@@ -2,6 +2,7 @@
 
 #include <functional>
 
+#include <QtCore/QString>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
 
@@ -15,24 +16,34 @@ class QnCommonModule;
 
 namespace nx::vms::client::desktop {
 
-class NX_VMS_CLIENT_DESKTOP_API AnalyticsEventsTreeBuilder final
+class NX_VMS_CLIENT_DESKTOP_API AnalyticsEntitiesTreeBuilder final
 {
 public:
     struct Node;
     using NodePtr = QSharedPointer<Node>;
 
-    enum class NodeType {
+    enum class NodeType
+    {
         root,
         engine,
         group,
-        eventType
+        eventType,
+        objectType
     };
 
-    struct Node {
+    struct Node
+    {
+        using EntityTypeId = QString;
+        static_assert(std::is_same<nx::analytics::GroupId, EntityTypeId>::value);
+        static_assert(std::is_same<nx::analytics::EventTypeId, EntityTypeId>::value);
+        static_assert(std::is_same<nx::analytics::ObjectTypeId, EntityTypeId>::value);
+
         const NodeType nodeType;
         QString text;
         nx::analytics::EngineId engineId;
-        nx::analytics::EventTypeId eventTypeId; //< GroupId can also be here.
+
+        /** Can contain group id, event type id or object type id. */
+        EntityTypeId entityId;
         std::vector<NodePtr> children;
 
         explicit Node(NodeType nodeType, const QString& text = QString()):
@@ -71,14 +82,33 @@ public:
 
     /**
      * Tree of the Event type ids. Root nodes are Engines, then Groups and Event types as leaves.
-     * Includes all Event types, which can theoretically be available on these Devices, so all
+     * Includes all Event types, which can theoretically be available in the System, so all
      * compatible Engines are used. Includes only those Event types, which are actually used in the
      * existing VMS Rules. Empty Groups and Engines are removed from the output.
      */
-    AnalyticsEventsTreeBuilder::NodePtr eventTypesTree() const;
+    AnalyticsEntitiesTreeBuilder::NodePtr eventTypesTree() const;
 
 signals:
     void eventTypesTreeChanged();
+};
+
+class AnalyticsObjectsSearchTreeBuilder : public QObject, public QnCommonModuleAware
+{
+    Q_OBJECT
+    using base_type = QObject;
+
+public:
+    explicit AnalyticsObjectsSearchTreeBuilder(QObject* parent = nullptr);
+
+    /**
+     * Tree of the Object type ids. Root nodes are Engines, then Groups and Object types as leaves.
+     * Includes all Object types, which can theoretically be available in the System, so all
+     * compatible Engines are used. Empty Groups and Engines are removed from the output.
+     */
+    AnalyticsEntitiesTreeBuilder::NodePtr objectTypesTree() const;
+
+signals:
+    void objectTypesTreeChanged();
 };
 
 } // namespace nx::vms::client::desktop

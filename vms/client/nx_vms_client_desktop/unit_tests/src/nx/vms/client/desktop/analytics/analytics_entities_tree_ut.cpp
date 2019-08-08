@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
-#include <nx/vms/client/desktop/analytics/analytics_events_tree.h>
+#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 
 namespace nx::vms::client::desktop {
 namespace test {
 
-using Node = AnalyticsEventsTreeBuilder::Node;
-using NodeType = AnalyticsEventsTreeBuilder::NodeType;
-using NodePtr = AnalyticsEventsTreeBuilder::NodePtr;
+using Node = AnalyticsEntitiesTreeBuilder::Node;
+using NodeType = AnalyticsEntitiesTreeBuilder::NodeType;
+using NodePtr = AnalyticsEntitiesTreeBuilder::NodePtr;
 
-TEST(AnalyticsEventsTreeBuilder, filterSingleEngine)
+TEST(AnalyticsEntitiesTreeBuilder, filterSingleEngine)
 {
     NodePtr engine(new Node(NodeType::engine));
     NodePtr group1(new Node(NodeType::group, "group1"));
@@ -24,7 +24,7 @@ TEST(AnalyticsEventsTreeBuilder, filterSingleEngine)
     engine->children.emplace_back(new Node(NodeType::eventType)); //< To filter out.
 
     // Filter out event type nodes with empty text.
-    const auto filtered_engine = AnalyticsEventsTreeBuilder::filterTree(engine,
+    const auto filtered_engine = AnalyticsEntitiesTreeBuilder::filterTree(engine,
         [](NodePtr node) { return node->nodeType == NodeType::eventType && node->text.isEmpty(); });
 
     // Filtered tree must still have an engine as the root.
@@ -46,7 +46,7 @@ TEST(AnalyticsEventsTreeBuilder, filterSingleEngine)
     ASSERT_EQ(event2->text, "event2");
 }
 
-TEST(AnalyticsEventsTreeBuilder, filterOutEmptyEngines)
+TEST(AnalyticsEntitiesTreeBuilder, filterOutEmptyEngines)
 {
     NodePtr root(new Node(NodeType::root));
     NodePtr engine(new Node(NodeType::engine));
@@ -55,13 +55,13 @@ TEST(AnalyticsEventsTreeBuilder, filterOutEmptyEngines)
     root->children.emplace_back(new Node(NodeType::engine));
 
     // Do not filter something out. Just collapse the tree.
-    const auto filtered_root = AnalyticsEventsTreeBuilder::filterTree(root);
+    const auto filtered_root = AnalyticsEntitiesTreeBuilder::filterTree(root);
 
     ASSERT_EQ(filtered_root->nodeType, NodeType::root);
     ASSERT_TRUE(filtered_root->children.empty());
 }
 
-TEST(AnalyticsEventsTreeBuilder, pullOutSingleEngine)
+TEST(AnalyticsEntitiesTreeBuilder, pullOutSingleEngine)
 {
     NodePtr root(new Node(NodeType::root));
     NodePtr engine(new Node(NodeType::engine));
@@ -69,7 +69,7 @@ TEST(AnalyticsEventsTreeBuilder, pullOutSingleEngine)
     engine->children.emplace_back(new Node(NodeType::eventType));
 
     // Do not filter something out. Just collapse the tree.
-    const auto filtered_root = AnalyticsEventsTreeBuilder::filterTree(root);
+    const auto filtered_root = AnalyticsEntitiesTreeBuilder::filterTree(root);
 
     ASSERT_EQ(filtered_root->nodeType, NodeType::engine);
 }

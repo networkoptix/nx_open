@@ -28,7 +28,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
-#include <nx/vms/client/desktop/analytics/analytics_events_tree.h>
+#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
@@ -241,12 +241,12 @@ QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem,
 void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
 {
     auto addItem =
-        [this](QStandardItem* parent, AnalyticsEventsTreeBuilder::NodePtr node)
+        [this](QStandardItem* parent, AnalyticsEntitiesTreeBuilder::NodePtr node)
         {
             auto item = new QStandardItem(node->text);
             item->setData(EventType::analyticsSdkEvent, EventTypeRole);
-            item->setData(qVariantFromValue(node->eventTypeId), AnalyticsEventTypeIdRole);
-            item->setSelectable(node->nodeType == AnalyticsEventsTreeBuilder::NodeType::eventType);
+            item->setData(qVariantFromValue(node->entityId), AnalyticsEventTypeIdRole);
+            item->setSelectable(node->nodeType == AnalyticsEntitiesTreeBuilder::NodeType::eventType);
 
             if (NX_ASSERT(parent))
                 parent->appendRow(item);
@@ -338,9 +338,10 @@ void QnEventLogDialog::initEventsModel()
 
     auto updateAnalyticsSubmenuOperation = new nx::utils::PendingOperation(
         [this] { updateAnalyticsEvents(); },
-        500ms,
+        100ms,
         this);
     updateAnalyticsSubmenuOperation->fire();
+    updateAnalyticsSubmenuOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
 
     connect(commonModule()->instance<AnalyticsEventsSearchTreeBuilder>(),
         &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,

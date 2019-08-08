@@ -1,4 +1,4 @@
-#include "analytics_events_tree.h"
+#include "analytics_entities_tree.h"
 
 #include <common/common_module.h>
 
@@ -17,10 +17,10 @@ namespace nx::vms::client::desktop {
 
 using namespace nx::analytics;
 
-using Node = AnalyticsEventsTreeBuilder::Node;
-using NodePtr = AnalyticsEventsTreeBuilder::NodePtr;
-using NodeType = AnalyticsEventsTreeBuilder::NodeType;
-using NodeFilter = AnalyticsEventsTreeBuilder::NodeFilter;
+using Node = AnalyticsEntitiesTreeBuilder::Node;
+using NodePtr = AnalyticsEntitiesTreeBuilder::NodePtr;
+using NodeType = AnalyticsEntitiesTreeBuilder::NodeType;
+using NodeFilter = AnalyticsEntitiesTreeBuilder::NodeFilter;
 
 namespace {
 
@@ -29,7 +29,7 @@ NodePtr makeNode(NodeType nodeType, const QString& text = QString())
     return NodePtr(new Node(nodeType, text));
 }
 
-NodePtr buildTree(QnCommonModule* commonModule, ScopedEventTypeIds scopedEventTypeIds)
+NodePtr buildEventTypesTree(QnCommonModule* commonModule, ScopedEventTypeIds scopedEventTypeIds)
 {
     const auto engineDescriptorManager = commonModule->analyticsEngineDescriptorManager();
     const auto groupDescriptorManager = commonModule->analyticsGroupDescriptorManager();
@@ -37,7 +37,7 @@ NodePtr buildTree(QnCommonModule* commonModule, ScopedEventTypeIds scopedEventTy
 
     auto root = makeNode(NodeType::root);
 
-    for (const auto& [engineId, eventTypeIdsByGroup] : scopedEventTypeIds)
+    for (const auto& [engineId, eventTypeIdsByGroup]: scopedEventTypeIds)
     {
         const auto engineDescriptor = engineDescriptorManager->descriptor(engineId);
         if (!NX_ASSERT(engineDescriptor))
@@ -56,12 +56,12 @@ NodePtr buildTree(QnCommonModule* commonModule, ScopedEventTypeIds scopedEventTy
             {
                 auto group = makeNode(NodeType::group, groupDescriptor->name);
                 group->engineId = engineId;
-                group->eventTypeId = groupDescriptor->id;
+                group->entityId = groupDescriptor->id;
                 engine->children.push_back(group);
                 parentNode = group;
             }
 
-            for (const auto& eventTypeId : eventTypeIds)
+            for (const auto& eventTypeId: eventTypeIds)
             {
                 const auto eventTypeDescriptor =
                     eventTypeDescriptorManager->descriptor(eventTypeId);
@@ -71,12 +71,62 @@ NodePtr buildTree(QnCommonModule* commonModule, ScopedEventTypeIds scopedEventTy
 
                 auto eventType = makeNode(NodeType::eventType, eventTypeDescriptor->name);
                 eventType->engineId = engineId;
-                eventType->eventTypeId = eventTypeDescriptor->id;
+                eventType->entityId = eventTypeDescriptor->id;
                 parentNode->children.push_back(eventType);
             }
         }
     }
-    return AnalyticsEventsTreeBuilder::filterTree(root);
+    return AnalyticsEntitiesTreeBuilder::filterTree(root);
+}
+
+NodePtr buildObjectTypesTree(QnCommonModule* commonModule, ScopedObjectTypeIds scopedObjectTypeIds)
+{
+    const auto engineDescriptorManager = commonModule->analyticsEngineDescriptorManager();
+    const auto groupDescriptorManager = commonModule->analyticsGroupDescriptorManager();
+    const auto objectTypeDescriptorManager = commonModule->analyticsObjectTypeDescriptorManager();
+
+    auto root = makeNode(NodeType::root);
+
+    for (const auto& [engineId, objectTypeIdsByGroup]: scopedObjectTypeIds)
+    {
+        const auto engineDescriptor = engineDescriptorManager->descriptor(engineId);
+        if (!NX_ASSERT(engineDescriptor))
+            continue;
+
+        auto engine = makeNode(NodeType::engine, engineDescriptor->name);
+        engine->engineId = engineId;
+        root->children.push_back(engine);
+
+        for (const auto& [groupId, objectTypeIds]: objectTypeIdsByGroup)
+        {
+            NodePtr parentNode = engine;
+
+            const auto groupDescriptor = groupDescriptorManager->descriptor(groupId);
+            if (groupDescriptor)
+            {
+                auto group = makeNode(NodeType::group, groupDescriptor->name);
+                group->engineId = engineId;
+                group->entityId = groupDescriptor->id;
+                engine->children.push_back(group);
+                parentNode = group;
+            }
+
+            for (const auto& objectTypeId : objectTypeIds)
+            {
+                const auto objectTypeDescriptor =
+                    objectTypeDescriptorManager->descriptor(objectTypeId);
+
+                if (!objectTypeDescriptor)
+                    continue;
+
+                auto objectType = makeNode(NodeType::objectType, objectTypeDescriptor->name);
+                objectType->engineId = engineId;
+                objectType->entityId = objectTypeDescriptor->id;
+                parentNode->children.push_back(objectType);
+            }
+        }
+    }
+    return AnalyticsEntitiesTreeBuilder::filterTree(root);
 }
 
 NodePtr filterEngine(NodePtr engine, NodeFilter excludeNodes)
@@ -109,9 +159,9 @@ NodePtr filterEngine(NodePtr engine, NodeFilter excludeNodes)
 } // namespace
 
 //-------------------------------------------------------------------------------------------------
-// AnalyticsEventsTreeBuilder class
+// AnalyticsEntitiesTreeBuilder class
 
-NodePtr AnalyticsEventsTreeBuilder::filterTree(NodePtr root, NodeFilter excludeNodes)
+NodePtr AnalyticsEntitiesTreeBuilder::filterTree(NodePtr root, NodeFilter excludeNodes)
 {
     if (root->nodeType == NodeType::engine)
         return filterEngine(root, excludeNodes);
@@ -132,11 +182,11 @@ NodePtr AnalyticsEventsTreeBuilder::filterTree(NodePtr root, NodeFilter excludeN
     return root;
 }
 
-NodePtr AnalyticsEventsTreeBuilder::eventTypesForRulesPurposes(
+NodePtr AnalyticsEntitiesTreeBuilder::eventTypesForRulesPurposes(
     QnCommonModule* commonModule,
     const QnVirtualCameraResourceList& devices)
 {
-    return buildTree(commonModule,
+    return buildEventTypesTree(commonModule,
         commonModule->analyticsEventTypeDescriptorManager()
             ->compatibleEventTypeIdsIntersection(devices));
 }
@@ -199,7 +249,7 @@ NodePtr AnalyticsEventsSearchTreeBuilder::eventTypesTree() const
     using namespace nx::vms::event;
 
     QSet<EventTypeId> actuallyUsedEventTypes;
-    for (const auto& rule : commonModule()->eventRuleManager()->rules())
+    for (const auto& rule: commonModule()->eventRuleManager()->rules())
     {
         if (rule->eventType() == EventType::analyticsSdkEvent)
             actuallyUsedEventTypes.insert(rule->eventParams().getAnalyticsEventTypeId());
@@ -211,15 +261,66 @@ NodePtr AnalyticsEventsSearchTreeBuilder::eventTypesTree() const
 
     // TODO: #GDM Shouldn't we filter out cameras here the same way?
     const auto devices = resourcePool()->getAllCameras({}, /*ignoreDesktopCameras*/ true);
-    auto unionTree = buildTree(commonModule(),
-        commonModule()->analyticsEventTypeDescriptorManager()->compatibleEventTypeIdsUnion(devices));
+    const auto manager = commonModule()->analyticsEventTypeDescriptorManager();
+    auto tree = buildEventTypesTree(commonModule(), manager->compatibleEventTypeIdsUnion(devices));
 
-    return AnalyticsEventsTreeBuilder::filterTree(unionTree,
+    return AnalyticsEntitiesTreeBuilder::filterTree(tree,
         [actuallyUsedEventTypes](NodePtr node)
         {
             return node->nodeType == NodeType::eventType &&
-                !actuallyUsedEventTypes.contains(node->eventTypeId);
+                !actuallyUsedEventTypes.contains(node->entityId);
         });
+}
+
+//-------------------------------------------------------------------------------------------------
+// AnalyticsObjectsSearchTreeBuilder class
+
+AnalyticsObjectsSearchTreeBuilder::AnalyticsObjectsSearchTreeBuilder(QObject* parent):
+    base_type(parent),
+    QnCommonModuleAware(parent)
+{
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
+        [this](const QnResourcePtr& resource)
+        {
+            const auto flags = resource->flags();
+            if (flags.testFlag(Qn::server_live_cam))
+            {
+                emit objectTypesTreeChanged();
+            }
+            else if (flags.testFlag(Qn::server) && !flags.testFlag(Qn::fake))
+            {
+                connect(resource.get(), &QnResource::propertyChanged, this,
+                    [this](const QnResourcePtr& /*res*/, const QString& key)
+                    {
+                        // TODO: #GDM Validate if other properties matter.
+                        if (key == nx::analytics::kObjectTypeDescriptorsProperty)
+                            emit objectTypesTreeChanged();
+                    });
+                emit objectTypesTreeChanged();
+            }
+        });
+
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource)
+        {
+            const auto flags = resource->flags();
+            if (flags.testFlag(Qn::server_live_cam))
+            {
+                emit objectTypesTreeChanged();
+            }
+            else if (flags.testFlag(Qn::server) && !flags.testFlag(Qn::fake))
+            {
+                resource->disconnect(this);
+                emit objectTypesTreeChanged();
+            }
+        });
+}
+
+AnalyticsEntitiesTreeBuilder::NodePtr AnalyticsObjectsSearchTreeBuilder::objectTypesTree() const
+{
+    const auto devices = resourcePool()->getAllCameras({}, /*ignoreDesktopCameras*/ true);
+    const auto manager = commonModule()->analyticsObjectTypeDescriptorManager();
+    return buildObjectTypesTree(commonModule(), manager->compatibleObjectTypeIdsUnion(devices));
 }
 
 } // namespace nx::vms::client::desktop

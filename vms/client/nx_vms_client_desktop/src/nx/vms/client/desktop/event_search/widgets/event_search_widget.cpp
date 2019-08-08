@@ -18,7 +18,7 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#include <nx/vms/client/desktop/analytics/analytics_events_tree.h>
+#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
@@ -92,9 +92,10 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
             if (m_eventModel->isOnline())
                 updateAnalyticsMenu();
         },
-        500ms,
+        100ms,
         this);
     updateAnalyticsSubmenuOperation->fire();
+    updateAnalyticsSubmenuOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
 
     connect(m_eventModel, &AbstractSearchListModel::isOnlineChanged,
         updateAnalyticsSubmenuOperation,
@@ -246,7 +247,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
         [this, currentSelection, &currentSelectionStillAvailable]
         (auto addItemRecursive, auto parent, auto root) -> void
         {
-            using NodeType = AnalyticsEventsTreeBuilder::NodeType;
+            using NodeType = AnalyticsEntitiesTreeBuilder::NodeType;
 
             for (auto node: root->children)
             {
@@ -254,10 +255,10 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
                 if (node->nodeType == NodeType::eventType)
                 {
                     addMenuAction(parent, node->text, EventType::analyticsSdkEvent,
-                        node->eventTypeId);
+                        node->entityId);
 
                     if (!currentSelectionStillAvailable
-                        && currentSelection == node->eventTypeId)
+                        && currentSelection == node->entityId)
                     {
                         currentSelectionStillAvailable = true;
                     }
@@ -284,7 +285,6 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
     if (NX_ASSERT(analyticsMenu))
     {
         using namespace nx::vms::event;
-        using namespace nx::analytics;
 
         auto analyticsEventsSearchTreeBuilder =
             q->commonModule()->instance<AnalyticsEventsSearchTreeBuilder>();
