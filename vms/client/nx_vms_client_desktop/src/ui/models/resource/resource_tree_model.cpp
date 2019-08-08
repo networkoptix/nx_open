@@ -141,8 +141,8 @@ QnResourceTreeModel::QnResourceTreeModel(
     m_nodeManager = new QnResourceTreeModelNodeManager(this);
     m_layoutNodeManager = new QnResourceTreeModelLayoutNodeManager(this);
 
-    //if (ini().developerMode)
-    //    nx::utils::ModelTransactionChecker::install(this);
+    if (ini().developerMode)
+        nx::utils::ModelTransactionChecker::install(this);
 
     /* Create top-level nodes. */
     for (NodeType nodeType: rootNodeTypes())
