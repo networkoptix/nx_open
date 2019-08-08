@@ -2,6 +2,7 @@
 
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
 #include <QtCore/QModelIndex>
 
 class QAbstractItemModel;
