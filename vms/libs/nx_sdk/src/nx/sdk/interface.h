@@ -31,8 +31,6 @@ public:
     using IRefCountable::queryInterface; //< Needed to enable overloaded template versions.
 
 protected:
-    using IRefCountable::makeIdForTemplate; //< Needed to make the method available in descendants.
-
     virtual IRefCountable* queryInterface(const IRefCountable::InterfaceId* id) override
     {
         return doQueryInterface(id);

@@ -39,9 +39,8 @@ protected:
 protected:
     /**
      * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
-     * @param printPrefix Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from libName.
      */
-    Engine(bool enableOutput, const std::string& printPrefix = "");
+    Engine(bool enableOutput);
 
     virtual std::string manifestString() const = 0;
 
@@ -118,7 +117,6 @@ protected:
 
 private:
     mutable std::mutex m_mutex;
-    const std::string m_overridingPrintPrefix;
     std::map<std::string, std::string> m_settings;
     Ptr<IEngine::IHandler> m_handler;
 };

@@ -24,6 +24,9 @@ MultiresourceDescriptorContainerHelper::MultiresourceDescriptorContainerHelper(
     connect(
         resourcePool, &QnResourcePool::resourceRemoved,
         this, &MultiresourceDescriptorContainerHelper::at_resourceRemoved);
+
+    for (const auto& server: resourcePool->getAllServers(Qn::AnyStatus))
+        at_resourceAdded(server);
 }
 
 void MultiresourceDescriptorContainerHelper::at_resourceAdded(QnResourcePtr resource)
