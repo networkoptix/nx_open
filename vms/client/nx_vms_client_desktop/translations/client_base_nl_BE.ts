@@ -3009,16 +3009,16 @@ to %1</source>
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
       <translation>
-        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
-        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
+        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis gevonden</numerusform>
+        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenisen gevonden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
       <translation>
-        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
-        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
+        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis gevonden</numerusform>
+        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenisen gevonden</numerusform>
       </translation>
     </message>
   </context>
@@ -5932,10 +5932,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Bevat geen persoonlijke informatie en is volledig anoniem.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Failover-servermaatregelen vragen mogelijk nog steeds om statusupdates van de camera, ongeacht deze instelling.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Schakel autodiscovery van apparaten en servers en geautomatiseerde apparaatstatuscontrole in</translation>
     </message>
@@ -5946,6 +5942,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Indien ingeschakeld, ontdekt het systeem continu nieuwe camera's en servers en verzendt het detectieverzoeken naar camera's voor statusupdate.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Als Failover is ingeschakeld, kan de server nog steeds camera-statusupdates vragen, ongeacht deze instelling.</translation>
     </message>
   </context>
   <context>
@@ -5965,44 +5965,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Spread Sheet (CSV) -bestand</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Verschil</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Datum</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Tijdzone</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Tijd</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Geen server heeft internettoegang. De tijd wordt niet gesynchroniseerd.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>VMS-tijd wordt gesynchroniseerd met internet en is niet afhankelijk van de lokale tijd op servers.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>VMS tijd wordt gesynchroniseerd met lokale tijd op de geselecteerde server en is niet afhankelijk van lokale tijd op andere servers.</translation>
     </message>
   </context>
   <context>
@@ -7454,17 +7416,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Deze I/O module heeft geen geavanceerde instellingen</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Deze camera heeft geen geavanceerde instellingen</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
@@ -8609,11 +8560,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>Sommige servers hebben het update proces niet voltooid. Toch afronden?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 wordt opnieuw gestart naar de bijgewerkte versie.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>

@@ -29,9 +29,9 @@
 </div>
 
 <div class="panel-body text-center panel-body-big" ng-if="stepIs('start')">
-    <div ng-class="{'vertical-bottom':!settings.liteClient, 'master-description': settings.liteClient}">
+    <div>
         <h2>{{Config.productName}} を始める</h2>
-        <p>最初にサーバーを構成してください<br>
+        <p class="master-description">最初にサーバーを構成してください<br>
 オプションを選択します</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
         <button class="btn btn-primary" autofocus ng-click="next()">新しいシステムをセットアップします</button>

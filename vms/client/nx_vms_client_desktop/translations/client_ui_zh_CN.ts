@@ -3183,19 +3183,6 @@
     </message>
   </context>
   <context>
-    <name>TimeServerSelectionWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>Sync time with the Internet</source>
-      <translation>与互联网同步时间</translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS Time</source>
-      <translation>VMS时间</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSynchronizationWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>

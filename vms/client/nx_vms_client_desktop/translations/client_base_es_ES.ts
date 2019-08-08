@@ -5934,10 +5934,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <translation>No incluye información personal y es completamente anónimo.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Las medidas del servidor Failover pueden solicitar actualizaciones de estado de la cámara independientemente de esta configuración.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Habilitar el autodescubrimiento de dispositivos y servidores y la comprobación automática del estado del dispositivo</translation>
     </message>
@@ -5948,6 +5944,10 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Cuando está habilitado, el sistema descubre continuamente nuevas cámaras y servidores, y envía peticiones de descubrimiento a cámaras para actualizar el estado.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
     </message>
   </context>
   <context>
@@ -5967,44 +5967,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Archivo de hoja de cálculo (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Servidor</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Compensación</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Fecha</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Zona Horaria</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Tiempo</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Ningún servidor tiene acceso a Internet. El tiempo no esta siendo sincronizado.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>La hora VMS está sincronizada con Internet y no depende de la hora local en los servidores.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>La hora de VMS se sincroniza con la hora local en el servidor seleccionado y no depende de la hora local de otros servidores.</translation>
     </message>
   </context>
   <context>
@@ -7456,17 +7418,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Este módulo no tiene ninguna configuración avanzada</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Esta cámara no tiene ninguna configuración avanzada</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
@@ -8611,11 +8562,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>Algunos servidores no han completado el proceso de actualización. ¿Terminar de todos modos?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 se reiniciará a la versión actualizada.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>

@@ -5932,10 +5932,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Enthält keine persönlichen Daten und ist völlig anonym.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Failover-Servermaßnahmen können unabhängig von dieser Einstellung weiterhin Kamerastatusupdates anfordern.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Aktivieren Sie die automatische Erkennung von Geräten und Servern und die automatische Überprüfung des Gerätestatus</translation>
     </message>
@@ -5946,6 +5942,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Wenn aktiviert, erkennt das System kontinuierlich neue Kameras und Server und sendet Erkennungsanforderungen an die Kameras zur Statusaktualisierung.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Wenn Failover aktiviert ist, fordert der Server unabhängig von dieser Einstellung möglicherweise weiterhin Kamerastatusaktualisierungen an.</translation>
     </message>
   </context>
   <context>
@@ -5965,44 +5965,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Tabellenkalkulationsdatei (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Versatz</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Datum</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Zeitzone</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Zeit</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Kein Server hat Internetzugang. Die Zeit wird nicht synchronisiert.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>Die VMS-Zeit wird mit dem Internet synchronisiert und ist unabhängig von der lokalen Zeit auf den Servern.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>Die VMS-Zeit wird mit der lokalen Zeit auf dem ausgewählten Server synchronisiert und hängt nicht von der lokalen Zeit auf anderen Servern ab.</translation>
     </message>
   </context>
   <context>
@@ -7454,17 +7416,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Dieses I/O-Modul hat keine erweiterten Einstellungen</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Diese Kamera verfügt über keine erweiterten Einstellungen</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
@@ -8611,11 +8562,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Einige Server haben den Aktualisierungsvorgang nicht abgeschlossen. Trotzdem beenden?</translation>
     </message>
     <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 wird auf die aktualisierte Version neu gestartet werden.</translation>
-    </message>
-    <message>
       <source>Failed to download update packages to some components</source>
       <translation>Aktualisierungspakete für einige Komponenten konnten nicht heruntergeladen werden</translation>
     </message>
@@ -9120,7 +9066,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation>Bibliotheksdatei kann nicht geladen werden</translation>
+      <translation>bibliotheksdatei kann nicht geladen werden</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
@@ -9128,15 +9074,15 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation>Plugin-Bibliothek konnte nicht initialisiert werden</translation>
+      <translation>plugin-bibliothek konnte nicht initialisiert werden</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation>Das Plugin hat ein schlechtes Manifest zurückgegeben</translation>
+      <translation>das plugin hat ein schlechtes manifest zurückgegeben</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation>Plugin-API-Version wird nicht mehr unterstützt</translation>
+      <translation>plugin-API-version wird nicht mehr unterstützt</translation>
     </message>
     <message>
       <source>unknown error</source>
@@ -9152,7 +9098,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation>Plugin ist auf der Blacklist</translation>
+      <translation>plugin ist auf der blacklist</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9160,7 +9106,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation>Plugin ist optional und nicht in der Whitelist</translation>
+      <translation>plugin ist optional und nicht in der whitelist</translation>
     </message>
     <message>
       <source>internal error</source>

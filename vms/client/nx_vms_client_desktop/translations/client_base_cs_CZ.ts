@@ -87,11 +87,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>Stahování aktualizačního balíčku</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Probíhá instalace</translation>
     </message>
   </context>
   <context>
@@ -861,7 +861,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>Zapomenuté heslo</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
@@ -873,15 +873,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>Nastavení analytických nástrojů...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation type="unfinished">Show Thumbnails</translation>
+      <translation>Zobrazit náhledy</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
-      <translation type="unfinished">Hide Thumbnails</translation>
+      <translation>Skrýt náhledy</translation>
     </message>
     <message>
       <source>Pin Panel</source>
@@ -893,11 +893,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>Virtuální kamera...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Nová virtuální kamera...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -921,35 +921,35 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>Přepněte na kartu upozornění</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>Přepněte na kartu Pohyby</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>Přepněte na kartu Záložky</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>Přepněte na kartu Události</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>Přepněte na kartu Objekty</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>Informace o ohraničených objektech...</translation>
     </message>
     <message>
       <source>Pin Calendar</source>
-      <translation type="unfinished">Pin Calendar</translation>
+      <translation>Připnout kalendář</translation>
     </message>
     <message>
       <source>Unpin Calendar</source>
-      <translation type="unfinished">Unpin Calendar</translation>
+      <translation>Uvolnit kalendář</translation>
     </message>
   </context>
   <context>
@@ -995,23 +995,23 @@ to view more bookmarks</source>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Zadejte prosím platné heslo</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>Zadané heslo není platné.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Šifrované rozložení</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>Soubor %1 je šifrován. Prosím zadejte heslo:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Prosím, znovu zadáte heslo pro rozložení %1:</translation>
     </message>
   </context>
   <context>
@@ -1346,7 +1346,7 @@ to view more bookmarks</source>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>Rozložení je uzamčeno</translation>
     </message>
   </context>
   <context>
@@ -1619,8 +1619,8 @@ to view more bookmarks</source>
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+        <numerusform>Podrobnosti pro %n relací z %1</numerusform>
+        <numerusform>Podrobnosti pro %n relací z %1</numerusform>
         <numerusform>Details for %n sessions of %1</numerusform>
         <numerusform>Details for %n sessions of %1</numerusform>
       </translation>
@@ -1629,7 +1629,7 @@ to view more bookmarks</source>
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
+        <numerusform>Podrobnosti pro %n kameru z %1</numerusform>
         <numerusform>Details for %n cameras of %1</numerusform>
         <numerusform>Details for %n cameras of %1</numerusform>
         <numerusform>Details for %n cameras of %1</numerusform>
@@ -1788,13 +1788,13 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>Aktualizace byla nainstalována</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
       <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+        <numerusform>%n akce</numerusform>
+        <numerusform>%n akcí</numerusform>
         <numerusform>%n actions</numerusform>
         <numerusform>%n actions</numerusform>
       </translation>
@@ -2091,7 +2091,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
+      <translation>Vynucené potvrzení bude fungovat pro obecné události pouze v případě, že jsou v adrese URL generické události použity identifikátory kamery</translation>
     </message>
   </context>
   <context>
@@ -2644,7 +2644,7 @@ to %1</source>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
+      <translation>Chyba serveru, zkuste to prosím později znovu.</translation>
     </message>
   </context>
   <context>
@@ -2798,11 +2798,11 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Stáhnout a nainstalovat</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>Nepodařilo se vstoupit do režimu kompatibility pro verzi %1</translation>
     </message>
   </context>
   <context>
@@ -2848,7 +2848,7 @@ to %1</source>
     </message>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
-      <translation type="unfinished">To generate Generic Event, please refer to %1.</translation>
+      <translation>Vytváření generické události najdete na %1.</translation>
     </message>
   </context>
   <context>
@@ -3069,7 +3069,7 @@ to %1</source>
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
       <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+        <numerusform>Deník událostí pro období od %1 do %2 - %n nalezených událostí</numerusform>
         <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
         <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
         <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
@@ -3079,7 +3079,7 @@ to %1</source>
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
       <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
+        <numerusform>Deník událostí na %1 - %n nalezených událostí</numerusform>
         <numerusform>Event log for %1 - %n events found</numerusform>
         <numerusform>Event log for %1 - %n events found</numerusform>
         <numerusform>Event log for %1 - %n events found</numerusform>
@@ -3169,7 +3169,7 @@ to %1</source>
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
       <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
+        <numerusform>%1 (%n kamery)</numerusform>
         <numerusform>%1 (%n cameras)</numerusform>
         <numerusform>%1 (%n cameras)</numerusform>
         <numerusform>%1 (%n cameras)</numerusform>
@@ -3255,11 +3255,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>Tato kamera aktuálně není ve vybraném rozvržení. Akce bude fungovat, pokud bude kamera přidána před spuštěním akce.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>Táto kamera momentálně není v některých vybraných rozloženích. Akce bude fungovat, pokud bude kamera přidána před spuštěním akcí.</translation>
     </message>
   </context>
   <context>
@@ -3296,7 +3296,7 @@ to %1</source>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -3454,7 +3454,7 @@ to %1</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>Zadejte prosím hodnotu.</translation>
     </message>
   </context>
   <context>
@@ -3875,7 +3875,7 @@ to %1</source>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+      <translation>Každou licenci lze deaktivovat pouze několikrát.</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -4185,7 +4185,7 @@ to %1</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>Přiblížení oblasti</translation>
     </message>
   </context>
   <context>
@@ -4340,15 +4340,15 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Virtuální kamera</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>Virtuální kamera %1</translation>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;virtuální kamera&quot; je virtuální úložiště pro video soubory, které lze nahrát na libovolný server Vašeho systému a poté můžou být přístupné jakémukoliv uživateli.</translation>
     </message>
   </context>
   <context>
@@ -4578,8 +4578,8 @@ to %1</source>
     <message numerus="yes">
       <source>about %n minutes</source>
       <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
+        <numerusform>asi %n minut</numerusform>
+        <numerusform>asi %n minuty</numerusform>
         <numerusform>about %n minutes</numerusform>
         <numerusform>about %n minutes</numerusform>
       </translation>
@@ -4770,11 +4770,11 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>Aktuální Bitrate</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>žádné údaje pro prognózu</translation>
     </message>
   </context>
   <context>
@@ -4824,11 +4824,11 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>Místní soubor</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Žádné lokální soubory</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4844,7 +4844,7 @@ to %1</source>
     </message>
     <message>
       <source>open all</source>
-      <translation>Otevřít vše</translation>
+      <translation>otevřít vše</translation>
     </message>
     <message>
       <source>All types</source>
@@ -4965,7 +4965,7 @@ to %1</source>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>Analytické zdroje</translation>
     </message>
   </context>
   <context>
@@ -5734,8 +5734,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Aktuální analytická data nebudou automaticky přesunuta na jiné místo a stanou se nedostupnými. Můžete si je ponechat a ručně je přesunout později nebo trvale smazat.
+Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktujte prosím podporu před pokračováním.</translation>
     </message>
   </context>
   <context>
@@ -6058,20 +6058,20 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Nezahrnuje žádné osobní údaje a je zcela anonymní.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Opatření failover serveru mohou stále vyžadovat aktualizace stavu kamery bez ohledu na tuto situaci.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Povolit automatickou detekci zařízení a serverů a automatickou kontrolu stavu zařízení</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation>Povolit automatickou detekci kamer a serverů a automatickou kontrolu stavu kamer.</translation>
+      <translation>Povolit automatickou detekci kamer a serverů a automatickou kontrolu stavu kamer</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Je-li tato funkce povolena, systém průběžně hledá nové kamery a servery a odesílá žádosti kamerám o aktualizaci stavu.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
     </message>
   </context>
   <context>
@@ -6091,44 +6091,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Spread Sheet (CSV) soubor</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Odsazení</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Datum</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Časové pásmo</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Čas</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Žádný server nemá přístup k Internetu. Čas není synchronizován.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>Systémový čas je synchronizován s Internetem a nezávisí na místním čase serverů.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>Systémový čas je synchronizován s místním časem vybraného serveru a nezávisí na místním čase jiných serverů.</translation>
     </message>
   </context>
   <context>
@@ -6658,7 +6620,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+      <translation>Chcete-li proces dokončit, připojte se k němu s klientem a aktualizujte na verzi %1.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
@@ -6742,7 +6704,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation>Proložit Audio Video)</translation>
+      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
     </message>
   </context>
   <context>
@@ -7026,7 +6988,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not enough space on server storage</source>
-      <translation>V úložišti není dostatek místa.</translation>
+      <translation>V úložišti není dostatek místa</translation>
     </message>
     <message>
       <source>Stop uploading?</source>
@@ -7046,13 +7008,13 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation>Otevřít záznamy virtuální kamery ...</translation>
+      <translation>Otevřít záznamy virtuální kamery...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <translation type="unfinished">
         <numerusform>Tyto soubory můžete nahrát do jiné instance virtuální kamery.</numerusform>
-        <numerusform>Tyto soubory můžete nahrát do jiné instance virtuální kamery</numerusform>
+        <numerusform>Tyto soubory můžete nahrát do jiné instance virtuální kamery.</numerusform>
         <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
         <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
       </translation>
@@ -7546,18 +7508,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Do Not Show</source>
-      <translation type="unfinished">Do Not Show</translation>
+      <translation>Nezobrazovat</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>smazaná kamera</translation>
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Neznámá cesta</translation>
     </message>
   </context>
   <context>
@@ -7573,7 +7535,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n objects</source>
       <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
+        <numerusform>%n objektů</numerusform>
         <numerusform>%n objects</numerusform>
         <numerusform>%n objects</numerusform>
         <numerusform>%n objects</numerusform>
@@ -7585,11 +7547,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Vybrat oblast</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Vyberte část videa...</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -7597,7 +7559,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
+      <translation>nepojmenovaný analytický modul</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
@@ -7605,11 +7567,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>Zadejte parametry</translation>
     </message>
     <message>
       <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+      <translation>Akce vyžaduje vyplnění některých parametrů.</translation>
     </message>
   </context>
   <context>
@@ -7623,7 +7585,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>smazaná kamera</translation>
     </message>
   </context>
   <context>
@@ -7655,17 +7617,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>Aplikování změn...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Tento I/O modul nemá žádné pokročilé nastavení</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Táto kamera nemá žádné pokročilé nastavení</translation>
     </message>
   </context>
   <context>
@@ -7734,7 +7685,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>Multicast</translation>
     </message>
   </context>
   <context>
@@ -7800,7 +7751,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>Detekce pohybu je zakázána</translation>
     </message>
   </context>
   <context>
@@ -7843,7 +7794,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n cameras</source>
       <translation type="unfinished">
-        <numerusform>kamery</numerusform>
+        <numerusform>%n kamera</numerusform>
         <numerusform>%n cameras</numerusform>
         <numerusform>%n cameras</numerusform>
         <numerusform>%n cameras</numerusform>
@@ -7851,7 +7802,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You do not have any cameras</source>
-      <translation type="unfinished">You do not have any cameras</translation>
+      <translation>Nemáte žádné kamery</translation>
     </message>
   </context>
   <context>
@@ -7949,11 +7900,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <translation>Detekce pohybu je zakázána, všechny plánované záznamy &quot;Pohyby&quot; a &quot;Pohyby + Lo-Res&quot; budou změněny na &quot;Vždy&quot;</translation>
     </message>
     <message>
       <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <translation>Duální streamování je zakázáno, všechny plánované záznamy &quot;Motion + Lo-Res&quot; budou změněny na &quot;Vždy&quot;</translation>
     </message>
   </context>
   <context>
@@ -7997,35 +7948,35 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Aktualizační soubor nebyl nalezen</translation>
     </message>
     <message>
       <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
+      <translation>Aktualizační soubor je poškozen</translation>
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>Nepodařilo se stáhnout balíčky aktualizací: %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>Aktualizační balíček je poškozen: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>Tato aktualizace je již nainstalována.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>Tato verze je již nainstalována.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>Neplatný formát verze.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>Přerušený aktualizační balíček.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -8033,11 +7984,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+      <translation>Na disku není dostatek místa k instalaci aktualizace klienta.</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation type="unfinished">Installation package has been lost.</translation>
+      <translation>Instalační balíček byl ztracen.</translation>
     </message>
   </context>
   <context>
@@ -8090,7 +8041,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>Některé z vybraných kamer vyžadují nastavení hesla.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -8174,12 +8125,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>Všechna zařízení již byla přidána</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
       <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+        <numerusform>Přidává se %n zařízení. Tento dialog můžete zavřít nebo zahájit nové vyhledávání</numerusform>
         <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
         <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
         <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
@@ -8200,18 +8151,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>Adresa nemůže být prázdná</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>Chcete-li pokračovat, zkontrolujte a souhlaste s %1</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>Chcete-li používat software, musíte souhlasit s licenční smlouvou koncového uživatele</translation>
     </message>
   </context>
   <context>
@@ -8246,39 +8197,39 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Události serveru</translation>
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Analytická událost</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Neznámý problém se zařízením</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>Neznámý problém s kamerou</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Jakákoli událost serveru</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Problémy se zařízením</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Problémy s kamerou</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>Jakákoliv událost</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Jakákoli analytická událost</translation>
     </message>
     <message>
       <source>No events</source>
@@ -8295,7 +8246,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No events occurred</source>
-      <translation type="unfinished">No events occurred</translation>
+      <translation>K žádným událostem nedošlo</translation>
     </message>
   </context>
   <context>
@@ -8314,7 +8265,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>Zadejte prosím heslo.</translation>
     </message>
   </context>
   <context>
@@ -8463,7 +8414,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>Chystáte se exportovat dlouhé video. To může vyžadovat spoustu úložného prostoru a zabere to značný čas.</translation>
     </message>
   </context>
   <context>
@@ -8536,8 +8487,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n new</source>
       <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+        <numerusform>%n nový</numerusform>
+        <numerusform>%n nové</numerusform>
         <numerusform>%n new</numerusform>
         <numerusform>%n new</numerusform>
       </translation>
@@ -8545,7 +8496,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n devices total</source>
       <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
+        <numerusform>Celkem %n zařízení</numerusform>
         <numerusform>%n devices total</numerusform>
         <numerusform>%n devices total</numerusform>
         <numerusform>%n devices total</numerusform>
@@ -8593,7 +8544,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>Kopírovat umístění odkazu</translation>
     </message>
   </context>
   <context>
@@ -8688,7 +8639,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>Nelze spustit proces vyhledávání</translation>
     </message>
   </context>
   <context>
@@ -8699,7 +8650,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>smazaná kamera</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8714,11 +8665,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Checking for updates automatically</source>
-      <translation type="unfinished">Checking for updates automatically</translation>
+      <translation>Automatická kontrola aktualizací</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>Vyhledat aktualizace</translation>
     </message>
     <message>
       <source>Force check</source>
@@ -8770,7 +8721,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Aktualizační soubor nebyl nalezen</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
@@ -8824,36 +8775,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+      <translation>Verze OS některých součástí již nejsou podporovány. Odstraňte je ze systému nebo aktualizujte jejich operační systém na podporovanou verzi.</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+      <translation>Verze OS klienta již není podporována. Aktualizujte prosím svůj operační systém na podporovanou verzi.</translation>
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
+      <translation>Aktualizace se nepodařilo spustit</translation>
     </message>
     <message>
       <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
+      <translation>Nepodařilo se zrušit aktualizaci</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
+      <translation>Nepodařilo se spustit instalaci</translation>
     </message>
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 bude restartován za účelem aktualizace verze.</translation>
+      <translation>Některé servery nedokončily proces aktualizace. I přesto dokončit?</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <translation>Stahování aktualizačních balíčků do některých součástí se nezdařilo</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -8873,7 +8819,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+      <translation>Aktualizace byla dokončena, ale některé části se znezdařilo aktualizovat</translation>
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
@@ -8905,7 +8851,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The latest version is already installed</source>
-      <translation>Nainstalována aktuální verze!</translation>
+      <translation>Nainstalována aktuální verze</translation>
     </message>
     <message>
       <source>This version is already installed</source>
@@ -8929,11 +8875,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Stáhnout a nainstalovat</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation>Vyhledat další soubor ...</translation>
+      <translation>Vyhledat další soubor...</translation>
     </message>
     <message>
       <source>Select Another Build</source>
@@ -8945,11 +8891,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation>Nahrávání aktualizací ...</translation>
+      <translation>Nahrávání aktualizací...</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation>Stahování klientského paketu ...</translation>
+      <translation>Stahování klientského paketu...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
@@ -8961,7 +8907,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
+      <translation>Zahájení aktualizace ...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -8977,11 +8923,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
+      <translation>Některé servery nemají k dispozici žádné aktualizace.</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+      <translation>Některé servery zaznamenaly interní chybu.</translation>
     </message>
     <message>
       <source>Please contact Customer Support.</source>
@@ -9029,7 +8975,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>Nemáte žádné rozvržení</translation>
     </message>
   </context>
   <context>
@@ -9048,15 +8994,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>Zařízení bylo odpojeno</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>Kamera byla odpojena</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>I/O modul byl odpojen</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
@@ -9090,58 +9036,58 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>Žádná z vybraných uživatelských rolí neobsahuje uživatele. Akce nebude fungovat.</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>Někteří uživatelé nemají přístup k vybranému uspořádání, akce pro ně nebude fungovat.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
       <source>The server is taking too long to respond</source>
-      <translation type="unfinished">The server is taking too long to respond</translation>
+      <translation>Odezva servru je příliš dlouhá</translation>
     </message>
     <message>
       <source>No update task</source>
-      <translation type="unfinished">No update task</translation>
+      <translation>Žádná aktualizace</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation type="unfinished">Ready to download update</translation>
+      <translation>Připraven ke stažení aktualizace</translation>
     </message>
     <message>
       <source>Downloading update</source>
-      <translation type="unfinished">Downloading update</translation>
+      <translation>Stahování aktualizace</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
-      <translation type="unfinished">Ready to restart to the new version</translation>
+      <translation>Připraveno k restartování na novou verzi</translation>
     </message>
     <message>
       <source>Installing update</source>
-      <translation type="unfinished">Installing update</translation>
+      <translation>Instalace aktualizace</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Nainstalováno</translation>
     </message>
     <message>
       <source>Failed to download update</source>
-      <translation type="unfinished">Failed to download update</translation>
+      <translation>Aktualizace se nepodařilo stáhnout</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation type="unfinished">Waiting for peer data</translation>
+      <translation>Čekání na peer data</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation type="unfinished">There is not enough space to download update files.</translation>
+      <translation>Nedostatek místa pro stažení aktualizačních souborů.</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation type="unfinished">There is not enough space to extract update files.</translation>
+      <translation>Nedostatek místa pro extrahování aktualizačních souborů.</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
@@ -9149,23 +9095,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation type="unfinished">Update contents are invalid.</translation>
+      <translation>Obsah aktualizace je neplatný.</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation type="unfinished">Update archive is corrupted.</translation>
+      <translation>Archiv aktualizací je poškozen.</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation type="unfinished">Update files cannot be extracted.</translation>
+      <translation>Aktualizační soubory nelze extrahovat.</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation type="unfinished">Internal downloader error.</translation>
+      <translation>Interní chyba stahování.</translation>
     </message>
     <message>
       <source>Internal client error.</source>
-      <translation type="unfinished">Internal client error.</translation>
+      <translation>Interní chyba klienta.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -9173,27 +9119,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation type="unfinished">Unexpected error code.</translation>
+      <translation>Neočekávaný chybový kód.</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation type="unfinished">Ready to install update</translation>
+      <translation>Připraven k instalaci aktualizace</translation>
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>Aktualizační balíček nebyl nalezen.</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>Není dostatek místa pro instalaci aktualizace.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Vnitřní chyba serveru.</translation>
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation type="unfinished">This OS version is no longer supported.</translation>
+      <translation>Tato verze OS již není podporována.</translation>
     </message>
   </context>
   <context>
@@ -9273,7 +9219,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Low-Res</source>
-      <translation type="unfinished">Motion + Low-Res</translation>
+      <translation>Pohyb + nízké rozlišení</translation>
     </message>
   </context>
   <context>
@@ -9303,11 +9249,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>Detekce pohybu je vypnutá nebo není podporována</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>Duální streamování je deaktivováno nebo není podporováno</translation>
     </message>
   </context>
   <context>
@@ -9333,18 +9279,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>Uživatelé budou automaticky odhlášeni, pokud jejich relace překročí zadanou dobu.</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation type="unfinished">Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</translation>
+      <translation>Vodoznaky se budou zobrazovat na živých, archivovaných a exportovaných videích pouze pro neadministrativní uživatele. Vy a další administrátoři je neuvidíte.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
       <source>Library</source>
-      <translation type="unfinished">Library</translation>
+      <translation>Knihovna</translation>
     </message>
     <message>
       <source>Version</source>
@@ -9356,19 +9302,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>žádné chyby</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>soubor knihovny nelze načíst</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>neplatná nebo nekompatibilní knihovna pluginů</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>inicializace knihovny pluginů se nezdařila</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
@@ -9376,7 +9322,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>verze pluginu API již není podporována</translation>
     </message>
     <message>
       <source>unknown error</source>
@@ -9384,15 +9330,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>Nenačteno</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>Načteno</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>plugin je na černé listině</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9400,7 +9346,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>plugin je volitelný a není na bílém seznamu</translation>
     </message>
     <message>
       <source>internal error</source>
@@ -9415,11 +9361,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Nainstalováno</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Probíhá instalace...</translation>
     </message>
     <message>
       <source>Downloaded</source>
@@ -9427,14 +9373,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation type="unfinished">Waiting for server to respond...</translation>
+      <translation>Čekání na odpověď serveru...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>Žádné připojení k serveru.</translation>
     </message>
     <message>
       <source>Network error.</source>
@@ -9442,7 +9388,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Chyba serveru.</translation>
     </message>
   </context>
   <context>
@@ -9457,7 +9403,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>Uložte aktualizační soubory</translation>
     </message>
     <message>
       <source>Client</source>
@@ -9465,11 +9411,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>Komponenty</translation>
     </message>
     <message>
       <source>Installed Version</source>
-      <translation type="unfinished">Installed Version</translation>
+      <translation>Instalovaná verze</translation>
     </message>
   </context>
   <context>
@@ -9487,7 +9433,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
+      <translation>Chcete-li filtrovat výsledky, vyberte oblast na videu</translation>
     </message>
     <message>
       <source>In selected area</source>
@@ -9520,7 +9466,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
+      <translation>Vybrat média</translation>
     </message>
     <message>
       <source>none</source>
@@ -9540,8 +9486,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
       <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+        <numerusform>E-mailová adresa není nastavena pro %n uživatelů</numerusform>
+        <numerusform>Emailová adresa není nastavena pro %n uživatele</numerusform>
         <numerusform>Email address is not set for %n users</numerusform>
         <numerusform>Email address is not set for %n users</numerusform>
       </translation>
@@ -9565,7 +9511,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
       <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+        <numerusform>Dvojitým kliknutím přidáte kamery do aktuálního rozvržení nebo ctrl + klik otevřete na nové kartě</numerusform>
         <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
         <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
         <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
@@ -9573,7 +9519,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>Žádný dostupný archiv</translation>
     </message>
   </context>
   <context>
@@ -9584,7 +9530,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>Časové pásmo</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9592,42 +9538,42 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>Čas OS serveru</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Čas VMS</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Čas, společný a synchronizovaný mezi všemi servery. se může lišit od času OS na konkrétním serveru.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>Synchronizováno s internetem</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Synchronizováno s místním časem na vybraném serveru</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>Nesynchronizováno. Každý server používá svůj vlastní místní čas.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>Stejné jako místní čas serveru</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>Žádné internetové připojení. Čas není synchronizován.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>Time Server je offline. Čas není synchronizován.</translation>
     </message>
   </context>
   <context>
@@ -9653,7 +9599,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>Nahrávání na straně serveru se nepodařilo vytvořit: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9669,22 +9615,22 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>Vzdálený soubor &quot;%1&quot; je poškozen</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>Server již tento soubor obsahuje &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>Pohyb je detekován pouze během nahrávání videa.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>Povolením nebo zakázáním tohoto nastavení se ve stávajícím archivu nic nezmění.</translation>
     </message>
   </context>
   <context>
@@ -9773,7 +9719,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Několik záložek lze exportovat pouze jako rozvržení.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
@@ -9785,27 +9731,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>Zahájení exportu...</translation>
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>Ukládání rozložení</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation type="unfinished">Stop Saving</translation>
+      <translation>Zastavte ukládání</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation type="unfinished">Saving failed</translation>
+      <translation>Uložení selhalo</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation type="unfinished">Starting saving...</translation>
+      <translation>Probíhá ukládání...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>Připrava souborů pro exportní proces. Počkejte prosím několik sekund.</translation>
     </message>
   </context>
   <context>
@@ -9842,7 +9788,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>Znovu vytvořit rozlišení</translation>
     </message>
   </context>
   <context>
@@ -9883,7 +9829,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Jakýkoli plugin</translation>
     </message>
   </context>
   <context>
@@ -10014,7 +9960,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Rozložení je plné</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -10084,7 +10030,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>Virtuální kamery nelze přesouvat mezi servery</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -10096,7 +10042,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Všechny podporované</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -10181,7 +10127,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Až bude k dispozici, upgradujte na další dostupnou opravu nebo verzi vydání.</translation>
     </message>
     <message>
       <source>System sends anonymous usage statistics</source>
@@ -10203,7 +10149,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
       <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+        <numerusform>Nepodařilo se změnit heslo na %n z %1 kamer</numerusform>
         <numerusform>Failed to change password on %n cameras of %1</numerusform>
         <numerusform>Failed to change password on %n cameras of %1</numerusform>
         <numerusform>Failed to change password on %n cameras of %1</numerusform>
@@ -10211,11 +10157,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Toto sestavení je pouze pro účely testování.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>Otevřete Nastavení serveru</translation>
     </message>
     <message>
       <source>OK</source>
@@ -10223,21 +10169,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>Potvrďte umístění analytických dat na &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>největší dostupný oddíl</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>Analytická databáze by měla být uložena pouze na místní jednotce a může zabírat velké množství místa.
+Jakmile je vybráno místo pro uložení analytických dat, nelze jej snadno změnit bez ztráty stávajících dat. Doporučujeme zvolit umístění pečlivě a vyhnout se použití systémové oblasti, protože by to mohlo způsobit vážnou poruchu systému.
+Ve výchozím nastavení budou analytická data uložena na %1.
+kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru můžete vybrat jiné umístění úložiště.</translation>
     </message>
   </context>
   <context>

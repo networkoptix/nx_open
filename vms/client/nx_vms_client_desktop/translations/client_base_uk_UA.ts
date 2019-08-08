@@ -301,7 +301,7 @@ to view more bookmarks</source>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation>Відкрити %1 Портал ...</translation>
+      <translation>Відкрити %1 Портал...</translation>
     </message>
     <message>
       <source>Account Settings...</source>
@@ -1619,20 +1619,20 @@ to view more bookmarks</source>
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation>
-        <numerusform>Подробиці для %n сеансу(ів) з %1</numerusform>
-        <numerusform>Подробиці для %n сеансу(ів) з %1</numerusform>
-        <numerusform>Подробиці для %n сеансу(ів) з %1</numerusform>
-        <numerusform>Подробиці для %n сеансу(ів) з %1</numerusform>
+        <numerusform>Подробиці для %n сеансу з %1</numerusform>
+        <numerusform>Подробиці для %n сеансів з %1</numerusform>
+        <numerusform>Подробиці для %n сеансуів з %1</numerusform>
+        <numerusform>Подробиці для %n сеансуів з %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation>
-        <numerusform>Подробиці %n камери(р) із %1</numerusform>
-        <numerusform>Подробиці %n камери(р) із %1</numerusform>
-        <numerusform>Подробиці %n камери(р) із %1</numerusform>
-        <numerusform>Подробиці %n камери(р) із %1</numerusform>
+        <numerusform>Подробиці %n камер із %1</numerusform>
+        <numerusform>Подробиці %n камер із %1</numerusform>
+        <numerusform>Подробиці %n камер із %1</numerusform>
+        <numerusform>Подробиці %n камер із %1</numerusform>
       </translation>
     </message>
   </context>
@@ -6060,10 +6060,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Не містить ніякої особистої інформації і є повністю анонімним.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Файловер серверу може вимагати оновлення статусу камери незалежно від цього налаштування.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Увімкнути автоматичне виявлення пристроїв і серверів і автоматичну перевірку стану пристрою</translation>
     </message>
@@ -6074,6 +6070,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Коли ця функція ввімкнена, система постійно виявляє нові камери і сервери і надсилає запити до камер для оновлення статусів.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
     </message>
   </context>
   <context>
@@ -6093,44 +6093,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Файл розповсюдження аркуша (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Сервер</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Різниця</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Дата</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Часовий пояс</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Час</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Жоден сервер не має доступу до Інтернету. Час не синхронізується.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>Час VMS синхронізується з Інтернетом і не залежить від місцевого часу на серверах.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>Системний час синхронізується з локальним часом на вибраному сервері і не залежить від локального часу на інших серверах.</translation>
     </message>
   </context>
   <context>
@@ -7660,17 +7622,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Цей модуль вводу / виводу не має додаткових параметрів</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Ця камера не має додаткових налаштувань</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
@@ -8847,11 +8798,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>Деякі сервери не завершили процес оновлення. Закінчити його все одно?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 буде перезапущено до оновленої версії.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>

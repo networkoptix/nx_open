@@ -873,7 +873,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation>การตั้งค่าเครื่องมือวิเคราะห์ ...</translation>
+      <translation>การตั้งค่าเครื่องมือวิเคราะห์...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -893,11 +893,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation>กล้องเสมือน ...</translation>
+      <translation>กล้องเสมือน...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation>ใหม่กล้องเสมือนจริง ...</translation>
+      <translation>ใหม่กล้องเสมือนจริง...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -917,7 +917,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Files...</source>
-      <translation>ไฟล์ ...</translation>
+      <translation>ไฟล์...</translation>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
@@ -3062,7 +3062,7 @@ to %1</source>
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
       <translation>
-        <numerusform>%1 ของ%n กล้อง)</numerusform>
+        <numerusform>%1 (ของ%n กล้อง)</numerusform>
       </translation>
     </message>
   </context>
@@ -3744,7 +3744,7 @@ to %1</source>
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>%1  มีใช้อยู่ในปัจจุบัน</numerusform>
+        <numerusform>%1 มีใช้อยู่ในปัจจุบัน</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4194,7 +4194,7 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation>กล้องเสมือน ...</translation>
+      <translation>กล้องเสมือน...</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
@@ -4791,7 +4791,7 @@ to %1</source>
     </message>
     <message>
       <source>Videowalls</source>
-      <translation>videowalls</translation>
+      <translation>Videowalls</translation>
     </message>
     <message>
       <source>Analytics Engines</source>
@@ -5869,10 +5869,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ไม่รวมข้อมูลส่วนบุคคลใด ๆ และไม่ระบุชื่อ</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>มาตรการการเซิร์ฟเวอร์ล้มเหลวยังคงร้องขอการปรับปรุงสถานะของกล้องโดยไม่คำนึงถึงการตั้งค่านี้</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>เปิดใช้งานอุปกรณ์และเซิร์ฟเวอร์ค้นหาอัตโนมัติและตรวจสอบสถานะอุปกรณ์อัตโนมัติ</translation>
     </message>
@@ -5883,6 +5879,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>เมื่อเปิดใช้งานระบบจะค้นพบกล้องและเซิร์ฟเวอร์ใหม่อย่างต่อเนื่องและส่งคำขอการค้นพบไปยังกล้องเพื่ออัพเดทสถานะ</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
     </message>
   </context>
   <context>
@@ -5902,44 +5902,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>ไฟล์สเปรดชีต (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>เซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>สาขา</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>วันที่</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>เขตเวลา</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>เวลา</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>ไม่มีเซิร์ฟเวอร์ที่มีการเข้าถึงอินเทอร์เน็ต เวลาไม่ได้ซิงโครไนซ์</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>เวลา VMS ถูกซิงโครไนซ์กับอินเทอร์เน็ตและไม่ขึ้นอยู่กับเวลาท้องถิ่นบนเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>เวลา VMS ถูกซิงโครไนซ์กับเวลาท้องถิ่นบนเซิร์ฟเวอร์ที่เลือกและไม่ขึ้นอยู่กับเวลาท้องถิ่นบนเซิร์ฟเวอร์อื่น</translation>
     </message>
   </context>
   <context>
@@ -6806,7 +6768,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation>เปิดการบันทึกกล้องเสมือน ...</translation>
+      <translation>เปิดการบันทึกกล้องเสมือน...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
@@ -7070,7 +7032,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>LST</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
@@ -7080,7 +7042,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>ME</translation>
+      <translation>Me</translation>
     </message>
     <message>
       <source>Hi</source>
@@ -7352,17 +7314,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>โมดูล I / O นี้ไม่มีการตั้งค่าขั้นสูง</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>กล้องนี้ไม่มีการตั้งค่าขั้นสูง</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
@@ -7416,7 +7367,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
       <translation>
-        <numerusform>รหัสนี้ใช้กับกล้อง %n ต่อไปนี้: </numerusform>
+        <numerusform>รหัสนี้ใช้กับกล้อง %n ต่อไปนี้:</numerusform>
       </translation>
     </message>
     <message>
@@ -8427,7 +8378,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation>ไม่มีแพ็คเกจการอัปเดตสำหรับเซิร์ฟเวอร์ </translation>
+      <translation>ไม่มีแพ็คเกจการอัปเดตสำหรับเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
@@ -8491,11 +8442,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>เซิร์ฟเวอร์บางตัวยังไม่เสร็จสิ้นกระบวนการอัพเดต เสร็จแล้วหรือยัง?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 จะเริ่มต้นใหม่เป็นเวอร์ชันที่ได้รับการปรับปรุง</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -8579,7 +8525,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation>เรียกดูไฟล์อื่น ...</translation>
+      <translation>เรียกดูไฟล์อื่น...</translation>
     </message>
     <message>
       <source>Select Another Build</source>
@@ -8729,7 +8675,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation>เค้าโครงเฉพาะสามารถแสดงต่อเจ้าของได้เท่านั้น </translation>
+      <translation>เค้าโครงเฉพาะสามารถแสดงต่อเจ้าของได้เท่านั้น</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
@@ -9411,7 +9357,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Starting export...</source>
-      <translation>เริ่มส่งออก ...</translation>
+      <translation>เริ่มส่งออก...</translation>
     </message>
     <message>
       <source>Saving layout</source>
@@ -9427,7 +9373,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation>เริ่มบันทึก ...</translation>
+      <translation>เริ่มบันทึก...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>

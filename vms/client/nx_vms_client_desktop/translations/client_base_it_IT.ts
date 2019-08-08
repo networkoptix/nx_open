@@ -1599,8 +1599,8 @@ to view more bookmarks</source>
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation>
-        <numerusform>Dettagli per %n telecamere (s) di %1</numerusform>
-        <numerusform>Dettagli per %n telecamere (s) di %1</numerusform>
+        <numerusform>Dettagli per %n telecamera di %1</numerusform>
+        <numerusform>Dettagli per %n telecamere di %1</numerusform>
       </translation>
     </message>
   </context>
@@ -2045,7 +2045,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
+      <translation>La notifica forzato funziona solo per gli eventi generici se i identificatori della telecamera vengono utilizzati nell'URL dell'evento generico</translation>
     </message>
   </context>
   <context>
@@ -3010,16 +3010,16 @@ to %1</source>
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
       <translation>
-        <numerusform>Registro degli eventi per il periodo da %1 a %2 - %n evento (i) trovato (i)</numerusform>
-        <numerusform>Registro degli eventi per il periodo da %1 a %2 - %n evento (i) trovato (i)</numerusform>
+        <numerusform>Registro degli eventi per il periodo da %1 a %2 - %n evento trovato</numerusform>
+        <numerusform>Registro degli eventi per il periodo da %1 a %2 - %n eventi trovati</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
       <translation>
-        <numerusform>Registro degli eventi per %1 - %n evento (i) trovato (i)</numerusform>
-        <numerusform>Registro degli eventi per %1 - %n evento (i) trovato (i)</numerusform>
+        <numerusform>Registro degli eventi per %1 - %n evento trovato</numerusform>
+        <numerusform>Registro degli eventi per %1 - %n eventi trovati</numerusform>
       </translation>
     </message>
   </context>
@@ -3098,8 +3098,8 @@ to %1</source>
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
       <translation>
-        <numerusform>%1 di %n telecamere)</numerusform>
-        <numerusform>%1 di %n telecamere)</numerusform>
+        <numerusform>%1 (%n telecamera)</numerusform>
+        <numerusform>%1 (%n telecamere)</numerusform>
       </translation>
     </message>
   </context>
@@ -4247,7 +4247,7 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation>Telecamera virtuale</translation>
+      <translation>Telecamera virtuale %1</translation>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
@@ -5933,10 +5933,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Non include alcuna informazione personale ed è completamente anonimo.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Il server di failover puo' comunque richiedere aggiornamenti dello stato della telecamera indipendentemente da questa impostazione.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Abilita l'individuazione automatica di dispositivi e server e il controllo automatico dello stato del dispositivo</translation>
     </message>
@@ -5947,6 +5943,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Se abilitato, il sistema rileva continuamente nuove telecamere e server e invia richieste di rilevamento alle telecamere per l'aggiornamento dello stato.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
     </message>
   </context>
   <context>
@@ -5966,44 +5966,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>File Spread Sheet (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Offset</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Data</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Fuso orario</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Orario</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Nessun server ha accesso ad Internet. L'orario non verra' sincronizzato.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>L'ora del sistema è sincronizzata con Internet e non dipende dall'ora locale sui server.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>L'ora del sistema è sincronizzata con l'ora locale sul server selezionato e non dipende dall'ora locale su altri server.</translation>
     </message>
   </context>
   <context>
@@ -6605,7 +6567,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation>AVI (Audio / Video Interleaved) (*. avi)</translation>
+      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
     </message>
   </context>
   <context>
@@ -7374,8 +7336,8 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message numerus="yes">
       <source>%n objects</source>
       <translation>
-        <numerusform>oggetti</numerusform>
-        <numerusform>oggetti</numerusform>
+        <numerusform>%n oggetto</numerusform>
+        <numerusform>%n oggetti</numerusform>
       </translation>
     </message>
     <message>
@@ -7452,17 +7414,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Applying changes...</source>
       <translation>Applicazione delle modifiche...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Questo modulo I / O non ha impostazioni avanzate</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Questa telecamera non ha impostazioni avanzate</translation>
     </message>
   </context>
   <context>
@@ -7790,7 +7741,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation>Il pacchetto di aggiornamento è danneggiato</translation>
+      <translation>Il pacchetto di aggiornamento è danneggiato: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
@@ -8612,11 +8563,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Alcuni server non hanno completato il processo di aggiornamento. Finirlo comunque?</translation>
     </message>
     <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 verrà riavviato alla versione aggiornata.</translation>
-    </message>
-    <message>
       <source>Failed to download update packages to some components</source>
       <translation>Impossibile scaricare i pacchetti di aggiornamento su alcuni moduli</translation>
     </message>
@@ -9299,8 +9245,8 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
       <translation>
-        <numerusform>L'indirizzo email non è impostato per l'utente %1</numerusform>
-        <numerusform>L'indirizzo email non è impostato per l'utente %1</numerusform>
+        <numerusform>L'indirizzo email non è impostato per %n utente</numerusform>
+        <numerusform>L'indirizzo email non è impostato per %n utenti</numerusform>
       </translation>
     </message>
     <message>
@@ -9406,7 +9352,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation>Impossibile creare il caricamento sul lato server</translation>
+      <translation>Impossibile creare il caricamento sul lato server: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9958,7 +9904,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation>Confermare la posizione di archiviazione per memorizzare i dati di analisi</translation>
+      <translation>Confermare la posizione di archiviazione per memorizzare i dati di analisi su &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>

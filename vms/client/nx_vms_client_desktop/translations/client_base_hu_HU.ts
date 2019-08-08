@@ -5935,10 +5935,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Nem tartalmaz személyes adatokat, és teljesen névtelen.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>A hibaüzenetek kiszolgálói intézkedései továbbra is kérhetik a kamera állapotfrissítéseit a beállítástól függetlenül.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Engedélyezze az eszközök és szerverek automatikus felismerését és az automatikus állapotállapot-ellenőrzést</translation>
     </message>
@@ -5949,6 +5945,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Ha engedélyezve van, a rendszer folyamatosan felfedezi az új kamerákat és kiszolgálókat, és küldési lekérdezéseket küld a kamerákhoz az állapotfrissítéshez.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
     </message>
   </context>
   <context>
@@ -5968,44 +5968,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Spread Sheet (CSV) fájl</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Szerver</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Eltolás</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Dátum</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Időzóna</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Idő</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>A szerver nem rendelkezik Internet-hozzáféréssel. Az idő nincs szinkronizálva.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>A rendszeridő az Internettel szinkronizálva, és nem függ a helyi szerveridőtől.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>A rendszeridő a kiválasztott szerver idejével szinkronizálva, és nem függ a többi szerver idejétől.</translation>
     </message>
   </context>
   <context>
@@ -7457,17 +7419,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Ehhez az I/O modulhoz nincsenek speciális beállítási opciók</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Ehhez a kamerához nincsenek speciális beállítási opciók</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
@@ -8612,11 +8563,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 a frissítés miatt újra fog indulni.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>

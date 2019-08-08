@@ -5871,10 +5871,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>不包含任何个人信息，并且完全匿名</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>无论此设定为何，备援服务器仍可请求摄像机更新状态。</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>启用设备和服务器的自动搜寻以及自动确认设备状态</translation>
     </message>
@@ -5885,6 +5881,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>启用后，系统会持续搜寻新的摄像机和服务器，并向摄像机传送请求以进行状态更新。</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
     </message>
   </context>
   <context>
@@ -5904,44 +5904,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>电子表格（CSV）文件</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>服务器</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>偏移</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>日期</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>时区</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>时间</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>没有服务器具有互联网访问权限。时间不会被同步。</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>VMS时间与網路同步，不依赖于服务器上的本地时间。</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>VMS时间与所选服务器上的本地时间同步，并且不取决于其他服务器上的本地时间。</translation>
     </message>
   </context>
   <context>
@@ -7354,17 +7316,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>此 I/O 模块有没有高级的设置</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>摄像机没有高级的设置</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
@@ -8493,11 +8444,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>有些服务器未完成更新。继续完成？</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 将重新启动到更新的版本。</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>

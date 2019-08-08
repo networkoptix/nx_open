@@ -5937,10 +5937,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Inkluderer ikke personlig informasjon og er helt anonym.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Mislykkede servertiltak kan fremdeles be om kamerastatusoppdateringer uavhengig av denne innstillingen.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Aktiver enheter og servere autodiscovery og automatisert status status sjekk</translation>
     </message>
@@ -5951,6 +5947,10 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Når det er aktivert, oppdager systemet kontinuerlig nye kameraer og servere, og sender forespørsler til kameraer for statusoppdatering.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Hvis Failover er aktivert, kan det hende at serveren fremdeles ber om kamerastatusoppdateringer uavhengig av denne innstillingen.</translation>
     </message>
   </context>
   <context>
@@ -5970,44 +5970,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Regneark (CSV) File</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Avvik</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Dato</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Tidssone</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Tid</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Ingen server har Internett-tilgang. Tid blir ikke synkronisert.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>VMS-tid er synkronisert med Internett og er ikke avhengig av lokal tid på servere.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>VMS-tid synkroniseres med lokal tid på den valgte serveren og er ikke avhengig av lokal tid på andre servere.</translation>
     </message>
   </context>
   <context>
@@ -7459,17 +7421,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Denne I / O-modulen har ingen avanserte innstillinger</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Dette kameraet har ingen avanserte innstillinger</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
@@ -8614,11 +8565,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>Noen servere har ikke fullført oppdateringsprosessen. Fullfør likevel?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 vil bli startet på nytt til den oppdaterte versjonen.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
