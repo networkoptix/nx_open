@@ -6,18 +6,18 @@ include(find_doxygen)
 
 set(depends mediaserver server_plugins) #< Not required technically, but useful to prevent errors.
 
-message(STATUS "Generating files for Analytics SDK")
+message(STATUS "Generating files for Metadata SDK")
 
-set(sdk_name analytics_sdk)
-set(zip_file ${distribution_output_dir}/${analytics_sdk_distribution_name}.zip)
+set(sdk_name metadata_sdk)
+set(zip_file ${distribution_output_dir}/${metadata_sdk_distribution_name}.zip)
 set(sdk_dir ${CMAKE_CURRENT_BINARY_DIR}/${sdk_name})
 set(logs_dir ${CMAKE_BINARY_DIR}/build_logs)
-set(sample_build_log ${logs_dir}/analytics_sdk_sample_build.log)
-set(doxygen_log ${logs_dir}/analytics_sdk_doxygen.log)
-set(zip_log ${logs_dir}/analytics_sdk_zip.log)
+set(sample_build_log ${logs_dir}/metadata_sdk_sample_build.log)
+set(doxygen_log ${logs_dir}/metadata_sdk_doxygen.log)
+set(zip_log ${logs_dir}/metadata_sdk_zip.log)
 
 # Collect source files for statically prepared files.
-set(copied_static_origin ${CMAKE_CURRENT_SOURCE_DIR}/${sdk_name})
+set(copied_static_origin ${CMAKE_CURRENT_SOURCE_DIR}/files)
 file(GLOB_RECURSE copied_static_files ${copied_static_origin}/*)
 
 # Collect source files for nx_kit.
@@ -111,7 +111,7 @@ add_custom_command(OUTPUT ${zip_file}
 
     DEPENDS
         ${copy_sdk_files_script}
-        ${CMAKE_CURRENT_SOURCE_DIR}/${sdk_name}/${sample_build_script}
+        ${CMAKE_CURRENT_SOURCE_DIR}/files/${sample_build_script}
         ${copied_static_files}
         ${copied_nx_kit_files}
         ${copied_nx_sdk_src_nx_files}
@@ -119,4 +119,4 @@ add_custom_command(OUTPUT ${zip_file}
         ${copied_sample_unit_tests_files}
 )
 
-add_custom_target(nx_analytics_sdk ALL DEPENDS ${zip_file})
+add_custom_target(nx_metadata_sdk ALL DEPENDS ${zip_file})

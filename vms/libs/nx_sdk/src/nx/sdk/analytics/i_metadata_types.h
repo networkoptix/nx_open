@@ -13,7 +13,7 @@ namespace analytics {
 class IMetadataTypes: public Interface<IMetadataTypes>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IMetadataTypes"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IMetadataTypes"); }
 
     virtual ~IMetadataTypes() = default;
 

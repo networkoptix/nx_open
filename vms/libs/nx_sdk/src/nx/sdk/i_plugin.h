@@ -24,7 +24,7 @@ class IUtilityProvider;
 class IPlugin: public Interface<IPlugin>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::IPlugin"); }
+    static auto interfaceId() { return makeId("nx::sdk::IPlugin"); }
 
     /** Name of a plugin entry point function. */
     static constexpr const char* kEntryPointFuncName = "createNxPlugin";

@@ -18,7 +18,7 @@ namespace analytics {
 class IConsumingDeviceAgent: public Interface<IConsumingDeviceAgent, IDeviceAgent>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IConsumingDeviceAgent"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IConsumingDeviceAgent"); }
 
     /**
      * Supplies data to the engine. Called from a worker thread.

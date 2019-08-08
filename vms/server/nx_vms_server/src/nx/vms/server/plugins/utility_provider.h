@@ -16,7 +16,7 @@ public:
     virtual int64_t vmsSystemTimeSinceEpochMs() const override;
 
 protected:
-    virtual IRefCountable* queryInterface(nx::sdk::InterfaceId id) override;
+    virtual IRefCountable* queryInterface(const InterfaceId* id) override;
     virtual const nx::sdk::IString* getHomeDir() const override;
 
 private:

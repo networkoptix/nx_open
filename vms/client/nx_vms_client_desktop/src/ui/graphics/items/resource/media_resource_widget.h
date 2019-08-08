@@ -62,7 +62,7 @@ class QnTwoWayAudioWidget;
 struct QnHtmlTextItemOptions;
 
 /**
- * Widget to show media from a camera or disk file (from QnMediaResource). 
+ * Widget to show media from a camera or disk file (from QnMediaResource).
  */
 class QnMediaResourceWidget: public Customized<QnResourceWidget>
 {
@@ -252,6 +252,11 @@ protected:
         const QColor& penColor);
 
     void paintProgress(QPainter* painter, const QRectF& rect, int progress);
+
+    void paintAnalyticsObjectsDebugOverlay(
+        std::chrono::milliseconds timestamp,
+        QPainter* painter,
+        const QRectF& rect);
 
     void ensureMotionSensitivity() const;
     Q_SLOT void invalidateMotionSensitivity();
