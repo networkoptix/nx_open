@@ -5,6 +5,8 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSharedPointer>
 
+#include <common/common_module_aware.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <nx/analytics/types.h>
@@ -16,10 +18,6 @@ namespace nx::vms::client::desktop {
 class NX_VMS_CLIENT_DESKTOP_API AnalyticsEventsTreeBuilder final
 {
 public:
-    explicit AnalyticsEventsTreeBuilder(
-        QnCommonModule* commonModule);
-    ~AnalyticsEventsTreeBuilder();
-
     struct Node;
     using NodePtr = QSharedPointer<Node>;
 
@@ -58,7 +56,18 @@ public:
      * compatible Engines are used.
      * Event types are intersected, empty Groups and Engines are removed from the output.
      */
-    NodePtr eventTypesForRulesPurposes(const QnVirtualCameraResourceList& devices) const;
+    static NodePtr eventTypesForRulesPurposes(
+        QnCommonModule* commonModule,
+        const QnVirtualCameraResourceList& devices);
+};
+
+class AnalyticsEventsSearchTreeBuilder: public QObject, public QnCommonModuleAware
+{
+    Q_OBJECT
+    using base_type = QObject;
+
+public:
+    explicit AnalyticsEventsSearchTreeBuilder(QObject* parent = nullptr);
 
     /**
      * Tree of the Event type ids. Root nodes are Engines, then Groups and Event types as leaves.
@@ -66,12 +75,10 @@ public:
      * compatible Engines are used. Includes only those Event types, which are actually used in the
      * existing VMS Rules. Empty Groups and Engines are removed from the output.
      */
-    NodePtr eventTypesForSearchPurposes(const QnVirtualCameraResourceList& devices) const;
+    AnalyticsEventsTreeBuilder::NodePtr eventTypesTree() const;
 
-private:
-    struct Private;
-    QScopedPointer<Private> d;
+signals:
+    void eventTypesTreeChanged();
 };
-
 
 } // namespace nx::vms::client::desktop

@@ -54,8 +54,9 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
             }
         });
 
-    AnalyticsEventsTreeBuilder eventsTreeBuilder(commonModule());
-    const auto root = eventsTreeBuilder.eventTypesForRulesPurposes(cameras);
+    const auto root = AnalyticsEventsTreeBuilder::eventTypesForRulesPurposes(
+        commonModule(),
+        cameras);
 
     beginResetModel();
     clear();

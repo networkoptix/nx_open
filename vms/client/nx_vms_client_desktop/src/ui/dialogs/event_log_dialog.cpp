@@ -1,6 +1,8 @@
 #include "event_log_dialog.h"
 #include "ui_event_log_dialog.h"
 
+#include <chrono>
+
 #include <QtCore/QMimeData>
 #include <QtGui/QClipboard>
 #include <QtWidgets/QMenu>
@@ -21,8 +23,6 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/event/events/abstract_event.h>
-#include <nx/vms/event/rule_manager.h>
-#include <nx/vms/event/rule.h>
 #include <nx/vms/event/strings_helper.h>
 
 #include <client/client_globals.h>
@@ -53,15 +53,16 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
 
-#include <nx/analytics/properties.h>
-
 #include <nx/utils/log/log.h>
+#include <nx/utils/pending_operation.h>
 #include <nx/utils/std/algorithm.h>
 
 using namespace nx;
 using namespace nx::vms::event;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
+
+using namespace std::chrono;
 
 namespace {
 
@@ -264,9 +265,9 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
                 parent->sortChildren(0);
         });
 
-    AnalyticsEventsTreeBuilder eventsTreeBuilder(commonModule());
-    const auto root = eventsTreeBuilder.eventTypesForSearchPurposes(
-        resourcePool()->getAllCameras({}, /*ignoreDesktopCameras*/ true));
+    auto analyticsEventsSearchTreeBuilder =
+        commonModule()->instance<AnalyticsEventsSearchTreeBuilder>();
+    const auto root = analyticsEventsSearchTreeBuilder->eventTypesTree();
     addItemRecursive(rootItem, root);
 }
 
@@ -335,37 +336,16 @@ void QnEventLogDialog::initEventsModel()
     m_eventTypesModel->appendRow(rootItem);
     ui->eventComboBox->setModel(m_eventTypesModel);
 
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (!resource->hasFlags(Qn::server) || resource->hasFlags(Qn::fake))
-                return;
+    auto updateAnalyticsSubmenuOperation = new nx::utils::PendingOperation(
+        [this] { updateAnalyticsEvents(); },
+        500ms,
+        this);
+    updateAnalyticsSubmenuOperation->fire();
 
-            connect(resource, &QnResource::propertyChanged, this,
-                [this](const QnResourcePtr& /*res*/, const QString& key)
-                {
-                    if (key == nx::analytics::kEventTypeDescriptorsProperty)
-                        updateAnalyticsEvents();
-                });
-
-            updateAnalyticsEvents();
-        });
-
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (!resource->hasFlags(Qn::server) || resource->hasFlags(Qn::fake))
-                return;
-
-            resource->disconnect(this);
-            updateAnalyticsEvents();
-        });
-
-    using RuleManager = nx::vms::event::RuleManager;
-    const auto ruleManager = eventRuleManager();
-    connect(ruleManager, &RuleManager::rulesReset, this, &QnEventLogDialog::updateAnalyticsEvents);
-    connect(ruleManager, &RuleManager::ruleAddedOrUpdated, this, &QnEventLogDialog::updateAnalyticsEvents);
-    connect(ruleManager, &RuleManager::ruleRemoved, this, &QnEventLogDialog::updateAnalyticsEvents);
+    connect(commonModule()->instance<AnalyticsEventsSearchTreeBuilder>(),
+        &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
+        updateAnalyticsSubmenuOperation,
+        &nx::utils::PendingOperation::requestOperation);
 }
 
 void QnEventLogDialog::reset()
