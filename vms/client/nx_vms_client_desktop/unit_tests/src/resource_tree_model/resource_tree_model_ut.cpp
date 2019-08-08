@@ -174,7 +174,6 @@ TEST_F(ResourceTreeModelTest, shouldShowPinnedNodesIfLoggedIn)
 
     // Define reference snapshot.
     ItemModelStateSnapshotHelper::SnapshotParams params;
-    params.roles = {Qt::DisplayRole, Qn::ResourceIconKeyRole};
     params.depth = 0;
     params.rowCount = 3;
     const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
@@ -217,7 +216,6 @@ TEST_F(ResourceTreeModelTest, singleServerShouldBeTopLevelNode)
 
     // Define reference snapshot.
     ItemModelStateSnapshotHelper::SnapshotParams params;
-    params.roles = {Qt::DisplayRole, Qn::ResourceIconKeyRole};
     params.depth = 1;
     params.startRow = 3;
     params.rowCount = 1;
@@ -250,7 +248,6 @@ TEST_F(ResourceTreeModelTest, shouldGroupServersIfNotSingle)
 
     // Define reference snapshot.
     ItemModelStateSnapshotHelper::SnapshotParams params;
-    params.roles = {Qt::DisplayRole, Qn::ResourceIconKeyRole};
     params.depth = 1;
     params.startRow = 3;
     params.rowCount = 1;
@@ -336,7 +333,6 @@ TEST_F(ResourceTreeModelTest, localFilesAreSortedAlphanumerically)
     // Define reference snapshot.
     ItemModelStateSnapshotHelper::SnapshotParams params;
     params.parentIndex = getIndexByData(lookupData).first();
-    params.roles = {Qt::DisplayRole, Qn::ResourceIconKeyRole};
     const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
         [
             {
@@ -384,7 +380,6 @@ TEST_F(ResourceTreeModelTest, offlineLocalFileArentDisplayed)
     // Define reference snapshot.
     ItemModelStateSnapshotHelper::SnapshotParams params;
     params.parentIndex = getIndexByData(lookupData).first();
-    params.roles = {Qt::DisplayRole, Qn::ResourceIconKeyRole};
     const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
         [
             {
@@ -423,7 +418,6 @@ TEST_F(ResourceTreeModelTest, localFilesIconsAndGrouping)
     // Define reference snapshot.
     ItemModelStateSnapshotHelper::SnapshotParams params;
     params.parentIndex = getIndexByData(lookupData).first();
-    params.roles = { Qt::DisplayRole, Qn::ResourceIconKeyRole };
     const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
         [
             {
@@ -469,7 +463,6 @@ TEST_F(ResourceTreeModelTest, onlyFilenameIsDisplayed)
     // Define reference snapshot.
     ItemModelStateSnapshotHelper::SnapshotParams params;
     params.parentIndex = getIndexByData(lookupData).first();
-    params.roles = { Qt::DisplayRole, Qn::ResourceIconKeyRole };
     const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
         [
             {
