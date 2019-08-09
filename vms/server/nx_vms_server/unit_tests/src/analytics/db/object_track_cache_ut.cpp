@@ -80,8 +80,8 @@ protected:
             packet->deviceId = m_analyticsDataPackets.back()->deviceId;
             packet->objectMetadataList.front().trackId =
                 m_analyticsDataPackets.back()->objectMetadataList.front().trackId;
-            packet->objectMetadataList.front().objectTypeId =
-                m_analyticsDataPackets.back()->objectMetadataList.front().objectTypeId;
+            packet->objectMetadataList.front().typeId =
+                m_analyticsDataPackets.back()->objectMetadataList.front().typeId;
         }
 
         m_analyticsDataPackets.push_back(std::move(packet));
