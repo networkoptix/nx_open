@@ -490,7 +490,7 @@ void AnalyticsSearchListModel::Private::setLiveReceptionActive(bool value)
 void AnalyticsSearchListModel::Private::processMetadata()
 {
     // Don't start receiving live data until first archive fetch is finished.
-    if (m_data.empty() && !m_liveReceptionActive && (fetchInProgress() || q->canFetchMore()))
+    if (m_data.empty() && (fetchInProgress() || q->canFetchMore()))
         return;
 
     // Completely stop metadata reception if paused.
