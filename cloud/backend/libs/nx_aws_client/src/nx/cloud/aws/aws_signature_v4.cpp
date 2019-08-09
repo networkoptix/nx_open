@@ -10,15 +10,28 @@
 
 namespace nx::cloud::aws {
 
-static const std::set<std::string_view> kAllowedCanonicalHeaders {
+static const std::set<std::string_view, std::greater<std::string_view>>
+    kAllowedCanonicalHeaderPrefixes =
+{
     "content-encoding",
     "content-type",
     "date",
     "host",
+    "range",
     "user-agent",
-    "x-amz-content-sha256",
-    "x-amz-date"
+    "x-amz-"
 };
+
+static bool isAllowedCanonicalHeader(const std::string_view& name)
+{
+    auto it = kAllowedCanonicalHeaderPrefixes.lower_bound(name);
+    if (it == kAllowedCanonicalHeaderPrefixes.end())
+        return false;
+
+    return name.substr(0, it->size()) == *it; //< name.starts_with(*it)
+}
+
+//-------------------------------------------------------------------------------------------------
 
 static const nx::String kAwsAuthName = "AWS4-HMAC-SHA256";
 static const nx::String kAws4Request = "aws4_request";
@@ -206,11 +219,8 @@ void SignatureCalculator::hashCanonicalHeaders(
     for (const auto& header: headers)
     {
         const auto lowerName = header.first.toLower();
-        if (kAllowedCanonicalHeaders.count(
-               std::string_view(lowerName.data(), lowerName.size())) == 0)
-        {
+        if (!isAllowedCanonicalHeader(std::string_view(lowerName.data(), lowerName.size())))
             continue;
-        }
 
         lowCaseHeaderNames->push_back(lowerName);
 
