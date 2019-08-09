@@ -253,8 +253,8 @@ bool ObjectTrackSearcher::matchAttributes(
         bool found = false;
         for (const auto& attribute : attributes)
         {
-            if (attribute.name.indexOf(filterWord) != -1 ||
-                attribute.value.indexOf(filterWord) != -1)
+            if (attribute.name.indexOf(filterWord, 0, Qt::CaseInsensitive) != -1 ||
+                attribute.value.indexOf(filterWord, 0, Qt::CaseInsensitive) != -1)
             {
                 found = true;
                 break;
