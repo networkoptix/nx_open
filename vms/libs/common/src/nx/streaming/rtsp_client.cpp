@@ -826,8 +826,9 @@ void QnRtspClient::addAdditionAttrs( nx::network::http::Request* const request )
             nx::network::http::HttpHeader(i.key(), i.value()));
 }
 
-bool QnRtspClient::sendSetParameter( const QByteArray& paramName, const QByteArray& paramValue )
+bool QnRtspClient::sendSetParameter(const QByteArray& paramName, const QByteArray& paramValue)
 {
+    NX_VERBOSE(this, "Sending SetParameter %1: %2", paramName, paramValue);
     nx::network::http::Request request;
 
     request.messageBody.append(paramName);
