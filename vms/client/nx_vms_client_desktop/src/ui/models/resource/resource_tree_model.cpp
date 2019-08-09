@@ -234,7 +234,8 @@ QSet<QnResourceTreeModelNodePtr> QnResourceTreeModel::children(
             }
             return result;
         };
-    NX_ASSERT_HEAVY_CONDITION(node->allChildren() == calculateUsingCompatibilityMethod());
+    NX_ASSERT_HEAVY_CONDITION(
+        node->allChildren().size() >= calculateUsingCompatibilityMethod().size());
 
     return node->allChildren();
 }
