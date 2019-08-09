@@ -48,11 +48,14 @@ namespace {
 static constexpr int kDefaultTileSpacing = 1;
 static constexpr int kScrollBarStep = 16;
 
-static constexpr int kDefaultThumbnailWidth = 224;
+static constexpr int kDefaultThumbnailWidth = 214;
+static constexpr int kAlternativeThumbnailWidth = 242;
 
 static constexpr auto kFadeCurtainColorName = "dark3";
 
 static constexpr milliseconds kPreviewCheckInterval = 100ms;
+
+static constexpr milliseconds kPreviewLoadTimeout = 15s;
 
 /*
  * Tiles can have optional timed auto-close mode.
@@ -65,6 +68,12 @@ static constexpr milliseconds kPreviewCheckInterval = 100ms;
 static constexpr milliseconds kVisibleAutoCloseDelay = 20s;
 static constexpr milliseconds kInvisibleAutoCloseDelay = 80s;
 
+static const auto kTilePreviewLoadInterval = milliseconds(ini().tilePreviewLoadIntervalMs);
+static const int kMaxSimultaneousTilePreviewLoads = std::clamp(
+    ini().maxSimultaneousTilePreviewLoads, 1, 15);
+
+static const int kMaximumThumbnailWidth = ini().rightPanelMaxThumbnailWidth;
+
 QSize minimumWidgetSize(QWidget* widget)
 {
     return widget->minimumSizeHint()
@@ -75,16 +84,6 @@ QSize minimumWidgetSize(QWidget* widget)
 bool shouldAnimateTile(const QModelIndex& index)
 {
     return !index.data(Qt::DisplayRole).toString().isEmpty();
-}
-
-bool isPreviewLoadControlledByRibbon()
-{
-    return ini().tilePreviewLoadIntervalMs > 0;
-}
-
-int maximumThumbnailWidth()
-{
-    return ini().rightPanelMaxThumbnailWidth;
 }
 
 } // namespace
@@ -308,11 +307,15 @@ void EventRibbon::Private::updateTilePreview(int index)
     if (!previewResource.dynamicCast<QnMediaResource>())
         return;
 
+    const auto defaultThumbnailWidth = headersEnabled()
+        ? kDefaultThumbnailWidth
+        : kAlternativeThumbnailWidth;
+
     const auto previewTime = modelIndex.data(Qn::PreviewTimeRole).value<microseconds>();
     const auto previewCropRect = modelIndex.data(Qn::ItemZoomRectRole).value<QRectF>();
     const auto thumbnailWidth = previewCropRect.isEmpty()
-        ? kDefaultThumbnailWidth
-        : qMin<int>(kDefaultThumbnailWidth / previewCropRect.width(), maximumThumbnailWidth());
+        ? defaultThumbnailWidth
+        : qMin<int>(defaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
 
     const bool precisePreview = !previewCropRect.isEmpty()
         || modelIndex.data(Qn::ForcePrecisePreviewRole).toBool();
@@ -336,7 +339,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     auto& previewProvider = m_tiles[index]->preview;
     if (!previewProvider || request.resource != previewProvider->requestData().resource)
     {
-        previewProvider.reset(new ResourceThumbnailProvider(request));
+        previewProvider.reset(createPreviewProvider(request));
     }
     else
     {
@@ -350,6 +353,65 @@ void EventRibbon::Private::updateTilePreview(int index)
 
     widget->setPreview(previewProvider.get(), forceUpdate);
     widget->setPreviewCropRect(previewCropRect);
+}
+
+ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
+    const nx::api::ResourceImageRequest& request)
+{
+    auto provider = new ResourceThumbnailProvider(request);
+
+    connect(provider, &QObject::destroyed, this,
+        [this, provider]() { handleLoadingEnded(provider); });
+
+    connect(provider, &ImageProvider::statusChanged, this,
+        [this, provider](Qn::ThumbnailStatus status)
+        {
+            switch (status)
+            {
+                case Qn::ThumbnailStatus::Loading:
+                case Qn::ThumbnailStatus::Refreshing:
+                {
+                    const auto timeoutTimer = executeDelayedParented(
+                        [this, provider]() { handleLoadingEnded(provider); },
+                        kPreviewLoadTimeout,
+                        provider);
+
+                    m_loadingPreviews.insert(provider, QSharedPointer<QTimer>(timeoutTimer,
+                        [](QTimer* timer)
+                        {
+                            if (!timer)
+                                return;
+
+                            timer->stop();
+                            timer->deleteLater();
+                        }));
+
+                    NX_ASSERT(m_loadingPreviews.size() <= kMaxSimultaneousTilePreviewLoads);
+                    break;
+                }
+
+                default:
+                {
+                    handleLoadingEnded(provider);
+                    break;
+                }
+            }
+        });
+
+    return provider;
+}
+
+void EventRibbon::Private::handleLoadingEnded(ResourceThumbnailProvider* provider)
+{
+    if (m_loadingPreviews.remove(provider))
+        loadNextPreview();
+}
+
+bool EventRibbon::Private::isNextPreviewLoadAllowed() const
+{
+    return m_loadingPreviews.size() < kMaxSimultaneousTilePreviewLoads
+        && (kTilePreviewLoadInterval <= 0ms || m_sinceLastPreviewRequest.hasExpired(
+            kTilePreviewLoadInterval));
 }
 
 void EventRibbon::Private::ensureWidget(int index)
@@ -366,13 +428,10 @@ void EventRibbon::Private::ensureWidget(int index)
         widget->setContextMenuPolicy(Qt::CustomContextMenu);
         widget->installEventFilter(this);
 
-        widget->setAutomaticPreviewLoad(!isPreviewLoadControlledByRibbon());
+        widget->setAutomaticPreviewLoad(false);
 
-        if (isPreviewLoadControlledByRibbon())
-        {
-            connect(widget.get(), &EventTile::needsPreviewLoad,
-                m_previewLoad.get(), &nx::utils::PendingOperation::requestOperation);
-        }
+        connect(widget.get(), &EventTile::needsPreviewLoad,
+            this, &Private::loadNextPreview);
 
         connect(widget.get(), &EventTile::closeRequested, this,
             [this]()
@@ -1416,14 +1475,15 @@ void EventRibbon::Private::loadNextPreview()
         if (tile->preview->tryLoad())
             continue;
 
-        if (m_sinceLastPreviewRequest.hasExpired(milliseconds(ini().tilePreviewLoadIntervalMs)))
+        if (isNextPreviewLoadAllowed())
         {
             tile->preview->loadAsync();
             m_sinceLastPreviewRequest.restart();
         }
-        else
+        else if (m_loadingPreviews.empty())
         {
             m_previewLoad->requestOperation();
+            break;
         }
     }
 }

@@ -59,7 +59,7 @@ public:
      * Provides new object regardless of the aggregation period.
      * NOTE: Should be avoided when possible.
      */
-    std::optional<ObjectTrack> getTrackToInsertForced(const QnUuid& trackGuid);
+    std::optional<ObjectTrack> getTrackToInsertForced(const QnUuid& trackId);
 
     /**
      * Provides data only for objects with known dbId.
@@ -67,7 +67,7 @@ public:
      */
     std::vector<ObjectTrackUpdate> getTracksToUpdate(bool flush = false);
 
-    std::optional<ObjectTrack> getTrackById(const QnUuid& trackGuid) const;
+    std::optional<ObjectTrack> getTrackById(const QnUuid& trackId) const;
 
     /**
      * MUST be invoked after inserting track to the DB.
@@ -79,9 +79,9 @@ public:
      */
     int64_t dbIdFromTrackId(const QnUuid& trackId) const;
 
-    void saveTrackGuidToAttributesId(const QnUuid& guid, int64_t attributesId);
+    void saveTrackIdToAttributesId(const QnUuid& trackId, int64_t attributesId);
 
-    int64_t getAttributesIdByTrackGuid(const QnUuid& guid) const;
+    int64_t getAttributesIdByTrackId(const QnUuid& trackId) const;
 
     /**
      * NOTE: Data removal happens only in this method.
@@ -118,7 +118,7 @@ private:
         const std::vector<common::metadata::Attribute>& attributes,
         ObjectTrackContext* trackContext);
 
-    void removeTrack(const QnUuid& trackGuid);
+    void removeTrack(const QnUuid& trackId);
 };
 
 } // namespace nx::analytics::db

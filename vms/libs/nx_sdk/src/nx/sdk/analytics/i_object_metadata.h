@@ -22,7 +22,7 @@ public:
 
     /**
      * @return Id of the object track. Object track is a sequence of object detections from its
-     *     first appearance on the scene till its disappearing. The same object can have multiple
+     *     first appearance on the scene till its disappearance. The same object can have multiple
      *     tracks (e.g. the same person entered and exited a room several times).
      */
     protected: virtual void getTrackId(Uuid* outValue) const = 0;

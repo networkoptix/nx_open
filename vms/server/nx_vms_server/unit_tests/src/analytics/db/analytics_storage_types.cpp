@@ -125,7 +125,7 @@ common::metadata::ObjectMetadataPacketPtr generateRandomPacket(
     for (int i = 0; i < eventCount; ++i)
     {
         common::metadata::ObjectMetadata objectMetadata;
-        objectMetadata.objectTypeId = QnUuid::createUuid().toString();
+        objectMetadata.typeId = QnUuid::createUuid().toString();
         objectMetadata.trackId = QnUuid::createUuid();
         objectMetadata.boundingBox = generateRandomRectf();
         objectMetadata.attributes.resize(nx::utils::random::number<int>(

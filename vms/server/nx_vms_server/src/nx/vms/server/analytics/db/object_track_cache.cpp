@@ -8,7 +8,7 @@ ObjectTrackCache::ObjectTrackCache(
     :
     m_aggregationPeriod(aggregationPeriod),
     m_maxObjectLifetime(maxObjectLifetime),
-    m_timerPool([this](const QnUuid& trackGuid) { removeTrack(trackGuid); })
+    m_timerPool([this](const QnUuid& trackId) { removeTrack(trackId); })
 {
 }
 
@@ -49,11 +49,11 @@ std::vector<ObjectTrack> ObjectTrackCache::getTracksToInsert(bool flush)
     return result;
 }
 
-std::optional<ObjectTrack> ObjectTrackCache::getTrackToInsertForced(const QnUuid& trackGuid)
+std::optional<ObjectTrack> ObjectTrackCache::getTrackToInsertForced(const QnUuid& trackId)
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto it = m_tracksById.find(trackGuid);
+    auto it = m_tracksById.find(trackId);
     if (it == m_tracksById.end())
         return std::nullopt;
 
@@ -108,11 +108,11 @@ std::vector<ObjectTrackUpdate> ObjectTrackCache::getTracksToUpdate(bool flush)
     return result;
 }
 
-std::optional<ObjectTrack> ObjectTrackCache::getTrackById(const QnUuid& trackGuid) const
+std::optional<ObjectTrack> ObjectTrackCache::getTrackById(const QnUuid& trackId) const
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (auto it = m_tracksById.find(trackGuid); it != m_tracksById.end())
+    if (auto it = m_tracksById.find(trackId); it != m_tracksById.end())
         return it->second.track;
 
     return std::nullopt;
@@ -142,7 +142,7 @@ int64_t ObjectTrackCache::dbIdFromTrackId(const QnUuid& trackId) const
     return -1;
 }
 
-void ObjectTrackCache::saveTrackGuidToAttributesId(
+void ObjectTrackCache::saveTrackIdToAttributesId(
     const QnUuid& trackId,
     int64_t attributesId)
 {
@@ -155,7 +155,7 @@ void ObjectTrackCache::saveTrackGuidToAttributesId(
     }
 }
 
-int64_t ObjectTrackCache::getAttributesIdByTrackGuid(const QnUuid& trackId) const
+int64_t ObjectTrackCache::getAttributesIdByTrackId(const QnUuid& trackId) const
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -188,7 +188,7 @@ void ObjectTrackCache::updateObject(
     {
         trackContext.track.deviceId = packet.deviceId;
         trackContext.track.id = objectMetadata.trackId;
-        trackContext.track.objectTypeId = objectMetadata.objectTypeId;
+        trackContext.track.objectTypeId = objectMetadata.typeId;
         trackContext.track.firstAppearanceTimeUs = packet.timestampUs;
 
         trackContext.lastReportTime = nx::utils::monotonicTime();
@@ -249,9 +249,9 @@ void ObjectTrackCache::addNewAttributes(
     }
 }
 
-void ObjectTrackCache::removeTrack(const QnUuid& trackGuid)
+void ObjectTrackCache::removeTrack(const QnUuid& trackId)
 {
-    m_tracksById.erase(trackGuid);
+    m_tracksById.erase(trackId);
 }
 
 } // namespace nx::analytics::db

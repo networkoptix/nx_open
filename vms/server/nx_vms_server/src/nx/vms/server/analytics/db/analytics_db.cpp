@@ -415,7 +415,7 @@ void EventsStorage::updateDictionariesIfNeeded(
     const common::metadata::ObjectMetadata& objectMetadata)
 {
     m_deviceDao.insertOrFetch(queryContext, packet.deviceId);
-    m_objectTypeDao.insertOrFetch(queryContext, objectMetadata.objectTypeId);
+    m_objectTypeDao.insertOrFetch(queryContext, objectMetadata.typeId);
 }
 
 void EventsStorage::insertEvent(
@@ -439,7 +439,7 @@ void EventsStorage::insertEvent(
     insertEventQuery.bindValue(":deviceId", m_deviceDao.deviceIdFromGuid(packet.deviceId));
     insertEventQuery.bindValue(
         ":objectTypeId",
-        (long long) m_objectTypeDao.objectTypeIdFromName(objectMetadata.objectTypeId));
+        (long long) m_objectTypeDao.objectTypeIdFromName(objectMetadata.typeId));
     insertEventQuery.bindValue(
         ":trackId",
         QnSql::serialized_field(objectMetadata.trackId));
