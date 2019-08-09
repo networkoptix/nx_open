@@ -105,3 +105,24 @@ C:\Program Files\<vms-installation-dir>\MediaServer\plugins\
 /opt/<vms-installation-dir>/mediaserver/bin/plugins/
 ```
 ATTENTION: After copying the plugin library, the Server has to be restarted.
+
+---------------------------------------------------------------------------------------------------
+## Compatibility and Breaking Changes
+
+Plugin libraries compiled using nx_sdk 1.7.1 (which has been included with VMS 3.2) are compatible
+with VMS 4.0, because the binary interface (ABI) did not change. The same way, plugins compiled
+with this newer nx_sdk should work with VMS 3.2 as well.
+
+The current nx_sdk version (coming with VMS 4.0) has no new features or extensions to the API
+available for the plugins in nx_sdk 1.7.1 (coming with VMS 3.2).
+
+Re-compiling the source code of plugins written with nx_sdk 1.7.1 using this newer nx_sdk requires
+some simple adjustments due the following breaking changes in SDK source code:
+
+- SDK headers moved:
+    - `include/plugins/camera_*.h` -> `src/camera/`.
+    - `include/plugins/plugin_*.h -> src/plugins/`.
+- Removed unused interface `nxpl::Plugin3` which only added `setLocale()` to `nxpl::Plugin2`.
+- Helper utilities, formerly in `plugin_tools.h`:
+    - `ScopedRef<>` replaced with `Ptr<>` (`src/nx/sdk/ptr.h`).
+    - `alignUp()`, `mallocAligned()`, `freeAligned()` moved to `nx/kit/utils.h`.
