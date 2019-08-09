@@ -87,6 +87,9 @@ private:
     bool calculateIsAnalyticsSupported() const;
     void updateIsAnalyticsSupported();
 
+    /** Request analytics objects once to check if they exist in the archive. */
+    void requestAnalyticsObjectsExistence();
+
 private:
     QnResourceDisplayPtr m_display;
     QScopedPointer<QnSingleCamLicenseStatusHelper> m_licenseStatusHelper;
@@ -95,6 +98,7 @@ private:
     bool m_isPlayingLive = false;
     bool m_isOffline = false;
     bool m_isUnauthorized = false;
+    bool m_analyticsObjectsFound = false;
 };
 
 } // namespace nx::vms::client::desktop
