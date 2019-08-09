@@ -18,8 +18,7 @@ namespace {
 
 bool isTextSelectable(const QLabel* label)
 {
-    const auto flags = label ? label->textInteractionFlags() : 0;
-    return flags.testFlag(Qt::TextSelectableByMouse);
+    return label && label->textInteractionFlags().testFlag(Qt::TextSelectableByMouse);
 }
 
 } // namespace
