@@ -43,6 +43,7 @@
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <core/resource_access/resource_access_subject.h>
 
 namespace {
 
@@ -318,7 +319,7 @@ void StartupActionsHandler::handleAcsModeResources(
         windowStart = maxTime - kAcsModeTimelineWindowSize;
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid());
+    layout->setIdUnsafe(QnUuid::createUuid());
     layout->setParentId(context()->user()->getId());
     layout->setCellSpacing(0);
     resourcePool()->addResource(layout);

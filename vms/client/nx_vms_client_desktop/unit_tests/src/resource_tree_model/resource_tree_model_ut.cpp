@@ -69,7 +69,7 @@ protected:
         QnUserType userType = QnUserType::Local)
     {
         QnUserResourcePtr user(new QnUserResource(userType));
-        user->setId(QnUuid::createUuid());
+        user->setIdUnsafe(QnUuid::createUuid());
         user->setName(name);
         user->setRawPermissions(globalPermissions);
         user->addFlags(Qn::remote);
@@ -80,7 +80,7 @@ protected:
     QnMediaServerResourcePtr addServer(const QString& name)
     {
         QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule()));
-        server->setId(QnUuid::createUuid());
+        server->setIdUnsafe(QnUuid::createUuid());
         server->setStatus(Qn::ResourceStatus::Offline);
         server->setName(name);
         resourcePool()->addResource(server);

@@ -141,7 +141,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>ไม่สามารถเริ่มต้น encoder เสียง.</translation>
+      <translation>ไม่สามารถเริ่มต้น เข้ารหัส เสียง.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>

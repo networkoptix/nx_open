@@ -104,12 +104,12 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>Không thể hợp nhất các Hệ thống vì chúng có ít nhất một máy chủ có cùng ID. Vui lòng xóa máy chủ này và thử lại.</translation>
     </message>
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
+      <translation>Hệ thống đám mây có chủ sở hữu khác nhau. Hợp nhất không được phép.</translation>
     </message>
   </context>
   <context>
@@ -336,15 +336,15 @@
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation type="unfinished">Plugin error. %1</translation>
+      <translation>Lỗi plugin. %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation type="unfinished">Plugin is unavailable</translation>
+      <translation>Plugin không có sẵn</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation type="unfinished">Internal server error. %1</translation>
+      <translation>Lỗi nội bộ máy chủ. %1</translation>
     </message>
   </context>
   <context>
@@ -383,7 +383,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
-      <translation type="unfinished">Could not allocate sample buffers</translation>
+      <translation>Không thể phân bổ bộ đệm mẫu</translation>
     </message>
   </context>
   <context>
@@ -520,162 +520,162 @@
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Time Licenses</numerusform>
+      <translation>
+        <numerusform>%n Bản quyền theo thời gian</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Analog Licenses</numerusform>
+      <translation>
+        <numerusform>%n Phép loại suy giấy phép</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Professional Licenses</numerusform>
+      <translation>
+        <numerusform>%n Giấy phép chuyên nghiệp</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Edge Licenses</numerusform>
+      <translation>
+        <numerusform>%n Giấy phép cạnh</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Vmax Licenses</numerusform>
+      <translation>
+        <numerusform>%n Giấy phép Vmax</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Analog Encoder Licenses</numerusform>
+      <translation>
+        <numerusform>%n Giấy phép phép loại suy encoder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Video Wall Licenses</numerusform>
+      <translation>
+        <numerusform>%n Giấy phép bức tường video</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Module Licenses</numerusform>
+      <translation>
+        <numerusform>%n I/O Module giấy phép</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n Start giấy phép</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Bridge Licenses</numerusform>
+      <translation>
+        <numerusform>%n Giấy phép Cầu</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Invalid Licenses</numerusform>
+      <translation>
+        <numerusform>%n Giấy phép không hợp lệ</numerusform>
       </translation>
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>Bản quyền miễn phí</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n Bản quyền miễn phí</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Time Licenses</numerusform>
+      <translation>
+        <numerusform>%n%1 Bản quyền theo thời gian</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Analog Licenses</numerusform>
+      <translation>
+        <numerusform>%n%1 Phép loại suy giấy phép</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Professional Licenses</numerusform>
+      <translation>
+        <numerusform>%n%1 Giấy phép chuyên nghiệp</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Edge Licenses</numerusform>
+      <translation>
+        <numerusform>%n%1 Giấy phép cạnh</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Vmax Licenses</numerusform>
+      <translation>
+        <numerusform>%n%1 Giấy phép Vmax</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Analog Encoder Licenses</numerusform>
+      <translation>
+        <numerusform>%n%1 Giấy phép phép loại suy encoder</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Video Wall Licenses</numerusform>
+      <translation>
+        <numerusform>%n%1 Giấy phép bức tường video</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 I/O Module Licenses</numerusform>
+      <translation>
+        <numerusform>%n%1 I/O Module giấy phép</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Start Licenses</numerusform>
+      <translation>
+        <numerusform>%n%1 Start giấy phép</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n%1 Bản quyền miễn phí</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Bridge Licenses</numerusform>
+      <translation>
+        <numerusform>%n%1 Giấy phép Cầu</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 Invalid Licenses</numerusform>
+      <translation>
+        <numerusform>%n%1 Giấy phép không hợp lệ</numerusform>
       </translation>
     </message>
   </context>
@@ -738,11 +738,11 @@
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+      <translation>Chỉ có một giấy phép Starter được cho phép trên mỗi Hệ thống.</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation type="unfinished">You already have one active starter license.</translation>
+      <translation>Bạn đã có một giấy phép Starter hoạt động.</translation>
     </message>
   </context>
   <context>
@@ -756,11 +756,11 @@
     <name>QnResourceNameStrings</name>
     <message>
       <source>Cameras</source>
-      <translation>Máy ảnh</translation>
+      <translation>Camera</translation>
     </message>
     <message>
       <source>cameras</source>
-      <translation>máy ảnh</translation>
+      <translation>camera</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -805,7 +805,7 @@
     <message numerus="yes">
       <source>%n Cameras</source>
       <translation>
-        <numerusform>%n Camera</numerusform>
+        <numerusform>%n camera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -816,26 +816,26 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n Mô-đun I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n Mô-đun I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Devices</source>
-      <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
+      <translation>
+        <numerusform>%n Thiết bị</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices</source>
-      <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
+      <translation>
+        <numerusform>%n thiết bị</numerusform>
       </translation>
     </message>
   </context>
@@ -994,42 +994,42 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation type="unfinished">Zip file is corrupted.</translation>
+      <translation>Tệp Zip bị hỏng.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation type="unfinished">Could not find target dir.</translation>
+      <translation>Không thể tìm thấy thư mục đích.</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation type="unfinished">Could not open file for writing.</translation>
+      <translation>Không thể mở tập tin để viết.</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation type="unfinished">There is no free space on the disk.</translation>
+      <translation>Không có không gian trống trên đĩa.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Lỗi không rõ.</translation>
+      <translation>Lỗi không xác định.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation type="unfinished">Extraction was cancelled.</translation>
+      <translation>Khai thác đã bị hủy bỏ.</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation type="unfinished">Extractor is busy.</translation>
+      <translation>Extractor là bận rộn.</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>Kích thước luồng mã hóa sai.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>Tiêu đề dòng mã hóa bị hỏng.</translation>
     </message>
   </context>
   <context>
@@ -1485,19 +1485,19 @@
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation type="unfinished">Storage Issue</translation>
+      <translation>Vấn đề lưu trữ</translation>
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation type="unfinished">Storage Issue at %1</translation>
+      <translation>Vấn đề lưu trữ ở %1</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation type="unfinished">Set to fullscreen</translation>
+      <translation>Chuyển sang màn hình đầy đủ</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
-      <translation type="unfinished">Exit fullscreen</translation>
+      <translation>Để lại toàn màn hình</translation>
     </message>
     <message>
       <source>Open layout</source>
@@ -1505,35 +1505,35 @@
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+      <translation>Không thể ép buộc sử dụng thời gian camera, nó bị trễ quá nhiều, thời gian hệ thống sẽ được sử dụng</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
+      <translation>Thời gian camera trở lại bình thường</translation>
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>Nhiều %1 sự kiện đã xảy ra</translation>
     </message>
     <message>
       <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+      <translation>Phát hiện xung đột địa chỉ Multicast. Địa chỉ %1 đã được sử dụng bởi %2 trên %3 luồng</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address</source>
-      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+      <translation>Địa chỉ mạng %1 không phải là địa chỉ multicast</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>Lưu trữ phân tích &quot;%1&quot; đang ngoại tuyến.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>Lưu trữ phân tích &quot;%1&quot; gần đầy.</translation>
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation type="unfinished">Plugin Diagnostic Event</translation>
+      <translation>Plugin chẩn đoán sự kiện</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
@@ -1541,7 +1541,7 @@
     </message>
     <message>
       <source>RAID error. %1.</source>
-      <translation type="unfinished">RAID error. %1.</translation>
+      <translation>Lỗi RAID. %1.</translation>
     </message>
   </context>
   <context>

@@ -114,7 +114,7 @@ public:
     {
         setSpaceLimit(spaceLimit);
         setUsedForWriting(isUsedForWriting);
-        setId(QnUuid::createUuid());
+        setIdUnsafe(QnUuid::createUuid());
     }
 
     virtual QIODevice* open(const QString& /*fileName*/, QIODevice::OpenMode /*openMode*/) override

@@ -841,7 +841,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
 
 void QnRtspClientArchiveDelegate::setSpeed(qint64 displayTime, double value)
 {
-    if (value == 0.0)
+    if (value == 0.0 && m_rtspSession->getScale() >= 0) // reopen stream after reverse play
         return;
 
     m_position = displayTime;

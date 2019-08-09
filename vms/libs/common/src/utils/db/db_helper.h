@@ -22,7 +22,7 @@ public:
         QnDbTransaction(QSqlDatabase& database, QnReadWriteLock& mutex);
         virtual ~QnDbTransaction();
     protected:
-        virtual bool beginTran();
+        virtual bool beginTran(const char* sourceFile, int sourceLine);
         virtual void rollback();
         virtual bool commit();
         bool dbCommit(const QString& event);
@@ -44,7 +44,7 @@ public:
     class QnDbTransactionLocker: public QnAbstractTransactionLocker
     {
     public:
-        QnDbTransactionLocker(QnDbTransaction* tran);
+        QnDbTransactionLocker(QnDbTransaction* tran, const char* sourceFile, int sourceLine);
         virtual ~QnDbTransactionLocker();
         virtual bool commit() override;
 

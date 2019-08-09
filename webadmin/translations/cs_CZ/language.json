@@ -118,7 +118,7 @@
         "updateNotificationsEnabled": "Aktualizace oznámení byla povolena",
         "upnpPortMappingEnabled": "Mapování portů UPNP bylo povoleno",
         "useTextEmailFormat": "Odeslat prostý text emailem",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails",
+        "useWindowsEmailLineFeed": "V e-mailech použijte linkový zdroj Windows",
         "trafficEncryptionForced": "Force traffic encryption",
         "videoTrafficEncryptionForced": "Force video traffic encryption",
         "updateStatus": "Update status",
@@ -182,7 +182,7 @@
         "selectFiles": "Vybrat soubory"
     },
     "advanced": {
-        "free": "Volný",
+        "free": "Zdarma",
         "total": "Celkem",
         "occupied": "Obsazený",
         "reserved": "Vyhrazený"

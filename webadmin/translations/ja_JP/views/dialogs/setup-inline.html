@@ -24,7 +24,7 @@
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">もう一度やり直してください</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">再試行</button>
     </p>
 </div>
 
@@ -233,7 +233,7 @@
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                パスワードを保存
+                パスワードを保存する
             </labe>
         </div>
 

@@ -203,8 +203,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     m_crashReporter(commonModule())
 {
     // This will work on its own.
-    if (ini().enableSessionTimeout)
-        const auto sessionTimeoutWatcher = new WorkbenchSessionTimeoutWatcher(this);
+    const auto sessionTimeoutWatcher = new WorkbenchSessionTimeoutWatcher(this);
 
     connect(this, &QnWorkbenchConnectHandler::stateChanged, this,
         &QnWorkbenchConnectHandler::handleStateChanged);

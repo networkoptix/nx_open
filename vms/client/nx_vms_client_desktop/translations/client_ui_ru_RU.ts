@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Техническая поддержка</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -320,7 +315,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>на следующий день</translation>
     </message>
   </context>
   <context>
@@ -665,12 +660,12 @@
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>Особый порт потока</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>Доверять меткам времени камеры</translation>
     </message>
     <message>
       <location/>
@@ -690,7 +685,7 @@
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>Собственные пресеты камеры не будут доступны.</translation>
     </message>
     <message>
       <location/>
@@ -705,7 +700,7 @@
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>Обнаружение движения во время импорта архива</translation>
     </message>
   </context>
   <context>
@@ -1044,7 +1039,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>Подсказка</translation>
     </message>
     <message>
       <location/>
@@ -1089,7 +1084,7 @@
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Добавить устройства</translation>
     </message>
     <message>
       <location/>
@@ -1107,12 +1102,12 @@
     <message>
       <location/>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>Я не согласен</translation>
     </message>
     <message>
       <location/>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>Я согласен</translation>
     </message>
   </context>
   <context>
@@ -3078,8 +3073,8 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation>Данные аналитики могут занимать десятки гигабайт дискового пространства. Мы рекомендуем выбрать другое место для него вместо системного раздела.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <translation>Данные аналитики могут занять много места. Рекомендуем выбрать другое место вместо системного раздела.</translation>
     </message>
   </context>
   <context>

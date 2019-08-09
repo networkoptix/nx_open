@@ -2,6 +2,9 @@
 #include "ui_watermark_preview_dialog.h"
 #include "../watermark_edit_settings.h"
 
+#include <array>
+#include <chrono>
+
 #include <QtGui/QPainter>
 #include <QtCore/QScopedValueRollback>
 
@@ -14,7 +17,39 @@
 namespace nx::vms::client::desktop {
 
 namespace {
+
 const QString kPreviewUsername = "username";
+
+static constexpr int kOpacitySteps = 20;
+static constexpr int kFrequencySteps = 5;
+static constexpr std::array<double, kFrequencySteps> kFrequencies { 0.1, 0.2, 0.3, 0.4, 0.5 };
+
+int frequencyToIndex(double value)
+{
+    for (int index = 0; index < kFrequencySteps; ++index)
+    {
+        if (value <= kFrequencies[index])
+            return index;
+    }
+    return kFrequencySteps;
+}
+
+double indexToFrequency(int index)
+{
+    return kFrequencies[std::clamp(0, index, kFrequencySteps - 1)];
+}
+
+int opacityToIndex(double value)
+{
+    return (int)(value * kOpacitySteps);
+}
+
+double indexToOpacity(int index)
+{
+    NX_ASSERT(index >= 1 && index <= kOpacitySteps);
+    return index / (double) kOpacitySteps;
+}
+
 } // namespace
 
 WatermarkPreviewDialog::WatermarkPreviewDialog(QWidget* parent):
@@ -29,10 +64,16 @@ WatermarkPreviewDialog::WatermarkPreviewDialog(QWidget* parent):
     ui->frequencySlider->setProperty(style::Properties::kSliderFeatures,
         static_cast<int>(style::SliderFeature::FillingUp));
 
+    ui->frequencySlider->setRange(0, kFrequencySteps - 1);
+    ui->opacitySlider->setRange(1, kOpacitySteps);
+
     connect(ui->opacitySlider, &QSlider::valueChanged,
         this, &WatermarkPreviewDialog::updateDataFromControls);
     connect(ui->frequencySlider, &QSlider::valueChanged,
         this, &WatermarkPreviewDialog::updateDataFromControls);
+
+    m_repaintOperation.setCallback( [this] { drawPreview(); });
+    m_repaintOperation.setInterval(std::chrono::milliseconds(60));
 }
 
 WatermarkPreviewDialog::~WatermarkPreviewDialog()
@@ -54,9 +95,9 @@ bool WatermarkPreviewDialog::editSettings(QnWatermarkSettings& settings, QWidget
 void WatermarkPreviewDialog::loadDataToUi()
 {
     QScopedValueRollback<bool> lock_guard(m_lockUpdate, true);
-    ui->opacitySlider->setValue((int) (m_settings.opacity * ui->opacitySlider->maximum()));
-    ui->frequencySlider->setValue((int) (m_settings.frequency * ui->frequencySlider->maximum()));
-    drawPreview();
+    ui->opacitySlider->setValue(opacityToIndex(m_settings.opacity));
+    ui->frequencySlider->setValue(frequencyToIndex(m_settings.frequency));
+    m_repaintOperation.requestOperation();
 }
 
 void WatermarkPreviewDialog::updateDataFromControls()
@@ -64,15 +105,16 @@ void WatermarkPreviewDialog::updateDataFromControls()
     if (m_lockUpdate)
         return;
 
-    m_settings.frequency = ui->frequencySlider->value() / (double) ui->frequencySlider->maximum();
-    m_settings.opacity = ui->opacitySlider->value() / (double) ui->opacitySlider->maximum();
-    drawPreview();
+    m_settings.frequency = indexToFrequency(ui->frequencySlider->value());
+    m_settings.opacity = indexToOpacity(ui->opacitySlider->value());
+    m_repaintOperation.requestOperation();
 }
 
 void WatermarkPreviewDialog::drawPreview()
 {
     QPixmap image = m_baseImage;
-    const auto watermark = core::createWatermarkImage({m_settings, kPreviewUsername}, QSize(1920, 1080));
+    const auto watermark =
+        nx::core::createWatermarkImage({m_settings, kPreviewUsername}, QSize(1920, 1080));
 
     // Draw watermark in logical coordinates.
     const QRectF dest(

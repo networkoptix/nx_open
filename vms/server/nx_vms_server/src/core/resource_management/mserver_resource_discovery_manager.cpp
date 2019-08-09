@@ -293,7 +293,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 NX_ASSERT(foundCamera->resourcePool() == nullptr);
                 foundCamera->setParentId(commonModule()->moduleGUID());
                 foundCamera->setFlags(existingCamera->flags() & ~Qn::foreigner);
-                foundCamera->setId(existingCamera->getId());
+                foundCamera->setIdUnsafe(existingCamera->getId());
                 foundCamera->addFlags(Qn::parent_change);
                 if (updateTypeId)
                     foundCamera->setTypeId(newTypeId);

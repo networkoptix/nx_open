@@ -104,12 +104,12 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
+      <translation>Nelze sloučit systémy, protože mají alespoň jeden server se stejným ID. Odstraňte tento server a zkuste to znovu.</translation>
     </message>
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
+      <translation>Cloudové systémy mají různé majitele. Sloučení není povoleno.</translation>
     </message>
   </context>
   <context>
@@ -336,15 +336,15 @@
     </message>
     <message>
       <source>Plugin error. %1</source>
-      <translation type="unfinished">Plugin error. %1</translation>
+      <translation>Chyba pluginu. %1</translation>
     </message>
     <message>
       <source>Plugin is unavailable</source>
-      <translation type="unfinished">Plugin is unavailable</translation>
+      <translation>Plugin je nedostupný</translation>
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation type="unfinished">Internal server error. %1</translation>
+      <translation>Interní chyba serveru.</translation>
     </message>
   </context>
   <context>
@@ -383,7 +383,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers</source>
-      <translation type="unfinished">Could not allocate sample buffers</translation>
+      <translation>Nelze přidělit vyrovnávací paměti vzorku, kód chyby</translation>
     </message>
   </context>
   <context>
@@ -417,7 +417,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Nelze najít enkodér pro kodek %1.</translation>
+      <translation>Nelze najít kodér pro kodek %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -619,14 +619,14 @@
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation type="unfinished">Free Licenses</translation>
+      <translation>Bezplatné licence</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
       <translation type="unfinished">
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+        <numerusform>%n Bezplatné licence</numerusform>
+        <numerusform>%n Bezplatné licence</numerusform>
+        <numerusform>%n Bezplatné licence</numerusform>
         <numerusform>%n Free Licenses</numerusform>
       </translation>
     </message>
@@ -724,7 +724,7 @@
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation type="unfinished">
-        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n%1 Bezplatné licence</numerusform>
         <numerusform>%n/%1 Free Licenses</numerusform>
         <numerusform>%n/%1 Free Licenses</numerusform>
         <numerusform>%n/%1 Free Licenses</numerusform>
@@ -822,11 +822,11 @@
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+      <translation>V systému je povolena pouze jedna výchozí licence.</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation type="unfinished">You already have one active starter license.</translation>
+      <translation>Již máte jednu aktivní výchozí licenci.</translation>
     </message>
   </context>
   <context>
@@ -889,7 +889,7 @@
     <message numerus="yes">
       <source>%n Cameras</source>
       <translation type="unfinished">
-        <numerusform>%n Cameras</numerusform>
+        <numerusform>Kamery</numerusform>
         <numerusform>%n Cameras</numerusform>
         <numerusform>%n Cameras</numerusform>
         <numerusform>%n Cameras</numerusform>
@@ -898,7 +898,7 @@
     <message numerus="yes">
       <source>%n cameras</source>
       <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
+        <numerusform>kamery</numerusform>
         <numerusform>%n cameras</numerusform>
         <numerusform>%n cameras</numerusform>
         <numerusform>%n cameras</numerusform>
@@ -907,8 +907,8 @@
     <message numerus="yes">
       <source>%n I/O Modules</source>
       <translation type="unfinished">
-        <numerusform>%n I/O Modules</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Modul(y</numerusform>
+        <numerusform>%n I/O Moduly</numerusform>
         <numerusform>%n I/O Modules</numerusform>
         <numerusform>%n I/O Modules</numerusform>
       </translation>
@@ -916,7 +916,7 @@
     <message numerus="yes">
       <source>%n I/O modules</source>
       <translation type="unfinished">
-        <numerusform>%n I/O modules</numerusform>
+        <numerusform>%n I/O moduly</numerusform>
         <numerusform>%n I/O modules</numerusform>
         <numerusform>%n I/O modules</numerusform>
         <numerusform>%n I/O modules</numerusform>
@@ -925,7 +925,7 @@
     <message numerus="yes">
       <source>%n Devices</source>
       <translation type="unfinished">
-        <numerusform>%n Devices</numerusform>
+        <numerusform>%n Zařízení</numerusform>
         <numerusform>%n Devices</numerusform>
         <numerusform>%n Devices</numerusform>
         <numerusform>%n Devices</numerusform>
@@ -934,7 +934,7 @@
     <message numerus="yes">
       <source>%n devices</source>
       <translation type="unfinished">
-        <numerusform>%n devices</numerusform>
+        <numerusform>%n zařízení</numerusform>
         <numerusform>%n devices</numerusform>
         <numerusform>%n devices</numerusform>
         <numerusform>%n devices</numerusform>
@@ -1096,19 +1096,19 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation type="unfinished">Zip file is corrupted.</translation>
+      <translation>Zip Soubor je poškozen.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation type="unfinished">Could not find target dir.</translation>
+      <translation>Cílový adresář nebyl nalezen.</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation type="unfinished">Could not open file for writing.</translation>
+      <translation>Nelze otevřít soubor pro zápis</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation type="unfinished">There is no free space on the disk.</translation>
+      <translation>Na disku není volné místo.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -1116,22 +1116,22 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation type="unfinished">Extraction was cancelled.</translation>
+      <translation>Extrahování bylo zrušeno</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation type="unfinished">Extractor is busy.</translation>
+      <translation>Extractor je zaneprázdněn.</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation type="unfinished">Wrong crypted stream size.</translation>
+      <translation>Špatná velikost šifrovaného proudu.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation type="unfinished">Damaged crypted stream header.</translation>
+      <translation>Poškozená záhlaví šifrovaného proudu.</translation>
     </message>
   </context>
   <context>
@@ -1643,43 +1643,43 @@
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation type="unfinished">Failed to force using camera time, it lags too much, system time will be used</translation>
+      <translation>Použití času z kamery se nepodařilo vynutit - přílišné zpoždění. BUde použit systémový čas</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation type="unfinished">Camera time is back to normal</translation>
+      <translation>Čas kamery je zpět v normálu</translation>
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation type="unfinished">Multiple %1 events have occurred</translation>
+      <translation>Došlo k několika událostem %1</translation>
     </message>
     <message>
       <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+      <translation>Byl zjištěn konflikt multicast adresy. Adresa %1 je již používána %2 na %3 proudu</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address</source>
-      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+      <translation>Síťová adresa %1 není multicast adresou</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>Uložiště analytik &quot;%1&quot; je v režimu offline.</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>Úložiště analytik &quot;%1&quot; je téměř plné.</translation>
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation type="unfinished">Plugin Diagnostic Event</translation>
+      <translation>Diagnosticka události pluginu</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Neznámá diagnosticka události pluginu</translation>
     </message>
     <message>
       <source>RAID error. %1.</source>
-      <translation type="unfinished">RAID error. %1.</translation>
+      <translation>Chyba RAID. %1.</translation>
     </message>
   </context>
   <context>

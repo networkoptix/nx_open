@@ -47,6 +47,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <nx/vms/client/desktop/system_health/system_health_state.h>
+#include <nx/vms/client/desktop/system_update/server_update_tool.h>
 #include <nx/vms/client/desktop/system_update/workbench_update_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
 
@@ -119,6 +120,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     instance<QnGLCheckerInstrument>();
 
     instance<nx::vmx::client::desktop::Director>();
+    instance<nx::vms::client::desktop::ServerUpdateTool>();
     instance<nx::vms::client::desktop::WorkbenchUpdateWatcher>();
 
     initWorkarounds();
@@ -207,14 +209,12 @@ void QnWorkbenchContext::setMainWindow(MainWindow* mainWindow)
 
 nx::core::Watermark QnWorkbenchContext::watermark() const
 {
-    if (ini().enableWatermark)
+    if (globalSettings()->watermarkSettings().useWatermark
+        && !accessController()->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
+        && user()
+        && !user()->getName().isEmpty())
     {
-        if (globalSettings()->watermarkSettings().useWatermark
-            && !accessController()->hasGlobalPermission(nx::vms::api::GlobalPermission::admin)
-            && user() && !user()->getName().isEmpty())
-        {
-            return {globalSettings()->watermarkSettings(), user()->getName()};
-        }
+        return {globalSettings()->watermarkSettings(), user()->getName()};
     }
     return {};
 }

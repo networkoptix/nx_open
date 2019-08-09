@@ -586,7 +586,7 @@ void QnBusinessRuleWidget::updateWarningLabel()
         {
             static const QString warning = tr(
                 "Force Acknowledgement will only work for Generic Events"
-                " if camera modifiers are used in the Generic Event URL");
+                " if camera identifiers are used in the Generic Event URL");
             ui->actionWarningLabel->setText(warning);
             ui->actionWarningLabel->show();
             return;

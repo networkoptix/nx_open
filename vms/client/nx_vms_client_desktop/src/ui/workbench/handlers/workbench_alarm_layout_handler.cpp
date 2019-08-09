@@ -216,7 +216,7 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout()
     if (!m_alarmLayout)
     {
         m_alarmLayout.reset(new QnLayoutResource(commonModule()));
-        m_alarmLayout->setId(QnUuid::createUuid());
+        m_alarmLayout->setIdUnsafe(QnUuid::createUuid());
         m_alarmLayout->setName(tr("Alarms"));
         m_alarmLayout->setCellSpacing(QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Small));
         m_alarmLayout->setData(Qn::LayoutIconRole, qnSkin->icon("layouts/alarm.png"));

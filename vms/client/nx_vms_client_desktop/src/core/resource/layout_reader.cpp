@@ -62,7 +62,7 @@ QnFileLayoutResourcePtr nx::vms::client::desktop::layout::layoutFromFile(
     auto layoutBase = layout.staticCast<QnLayoutResource>();
     ec2::fromApiToResource(apiLayout, layoutBase);
 
-    layout->setId(layoutId);
+    layout->setIdUnsafe(layoutId);
     layout->setParentId(QnUuid());
     layout->setName(QFileInfo(layoutUrl).fileName());
     layout->setUrl(layoutUrl);

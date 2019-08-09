@@ -21,6 +21,7 @@
 #include <nx/cloud/db/client/data/auth_data.h>
 
 #include "ec_connection_notification_manager.h"
+#include <core/resource_access/resource_access_subject.h>
 
 using namespace nx::vms;
 

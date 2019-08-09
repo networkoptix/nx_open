@@ -320,7 +320,7 @@ TEST_F(BookmarksDatabaseTest, tagSearchTest)
     ASSERT_EQ(0, result.size());
 
     result.clear();
-    filter.text = "btag";
+    filter.text = "Btag";
     mediaServerLauncher->serverModule()->serverDb()->getBookmarks(cameras, filter, result);
     ASSERT_EQ(3, result.size());
 }

@@ -7,6 +7,7 @@
 #include <client_core/client_core_module.h>
 #include <utils/license_usage_helper.h>
 #include <nx/client/core/watchers/user_watcher.h>
+#include <core/resource_access/resource_access_subject.h>
 
 namespace nx::vms::client::core {
 

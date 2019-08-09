@@ -20,6 +20,7 @@ extern "C" {
 #include <utils/media/ffmpeg_initializer.h>
 #include <utils/common/writer_pool.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/random_qt_device.h>
 #include <media_server/settings.h>
 
 #ifndef _WIN32
@@ -250,7 +251,7 @@ public:
 private:
     void generateTestData()
     {
-        std::random_device rd;
+        nx::utils::random::QtDevice rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<int> normalStartDistMs(5500, 7000);
         std::uniform_int_distribution<int> holeStartDistMs(20000, 55000);
@@ -360,7 +361,7 @@ private:
         {
             QnStorageResourcePtr storage = QnStorageResourcePtr(new QnFileStorageResource(serverModule));
             storage->setUrl(m_storageUrls[i]);
-            storage->setId(QnUuid::createUuid());
+            storage->setIdUnsafe(QnUuid::createUuid());
             storage->setUsedForWriting(true);
             ASSERT_EQ(storage->initOrUpdate(), Qn::StorageInit_Ok);
             if (i % 2 == 0)
@@ -454,7 +455,7 @@ public:
     static void SetUpTestCase()
     {
         testCamera.reset(new nx::CameraResourceStub());
-        testCamera->setId(QnUuid::createUuid());
+        testCamera->setIdUnsafe(QnUuid::createUuid());
         testCamera->setPhysicalId(testCamera->getId().toString());
 
         serverModule.reset(new QnMediaServerModule());

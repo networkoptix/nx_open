@@ -199,6 +199,20 @@ TEST(Algorithm_equalRangeByPrefix, all)
     ASSERT_EQ(m.end(), range.second);
 }
 
+TEST(Algorithm_y_combinator, compilation_test)
+{
+    auto addItemRecursive = nx::utils::y_combinator(
+        [](auto addItemRecursive, int a) -> int
+        {
+            if (a == 10)
+                return a;
+
+            return addItemRecursive(a + 1);
+        });
+
+    ASSERT_EQ(addItemRecursive(0), 10);
+}
+
 } // namespace test
 } // namespace utils
 } // namespace nx

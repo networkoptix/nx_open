@@ -25,6 +25,11 @@ if((withDesktopClient OR withMobileClient) AND NOT (ANDROID OR IOS))
     add_subdirectory(qtkeychain)
 endif()
 
+if(withDesktopClient AND WINDOWS)
+    add_subdirectory(detours)
+    add_subdirectory(stackwalker)
+endif()
+
 if(withMobileClient)
     add_subdirectory(qtsingleguiapplication)
 endif()

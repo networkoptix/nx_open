@@ -7,6 +7,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <common/common_module.h>
+#include <core/resource_access/resource_access_subject.h>
 
 using namespace nx::core::access;
 
@@ -44,7 +45,8 @@ Source QnPermissionsResourceAccessProvider::baseSource() const
 }
 
 bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& resource) const
+    const QnResourcePtr& resource,
+    GlobalPermissions globalPermissions) const
 {
     NX_ASSERT(acceptable(subject, resource));
     if (!acceptable(subject, resource))
@@ -64,7 +66,7 @@ bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccess
     else if (isLayout(resource) && subject.user() && resource->getParentId() == subject.id())
         requiredPermission = {};
 
-    return globalPermissionsManager()->hasGlobalPermission(subject, requiredPermission);
+    return globalPermissions.testFlag(requiredPermission);
 }
 
 void QnPermissionsResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
