@@ -86,6 +86,9 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
     connect(m_analyticsSearchWidget, &AnalyticsSearchWidget::textFilterChanged,
         this, &AnalyticsSearchSynchronizer::updateTimelineDisplay);
 
+    connect(m_analyticsSearchWidget, &AnalyticsSearchWidget::selectedObjectTypeChanged,
+        this, &AnalyticsSearchSynchronizer::updateTimelineDisplay);
+
     connect(m_analyticsSearchWidget, &AnalyticsSearchWidget::filterRectChanged, this,
         [this](const QRectF& value)
         {
@@ -205,12 +208,15 @@ void AnalyticsSearchSynchronizer::updateTimelineDisplay()
     }
 
     const auto filterRect = m_analyticsSearchWidget->filterRect();
+    const auto selectedObjectType = m_analyticsSearchWidget->selectedObjectType();
 
     analytics::db::Filter filter;
     filter.deviceIds = {camera->getId()};
     if (!filterRect.isNull())
         filter.boundingBox = filterRect;
     filter.freeText = m_analyticsSearchWidget->textFilter();
+    if (!selectedObjectType.isEmpty())
+        filter.objectTypeId.push_back(selectedObjectType);
     navigator()->setAnalyticsFilter(filter);
     navigator()->setSelectedExtraContent(Qn::AnalyticsContent);
 }

@@ -272,7 +272,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(ui->releaseNotesUrl, &QLabel::linkActivated, this,
         [this]()
         {
-            if (m_haveValidUpdate && !m_updateInfo.info.releaseNotesUrl.isEmpty())
+            if (m_updateInfo.isValidToInstall() && !m_updateInfo.info.releaseNotesUrl.isEmpty())
                 QDesktopServices::openUrl(m_updateInfo.info.releaseNotesUrl);
         });
 
@@ -745,18 +745,6 @@ void MultiServerUpdatesWidget::setUpdateTarget(
     auto clientId = clientPeerId();
     auto report = calculateUpdateVersionReport(m_updateInfo, clientId);
     m_updateReport = report;
-
-    if (activeUpdate)
-    {
-        m_haveValidUpdate = true;
-    }
-    else
-    {
-        m_haveValidUpdate = false;
-        if (contents.isValidToInstall() && !contents.alreadyInstalled)
-            m_haveValidUpdate = true;
-    }
-
     m_stateTracker->setUpdateTarget(contents.getVersion());
     m_forceUiStateUpdate = true;
     m_updateRemoteStateChanged = true;
@@ -886,7 +874,7 @@ void MultiServerUpdatesWidget::pickLocalFile()
     auto options = QnCustomFileDialog::fileDialogOptions();
     QString caption = tr("Select Update File...");
     QString filter = QnCustomFileDialog::createFilter(tr("Update Files"), "zip");
-    QString fileName = QFileDialog::getOpenFileName(this, caption, QString(), filter, 0, options);
+    QString fileName = QFileDialog::getOpenFileName(this, caption, {}, filter, nullptr, options);
 
     if (fileName.isEmpty())
         return;
@@ -1005,7 +993,7 @@ void MultiServerUpdatesWidget::atStartUpdateAction()
         NX_INFO(this, "atStartUpdateAction() - starting installation for %1", targets);
         setTargetState(WidgetUpdateState::startingInstall, targets);
     }
-    else if (m_widgetState == WidgetUpdateState::ready && m_haveValidUpdate)
+    else if (m_widgetState == WidgetUpdateState::ready && m_updateInfo.isValidToInstall())
     {
         int acceptedEula = qnSettings->acceptedEulaVersion();
         int newEula = m_updateInfo.info.eulaVersion;
@@ -1475,7 +1463,9 @@ void MultiServerUpdatesWidget::atServerConfigurationChanged(std::shared_ptr<Upda
      *  - server was added. We should repeat verification
      */
 
-    if (!item->offline || !item->verificationMessage.isEmpty())
+    if (!item->offline
+        || !item->verificationMessage.isEmpty()
+        || m_updateInfo.peersWithUpdate.contains(item->id))
     {
         // TODO: Make more conservative check: only check if server goes online, or if
         // server has errors and goes offline.
@@ -2193,8 +2183,10 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
     }
     else
     {
+        const bool validInstall = m_updateInfo.isValidToInstall()
+            && !m_updateInfo.peersWithUpdate.empty();
         ui->downloadButton->setVisible(
-            m_haveValidUpdate || m_widgetState == WidgetUpdateState::readyInstall);
+            validInstall || m_widgetState == WidgetUpdateState::readyInstall);
 
         if (latestVersion)
         {
@@ -2206,7 +2198,7 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
         }
         else
         {
-            if (m_haveValidUpdate)
+            if (validInstall)
             {
                 if (m_widgetState == WidgetUpdateState::readyInstall)
                 {
@@ -2236,7 +2228,7 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
         bool browseUpdateVisible = false;
         if (/*!m_haveValidUpdate && */m_widgetState == WidgetUpdateState::ready)
         {
-            if (m_haveValidUpdate)
+            if (m_updateInfo.isValidToInstall())
             {
                 if (m_updateSourceMode == UpdateSourceType::file)
                 {
@@ -2363,7 +2355,7 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
             storageSettingsVisible = true;
             break;
         case WidgetUpdateState::ready:
-            if (m_haveValidUpdate)
+            if (m_updateInfo.isValidToInstall())
                 storageSettingsVisible = true;
             break;
         case WidgetUpdateState::startingDownload:
@@ -2425,6 +2417,7 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
     bool hasStatusErrors = m_stateTracker->hasStatusErrors();
     bool hasSpaceIssues = !checkSpaceRequirements(m_updateInfo)
         && m_widgetState == WidgetUpdateState::ready;
+    bool nothingToInstall = m_updateInfo.peersWithUpdate.empty();
 
     QStringList errorTooltips;
     if (m_widgetState == WidgetUpdateState::readyInstall
@@ -2468,7 +2461,8 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
         ui->spaceErrorLabel->hide();
     }
 
-    if (errorTooltips.isEmpty() && !hasSpaceIssues
+    // TODO: We should move all code about ui->downloadButton to a single place.
+    if (errorTooltips.isEmpty() && !hasSpaceIssues && !nothingToInstall
         && m_widgetState != WidgetUpdateState::cancelingReadyInstall)
     {
         ui->downloadButton->setEnabled(true);
@@ -2560,7 +2554,7 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
             QString("Widget source=%1, Update source=%2").arg(toString(m_updateSourceMode), toString(m_updateInfo.sourceType)),
             QString("UploadTool=%1").arg(toString(m_serverUpdateTool->getUploaderState())),
             QString("ClientTool=%1").arg(ClientUpdateTool::toString(m_clientUpdateTool->getState())),
-            QString("validUpdate=%1").arg(m_haveValidUpdate),
+            QString("validUpdate=%1").arg(m_updateInfo.isValidToInstall()),
             QString("targetVersion=%1").arg(m_updateInfo.info.version),
             QString("checkUpdate=%1").arg(m_updateCheck.valid()),
             QString("checkServerUpdate=%1").arg(m_serverUpdateCheck.valid()),

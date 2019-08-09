@@ -6,7 +6,7 @@ namespace nx::vms::client::desktop {
 
 struct Ini: nx::kit::IniConfig
 {
-    Ini(): IniConfig("desktop_client.ini") {}
+    Ini(): IniConfig("desktop_client.ini") { reload(); }
 
     NX_INI_STRING("", cloudHost,
         "Overrides the current Client's Cloud Host. Allows to connect to the Server that uses\n"
@@ -134,6 +134,9 @@ struct Ini: nx::kit::IniConfig
         "after appearing. Values <= 1 are treated as 1.");
     NX_INI_INT(750, tilePreviewLoadIntervalMs,
         "Right Panel tiles will not request previews more often than this period, milliseconds.");
+    NX_INI_INT(10, maxSimultaneousTilePreviewLoads,
+        "Right Panel tab will not request simultaneously more previews than this number.\n"
+        "Valid range: [1, 15].");
     NX_INI_FLAG(0, enableSyncedChunksForExtraContent,
         "Whether to show motion and analytics chunks in the synced area of the timeline.");
     NX_INI_INT(0, clientWebServerPort,

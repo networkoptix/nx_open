@@ -84,20 +84,26 @@ Appserver2Process::Appserver2Process(int argc, char** argv):
 {
 }
 
-void Appserver2Process::pleaseStop()
-{
-    QnMutexLocker lk(&m_mutex);
-    m_terminated = true;
-    m_eventLoop.quit();
-}
-
 void Appserver2Process::setOnStartedEventHandler(
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
 {
     m_onStartedEventHandler = std::move(handler);
 }
 
+void Appserver2Process::pleaseStop()
+{
+    quit();
+    QnLongRunnable::pleaseStop();
+}
+
 int Appserver2Process::exec()
+{
+    start();
+    wait();
+    return 0;
+}
+
+void Appserver2Process::run()
 {
     bool processStartResult = false;
     auto triggerOnStartedEventHandlerGuard = nx::utils::makeScopeGuard(
@@ -115,7 +121,7 @@ int Appserver2Process::exec()
     if (settings.showHelp())
     {
         // TODO: settings.printCmdLineArgsHelp();
-        return 0;
+        return;
     }
 
     auto auditManager = std::make_unique<AuditManager>();
@@ -201,7 +207,7 @@ int Appserver2Process::exec()
     registerHttpHandlers(ec2ConnectionFactory.get());
 
     if (!tcpListener.bindToLocalAddress())
-        return 1;
+        return;
 
     auto server = addSelfServerResource(ec2Connection, tcpListener.getPort());
     nx::vms::utils::loadResourcesFromEcs(
@@ -221,7 +227,7 @@ int Appserver2Process::exec()
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();
 
-    m_eventLoop.exec();
+    QnLongRunnable::exec();
 
     m_tcpListener = nullptr;
     tcpListener.stop();
@@ -231,9 +237,9 @@ int Appserver2Process::exec()
     // Must call messageProcessor->init(ec2Connection).
     m_commonModule->messageProcessor()->init(nullptr);
     ec2Connection.reset();
+    ec2ConnectionFactory.reset();
+    m_commonModule.reset();
     m_ecConnection = nullptr;
-
-    return 0;
 }
 
 ec2::AbstractECConnection* Appserver2Process::ecConnection()
