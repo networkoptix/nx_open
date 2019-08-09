@@ -14,6 +14,16 @@
 
 namespace nx::vms::client::desktop {
 
+namespace {
+
+bool isTextSelectable(const QLabel* label)
+{
+    const auto flags = label ? label->textInteractionFlags() : 0;
+    return flags.testFlag(Qt::TextSelectableByMouse);
+}
+
+} // namespace
+
 //-------------------------------------------------------------------------------------------------
 // LabelSelectionManager::Private
 
@@ -73,6 +83,9 @@ protected:
                     break;
 
                 const auto textControl = getTextControl(label);
+                if (!textControl || !isTextSelectable(label))
+                    break;
+
                 const auto linkText = textControl->anchorAt(mouseEvent->pos());
                 if (linkText.isEmpty())
                     setFullSelection(textControl);
@@ -99,7 +112,7 @@ private:
     bool processContextMenuEvent(QLabel* label, QContextMenuEvent* event) const
     {
         const auto textControl = getTextControl(label);
-        if (!textControl)
+        if (!textControl || !isTextSelectable(label))
             return false;
 
         if (label->text().isEmpty())
