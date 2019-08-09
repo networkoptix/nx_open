@@ -102,6 +102,8 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
                 m_cachedSupportedEventTypes.reset();
                 m_cachedSupportedObjectTypes.reset();
                 emit userEnabledAnalyticsEnginesChanged(toSharedPointer(this));
+                emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
+                emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
             }
 
             if (key == kCompatibleAnalyticsEnginesProperty)
@@ -110,6 +112,8 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
                 m_cachedSupportedEventTypes.reset();
                 m_cachedSupportedObjectTypes.reset();
                 emit compatibleAnalyticsEnginesChanged(toSharedPointer(this));
+                emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
+                emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
             }
 
             if (key == kDeviceAgentManifestsProperty)
@@ -118,6 +122,8 @@ QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
                 m_cachedSupportedEventTypes.reset();
                 m_cachedSupportedObjectTypes.reset();
                 emit deviceAgentManifestsChanged(toSharedPointer(this));
+                emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
+                emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
             }
         });
 }
