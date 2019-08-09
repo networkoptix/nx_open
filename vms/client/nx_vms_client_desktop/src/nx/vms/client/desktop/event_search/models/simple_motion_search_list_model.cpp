@@ -6,21 +6,24 @@
 
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <core/resource/camera_resource.h>
+#include <translation/datetime_formatter.h>
 #include <ui/help/business_help.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/synctime.h>
 
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/client/core/utils/human_readable.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/range_adapters.h>
 
 #include <nx/vms/client/desktop/ini.h>
 
@@ -129,8 +132,8 @@ QVariant SimpleMotionSearchListModel::data(const QModelIndex& index, int role) c
                 return QString();
 
             return lm("Begin: %1<br>End: %2<br>Duration: %3").args( //< Not translatable debug string.
-                utils::timestampToDebugString(chunk.startTimeMs),
-                utils::timestampToDebugString(chunk.endTimeMs()),
+                nx::utils::timestampToDebugString(chunk.startTimeMs),
+                nx::utils::timestampToDebugString(chunk.endTimeMs()),
                 core::HumanReadable::timeSpan(chunk.duration())).toQString();
         }
 
@@ -205,8 +208,8 @@ void SimpleMotionSearchListModel::requestFetch()
     {
         NX_VERBOSE(this, "Loader contains %1 chunks, time range:\n    from: %2\n    to: %3",
             periods.size(),
-            utils::timestampToDebugString(periods.front().startTime()),
-            utils::timestampToDebugString(periods.back().startTime()));
+            nx::utils::timestampToDebugString(periods.front().startTime()),
+            nx::utils::timestampToDebugString(periods.back().startTime()));
     }
 
     if (fetchDirection() == FetchDirection::earlier)
@@ -301,7 +304,7 @@ void SimpleMotionSearchListModel::updateMotionPeriods(qint64 startTimeMs)
         startTimeMs = std::clamp(startTimeMs, m_data.back().startTimeMs, m_data.front().startTimeMs);
 
     NX_VERBOSE(this, "Updating, from %1, old item count = %2",
-        utils::timestampToDebugString(startTimeMs),
+        nx::utils::timestampToDebugString(startTimeMs),
         m_data.size());
 
     NX_ASSERT(!fetchedTimeWindow().isNull());
@@ -436,6 +439,26 @@ QSharedPointer<QMenu> SimpleMotionSearchListModel::contextMenu(const QnTimePerio
         });
 
     return menu;
+}
+
+QString SimpleMotionSearchListModel::timestampText(microseconds timestamp) const
+{
+    if (timestamp <= 0ms)
+        return QString();
+
+    const auto timestampMs = duration_cast<milliseconds>(timestamp).count();
+
+    const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+    const QDateTime dateTime = timeWatcher->displayTime(timestampMs);
+
+    if (qnSyncTime->currentDateTime().date() != dateTime.date())
+    {
+        return QString("%1, %2").arg(
+            datetime::toString(dateTime.date()),
+            datetime::toString(dateTime.time()));
+    }
+
+    return datetime::toString(dateTime.time());
 }
 
 } // namespace nx::vms::client::desktop

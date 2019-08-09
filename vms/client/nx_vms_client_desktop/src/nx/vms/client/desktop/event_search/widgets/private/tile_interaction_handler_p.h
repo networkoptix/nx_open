@@ -32,8 +32,8 @@ public:
 private:
     TileInteractionHandler(EventRibbon* parent);
 
-    void navigateToSource(const QModelIndex& index);
-    void openSource(const QModelIndex& index, bool inNewTab);
+    void navigateToSource(const QPersistentModelIndex& index, bool instantMessages);
+    void openSource(const QModelIndex& index, bool inNewTab, bool fromDoubleClick);
     void performDragAndDrop(const QModelIndex& index, const QPoint& pos, const QSize& size);
 
     void showMessage(const QString& text);
@@ -44,9 +44,12 @@ private:
 
     utils::Guard scopedPlaybackStarter(bool baseCondition);
 
+    bool isSyncOn() const;
+
 private:
     const QPointer<EventRibbon> m_ribbon;
     const QScopedPointer<nx::utils::PendingOperation> m_showPendingMessages;
+    const QScopedPointer<nx::utils::PendingOperation> m_navigateDelayed;
     QSet<QnGraphicsMessageBox*> m_messages;
     QStringList m_pendingMessages;
 };

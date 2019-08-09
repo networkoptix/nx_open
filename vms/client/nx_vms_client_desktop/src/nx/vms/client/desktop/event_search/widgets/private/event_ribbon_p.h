@@ -14,6 +14,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QVariantAnimation>
 #include <QtCore/QHash>
+#include <QtCore/QSharedPointer>
 
 #include <ui/common/notification_levels.h>
 #include <ui/style/helper.h>
@@ -119,7 +120,10 @@ private:
 
     void closeExpiredTiles();
 
+    ResourceThumbnailProvider* createPreviewProvider(const nx::api::ResourceImageRequest& request);
     void loadNextPreview();
+    bool isNextPreviewLoadAllowed() const;
+    void handleLoadingEnded(ResourceThumbnailProvider* provider); //< Provider may be destroying.
 
     int scrollValue() const;
     int totalTopMargin() const; //< Top margin and viewport header.
@@ -213,6 +217,8 @@ private:
 
     nx::utils::ImplPtr<nx::utils::PendingOperation> m_previewLoad;
     nx::utils::ElapsedTimer m_sinceLastPreviewRequest;
+
+    QHash<ResourceThumbnailProvider*, QSharedPointer<QTimer>> m_loadingPreviews;
 };
 
 } // namespace nx::vms::client::desktop
