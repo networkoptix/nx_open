@@ -1,3 +1,5 @@
+add_subdirectory(axis_camera_plugin)
+
 add_subdirectory(generic_rtsp_plugin)
 
 add_subdirectory(image_library_plugin)
