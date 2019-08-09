@@ -91,7 +91,7 @@ cmake_dependent_option(withDistributions "Enable distributions build"
     ON
 )
 
-cmake_dependent_option(withMetadataSdk "Enable nx_metadata_sdk build"
+cmake_dependent_option(withSdk "Enable nx_*_sdk build"
     OFF "NOT withDistributions"
     ON
 )

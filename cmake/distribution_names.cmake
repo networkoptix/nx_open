@@ -90,6 +90,8 @@ function(set_distribution_names)
         "${prefix}-client-${mobileClientVersion.full}-${suffix}" PARENT_SCOPE)
     set(metadata_sdk_distribution_name
         "${prefix}-metadata_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
+    set(camera_sdk_distribution_name
+        "${prefix}-camera_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
     set(ssc_analytics_plugin_distribution_name
         "${prefix}-ssc_analytics_plugin-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(product_distribution_name
