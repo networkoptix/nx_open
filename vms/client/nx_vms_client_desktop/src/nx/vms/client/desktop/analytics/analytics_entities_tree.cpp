@@ -4,6 +4,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
 
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/event/rule.h>
@@ -213,7 +214,19 @@ AnalyticsEventsSearchTreeBuilder::AnalyticsEventsSearchTreeBuilder(QObject* pare
             const auto flags = resource->flags();
             if (flags.testFlag(Qn::server_live_cam))
             {
-                emit eventTypesTreeChanged();
+                if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+                {
+                    connect(
+                        camera.get(),
+                        &QnVirtualCameraResource::compatibleEventTypesMaybeChanged,
+                        this,
+                        [this](const QnVirtualCameraResourcePtr& /*camera*/)
+                        {
+                            emit eventTypesTreeChanged();
+                        });
+
+                    emit eventTypesTreeChanged();
+                }
             }
             else if (flags.testFlag(Qn::server) && !flags.testFlag(Qn::fake))
             {
@@ -234,6 +247,7 @@ AnalyticsEventsSearchTreeBuilder::AnalyticsEventsSearchTreeBuilder(QObject* pare
             const auto flags = resource->flags();
             if (flags.testFlag(Qn::server_live_cam))
             {
+                resource->disconnect(this);
                 emit eventTypesTreeChanged();
             }
             else if (flags.testFlag(Qn::server) && !flags.testFlag(Qn::fake))
@@ -285,7 +299,19 @@ AnalyticsObjectsSearchTreeBuilder::AnalyticsObjectsSearchTreeBuilder(QObject* pa
             const auto flags = resource->flags();
             if (flags.testFlag(Qn::server_live_cam))
             {
-                emit objectTypesTreeChanged();
+                if (const auto camera = resource.dynamicCast<QnVirtualCameraResource>())
+                {
+                    connect(
+                        camera.get(),
+                        &QnVirtualCameraResource::compatibleObjectTypesMaybeChanged,
+                        this,
+                        [this](const QnVirtualCameraResourcePtr& /*camera*/)
+                        {
+                            emit objectTypesTreeChanged();
+                        });
+
+                    emit objectTypesTreeChanged();
+                }
             }
             else if (flags.testFlag(Qn::server) && !flags.testFlag(Qn::fake))
             {
@@ -306,6 +332,7 @@ AnalyticsObjectsSearchTreeBuilder::AnalyticsObjectsSearchTreeBuilder(QObject* pa
             const auto flags = resource->flags();
             if (flags.testFlag(Qn::server_live_cam))
             {
+                resource->disconnect(this);
                 emit objectTypesTreeChanged();
             }
             else if (flags.testFlag(Qn::server) && !flags.testFlag(Qn::fake))
