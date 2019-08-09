@@ -6,7 +6,7 @@ namespace nx::vms::client::desktop {
 
 struct Ini: nx::kit::IniConfig
 {
-    Ini(): IniConfig("desktop_client.ini") {}
+    Ini(): IniConfig("desktop_client.ini") { reload(); }
 
     NX_INI_STRING("", cloudHost,
         "Overrides the current Client's Cloud Host. Allows to connect to the Server that uses\n"

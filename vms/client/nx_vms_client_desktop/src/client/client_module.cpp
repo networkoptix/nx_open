@@ -217,8 +217,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     QObject(parent),
     m_startupParameters(startupParams)
 {
-    ini().reload();
-
 #if defined(Q_OS_WIN)
     // Enable full crash dumps if needed. Do not disable here as it can be enabled elsewhere.
     if (ini().profilerMode)
