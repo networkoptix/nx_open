@@ -2788,6 +2788,9 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
         filter.setFlag(StreamDataFilter::objectDetection, analyticsEnabled);
         filter.setFlag(StreamDataFilter::media);
         reader->setStreamDataFilter(filter);
+
+        if (const auto archiveDelegate = reader->getArchiveDelegate())
+            archiveDelegate->setStreamDataFilter(filter);
     }
 
     if (!analyticsEnabled)

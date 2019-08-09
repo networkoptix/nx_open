@@ -341,12 +341,12 @@ int AsyncImageWidget::heightForWidth(int width) const
     double height = hint.height();
 
     if (autoScaleDown())
-        height = qMin(height, qRound(width * height / hint.width()));
+        height = qMin(height, qCeil(width / hint.width() * hint.height()));
 
     if (autoScaleUp())
-        height = qMax(height, qRound(width * height / hint.width()));
+        height = qMax(height, qFloor(width / hint.width() * hint.height()));
 
-    return (int)height;
+    return qRound(height);
 }
 
 void AsyncImageWidget::retranslateUi()
@@ -414,17 +414,19 @@ void AsyncImageWidget::updateSizeHint() const
     if (perfectSize.isNull())
         perfectSize = kDefaultThumbnailSize; //< Take a constant.
 
-    // Decrease sizeHint if it does not fit in maximumSize() and autoScaleDown.
     m_cachedSizeHint = perfectSize;
+
+    // Decrease sizeHint if it does not fit in maximumSize() and autoScaleDown.
     if (autoScaleDown())
     {
-        const qreal oversizeCoefficient = qMax(
+        const auto oversizeCoefficient = qMax(
             static_cast<qreal>(m_cachedSizeHint.width()) / maximumSize().width(),
             static_cast<qreal>(m_cachedSizeHint.height()) / maximumSize().height());
+
         if (oversizeCoefficient > 1.0)
         {
-            m_cachedSizeHint.setWidth(qMax(1, perfectSize.width() / oversizeCoefficient));
-            m_cachedSizeHint.setHeight(qMax(1, perfectSize.height() / oversizeCoefficient));
+            m_cachedSizeHint.setWidth(qMax(1, qRound(perfectSize.width() / oversizeCoefficient)));
+            m_cachedSizeHint.setHeight(qMax(1, qRound(perfectSize.height() / oversizeCoefficient)));
         }
     }
 }
