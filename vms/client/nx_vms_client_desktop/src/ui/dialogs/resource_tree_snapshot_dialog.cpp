@@ -63,6 +63,8 @@ void nx::vms::client::desktop::ResourceTreeSnapshotDialog::updateShapshot()
         params.roles.insert(Qt::DisplayRole);
     if (ui->iconKeyRoleCheckbox->checkState() == Qt::Checked)
         params.roles.insert(Qn::ResourceIconKeyRole);
+    if (ui->nodeTypeCheckBox->checkState() == Qt::Checked)
+        params.roles.insert(Qn::NodeTypeRole);
 
     auto snapshotDocument = ItemModelStateSnapshotHelper::makeSnapshot(m_treeModel, params);
 
