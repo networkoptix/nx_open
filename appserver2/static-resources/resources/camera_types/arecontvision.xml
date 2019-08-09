@@ -164,7 +164,11 @@
                 <param name = "MaxFPS" default_value = "15"/>
             </params>
         </resource>     
-        <resource name = "4656" public = "4655"/>
+        <resource name = "4656" public = "4655">
+            <params>
+                <param name = "VideoLayout" default_value = "width=2;height=1;sensors=0,1"/>
+            </params>
+        </resource>         
         <resource name = "3325" public = "3556"/>
         <resource name = "3326" public = "3556"/>
         <resource name = "2325" public = "2195"/>
