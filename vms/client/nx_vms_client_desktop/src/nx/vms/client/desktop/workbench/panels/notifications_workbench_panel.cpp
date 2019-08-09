@@ -51,8 +51,8 @@ using namespace ui;
 
 namespace {
 
-static constexpr int kNarrowWidth = 280;
-static constexpr int kWideWidth = 430;
+static constexpr int kNarrowWidth = 283;
+static constexpr int kWideWidth = 433;
 
 static const QSize kToolTipMaxThumbnailSize(240, 180);
 static constexpr int kToolTipShowDelayMs = 250;

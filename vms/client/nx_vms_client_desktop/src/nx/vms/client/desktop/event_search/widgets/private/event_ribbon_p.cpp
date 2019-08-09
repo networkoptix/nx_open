@@ -48,7 +48,8 @@ namespace {
 static constexpr int kDefaultTileSpacing = 1;
 static constexpr int kScrollBarStep = 16;
 
-static constexpr int kDefaultThumbnailWidth = 224;
+static constexpr int kDefaultThumbnailWidth = 214;
+static constexpr int kAlternativeThumbnailWidth = 242;
 
 static constexpr auto kFadeCurtainColorName = "dark3";
 
@@ -306,11 +307,15 @@ void EventRibbon::Private::updateTilePreview(int index)
     if (!previewResource.dynamicCast<QnMediaResource>())
         return;
 
+    const auto defaultThumbnailWidth = headersEnabled()
+        ? kDefaultThumbnailWidth
+        : kAlternativeThumbnailWidth;
+
     const auto previewTime = modelIndex.data(Qn::PreviewTimeRole).value<microseconds>();
     const auto previewCropRect = modelIndex.data(Qn::ItemZoomRectRole).value<QRectF>();
     const auto thumbnailWidth = previewCropRect.isEmpty()
-        ? kDefaultThumbnailWidth
-        : qMin<int>(kDefaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
+        ? defaultThumbnailWidth
+        : qMin<int>(defaultThumbnailWidth / previewCropRect.width(), kMaximumThumbnailWidth);
 
     const bool precisePreview = !previewCropRect.isEmpty()
         || modelIndex.data(Qn::ForcePrecisePreviewRole).toBool();
