@@ -6,8 +6,11 @@
 ## License
 
 The whole contents of this package, including all C/C++ source code, is licensed as Open Source
-under the terms of Mozilla Public License 2.0: www.mozilla.org/MPL/2.0/, see the license text in
-`license_mpl2.md` file in the root directory of this package.
+under the terms of Mozilla Public License 2.0: www.mozilla.org/MPL/2.0/, with the possible
+exception of certain files which may be licensed under the terms of other open-source licenses
+explicitly referenced in those files.
+
+See the license texts in `license_*.md` files in the root directory of this package.
 
 ---------------------------------------------------------------------------------------------------
 ## Introduction
@@ -89,7 +92,8 @@ Prerequisites:
 ```
 - CMake >= 3.3.2
 - Windows (7 or 10): Microsoft Visual Studio >= 2015
-- Linux (Ubuntu 16.04 or 18.04) including 64-bit ARM (e.g. Nvidia Tegra) native or cross-compiling:
+- Linux (Ubuntu 16.04 or 18.04) including ARM (e.g. Raspberry Pi or Nvidia Tegra) native or
+    cross-compiling:
     - g++ >= 5.4.0
     - make or Ninja
 ```
@@ -104,11 +108,11 @@ build_sample.bat
 build_sample.sh
 
 # Linux, 64-bit ARM cross-compiling (e.g. Nvidia Tegra):
-# NOTE: The file toolchain_arm64.cmake defines which cross-compiler will be used.
+# NOTE: The provided file toolchain_arm64.cmake defines which cross-compiler will be used.
 build_sample_arm64.sh
 
 # Linux, 32-bit ARM cross-compiling (e.g. Raspberry Pi):
-# NOTE: The file toolchain_arm32.cmake defines which cross-compiler will be used.
+# NOTE: The provided file toolchain_arm32.cmake defines which cross-compiler will be used.
 build_sample_arm32.sh
 ```
 
