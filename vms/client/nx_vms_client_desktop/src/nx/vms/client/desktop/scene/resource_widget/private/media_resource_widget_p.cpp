@@ -1,7 +1,10 @@
 #include "media_resource_widget_p.h"
 
-#include <core/resource_management/resource_pool.h>
+#include <analytics/db/analytics_db_types.h>
 
+#include <api/server_rest_connection.h>
+
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/client_camera.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
@@ -16,6 +19,8 @@
 #include <utils/license_usage_helper.h>
 
 #include <nx/analytics/metadata_log_parser.h>
+
+#include <nx/utils/guarded_callback.h>
 
 namespace nx::vms::client::desktop {
 
@@ -73,6 +78,7 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
 			&MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
 
         updateIsAnalyticsSupported();
+        requestAnalyticsObjectsExistence();
 
         const QString debugAnalyticsLogFile = ini().debugAnalyticsVideoOverlayFromLogFile;
         if (!debugAnalyticsLogFile.isEmpty())
@@ -242,6 +248,10 @@ void MediaResourceWidgetPrivate::setIsUnauthorized(bool value)
 
 bool MediaResourceWidgetPrivate::calculateIsAnalyticsSupported() const
 {
+    // If we found some analytics objects in the archive, that's enough.
+    if (m_analyticsObjectsFound)
+        return true;
+
     // Analytics stream should be enabled only for cameras with enabled analytics engine and only
     // if at least one of these engines has the objects support.
     if (!camera || !analyticsMetadataProvider)
@@ -263,6 +273,38 @@ void MediaResourceWidgetPrivate::updateIsAnalyticsSupported()
 
     this->isAnalyticsSupported = isAnalyticsSupported;
     emit analyticsSupportChanged();
+}
+
+void MediaResourceWidgetPrivate::requestAnalyticsObjectsExistence()
+{
+    NX_ASSERT(camera);
+    const auto server = camera->getParentServer();
+    if (!NX_ASSERT(server))
+        return;
+
+    const auto connection = server->restConnection();
+    if (!NX_ASSERT(connection))
+        return;
+
+    nx::analytics::db::Filter filter;
+    filter.deviceIds.push_back(camera->getId());
+    filter.maxObjectTracksToSelect = 1;
+    filter.timePeriod = {QnTimePeriod::kMinTimeValue, QnTimePeriod::kMaxTimeValue};
+
+    auto callback = nx::utils::guarded(this,
+        [this](bool success, rest::Handle /*handle*/, analytics::db::LookupResult&& result)
+        {
+            if (m_analyticsObjectsFound)
+                return;
+
+            m_analyticsObjectsFound = success && !result.empty();
+            if (m_analyticsObjectsFound)
+                updateIsAnalyticsSupported();
+
+            if (!success)
+                requestAnalyticsObjectsExistence();
+        });
+    connection->lookupObjectTracks(filter, /*isLocal*/ false, callback, this->thread());
 }
 
 } // namespace nx::vms::client::desktop

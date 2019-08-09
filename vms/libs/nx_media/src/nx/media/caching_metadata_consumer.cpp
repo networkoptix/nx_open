@@ -7,6 +7,7 @@
 #include <QtCore/QSharedPointer>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/log/log.h>
 
 #include <nx/media/ini.h>
 
@@ -192,6 +193,8 @@ QList<QnAbstractCompressedMetadataPtr> CachingMetadataConsumer::metadataRange(
 
 void CachingMetadataConsumer::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
 {
+    NX_VERBOSE(this, "Metadata packet received, type %1", (int)metadata->metadataType);
+
     const auto channel = static_cast<int>(metadata->channelNumber);
     if (d->cachePerChannel.size() <= channel)
         d->cachePerChannel.resize(channel + 1);

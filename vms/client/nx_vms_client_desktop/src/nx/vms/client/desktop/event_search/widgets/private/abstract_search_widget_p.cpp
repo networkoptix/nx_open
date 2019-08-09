@@ -626,7 +626,7 @@ void AbstractSearchWidget::Private::setAllowed(bool value)
 
 void AbstractSearchWidget::Private::goToLive()
 {
-    if (m_mainModel->liveSupported())
+    if (m_mainModel->effectiveLiveSupported())
         m_mainModel->setLive(true);
 
     ui->ribbon->scrollBar()->setValue(0);

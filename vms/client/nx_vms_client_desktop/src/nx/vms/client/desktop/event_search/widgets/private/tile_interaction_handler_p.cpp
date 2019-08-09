@@ -213,14 +213,6 @@ void TileInteractionHandler::navigateToSource(
         return;
     }
 
-    // In case of requested time within the last minute, navigate to live instead.
-    if (const bool lastMinute = navigationTime > (timelineRange.endTime() - 1min);
-        lastMinute && std::all_of(resourceList.cbegin(), resourceList.cend(),
-            [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::network); }))
-    {
-        navigationTime = microseconds(DATETIME_NOW);
-    }
-
     const auto playbackStarter = scopedPlaybackStarter(navigationTime != microseconds(DATETIME_NOW)
         && ini().startPlaybackOnTileNavigation);
 
