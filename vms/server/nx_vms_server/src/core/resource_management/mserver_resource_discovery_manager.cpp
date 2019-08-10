@@ -532,7 +532,8 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
         if (isCamUsed)
             m_camUsage << uniqueId;
 
-        if (discoveredResources.contains(uniqueId) || (isCamUsed && res->getStatus() != Qn::Offline))
+        if (discoveredResources.contains(uniqueId)
+            || (m_camUsage.contains(uniqueId) && res->getStatus() != Qn::Offline))
         {
             NX_VERBOSE(this, "Resource %1 is discovered or seems alive", resString);
             m_resourceDiscoveryCounter[uniqueId] = 0;
