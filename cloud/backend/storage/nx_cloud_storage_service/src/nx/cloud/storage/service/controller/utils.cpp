@@ -17,4 +17,29 @@ api::ResultCode toResultCode(nx::sql::DBResult dbResult)
     }
 }
 
+api::ResultCode toResultCode(aws::ResultCode resultCode)
+{
+    switch (resultCode)
+    {
+        case aws::ResultCode::ok:
+            return api::ResultCode::ok;
+        case aws::ResultCode::networkError:
+        case aws::ResultCode::notImplemented:
+            return api::ResultCode::internalError;
+        case aws::ResultCode::unauthorized:
+        default:
+            return api::ResultCode::awsApiError;
+    }
+}
+
+api::Result toResult(aws::Result result)
+{
+    return api::Result(toResultCode(result.code()), result.text());
+}
+
+api::Result badRequest(QString message)
+{
+    return api::Result(api::ResultCode::badRequest, message.toStdString());
+}
+
 }

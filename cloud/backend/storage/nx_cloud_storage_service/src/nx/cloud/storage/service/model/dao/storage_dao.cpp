@@ -99,9 +99,6 @@ std::optional<api::Storage> StorageDao::readStorage(
 
     auto storage = toStorage(query.get());
 
-    // TODO request actual storage free space from S3, probably in controller code
-    storage.freeSpace = storage.totalSpace;
-
     if (storage.id != storageId)
         return std::nullopt;
 
@@ -132,7 +129,7 @@ void StorageDao::addStorageBucketRelation(
     query->bindValue(kStorageIdBinding, storage.id);
     query->bindValue(
         kBucketNameBinding,
-        service::utils::parseBucketName(storage.ioDevices.back().dataUrl));
+        service::utils::bucketName(storage.ioDevices.back().dataUrl));
     query->bindValue(kRegionBinding, storage.ioDevices.back().region);
     query->exec();
 }

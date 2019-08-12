@@ -48,11 +48,7 @@ void BucketManager::addBucket(const api::AddBucketRequest& request, AddBucketHan
     using namespace std::placeholders;
 
     if (request.name.empty())
-    {
-        return handler(
-            api::Result(api::ResultCode::badRequest, "Empty bucket name"),
-            api::Bucket{});
-    }
+        return handler(utils::badRequest("Empty bucket name"), api::Bucket{});
 
     auto permissionsTester = createPermissionsTest(request.name);
 

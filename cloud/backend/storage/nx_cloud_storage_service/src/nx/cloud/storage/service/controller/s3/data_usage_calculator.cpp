@@ -3,7 +3,7 @@
 #include <nx/cloud/aws/s3/api_client.h>
 #include <nx/network/url/url_builder.h>
 
-#include <nx/network/url/url_builder.h>
+#include "nx/cloud/storage/service/controller/utils.h"
 
 namespace nx::cloud::storage::service::controller::s3 {
 
@@ -40,13 +40,8 @@ void DataUsageCalculator::calculate(
                 client->getBucketSize(
                     [this](auto result, auto size)
                     {
-                        if (result.code() != aws::ResultCode::ok)
-                        {
-                            return nx::utils::swapAndCall(
-                                m_handler,
-                                api::Result(api::ResultCode::awsApiError, result.text()),
-                                0);
-                        }
+                        if (!result.ok())
+                            return nx::utils::swapAndCall(m_handler, utils::toResult(result), 0);
 
                         m_size += size;
                         ++m_responses;
@@ -55,7 +50,6 @@ void DataUsageCalculator::calculate(
                             nx::utils::swapAndCall(m_handler, api::Result(), m_size.load());
                     });
             }
-
         });
 }
 

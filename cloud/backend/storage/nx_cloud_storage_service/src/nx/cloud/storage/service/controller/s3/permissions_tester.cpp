@@ -1,6 +1,7 @@
 #include "permissions_tester.h"
 
 #include "nx/cloud/storage/service/settings.h"
+#include "nx/cloud/storage/service/controller/utils.h"
 
 namespace nx::cloud::storage::service::controller::s3 {
 
@@ -8,8 +9,7 @@ using namespace std::placeholders;
 
 namespace {
 
-static constexpr char kDefaultBucketLocation[] = "us-east-1";
-static constexpr char kFileData[] = "Permissionstest";
+static constexpr char kFileData[] = "permissionstest";
 
 } // namespace
 
@@ -19,7 +19,7 @@ PermissionsTester::PermissionsTester(
     :
     m_credentials(credentials),
     m_url(bucketUrl),
-    m_bucketLocation(kDefaultBucketLocation)
+    m_bucketLocation(utils::kDefaultBucketRegion)
 {
 }
 
@@ -130,10 +130,7 @@ void PermissionsTester::testFailed(std::string_view operation, const aws::Result
 {
     NX_ERROR(this, "%1 failed: %2, %3",
         operation.data(), aws::toString(result.code()).data(), result.text());
-    nx::utils::swapAndCall(
-        m_handler,
-        api::Result(api::ResultCode::awsApiError, result.text()),
-        std::string());
+    nx::utils::swapAndCall(m_handler, utils::toResult(result), std::string());
 }
 
 
