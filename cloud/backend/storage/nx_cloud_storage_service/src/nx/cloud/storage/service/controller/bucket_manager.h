@@ -53,11 +53,11 @@ private:
         api::AddBucketRequest request,
         AddBucketHandler handler);
 
-    nx::sql::DBResult addBucketInternal(
+    nx::sql::DBResult addBucketAndSynchronize(
         nx::sql::QueryContext* queryContext,
         const api::Bucket& bucket);
 
-    nx::sql::DBResult removeBucketInternal(
+    nx::sql::DBResult removeBucketAndSynchronize(
         nx::sql::QueryContext* queryContext,
         const std::string& bucketName);
 

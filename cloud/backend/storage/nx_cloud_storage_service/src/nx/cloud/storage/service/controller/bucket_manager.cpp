@@ -109,7 +109,7 @@ void BucketManager::removeBucket(
         m_settings.database().synchronization.clusterId,
         [this, bucketName](auto queryContext)
         {
-            return removeBucketInternal(queryContext, bucketName);
+            return removeBucketAndSynchronize(queryContext, bucketName);
         },
         [this, handler = std::move(handler), bucketName](nx::sql::DBResult dbResult)
         {
@@ -133,7 +133,7 @@ std::vector<api::Bucket> BucketManager::fetchBuckets(
     return m_bucketDao->fetchBuckets(queryContext, withStorageCount);
 }
 
-nx::sql::DBResult BucketManager::addBucketInternal(
+nx::sql::DBResult BucketManager::addBucketAndSynchronize(
     nx::sql::QueryContext* queryContext,
     const api::Bucket& bucket)
 {
@@ -148,7 +148,7 @@ nx::sql::DBResult BucketManager::addBucketInternal(
     return nx::sql::DBResult::ok;
 }
 
-nx::sql::DBResult BucketManager::removeBucketInternal(
+nx::sql::DBResult BucketManager::removeBucketAndSynchronize(
     nx::sql::QueryContext* queryContext,
     const std::string& bucketName)
 {
@@ -193,7 +193,7 @@ void BucketManager::addBucketToDb(
         m_settings.database().synchronization.clusterId,
         [this, bucket](auto queryContext)
         {
-            return addBucketInternal(queryContext, *bucket);
+            return addBucketAndSynchronize(queryContext, *bucket);
         },
         [this, handler = std::move(handler), bucket](auto dbResult)
         {
