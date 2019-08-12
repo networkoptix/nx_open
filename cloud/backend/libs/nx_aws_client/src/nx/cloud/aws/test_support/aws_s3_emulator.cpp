@@ -225,12 +225,12 @@ void AwsS3Emulator::dispatchRootPathGetRequest(
     listBucket(std::move(requestContext), std::move(completionHandler));
 }
 
-s3::ListBucketResult AwsS3Emulator::getListBucketResult(
+ListBucketResult AwsS3Emulator::getListBucketResult(
     std::map<QString, QString> queries) const
 {
     const auto prefix = queries[http::kPrefix].toStdString();
 
-    s3::ListBucketResult result;
+    ListBucketResult result;
     result.prefix = prefix;
 
     QnMutexLocker lock(&m_mutex);
@@ -245,7 +245,7 @@ s3::ListBucketResult AwsS3Emulator::getListBucketResult(
 
     for (auto it = itLow; it != itHigh; ++it)
     {
-        s3::Contents contents;
+        Contents contents;
         contents.key = !prefix.empty() ? parseFileName(it->first, prefix) : it->first;
         contents.size = it->second.size();
         result.contents.emplace_back(std::move(contents));

@@ -23,9 +23,6 @@ public:
         nx::utils::MoveOnlyFunc<void(Result, AssumeRoleResult)> handler);
 
 private:
-    virtual void addAuthorizationToRequest(network::http::Request* request) override;
-
-private:
     QString buildQuery(const AssumeRoleRequest& request) const;
 };
 

@@ -34,11 +34,6 @@ void ApiClient::assumeRole(
         std::move(handler));
 }
 
-void ApiClient::addAuthorizationToRequest(network::http::Request* request)
-{
-
-}
-
 QString ApiClient::buildQuery(const AssumeRoleRequest& request) const
 {
     static constexpr char kRequiredQueries[] = "Action=AssumeRole&Version=2011-06-15";

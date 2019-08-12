@@ -114,7 +114,7 @@ private:
         nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler);
 
-    s3::ListBucketResult getListBucketResult(std::map<QString, QString> queries) const;
+    ListBucketResult getListBucketResult(std::map<QString, QString> queries) const;
 
     std::map<QString, QString> parseQuery(const QString& query) const;
 };

@@ -3,8 +3,10 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/async_operation_pool.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/network/url/url_builder.h>
 
 #include "api_types.h"
+#include "xml/deserialize.h"
 
 namespace nx::cloud::aws {
 

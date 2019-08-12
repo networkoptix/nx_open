@@ -91,9 +91,9 @@ std::tuple<nx::String, bool> BaseApiClient::calculateAuthorizationHeader(
     SignatureCalculator calculator;
     return calculator.calculateAuthorizationHeader(
         request,
-        m_credentials,
-        m_awsRegion,
-        m_service);
+        credentials,
+        region,
+        service);
 }
 
 ResultCode BaseApiClient::getResultCode(const nx::network::http::AsyncClient& httpClient) const
