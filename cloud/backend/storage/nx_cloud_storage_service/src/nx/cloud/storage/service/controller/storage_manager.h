@@ -112,8 +112,6 @@ private:
     std::shared_ptr<s3::DataUsageCalculator> createDataUsageCalculator();
     void removeDataUsageCalculator(const std::shared_ptr<s3::DataUsageCalculator>& calculator);
 
-    void initializeStsClient();
-
 private:
     struct AddStorageContext
     {

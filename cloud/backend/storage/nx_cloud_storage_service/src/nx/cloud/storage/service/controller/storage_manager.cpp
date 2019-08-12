@@ -15,6 +15,8 @@ namespace nx::cloud::storage::service::controller {
 
 namespace {
 
+// TODO should this be a setting?
+static constexpr char kStsUrl[] = "https://sts.amazonaws.com";
 static constexpr char kStorageType[] = "awss3";
 
 static const std::map<std::string, nx::geo_ip::Geopoint> kAwsGeopoints = {
@@ -102,7 +104,12 @@ StorageManager::StorageManager(
     m_database(model->database()),
     m_storageDao(model->storageDao()),
     m_bucketManager(bucketManager),
-    m_geoIpResolver(GeoIpResolverFactory::instance().create(settings))
+    m_geoIpResolver(GeoIpResolverFactory::instance().create(settings)),
+    m_stsClient(
+        std::make_unique<aws::sts::ApiClient>(
+            utils::kDefaultBucketRegion,
+            kStsUrl,
+            m_settings.aws().credentials))
 {
     m_database->synchronizationEngine()->incomingCommandDispatcher()
         .registerCommandHandler<command::SaveStorage>(
@@ -237,7 +244,7 @@ void StorageManager::getCredentials(
             if (result.resultCode != api::ResultCode::ok)
                 return handler(std::move(result), api::StorageCredentials{});
 
-            getCredentialsForStorage(storageId, std::move(storage), std::move(handler));
+            getCredentialsForStorage(std::move(storage), std::move(handler));
         }
     );
 }
@@ -273,7 +280,7 @@ void StorageManager::getStorage(
             if (!*storage)
                 return handler(api::Result(api::ResultCode::notFound), api::Storage{});
 
-            // TODO where to information about storage type?
+            // TODO where to get information about storage type?
             for (auto& device : (*storage)->ioDevices)
                 device.type = kStorageType;
 
@@ -288,10 +295,6 @@ void StorageManager::getCredentialsForStorage(
     api::Storage storage,
     nx::utils::MoveOnlyFunc<void(api::Result, api::StorageCredentials)> handler)
 {
-    if (!m_stsClient)
-        initializeStsClient();
-
-
     aws::sts::AssumeRoleRequest request;
     request.policy = buildStorageAccessPolicy(storage);
     request.roleArn = m_settings.aws().assumeRoleArn;
@@ -314,9 +317,8 @@ void StorageManager::getCredentialsForStorage(
             api::StorageCredentials credentials;
             credentials.login = assumeRoleResult.credentials.accessKeyId;
             credentials.password = assumeRoleResult.credentials.secretAccessKey;
-            // TODO replace this with the expiration time
             credentials.durationSeconds =
-                ( int) m_settings.aws().storageCredentialsDuration.count();
+                (int) m_settings.aws().storageCredentialsDuration.count();
             for (const auto& ioDevice : storage.ioDevices)
                 credentials.urls.emplace_back(ioDevice.dataUrl);
 
@@ -498,15 +500,6 @@ void StorageManager::removeDataUsageCalculator(
 {
     QnMutexLocker lock(&m_mutex);
     m_dataUsageCalculators.erase(calculator);
-}
-
-void StorageManager::initializeStsClient()
-{
-    // TODO decide what endpoint to use for this api call, should it go into settings?
-    m_stsClient = std::make_unique<aws::sts::ApiClient>(
-        utils::kDefaultBucketRegion,
-        "https://sts.amazonaws.com",
-        m_settings.aws().credentials);
 }
 
 } // namespace nx::cloud::storage::service::controller
