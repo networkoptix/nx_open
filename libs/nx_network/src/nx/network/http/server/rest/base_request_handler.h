@@ -152,11 +152,11 @@ private:
  *
  *     using GetFooHandler =
  *         MyRequestHandler<void, FooResult, RestArgFetcher<kIdParam>>;
- *     m_dispatcher.registerRequestProcessor<BusinessLogicHandler2>(
+ *     m_dispatcher.registerRequestProcessor<GetFooHandler>(
  *     "/foo/{id}",
  *     [this]()
  *     {
- *          return std::make_unique<BusinessLogicHandler2>(
+ *          return std::make_unique<GetFooHandler>(
  *              std::bind(&FooManager::getFoo, &m_fooManager, _1, _2));
  *     },
  *     network::http::Method::get);
@@ -167,7 +167,7 @@ private:
 
  *     using DeleteFooHandler =
  *         MyRequestHandler<void, void, RestArgFetcher<kIdParam>, ClientEndpointFetcher>;
- *     m_dispatcher.registerRequestProcessor<BusinessLogicHandler3>(
+ *     m_dispatcher.registerRequestProcessor<DeleteFooHandler>(
  *     "foo/{id}",
  *     [this]()
  *     {
