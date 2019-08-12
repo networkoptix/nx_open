@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-# Axis Camera Plugin
+# Image Library Plugin
 
 This plugin provides access to a directory with image files using Camera Integration API (mainly,
 by implementing `nxcip::DtsArchiveReader` interface).
