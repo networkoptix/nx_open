@@ -9,6 +9,8 @@
 #include <nx/client/core/media/abstract_metadata_consumer_owner.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
 
+#include <nx/vms/api/types/resource_types.h>
+
 #include <utils/common/connective.h>
 
 class QnSingleCamLicenseStatusHelper;
@@ -69,6 +71,11 @@ public:
     QSharedPointer<nx::media::AbstractMetadataConsumer> motionMetadataConsumer() const;
     QSharedPointer<nx::media::AbstractMetadataConsumer> analyticsMetadataConsumer() const;
 
+    void setMotionEnabled(bool enabled);
+
+    bool isAnalyticsEnabled() const;
+    void setAnalyticsEnabled(bool enabled);
+
 signals:
     void stateChanged();
     void licenseStatusChanged();
@@ -89,6 +96,9 @@ private:
 
     /** Request analytics objects once to check if they exist in the archive. */
     void requestAnalyticsObjectsExistence();
+
+    void setStreamDataFilter(nx::vms::api::StreamDataFilter filter, bool on);
+    void setStreamDataFilters(nx::vms::api::StreamDataFilters filters);
 
 private:
     QnResourceDisplayPtr m_display;

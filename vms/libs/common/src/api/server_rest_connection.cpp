@@ -850,6 +850,13 @@ Handle ServerConnection::getUpdateInfo(
     return executeGet("/ec2/updateInformation", params, callback, targetThread);
 }
 
+Handle ServerConnection::getUpdateInfo(
+    const QString& version, Result<UpdateInformationData>::type&& callback, QThread* targetThread)
+{
+    QnRequestParamList params{{"version", version}};
+    return executeGet("/ec2/updateInformation", params, callback, targetThread);
+}
+
 Handle ServerConnection::checkForUpdates(const QString& changeset,
     Result<UpdateInformationData>::type&& callback,
     QThread* targetThread)

@@ -2057,7 +2057,7 @@
     <message>
       <location/>
       <source>Show to</source>
-      <translation>에 보이기 </translation>
+      <translation>에 보이기</translation>
     </message>
     <message>
       <location/>
@@ -3180,19 +3180,6 @@
       <location/>
       <source>Area Width</source>
       <translation>영역 넓이</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeServerSelectionWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>Sync time with the Internet</source>
-      <translation>인터넷으로 시간 동기화</translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
     </message>
   </context>
   <context>

@@ -32,6 +32,7 @@ CheckBox
         leftPadding: 2
         rightPadding: 2
         verticalAlignment: Text.AlignVCenter
+        elide: Qt.ElideRight
         font: control.font
         text: control.text
         color:

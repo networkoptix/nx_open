@@ -330,7 +330,7 @@ void AnalyticsSearchWidget::Private::updateTypeMenu()
     addItemRecursive(m_objectTypeMenu, objectsTree);
 
     if (!currentSelectionStillAvailable)
-        setSelectedObjectType({});
+        m_typeSelectionButton->deactivate();
 }
 
 void AnalyticsSearchWidget::Private::setupAreaSelection()
