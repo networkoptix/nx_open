@@ -7,7 +7,7 @@
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/std/filesystem.h>
 
-#include <nx/cloud/aws/api_client.h>
+#include <nx/cloud/aws/s3/api_client.h>
 
 void printHelp(const char* name)
 {
@@ -105,14 +105,14 @@ public:
 protected:
     const nx::utils::ArgumentParser& m_arguments;
     Settings m_settings;
-    std::unique_ptr<nx::cloud::aws::ApiClient> m_client;
+    std::unique_ptr<nx::cloud::aws::s3::ApiClient> m_client;
 
     virtual int runImpl() = 0;
 
-    std::unique_ptr<nx::cloud::aws::ApiClient>
+    std::unique_ptr<nx::cloud::aws::s3::ApiClient>
         prepareApiClient(const CommonSettings& settings)
     {
-        return std::make_unique<nx::cloud::aws::ApiClient>(
+        return std::make_unique<nx::cloud::aws::s3::ApiClient>(
             "cmd_line_client",
             settings.region,
             nx::utils::Url(settings.url),
@@ -150,7 +150,7 @@ protected:
         typename OutputTuple = typename DeriveResultTupleFromHandler<Handler>::type
     >
     OutputTuple invoke(
-        void (nx::cloud::aws::ApiClient::*func)(FuncInputArgs...),
+        void (nx::cloud::aws::s3::ApiClient::*func)(FuncInputArgs...),
         InputArgs&&... inputArgs)
     {
         std::promise<OutputTuple> done;
@@ -220,7 +220,7 @@ public:
             uploadPath = std::filesystem::path(m_settings.inputFilePath).filename().string();
 
         const auto [uploadResult] = invoke(
-            &nx::cloud::aws::ApiClient::uploadFile,
+            &nx::cloud::aws::s3::ApiClient::uploadFile,
             uploadPath,
             nx::Buffer::fromStdString(contents.str()));
 
@@ -240,7 +240,7 @@ public:
 
     virtual int runImpl() override
     {
-        const auto [deleteResult] = invoke(&nx::cloud::aws::ApiClient::deleteFile, "");
+        const auto [deleteResult] = invoke(&nx::cloud::aws::s3::ApiClient::deleteFile, "");
         return deleteResult.ok() ? 0 : 2;
     }
 };
@@ -280,7 +280,7 @@ public:
     virtual int runImpl() override
     {
         const auto [downloadResult, fileContents] = invoke(
-            &nx::cloud::aws::ApiClient::downloadFile,
+            &nx::cloud::aws::s3::ApiClient::downloadFile,
             "");
         if (!downloadResult.ok())
             return 2;

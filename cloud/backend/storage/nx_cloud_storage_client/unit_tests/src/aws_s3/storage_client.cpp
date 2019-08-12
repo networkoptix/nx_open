@@ -99,7 +99,7 @@ private:
     };
 
     aws_s3::StorageClient m_client;
-    aws::test::AwsS3Emulator m_awsS3;
+    aws::s3::test::AwsS3Emulator m_awsS3;
     std::string m_cameraId;
     Chunk m_lastUploadedChunk;
     DeviceDescription m_cameraInfo;
