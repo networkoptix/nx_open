@@ -125,6 +125,8 @@
 
 #include <nx/network/cloud/protocol_type.h>
 
+#include <nx/utils/guarded_callback.h>
+
 using namespace std::chrono;
 
 using namespace nx;
@@ -3128,9 +3130,9 @@ rest::Handle QnMediaResourceWidget::invokeTrigger(
         return rest::Handle();
 
     const auto responseHandler =
-        [this, resultHandler, id](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        [this, resultHandler, id]
+        (bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
-            Q_UNUSED(handle);
             success = success && result.error == QnRestResult::NoError;
 
             if (!success)
@@ -3144,8 +3146,11 @@ rest::Handle QnMediaResourceWidget::invokeTrigger(
         };
 
     return commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
-        d->resource->getId(), id, toggleState,
-        responseHandler, QThread::currentThread());
+        /*cameraId*/ d->resource->getId(),
+        /*triggerId*/ id,
+        toggleState,
+        nx::utils::guarded(this, responseHandler),
+        thread());
 }
 
 void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
