@@ -61,8 +61,10 @@ bool EventsStorage::initialize(const Settings& settings)
             cursor->close();
         m_openedCursors.clear();
     }
-    m_analyticsArchiveDirectory.reset();
+    // Unprocessed tasks in dbController could reference to m_analyticsArchiveDirectory
+    // via detectionDataSaver. Destroy dbController first.
     m_dbController.reset();
+    m_analyticsArchiveDirectory.reset();
 
     m_closingDbController = false;
 
