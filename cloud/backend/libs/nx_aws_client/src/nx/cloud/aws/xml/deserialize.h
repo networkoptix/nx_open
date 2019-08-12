@@ -14,17 +14,16 @@ bool advancePastEndElement(QXmlStreamReader* reader);
 
 } // namespace detail
 
-void assign(bool* var, const QString& value);
-void assign(int* var, const QString& value);
-void assign(std::string* var, const QString& value);
-void assign(std::chrono::system_clock::time_point* var, const QString* value);
+bool assign(bool* outField, const QString& value);
+bool assign(int* outField, const QString& value);
+bool assign(std::string* outField, const QString& value);
 
 template<typename ObjectType>
 struct Field
 {
-    using Assigners = std::map<
+    using Parsers = std::map<
         QString/*elementName*/,
-        std::function<void(ObjectType* /*outObject*/, const QString& /*value*/)>>;
+        std::function<bool(ObjectType* /*outObject*/, const QString& /*value*/)>>;
 };
 
 std::optional<QString> parseNextElement(QXmlStreamReader* reader);
@@ -32,7 +31,7 @@ std::optional<QString> parseNextElement(QXmlStreamReader* reader);
 template<typename ObjectType>
 bool parseNextField(
     QXmlStreamReader* reader,
-    const typename Field<ObjectType>::Assigners& fieldFuncs,
+    const typename Field<ObjectType>::Parsers& fieldFuncs,
     ObjectType* outObject)
 {
     if (reader->hasError())
@@ -51,9 +50,7 @@ bool parseNextField(
     if (!parsedElement)
         return false;
 
-    it->second(outObject, *parsedElement);
-
-    return true;
+    return it->second(outObject, *parsedElement);
 }
 
 /**
@@ -62,7 +59,7 @@ bool parseNextField(
 template<typename ObjectType>
 bool deserialize(
     QXmlStreamReader* reader,
-    const typename Field<ObjectType>::Assigners& assigners,
+    const typename Field<ObjectType>::Parsers& assigners,
     const QString& xmlName,
     ObjectType* outObject)
 {
@@ -84,7 +81,7 @@ bool deserialize(
 template<typename ObjectType>
 bool deserialize(
     QXmlStreamReader* reader,
-    const typename Field<ObjectType>::Assigners& assigners,
+    const typename Field<ObjectType>::Parsers& assigners,
     const QString& xmlName,
     std::vector<ObjectType>* outVector)
 {
@@ -98,7 +95,6 @@ bool deserialize(
 template<typename ObjectType>
 bool deserialize(QXmlStreamReader* /*reader*/, ObjectType* /*outObject*/)
 {
-    static_assert(false, "Template specialization is required...");
     return false;
 }
 

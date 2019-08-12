@@ -16,24 +16,23 @@ bool advancePastEndElement(QXmlStreamReader* xml)
 
 } // namespace detail
 
-void assign(bool* var, const QString& value)
+bool assign(bool* outField, const QString& value)
 {
-    *var = value.toLower() == "true " ? true : false;
+    *outField = value.toLower() == "true " ? true : false;
+    return true;
 }
 
-void assign(int* var, const QString& value)
+bool assign(int* outField, const QString& value)
 {
-    *var = value.toInt();
+    bool ok = false;
+    *outField = value.toInt(&ok);
+    return ok;
 }
 
-void assign(std::string* var, const QString& value)
+bool assign(std::string* outField, const QString& value)
 {
-    *var = value.toStdString();
-}
-
-void assign(std::chrono::system_clock::time_point* var, const QString* value)
-{
-
+    *outField = value.toStdString();
+    return true;
 }
 
 std::optional<QString> parseNextElement(QXmlStreamReader* xml)

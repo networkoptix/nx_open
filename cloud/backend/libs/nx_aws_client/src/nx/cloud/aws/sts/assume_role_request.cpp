@@ -20,23 +20,23 @@ static constexpr char kAccessKeyId[] = "AccessKeyId";
 static constexpr char kAssumedRoleId[] = "AssumedRoleId";
 static constexpr char kArn[] = "Arn";
 
-static const Field<sts::AssumeRoleResult>::Assigners kAssumeRoleResultAssigners = {
-    {kPackedPolicySize, [](auto* obj, auto& value) { assign(&obj->packedPolicySize, value); }},
+static const Field<sts::AssumeRoleResult>::Parsers kAssumeRoleResultParsers = {
+    {kPackedPolicySize, [](auto* obj, auto& value) { return assign(&obj->packedPolicySize, value); }},
 };
 
-static const Field<sts::Credentials>::Assigners kCredentialsAssigners = {
-    {kAccessKeyId, [](auto* obj, auto& value) { assign(&obj->accessKeyId, value); }},
-    {kSecretAccessKey, [](auto* obj, auto& value) { assign(&obj->secretAccessKey, value); }},
-    {kSessionToken, [](auto* obj, auto& value) { assign(&obj->sessionToken, value); }},
-    {kExpiration, [](auto* obj, auto& value) { assign(&obj->expiration, value); }}
+static const Field<sts::Credentials>::Parsers kCredentialsParsers = {
+    {kAccessKeyId, [](auto* obj, auto& value) { return assign(&obj->accessKeyId, value); }},
+    {kSecretAccessKey, [](auto* obj, auto& value) { return assign(&obj->secretAccessKey, value); }},
+    {kSessionToken, [](auto* obj, auto& value) { return assign(&obj->sessionToken, value); }},
+    {kExpiration, [](auto* obj, auto& value) { return assign(&obj->expiration, value); }}
 };
 
-static const Field<sts::AssumedRoleUser>::Assigners kAssumedRoleUserAssigners{
-    {kAssumedRoleId, [](auto* obj, auto& value) { assign(&obj->assumedRoleId, value); }},
-    {kArn, [](auto* obj, auto& value) { assign(&obj->arn, value); }}
+static const Field<sts::AssumedRoleUser>::Parsers kAssumedRoleUserParsers{
+    {kAssumedRoleId, [](auto* obj, auto& value) { return assign(&obj->assumedRoleId, value); }},
+    {kArn, [](auto* obj, auto& value) { return assign(&obj->arn, value); }}
 };
 
-}
+} // namespace
 
 template<>
 void serialize(QXmlStreamWriter* writer, const sts::AssumeRoleResult& object)
@@ -57,23 +57,23 @@ void serialize(QXmlStreamWriter* writer, const sts::AssumeRoleResult& object)
 }
 
 template<>
-bool deserialize(QXmlStreamReader* xml, sts::AssumeRoleResult* outObject)
+bool deserialize(QXmlStreamReader* reader, sts::AssumeRoleResult* outObject)
 {
-    while (!xml->atEnd())
+    while (!reader->atEnd())
     {
-        if (xml->name() == kCredentials)
+        if (reader->name() == kCredentials)
         {
-            if (!deserialize(xml, kCredentialsAssigners, kCredentials, &outObject->credentials))
+            if (!deserialize(reader, kCredentialsParsers, kCredentials, &outObject->credentials))
                 return false;
         }
 
-        if (xml->name() == kAssumedRoleUser)
+        if (reader->name() == kAssumedRoleUser)
         {
-            if (!deserialize(xml, kAssumedRoleUserAssigners, kCredentials, &outObject->assumedRoleUser))
+            if (!deserialize(reader, kAssumedRoleUserParsers, kCredentials, &outObject->assumedRoleUser))
                 return false;
         }
 
-        if (!parseNextField(xml, kAssumeRoleResultAssigners, outObject))
+        if (!parseNextField(reader, kAssumeRoleResultParsers, outObject))
             return false;
     }
 

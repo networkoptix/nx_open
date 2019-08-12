@@ -8,24 +8,24 @@ using namespace xml;
 
 static constexpr char kContents[] = "Contents";
 
-static const Field<s3::Contents>::Assigners kContentsAssigners = {
-    {"Key", [](auto* obj, auto& value) { assign(&obj->key, value); }},
-    {"LastModified", [](auto* obj, auto& value) { assign(&obj->lastModified, value); }},
-    {"ETag", [](auto* obj, auto& value) { assign(&obj->etag, value); }},
-    {"Size", [](auto* obj, auto& value) { assign(&obj->size, value); }},
-    {"StorageClass", [](auto* obj, auto& value) { assign(&obj->storageClass, value); }},
+static const Field<s3::Contents>::Parsers kContentsParsers = {
+    {"Key", [](auto* obj, auto& value) { return assign(&obj->key, value); }},
+    {"LastModified", [](auto* obj, auto& value) { return assign(&obj->lastModified, value); }},
+    {"ETag", [](auto* obj, auto& value) { return assign(&obj->etag, value); }},
+    {"Size", [](auto* obj, auto& value) { return assign(&obj->size, value); }},
+    {"StorageClass", [](auto* obj, auto& value) { return assign(&obj->storageClass, value); }},
 };
 
-static const Field<s3::ListBucketResult>::Assigners kListBucketResultAssigners = {
-    {"Name", [](auto* obj, auto& value) { assign(&obj->name, value); }},
-    {"Prefix", [](auto* obj, auto& value) { assign(&obj->prefix, value); }},
+static const Field<s3::ListBucketResult>::Parsers kListBucketResultParsers = {
+    {"Name", [](auto* obj, auto& value) { return assign(&obj->name, value); }},
+    {"Prefix", [](auto* obj, auto& value) { return assign(&obj->prefix, value); }},
     {
         "NextContinuationToken",
-        [](auto* obj, auto& value) { assign(&obj->nextContinuationToken, value); }},
-    {"KeyCount", [](auto* obj, auto& value) { assign(&obj->keyCount, value); }},
-    {"MaxKeys", [](auto* obj, auto& value) { assign(&obj->maxKeys, value); }},
-    {"Delimiter", [](auto* obj, auto& value) { assign(&obj->delimiter, value); }},
-    {"IsTruncated", [](auto* obj, auto& value) { assign(&obj->isTruncated, value); }}
+        [](auto* obj, auto& value) { return assign(&obj->nextContinuationToken, value); }},
+    {"KeyCount", [](auto* obj, auto& value) { return assign(&obj->keyCount, value); }},
+    {"MaxKeys", [](auto* obj, auto& value) { return assign(&obj->maxKeys, value); }},
+    {"Delimiter", [](auto* obj, auto& value) { return assign(&obj->delimiter, value); }},
+    {"IsTruncated", [](auto* obj, auto& value) { return assign(&obj->isTruncated, value); }}
 };
 
 } // namespace
@@ -41,12 +41,12 @@ bool deserialize(
     {
         if (reader->name() == kContents)
         {
-            if (!deserialize(reader, kContentsAssigners, kContents, &outObject->contents))
+            if (!deserialize(reader, kContentsParsers, kContents, &outObject->contents))
                 return false;
             continue;
         }
 
-        if (!parseNextField(reader, kListBucketResultAssigners, outObject))
+        if (!parseNextField(reader, kListBucketResultParsers, outObject))
             return false;
     }
 
