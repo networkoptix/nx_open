@@ -31,10 +31,12 @@ set(copied_nx_sdk_unit_tests_origin ${CMAKE_SOURCE_DIR}/vms/libs/nx_sdk/unit_tes
 file(GLOB_RECURSE copied_nx_sdk_unit_tests_files ${copied_nx_sdk_unit_tests_origin}/*)
 
 # Collect source files for the sample - Stub Analytics Plugin.
-set(copied_sample_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics/stub_analytics_plugin)
-set(copied_sample_origin ${copied_sample_dir}/src)
+set(copied_sample_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics)
+set(copied_sample_target stub_analytics_plugin/src)
+set(copied_sample_origin ${copied_sample_dir}/${copied_sample_target})
 file(GLOB_RECURSE copied_sample_files ${copied_sample_origin}/*)
-set(copied_sample_unit_tests_origin ${copied_sample_dir}/unit_tests/src)
+set(copied_sample_unit_tests_target stub_analytics_plugin/unit_tests/src)
+set(copied_sample_unit_tests_origin ${copied_sample_dir}/${copied_sample_unit_tests_target})
 file(GLOB_RECURSE copied_sample_unit_tests_files ${copied_sample_unit_tests_origin}/*)
 
 set(copy_sdk_files_script ${CMAKE_CURRENT_BINARY_DIR}/copy_sdk_files.cmake)

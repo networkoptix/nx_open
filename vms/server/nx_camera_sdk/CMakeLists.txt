@@ -35,9 +35,13 @@ set(copied_nx_sdk_src_files
 )
 
 # Collect source files for the sample - Axis Camera Plugin.
-set(copied_sample_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/device/axis_camera_plugin)
-set(copied_sample_origin ${copied_sample_dir}/src)
-file(GLOB_RECURSE copied_sample_files ${copied_sample_origin}/*)
+set(copied_sample_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/device)
+set(copied_sample_1_target axis_camera_plugin/src)
+set(copied_sample_1_origin ${copied_sample_dir}/${copied_sample_1_target})
+file(GLOB_RECURSE copied_sample_1_files ${copied_sample_1_origin}/*)
+set(copied_sample_2_target image_library_plugin/src)
+set(copied_sample_2_origin ${copied_sample_dir}/${copied_sample_1_target})
+file(GLOB_RECURSE copied_sample_2_files ${copied_sample_1_origin}/*)
 
 set(copy_sdk_files_script ${CMAKE_CURRENT_BINARY_DIR}/copy_sdk_files.cmake)
 
