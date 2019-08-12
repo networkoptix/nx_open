@@ -4,12 +4,15 @@
 
 namespace nx::cloud::storage::service::test {
 
-class S3Bucket: public aws::test::AwsS3Emulator
+class S3Bucket: public aws::s3::test::AwsS3Emulator
 {
-    using base_type = aws::test::AwsS3Emulator;
+    using base_type = aws::s3::test::AwsS3Emulator;
 
 public:
-    S3Bucket(const std::string& name, std::string location = aws::test::kDefaultS3Location);
+    S3Bucket(
+        std::string location = aws::s3::test::kDefaultS3Location,
+        std::string name = std::string(),
+        bool local = true);
     ~S3Bucket();
 
     /**

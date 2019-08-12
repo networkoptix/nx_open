@@ -10,10 +10,13 @@ namespace nx::cloud::storage::service::test {
 
 using namespace nx::network;
 
-S3Bucket::S3Bucket(const std::string& name, std::string location):
+S3Bucket::S3Bucket(std::string location, std::string name, bool local):
     base_type(location),
     m_name(name)
 {
+    if (!local)
+        return;
+
     NX_ASSERT(bindAndListen(SocketAddress::anyPrivateAddress));
     SocketGlobals::addressResolver().addFixedAddress(hostName(), serverAddress());
 }
