@@ -45,7 +45,7 @@ The SDK C++ files have extensive documentation comments in Doxygen format, from 
 are generated and included into the SDK: see `docs/html/index.html`.
 
 ---------------------------------------------------------------------------------------------------
-## Sample: building and installing
+## Samples: building and installing
 
 This package includes a number of sample Camera Plugins written in C++, located at `samples/`.
 
@@ -58,7 +58,7 @@ Prerequisites:
 - Linux (Ubuntu 16.04 or 18.04) including 64-bit ARM (e.g. Nvidia Tegra) native or cross-compiling:
     - g++ >= 5.4.0
     - make or Ninja
-- Qt5
+- Qt5 (required by certain samples only)
 ```
 
 To compile the samples, execute the commands collected into the provided scripts (use their source
