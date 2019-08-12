@@ -1,18 +1,4 @@
-#include <gtest/gtest.h>
-
-#include <QtCore/QFileInfo>
-
-#include <common/common_module.h>
-#include <client_core/client_core_module.h>
-#include <client/client_module.h>
-#include <api/global_settings.h>
-
-#include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/models/resource/resource_tree_model.h>
-#include <ui/models/resource_tree_sort_proxy_model.h>
-#include <ui/models/item_model_state_snapshot_helper.h>
-#include <ui/style/resource_icon_cache.h>
+#include "resource_tree_model_test_fixture.h"
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
@@ -20,164 +6,11 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/file_layout_resource.h>
 
+#include <ui/style/resource_icon_cache.h>
+
 using namespace nx;
 using namespace nx::vms::api;
 using namespace nx::vms::client::desktop;
-
-class ResourceTreeModelTest: public testing::Test
-{
-protected:
-    virtual void SetUp()
-    {
-        QnStartupParameters startupParameters;
-        startupParameters.skipMediaFolderScan = true;
-
-        m_clientModule.reset(new QnClientModule(startupParameters, nullptr));
-        m_accessController.reset(new QnWorkbenchAccessController(commonModule()));
-        m_layoutSnapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(commonModule()));
-        m_resourceTreeModel.reset(new QnResourceTreeModel(
-            QnResourceTreeModel::FullScope,
-            m_accessController.get(),
-            m_layoutSnapshotManager.get(),
-            commonModule()));
-
-        m_resourceTreeProxyModel.reset(new QnResourceTreeSortProxyModel());
-        m_resourceTreeProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-        m_resourceTreeProxyModel->setSourceModel(m_resourceTreeModel.get());
-        m_resourceTreeProxyModel->sort(Qn::NameColumn);
-    }
-
-    virtual void TearDown()
-    {
-        m_resourceTreeProxyModel.clear();
-        m_resourceTreeModel.clear();
-        m_layoutSnapshotManager.clear();
-        m_accessController.clear();
-        m_clientModule.clear();
-    }
-
-    QnCommonModule* commonModule() const
-    {
-        return m_clientModule->clientCoreModule()->commonModule();
-    }
-
-    QnResourcePool* resourcePool() const
-    {
-        return commonModule()->resourcePool();
-    }
-
-    QnUserResourcePtr addUser(
-        const QString& name,
-        GlobalPermissions globalPermissions,
-        QnUserType userType = QnUserType::Local)
-    {
-        QnUserResourcePtr user(new QnUserResource(userType));
-        user->setIdUnsafe(QnUuid::createUuid());
-        user->setName(name);
-        user->setRawPermissions(globalPermissions);
-        user->addFlags(Qn::remote);
-        resourcePool()->addResource(user);
-        return user;
-    }
-
-    QnMediaServerResourcePtr addServer(const QString& name)
-    {
-        QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule()));
-        server->setIdUnsafe(QnUuid::createUuid());
-        server->setStatus(Qn::ResourceStatus::Offline);
-        server->setName(name);
-        resourcePool()->addResource(server);
-        return server;
-    }
-
-    QnAviResourcePtr addMediaResource(const QString& path)
-    {
-        QnAviResourcePtr mediaResource(new QnAviResource(path, commonModule()));
-        resourcePool()->addResource(mediaResource);
-        return mediaResource;
-    }
-
-    QnFileLayoutResourcePtr addFileLayoutResource(const QString& path)
-    {
-        QnFileLayoutResourcePtr fileLayoutResource(new QnFileLayoutResource(commonModule()));
-        fileLayoutResource->setIdUnsafe(guidFromArbitraryData(path));
-        fileLayoutResource->setUrl(path);
-        fileLayoutResource->setName(QFileInfo(path).fileName());
-        resourcePool()->addResource(fileLayoutResource);
-        return fileLayoutResource;
-    }
-
-    void logout()
-    {
-        m_accessController->setUser(QnUserResourcePtr());
-        resourcePool()->removeResources(resourcePool()->getResourcesWithFlag(Qn::remote));
-    }
-
-    void loginAsAdmin(const QString& name)
-    {
-        logout();
-        auto user = addUser(name, GlobalPermission::adminPermissions);
-        m_accessController->setUser(user);
-    }
-
-    void setSystemName(const QString& name)
-    {
-        commonModule()->globalSettings()->setSystemName(name);
-    }
-
-    QJsonDocument testSnapshot(ItemModelStateSnapshotHelper::SnapshotParams& params) const
-    {
-        return ItemModelStateSnapshotHelper::makeSnapshot(m_resourceTreeProxyModel.get(), params);
-    }
-
-    QModelIndexList getAllIndexes() const
-    {
-        std::function<QModelIndexList(const QModelIndex&)> getChildren;
-        getChildren =
-            [this, &getChildren](const QModelIndex& parent)
-            {
-                QModelIndexList result;
-                for (int row = 0; row < m_resourceTreeProxyModel->rowCount(parent); ++row)
-                {
-                    const auto childIndex = m_resourceTreeProxyModel->index(row, 0, parent);
-                    result.append(childIndex);
-                    result.append(getChildren(childIndex));
-                }
-                return result;
-            };
-        return getChildren(QModelIndex());
-    }
-
-    using KeyValue = std::pair<int, QVariant>;
-    using KeyValueVector = std::vector<KeyValue>;
-    QModelIndexList getIndexByData(const KeyValueVector& lookupData) const
-    {
-        const auto dataMatch =
-            [lookupData](const QModelIndex& index) -> bool
-            {
-                for (const auto& keyValue: lookupData)
-                {
-                    const auto indexData = index.data(keyValue.first);
-                    if (indexData.isNull() || indexData != keyValue.second)
-                        return false;
-                }
-                return true;
-            };
-
-        QModelIndexList result;
-        const auto allIndexes = getAllIndexes();
-        std::copy_if(allIndexes.cbegin(), allIndexes.cend(), std::back_inserter(result), dataMatch);
-
-        return result;
-    }
-
-protected:
-    QSharedPointer<QnClientModule> m_clientModule;
-    QSharedPointer<QnWorkbenchAccessController> m_accessController;
-    QSharedPointer<QnWorkbenchLayoutSnapshotManager> m_layoutSnapshotManager;
-    QSharedPointer<QnResourceTreeModel> m_resourceTreeModel;
-    QSharedPointer<QnResourceTreeSortProxyModel> m_resourceTreeProxyModel;
-};
 
 TEST_F(ResourceTreeModelTest, shouldShowPinnedNodesIfLoggedIn)
 {
@@ -328,12 +161,12 @@ TEST_F(ResourceTreeModelTest, localFilesAreSortedAlphanumerically)
 {
     // Define string constants.
     static constexpr auto userName = "test_user";
-    static constexpr auto filePath1 = "picture1.png";
-    static constexpr auto filePath2 = "picture2_.png";
-    static constexpr auto filePath3 = "picture10.png";
+    static constexpr auto filePath1 = "picture1_2.png";
+    static constexpr auto filePath2 = "picture2_11.png";
+    static constexpr auto filePath3 = "picture10_1.png";
 
     // Define node lookup data.
-    const KeyValueVector lookupData =
+    const KeyValueVector localFilesNodeLookupData =
         {{Qt::DisplayRole, "Local Files"},
         {Qn::ResourceIconKeyRole, QnResourceIconCache::LocalResources}};
 
@@ -345,24 +178,24 @@ TEST_F(ResourceTreeModelTest, localFilesAreSortedAlphanumerically)
 
     // Define reference snapshot.
     ItemModelStateSnapshotHelper::SnapshotParams params;
-    params.parentIndex = getIndexByData(lookupData).first();
+    params.parentIndex = getIndexByData(localFilesNodeLookupData).first();
     const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
         [
             {
                 "data": {
-                    "display": "picture1.png",
+                    "display": "picture1_2.png",
                     "iconKey": "Image|Online"
                 }
             },
             {
                 "data": {
-                    "display": "picture2_.png",
+                    "display": "picture2_11.png",
                     "iconKey": "Image|Online"
                 }
             },
             {
                 "data": {
-                    "display": "picture10.png",
+                    "display": "picture10_1.png",
                     "iconKey": "Image|Online"
                 }
             }
@@ -373,34 +206,30 @@ TEST_F(ResourceTreeModelTest, localFilesAreSortedAlphanumerically)
     ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
 }
 
-TEST_F(ResourceTreeModelTest, offlineLocalFileArentDisplayed)
+TEST_F(ResourceTreeModelTest, offlineMediaResourcesAreNotDisplayed)
 {
     // Define string constants.
     static constexpr auto userName = "test_user";
-    static constexpr auto filePath1 = "picture1.png";
-    static constexpr auto filePath2 = "picture2.png";
+    static constexpr auto imageFilePath = "picture.bmp";
+    static constexpr auto videoFilePath = "video.mov";
+    static constexpr auto layoutFilePath = "layout.nov";
 
     // Define node lookup data.
-    const KeyValueVector lookupData =
+    const KeyValueVector localFilesNodeLookupData =
     {{Qt::DisplayRole, "Local Files"},
     {Qn::ResourceIconKeyRole, QnResourceIconCache::LocalResources}};
 
     // Setup resources.
     loginAsAdmin(userName);
-    addMediaResource(filePath1)->setStatus(Qn::Online);
-    addMediaResource(filePath2)->setStatus(Qn::Offline);
+    addMediaResource(imageFilePath)->setStatus(Qn::Offline);
+    addMediaResource(videoFilePath)->setStatus(Qn::Offline);
+    addMediaResource(layoutFilePath)->setStatus(Qn::Offline);
 
     // Define reference snapshot.
     ItemModelStateSnapshotHelper::SnapshotParams params;
-    params.parentIndex = getIndexByData(lookupData).first();
+    params.parentIndex = getIndexByData(localFilesNodeLookupData).first();
     const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
         [
-            {
-                "data": {
-                    "display": "picture1.png",
-                    "iconKey": "Image|Online"
-                }
-            }
         ])json")
         .toUtf8());
 
@@ -408,35 +237,64 @@ TEST_F(ResourceTreeModelTest, offlineLocalFileArentDisplayed)
     ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
 }
 
-// TODO: #vbreus To be extended and finalized
-TEST_F(ResourceTreeModelTest, localFilesIconsAndGrouping)
+TEST_F(ResourceTreeModelTest, localResourceVisibilityTransitions)
 {
     // Define string constants.
     static constexpr auto userName = "test_user";
-    static constexpr auto filePath1 = "1_picture.png";
-    static constexpr auto filePath2 = "2_video.avi";
-    static constexpr auto filePath3 = "3_layout.nov";
+    static constexpr auto resourceFilePath = "test_resource.mkv";
+
+    // Define reference data.
+    const KeyValueVector lookupData = { {Qt::DisplayRole, resourceFilePath} };
+
+    // Perform actions.
+    const auto mediaResource = addMediaResource(resourceFilePath);
+    mediaResource->setStatus(Qn::Online);
+    ASSERT_TRUE(getIndexByData(lookupData).size() == 1);
+
+    mediaResource->setStatus(Qn::Offline);
+    ASSERT_TRUE(getIndexByData(lookupData).size() == 0);
+
+    mediaResource->setStatus(Qn::Online);
+    ASSERT_TRUE(getIndexByData(lookupData).size() == 1);
+}
+
+TEST_F(ResourceTreeModelTest, localResourcesIconsAndGrouping)
+{
+    // Define string constants.
+    static constexpr auto userName = "test_user";
+    static constexpr auto imageFilePath = "1_picture.png";
+    static constexpr auto videoFilePath = "2_video.avi";
+    static constexpr auto layoutFilePath = "3_layout.nov";
+    static constexpr auto encryptedLayoutFilePath = "4_encrypted_layout.nov";
 
     // Define node lookup data.
-    const KeyValueVector lookupData =
+    const KeyValueVector localFilesNodeLookupData =
     {{Qt::DisplayRole, "Local Files"},
     {Qn::ResourceIconKeyRole, QnResourceIconCache::LocalResources}};
 
     // Setup resources.
     loginAsAdmin(userName);
-    addMediaResource(filePath1)->setStatus(Qn::Online);
-    addMediaResource(filePath2)->setStatus(Qn::Online);
-    addFileLayoutResource(filePath3)->setStatus(Qn::Online);
+    addMediaResource(imageFilePath)->setStatus(Qn::Online);
+    addMediaResource(videoFilePath)->setStatus(Qn::Online);
+    addFileLayoutResource(layoutFilePath)->setStatus(Qn::Online);
+    addFileLayoutResource(encryptedLayoutFilePath,/*isEncrypted*/ true)->setStatus(Qn::Online);
 
     // Define reference snapshot.
     ItemModelStateSnapshotHelper::SnapshotParams params;
-    params.parentIndex = getIndexByData(lookupData).first();
+    params.parentIndex = getIndexByData(localFilesNodeLookupData).first();
+    params.depth = 1;
     const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
         [
             {
                 "data": {
                     "display": "3_layout.nov",
                     "iconKey": "ExportedLayout"
+                }
+            },
+            {
+                "data": {
+                    "display": "4_encrypted_layout.nov",
+                    "iconKey": "ExportedEncryptedLayout"
                 }
             },
             {
@@ -458,24 +316,24 @@ TEST_F(ResourceTreeModelTest, localFilesIconsAndGrouping)
     ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
 }
 
-TEST_F(ResourceTreeModelTest, onlyFilenameIsDisplayed)
+TEST_F(ResourceTreeModelTest, mediaResourceOnlyFilenameDisplayed)
 {
     // Define string constants.
     static constexpr auto userName = "test_user";
-    static constexpr auto filePath1 = "test_directory/picture.png";
+    static constexpr auto imageFilePath = "test_directory/picture.png";
 
     // Define node lookup data.
-    const KeyValueVector lookupData =
+    const KeyValueVector localFilesNodeLookupData =
     {{Qt::DisplayRole, "Local Files"},
     {Qn::ResourceIconKeyRole, QnResourceIconCache::LocalResources}};
 
     // Setup resources.
     loginAsAdmin(userName);
-    addMediaResource(filePath1)->setStatus(Qn::Online);
+    addMediaResource(imageFilePath)->setStatus(Qn::Online);
 
     // Define reference snapshot.
     ItemModelStateSnapshotHelper::SnapshotParams params;
-    params.parentIndex = getIndexByData(lookupData).first();
+    params.parentIndex = getIndexByData(localFilesNodeLookupData).first();
     const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
         [
             {

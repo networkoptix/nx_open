@@ -75,7 +75,7 @@ QJsonArray ItemModelStateSnapshotHelper::createChildrenArray(
     const int startRow = params.startRow ? *params.startRow : 0;
     const int rowCount =
         params.rowCount ? *params.rowCount : model->rowCount(params.parentIndex) - startRow;
-    NX_ASSERT(rowCount > 0);
+    NX_ASSERT(rowCount >= 0);
 
     QJsonArray rowsArray;
     for (int row = startRow; row < startRow + rowCount; ++row)
