@@ -21,8 +21,15 @@ TEST(ServerStartedEvent, serverStartedEvent)
         filter.period.setEndTimeMs(QnTimePeriod::kMaxTimeValue);
 
         auto db = launcher.serverModule()->serverDb();
-        while (db->getActions(filter).size() != i)
+        do
+        {
+            auto result = db->getActions(filter);
+            if (i == result.size())
+                break;
+
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
+        while (true);
 
         launcher.stop();
     }

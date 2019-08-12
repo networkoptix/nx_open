@@ -412,12 +412,6 @@ void RuleProcessor::processEvent(const vms::event::AbstractEventPtr& event)
         processEventInternal(event);
 }
 
-QList<vms::event::RulePtr> RuleProcessor::rules() const
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_rules;
-}
-
 bool RuleProcessor::rulesHaveNotBeenLoadedYet() const
 {
     return m_rules.isEmpty();
