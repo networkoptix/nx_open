@@ -11,7 +11,7 @@
 
 namespace nx::cloud {
 
-namespace aws { class ApiClient; }
+namespace aws::s3 { class ApiClient; }
 
 namespace storage::service::controller::s3 {
 
@@ -45,7 +45,7 @@ private:
 private:
     network::http::Credentials m_credentials;
     nx::utils::MoveOnlyFunc<void(api::Result, int /*bytesUsed*/)> m_handler;
-    std::vector<std::unique_ptr<aws::ApiClient>> m_s3Clients;
+    std::vector<std::unique_ptr<aws::s3::ApiClient>> m_s3Clients;
     std::atomic_int m_size = 0;
     std::atomic_int m_responses = 0;
 };

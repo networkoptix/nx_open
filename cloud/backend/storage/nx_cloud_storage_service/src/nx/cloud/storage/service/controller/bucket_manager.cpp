@@ -1,6 +1,6 @@
 #include "bucket_manager.h"
 
-#include <nx/cloud/aws/api_client.h>
+#include <nx/cloud/aws/s3/api_client.h>
 #include <nx/clusterdb/engine/synchronization_engine.h>
 #include <nx/network/url/url_builder.h>
 

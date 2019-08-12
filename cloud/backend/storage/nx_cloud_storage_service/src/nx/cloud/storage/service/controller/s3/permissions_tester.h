@@ -2,7 +2,7 @@
 
 #include <nx/network/aio/basic_pollable.h>
 
-#include <nx/cloud/aws/api_client.h>
+#include <nx/cloud/aws/s3/api_client.h>
 #include <nx/network/http/auth_tools.h>
 
 #include <nx/network/cloud/storage/service/api/result.h>
@@ -46,7 +46,7 @@ private:
     const network::http::Credentials m_credentials;
     nx::utils::Url m_url;
     std::string m_bucketLocation;
-    std::unique_ptr<aws::ApiClient> m_s3Client;
+    std::unique_ptr<aws::s3::ApiClient> m_s3Client;
     nx::utils::MoveOnlyFunc<void(api::Result, std::string)> m_handler;
 };
 

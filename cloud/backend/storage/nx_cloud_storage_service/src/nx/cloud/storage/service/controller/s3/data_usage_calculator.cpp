@@ -1,6 +1,7 @@
 #include "data_usage_calculator.h"
 
-#include <nx/cloud/aws/api_client.h>
+#include <nx/cloud/aws/s3/api_client.h>
+#include <nx/network/url/url_builder.h>
 
 #include <nx/network/url/url_builder.h>
 
@@ -69,7 +70,7 @@ void DataUsageCalculator::initializeS3Clients(
     for (const auto& bucket: buckets)
     {
         m_s3Clients.emplace_back(
-            std::make_unique<aws::ApiClient>(
+            std::make_unique<aws::s3::ApiClient>(
                 std::string() /*storageClientId*/,
                 bucket.region,
                 bucket.url,
