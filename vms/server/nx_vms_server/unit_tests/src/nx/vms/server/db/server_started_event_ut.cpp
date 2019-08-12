@@ -4,6 +4,7 @@
 #include <media_server/media_server_module.h>
 #include <api/helpers/event_log_request_data.h>
 #include <nx/vms/event/actions/common_action.h>
+#include <nx/vms/server/event/extended_rule_processor.h>
 
 using namespace nx::vms::event;
 
@@ -16,6 +17,8 @@ TEST(ServerStartedEvent, serverStartedEvent)
     for (int i = 1; i <= 2; ++i)
     {
         ASSERT_TRUE(launcher.start());
+        launcher.serverModule()->eventRuleProcessor()->waitForDone();
+
         QnEventLogFilterData filter;
         filter.eventType = EventType::serverStartEvent;
         filter.period.setEndTimeMs(QnTimePeriod::kMaxTimeValue);

@@ -76,10 +76,15 @@ RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
                 [this, slot](auto arg)
                 {
                     (this->*slot)(arg);
+
+                    QnMutexLocker lock(&m_mutex);
                     const auto currentValue = --m_updatingRulesCount;
                     NX_ASSERT(currentValue >= 0, currentValue);
                     if (currentValue == 0)
-                        m_ruleUpdateCondition.wakeAll(); //< // Resume event processing.
+                    {
+                        processDelayedEvents();
+                        m_ruleUpdateCondition.wakeAll();
+                    }
                 },
                 Qt::QueuedConnection);
         };
@@ -93,11 +98,17 @@ RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
     start();
 }
 
+void RuleProcessor::waitForDone()
+{
+    QnMutexLocker lock(&m_mutex);
+    while(m_updatingRulesCount > 0)
+        m_ruleUpdateCondition.wait(&m_mutex);
+}
+
 RuleProcessor::~RuleProcessor()
 {
     NX_ASSERT(m_updatingRulesCount == 0, m_updatingRulesCount);
     m_updatingRulesCount = 0;
-    m_ruleUpdateCondition.wakeAll();
 }
 
 QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
@@ -423,21 +434,26 @@ void RuleProcessor::processEvent(const vms::event::AbstractEventPtr& event)
     NX_VERBOSE(this, "Processing event [%1]", event->getEventType());
 
     QnMutexLocker lock(&m_mutex);
-    // If we wait within event loop, will freeze forever...
-    if (thread() != QThread::currentThread())
-    {
-        // This is a dirty huck, which makes sure that no actions are executed until rule update
-        // request is complete. This is mostly important for HTTP requests which do not have a way
-        // to detect if change is complete.
-        // TODO: Remove and notify HTTP requests some other way.
-        while (m_updatingRulesCount > 0)
-            m_ruleUpdateCondition.wait(&m_mutex);
-    }
+    if (m_updatingRulesCount > 0)
+        m_delayedEvents.append(event);
+    else
+        processEventInternal(event);
+}
 
+void RuleProcessor::processEventInternal(const vms::event::AbstractEventPtr& event)
+{
     // Get pairs of {rule, action} for event.
     const auto actions = matchActions(event);
     for (const auto& action: actions)
         executeAction(action);
+}
+
+void RuleProcessor::processDelayedEvents()
+{
+    for (const auto& event: m_delayedEvents)
+        processEventInternal(event);
+
+    m_delayedEvents.clear();
 }
 
 bool RuleProcessor::containsResource(const QnResourceList& resList, const QnUuid& resId) const

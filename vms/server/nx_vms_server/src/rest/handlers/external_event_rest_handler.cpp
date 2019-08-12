@@ -16,6 +16,7 @@
 #include <nx/vms/event/event_parameters.h>
 #include <media_server/media_server_module.h>
 #include <api/helpers/camera_id_helper.h>
+#include <nx/vms/server/event/extended_rule_processor.h>
 
 using namespace nx;
 
@@ -124,6 +125,6 @@ int QnExternalEventRestHandler::executeGet(
     {
         result.setError(QnRestResult::InvalidParameter, errStr);
     }
-
+    serverModule()->eventRuleProcessor()->waitForDone();
     return nx::network::http::StatusCode::ok;
 }
