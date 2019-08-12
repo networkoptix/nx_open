@@ -16,10 +16,10 @@ namespace nx::cloud::storage::service::controller {
 
 BucketManager::BucketManager(const conf::Settings& settings, model::Model* model):
     m_settings(settings),
-    m_database(model->database()),
-    m_bucketDao(model->bucketDao())
+    m_database(&model->database()),
+    m_bucketDao(&model->bucketDao())
 {
-    m_database->synchronizationEngine()->incomingCommandDispatcher().
+    m_database->synchronizationEngine().incomingCommandDispatcher().
         registerCommandHandler<command::SaveBucket>(
             [this](auto&& ... args)
             {
@@ -27,7 +27,7 @@ BucketManager::BucketManager(const conf::Settings& settings, model::Model* model
                 return nx::sql::DBResult::ok;
             });
 
-    m_database->synchronizationEngine()->incomingCommandDispatcher().
+    m_database->synchronizationEngine().incomingCommandDispatcher().
         registerCommandHandler<command::RemoveBucket>(
             [this](auto&& ... args)
             {
@@ -75,7 +75,7 @@ void BucketManager::listBuckets(
 {
     auto buckets = std::make_shared<api::Buckets>();
 
-    m_database->synchronizationEngine()->transactionLog().startDbTransaction(
+    m_database->synchronizationEngine().transactionLog().startDbTransaction(
         m_settings.database().synchronization.clusterId,
         [this, buckets](auto queryContext)
         {
@@ -101,7 +101,7 @@ void BucketManager::removeBucket(
     const std::string& bucketName,
     nx::utils::MoveOnlyFunc<void(api::Result)> handler)
 {
-    m_database->synchronizationEngine()->transactionLog().startDbTransaction(
+    m_database->synchronizationEngine().transactionLog().startDbTransaction(
         m_settings.database().synchronization.clusterId,
         [this, bucketName](auto queryContext)
         {
@@ -135,7 +135,7 @@ nx::sql::DBResult BucketManager::addBucketAndSynchronize(
 {
     m_bucketDao->addBucket(queryContext, bucket);
 
-    m_database->synchronizationEngine()->transactionLog()
+    m_database->synchronizationEngine().transactionLog()
         .generateTransactionAndSaveToLog<command::SaveBucket>(
             queryContext,
             m_settings.database().synchronization.clusterId,
@@ -150,7 +150,7 @@ nx::sql::DBResult BucketManager::removeBucketAndSynchronize(
 {
     m_bucketDao->removeBucket(queryContext, bucketName);
 
-    m_database->synchronizationEngine()->transactionLog()
+    m_database->synchronizationEngine().transactionLog()
         .generateTransactionAndSaveToLog<command::RemoveBucket>(
             queryContext,
             m_settings.database().synchronization.clusterId,
@@ -185,7 +185,7 @@ void BucketManager::addBucketToDb(
     bucket->region = std::move(region);
     bucket->cloudStorageCount = 0;
 
-    m_database->synchronizationEngine()->transactionLog().startDbTransaction(
+    m_database->synchronizationEngine().transactionLog().startDbTransaction(
         m_settings.database().synchronization.clusterId,
         [this, bucket](auto queryContext)
         {

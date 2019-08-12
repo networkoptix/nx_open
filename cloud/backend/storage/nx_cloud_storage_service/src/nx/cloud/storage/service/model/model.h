@@ -25,9 +25,9 @@ public:
 
     void stop();
 
-    Database* database();
-    dao::AbstractBucketDao* bucketDao();
-    dao::AbstractStorageDao* storageDao();
+    Database& database();
+    dao::AbstractBucketDao& bucketDao();
+    dao::AbstractStorageDao& storageDao();
 
 private:
     std::unique_ptr<Database> m_database;

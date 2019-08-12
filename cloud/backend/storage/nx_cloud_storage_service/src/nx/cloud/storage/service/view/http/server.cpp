@@ -21,8 +21,8 @@ static constexpr char kBucketNameParam[] = "name";
 
 Server::Server(const conf::Settings& settings, controller::Controller* controller):
     m_settings(settings),
-    m_bucketManager(controller->bucketManager()),
-    m_storageManager(controller->storageManager()),
+    m_bucketManager(&controller->bucketManager()),
+    m_storageManager(&controller->storageManager()),
     m_cloudDBAuthenticationForwarder(CloudDbAuthenticationFactory::instance().create(settings)),
     m_multiAddressServer(
         &m_authenticationDispatcher,

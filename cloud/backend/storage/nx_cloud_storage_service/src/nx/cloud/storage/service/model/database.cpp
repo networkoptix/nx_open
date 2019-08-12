@@ -28,9 +28,9 @@ void Database::stop()
     m_sqlExecutor->pleaseStopSync();
 }
 
-nx::clusterdb::engine::SynchronizationEngine* Database::synchronizationEngine()
+nx::clusterdb::engine::SynchronizationEngine& Database::synchronizationEngine()
 {
-    return m_syncEngine.get();
+    return *m_syncEngine;
 }
 
 } // namespace nx::cloud::storage::service::model

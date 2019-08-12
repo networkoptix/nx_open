@@ -101,8 +101,8 @@ StorageManager::StorageManager(
     BucketManager* bucketManager)
     :
     m_settings(settings),
-    m_database(model->database()),
-    m_storageDao(model->storageDao()),
+    m_database(&model->database()),
+    m_storageDao(&model->storageDao()),
     m_bucketManager(bucketManager),
     m_geoIpResolver(GeoIpResolverFactory::instance().create(settings)),
     m_stsClient(
@@ -111,7 +111,7 @@ StorageManager::StorageManager(
             kStsUrl,
             m_settings.aws().credentials))
 {
-    m_database->synchronizationEngine()->incomingCommandDispatcher()
+    m_database->synchronizationEngine().incomingCommandDispatcher()
         .registerCommandHandler<command::SaveStorage>(
             [this](auto&& ... args)
             {
@@ -119,7 +119,7 @@ StorageManager::StorageManager(
                 return nx::sql::DBResult::ok;
             });
 
-    m_database->synchronizationEngine()->incomingCommandDispatcher()
+    m_database->synchronizationEngine().incomingCommandDispatcher()
         .registerCommandHandler<command::RemoveStorage>(
             [this](auto&& ... args)
             {
@@ -150,7 +150,7 @@ void StorageManager::addStorage(
 
     auto addStorageContext = std::make_shared<AddStorageContext>();
 
-    m_database->synchronizationEngine()->transactionLog().startDbTransaction(
+    m_database->synchronizationEngine().transactionLog().startDbTransaction(
         m_settings.database().synchronization.clusterId,
         [this, addStorageContext, request, clientEndpoint](auto queryContext)
         {
@@ -200,7 +200,7 @@ void StorageManager::removeStorage(
 
     auto storage = std::make_shared<std::optional<api::Storage>>();
 
-    m_database->synchronizationEngine()->transactionLog().startDbTransaction(
+    m_database->synchronizationEngine().transactionLog().startDbTransaction(
         m_settings.database().synchronization.clusterId,
         [this, storageId, storage](auto queryContext)
         {
@@ -259,7 +259,7 @@ void StorageManager::getStorage(
 
     auto storage = std::make_shared<std::optional<api::Storage>>();
 
-    m_database->synchronizationEngine()->transactionLog().startDbTransaction(
+    m_database->synchronizationEngine().transactionLog().startDbTransaction(
         m_settings.database().synchronization.clusterId,
         [this, storageId, storage](auto queryContext)
         {
@@ -332,7 +332,7 @@ nx::sql::DBResult StorageManager::addStorageAndSynchronize(
 {
     m_storageDao->addStorage(queryContext, storage);
 
-    m_database->synchronizationEngine()->transactionLog()
+    m_database->synchronizationEngine().transactionLog()
         .generateTransactionAndSaveToLog<command::SaveStorage>(
             queryContext,
             m_settings.database().synchronization.clusterId,
@@ -351,7 +351,7 @@ std::optional<api::Storage> StorageManager::removeStorageAndSynchronize(
 
     m_storageDao->removeStorage(queryContext, storageId);
 
-    m_database->synchronizationEngine()->transactionLog()
+    m_database->synchronizationEngine().transactionLog()
         .generateTransactionAndSaveToLog<command::RemoveStorage>(
             queryContext,
             m_settings.database().synchronization.clusterId,

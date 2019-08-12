@@ -24,19 +24,19 @@ void Model::stop()
     m_database->stop();
 }
 
-Database* Model::database()
+Database& Model::database()
 {
-    return m_database.get();
+    return *m_database;
 }
 
-dao::AbstractBucketDao* Model::bucketDao()
+dao::AbstractBucketDao& Model::bucketDao()
 {
-    return m_bucketDao.get();
+    return *m_bucketDao;
 }
 
-dao::AbstractStorageDao* Model::storageDao()
+dao::AbstractStorageDao& Model::storageDao()
 {
-    return m_storageDao.get();
+    return *m_storageDao;
 }
 
 } // namespace nx::cloud::storage::service::model

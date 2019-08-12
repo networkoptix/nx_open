@@ -11,14 +11,14 @@ Controller::Controller(const conf::Settings& settings, model::Model* model):
 {
 }
 
-BucketManager* Controller::bucketManager()
+BucketManager& Controller::bucketManager()
 {
-    return &m_bucketManager;
+    return m_bucketManager;
 }
 
-StorageManager* Controller::storageManager()
+StorageManager& Controller::storageManager()
 {
-    return &m_storageManager;
+    return m_storageManager;
 }
 
 } // namespace nx::cloud::storage::service::controller
