@@ -1,6 +1,8 @@
 #include "deserialize.h"
 
-namespace nx::cloud::aws::api::xml {
+#include <nx/utils/datetime.h>
+
+namespace nx::cloud::aws::xml {
 
 namespace detail {
 
@@ -14,9 +16,24 @@ bool advancePastEndElement(QXmlStreamReader* xml)
 
 } // namespace detail
 
-bool toBool(const QString& value)
+void assign(bool* var, const QString& value)
 {
-    return value.toLower() == "true " ? true : false;
+    *var = value.toLower() == "true " ? true : false;
+}
+
+void assign(int* var, const QString& value)
+{
+    *var = value.toInt();
+}
+
+void assign(std::string* var, const QString& value)
+{
+    *var = value.toStdString();
+}
+
+void assign(std::chrono::system_clock::time_point* var, const QString* value)
+{
+
 }
 
 std::optional<QString> parseNextElement(QXmlStreamReader* xml)
@@ -38,5 +55,5 @@ std::optional<QString> parseNextElement(QXmlStreamReader* xml)
     return element;
 }
 
-} // namespace nx::cloud::aws::api::xml
+} // namespace nx::cloud::aws::xml
 

@@ -6,13 +6,12 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 
-#include <nx/cloud/aws/aws_signature_v4.h>
+#include <nx/cloud/aws/s3/aws_signature_v4.h>
 #include <nx/cloud/aws/http_request_paths.h>
+#include <nx/cloud/aws/s3/http_request_paths.h>
+#include <nx/cloud/aws/s3/location_constraint.h>
 
-#include <nx/cloud/aws/api/list_bucket_result.h>
-#include <nx/cloud/aws/api/location_constraint.h>
-
-namespace nx::cloud::aws::test {
+namespace nx::cloud::aws::s3::test {
 
 namespace {
 
@@ -189,7 +188,7 @@ void AwsS3Emulator::getLocation(
     if (requestContext.request.requestLine.url.query() != http::kLocation)
         return completionHandler(network::http::StatusCode::badRequest);
 
-    auto buffer = api::xml::serialized({this->location()});
+    auto buffer = xml::serialized({this->location()});
 
     network::http::RequestResult result(network::http::StatusCode::ok);
     result.dataSource =
@@ -204,7 +203,7 @@ void AwsS3Emulator::listBucket(
     nx::network::http::RequestContext requestContext,
     nx::network::http::RequestProcessedHandler completionHandler)
 {
-    auto buffer = api::xml::serialized(
+    auto buffer = xml::serialized(
         getListBucketResult(
             parseQuery(
                 requestContext.request.requestLine.url.query())));
@@ -226,12 +225,12 @@ void AwsS3Emulator::dispatchRootPathGetRequest(
     listBucket(std::move(requestContext), std::move(completionHandler));
 }
 
-api::ListBucketResult AwsS3Emulator::getListBucketResult(
+s3::ListBucketResult AwsS3Emulator::getListBucketResult(
     std::map<QString, QString> queries) const
 {
     const auto prefix = queries[http::kPrefix].toStdString();
 
-    api::ListBucketResult result;
+    s3::ListBucketResult result;
     result.prefix = prefix;
 
     QnMutexLocker lock(&m_mutex);
@@ -246,7 +245,7 @@ api::ListBucketResult AwsS3Emulator::getListBucketResult(
 
     for (auto it = itLow; it != itHigh; ++it)
     {
-        api::Contents contents;
+        s3::Contents contents;
         contents.key = !prefix.empty() ? parseFileName(it->first, prefix) : it->first;
         contents.size = it->second.size();
         result.contents.emplace_back(std::move(contents));
@@ -314,7 +313,8 @@ void AwsSignatureV4Authenticator::authenticate(
         return completionHandler(prepareUnsuccesfulResult());
     const auto signature = signatureIt->second;
 
-    const auto [calculatedSignature, result] = SignatureCalculator::calculateSignature(
+    s3::SignatureCalculator calculator;
+    const auto [calculatedSignature, result] = calculator.calculateSignature(
         request,
         network::http::Credentials(
             accessKeyId,
@@ -347,4 +347,4 @@ network::http::server::AuthenticationResult
     return authenticationResult;
 }
 
-} // namespace nx::cloud::aws::test
+} // namespace nx::cloud::aws::s3::test

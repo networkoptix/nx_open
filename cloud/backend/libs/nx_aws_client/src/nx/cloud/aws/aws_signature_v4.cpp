@@ -179,7 +179,7 @@ std::tuple<nx::Buffer, bool /*result*/>
 void SignatureCalculator::hashPath(
     nx::utils::QnCryptographicHash* hash, const QString& path)
 {
-    const auto encodedPath = QUrl::toPercentEncoding(path, "/");
+    const auto encodedPath = QUrl::toPercentEncoding(QUrl::toPercentEncoding(path, "/"), "/");
     if (!encodedPath.startsWith('/'))
         hash->addData("/");
     hash->addData(encodedPath);

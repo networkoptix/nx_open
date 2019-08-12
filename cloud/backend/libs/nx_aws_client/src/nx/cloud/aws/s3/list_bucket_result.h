@@ -4,10 +4,12 @@
 
 #include <vector>
 
-#include "xml/serialize.h"
-#include "xml/deserialize.h"
+#include "nx/cloud/aws/xml/serialize.h"
+#include "nx/cloud/aws/xml/deserialize.h"
 
-namespace nx::cloud::aws::api {
+namespace nx::cloud::aws {
+
+namespace s3 {
 
 struct NX_AWS_CLIENT_API Contents
 {
@@ -27,19 +29,21 @@ struct NX_AWS_CLIENT_API ListBucketResult
     std::string nextContinuationToken;
     int keyCount = 0;
     int maxKeys = 0;
-    std::string delimitter;
+    std::string delimiter;
     bool isTruncated = false;
     std::vector<Contents> contents;
 };
 
+} // namespace s3
+
 namespace xml {
 
 template<>
-NX_AWS_CLIENT_API bool deserialize(QXmlStreamReader* xml, ListBucketResult* outObject);
+bool deserialize(QXmlStreamReader* xml, s3::ListBucketResult* outObject);
 
 template<>
-NX_AWS_CLIENT_API void serialize(QXmlStreamWriter* xml, const ListBucketResult& object);
+void serialize(QXmlStreamWriter* xml, const s3::ListBucketResult& object);
 
 } // namespace xml
 
-} // namespace nx::cloud::aws::api
+} // namespace nx::cloud::aws

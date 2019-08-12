@@ -22,15 +22,15 @@ public:
     };
 
     /**
-     * Implements https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-header-based-auth.html.
+     * Implements https://docs.aws.amazon.com/general/latest/gr/sigv4_signing.html#Query string.
      *
      * The request is expected to have the following headers with non-empty values:
      * x-amz-content-sha256
      * x-amz-date
      *
-     * @return Value of the Authorization header.
+     * @return Value of the Authorization Query string.
      */
-    static std::tuple<nx::String, bool /*result*/> calculateAuthorizationHeader(
+     std::tuple<nx::String, bool /*result*/> calculateAuthorizationHeader(
         const network::http::Request& request,
         const network::http::Credentials& credentials,
         const std::string& region,
@@ -39,39 +39,40 @@ public:
     /**
      * @return Hex(HMAC-SHA256(SigningKey, StringToSign)).
      */
-    static std::tuple<nx::String, bool /*result*/> calculateSignature(
+     std::tuple<nx::String, bool /*result*/> calculateSignature(
         const network::http::Request& request,
         const network::http::Credentials& credentials,
         const std::string& region,
         const std::string& service,
         IntermediateValues* intermediateValues = nullptr);
 
-private:
+protected:
+    virtual void hashPath(nx::utils::QnCryptographicHash* hash, const QString& path);
 
-    static nx::Buffer calculateSignKey(
+private:
+     nx::Buffer calculateSignKey(
         const nx::String& date,
         const network::http::Credentials& credentials,
         const std::string& region,
         const std::string& service);
 
-    static std::tuple<nx::Buffer, bool /*result*/> calculateCanonicalRequestSha256Hash(
+     std::tuple<nx::Buffer, bool /*result*/> calculateCanonicalRequestSha256Hash(
         const network::http::Request& request,
         IntermediateValues* intermediateValues);
 
-    static void hashPath(nx::utils::QnCryptographicHash* hash, const QString& path);
-    static void hashQuery(nx::utils::QnCryptographicHash* hash, const nx::String& query);
+     void hashQuery(nx::utils::QnCryptographicHash* hash, const nx::String& query);
 
-    static void hashCanonicalHeaders(
+     void hashCanonicalHeaders(
         nx::utils::QnCryptographicHash* hash,
         const nx::network::http::HttpHeaders& headers,
         std::vector<nx::String>* lowCaseHeaderNames);
 
-    static void hashSignedHeaders(
+     void hashSignedHeaders(
         nx::utils::QnCryptographicHash* hash,
         const std::vector<nx::String>& lowCaseHeaderNames,
         IntermediateValues* intermediateValues);
 
-    static bool addScope(
+     bool addScope(
         HMAC_CTX* hmacCtx,
         const nx::String& date,
         const std::string& region,

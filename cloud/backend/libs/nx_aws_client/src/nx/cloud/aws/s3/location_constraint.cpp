@@ -3,7 +3,7 @@
 #include <vector>
 #include <functional>
 
-namespace nx::cloud::aws::api::xml {
+namespace nx::cloud::aws {
 
 namespace {
 
@@ -89,16 +89,17 @@ static std::string parseLocation(const QByteArray& messageBody)
 
 } // namespace
 
-bool deserialize(const QByteArray& data, LocationConstraint* outObject)
+namespace xml {
+
+bool deserialize(const QByteArray& data, s3::LocationConstraint* outObject)
 {
-    auto region = parseLocation(data);
-    if (region.empty())
+    outObject->region = parseLocation(data);
+    if (outObject->region.empty())
         return false;
-    outObject->region = region;
     return true;
 }
 
-QByteArray serialized(const LocationConstraint& object)
+QByteArray serialized(const s3::LocationConstraint& object)
 {
     if (object.region == kDefaultRegion)
         return kDefaultLocationTemplate;
@@ -106,4 +107,6 @@ QByteArray serialized(const LocationConstraint& object)
     return QString(kLocationTemplate).arg(object.region.c_str()).toUtf8();
 }
 
-} // namespace nx::cloud::aws::api::xml
+} // namespace xml
+
+} // namespace nx::cloud::aws

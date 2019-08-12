@@ -3,7 +3,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/url.h>
 
-#include <nx/cloud/aws/api_client.h>
+#include <nx/cloud/aws/s3/api_client.h>
 
 #include "../abstract_content_client.h"
 
@@ -73,7 +73,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    nx::cloud::aws::ApiClient m_awsClient;
+    nx::cloud::aws::s3::ApiClient m_awsClient;
 
     static ResultCode toResultCode(aws::Result result);
 };

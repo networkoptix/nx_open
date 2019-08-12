@@ -7,9 +7,9 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <nx/cloud/aws/api/list_bucket_result.h>
+#include <nx/cloud/aws/s3/list_bucket_result.h>
 
-namespace nx::cloud::aws::test {
+namespace nx::cloud::aws::s3::test {
 
 /**
  * Requires a request to be signed using AWS Signature V4
@@ -114,9 +114,9 @@ private:
         nx::network::http::RequestContext requestContext,
         nx::network::http::RequestProcessedHandler completionHandler);
 
-    api::ListBucketResult getListBucketResult(std::map<QString, QString> queries) const;
+    s3::ListBucketResult getListBucketResult(std::map<QString, QString> queries) const;
 
     std::map<QString, QString> parseQuery(const QString& query) const;
 };
 
-} // namespace nx::cloud::aws::test
+} // namespace nx::cloud::aws::s3::test

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../base_api_client.h"
+
 #include <optional>
 #include <string>
 
@@ -11,14 +13,12 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/url.h>
 
-#include "api_types.h"
-
-namespace nx::cloud::aws {
+namespace nx::cloud::aws::s3 {
 
 class NX_AWS_CLIENT_API ApiClient:
-    public nx::network::aio::BasicPollable
+    public BaseApiClient
 {
-    using base_type = nx::network::aio::BasicPollable;
+    using base_type = BaseApiClient;
 
 public:
     using CommonHandler = nx::utils::MoveOnlyFunc<void(Result)>;
@@ -34,10 +34,6 @@ public:
         const nx::utils::Url& url,
         const nx::network::http::Credentials& credentials);
     virtual ~ApiClient();
-
-    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
-
-    void setTimeouts(const nx::network::http::AsyncClient::Timeouts& timeouts);
 
     void uploadFile(
         const std::string& destinationPath,
@@ -63,36 +59,12 @@ public:
      */
     void getBucketSize(nx::utils::MoveOnlyFunc<void(Result, int/*bytes*/)> handler);
 
-protected:
-    virtual void stopWhileInAioThread() override;
-
 private:
-    using RequestPool = nx::network::aio::AsyncOperationPool<nx::network::http::AsyncClient>;
-
-    const std::string m_awsRegion;
-    const nx::utils::Url m_url;
-    const nx::network::http::Credentials m_credentials;
-    RequestPool m_requestPool;
-    nx::network::http::AsyncClient::Timeouts m_timeouts;
-
-    std::unique_ptr<network::http::AsyncClient> prepareHttpClient();
-
-    void addAuthorizationToRequest(network::http::Request* request);
-
-    template<typename Handler>
-    void doAwsApiCall(
-        const nx::network::http::Method::ValueType& method,
-        const std::string& path,
-        Handler handler,
-        std::unique_ptr<nx::network::http::AbstractMsgBodySource> body = nullptr);
-
-    template<typename Handler>
-    void doAwsApiCall(const nx::network::http::Method::ValueType& method,
-        const nx::utils::Url& url,
-        Handler handler,
-        std::unique_ptr<nx::network::http::AbstractMsgBodySource> body = nullptr);
-
-    ResultCode getResultCode(const nx::network::http::AsyncClient& httpClient) const;
+    std::tuple<nx::String, bool> calculateAuthorizationHeader(
+        const network::http::Request& request,
+        const network::http::Credentials& credentials,
+        const std::string& region,
+        const std::string& service) override;
 
     void getBucketSizeInternal(
         int runningTotalSize,
@@ -102,4 +74,4 @@ private:
     QString formatQuery(QString key, QString value);
 };
 
-} // namespace nx::cloud::aws
+} // namespace nx::cloud::aws::s3

@@ -2,7 +2,7 @@
 
 #include <QXmlStreamWriter>
 
-namespace nx::cloud::aws::api::xml {
+namespace nx::cloud::aws::xml {
 
 void writeElement(QXmlStreamWriter* xml, const QString& name, const QString& value);
 void writeElement(QXmlStreamWriter* xml, const QString& name, const std::string& value);
@@ -18,22 +18,20 @@ QString className(const ObjectType& object)
 }
 
 template<typename ObjectType>
-struct ScopedElement
+struct NestedObject
 {
-    QXmlStreamWriter* xml;
-    QString element;
-
-    ScopedElement(QXmlStreamWriter* xml, const ObjectType& object):
-        xml(xml),
-        element(className(object))
+    NestedObject(QXmlStreamWriter* xml, const ObjectType& object):
+        m_xml(xml)
     {
-        xml->writeStartElement(element);
+        m_xml->writeStartElement(className(object));
     }
 
-    ~ScopedElement()
+    ~NestedObject()
     {
-        xml->writeEndElement();
+        m_xml->writeEndElement();
     }
+    private:
+        QXmlStreamWriter* m_xml;
 };
 
 template<typename ObjectType>
@@ -45,15 +43,15 @@ template<typename ObjectType>
 QByteArray serialized(const ObjectType& object)
 {
     QByteArray buffer;
-    QXmlStreamWriter xml(&buffer);
-    xml.writeStartDocument();
-    xml.writeStartElement(className(object));
+    QXmlStreamWriter writer(&buffer);
+    writer.writeStartDocument();
+    writer.writeStartElement(className(object));
 
-    serialize(&xml, object);
+    serialize(&writer, object);
 
-    xml.writeEndElement();
-    xml.writeEndDocument();
+    writer.writeEndElement();
+    writer.writeEndDocument();
     return buffer;
 }
 
-} // namespace nx::cloud::aws::api::xml
+} // namespace nx::cloud::aws::xml

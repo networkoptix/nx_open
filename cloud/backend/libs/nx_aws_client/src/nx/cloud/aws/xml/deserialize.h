@@ -6,45 +6,48 @@
 
 #include <QXmlStreamReader>
 
-namespace nx::cloud::aws::api::xml {
+namespace nx::cloud::aws::xml {
 
 namespace detail {
 
-bool advancePastEndElement(QXmlStreamReader* xml);
+bool advancePastEndElement(QXmlStreamReader* reader);
 
 } // namespace detail
 
-NX_AWS_CLIENT_API bool toBool(const QString& value);
+void assign(bool* var, const QString& value);
+void assign(int* var, const QString& value);
+void assign(std::string* var, const QString& value);
+void assign(std::chrono::system_clock::time_point* var, const QString* value);
 
 template<typename ObjectType>
-struct NX_AWS_CLIENT_API Field
+struct Field
 {
     using Assigners = std::map<
         QString/*elementName*/,
         std::function<void(ObjectType* /*outObject*/, const QString& /*value*/)>>;
 };
 
-NX_AWS_CLIENT_API std::optional<QString> parseNextElement(QXmlStreamReader* xml);
+std::optional<QString> parseNextElement(QXmlStreamReader* reader);
 
 template<typename ObjectType>
 bool parseNextField(
-    QXmlStreamReader* xml,
+    QXmlStreamReader* reader,
     const typename Field<ObjectType>::Assigners& fieldFuncs,
     ObjectType* outObject)
 {
-    if (xml->hasError())
+    if (reader->hasError())
         return false;
 
-    auto name = xml->name().toString();
+    auto name = reader->name().toString();
 
-    auto it = fieldFuncs.find(xml->name().toString());
+    auto it = fieldFuncs.find(reader->name().toString());
     if (it == fieldFuncs.end())
     {
-        xml->readNext();
+        reader->readNext();
         return true;
     }
 
-    auto parsedElement = parseNextElement(xml);
+    auto parsedElement = parseNextElement(reader);
     if (!parsedElement)
         return false;
 
@@ -58,18 +61,18 @@ bool parseNextField(
  */
 template<typename ObjectType>
 bool deserialize(
-    QXmlStreamReader* xml,
+    QXmlStreamReader* reader,
     const typename Field<ObjectType>::Assigners& assigners,
     const QString& xmlName,
     ObjectType* outObject)
 {
-    while (!(xml->isEndElement() && xml->name() == xmlName))
+    while (!(reader->isEndElement() && reader->name() == xmlName))
     {
-        if (!parseNextField(xml, assigners, outObject))
+        if (!parseNextField(reader, assigners, outObject))
             return false;
     }
 
-    if (!detail::advancePastEndElement(xml))
+    if (!detail::advancePastEndElement(reader))
         return false;
 
     return true;
@@ -80,29 +83,30 @@ bool deserialize(
  */
 template<typename ObjectType>
 bool deserialize(
-    QXmlStreamReader* xml,
-    const typename xml::Field<ObjectType>::Assigners& assigners,
+    QXmlStreamReader* reader,
+    const typename Field<ObjectType>::Assigners& assigners,
     const QString& xmlName,
     std::vector<ObjectType>* outVector)
 {
     ObjectType object;
-    if (!deserialize(xml, assigners, xmlName, &object))
+    if (!deserialize(reader, assigners, xmlName, &object))
         return false;
     outVector->emplace_back(std::move(object));
     return true;
 }
 
 template<typename ObjectType>
-bool deserialize(QXmlStreamReader* /*xml*/, ObjectType* /*outObject*/)
+bool deserialize(QXmlStreamReader* /*reader*/, ObjectType* /*outObject*/)
 {
+    static_assert(false, "Template specialization is required...");
     return false;
 }
 
 template<typename ObjectType>
 bool deserialize(const QByteArray& data, ObjectType* outObject)
 {
-    QXmlStreamReader xml(data);
-    return deserialize(&xml, outObject);
+    QXmlStreamReader reader(data);
+    return deserialize(&reader, outObject);
 }
 
-} // namespace nx::cloud::aws::api::xml
+} // namespace nx::cloud::aws::xml

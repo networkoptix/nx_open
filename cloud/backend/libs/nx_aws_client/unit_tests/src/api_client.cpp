@@ -3,7 +3,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <nx/cloud/aws/api_client.h>
+#include <nx/cloud/aws/s3/api_client.h>
 #include <nx/cloud/aws/test_support/aws_s3_emulator.h>
 
 namespace nx::cloud::aws::test {
@@ -28,7 +28,7 @@ protected:
 
         m_awsS3Emulator->saveOrReplaceFile(kExistingFilePath, kExistingFileBody);
 
-        m_client = std::make_unique<aws::ApiClient>(
+        m_client = std::make_unique<aws::s3::ApiClient>(
             "id",
             "us-east-1",
             nx::network::url::Builder()
@@ -122,7 +122,7 @@ private:
 
     std::unique_ptr<AwsS3Emulator> m_awsS3Emulator;
     nx::network::http::Credentials m_credentials;
-    std::unique_ptr<aws::ApiClient> m_client;
+    std::unique_ptr<aws::s3::ApiClient> m_client;
     nx::utils::SyncQueue<Result> m_uploadResults;
     nx::utils::SyncQueue<std::tuple<Result, nx::Buffer>> m_downloadResults;
     nx::utils::SyncQueue<Result> m_deleteResults;
