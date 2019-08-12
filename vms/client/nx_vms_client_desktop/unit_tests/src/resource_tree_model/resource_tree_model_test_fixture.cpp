@@ -162,3 +162,12 @@ QJsonDocument ResourceTreeModelTest::testSnapshot(
 {
     return ItemModelStateSnapshotHelper::makeSnapshot(model(), params);
 }
+
+std::string ResourceTreeModelTest::snapshotsOutputString(const QJsonDocument& actual,
+    const QJsonDocument& reference) const
+{
+    return QString("Actual snapshot:\n%1Reference snapshot:\n%2")
+        .arg(QString(actual.toJson()))
+        .arg(QString(reference.toJson()))
+        .toStdString();
+}

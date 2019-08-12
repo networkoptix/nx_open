@@ -45,6 +45,8 @@ protected:
     QModelIndexList getIndexByData(const KeyValueVector& lookupData) const;
 
     QJsonDocument testSnapshot(ItemModelStateSnapshotHelper::SnapshotParams& params) const;
+    std::string snapshotsOutputString(const QJsonDocument& actual,
+        const QJsonDocument& reference) const;
 
 protected:
     QSharedPointer<QnClientModule> m_clientModule;

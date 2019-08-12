@@ -51,7 +51,8 @@ TEST_F(ResourceTreeModelTest, shouldShowPinnedNodesIfLoggedIn)
     loginAsAdmin(userName);
 
     // Check result.
-    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
+    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot)
+        << snapshotsOutputString(testSnapshot(params), referenceSnapshot);
 }
 
 TEST_F(ResourceTreeModelTest, singleServerShouldBeTopLevelNode)
@@ -82,7 +83,8 @@ TEST_F(ResourceTreeModelTest, singleServerShouldBeTopLevelNode)
     addServer(serverName1);
 
     // Check result.
-    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
+    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot)
+        << snapshotsOutputString(testSnapshot(params), referenceSnapshot);
 }
 
 TEST_F(ResourceTreeModelTest, shouldGroupServersIfNotSingle)
@@ -130,7 +132,8 @@ TEST_F(ResourceTreeModelTest, shouldGroupServersIfNotSingle)
     addServer(serverName2);
 
     // Check result.
-    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
+    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot)
+        << snapshotsOutputString(testSnapshot(params), referenceSnapshot);
 }
 
 TEST_F(ResourceTreeModelTest, localFilesNodeVisibility)
@@ -203,7 +206,8 @@ TEST_F(ResourceTreeModelTest, localFilesAreSortedAlphanumerically)
         .toUtf8());
 
     // Check result.
-    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
+    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot)
+        << snapshotsOutputString(testSnapshot(params), referenceSnapshot);
 }
 
 TEST_F(ResourceTreeModelTest, localFilesAreSortedCaseInsensitive)
@@ -252,7 +256,8 @@ TEST_F(ResourceTreeModelTest, localFilesAreSortedCaseInsensitive)
         .toUtf8());
 
     // Check result.
-    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
+    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot)
+        << snapshotsOutputString(testSnapshot(params), referenceSnapshot);
 }
 
 TEST_F(ResourceTreeModelTest, offlineMediaResourcesAreNotDisplayed)
@@ -283,7 +288,8 @@ TEST_F(ResourceTreeModelTest, offlineMediaResourcesAreNotDisplayed)
         .toUtf8());
 
     // Check result.
-    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
+    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot)
+        << snapshotsOutputString(testSnapshot(params), referenceSnapshot);
 }
 
 TEST_F(ResourceTreeModelTest, localResourceVisibilityTransitions)
@@ -362,7 +368,8 @@ TEST_F(ResourceTreeModelTest, localResourcesIconsAndGrouping)
         .toUtf8());
 
     // Check result.
-    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
+    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot)
+        << snapshotsOutputString(testSnapshot(params), referenceSnapshot);
 }
 
 TEST_F(ResourceTreeModelTest, mediaResourceOnlyFilenameDisplayed)
@@ -395,5 +402,6 @@ TEST_F(ResourceTreeModelTest, mediaResourceOnlyFilenameDisplayed)
         .toUtf8());
 
     // Check result.
-    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot);
+    ASSERT_TRUE(testSnapshot(params) == referenceSnapshot)
+        << snapshotsOutputString(testSnapshot(params), referenceSnapshot);
 }
