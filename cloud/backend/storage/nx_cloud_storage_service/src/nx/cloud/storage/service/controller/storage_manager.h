@@ -74,7 +74,6 @@ private:
         GetStorageHandler handler);
 
     void getCredentialsForStorage(
-        const std::string& storageId,
         api::Storage storage,
         nx::utils::MoveOnlyFunc<void(api::Result, api::StorageCredentials)> handler);
 

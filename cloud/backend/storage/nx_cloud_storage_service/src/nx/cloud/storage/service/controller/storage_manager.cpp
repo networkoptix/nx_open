@@ -285,7 +285,6 @@ void StorageManager::getStorage(
 }
 
 void StorageManager::getCredentialsForStorage(
-    const std::string& storageId,
     api::Storage storage,
     nx::utils::MoveOnlyFunc<void(api::Result, api::StorageCredentials)> handler)
 {
