@@ -100,6 +100,10 @@ TEST_F(ResourceTreeModelTest, shouldGroupServersIfNotSingle)
     const auto referenceSnapshot = QJsonDocument::fromJson(QString(R"json(
         [
             {
+                "data": {
+                    "display": "Servers",
+                    "iconKey": "Servers"
+                },
                 "children": [
                     {
                         "data": {
@@ -113,11 +117,7 @@ TEST_F(ResourceTreeModelTest, shouldGroupServersIfNotSingle)
                             "iconKey": "Server|Offline"
                         }
                     }
-                ],
-                "data": {
-                    "display": "Servers",
-                    "iconKey": "Servers"
-                }
+                ]
             }
         ])json")
         .arg(serverName1)
