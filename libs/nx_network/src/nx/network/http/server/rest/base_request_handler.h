@@ -74,6 +74,110 @@ private:
     BusinessFunc m_businessFunc;
 };
 
+/**
+ * RequestHandler class that can be used to standardize http request error processing.
+ * Usage example:
+ *
+ * struct FooResult { bool ok; };
+ * struct FooRequest { ... };
+ * struct FooResponse { std::string id; };
+ *
+ * class FooManager
+ * {
+ * public:
+ *     void putFoo(
+ *         FooRequest request,
+ *         nx::utils::MoveOnlyFunc<void(FooResult, FooResponse)> handler);
+ *
+ *     // NOTE: void input type. id requires parsing of http request path "/foo/{id}"
+ *     void getFoo(
+ *           std::string id,
+ *           nx::utils::MoveOnlyFunc<void(FooResult, FooResponse)> handler);
+ *
+ *    // NOTE: requires getting the client's IP address from the http request
+ *    void deleteFooAndLogClientEndoint(
+ *        std::string id,
+ *        network::SocketAddress clientEndpoint,
+ *        nx::utils::MoveOnlyFunc<void(FooResult)> handler);
+ * };
+ *
+ * template<
+ *   typename Result,
+ *   typename Input,
+ *   typename Output,
+ *   typename... RestArgFetchers>
+ * class MyRequestHandler: public BaseRequestHandler
+ * {
+ * public:
+ *     template<typename... OutputData>
+ *     void processResponseInternal(FooResult result, OutputData... output)
+ *     {
+ *         if (result.ok)
+ *         {
+ *             this->RequestCompleted(network::http::FusionRequestResult(), std::move(output)...);
+ *         }
+ *         else
+ *         {
+ *             network::http::FusionRequestResult error = fooResultToFusionRequestError(result);
+ *             this->requestCompleted(std::move(error), std:move(output)...);
+ *         }
+ *     }
+ * };
+ *
+ * class MyHttpServer
+ * {
+ * public:
+ *     void registerFooManagerApi();
+ *
+ * private:
+ *     network::http::server::rest::MessageDispatcher m_dispatcher;
+ *     FooManager m_fooManager;
+ * }
+ *
+ * void MyHttpServer::registerFooManagerApi()
+ * {
+ *     using namespace std::placeholders;
+ *
+ *     static constexpr char kIdParam[] = "id";
+ *
+ *     using PutFooHandler = MyRequestHandler<FooRequest, FooResponse>;
+ *     m_dispatcher.registerRequestProcessor<PutFooHandler>(
+ *     "/foo",
+ *     [this]()
+ *     {
+ *          return std::make_unique<PutFooHandler>(
+ *              std::bind(&FooManager::putFoo, &m_fooManager, _1, _2));
+ *     },
+ *     network::http::Method::put);
+ *
+ *     using GetFooHandler =
+ *         MyRequestHandler<void, FooResult, RestArgFetcher<kIdParam>>;
+ *     m_dispatcher.registerRequestProcessor<BusinessLogicHandler2>(
+ *     "/foo/{id}",
+ *     [this]()
+ *     {
+ *          return std::make_unique<BusinessLogicHandler2>(
+ *              std::bind(&FooManager::getFoo, &m_fooManager, _1, _2));
+ *     },
+ *     network::http::Method::get);
+ *
+ *     // NOTE: this request has no fusion input and no fusion output.
+ *     // NOTE: RestArgFetcher<kIdParam> and ClientEndpointFetcher must occur in the same order
+ *     // as the parameters they correspond to.
+
+ *     using DeleteFooHandler =
+ *         MyRequestHandler<void, void, RestArgFetcher<kIdParam>, ClientEndpointFetcher>;
+ *     m_dispatcher.registerRequestProcessor<BusinessLogicHandler3>(
+ *     "foo/{id}",
+ *     [this]()
+ *     {
+ *         return std::make_unique<DeleteFooHandler>(
+ *             std::bind(&FooManager::deleteFooAndLogClientEndpoint, &m_fooManager, _1, _2, _3));
+ *     },
+ *     network::http::Method::delete_);
+ * }
+ */
+
 template<
     typename Derived,
     typename Result,
