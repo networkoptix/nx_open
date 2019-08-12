@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <QtCore/QFileInfo>
+
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
 #include <client/client_module.h>
@@ -16,6 +18,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/avi/avi_resource.h>
+#include <core/resource/file_layout_resource.h>
 
 using namespace nx;
 using namespace nx::vms::api;
@@ -92,6 +95,16 @@ protected:
         QnAviResourcePtr mediaResource(new QnAviResource(path, commonModule()));
         resourcePool()->addResource(mediaResource);
         return mediaResource;
+    }
+
+    QnFileLayoutResourcePtr addFileLayoutResource(const QString& path)
+    {
+        QnFileLayoutResourcePtr fileLayoutResource(new QnFileLayoutResource(commonModule()));
+        fileLayoutResource->setIdUnsafe(guidFromArbitraryData(path));
+        fileLayoutResource->setUrl(path);
+        fileLayoutResource->setName(QFileInfo(path).fileName());
+        resourcePool()->addResource(fileLayoutResource);
+        return fileLayoutResource;
     }
 
     void logout()
@@ -413,7 +426,7 @@ TEST_F(ResourceTreeModelTest, localFilesIconsAndGrouping)
     loginAsAdmin(userName);
     addMediaResource(filePath1)->setStatus(Qn::Online);
     addMediaResource(filePath2)->setStatus(Qn::Online);
-    addMediaResource(filePath3)->setStatus(Qn::Online);
+    addFileLayoutResource(filePath3)->setStatus(Qn::Online);
 
     // Define reference snapshot.
     ItemModelStateSnapshotHelper::SnapshotParams params;
@@ -422,13 +435,13 @@ TEST_F(ResourceTreeModelTest, localFilesIconsAndGrouping)
         [
             {
                 "data": {
-                    "display": "2_video.avi",
-                    "iconKey": "Media|Online"
+                    "display": "3_layout.nov",
+                    "iconKey": "ExportedLayout"
                 }
             },
             {
                 "data": {
-                    "display": "3_layout.nov",
+                    "display": "2_video.avi",
                     "iconKey": "Media|Online"
                 }
             },
