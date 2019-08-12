@@ -367,20 +367,20 @@ void MediaResourceWidgetPrivate::setStreamDataFilter(StreamDataFilter filter, bo
 
 void MediaResourceWidgetPrivate::setStreamDataFilters(StreamDataFilters filters)
 {
-    if (auto reader = display()->archiveReader())
-    {
-        reader->setStreamDataFilter(filters);
-        if (const auto archiveDelegate = reader->getArchiveDelegate())
-        {
-            archiveDelegate->setStreamDataFilter(filters);
-            const bool isLive = display()->camDisplay()->isRealTimeSource();
-            if (!isLive)
-            {
-                archiveDelegate->seek(display()->camDisplay()->getCurrentTime(),
-                    /*findIFrame*/ false);
-            }
-        }
-    }
+    auto reader = display()->archiveReader();
+    if (!reader)
+        return;
+
+    if (!reader->setStreamDataFilter(filters))
+        return;
+
+    const auto positionUsec = display()->camDisplay()->getExternalTime();
+    const auto isPaused = reader->isMediaPaused();
+
+    if (isPaused)
+        reader->jumpTo(/*mksek*/ positionUsec, /*skipTime*/ positionUsec);
+    else
+        reader->jumpTo(/*mksek*/ positionUsec, /*skipTime*/ 0);
 }
 
 } // namespace nx::vms::client::desktop
