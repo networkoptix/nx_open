@@ -1,3 +1,5 @@
+## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 cmake_minimum_required(VERSION 3.1)
 
 set(IMAGE_LIB_TARGET image_library_plugin)

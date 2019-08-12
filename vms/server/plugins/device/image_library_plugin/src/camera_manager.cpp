@@ -1,7 +1,4 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "camera_manager.h"
 
@@ -10,7 +7,6 @@
 #include "archive_reader.h"
 #include "media_encoder.h"
 #include "time_periods.h"
-
 
 static const int FRAME_DURATION_USEC = 1*1000*1000;
 

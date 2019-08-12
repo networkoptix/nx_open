@@ -1,15 +1,10 @@
-/**********************************************************
-* 04 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef DIR_ITERATOR_H
-#define DIR_ITERATOR_H
+#pragma once
 
 #include <string>
 
 #include <stdint.h>
-
 
 namespace FsEntryType
 {
@@ -80,5 +75,3 @@ public:
 private:
     DirIteratorImpl* m_impl;
 };
-
-#endif  //DIR_ITERATOR_H

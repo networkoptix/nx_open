@@ -1,15 +1,10 @@
-/**********************************************************
-* 05 sep 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef ILP_VIDEO_PACKET_H
-#define ILP_VIDEO_PACKET_H
+#pragma once
 
 #include <camera/camera_plugin.h>
 
 #include <plugins/plugin_tools.h>
-
 
 class ILPVideoPacket
 :
@@ -69,5 +64,3 @@ private:
     nxcip::Picture* m_motionData;
     unsigned int m_cSeq;
 };
-
-#endif  //ILP_VIDEO_PACKET_H

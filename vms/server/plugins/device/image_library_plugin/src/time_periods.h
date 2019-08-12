@@ -1,10 +1,6 @@
-/**********************************************************
-* 10 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef TIME_PERIODS_H
-#define TIME_PERIODS_H
+#pragma once
 
 #include <list>
 #include <utility>
@@ -12,7 +8,6 @@
 #include <camera/camera_plugin.h>
 
 #include <plugins/plugin_tools.h>
-
 
 class TimePeriods
 :
@@ -44,5 +39,3 @@ private:
     nxpt::CommonRefManager m_refManager;
     container_type::const_iterator m_pos;
 };
-
-#endif //TIME_PERIODS_H

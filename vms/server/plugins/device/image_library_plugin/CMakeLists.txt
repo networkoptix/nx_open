@@ -1,7 +1,7 @@
 nx_add_server_plugin(image_library_plugin NO_MOC OPTIONAL
     PRIVATE_LIBS
-        Qt5::Core
-        nx_plugin_utils
+        nx_sdk
+        nx_kit
     ADD_TO_DISTRIBUTION_IF FALSE
 )
 
