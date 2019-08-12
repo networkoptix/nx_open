@@ -6,7 +6,7 @@
 #include <nx/cloud/aws/s3/api_client.h>
 #include <nx/cloud/aws/test_support/aws_s3_emulator.h>
 
-namespace nx::cloud::aws::test {
+namespace nx::cloud::aws::s3::test {
 
 class AwsS3Client:
     public ::testing::Test
@@ -17,7 +17,7 @@ class AwsS3Client:
 protected:
     virtual void SetUp() override
     {
-        m_awsS3Emulator = std::make_unique<AwsS3Emulator>(randomS3Location());
+        m_awsS3Emulator = std::make_unique<AwsS3Emulator>(s3::test::randomS3Location());
 
         ASSERT_TRUE(m_awsS3Emulator->bindAndListen(
             nx::network::SocketAddress::anyPrivateAddress));
@@ -156,4 +156,4 @@ TEST_F(AwsS3Client, gets_location)
     thenLocationIsGotten();
 }
 
-} // namespace nx::cloud::aws::test
+} // namespace nx::cloud::aws::s3::test
