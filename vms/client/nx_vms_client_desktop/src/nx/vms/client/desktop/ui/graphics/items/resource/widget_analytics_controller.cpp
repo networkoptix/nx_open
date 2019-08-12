@@ -4,6 +4,8 @@
 
 #include <QtCore/QPointer>
 
+#include <analytics/db/analytics_db_types.h>
+
 #include <common/common_module.h>
 
 #include <core/resource/layout_resource.h>
@@ -127,6 +129,8 @@ public:
 
         QRectF futureRectangle;
         microseconds futureRectangleTimestamp = 0us;
+
+        ObjectMetadata rawData;
     };
 
     static AreaHighlightOverlayWidget::AreaInformation areaInfoFromObject(
@@ -137,7 +141,7 @@ public:
     QnLayoutResourcePtr layoutResource() const;
 
     ObjectInfo& addOrUpdateObject(const ObjectMetadata& object);
-    void removeArea(ObjectInfo& object);
+    void removeArea(const ObjectInfo& object);
 
     void updateObjectAreas(microseconds timestamp);
 
@@ -154,6 +158,9 @@ public:
 
     microseconds averageMetadataPeriod = 1s;
     std::unique_ptr<nx::analytics::MetadataLogger> logger;
+
+    Filter filter;
+    microseconds lastTimestamp{};
 };
 
 AreaHighlightOverlayWidget::AreaInformation WidgetAnalyticsController::Private::areaInfoFromObject(
@@ -191,10 +198,12 @@ WidgetAnalyticsController::Private::ObjectInfo&
     objectInfo.basicDescription = objectDescription(settings->briefAttributes(objectMetadata));
     objectInfo.description = objectDescription(settings->visibleAttributes(objectMetadata));
 
+    objectInfo.rawData = objectMetadata;
+
     return objectInfo;
 }
 
-void WidgetAnalyticsController::Private::removeArea(ObjectInfo& objectInfo)
+void WidgetAnalyticsController::Private::removeArea(const ObjectInfo& objectInfo)
 {
     areaHighlightWidget->removeArea(objectInfo.id);
 }
@@ -203,6 +212,12 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
 {
     for (const auto& objectInfo: objectInfoById)
     {
+        if (!filter.acceptsMetadata(objectInfo.rawData))
+        {
+            areaHighlightWidget->removeArea(objectInfo.id);
+            continue;
+        }
+
         auto areaInfo = areaInfoFromObject(objectInfo);
 
         if (ini().enableObjectMetadataInterpolation)
@@ -392,6 +407,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         }
     }
 
+    d->lastTimestamp = timestamp;
     d->updateObjectAreas(timestamp);
 }
 
@@ -410,6 +426,22 @@ void WidgetAnalyticsController::setAnalyticsMetadataProvider(
 void WidgetAnalyticsController::setAreaHighlightOverlayWidget(AreaHighlightOverlayWidget* widget)
 {
     d->areaHighlightWidget = widget;
+}
+
+const WidgetAnalyticsController::Filter& WidgetAnalyticsController::filter() const
+{
+    return d->filter;
+}
+
+void WidgetAnalyticsController::setFilter(const Filter& value)
+{
+    if (d->filter == value)
+        return;
+
+    d->filter = value;
+
+    if (d->lastTimestamp != 0us)
+        d->updateObjectAreas(d->lastTimestamp);
 }
 
 } // namespace nx::vms::client::desktop
