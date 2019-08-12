@@ -1,4 +1,4 @@
-nx_add_server_plugin(image_library_plugin NO_MOC OPTIONAL
+nx_add_server_plugin(image_library_plugin NO_MOC NO_GTEST OPTIONAL
     PRIVATE_LIBS
         nx_sdk
         nx_kit

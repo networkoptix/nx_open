@@ -85,7 +85,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
 //!Implementation of nxcip::BaseCameraManager::getCameraInfo
 int CameraManager::getCameraInfo( nxcip::CameraInfo* info ) const
 {
-    memcpy( info, &m_info, sizeof(m_info) );
+    memcpy( (void*) info, &m_info, sizeof(m_info) );
     return nxcip::NX_NO_ERROR;
 }
 
@@ -139,7 +139,7 @@ int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveR
     return nxcip::NX_NO_ERROR;
 }
 
-int CameraManager::find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::TimePeriods** timePeriods ) const
+int CameraManager::find( nxcip::ArchiveSearchOptions* /*searchOptions*/, nxcip::TimePeriods** timePeriods ) const
 {
     std::unique_ptr<TimePeriods> resTimePeriods( new TimePeriods() );
     resTimePeriods->timePeriods.push_back( std::make_pair( m_dirContentsManager.minTimestamp(), m_dirContentsManager.maxTimestamp() ) );
