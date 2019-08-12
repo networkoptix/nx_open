@@ -7,6 +7,7 @@
 #include "bucket.h"
 #include "result.h"
 #include "storage.h"
+#include "storage_credentials.h"
 
 namespace nx::cloud::storage::service::api {
 
@@ -47,6 +48,10 @@ public:
 
     void listBuckets(
         nx::utils::MoveOnlyFunc<void(ResultCode, Buckets)> handler);
+
+    void getCredentials(
+        const std::string& storageId,
+        nx::utils::MoveOnlyFunc<void(ResultCode, StorageCredentials)> handler);
 
     template<typename... Output>
     static ResultCode getResultCode(

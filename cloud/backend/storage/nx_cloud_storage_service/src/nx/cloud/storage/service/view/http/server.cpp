@@ -118,6 +118,16 @@ void Server::registerStorageApiHandlers()
                 std::bind(&controller::StorageManager::removeStorage, m_storageManager, _1, _2));
         },
         network::http::Method::delete_);
+
+    using GetCredentialsHandler =
+        RequestHandler<void, api::StorageCredentials, RestArgFetcher<kStorageIdParam>>;
+    m_messageDispatcher.registerRequestProcessor<GetCredentialsHandler>(
+        api::kStorageCredentials,
+        [this]()
+        {
+            return std::make_unique<GetCredentialsHandler>(
+                std::bind(&controller::StorageManager::getCredentials, m_storageManager, _1, _2));
+        });
 }
 
 void Server::registerBucketApiHandlers()

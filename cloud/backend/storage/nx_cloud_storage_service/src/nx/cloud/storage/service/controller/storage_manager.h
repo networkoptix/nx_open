@@ -1,11 +1,11 @@
 #pragma once
 
 #include <nx/utils/move_only_func.h>
-
 #include <nx/network/cloud/storage/service/api/add_storage.h>
 #include <nx/network/cloud/storage/service/api/bucket.h>
 #include <nx/network/cloud/storage/service/api/result.h>
 #include <nx/network/cloud/storage/service/api/storage.h>
+#include <nx/network/cloud/storage/service/api/storage_credentials.h>
 #include <nx/sql/query_context.h>
 #include <nx/utils/basic_factory.h>
 
@@ -17,7 +17,11 @@ namespace nx {
 
 namespace network { class SocketAddress; }
 
-namespace cloud::storage::service {
+namespace cloud {
+
+namespace aws::sts { class ApiClient; }
+
+namespace storage::service {
 
 namespace conf { class Settings; }
 
@@ -47,7 +51,9 @@ public:
         const api::AddStorageRequest& request,
         GetStorageHandler handler);
 
-    void readStorage(const std::string& storageId, GetStorageHandler handler);
+    void readStorage(
+        const std::string& storageId,
+        GetStorageHandler handler);
 
     void removeStorage(
         const std::string& storageId,
@@ -57,12 +63,26 @@ public:
         const std::string& storageId,
         nx::utils::MoveOnlyFunc<void(api::Result, std::vector<std::string>)> handler);
 
+    void getCredentials(
+        const std::string& storageId,
+        nx::utils::MoveOnlyFunc<void(api::Result, api::StorageCredentials)> handler);
+
 private:
-    nx::sql::DBResult addStorageInternal(
+    void getStorage(
+        const std::string& storageId,
+        bool withDataUsage,
+        GetStorageHandler handler);
+
+    void getCredentialsForStorage(
+        const std::string& storageId,
+        api::Storage storage,
+        nx::utils::MoveOnlyFunc<void(api::Result, api::StorageCredentials)> handler);
+
+    nx::sql::DBResult addStorageAndSynchronize(
         nx::sql::QueryContext* queryContext,
         const api::Storage& storage);
 
-    std::optional<api::Storage> removeStorageInternal(
+    std::optional<api::Storage> removeStorageAndSynchronize(
         nx::sql::QueryContext* queryContext,
         const std::string& storageId);
 
@@ -93,6 +113,8 @@ private:
     std::shared_ptr<s3::DataUsageCalculator> createDataUsageCalculator();
     void removeDataUsageCalculator(const std::shared_ptr<s3::DataUsageCalculator>& calculator);
 
+    void initializeStsClient();
+
 private:
     struct AddStorageContext
     {
@@ -112,9 +134,10 @@ private:
     std::unique_ptr<nx::geo_ip::AbstractResolver> m_geoIpResolver;
     QnMutex m_mutex;
     std::set<std::shared_ptr<s3::DataUsageCalculator>> m_dataUsageCalculators;
-
+    std::unique_ptr<aws::sts::ApiClient> m_stsClient;
 };
 
 } // namespace controller
-} // namespace cloud::storage::service
+} // namespace storage::service
+} // namespace cloud
 } // namespace nx

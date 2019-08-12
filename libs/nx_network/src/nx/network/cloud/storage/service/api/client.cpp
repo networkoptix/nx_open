@@ -89,6 +89,16 @@ void Client::listBuckets(
         std::move(handler));
 }
 
+void Client::getCredentials(
+    const std::string& storageId,
+    nx::utils::MoveOnlyFunc<void(ResultCode, StorageCredentials)> handler)
+{
+    base_type::template makeAsyncCall<StorageCredentials>(
+        Method::get,
+        rest::substituteParameters(api::kStorageCredentials, {storageId}),
+        std::move(handler));
+}
+
 Client::ResultCode Client::toResultCode(SystemError::ErrorCode errorCode)
 {
     switch (errorCode)

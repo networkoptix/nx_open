@@ -2,6 +2,7 @@
 
 #include <nx/network/socket_common.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/cloud/aws/sts/api_client.h>
 
 #include "nx/cloud/storage/service/settings.h"
 #include "nx/cloud/storage/service/utils.h"
@@ -15,11 +16,6 @@ namespace nx::cloud::storage::service::controller {
 namespace {
 
 static constexpr char kStorageType[] = "awss3";
-
-static api::Result badRequest(QString message)
-{
-    return api::Result(api::ResultCode::badRequest, message.toStdString());
-}
 
 static const std::map<std::string, nx::geo_ip::Geopoint> kAwsGeopoints = {
     {"us-east-1", {39, -78}},
@@ -45,6 +41,37 @@ static const std::map<std::string, nx::geo_ip::Geopoint> kAwsGeopoints = {
     {"us-gov-west-1", {40, -104}},
     {"us-gov-east-1", {39, -78}}
 };
+
+// TODO attempt to format this string properly when sts::ApiClient works
+// %1 is an array of arns with the form: "arn:aws:s3:::examplebucket/folder".
+// NOTE: Because storages can be merged, access must be granted to multiple buckets/folders.
+// There is no way know the specific bucket/folder will be be written to, access must be granted
+// to all of them.
+static constexpr char kStorageAccessPolicyTemplate[] =
+    R"json({"Version":"2012-10-17","Statement":[{"Sid":"S3ReadWriteAccess%1","Effect":"Allow","Action":["s3:GetObject","s3:PutObject","s3:DeleteObject"],"Resource":[%2]}]})json";
+
+static std::string buildStorageAccessPolicy(
+    const api::Storage& storage)
+{
+    static constexpr char kArnTemplate[] = "arn:aws:s3:::%1/%2";
+
+    QString arns;
+    for (const auto& ioDevice : storage.ioDevices)
+    {
+        QString arn = lm(kArnTemplate).args(
+            service::utils::bucketName(ioDevice.dataUrl),
+            service::utils::storageFolder(ioDevice.dataUrl));
+
+        arns += "\"" + arn + "\",";        //< "arn:aws:s3:::examplebucket/folder",
+        arns += "\"" + arn + "/*" + "\","; //< "arn:aws:s3:::examplebucket/folder/*",
+    }
+
+    if (arns.endsWith(','))
+        arns.truncate(arns.size() - 1);
+
+    return lm(kStorageAccessPolicyTemplate)
+        .args(QnUuid::createUuid().toSimpleString(), arns).toStdString();
+}
 
 } // namespace
 
@@ -96,6 +123,7 @@ StorageManager::StorageManager(
 
 StorageManager::~StorageManager()
 {
+    m_stsClient->pleaseStopSync();
     QnMutexLocker lock(&m_mutex);
     for (auto& calculator: m_dataUsageCalculators)
         calculator->pleaseStopSync();
@@ -109,7 +137,7 @@ void StorageManager::addStorage(
     if (request.totalSpace <= 0)
     {
         return handler(
-            badRequest(lm("Invalid storage size: %1").arg(request.totalSpace)),
+            utils::badRequest(lm("Invalid storage size: %1").arg(request.totalSpace)),
             api::Storage{});
     }
 
@@ -131,7 +159,7 @@ void StorageManager::addStorage(
 
             addStorageContext->initializeStorage(bucket, request);
 
-            return addStorageInternal(queryContext, *addStorageContext->storage);
+            return addStorageAndSynchronize(queryContext, *addStorageContext->storage);
         },
         [this, handler = std::move(handler), addStorageContext](auto dbResult)
         {
@@ -153,38 +181,7 @@ void StorageManager::addStorage(
 
 void StorageManager::readStorage(const std::string& storageId, GetStorageHandler handler)
 {
-    if (storageId.empty())
-        return handler(badRequest("Empty storageId"), api::Storage{});
-
-    auto storage = std::make_shared<std::optional<api::Storage>>();
-
-    m_database->synchronizationEngine()->transactionLog().startDbTransaction(
-        m_settings.database().synchronization.clusterId,
-        [this, storageId, storage](auto queryContext)
-        {
-            *storage = m_storageDao->readStorage(queryContext, storageId);
-            return nx::sql::DBResult::ok;
-        },
-        [this, storageId, handler = std::move(handler), storage](auto dbResult) mutable
-        {
-            if (dbResult != nx::sql::DBResult::ok)
-            {
-                api::Result error(utils::toResultCode(dbResult));
-                error.error = lm("readStorage(%1) failed with sql error: %2")
-                    .args(storageId, toString(dbResult)).toStdString();
-                NX_ERROR(this, error.error);
-                return handler(std::move(error), api::Storage{});
-            }
-
-            if (!*storage)
-                return handler(api::Result(api::ResultCode::notFound), api::Storage{});
-
-            // TODO where to information about storage type?
-            for (auto& device: (*storage)->ioDevices)
-                device.type = kStorageType;
-
-            calculateDataUsage(std::move(**storage), std::move(handler));
-        });
+    getStorage(storageId, true /*withDataUsage*/, std::move(handler));
 }
 
 void StorageManager::removeStorage(
@@ -192,7 +189,7 @@ void StorageManager::removeStorage(
     nx::utils::MoveOnlyFunc<void(api::Result)> handler)
 {
     if (storageId.empty())
-        return handler(badRequest("Empty storageId"));
+        return handler(utils::badRequest("Empty storageId"));
 
     auto storage = std::make_shared<std::optional<api::Storage>>();
 
@@ -200,7 +197,7 @@ void StorageManager::removeStorage(
         m_settings.database().synchronization.clusterId,
         [this, storageId, storage](auto queryContext)
         {
-            *storage = removeStorageInternal(queryContext, storageId);
+            *storage = removeStorageAndSynchronize(queryContext, storageId);
             return nx::sql::DBResult::ok;
         },
         [this, storageId, handler = std::move(handler), storage](auto dbResult)
@@ -228,7 +225,107 @@ void StorageManager::listCameras(
     handler(api::Result{api::ResultCode::ok, "listCamerasOk"}, std::vector<std::string>());
 }
 
-nx::sql::DBResult StorageManager::addStorageInternal(
+void StorageManager::getCredentials(
+    const std::string& storageId,
+    nx::utils::MoveOnlyFunc<void(api::Result, api::StorageCredentials)> handler)
+{
+    getStorage(
+        storageId,
+        false /*withDataUsage*/,
+        [this, storageId, handler = std::move(handler)](auto result, auto storage) mutable
+        {
+            if (result.resultCode != api::ResultCode::ok)
+                return handler(std::move(result), api::StorageCredentials{});
+
+            getCredentialsForStorage(storageId, std::move(storage), std::move(handler));
+        }
+    );
+}
+
+void StorageManager::getStorage(
+    const std::string& storageId,
+    bool withDataUsage,
+    GetStorageHandler handler)
+{
+    if (storageId.empty())
+        return handler(utils::badRequest("Empty storageId"), api::Storage{});
+
+    auto storage = std::make_shared<std::optional<api::Storage>>();
+
+    m_database->synchronizationEngine()->transactionLog().startDbTransaction(
+        m_settings.database().synchronization.clusterId,
+        [this, storageId, storage](auto queryContext)
+        {
+            *storage = m_storageDao->readStorage(queryContext, storageId);
+            return nx::sql::DBResult::ok;
+        },
+        [this, storageId, withDataUsage, handler = std::move(handler), storage](auto dbResult) mutable
+        {
+            if (dbResult != nx::sql::DBResult::ok)
+            {
+                api::Result error(utils::toResultCode(dbResult));
+                error.error = lm("readStorage(%1) failed with sql error: %2")
+                    .args(storageId, toString(dbResult)).toStdString();
+                NX_ERROR(this, error.error);
+                return handler(std::move(error), api::Storage{});
+            }
+
+            if (!*storage)
+                return handler(api::Result(api::ResultCode::notFound), api::Storage{});
+
+            // TODO where to information about storage type?
+            for (auto& device : (*storage)->ioDevices)
+                device.type = kStorageType;
+
+            if (!withDataUsage)
+                return handler(api::Result(), std::move(**storage));
+
+            calculateDataUsage(std::move(**storage), std::move(handler));
+        });
+}
+
+void StorageManager::getCredentialsForStorage(
+    const std::string& storageId,
+    api::Storage storage,
+    nx::utils::MoveOnlyFunc<void(api::Result, api::StorageCredentials)> handler)
+{
+    if (!m_stsClient)
+        initializeStsClient();
+
+
+    aws::sts::AssumeRoleRequest request;
+    request.policy = buildStorageAccessPolicy(storage);
+    request.roleArn = m_settings.aws().assumeRoleArn;
+    request.roleSessionName =
+        QnUuid::createUuid().toSimpleString().toStdString();
+    request.durationSeconds = (int) m_settings.aws().storageCredentialsDuration.count();
+
+    m_stsClient->assumeRole(
+        request,
+        [this, handler = std::move(handler), storage = std::move(storage)](
+            aws::Result result,
+            aws::sts::AssumeRoleResult assumeRoleResult)
+        {
+            if (!result.ok())
+            {
+                NX_ERROR(this, "sts:AssumeRole failed: %1", result.text());
+                return handler(utils::toResult(result), api::StorageCredentials{});
+            }
+
+            api::StorageCredentials credentials;
+            credentials.login = assumeRoleResult.credentials.accessKeyId;
+            credentials.password = assumeRoleResult.credentials.secretAccessKey;
+            // TODO replace this with the expiration time
+            credentials.durationSeconds =
+                ( int) m_settings.aws().storageCredentialsDuration.count();
+            for (const auto& ioDevice : storage.ioDevices)
+                credentials.urls.emplace_back(ioDevice.dataUrl);
+
+            handler(api::Result(), std::move(credentials));
+        });
+}
+
+nx::sql::DBResult StorageManager::addStorageAndSynchronize(
     nx::sql::QueryContext* queryContext,
     const api::Storage& storage)
 {
@@ -243,7 +340,7 @@ nx::sql::DBResult StorageManager::addStorageInternal(
     return nx::sql::DBResult::ok;
 }
 
-std::optional<api::Storage> StorageManager::removeStorageInternal(
+std::optional<api::Storage> StorageManager::removeStorageAndSynchronize(
     nx::sql::QueryContext* queryContext,
     const std::string& storageId)
 {
@@ -391,11 +488,10 @@ void StorageManager::calculateDataUsage(
 std::shared_ptr<s3::DataUsageCalculator> StorageManager::createDataUsageCalculator()
 {
     QnMutexLocker lock(&m_mutex);
-    auto usageCalculator =
-        std::make_shared<s3::DataUsageCalculator>(
-            m_settings.aws().credentials);
-    m_dataUsageCalculators.emplace(usageCalculator);
-    return usageCalculator;
+    auto dataUsageCalculator =
+        std::make_shared<s3::DataUsageCalculator>(m_settings.aws().credentials);
+    m_dataUsageCalculators.emplace(dataUsageCalculator);
+    return dataUsageCalculator;
 }
 
 void StorageManager::removeDataUsageCalculator(
@@ -403,6 +499,15 @@ void StorageManager::removeDataUsageCalculator(
 {
     QnMutexLocker lock(&m_mutex);
     m_dataUsageCalculators.erase(calculator);
+}
+
+void StorageManager::initializeStsClient()
+{
+    // TODO decide what endpoint to use for this api call, should it go into settings?
+    m_stsClient = std::make_unique<aws::sts::ApiClient>(
+        utils::kDefaultBucketRegion,
+        "https://sts.amazonaws.com",
+        m_settings.aws().credentials);
 }
 
 } // namespace nx::cloud::storage::service::controller
