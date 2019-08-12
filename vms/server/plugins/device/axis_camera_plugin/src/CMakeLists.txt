@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.1)
 
 project(axis_camera_plugin)
 
+set(CMAKE_AUTOMOC ON)
+
 file(GLOB_RECURSE source_files ${CMAKE_CURRENT_SOURCE_DIR}/*)
 add_library(axis_camera_plugin SHARED ${source_files})
 
