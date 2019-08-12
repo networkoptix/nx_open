@@ -42,6 +42,7 @@ file(GLOB_RECURSE copied_sample_1_files ${copied_sample_1_origin}/*)
 set(copied_sample_2_target image_library_plugin/src)
 set(copied_sample_2_origin ${copied_sample_dir}/${copied_sample_1_target})
 file(GLOB_RECURSE copied_sample_2_files ${copied_sample_1_origin}/*)
+# TODO: #mshevchenko Add readme.md, consider relocating it and/or CMakeLists.txt to/from src.
 
 set(copy_sdk_files_script ${CMAKE_CURRENT_BINARY_DIR}/copy_sdk_files.cmake)
 
