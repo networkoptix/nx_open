@@ -22,10 +22,25 @@ public:
     ~BucketApi();
 
 protected:
+    struct Arg
+    {
+        std::string name;
+        std::string value;
+    };
+
     virtual void SetUp() override;
 
+    void setCredentials(
+        const std::string& accessKeyId,
+        const std::string& secretAccessKey);
+
+    void addArg(const std::string& name, const std::string& value);
+
     void givenExistingBucket();
-    service::test::S3Bucket* givenAddedBucket(std::string region = {});
+    service::test::S3Bucket* givenAddedBucket(
+        std::string region = {},
+        std::string name = {},
+        bool local = true);
     void whenAddBucket(std::string bucketName = {});
     void whenAddUnknownBucket();
     void whenListBuckets();
@@ -38,7 +53,10 @@ protected:
     void andBucketIsNotInService();
 
 private:
-    service::test::S3Bucket* createBucket(std::string location = {});
+    service::test::S3Bucket* createBucket(
+        std::string region = {},
+        std::string name = {},
+        bool local = true);
     void addBucket(const AddBucketRequest& request);
 
 protected:
@@ -50,6 +68,7 @@ protected:
     Buckets m_lastBucketsListed;
 
 private:
+    std::map<std::string, std::string>m_args;
     std::map<std::string, std::unique_ptr<service::test::S3Bucket>> m_buckets;
     nx::network::http::Credentials m_credentials;
     nx::utils::SyncQueue<std::pair<Result, Bucket>> m_addBucketResponse;

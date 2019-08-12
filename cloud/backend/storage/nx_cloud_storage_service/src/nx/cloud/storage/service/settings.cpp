@@ -1,7 +1,7 @@
 #include "settings.h"
 
 #include <nx/utils/app_info.h>
-#include <nx/utils/log/log_message.h>
+#include <nx/utils/timer_manager.h>
 
 namespace nx::cloud::storage::service {
 
@@ -38,8 +38,10 @@ static constexpr char kDefaultUrl[] = "";
 namespace aws {
 
 static constexpr char kGroupName[] = "aws";
-static constexpr char kUserName[] = "userName";
-static constexpr char kAuthToken[] = "authToken";
+static constexpr char kAccessKeyId[] = "accessKeyId";
+static constexpr char kSecretAccessKey[] = "secretAccessKey";
+static constexpr char kAssumeRoleArn[] = "assumeRoleArn";
+static constexpr char kStorageCredentialsDuration[] = "storageCredentialsDuration";
 
 } // namespace aws
 
@@ -56,7 +58,7 @@ static constexpr char kGroupName[] = "database";
 static constexpr char kSqlGroupName[] = "sql";
 static constexpr char kSynchronizationGroupName[] = "p2pDb";
 
-}
+} //namespace database
 
 namespace statistics {
 
@@ -115,19 +117,27 @@ void Settings::loadCloudDb()
 void Settings::loadAws()
 {
     using namespace aws;
+    using namespace std::chrono;
 
-    QString accessKeyId = settings().value(
-        lm("%1/%2").args(kGroupName, kUserName)).toString();
+    QString accessKeyId(
+        settings().value(lm("%1/%2").args(kGroupName, kAccessKeyId)).toString());
     network::http::Ha1AuthToken secretAccessKey(
-        settings().value(lm("%1/%2").args(kGroupName, kAuthToken)).toByteArray());
-
+        settings().value(lm("%1/%2").args(kGroupName, kSecretAccessKey)).toByteArray());
     m_aws.credentials = network::http::Credentials(accessKeyId, secretAccessKey);
+
+    m_aws.assumeRoleArn = settings().value(
+        lm("%1/%2").args(kGroupName, kAssumeRoleArn)).toString().toStdString();
+
+    m_aws.storageCredentialsDuration = duration_cast<seconds>(
+            nx::utils::parseTimerDuration(
+                settings().value(lm("%1/%2").args(kGroupName, kStorageCredentialsDuration))
+                    .toString(),
+                m_aws.storageCredentialsDuration));
 }
 
 void Settings::loadGeoIp()
 {
     using namespace geo_ip;
-
     m_geoIp.dbPath = settings().value(
         lm("%1/%2").args(kGroupName, kDbPath)).toString().toStdString();
 }
@@ -145,9 +155,10 @@ void Settings::loadDatabase()
 
 void Settings::loadStatistics()
 {
+    using namespace statistics;
     m_statistics.enabled = settings().value(
-        lm("%1/%2").args(statistics::kGroupName, statistics::kEnabled),
-        statistics::kDefaultEnabled).toBool();
+        lm("%1/%2").args(kGroupName, kEnabled),
+        kDefaultEnabled).toBool();
 }
 
 const Http& Settings::http() const

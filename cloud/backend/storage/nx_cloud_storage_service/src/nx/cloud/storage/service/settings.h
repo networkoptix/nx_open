@@ -31,6 +31,9 @@ struct CloudDb
 struct Aws
 {
     nx::network::http::Credentials credentials;
+    std::string assumeRoleArn;
+    // Corresponds to aws default value
+    std::chrono::seconds storageCredentialsDuration = std::chrono::seconds(3600);
 };
 
 struct GeoIp

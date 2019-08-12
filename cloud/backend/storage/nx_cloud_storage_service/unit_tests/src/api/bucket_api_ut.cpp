@@ -24,13 +24,22 @@ void BucketApi::SetUp()
                 return resolver;
             });
 
+    m_cloudStorage = std::make_unique<service::test::CloudStorageLauncher>();
+
     m_credentials.username = nx::utils::generateRandomName(7);
     m_credentials.authToken.setPassword(nx::utils::generateRandomName(7));
 
-    m_cloudStorage = std::make_unique<service::test::CloudStorageLauncher>();
+    m_cloudStorage->addArg("-aws/accessKeyId", m_credentials.username.toUtf8().constData());
+    m_cloudStorage->addArg("-aws/secretAccessKey", m_credentials.authToken.value.constData());
 
-    m_cloudStorage->addArg("-aws/userName", m_credentials.username.toUtf8().constData());
-    m_cloudStorage->addArg("-aws/authToken", m_credentials.authToken.value.constData());
+    for (const auto& arg : m_args)
+    {
+        auto name = arg.first;
+        while (name[0] == '-')
+            name.erase(0, 1);
+        m_cloudStorage->removeArgByName(name.c_str());
+        m_cloudStorage->addArg(arg.first.c_str(), arg.second.c_str());
+    }
 
     ASSERT_TRUE(m_cloudStorage->startAndWaitUntilStarted());
 
@@ -38,14 +47,27 @@ void BucketApi::SetUp()
     m_cloudStorageClient->setRequestTimeout(std::chrono::milliseconds(0));
 }
 
+void BucketApi::setCredentials(
+    const std::string& accessKeyId,
+    const std::string& secretAccessKey)
+{
+    addArg("-aws/accessKeyId", accessKeyId);
+    addArg("-aws/secretAccessKey", secretAccessKey);
+}
+
+void BucketApi::addArg(const std::string& name, const std::string& value)
+{
+    m_args[name] = value;
+}
+
 void BucketApi::givenExistingBucket()
 {
     createBucket();
 }
 
-service::test::S3Bucket* BucketApi::givenAddedBucket(std::string region)
+service::test::S3Bucket* BucketApi::givenAddedBucket(std::string region, std::string name, bool local)
 {
-    auto bucket = createBucket(region);
+    auto bucket = createBucket(region, name, local);
     whenAddBucket(bucket->name());
 
     thenAddBucketResponseIs(ResultCode::ok);
@@ -136,18 +158,23 @@ void BucketApi::andBucketIsNotInService()
 }
 
 
-service::test::S3Bucket* BucketApi::createBucket(std::string location)
+service::test::S3Bucket* BucketApi::createBucket(
+    std::string region,
+    std::string name,
+    bool local)
 {
-    if (location.empty())
-        location = aws::test::randomS3Location();
+    if (region.empty())
+        region = aws::s3::test::randomS3Location();
 
-    std::string bucketName = lm("bucket-%1").arg(m_buckets.size()).toStdString();
-    m_buckets[bucketName] =
-        std::make_unique<service::test::S3Bucket>(bucketName, location);
+    if (name.empty())
+        name = lm("bucket-%1").arg(m_buckets.size()).toStdString();
+    m_buckets[name] =
+        std::make_unique<service::test::S3Bucket>(region, name, local);
 
-    m_buckets[bucketName]->enableAthentication(std::regex(".*"), m_credentials);
+    if (local)
+        m_buckets[name]->enableAthentication(std::regex(".*"), m_credentials);
 
-    m_lastBucketCreated = m_buckets[bucketName].get();
+    m_lastBucketCreated = m_buckets[name].get();
 
     return m_lastBucketCreated;
 }
