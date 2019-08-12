@@ -19,18 +19,9 @@ TEST(ServerStartedEvent, serverStartedEvent)
         QnEventLogFilterData filter;
         filter.eventType = EventType::serverStartEvent;
         filter.period.setEndTimeMs(QnTimePeriod::kMaxTimeValue);
-
         auto db = launcher.serverModule()->serverDb();
-        do
-        {
-            auto result = db->getActions(filter);
-            if (i == result.size())
-                break;
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        }
-        while (true);
-
+        auto result = db->getActions(filter);
+        ASSERT_EQ(i, result.size());
         launcher.stop();
     }
 }
