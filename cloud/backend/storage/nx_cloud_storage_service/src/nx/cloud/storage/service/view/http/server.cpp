@@ -88,46 +88,27 @@ void Server::registerStorageApiHandlers()
     using namespace std::placeholders;
     using namespace nx::network::http::server::rest;
 
-    using AddStorageHandler = RequestHandler<api::AddStorageRequest, api::Storage, ClientEndpointFetcher>;
-    m_messageDispatcher.registerRequestProcessor<AddStorageHandler>(
-        api::kStorages,
-        [this]()
-        {
-            return std::make_unique<AddStorageHandler>(
-                std::bind(&controller::StorageManager::addStorage, m_storageManager, _1, _2, _3));
-        },
-        network::http::Method::put);
+    registerRequestProcessor<
+        RequestHandler<api::AddStorageRequest, api::Storage, ClientEndpointFetcher>>(
+            api::kStorages,
+            std::bind(&controller::StorageManager::addStorage, m_storageManager, _1, _2, _3),
+            network::http::Method::put);
 
-    using ReadStorageHandler =
-        RequestHandler<void, api::Storage, RestArgFetcher<kStorageIdParam>>;
-    m_messageDispatcher.registerRequestProcessor<ReadStorageHandler>(
+    registerRequestProcessor<RequestHandler<void, api::Storage, RestArgFetcher<kStorageIdParam>>>(
         api::kStorageId,
-        [this]()
-        {
-            return std::make_unique<ReadStorageHandler>(
-                std::bind(&controller::StorageManager::readStorage, m_storageManager, _1, _2));
-        },
+        std::bind(&controller::StorageManager::readStorage, m_storageManager, _1, _2),
         network::http::Method::get);
 
-    using RemoveStorageHandler = RequestHandler<void, void, RestArgFetcher<kStorageIdParam>>;
-    m_messageDispatcher.registerRequestProcessor<RemoveStorageHandler>(
+    registerRequestProcessor<RequestHandler<void, void, RestArgFetcher<kStorageIdParam>>>(
         api::kStorageId,
-        [this]()
-        {
-            return std::make_unique<RemoveStorageHandler>(
-                std::bind(&controller::StorageManager::removeStorage, m_storageManager, _1, _2));
-        },
+        std::bind(&controller::StorageManager::removeStorage, m_storageManager, _1, _2),
         network::http::Method::delete_);
 
-    using GetCredentialsHandler =
-        RequestHandler<void, api::StorageCredentials, RestArgFetcher<kStorageIdParam>>;
-    m_messageDispatcher.registerRequestProcessor<GetCredentialsHandler>(
-        api::kStorageCredentials,
-        [this]()
-        {
-            return std::make_unique<GetCredentialsHandler>(
-                std::bind(&controller::StorageManager::getCredentials, m_storageManager, _1, _2));
-        });
+    registerRequestProcessor<
+        RequestHandler<void, api::StorageCredentials, RestArgFetcher<kStorageIdParam>>>(
+            api::kStorageCredentials,
+            std::bind(&controller::StorageManager::getCredentials, m_storageManager, _1, _2),
+            network::http::Method::get);
 }
 
 void Server::registerBucketApiHandlers()
@@ -135,35 +116,35 @@ void Server::registerBucketApiHandlers()
     using namespace std::placeholders;
     using namespace nx::network::http::server::rest;
 
-    using AddBucketHandler = RequestHandler<api::AddBucketRequest, api::Bucket>;
-    m_messageDispatcher.registerRequestProcessor<AddBucketHandler>(
+    registerRequestProcessor<RequestHandler<api::AddBucketRequest, api::Bucket>>(
         api::kAwsBuckets,
-        [this]()
-        {
-            return std::make_unique<AddBucketHandler>(
-                std::bind(&controller::BucketManager::addBucket, m_bucketManager, _1, _2));
-        },
+        std::bind(&controller::BucketManager::addBucket, m_bucketManager, _1, _2),
         network::http::Method::put);
 
-    using ListBucketsHandler = RequestHandler<void, api::Buckets>;
-    m_messageDispatcher.registerRequestProcessor<ListBucketsHandler>(
+    registerRequestProcessor<RequestHandler<void, api::Buckets>>(
         api::kAwsBuckets,
-        [this]()
-        {
-            return std::make_unique<ListBucketsHandler>(
-                std::bind(&controller::BucketManager::listBuckets, m_bucketManager, _1));
-        },
+        std::bind(&controller::BucketManager::listBuckets, m_bucketManager, _1),
         network::http::Method::get);
 
-    using RemoveBucketHandler = RequestHandler<void, void, RestArgFetcher<kBucketNameParam>>;
-    m_messageDispatcher.registerRequestProcessor<RemoveBucketHandler>(
+    registerRequestProcessor<RequestHandler<void, void, RestArgFetcher<kBucketNameParam>>>(
         api::kAwsBucketName,
-        [this]()
-        {
-            return std::make_unique<RemoveBucketHandler>(
-                std::bind(&controller::BucketManager::removeBucket, m_bucketManager, _1, _2));
-        },
+        std::bind(&controller::BucketManager::removeBucket, m_bucketManager, _1, _2),
         network::http::Method::delete_);
+}
+
+template<typename Handler, typename HandlerFunc>
+void Server::registerRequestProcessor(
+    const char* path,
+    HandlerFunc handlerFunc,
+    const nx::network::http::Method::ValueType& method)
+{
+    m_messageDispatcher.registerRequestProcessor<Handler>(
+        path,
+        [handlerFunc = std::move(handlerFunc)]()
+        {
+            return std::make_unique<Handler>(std::move(handlerFunc));
+        },
+        method);
 }
 
 } // namespace nx::cloud::storage::service::view::http

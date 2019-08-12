@@ -37,6 +37,12 @@ private:
         const std::string& regex,
         network::http::server::AbstractAuthenticationManager* authenticationManager);
 
+    template<typename Handler, typename HandlerFunc>
+    void registerRequestProcessor(
+        const char* path,
+        HandlerFunc handler,
+        const nx::network::http::Method::ValueType& method);
+
     void registerStorageApiHandlers();
     void registerBucketApiHandlers();
 
