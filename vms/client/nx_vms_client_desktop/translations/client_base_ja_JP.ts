@@ -5870,10 +5870,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>いかなる個人情報も含まず、完全に匿名です。</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>フェイルオーバーサーバーの対策では、この設定に関係なくカメラステータスの更新を要求することがあります。</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>デバイスとサーバーの自動検出と自動デバイスステータスチェックを有効にする</translation>
     </message>
@@ -5884,6 +5880,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>有効にすると、システムは新しいカメラとサーバーを継続的に検出し、状態更新のために検出リクエストをカメラに送信します。</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
     </message>
   </context>
   <context>
@@ -5903,44 +5903,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>スプレッドシート（CSV）ファイル</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>サーバー</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>オフセット</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>日付</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>タイムゾーン</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>時間</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>インターネットにアクセスできるサーバーはありません　時間は同期されていません</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>VMSの時間はインターネットと同期しており、サーバーの現地時間には依存しません。</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>VMSの時間は選択したサーバーの現地時間と同期され、他のサーバーの現地時間には依存しません。</translation>
     </message>
   </context>
   <context>
@@ -7294,10 +7256,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>選択されたエリア</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>無名の分析エンジン</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>プラグインアクションの実行に失敗しました</translation>
     </message>
@@ -7350,17 +7308,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>変更の適応中...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>この I/O モジュールは、アドバンス設定がありません</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>この I/O モジュールは、アドバンス設定がありません</translation>
     </message>
   </context>
   <context>
@@ -8492,11 +8439,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>一部のサーバーでは更新プロセスが完了しませんでした。終了しますか？</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 は、更新されたバージョンで再起動します</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>

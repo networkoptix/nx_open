@@ -5937,10 +5937,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Innehåller inte någon personlig information och är helt anonym.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Failover-serveråtgärder kan fortfarande kräva statusuppdateringar för kameror oavsett inställningen.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Aktivera autodiscovery för enheter och servrar och automatisk kontroll av enhetsstatus</translation>
     </message>
@@ -5951,6 +5947,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>När den är aktiverad upptäcker systemet kontinuerligt nya kameror och servrar och skickar funktionsförfrågningar till kameror för statusuppdatering.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Om Failover är aktiverat kan servern fortfarande begära kamerastatusuppdateringar oavsett inställning.</translation>
     </message>
   </context>
   <context>
@@ -5970,44 +5970,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Kalkylblad (CSV) -fil</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Förskjutning</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Datum</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Tidszon</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Tid</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Ingen server har tillgång till internet. Tiden synkroniseras inte.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>Systemtiden synkroniseras med Internet och beror inte på lokal tid på servrar.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>Systemtiden synkroniseras med lokal tid på den valda servern och beror inte på lokal tid på andra servrar.</translation>
     </message>
   </context>
   <context>
@@ -7399,10 +7361,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>I markerat område</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>namnlös analysmotor</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>Kunde inte köra plugin åtgärd</translation>
     </message>
@@ -7456,17 +7414,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Applying changes...</source>
       <translation>Tillämpa ändringar...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Denna I / O-modul har inga avancerade inställningar</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Kameran har inga avancerade inställningar</translation>
     </message>
   </context>
   <context>
@@ -8614,11 +8561,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>Vissa servrar har ej slutförda uppdateringsprocesser. Slutför det ändå?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 kommer att startas om till den uppdaterade versionen.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>

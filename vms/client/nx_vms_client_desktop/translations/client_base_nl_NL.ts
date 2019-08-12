@@ -5932,10 +5932,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Bevat geen persoonlijke informatie en is volledig anoniem.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Failover-servermaatregelen kunnen nog steeds om camera-statusupdates vragen, ongeacht deze instelling.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Apparaten en servers autodiscovery en geautomatiseerde apparaatstatuscontrole inschakelen</translation>
     </message>
@@ -5946,6 +5942,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Indien ingeschakeld, detecteert het systeem continu nieuwe camera's en servers en stuurt het detectie aanvragen naar camera's voor een statusupdate.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Als Failover is ingeschakeld, kan de server nog steeds camera-statusupdates vragen, ongeacht deze instelling.</translation>
     </message>
   </context>
   <context>
@@ -5965,44 +5965,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>CSV-bestand (Spread Sheet)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Verschil</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Datum</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Tijdzone</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Tijd</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Geen server heeft internettoegang. De tijd wordt niet gesynchroniseerd.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>De systeemtijd wordt gesynchroniseerd met internet en is niet afhankelijk van de lokale tijd op servers.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>De systeemtijd wordt gesynchroniseerd met de lokale tijd op de geselecteerde server en is niet afhankelijk van de lokale tijd op andere servers.</translation>
     </message>
   </context>
   <context>
@@ -7394,10 +7356,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>In het geselecteerde gebied</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>naamloze analytics engine</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>Kan de plugin niet uitvoeren</translation>
     </message>
@@ -7451,17 +7409,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Applying changes...</source>
       <translation>Wijzigingen toepassen...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Deze I/O module heeft geen geavanceerde instellingen</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Deze camera heeft geen geavanceerde instellingen</translation>
     </message>
   </context>
   <context>
@@ -8609,11 +8556,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>Sommige servers hebben het update proces niet voltooid. Toch afronden?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 wordt opnieuw gestart naar de bijgewerkte versie.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>

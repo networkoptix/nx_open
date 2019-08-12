@@ -5875,10 +5875,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>不包含任何個人資訊, 並且完全匿名</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>無論此設定為何，備援伺服器仍可請求攝影機更新狀態。</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>啟用設備和伺服器的自動搜尋以及自動確認設備狀態</translation>
     </message>
@@ -5889,6 +5885,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>啟用後，系統會持續搜尋新的攝影機和伺服器，並向攝影機傳送請求以進行狀態更新。</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
     </message>
   </context>
   <context>
@@ -5908,44 +5908,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>電子表格（CSV）文件</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>伺服器</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>時間差</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>日期</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>時區</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>時間</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>沒有伺服器能連接至網路. 時間將不會被同步.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>VMS時間與網路同步, 無關於伺服器上的本地時間.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>VMS時間與所選伺服器的本地時間同步, 無關於其它伺服器本地時間.</translation>
     </message>
   </context>
   <context>
@@ -7299,10 +7261,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>在選定區域</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>未命名的分析引擎</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>套件執行失敗</translation>
     </message>
@@ -7355,17 +7313,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>套用變更...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>此 I/O 模組未提供進階設定</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>此攝影機未提供進階設定</translation>
     </message>
   </context>
   <context>
@@ -8497,11 +8444,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>某些伺服器未完成更新。繼續完成？</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 將重新啟動到更新的版本.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>

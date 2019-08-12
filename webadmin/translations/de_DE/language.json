@@ -68,7 +68,7 @@
         "cloudConnectRelayingEnabled": "Aktivieren Sie die Weiterleitung für die Cloudverbindung",
         "cloudConnectUdpHolePunchingEnabled": "Aktivieren Sie die UDP-Lochung für die Cloudverbindung",
         "cloudHost": "Cloud-host",
-        "cloudSystemID": "Cloudsystem-ID",
+        "cloudSystemID": "Cloudsystem-id",
         "disabledVendors": "Deaktivierte Treiber",
         "ec2AliveUpdateIntervalSec": "Aktualisierungsintervall des Systems (Sekunden)",
         "ec2ConnectionKeepAliveTimeoutSec": "Verbindungstimeout (Sekunden)",

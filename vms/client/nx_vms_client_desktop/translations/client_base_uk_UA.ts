@@ -42,7 +42,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation>Редагувати закладку</translation>
+      <translation>Редагувати Закладку/ Bookmark</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
@@ -50,7 +50,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation>Експортувати закладку</translation>
+      <translation>Експортувати Закладку/ Bookmark</translation>
     </message>
   </context>
   <context>
@@ -301,7 +301,7 @@ to view more bookmarks</source>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation>Відкрити %1 Портал ...</translation>
+      <translation>Відкрити %1 Портал...</translation>
     </message>
     <message>
       <source>Account Settings...</source>
@@ -481,7 +481,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Manage...</source>
-      <translation>Налаштування...</translation>
+      <translation>Управління...</translation>
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
@@ -545,7 +545,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Rename</source>
-      <translation>Перейменувати</translation>
+      <translation>Змінити Назву</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
@@ -565,7 +565,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Role Settings...</source>
-      <translation>Налаштування Ролі...</translation>
+      <translation>Налаштування Ролi Користувача...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
@@ -737,27 +737,27 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Volume Down</source>
-      <translation>Тихіше</translation>
+      <translation>Зменшити Гучність</translation>
     </message>
     <message>
       <source>Volume Up</source>
-      <translation>Гучніше</translation>
+      <translation>Збільшити Гучність</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation>Вкл/Викл звук</translation>
+      <translation>Вкл / Викл Звук</translation>
     </message>
     <message>
       <source>Jump to Live</source>
-      <translation>Відео в Реальному Часі</translation>
+      <translation>Перехiд до Відео у Реальному Часі</translation>
     </message>
     <message>
       <source>Synchronize Streams</source>
-      <translation>Синхронізуйте Потоки</translation>
+      <translation>Синхронізуйте Відео Потоки</translation>
     </message>
     <message>
       <source>Disable Stream Synchronization</source>
-      <translation>Вимкнути Синхронізацію Відео</translation>
+      <translation>Вимкнути Синхронізацію Відео Потоків</translation>
     </message>
     <message>
       <source>Show Bookmarks</source>
@@ -789,19 +789,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Unpin Tree</source>
-      <translation>Відкріпити дерево</translation>
+      <translation>Видалити зi Списку Пристроїв</translation>
     </message>
     <message>
       <source>Show Timeline</source>
-      <translation>Показати шкалу часу</translation>
+      <translation>Показати Шкалу Часу</translation>
     </message>
     <message>
       <source>Hide Timeline</source>
-      <translation>Сховати шкалу часу</translation>
+      <translation>Сховати Шкалу Часу</translation>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation>Журнал закладок...</translation>
+      <translation>Журнал Закладок...</translation>
     </message>
     <message>
       <source>Showreel...</source>
@@ -809,55 +809,55 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation>Нова прокрутка...</translation>
+      <translation>Нова Прокрутка...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation>Видалити з прокрутки</translation>
+      <translation>Видалити з Прокрутки</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation>Зробити прокрутку</translation>
+      <translation>Зробити Прокрутку</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation>Завантажити файл...</translation>
+      <translation>Завантажити Файл...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation>Завантажити папку...</translation>
+      <translation>Завантажити Папку...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation>Деякі камери вимагають встановлення паролів</translation>
+      <translation>Деякі Камери Вимагають Встановлення Паролю</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation>Експортувати відео...</translation>
+      <translation>Експортувати Відео...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
-      <translation>Експортувати закладку...</translation>
+      <translation>Експортувати Закладки...</translation>
     </message>
     <message>
       <source>Resolution...</source>
-      <translation>Роздільна здатність...</translation>
+      <translation>Роздільна Здатність...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
-      <translation>Співвідношення сторін клітинок...</translation>
+      <translation>Роздільна Здатність Комiрки...</translation>
     </message>
     <message>
       <source>Cell Spacing...</source>
-      <translation>Відстань між клітинками...</translation>
+      <translation>Відстань між Комірками...</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
-      <translation>Налаштування екрана...</translation>
+      <translation>Налаштування Екрану...</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation>Експортувати закладки...</translation>
+      <translation>Експортувати Закладки...</translation>
     </message>
     <message>
       <source>Forget password</source>
@@ -865,55 +865,55 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cancel Upload...</source>
-      <translation>Відмінити завантаження...</translation>
+      <translation>Скасувати Завантаження...</translation>
     </message>
     <message>
       <source>Copy Schedule...</source>
-      <translation>Копіювати розклад...</translation>
+      <translation>Копіювати Розклад...</translation>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation>Налаштування движка Analytics...</translation>
+      <translation>Налаштування Analytics Engine...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation>Показувати мініатюри</translation>
+      <translation>Показувати Thumbnails/ мініатюри</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
-      <translation>Сховати мініатюри</translation>
+      <translation>Сховати Thumbnails/ мініатюри</translation>
     </message>
     <message>
       <source>Pin Panel</source>
-      <translation>Прикріпити панель</translation>
+      <translation>Прикріпити Панель</translation>
     </message>
     <message>
       <source>Unpin Panel</source>
-      <translation>Відкріпити панель</translation>
+      <translation>Відкріпити Панель</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation>Віртуальна камера...</translation>
+      <translation>Віртуальна Камера...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation>Нова віртуальна камера...</translation>
+      <translation>Нова Віртуальна Камера...</translation>
     </message>
     <message>
       <source>Show Tree</source>
-      <translation>Показати дерево</translation>
+      <translation>Показати Список Пристроїв</translation>
     </message>
     <message>
       <source>Hide Tree</source>
-      <translation>Сховати дерево</translation>
+      <translation>Сховати Список Пристроїв</translation>
     </message>
     <message>
       <source>Show Notifications</source>
-      <translation>Показувати сповіщення</translation>
+      <translation>Відображати всі Сповіщення</translation>
     </message>
     <message>
       <source>Hide Notifications</source>
-      <translation>Приховати сповіщення</translation>
+      <translation>Сховати Сповіщення</translation>
     </message>
     <message>
       <source>Files...</source>
@@ -929,7 +929,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation>Перейдіть на вкладку "Закладка"</translation>
+      <translation>Перейдіть на вкладку Закладки</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
@@ -945,11 +945,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Pin Calendar</source>
-      <translation>Налаштувати календар</translation>
+      <translation>Прикрiпити Календар</translation>
     </message>
     <message>
       <source>Unpin Calendar</source>
-      <translation>Відкріпити календар</translation>
+      <translation>Відкріпити Календар</translation>
     </message>
   </context>
   <context>
@@ -964,7 +964,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation>Ліцензія вимкнена.</translation>
+      <translation>Термін дії ліцензії завершився.</translation>
     </message>
     <message>
       <source>License is inactive.</source>
@@ -976,15 +976,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation>Пробна ліцензія.</translation>
+      <translation>Ліцензія з обмеженим терміном дії.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation>Ліцензія знаходиться в стані деактивації, але ще не деактивована.</translation>
+      <translation>Ліцензія знаходиться в стані Деактивації, але ще не деактивована.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation>Кількість дезактивацій перевищила ліміт для цієї ліцензії.</translation>
+      <translation>Кількість Деактивацій Перевищила ліміт для цієї ліцензії.</translation>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
@@ -995,7 +995,7 @@ to view more bookmarks</source>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation>Будь ласка введіть пароль</translation>
+      <translation>Будь ласка, введіть коректний пароль</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
@@ -1003,7 +1003,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation>Зашифрований макет</translation>
+      <translation>Зашифрована Розкладка</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
@@ -1011,14 +1011,14 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation>Повторно введіть пароль для макета %1:</translation>
+      <translation>Будь-ласка, повторно введіть пароль для Розкладки %1:</translation>
     </message>
   </context>
   <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation>Виберіть макет...</translation>
+      <translation>Виберіть Розкладку...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
@@ -1042,14 +1042,14 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>All Files</source>
-      <translation>Всі файли</translation>
+      <translation>Всі Файли</translation>
     </message>
   </context>
   <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation>Audio Video Interleave</translation>
+      <translation>Audio Video Interleave (.avi format)</translation>
     </message>
     <message>
       <source>Matroska</source>
@@ -1061,7 +1061,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation>%1 Файл мультимедіа</translation>
+      <translation>%1 Файл Мультимедіа</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x64)</source>
@@ -1076,15 +1076,15 @@ to view more bookmarks</source>
     <name>FullscreenActionHelper</name>
     <message>
       <source>Source camera</source>
-      <translation>Початкова камера</translation>
+      <translation>Source camera</translation>
     </message>
     <message>
       <source>Select device...</source>
-      <translation>Виберіть пристрій...</translation>
+      <translation>Обрати пристрій...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation>Виберіть камеру...</translation>
+      <translation>Обрати камеру...</translation>
     </message>
     <message>
       <source>Select layout...</source>
@@ -1109,7 +1109,7 @@ to view more bookmarks</source>
     <name>GraphicsScrollBar</name>
     <message>
       <source>Scroll Here</source>
-      <translation>Перегорнути сюди</translation>
+      <translation>Прокрутіть тут</translation>
     </message>
     <message>
       <source>Left Edge</source>
@@ -1164,18 +1164,18 @@ to view more bookmarks</source>
     <name>LayoutTourTextFactory</name>
     <message>
       <source>Start Showreel</source>
-      <translation>Почати прокрутку</translation>
+      <translation>Почати Прокрутку</translation>
     </message>
   </context>
   <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation>Невірний шлях &quot;%1&quot;. Спробуйти інший.</translation>
+      <translation>Шлях &quot;%1&quot; недійсний. Спробуйте інший шлях.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation>Файл &quot;%1&quot; вже існує. Будь ласка, спробуйте інше ім'я.</translation>
+      <translation>Файл &quot;%1&quot; вже існує. Будь ласка, спробуйте інше ім'я файлу.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
@@ -1183,11 +1183,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation>Файл &quot;%1&quot; не може бути записаний. Будь ласка, спробуйте інше ім'я.</translation>
+      <translation>Файл &quot;%1&quot; не може бути записаний. Будь ласка, спробуйте інше ім'я файлу.</translation>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation>Файл &quot;%1&quot; зарезервовано операційною системою. Будь ласка, спробуйте інше ім’я.</translation>
+      <translation>Ім'я файлу &quot;%1&quot; зарезервовано операційною системою. Будь ласка, спробуйте інше ім’я файлу.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
@@ -1296,11 +1296,11 @@ to view more bookmarks</source>
     <name>PermissionsInfoTable</name>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation>Усі камери та ресурси</translation>
+      <translation>Усі Камери та Пристрої</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>Розкладки із загальним доступом</translation>
+      <translation>Розкладки із Загальним Доступом</translation>
     </message>
     <message>
       <source>All</source>
@@ -1323,11 +1323,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Failed to get current position</source>
-      <translation>Не вдалося визначити поточне місцезнаходження</translation>
+      <translation>Не вдалося визначити поточну позицію</translation>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation>Неможливо отримати поточну позицію з камери &quot;%1&quot;</translation>
+      <translation>Неможливо отримати поточну позицію камери &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
@@ -1335,7 +1335,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>Позиція використовується у дукількох турах. Видалити її?</translation>
+      <translation>Позиція використовується у декількох турах. Видалити її?</translation>
     </message>
     <message>
       <source>These tours will become invalid.</source>
@@ -1346,7 +1346,7 @@ to view more bookmarks</source>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation>Макет заблокований</translation>
+      <translation>Закладка заблокована</translation>
     </message>
   </context>
   <context>
@@ -1373,7 +1373,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Change Dewarping Mode</source>
-      <translation>Змінити режим розгортки</translation>
+      <translation>Змінити Режим Розгортки</translation>
     </message>
   </context>
   <context>
@@ -1402,7 +1402,7 @@ to view more bookmarks</source>
     <name>QnAboutDialog</name>
     <message>
       <source>%1 uses the following external libraries:</source>
-      <translation>%1 використовує наступні бібліотеки:</translation>
+      <translation>%1 використовує наступні зовнішні бібліотеки:</translation>
     </message>
     <message>
       <source>OpenGL version</source>
@@ -1449,10 +1449,10 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>...and %n more</source>
       <translation>
-        <numerusform>... і ще %n</numerusform>
-        <numerusform>... і ще %n</numerusform>
-        <numerusform>... і ще %n</numerusform>
-        <numerusform>... і ще %n</numerusform>
+        <numerusform>... і %n ще</numerusform>
+        <numerusform>... і %n ще</numerusform>
+        <numerusform>... і %n ще</numerusform>
+        <numerusform>... і %n ще</numerusform>
       </translation>
     </message>
   </context>
@@ -1464,7 +1464,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>Усі камери та ресурси</translation>
+      <translation>Усі Камери та Пристрої</translation>
     </message>
   </context>
   <context>
@@ -1490,7 +1490,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation>Відкоректуйте до найменшого значення, яке не погіршує перегляд в реальному часі. Більший буфер робить відтворення більш плавним, але збільшує затримку між реальним і відображуваним часом; менший буфер зменшує затримку, але може привести до ривків зображення.</translation>
+      <translation>Відкоректуйте до найменшого значення, яке не погіршує перегляд вiдео в реальному часі. Більший буфер робить відтворення більш плавним, але збільшує затримку між реальним і відображуваним часом; менший буфер зменшує затримку, але може привести до ривків зображення.</translation>
     </message>
   </context>
   <context>
@@ -1501,26 +1501,26 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>User settings...</source>
-      <translation>Налаштування користувача...</translation>
+      <translation>Налаштування Користувача...</translation>
     </message>
     <message>
       <source>Server settings...</source>
-      <translation>Налаштування сервера...</translation>
+      <translation>Налаштування Сервера...</translation>
     </message>
     <message>
       <source>Camera settings...</source>
-      <translation>Налаштування камери...</translation>
+      <translation>Налаштування Камери...</translation>
     </message>
   </context>
   <context>
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Скопіювати виділення в буфер обміну</translation>
+      <translation>Скопіюйте вибір у Буфер Обміну</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Експорт виділення в файл...</translation>
+      <translation>Експорт Вибору у Файл...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -1528,7 +1528,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export selected records to a file</source>
-      <translation>Вивантажити вибрані записи в файл</translation>
+      <translation>Експортувати вибрані події, записи до файлу</translation>
     </message>
     <message>
       <source>Devices</source>
@@ -1540,11 +1540,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Device actions</source>
-      <translation>Дії для пристрїв</translation>
+      <translation>Дії пристрою</translation>
     </message>
     <message>
       <source>Camera actions</source>
-      <translation>Дії для камер</translation>
+      <translation>Дії камери</translation>
     </message>
     <message>
       <source>No sessions</source>
@@ -1552,15 +1552,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No cameras</source>
-      <translation>Немає камер</translation>
+      <translation>Камер немає</translation>
     </message>
     <message>
       <source>Select sessions to see their details</source>
-      <translation>Виберіть сеанси, щоб побачити інформацію</translation>
+      <translation>Виберіть сеанси, щоб побачити їх детальну інформацію</translation>
     </message>
     <message>
       <source>Select cameras to see their details</source>
-      <translation>Виберіть камери, щоб побачити інформацію</translation>
+      <translation>Виберіть камери, щоб побачити їх детальну інформацію</translation>
     </message>
     <message>
       <source>No archive for this position</source>
@@ -1569,70 +1569,70 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>These devices are removed from System</source>
       <translation>
-        <numerusform>Це пристрій було видалено з системи</numerusform>
-        <numerusform>Ці пристрої були видалені з системи</numerusform>
-        <numerusform>Ці пристрої були видалені з системи</numerusform>
-        <numerusform>Ці пристрої були видалені з системи</numerusform>
+        <numerusform>Цей пристрій було видалено з Системи</numerusform>
+        <numerusform>Ці пристрої були видалені з Системи</numerusform>
+        <numerusform>Ці пристрої були видалені з Системи</numerusform>
+        <numerusform>Ці пристрої були видалені з Системи</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
       <translation>
-        <numerusform>Ця камера була видалена з системи</numerusform>
-        <numerusform>Ці камери були видалені з системи</numerusform>
-        <numerusform>Ці камери були видалені з системи</numerusform>
-        <numerusform>Ці камери були видалені з системи</numerusform>
+        <numerusform>Ця камера була видалена з Системи</numerusform>
+        <numerusform>Ці камери були видалені з Системи</numerusform>
+        <numerusform>Ці камери були видалені з Системи</numerusform>
+        <numerusform>Ці камери були видалені з Системи</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
       <translation>
-        <numerusform>Цей сервер був видалений з системи</numerusform>
-        <numerusform>Ці сервери були видалені з системи</numerusform>
-        <numerusform>Ці сервери були видалені з системи</numerusform>
-        <numerusform>Ці сервери були видалені з системи</numerusform>
+        <numerusform>Цей сервер був видалений з Системи</numerusform>
+        <numerusform>Ці сервери були видалені з Системи</numerusform>
+        <numerusform>Ці сервери були видалені з Системи</numerusform>
+        <numerusform>Ці сервери були видалені з Системи</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
       <translation>
-        <numerusform>Цей користувач був видалений з системи</numerusform>
-        <numerusform>Ці користувачі були видалені з системи</numerusform>
-        <numerusform>Ці користувачі були видалені з системи</numerusform>
-        <numerusform>Ці користувачі були видалені з системи</numerusform>
+        <numerusform>Цей користувач був видалений з Системи</numerusform>
+        <numerusform>Ці користувачі були видалені з Системи</numerusform>
+        <numerusform>Ці користувачі були видалені з Системи</numerusform>
+        <numerusform>Ці користувачі були видалені з Системи</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
       <translation>
-        <numerusform>Цей ресурс був видалений з системи</numerusform>
-        <numerusform>Ці ресурси були видалені з системи</numerusform>
-        <numerusform>Ці ресурси були видалені з системи</numerusform>
-        <numerusform>Ці ресурси були видалені з системи</numerusform>
+        <numerusform>Цей ресурс був видалений з Системи</numerusform>
+        <numerusform>Ці ресурси були видалені з Системи</numerusform>
+        <numerusform>Ці ресурси були видалені з Системи</numerusform>
+        <numerusform>Ці ресурси були видалені з Системи</numerusform>
       </translation>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation>Відтворити журнал аудиту</translation>
+      <translation>Відтворити Audit trail</translation>
     </message>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation>
-        <numerusform>Подробиці для %n сеансу(ів) з %1</numerusform>
-        <numerusform>Подробиці для %n сеансу(ів) з %1</numerusform>
-        <numerusform>Подробиці для %n сеансу(ів) з %1</numerusform>
-        <numerusform>Подробиці для %n сеансу(ів) з %1</numerusform>
+        <numerusform>Подробиці для %n сеансу з %1</numerusform>
+        <numerusform>Подробиці для %n сеансів з %1</numerusform>
+        <numerusform>Подробиці для %n сеансуів з %1</numerusform>
+        <numerusform>Подробиці для %n сеансуів з %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation>
-        <numerusform>Подробиці %n камери(р) із %1</numerusform>
-        <numerusform>Подробиці %n камери(р) із %1</numerusform>
-        <numerusform>Подробиці %n камери(р) із %1</numerusform>
-        <numerusform>Подробиці %n камери(р) із %1</numerusform>
+        <numerusform>Подробиці %n камер із %1</numerusform>
+        <numerusform>Подробиці %n камер із %1</numerusform>
+        <numerusform>Подробиці %n камер із %1</numerusform>
+        <numerusform>Подробиці %n камер із %1</numerusform>
       </translation>
     </message>
   </context>
@@ -1708,7 +1708,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Session begins</source>
-      <translation>Почата сесія</translation>
+      <translation>Сесія починається</translation>
     </message>
     <message>
       <source>Session ends</source>
@@ -1744,7 +1744,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Click to expand</source>
-      <translation>Клацніть, щоб розгорнути</translation>
+      <translation>Натисніть, щоб розгорнути</translation>
     </message>
     <message>
       <source>Device updated</source>
@@ -1764,7 +1764,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Device removed</source>
-      <translation>Пристрій вилучено</translation>
+      <translation>Пристрій видалено</translation>
     </message>
     <message>
       <source>Camera removed</source>
@@ -1780,7 +1780,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Email settings changed</source>
-      <translation>Параметри Email змінені</translation>
+      <translation>Налаштування електронної пошти змінено</translation>
     </message>
     <message>
       <source>Filled circle mark means the archive is still available</source>
@@ -1804,11 +1804,11 @@ to view more bookmarks</source>
     <name>QnBackupCamerasDialog</name>
     <message>
       <source>Select Devices to Backup...</source>
-      <translation>Виберіть пристрої для резервного копіювання...</translation>
+      <translation>Виберіть Пристрої для резервного Копіювання...</translation>
     </message>
     <message>
       <source>Select Cameras to Backup...</source>
-      <translation>Виберіть камери для резервного копіювання...</translation>
+      <translation>Виберіть Камери для резервного Копіювання...</translation>
     </message>
     <message>
       <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
@@ -1826,39 +1826,39 @@ to view more bookmarks</source>
     <name>QnBackupSettingsDialog</name>
     <message>
       <source>By Schedule</source>
-      <translation>За розкладом</translation>
+      <translation>За Розкладом</translation>
     </message>
     <message>
       <source>Realtime</source>
-      <translation>У реальному часі</translation>
+      <translation>Реальний час</translation>
     </message>
     <message>
       <source>On Demand</source>
-      <translation>За запитом</translation>
+      <translation>За Запитом</translation>
     </message>
     <message>
       <source>Hi-Res Streams</source>
       <comment>Cameras Backup</comment>
-      <translation>Висока якість</translation>
+      <translation>Висока Якість</translation>
     </message>
     <message>
       <source>All Streams</source>
       <comment>Cameras Backup</comment>
-      <translation>Всі потоки</translation>
+      <translation>Усі вiдео потоки</translation>
     </message>
     <message>
       <source>Global Settings</source>
-      <translation>Глобальні налаштування</translation>
+      <translation>Глобальні Налаштування</translation>
     </message>
     <message>
       <source>Lo-Res Streams</source>
       <comment>Cameras Backup</comment>
-      <translation>Потоки с низькою якістю</translation>
+      <translation>Потоки вiдео с низькою якістю</translation>
     </message>
     <message>
       <source>affect all servers in System</source>
       <comment>Relates to &apos;Global Settings&apos; subject</comment>
-      <translation>впливають на всі сервери в системі</translation>
+      <translation>впливати на всі сервери в Системі</translation>
     </message>
   </context>
   <context>
@@ -1867,7 +1867,7 @@ to view more bookmarks</source>
       <source>You have %n notifications</source>
       <translation>
         <numerusform>У Вас %n сповіщення</numerusform>
-        <numerusform>У Вас %n сповіщення</numerusform>
+        <numerusform>У Вас %n сповіщеннь</numerusform>
         <numerusform>У Вас %n сповіщеннь</numerusform>
         <numerusform>У Вас %n сповіщеннь</numerusform>
       </translation>
@@ -1877,7 +1877,7 @@ to view more bookmarks</source>
     <name>QnBookmarkWidget</name>
     <message>
       <source>Do not lock archive</source>
-      <translation>Видаляти з архівом</translation>
+      <translation>Не блокувати архів</translation>
     </message>
     <message>
       <source>1 month</source>
@@ -1889,7 +1889,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>6 month</source>
-      <translation>6 Місяців</translation>
+      <translation>6 місяців</translation>
     </message>
     <message>
       <source>year</source>
@@ -1908,7 +1908,7 @@ to view more bookmarks</source>
     <name>QnBuildNumberDialog</name>
     <message>
       <source>Build Number</source>
-      <translation>Номер випуску</translation>
+      <translation>Номер Випуску системи</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1920,7 +1920,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select Build</source>
-      <translation>Виберіть збірку</translation>
+      <translation>Обрати файл, випуск системи</translation>
     </message>
   </context>
   <context>
@@ -1973,7 +1973,7 @@ to view more bookmarks</source>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation>Керування закладками</translation>
+      <translation>Керування Закладками</translation>
     </message>
   </context>
   <context>
@@ -1984,7 +1984,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Instant</source>
-      <translation>Миттєво</translation>
+      <translation>Миттєвий</translation>
     </message>
     <message>
       <source>Stops</source>
@@ -2021,7 +2021,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>N/A</source>
-      <translation>Н/Д</translation>
+      <translation>Недоступний</translation>
     </message>
     <message>
       <source>Every %1</source>
@@ -2033,7 +2033,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Server</source>
-      <translation>Будь-який сервер</translation>
+      <translation>Будь-який Cервер</translation>
     </message>
     <message>
       <source>Any Device</source>
@@ -2091,14 +2091,14 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation>Примусове підтвердження працюватиме лише для Загальних подій, якщо в URL-адресі загальних подій використовуються ідентифікатори камери</translation>
+      <translation>Примусове Підтвердження працюватиме лише для Generic Events/ Аналiтичних Подiй, якщо в URL-адресі Аналiтичних Подiй використовуються ідентифікатори камери</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessRulesDialog</name>
     <message>
       <source>&amp;New...</source>
-      <translation>&amp;Створити...</translation>
+      <translation>&amp;Новий...</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
@@ -2110,11 +2110,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Restore All Rules to Default</source>
-      <translation>Відновити всі правила за умовчанням</translation>
+      <translation>Встановити Всі Правила за замовчуванням</translation>
     </message>
     <message>
       <source>No event rules</source>
-      <translation>Немає правил подій</translation>
+      <translation>Немає Правил Подій</translation>
     </message>
     <message>
       <source>Filter by devices...</source>
@@ -2142,18 +2142,18 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation>Цю дію не можна відмінити.</translation>
+      <translation>Цю дію не можна скасувати.</translation>
     </message>
     <message>
       <source>Restore all rules to default?</source>
-      <translation>Відновити всі правила за умовчанням?</translation>
+      <translation>Встановити всі правила за замовчуванням?</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessRulesViewModel</name>
     <message>
       <source>On</source>
-      <translation>Вкл</translation>
+      <translation>Включити</translation>
     </message>
     <message>
       <source>Event</source>
@@ -2196,10 +2196,10 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
       <translation>
-        <numerusform>%1 не підтримує двосторонній звук</numerusform>
+        <numerusform>%1 не підтримує двостороннє аудіо</numerusform>
         <numerusform>%1 не підтримують двосторонній звук</numerusform>
         <numerusform>%1 не підтримують двосторонній звук</numerusform>
-        <numerusform>%1 не підтримують двосторонній звук</numerusform>
+        <numerusform>%1 не підтримують двостороннє аудіо</numerusform>
       </translation>
     </message>
   </context>
@@ -2231,11 +2231,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Device Diagnostics</source>
-      <translation>Діагностика пристрою</translation>
+      <translation>Діагностика Пристроїв</translation>
     </message>
     <message>
       <source>Camera Diagnostics</source>
-      <translation>Діагностика камери</translation>
+      <translation>Діагностика Камер</translation>
     </message>
     <message>
       <source>Confirming device is accessible.</source>
@@ -6060,10 +6060,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Не містить ніякої особистої інформації і є повністю анонімним.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Файловер серверу може вимагати оновлення статусу камери незалежно від цього налаштування.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Увімкнути автоматичне виявлення пристроїв і серверів і автоматичну перевірку стану пристрою</translation>
     </message>
@@ -6074,6 +6070,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Коли ця функція ввімкнена, система постійно виявляє нові камери і сервери і надсилає запити до камер для оновлення статусів.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Якщо параметр Failover увімкнено, сервер може все ще вимагати оновлення стану камери незалежно від цього параметра.</translation>
     </message>
   </context>
   <context>
@@ -6093,44 +6093,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Файл розповсюдження аркуша (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Сервер</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Різниця</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Дата</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Часовий пояс</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Час</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Жоден сервер не має доступу до Інтернету. Час не синхронізується.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>Час VMS синхронізується з Інтернетом і не залежить від місцевого часу на серверах.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>Системний час синхронізується з локальним часом на вибраному сервері і не залежить від локального часу на інших серверах.</translation>
     </message>
   </context>
   <context>
@@ -7598,10 +7560,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>У вибраній ділянці</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>неназваний движок аналітики</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>Не вдалося виконати дії плагіна</translation>
     </message>
@@ -7657,17 +7615,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>Застосування змін...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Цей модуль вводу / виводу не має додаткових параметрів</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Ця камера не має додаткових налаштувань</translation>
     </message>
   </context>
   <context>
@@ -8847,11 +8794,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>Деякі сервери не завершили процес оновлення. Закінчити його все одно?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 буде перезапущено до оновленої версії.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
