@@ -3,6 +3,8 @@
 #include <cmath>
 #include <sstream>
 
+#include <QtCore/QRegularExpression>
+
 #include <nx/fusion/model_functions.h>
 
 #include <common/common_globals.h>
@@ -54,6 +56,48 @@ Filter::Filter()
 bool Filter::empty() const
 {
     return *this == Filter();
+}
+
+bool Filter::acceptsObjectType(const QString& typeId) const
+{
+    return objectTypeId.empty()
+        || std::find(objectTypeId.cbegin(), objectTypeId.cend(), typeId) != objectTypeId.cend();
+}
+
+bool Filter::acceptsBoundingBox(const QRectF& boundingBox) const
+{
+    return !this->boundingBox || this->boundingBox->intersects(boundingBox);
+}
+
+bool Filter::acceptsAttributes(const std::vector<nx::common::metadata::Attribute>& attributes) const
+{
+    if (freeText.isEmpty())
+        return true;
+
+    return std::any_of(attributes.cbegin(), attributes.cend(),
+        [this](const nx::common::metadata::Attribute& attribute) -> bool
+        {
+            const auto checkWord =
+                [this](const QString& word)
+                {
+                    return word.startsWith(freeText, Qt::CaseInsensitive);
+                };
+
+            if (checkWord(attribute.name))
+                return true;
+
+            const auto words = attribute.value.split(QRegularExpression("\\s+"),
+                QString::SkipEmptyParts);
+
+            return std::any_of(words.cbegin(), words.cend(), checkWord);
+        });
+}
+
+bool Filter::acceptsMetadata(const nx::common::metadata::ObjectMetadata& metadata) const
+{
+    return acceptsObjectType(metadata.typeId)
+        && acceptsBoundingBox(metadata.boundingBox)
+        && acceptsAttributes(metadata.attributes);
 }
 
 bool Filter::operator==(const Filter& right) const
