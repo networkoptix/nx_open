@@ -15,7 +15,7 @@ TransactionMessageBusAdapter::TransactionMessageBusAdapter(
     m_jsonTranSerializer(jsonTranSerializer),
     m_ubjsonTranSerializer(ubjsonTranSerializer)
 {
-    QTimer::singleShot(std::chrono::seconds(3), commonModule,
+    QTimer::singleShot(std::chrono::seconds(4), commonModule,
         [this]()
         {
             DelayedTransactions delayed;
