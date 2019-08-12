@@ -11,7 +11,7 @@
 
 namespace nx::cloud::storage::service::api {
 
-class NX_NETWORK_API Client:
+class NX_CLOUD_STORAGE_CLIENT_API Client:
     public network::http::GenericApiClient<Client>
 {
     using base_type = network::http::GenericApiClient<Client>;

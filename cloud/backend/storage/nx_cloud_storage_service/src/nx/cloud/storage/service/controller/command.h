@@ -4,8 +4,8 @@
 
 #include <nx/clusterdb/engine/command_descriptor.h>
 #include <nx/network/buffer.h>
-#include <nx/network/cloud/storage/service/api/bucket.h>
-#include <nx/network/cloud/storage/service/api/storage.h>
+#include <nx/cloud/storage/service/api/bucket.h>
+#include <nx/cloud/storage/service/api/storage.h>
 
 namespace nx::cloud::storage::service::controller {
 

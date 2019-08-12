@@ -1,11 +1,11 @@
 #pragma once
 
 #include <nx/utils/move_only_func.h>
-#include <nx/network/cloud/storage/service/api/add_storage.h>
-#include <nx/network/cloud/storage/service/api/bucket.h>
-#include <nx/network/cloud/storage/service/api/result.h>
-#include <nx/network/cloud/storage/service/api/storage.h>
-#include <nx/network/cloud/storage/service/api/storage_credentials.h>
+#include <nx/cloud/storage/service/api/add_storage.h>
+#include <nx/cloud/storage/service/api/bucket.h>
+#include <nx/cloud/storage/service/api/result.h>
+#include <nx/cloud/storage/service/api/storage.h>
+#include <nx/cloud/storage/service/api/storage_credentials.h>
 #include <nx/sql/query_context.h>
 #include <nx/utils/basic_factory.h>
 

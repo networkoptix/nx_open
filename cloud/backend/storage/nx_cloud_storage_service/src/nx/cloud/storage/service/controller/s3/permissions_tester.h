@@ -5,7 +5,7 @@
 #include <nx/cloud/aws/s3/api_client.h>
 #include <nx/network/http/auth_tools.h>
 
-#include <nx/network/cloud/storage/service/api/result.h>
+#include <nx/cloud/storage/service/api/result.h>
 
 namespace nx::cloud::storage::service {
 

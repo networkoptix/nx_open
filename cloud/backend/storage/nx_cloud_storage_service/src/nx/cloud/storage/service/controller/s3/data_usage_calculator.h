@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include <nx/network/cloud/storage/service/api/result.h>
+#include <nx/cloud/storage/service/api/result.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/url.h>
 #include <nx/utils/move_only_func.h>

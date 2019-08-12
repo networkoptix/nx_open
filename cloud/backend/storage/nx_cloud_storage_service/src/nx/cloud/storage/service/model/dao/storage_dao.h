@@ -1,7 +1,7 @@
 #pragma once
 
-#include <nx/network/cloud/storage/service/api/add_storage.h>
-#include <nx/network/cloud/storage/service/api/storage.h>
+#include <nx/cloud/storage/service/api/add_storage.h>
+#include <nx/cloud/storage/service/api/storage.h>
 #include <nx/utils/basic_factory.h>
 
 namespace nx::sql { class QueryContext; }

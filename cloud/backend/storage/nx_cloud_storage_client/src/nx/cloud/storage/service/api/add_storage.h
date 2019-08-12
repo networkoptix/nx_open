@@ -4,7 +4,7 @@
 
 namespace nx::cloud::storage::service::api {
 
-struct NX_NETWORK_API AddStorageRequest
+struct NX_CLOUD_STORAGE_CLIENT_API AddStorageRequest
 {
     // Size in bytes of the requested storage
     int totalSpace = 0;
@@ -15,6 +15,6 @@ struct NX_NETWORK_API AddStorageRequest
 
 #define AddStorageRequest_Fields (totalSpace)(region)
 
-QN_FUSION_DECLARE_FUNCTIONS(AddStorageRequest, (json), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(AddStorageRequest, (json), NX_CLOUD_STORAGE_CLIENT_API)
 
 } // namespace nx::cloud::storage::service::api

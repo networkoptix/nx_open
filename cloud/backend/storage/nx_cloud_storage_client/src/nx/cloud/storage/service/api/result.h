@@ -17,9 +17,9 @@ enum class ResultCode
     unknownError
 };
 
-NX_NETWORK_API const char* toString(ResultCode resultCode);
+NX_CLOUD_STORAGE_CLIENT_API const char* toString(ResultCode resultCode);
 
-struct NX_NETWORK_API Result
+struct NX_CLOUD_STORAGE_CLIENT_API Result
 {
     ResultCode resultCode = ResultCode::ok;
     std::string error;

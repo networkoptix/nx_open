@@ -2,7 +2,7 @@
 
 #include <nx/network/http/server/rest/base_request_handler.h>
 
-#include <nx/network/cloud/storage/service/api/result.h>
+#include <nx/cloud/storage/service/api/result.h>
 
 namespace nx::cloud::storage::service::view::http {
 

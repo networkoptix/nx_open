@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/utils/basic_factory.h>
-#include <nx/network/cloud/storage/service/api/bucket.h>
+#include <nx/cloud/storage/service/api/bucket.h>
 
 namespace nx::sql { class QueryContext; }
 

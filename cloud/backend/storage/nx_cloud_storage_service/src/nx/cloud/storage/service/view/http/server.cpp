@@ -1,6 +1,6 @@
 #include "server.h"
 
-#include <nx/network/cloud/storage/service/api/request_paths.h>
+#include <nx/cloud/storage/service/api/request_paths.h>
 #include <nx/network/url/url_parse_helper.h>
 
 #include "nx/cloud/storage/service/settings.h"

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <nx/network/cloud/storage/service/api/result.h>
-#include <nx/network/cloud/storage/service/api/add_bucket.h>
-#include <nx/network/cloud/storage/service/api/bucket.h>
+#include <nx/cloud/storage/service/api/result.h>
+#include <nx/cloud/storage/service/api/add_bucket.h>
+#include <nx/cloud/storage/service/api/bucket.h>
 #include <nx/sql/query_context.h>
 
 #include "command.h"

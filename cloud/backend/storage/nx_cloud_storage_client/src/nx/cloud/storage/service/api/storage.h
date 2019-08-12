@@ -5,7 +5,7 @@
 
 namespace nx::cloud::storage::service::api {
 
-struct NX_NETWORK_API Device
+struct NX_CLOUD_STORAGE_CLIENT_API Device
 {
     std::string type;
     nx::utils::Url dataUrl;
@@ -16,12 +16,12 @@ struct NX_NETWORK_API Device
 
 #define Device_Fields (type)(dataUrl)(region)
 
-QN_FUSION_DECLARE_FUNCTIONS(Device, (json), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(Device, (json), NX_CLOUD_STORAGE_CLIENT_API)
 
 //-------------------------------------------------------------------------------------------------
 // Storage
 
-struct NX_NETWORK_API Storage
+struct NX_CLOUD_STORAGE_CLIENT_API Storage
 {
     std::string id;
     int totalSpace = 0;
@@ -33,6 +33,6 @@ struct NX_NETWORK_API Storage
 
 #define Storage_Fields (id)(totalSpace)(freeSpace)(ioDevices)
 
-QN_FUSION_DECLARE_FUNCTIONS(Storage, (ubjson)(json), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(Storage, (ubjson)(json), NX_CLOUD_STORAGE_CLIENT_API)
 
 } // namespace nx::cloud::storage::service::api

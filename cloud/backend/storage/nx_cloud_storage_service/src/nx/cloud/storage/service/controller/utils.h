@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/sql/types.h>
-#include <nx/network/cloud/storage/service/api/result.h>
+#include <nx/cloud/storage/service/api/result.h>
 
 #include <nx/cloud/aws/api_types.h>
 

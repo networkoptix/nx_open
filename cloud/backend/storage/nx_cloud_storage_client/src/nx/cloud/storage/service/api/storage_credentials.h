@@ -5,7 +5,7 @@
 
 namespace nx::cloud::storage::service::api {
 
-struct NX_NETWORK_API StorageCredentials
+struct NX_CLOUD_STORAGE_CLIENT_API StorageCredentials
 {
     std::vector<nx::utils::Url> urls;
     std::string login;
@@ -14,6 +14,6 @@ struct NX_NETWORK_API StorageCredentials
 };
 
 #define StorageCredentials_Fields (urls)(login)(password)(durationSeconds)
-QN_FUSION_DECLARE_FUNCTIONS(StorageCredentials, (json), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(StorageCredentials, (json), NX_CLOUD_STORAGE_CLIENT_API)
 
 } // namespace nx::cloud::storage::service::api

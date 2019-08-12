@@ -4,7 +4,7 @@
 
 namespace nx::cloud::storage::service::api {
 
-struct NX_NETWORK_API AddBucketRequest
+struct NX_CLOUD_STORAGE_CLIENT_API AddBucketRequest
 {
     // The name of the bucket to add to cloud storage
     std::string name;
@@ -12,6 +12,6 @@ struct NX_NETWORK_API AddBucketRequest
 
 #define AddBucketRequest_Fields (name)
 
-QN_FUSION_DECLARE_FUNCTIONS(AddBucketRequest, (json), NX_NETWORK_API)
+QN_FUSION_DECLARE_FUNCTIONS(AddBucketRequest, (json), NX_CLOUD_STORAGE_CLIENT_API)
 
 } // namespace nx::cloud::storage::service::api
