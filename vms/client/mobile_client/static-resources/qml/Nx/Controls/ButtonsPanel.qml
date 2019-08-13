@@ -89,7 +89,7 @@ ListView
         property bool filteringPressing: false
 
         icon.source: model.iconPath
-        enabled: model.enabled
+        enabledMask: model.enabled
         padding: 0
         anchors.verticalCenter: parent.verticalCenter
 
@@ -100,7 +100,7 @@ ListView
         }
 
         onDownChanged: pressedSignalOrderTimer.restart()
-        onEnabledChanged: control.enabledChanged(index, enabled)
+        onEnabledMaskChanged: control.enabledChanged(index, enabledMask)
 
         Connections
         {
