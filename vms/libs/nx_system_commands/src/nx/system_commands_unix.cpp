@@ -1,33 +1,40 @@
 #include "system_commands.h"
+
+#include <set>
+#include <iostream>
+#include <sstream>
+#include <stdio.h>
+#include <fcntl.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/statvfs.h>
+
+#ifdef Q_OS_LINUX
 #include "system_commands/domain_socket/send_linux.h"
 #include "system_commands/detail/mount_helper.h"
 
 #include <algorithm>
 #include <assert.h>
-#include <dirent.h>
-#include <fcntl.h>
 #include <fstream>
 #include <grp.h>
 #include <iomanip>
-#include <iostream>
 #include <iterator>
 #include <functional>
 #include <pwd.h>
-#include <set>
 #include <signal.h>
-#include <sstream>
 #include <string>
 #include <string.h>
 #include <sys/mount.h>
 #include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/statvfs.h>
 #include <sys/syscall.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#else
+#include <QtGlobal> // for Q_UNUSED
+#endif
 
 namespace nx {
 
@@ -100,6 +107,7 @@ std::string format(const std::string& formatString, Args&&... args)
     return formatImpl(pstr, out, std::forward<Args>(args)...);
 }
 
+#ifdef Q_OS_LINUX
 static std::string makeCredentialsFile(
     const std::string& userName, const std::string& password, std::string* outError)
 {
@@ -115,6 +123,7 @@ static std::string makeCredentialsFile(
 
     return "";
 }
+#endif
 
 } // namespace
 
@@ -138,6 +147,9 @@ bool SystemCommands::checkOwnerPermissions(const std::string& path)
 {
     static const std::set<std::string> kForbiddenOwnershipPaths = {"/"};
     static const std::set<std::string> kForbiddenOwnershipPrefixes = {
+#ifdef Q_OS_MAC
+        "/private/var/vm", "/Volumes/Recovery",
+#endif
         "/bin", "/boot", "/cdrom", "/dev", "/etc", "/lib", "/lib64", "/proc", "/root", "/run",
         "/sbin", "/snap", "/srv", "/sys", "/usr", "/var"};
 
@@ -199,6 +211,7 @@ SystemCommands::MountCode SystemCommands::mount(
     const boost::optional<std::string>& username,
     const boost::optional<std::string>& password)
 {
+#ifdef Q_OS_LINUX
     system_commands::MountHelperDelegates delegates;
     std::string credentialsFile;
     delegates.credentialsFileName =
@@ -225,10 +238,18 @@ SystemCommands::MountCode SystemCommands::mount(
     if (!credentialsFile.empty())
         unlink(credentialsFile.c_str());
     return result;
+#else
+    Q_UNUSED(url);
+    Q_UNUSED(directory);
+    Q_UNUSED(username);
+    Q_UNUSED(password);
+    return MountCode::otherError;
+#endif
 }
 
 SystemCommands::UnmountCode SystemCommands::unmount(const std::string& directory)
 {
+#ifdef Q_OS_LINUX
     UnmountCode result = UnmountCode::noPermissions;
 
     if (!checkMountPermissions(directory))
@@ -262,6 +283,10 @@ SystemCommands::UnmountCode SystemCommands::unmount(const std::string& directory
     }
 
     return result;
+#else
+    Q_UNUSED(directory);
+    return UnmountCode::noPermissions;
+#endif
 }
 
 bool SystemCommands::changeOwner(const std::string& path, int uid, int gid, bool isRecursive)
@@ -310,28 +335,28 @@ int SystemCommands::open(const std::string& path, int mode)
 
 int64_t SystemCommands::freeSpace(const std::string& path)
 {
-    struct statvfs64 stat;
+    struct statvfs stat;
     int64_t result = -1;
 
-    if (statvfs64(path.c_str(), &stat) == 0)
+    if (statvfs(path.c_str(), &stat) == 0)
         result = stat.f_bavail * (int64_t) stat.f_bsize;
     else
-        perror("freeSpace: statvfs64 failed:");
+        perror("freeSpace: statvfs failed:");
 
     return result;
 }
 
 int64_t SystemCommands::totalSpace(const std::string& path)
 {
-    struct statvfs64 stat;
+    struct statvfs stat;
     int64_t result = -1;
 
-    if (statvfs64(path.c_str(), &stat) == 0)
+    if (statvfs(path.c_str(), &stat) == 0)
         result = stat.f_blocks * (int64_t) stat.f_frsize;
     else
     {
         char buf[1024];
-        snprintf(buf, sizeof(buf), "totalSpace: statvfs64 failed for the path: %s", path.c_str());
+        snprintf(buf, sizeof(buf), "totalSpace: statvfs failed for the path: %s", path.c_str());
         perror(buf);
     }
 
@@ -345,9 +370,9 @@ bool SystemCommands::isPathExists(const std::string& path)
 
 SystemCommands::Stats SystemCommands::stat(const std::string& path)
 {
-    struct stat64 buf;
+    struct stat buf;
     Stats result;
-    result.exists = ::stat64(path.c_str(), &buf) == 0;
+    result.exists = ::stat(path.c_str(), &buf) == 0;
 
     if (result.exists)
     {
@@ -368,7 +393,7 @@ std::string SystemCommands::serializedFileList(const std::string& path)
 {
     DIR *dir = opendir(path.c_str());
     struct dirent *entry;
-    struct stat64 statBuf;
+    struct stat statBuf;
     std::stringstream out;
     char pathBuf[2048];
     ssize_t pathBufLen;
@@ -393,7 +418,7 @@ std::string SystemCommands::serializedFileList(const std::string& path)
         strncpy(pathBuf + pathBufLen, entry->d_name,
             std::max<int>((ssize_t) sizeof(pathBuf) - pathBufLen, 0));
 
-        if (::stat64(pathBuf, &statBuf) != 0)
+        if (::stat(pathBuf, &statBuf) != 0)
             continue;
 
         out << pathBuf << "," << (S_ISDIR(statBuf.st_mode) ? statBuf.st_size : 0) << ","
@@ -413,9 +438,10 @@ int64_t SystemCommands::fileSize(const std::string& path)
 
 std::string SystemCommands::devicePath(const std::string& path)
 {
-    struct stat64 statBuf;
+#ifdef Q_OS_LINUX
+    struct stat statBuf;
     std::string result;
-    if (::stat64(path.c_str(), &statBuf) == 0)
+    if (::stat(path.c_str(), &statBuf) == 0)
     {
         std::ifstream partitionsFile("/proc/partitions");
         if (partitionsFile.is_open())
@@ -446,10 +472,14 @@ std::string SystemCommands::devicePath(const std::string& path)
     }
 
     return result;
+#else
+    return path;
+#endif
 }
 
 std::string SystemCommands::serializedDmiInfo()
 {
+#ifdef Q_OS_LINUX
     constexpr std::array<const char*, 2> prefixes = {
        "Part Number: ",
        "Serial Number: ",
@@ -509,6 +539,9 @@ std::string SystemCommands::serializedDmiInfo()
     }
 
     return result;
+#else
+    return "";
+#endif
 }
 
 std::string SystemCommands::lastError() const
