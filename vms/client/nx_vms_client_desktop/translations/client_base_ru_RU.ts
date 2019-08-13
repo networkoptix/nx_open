@@ -6074,7 +6074,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>При Failover сервер по-прежнему будет запрашивать обновления статуса камеры независимо от этой настройки.</translation>
     </message>
   </context>
   <context>
@@ -7559,10 +7559,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>In selected area</source>
       <translation>В выбранной области</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>безымянный движок аналитики</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>

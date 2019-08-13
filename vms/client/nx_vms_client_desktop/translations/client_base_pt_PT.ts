@@ -7361,10 +7361,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Na área selecionada</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>Falha ao executar a acção do plug-in</translation>
     </message>

@@ -7557,10 +7557,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>באזור שנבחר</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>מנוע אנליטיקה ללא שם</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>ביצוע פעולת תוסף נכשלה</translation>
     </message>

@@ -7555,10 +7555,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>W zaznaczonym obszarze</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>nieznany silnik analityczny</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>Nie udało się uruchomić akcji wtyczki</translation>
     </message>

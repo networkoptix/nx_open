@@ -7256,10 +7256,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>選択されたエリア</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>無名の分析エンジン</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>プラグインアクションの実行に失敗しました</translation>
     </message>

@@ -196,7 +196,7 @@
             "pause": "pauze",
             "help": "help | show commands",
             "collapse all servers": "vouw alle servers samen",
-            "collapse server": "samenvouwen server + [servernaam]",
+            "collapse server": "vouw server + [servernaam] samen",
             "play": "afspelen",
             "clear search": "wis zoekopdracht",
             "live": "ga naar Live | live weergeven",

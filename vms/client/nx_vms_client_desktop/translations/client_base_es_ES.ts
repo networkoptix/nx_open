@@ -7358,10 +7358,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <translation>En area seleccionada</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>motor analítico sin nombre</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>No se pudo ejecutar plugin de acción</translation>
     </message>

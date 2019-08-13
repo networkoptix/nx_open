@@ -136,7 +136,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_fisheyeEnabled(false),
     m_channelsCount(0),
     m_lastQueuedVideoTime(AV_NOPTS_VALUE),
-    m_liveBufferSize(initialLiveBufferMkSecs()),
+    m_liveBufferSizeMkSec(initialLiveBufferMkSecs()),
     m_liveMaxLenReached(false),
     m_hasVideo(true)
 {
@@ -541,14 +541,15 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             // like Hanwha NVR. Don't increase buffer for archive mode to make item synchronization more
             /// precise.
             if (m_liveMaxLenReached && vd->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE))
-                m_liveBufferSize = qMin(maximumLiveBufferMkSecs(), m_liveBufferSize * 1.2);
+                m_liveBufferSizeMkSec = qMin(maximumLiveBufferMkSecs(), m_liveBufferSizeMkSec * 1.2);
             m_liveMaxLenReached = false;
-            NX_VERBOSE(this, lm("Increase live buffer size to %1 ms because of empty input buffer").arg(int(m_liveBufferSize * 1000)));
+            NX_VERBOSE(this, "Increase live buffer size to %1 ms because of empty input buffer",
+                m_liveBufferSizeMkSec / 1000);
             m_delay.afterdelay();
-            m_delay.addQuant(m_liveBufferSize /2); // realtime buffering for more smooth playback
+            m_delay.addQuant(m_liveBufferSizeMkSec /2); // realtime buffering for more smooth playback
             m_realTimeHurryUp = false;
         }
-        else if (queueLen > m_forcedVideoBufferLength.count() + m_liveBufferSize)
+        else if (queueLen > m_forcedVideoBufferLength.count() + m_liveBufferSizeMkSec)
         {
             m_liveMaxLenReached = true;
             if (!m_realTimeHurryUp)
@@ -556,7 +557,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             m_realTimeHurryUp = true;
         }
         else if (m_realTimeHurryUp
-            && queueLen <= m_forcedVideoBufferLength.count() + m_liveBufferSize / 2)
+            && queueLen <= m_forcedVideoBufferLength.count() + m_liveBufferSizeMkSec / 2)
         {
             NX_VERBOSE(this, lm("Half video buffer again. Turn of no-delay mode"));
             m_realTimeHurryUp = false;
@@ -1165,7 +1166,7 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
         }
         else if (video->flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE)
             && m_dataQueue.size() > 0
-            && video->timestamp - m_lastVideoPacketTime > m_liveBufferSize)
+            && video->timestamp - m_lastVideoPacketTime > m_liveBufferSizeMkSec)
         {
             m_delay.breakSleep();
         }
@@ -1882,7 +1883,7 @@ void QnCamDisplay::onRealTimeStreamHint(bool value)
     m_isRealTimeSource = value;
     if (m_isRealTimeSource)
     {
-        m_liveBufferSize = initialLiveBufferMkSecs();
+        m_liveBufferSizeMkSec = initialLiveBufferMkSecs();
         m_liveMaxLenReached = false;
         m_realTimeHurryUp = false;
         QnResourceConsumer* archive = dynamic_cast<QnResourceConsumer*>(sender());

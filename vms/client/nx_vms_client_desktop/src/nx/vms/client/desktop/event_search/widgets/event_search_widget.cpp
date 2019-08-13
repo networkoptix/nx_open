@@ -311,7 +311,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
     m_analyticsEventsSingleAction->setVisible(!hasAnalyticsMenu);
 
     if (!currentSelectionStillAvailable)
-        m_eventModel->setSelectedSubType({});
+        m_typeSelectionButton->deactivate();
 }
 
 // ------------------------------------------------------------------------------------------------

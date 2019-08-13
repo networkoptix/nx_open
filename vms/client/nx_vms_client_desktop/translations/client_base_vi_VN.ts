@@ -7255,10 +7255,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Trong khu vực được chọn</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>công cụ phân tích không tên</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>Không thể thực thi plugin</translation>
     </message>

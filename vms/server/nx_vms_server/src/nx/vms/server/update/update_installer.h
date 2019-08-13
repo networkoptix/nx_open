@@ -6,6 +6,8 @@
 #include <nx/vms/api/data/system_information.h>
 #include <nx/vms/server/server_module_aware.h>
 
+class QTimer;
+
 struct QnAuthSession;
 
 namespace nx::vms::server {
@@ -19,22 +21,27 @@ public:
         ok,
         inProgress,
         noFreeSpace,
+        noFreeSpaceToInstall,
         brokenZip,
         wrongDir,
         cantOpenFile,
         otherError,
         stopped,
         busy,
+        installing,
         cleanTemporaryFilesError,
         updateContentsError,
         unknownError,
     };
 
     UpdateInstaller(QnMediaServerModule* serverModule);
+    ~UpdateInstaller();
 
     void prepareAsync(const QString& path);
-    bool install(const QnAuthSession& authInfo);
+    void install(const QnAuthSession& authInfo);
+    void installDelayed();
     void stopSync(bool clearAndReset);
+    void recheckFreeSpaceForInstallation();
     State state() const;
 
     bool checkFreeSpace(const QString& path, qint64 bytes) const;
@@ -47,8 +54,8 @@ public:
 private:
     bool initializeUpdateLog(const QString& targetVersion, QString* logFileName) const;
 
-    void setState(State result);
-    void setStateLocked(State result);
+    void setState(State state);
+    void setStateLocked(State state);
     bool cleanInstallerDirectory();
     bool checkExecutable(const QString& executableName) const;
     State checkContents(const QString& outputPath) const;
@@ -63,6 +70,7 @@ private:
     qint64 m_bytesExtracted = 0;
     mutable qint64 m_freeSpaceRequiredToUpdate;
     mutable State m_state = State::idle;
+    std::unique_ptr<QTimer> m_installationTimer;
 };
 
 } // namespace nx::vms::server

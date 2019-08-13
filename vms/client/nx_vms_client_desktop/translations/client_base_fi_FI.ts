@@ -7358,10 +7358,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <translation>Valitulla alueella</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>nimettömän analytiikan alusta</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>Plugin-toiminnon suorittaminen epäonnistui</translation>
     </message>

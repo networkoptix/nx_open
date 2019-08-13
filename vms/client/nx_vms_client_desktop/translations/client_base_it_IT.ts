@@ -7357,10 +7357,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Nell'area selezionata</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>motore analisi senza nome</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>Impossibile eseguire l'azione del plugin</translation>
     </message>

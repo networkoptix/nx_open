@@ -125,6 +125,8 @@
 
 #include <nx/network/cloud/protocol_type.h>
 
+#include <nx/utils/guarded_callback.h>
+
 using namespace std::chrono;
 
 using namespace nx;
@@ -133,8 +135,6 @@ using namespace ui;
 
 using nx::vms::client::core::Geometry;
 using nx::vms::client::core::MotionGrid;
-using nx::vms::api::StreamDataFilter;
-using nx::vms::api::StreamDataFilters;
 
 namespace {
 
@@ -1891,14 +1891,7 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
     if (changedFlags.testFlag(DisplayMotion))
     {
         const bool motionSearchEnabled = options().testFlag(DisplayMotion);
-
-        if (auto reader = d->display()->archiveReader())
-        {
-            StreamDataFilters filter = reader->streamDataFilter();
-            filter.setFlag(StreamDataFilter::motion, motionSearchEnabled);
-            filter.setFlag(StreamDataFilter::media);
-            reader->setStreamDataFilter(filter);
-        }
+        d->setMotionEnabled(motionSearchEnabled);
 
         titleBar()->rightButtonsBar()->setButtonsChecked(
             Qn::MotionSearchButton, motionSearchEnabled);
@@ -2763,13 +2756,7 @@ bool QnMediaResourceWidget::isAnalyticsSupported() const
 
 bool QnMediaResourceWidget::isAnalyticsEnabled() const
 {
-    if (!isAnalyticsSupported())
-        return false;
-
-    if (const auto reader = display()->archiveReader())
-        return reader->streamDataFilter().testFlag(StreamDataFilter::objectDetection);
-
-    return false;
+    return d->isAnalyticsEnabled();
 }
 
 void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
@@ -2782,31 +2769,7 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
         analyticsEnabled ? "enabled" : "disabled",
         this);
 
-    if (auto reader = display()->archiveReader())
-    {
-        StreamDataFilters filter = reader->streamDataFilter();
-        filter.setFlag(StreamDataFilter::objectDetection, analyticsEnabled);
-        filter.setFlag(StreamDataFilter::media);
-        reader->setStreamDataFilter(filter);
-
-        if (const auto archiveDelegate = reader->getArchiveDelegate())
-            archiveDelegate->setStreamDataFilter(filter);
-    }
-
-    if (!analyticsEnabled)
-    {
-        d->analyticsController->clearAreas();
-
-        // Earlier we didn't unset forced video buffer length to avoid micro-freezes required to
-        // fill in the video buffer on succeeding analytics mode activations. But it looks like this
-        // mode causes a lot of glitches when enabled, so we'd prefer to leave on a safe side.
-        display()->camDisplay()->setForcedVideoBufferLength(milliseconds::zero());
-    }
-    else
-    {
-        display()->camDisplay()->setForcedVideoBufferLength(
-            milliseconds(ini().analyticsVideoBufferLengthMs));
-    }
+    d->setAnalyticsEnabled(analyticsEnabled);
 }
 
 nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr
@@ -3167,9 +3130,9 @@ rest::Handle QnMediaResourceWidget::invokeTrigger(
         return rest::Handle();
 
     const auto responseHandler =
-        [this, resultHandler, id](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        [this, resultHandler, id]
+        (bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
-            Q_UNUSED(handle);
             success = success && result.error == QnRestResult::NoError;
 
             if (!success)
@@ -3183,8 +3146,11 @@ rest::Handle QnMediaResourceWidget::invokeTrigger(
         };
 
     return commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
-        d->resource->getId(), id, toggleState,
-        responseHandler, QThread::currentThread());
+        /*cameraId*/ d->resource->getId(),
+        /*triggerId*/ id,
+        toggleState,
+        nx::utils::guarded(this, responseHandler),
+        thread());
 }
 
 void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)

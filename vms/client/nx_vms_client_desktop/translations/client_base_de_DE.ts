@@ -7356,10 +7356,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Im ausgewählten Bereich</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>unbenannte Analytik-Engine</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>Pluginaktion konnte nicht ausgeführt werden</translation>
     </message>

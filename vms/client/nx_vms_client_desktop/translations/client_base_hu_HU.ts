@@ -7359,10 +7359,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>A kijelölt területen</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>A bővítmény végrehajtása sikertelen</translation>
     </message>

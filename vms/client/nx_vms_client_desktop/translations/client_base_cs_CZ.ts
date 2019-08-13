@@ -7558,10 +7558,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Ve vybrané oblasti</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>nepojmenovaný analytický modul</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>Nepodařilo se spustit plugin</translation>
     </message>

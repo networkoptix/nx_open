@@ -7255,10 +7255,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ในพื้นที่ที่เลือก</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>โปรแกรมวิเคราะห์ชื่อ</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>ไม่สามารถดำเนินการกับปลั๊กอินได้</translation>
     </message>

@@ -2046,7 +2046,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
+      <translation>Reconnaissance forcé ne fonctionnera que pour les événements génériques si les identifiants de caméra sont utilisés dans l'URL de l'événement générique</translation>
     </message>
   </context>
   <context>
@@ -5950,7 +5950,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>Si le basculement est activé, le serveur peut toujours demander des mises à jour de l'état de la caméra, indépendamment de ce paramètre.</translation>
     </message>
   </context>
   <context>
@@ -7361,10 +7361,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Dans la zone sélectionnée</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>moteur d'analyse sans nom</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>Échec d’exécution d'action plugin</translation>
     </message>
@@ -7418,9 +7414,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Applying changes...</source>
       <translation>Application des modifications...</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>

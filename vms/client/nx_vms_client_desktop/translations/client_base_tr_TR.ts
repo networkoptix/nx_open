@@ -7355,10 +7355,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Seçilen alanda</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>isim verilmemiş analitik motoru</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>Eklenti eylemi yürütülemedi</translation>
     </message>

@@ -7361,10 +7361,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>I valgt område</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>ikke navngitt analysemotor</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>Kunne ikke utføre plugin-handlingen</translation>
     </message>

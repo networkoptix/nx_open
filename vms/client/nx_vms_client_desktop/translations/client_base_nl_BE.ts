@@ -7356,10 +7356,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>In geselecteerd gebied</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>naamloze analytics engine</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>Kan plugin actie niet uitvoeren</translation>
     </message>

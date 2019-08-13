@@ -441,6 +441,12 @@ public:
         Result<UpdateInformationData>::type&& callback,
         QThread* targetThread = nullptr);
 
+    /** Get information for a vertain version. */
+    Handle getUpdateInfo(
+        const QString& version,
+        Result<UpdateInformationData>::type&& callback,
+        QThread* targetThread = nullptr);
+
     /** Get information for installed update. It requests /ec2/updateInformation?version=installed. */
     Handle getInstalledUpdateInfo(
         Result<UpdateInformationData>::type&& callback,
