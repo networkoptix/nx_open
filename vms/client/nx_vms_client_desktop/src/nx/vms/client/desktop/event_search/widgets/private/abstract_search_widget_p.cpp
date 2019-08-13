@@ -382,7 +382,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
                     setSelectedPeriod(period);
 
                     if (ini().automaticFilterByTimelineSelection && period != Period::selection)
-                        navigator()->clearTimeSelection();
+                        navigator()->clearTimelineSelection();
                 });
 
             m_timeSelectionActions[period] = action;

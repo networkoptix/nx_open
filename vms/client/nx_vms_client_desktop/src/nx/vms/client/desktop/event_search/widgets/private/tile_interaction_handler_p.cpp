@@ -8,6 +8,7 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/resource.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
@@ -20,6 +21,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/utils/range_adapters.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -221,37 +223,64 @@ void TileInteractionHandler::navigateToSource(
         Parameters().withArgument(Qn::TimestampRole, navigationTime));
 }
 
+QHash<int, QVariant> TileInteractionHandler::setupDropActionParameters(
+    const QnResourceList& resources, const QVariant& timestamp) const
+{
+    QHash<int, QVariant> parameters;
+    parameters[Qn::SelectOnOpeningRole] = true;
+
+    parameters[Qn::ItemTimeRole] = QVariant::fromValue<qint64>(timestamp.canConvert<microseconds>()
+        ? duration_cast<milliseconds>(timestamp.value<microseconds>()).count()
+        : milliseconds(DATETIME_NOW).count());
+
+    if (resources.size() == 1 && navigator()->currentResource() == resources[0])
+    {
+        parameters[Qn::ItemSliderWindowRole] = QVariant::fromValue(navigator()->timelineWindow());
+
+        parameters[Qn::ItemSliderSelectionRole] =
+            QVariant::fromValue(navigator()->timelineSelection());
+
+        if (auto widget = navigator()->currentMediaWidget())
+        {
+            parameters[Qn::ItemMotionSelectionRole] = QVariant::fromValue(widget->motionSelection());
+            parameters[Qn::ItemAnalyticsSelectionRole] = widget->analyticsFilterRect();
+        }
+    }
+
+    return parameters;
+}
+
 void TileInteractionHandler::openSource(
     const QModelIndex& index, bool inNewTab, bool fromDoubleClick)
 {
-    const auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>()
+    auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>()
         .filtered(&isMediaResource);
+
+    const auto currentLayout = workbench()->currentLayout();
+    if (fromDoubleClick && currentLayout && NX_ASSERT(!inNewTab) && isSyncOn())
+    {
+        resourceList = resourceList.filtered(
+            [currentLayout](const QnResourcePtr& resource)
+            {
+                // Add only resources not opened on the current layout.
+                return currentLayout->items(resource).empty();
+            });
+    }
 
     if (resourceList.empty())
         return;
-
-    if (fromDoubleClick && NX_ASSERT(!inNewTab) && isSyncOn() && resourceList.size() == 1)
-    {
-        auto layout = workbench()->currentLayout();
-        if (layout && !layout->items(resourceList[0]).empty())
-            return;
-    }
-
-    Parameters parameters(resourceList);
-    parameters.setArgument(Qn::SelectOnOpeningRole, true);
-
-    const auto timestamp = index.data(Qn::TimestampRole);
-    if (timestamp.canConvert<microseconds>())
-    {
-        parameters.setArgument(Qn::ItemTimeRole,
-            duration_cast<milliseconds>(timestamp.value<microseconds>()).count());
-    }
 
     hideMessages();
     m_navigateDelayed->setCallback({});
 
     const auto playbackStarter = scopedPlaybackStarter(!inNewTab
         && ini().startPlaybackOnTileNavigation);
+
+    Parameters parameters(resourceList);
+    const auto arguments = setupDropActionParameters(resourceList, index.data(Qn::TimestampRole));
+
+    for (const auto& param: nx::utils::keyValueRange(arguments))
+        parameters.setArgument(param.first, param.second);
 
     const auto action = inNewTab ? OpenInNewTabAction : DropResourcesAction;
     menu()->trigger(action, parameters);
@@ -270,17 +299,9 @@ void TileInteractionHandler::performDragAndDrop(
     if (!baseMimeData)
         return;
 
-    QHash<int, QVariant> arguments;
-    arguments[Qn::SelectOnOpeningRole] = true;
-
-    const auto timestamp = index.data(Qn::TimestampRole);
-    arguments[Qn::ItemTimeRole] = QVariant::fromValue<qint64>(timestamp.canConvert<microseconds>()
-        ? duration_cast<milliseconds>(timestamp.value<microseconds>()).count()
-        : milliseconds(DATETIME_NOW).count());
-
     MimeData data(baseMimeData.get(), nullptr);
     data.setResources(resourceList);
-    data.setArguments(arguments);
+    data.setArguments(setupDropActionParameters(resourceList, index.data(Qn::TimestampRole)));
 
     QScopedPointer<QDrag> drag(new QDrag(this));
     drag->setMimeData(data.createMimeData());

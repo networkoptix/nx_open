@@ -1213,6 +1213,17 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if (frameColor.isValid())
         widget->setFrameDistinctionColor(frameColor);
 
+    if (auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget))
+    {
+        const auto motionRegions = item->data(Qn::ItemMotionSelectionRole).value<QList<QRegion>>();
+        if (!motionRegions.empty())
+            mediaWidget->setMotionSelection(motionRegions);
+
+        const auto analyticsRect = item->data(Qn::ItemAnalyticsSelectionRole).value<QRectF>();
+        if (analyticsRect.isValid())
+            mediaWidget->setAnalyticsFilterRect(analyticsRect);
+    }
+
     emit widgetAdded(widget);
 
     for (int i = 0; i < Qn::ItemRoleCount; i++)
