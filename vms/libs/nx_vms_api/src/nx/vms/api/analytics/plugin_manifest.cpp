@@ -22,8 +22,12 @@ std::vector<ManifestError> validate(const PluginManifest& pluginManifest)
     if (pluginManifest.version.isEmpty())
         result.emplace_back(ManifestErrorType::emptyPluginVersion);
 
+    // Vendor validation is temporary disabled, because it's unclear what to do with vendor in
+    // Nx plugins.
+#if 0
     if (pluginManifest.vendor.isEmpty())
         result.emplace_back(ManifestErrorType::emptyPluginVendor);
+#endif
 
     return result;
 }
