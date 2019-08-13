@@ -339,17 +339,7 @@ FsEntryType::Value DirIterator::entryType() const
 
 uint64_t DirIterator::entrySize() const
 {
-#ifdef __linux__
-    if( m_impl->entrySize == (uint64_t)-1 )
-    {
-        //performing stat here, because unneeded stat64 call can greately slow down directory traversal
-        struct stat64 st;
-        memset( &st, 0, sizeof(st) );
-        if( stat64( (m_impl->dir + "/" + m_impl->entryPath).c_str(), &st ) )
-            return 0;
-        m_impl->entrySize = st.st_size;
-    }
-#elif defined(__APPLE__)
+#ifndef _WIN32
     if( m_impl->entrySize == (uint64_t)-1 )
     {
         //performing stat here, because unneeded stat call can greately slow down directory traversal
