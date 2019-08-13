@@ -35,6 +35,9 @@ BookmarkSearchSynchronizer::BookmarkSearchSynchronizer(
 
     connect(navigator(), &QnWorkbenchNavigator::currentResourceChanged,
         this, &BookmarkSearchSynchronizer::updateTimelineBookmarks);
+
+    connect(bookmarkSearchWidget, &BookmarkSearchWidget::textFilterChanged,
+        this, &BookmarkSearchSynchronizer::updateTimelineBookmarks);
 }
 
 QAction* BookmarkSearchSynchronizer::bookmarksAction() const
