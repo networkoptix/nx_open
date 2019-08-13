@@ -19,7 +19,7 @@ angular.module('webadminApp')
 
         $scope.Config = Config;
 
-        mediaserver.systemSettings({ignore:'installedUpdateInformation'}).then(function(r){
+        mediaserver.systemSettings({ignore:'installedUpdateInformation,targetUpdateInformation'}).then(function(r){
             $scope.systemSettings = r.data.reply.settings;
 
             for(var settingName in $scope.systemSettings){
