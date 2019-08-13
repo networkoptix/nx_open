@@ -1,18 +1,13 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include <algorithm>
 #include <cstring>
 #include <cstdlib>
 
 #include <plugins/plugin_tools.h>
+#include <nx/kit/utils.h>
 
 #include "video_packet.h"
-
-namespace
-{
-    static void freeAlignedX( void* ptr)
-    {
-        nxpt::freeAligned( ptr );
-    }
-}
 
 namespace rpi_cam
 {
@@ -21,10 +16,14 @@ namespace rpi_cam
         m_time(ts),
         m_flags(flags)
     {
+        typedef void FreeAlignedFunc(void*); //< Needed to choose the proper overloaded version.
         if (data)
         {
-            m_data = std::shared_ptr<uint8_t>(
-                (uint8_t*)nxpt::mallocAligned( size + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT), freeAlignedX );
+            m_data = std::shared_ptr<uint8_t>((uint8_t*)
+                nx::kit::utils::mallocAligned(
+                    size + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE,
+                    nxcip::MEDIA_DATA_BUFFER_ALIGNMENT),
+                (FreeAlignedFunc*) nx::kit::utils::freeAligned);
             memcpy( m_data.get(), data, size );
             memset( m_data.get() + size, 0, nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE );
             m_size = size;

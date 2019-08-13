@@ -46,6 +46,12 @@ set(copied_sample_2_origin ${CMAKE_SOURCE_DIR}/vms/server/plugins/device/${copie
 file(GLOB_RECURSE copied_sample_2_files ${copied_sample_2_origin}/src/*)
 list(APPEND copied_sample_2_files ${copied_sample_2_origin}/readme.md)
 
+# Collect source files for the sample 3 - RPi Camera Plugin.
+set(copied_sample_3_target rpi_camera_plugin)
+set(copied_sample_3_origin ${CMAKE_SOURCE_DIR}/vms/server/plugins/device/${copied_sample_3_target})
+file(GLOB_RECURSE copied_sample_3_files ${copied_sample_3_origin}/src/*)
+list(APPEND copied_sample_3_files ${copied_sample_3_origin}/readme.md)
+
 set(copy_sdk_files_script ${CMAKE_CURRENT_BINARY_DIR}/copy_sdk_files.cmake)
 
 # Substitute variable values into the cmake script which will be called at the build phase.
@@ -78,7 +84,15 @@ else()
 
     if(toolchainFile)
         set(compilingOptions ${compilingOptions}
-            -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/toolchains/${toolchainFile}.cmake)
+            -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/toolchains/${toolchainFile}.cmake
+        )
+    endif()
+    
+    if(targetDevice STREQUAL "linux_arm32")
+        set(extraArgs ${extraArgs}
+            --with-rpi-samples
+            -DrpiSysroot=${sysroot_directory}
+        )
     endif()
 endif()
 
@@ -91,7 +105,7 @@ add_custom_command(OUTPUT ${zip_file}
     COMMAND ${CMAKE_COMMAND} -E echo
         "  Building samples - see ${sample_build_log}"
     COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir}
-        ${sample_build_script} ${compilingOptions} -DCMAKE_PREFIX_PATH=${QT_DIR}
+        ${sample_build_script} ${extraArgs} ${compilingOptions} -DCMAKE_PREFIX_PATH=${QT_DIR}
         >${sample_build_log} 2>&1
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${sdk_dir}-build #< Delete sdk build dir.
 

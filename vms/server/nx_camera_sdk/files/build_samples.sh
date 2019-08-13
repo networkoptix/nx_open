@@ -11,6 +11,14 @@ set -u #< Prohibit undefined variables.
 BASE_DIR=$(readlink -f "$(dirname "$0")") #< Absolute path to this script's dir.
 BUILD_DIR="$BASE_DIR-build"
 
+if (($# > 0)) && [[ $1 == "--with-rpi-samples" ]]
+then
+    shift
+    WITH_RPI_SAMPLES=1
+else
+    WITH_RPI_SAMPLES=0
+fi
+
 # Use Ninja for Linux and Cygwin, if it is available on PATH.
 if which ninja >/dev/null
 then
@@ -43,6 +51,12 @@ for SAMPLE_DIR in "$BASE_DIR/samples"/*
 do
     SOURCE_DIR="$SAMPLE_DIR/src"
     SAMPLE=$(basename "$SAMPLE_DIR")
+    if [[ $WITH_RPI_SAMPLES == 0 && $SAMPLE == rpi_* ]]
+    then
+        echo "ATTENTION: Skipping $SAMPLE because --with-rpi-samples is not specified."
+        echo ""
+        continue
+    fi
     (set -x #< Log each command.
         mkdir -p "$BUILD_DIR/$SAMPLE"
         cd "$BUILD_DIR/$SAMPLE"
@@ -50,7 +64,16 @@ do
         cmake "$SOURCE_DIR" `# allow empty array #` ${GEN_OPTIONS[@]+"${GEN_OPTIONS[@]}"} "$@"
         cmake --build . `# allow empty array #` ${BUILD_OPTIONS[@]+"${BUILD_OPTIONS[@]}"}
     )
+    ARTIFACT=$(find "$BUILD_DIR" -name "$SAMPLE.dll" -o -name "lib$SAMPLE.so")
+    if [ ! -f "$ARTIFACT" ]
+    then
+        echo "ERROR: Failed to build plugin $SAMPLE."
+        exit 64
+    fi
+    echo ""
+    echo "Plugin built:"
+    echo "$ARTIFACT"
+    echo ""
 done
 
-echo ""
 echo "Samples built successfully, see the binaries in $BUILD_DIR"

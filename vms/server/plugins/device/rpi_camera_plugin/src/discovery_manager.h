@@ -1,9 +1,11 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #ifndef RPI_DISCOVERY_MANAGER_H
 #define RPI_DISCOVERY_MANAGER_H
 
 #include <mutex>
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 
 #include "ref_counter.h"
 

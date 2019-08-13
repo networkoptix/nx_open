@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #ifndef RPI_STREAM_READER_H
 #define RPI_STREAM_READER_H
 
@@ -5,7 +7,7 @@
 #include <vector>
 #include <memory>
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
 #include "ref_counter.h"

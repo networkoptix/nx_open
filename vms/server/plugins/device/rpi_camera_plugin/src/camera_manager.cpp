@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include <string>
 #include <cstdlib>
 
@@ -42,12 +44,12 @@ namespace rpi_cam
 
     void CameraManager::makeInfo(const std::string& serial, const std::string& url)
     {
-        std::string model = "NxPi";
+        static const std::string kModel = "NxPi";
 
-        memset( &m_info, 0, sizeof(nxcip::CameraInfo) );
-        strncpy( m_info.url, url.c_str(), std::min(url.size(), sizeof(nxcip::CameraInfo::url)-1) );
-        strncpy( m_info.uid, serial.c_str(), std::min(serial.size(), sizeof(nxcip::CameraInfo::uid)-1) );
-        strncpy( m_info.modelName, model.c_str(), std::min(model.size(), sizeof(nxcip::CameraInfo::modelName)-1) );
+        memset( (void*) &m_info, 0, sizeof(nxcip::CameraInfo) );
+        strncpy( m_info.url, url.c_str(), std::min(url.size(), sizeof(nxcip::CameraInfo::url))-1 );
+        strncpy( m_info.uid, serial.c_str(), std::min(serial.size(), sizeof(nxcip::CameraInfo::uid))-1 );
+        strncpy( m_info.modelName, kModel.c_str(), std::min(kModel.size(), sizeof(nxcip::CameraInfo::modelName))-1 );
     }
 
     void * CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -98,7 +100,7 @@ namespace rpi_cam
 
     int CameraManager::getCameraInfo(nxcip::CameraInfo * info) const
     {
-        memcpy( info, &m_info, sizeof(m_info) );
+        memcpy( (void*) info, &m_info, sizeof(m_info) );
         return nxcip::NX_NO_ERROR;
     }
 

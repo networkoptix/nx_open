@@ -16,7 +16,6 @@ for /d %%S in (%BASE_DIR%\samples\*) do (
     call :build_sample %%S %* || goto :end
 )
 
-echo:
 echo Samples built successfully, see the binaries in %BUILD_DIR%
 exit
 
@@ -28,13 +27,25 @@ exit /b %RESULT%
 :build_sample
 set SOURCE_DIR=%1\src
 set SAMPLE=%~n1
+if /i "%SAMPLE:~0,4%" == "rpi_" exit /b
+set SAMPLE_BUILD_DIR=%BUILD_DIR%\%SAMPLE%
 echo on
-    mkdir "%BUILD_DIR%\%SAMPLE%" || goto :build_sample_fail
-    cd "%BUILD_DIR%\%SAMPLE%" || goto :build_sample_fail
+    mkdir "%SAMPLE_BUILD_DIR%" || goto :build_sample_fail
+    cd "%SAMPLE_BUILD_DIR%" || goto :build_sample_fail
     
     cmake "%SOURCE_DIR%" -Ax64 -Tv140,host=x64 %* || goto :build_sample_fail
     cmake --build . || goto :build_sample_fail
-@echo off && exit /b 0
+@echo off
+set ARTIFACT=%SAMPLE_BUILD_DIR%\Debug\%SAMPLE%.dll
+if not exist "%ARTIFACT%" (
+    echo ERROR: Failed to build plugin %SAMPLE%.
+    exit /b 64
+)
+echo:
+echo Plugin built:
+echo %ARTIFACT%
+echo:
+exit /b 0
 
 :build_sample_fail
 @echo off && exit /b %ERRORLEVEL%

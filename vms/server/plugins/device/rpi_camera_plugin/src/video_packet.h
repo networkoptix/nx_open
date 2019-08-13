@@ -1,9 +1,11 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #ifndef RPI_VIDEO_PACKET_H
 #define RPI_VIDEO_PACKET_H
 
 #include <memory>
 
-#include <plugins/camera_plugin.h>
+#include <camera/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
 #include "ref_counter.h"

@@ -59,6 +59,7 @@ Prerequisites:
     - g++ >= 5.4.0
     - make or Ninja
 - Qt5 (required by certain samples only)
+- Raspberry Pi sysroot (required by certain samples only)
 ```
 
 To compile the samples, execute the commands collected into the provided scripts (use their source
@@ -74,25 +75,32 @@ build_samples.sh
 # NOTE: The provided file toolchain_arm64.cmake defines which cross-compiler will be used.
 build_samples_arm64.sh
 
-# Linux, 32-bit ARM cross-compiling (e.g. Raspberry Pi):
+# Linux, 32-bit ARM cross-compiling, without Raspberry Pi specific samples:
 # NOTE: The provided file toolchain_arm32.cmake defines which cross-compiler will be used.
 build_samples_arm32.sh
+
+# Linux, Raspberry Pi (32-bit ARM) cross-compiling, with Raspberry Pi specific samples:
+# NOTE: The provided file toolchain_arm32.cmake defines which cross-compiler will be used.
+build_samples_rpi.sh
 ```
 
-If cmake cannot find Qt, add the following arg to a build_samples.* script (will be passed to
-cmake): -DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>
+ATTENTION: If cmake cannot find Qt, add the following arg to a build_samples* script (will be
+passed to cmake):
+```
+build_samples* -DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>
+```
         
 On Windows, after CMake generation phase, Visual Studio GUI can be used to compile the sample:
 open `../nx_sdk-build/<sample_name>/<sample_name>.sln` and build the `ALL_BUILD` project. Make
 sure that the platform combo-box is set to "x64".
 
-After successful build, locate the main built artifact:
+After successful build, locate the built artifacts:
 ```
 # Windows:
 ..\nx_sdk-build\<sample_name>\Debug\<sample_name>.dll
 
 # Linux:
-../nx_sdk-build/lib<sample_name>.so
+../nx_sdk-build/<sample_name>/lib<sample_name>.so
 ```
 
 To install a plugin, just copy its library file to the dedicated folder in the VMS Server
@@ -119,10 +127,14 @@ available for the plugins in nx_sdk 1.7.1 (coming with VMS 3.2).
 Re-compiling the source code of plugins written with nx_sdk 1.7.1 using this newer nx_sdk requires
 some simple adjustments due the following breaking changes in SDK source code:
 
+- Changed prototypes of the base interface `class PluginInterface` methods (does not affect binary
+    compatibility) `addRef()` and `releaseRef()`:
+    - Now they return `int` instead of `unsigned int`.
+    - Now they are `const`.
+- Removed unused interface `nxpl::Plugin3` which only added `setLocale()` to `nxpl::Plugin2`.
 - SDK headers moved:
     - `include/plugins/camera_*.h` -> `src/camera/`.
     - `include/plugins/plugin_*.h -> src/plugins/`.
-- Removed unused interface `nxpl::Plugin3` which only added `setLocale()` to `nxpl::Plugin2`.
 - Helper utilities, formerly in `plugin_tools.h`:
     - `ScopedRef<>` replaced with `Ptr<>` (`src/nx/sdk/ptr.h`).
     - `alignUp()`, `mallocAligned()`, `freeAligned()` moved to `nx/kit/utils.h`.
