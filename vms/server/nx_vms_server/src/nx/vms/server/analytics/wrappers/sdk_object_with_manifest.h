@@ -36,7 +36,8 @@ public:
             return;
     }
 
-    std::optional<ManifestType> manifest() const
+    std::optional<ManifestType> manifest(
+        std::unique_ptr<StringBuilder>* outStringBuilder = nullptr) const
     {
         if (!NX_ASSERT(m_mainSdkObject))
             return std::nullopt;
@@ -44,12 +45,26 @@ public:
         ManifestProcessor<ManifestType> manifestProcessor(
             makeManifestProcessorSettings(),
             sdkObjectDescription(),
-            [this](Violation violation)
+            [this, outStringBuilder](Violation violation)
             {
+                if (outStringBuilder)
+                {
+                    *outStringBuilder =
+                        std::make_unique<StringBuilder>(
+                            SdkMethod::manifest, sdkObjectDescription(), violation);
+                }
+
                 handleViolation(SdkMethod::manifest, violation, /*returnValue*/ nullptr);
             },
-            [this](sdk_support::Error error)
+            [this, outStringBuilder](sdk_support::Error error)
             {
+                if (outStringBuilder)
+                {
+                    *outStringBuilder =
+                        std::make_unique<StringBuilder>(
+                            SdkMethod::manifest, sdkObjectDescription(), error);
+                }
+
                 handleError(SdkMethod::manifest, error, /*returnValue*/ nullptr);
             });
 

@@ -201,10 +201,15 @@ private:
         const std::vector<nx::vms::api::analytics::ManifestError>& manifestErrors) const
     {
         QString result;
-        for (const auto& error: manifestErrors)
+        for (int i = 0; i < manifestErrors.size(); ++i)
         {
-            result += lm("Error: %1, details: %2;\n").args(
-                toHumanReadableString(error.errorType), error.additionalInfo);
+            const auto& error = manifestErrors[i];
+            result += lm("error: %1").args(toHumanReadableString(error.errorType));
+            if (!error.additionalInfo.isEmpty())
+                result += lm(", details: %1").args(error.additionalInfo);
+
+            if (i < manifestErrors.size() - 1)
+                result += ";\n";
         }
 
         return result;

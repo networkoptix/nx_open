@@ -76,6 +76,31 @@ QString StringBuilder::buildLogString() const
     return buildErrorFullString();
 }
 
+QString StringBuilder::buildPluginInfoString() const
+{
+    if (m_violation.type != ViolationType::undefined)
+        return buildViolationPluginInfoString();
+
+    return buildErrorPluginInfoString();
+}
+
+QString StringBuilder::buildViolationPluginInfoString() const
+{
+    return lm("Method %1::%2 violated its contract: %3%4").args(
+        toHumanReadableString(m_sdkObjectDescription.sdkObjectType()),
+        toHumanReadableString(m_sdkMethod),
+        toHumanReadableString(m_violation.type),
+        m_violation.details.isEmpty() ? QString() : lm(", details: %1").args(m_violation.details));
+}
+
+QString StringBuilder::buildErrorPluginInfoString() const
+{
+    return lm("Method %1::%2 returned an error: %3").args(
+        toHumanReadableString(m_sdkObjectDescription.sdkObjectType()),
+        toHumanReadableString(m_sdkMethod),
+        m_error);
+}
+
 QString StringBuilder::buildPluginDiagnosticEventCaption() const
 {
     if (m_violation.type != ViolationType::undefined)

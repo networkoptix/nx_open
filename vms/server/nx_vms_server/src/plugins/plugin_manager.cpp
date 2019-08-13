@@ -315,8 +315,9 @@ bool PluginManager::processPluginEntryPointForNewSdk(
             analyticsPlugin,
             pluginInfo->libName);
 
+        std::unique_ptr<wrappers::StringBuilder> stringBuilder;
         pluginInfo->mainInterface = MainInterface::nx_sdk_analytics_IPlugin;
-        if (const auto manifest = plugin->manifest())
+        if (const auto manifest = plugin->manifest(&stringBuilder))
         {
             pluginInfo->name = manifest->name;
             pluginInfo->description = manifest->description;
@@ -325,8 +326,13 @@ bool PluginManager::processPluginEntryPointForNewSdk(
         }
         else
         {
+            QString errorDescription = stringBuilder
+                ? lm(": %1").args(stringBuilder->buildPluginInfoString())
+                : QString();
+
             return storeNotLoadedPluginInfo(pluginInfo, Status::notLoadedBecauseOfError,
-                Error::badManifest, "Invalid manifest");
+                Error::badManifest,
+                lm("Invalid manifest%1").args(errorDescription));
         }
     }
 
