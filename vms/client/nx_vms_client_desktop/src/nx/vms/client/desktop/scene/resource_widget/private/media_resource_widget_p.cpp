@@ -386,16 +386,11 @@ void MediaResourceWidgetPrivate::setStreamDataFilters(StreamDataFilters filters)
     if (!reader->setStreamDataFilter(filters))
         return;
 
-    // TODO: #gdm This block is temporarily disabled because it breaks everything when SYNC=OFF.
-    // Needs investigation and fixing.
-    //
-    // const auto positionUsec = display()->camDisplay()->getExternalTime();
-    // const auto isPaused = reader->isMediaPaused();
-    //
-    // if (isPaused)
-    //     reader->jumpTo(/*mksek*/ positionUsec, /*skipTime*/ positionUsec);
-    // else
-    //     reader->jumpTo(/*mksek*/ positionUsec, /*skipTime*/ 0);
+     const auto positionUsec = display()->camDisplay()->getExternalTime();
+     if (positionUsec == AV_NOPTS_VALUE || positionUsec == DATETIME_NOW)
+         return;
+
+    reader->jumpTo(/*mksek*/ positionUsec, /*skipTime*/ positionUsec);
 }
 
 } // namespace nx::vms::client::desktop

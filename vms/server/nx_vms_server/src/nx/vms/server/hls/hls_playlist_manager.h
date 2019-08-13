@@ -9,6 +9,8 @@
 
 #include <QtCore/QString>
 
+#include <utils/camera/camera_diagnostics.h>
+
 namespace nx {
 namespace vms::server {
 namespace hls {
@@ -48,7 +50,7 @@ public:
      * @param endOfStreamReached Can be NULL.
      * @return Number of chunks generated.
      */
-    virtual size_t generateChunkList(
+    virtual CameraDiagnostics::Result generateChunkList(
         std::vector<ChunkData>* const chunkList,
         bool* const endOfStreamReached) const = 0;
     //!Returns maximum stream bitrate in bps
