@@ -2,6 +2,8 @@
 
 #include <nx/network/url/url_builder.h>
 
+#include "nx/cloud/aws/format_query.h"
+
 namespace nx::cloud::aws::sts {
 
 namespace {
@@ -43,28 +45,29 @@ QString ApiClient::buildQuery(const AssumeRoleRequest& request) const
 
     query += kRequiredQueries;
     if (!request.roleArn.empty())
-        query.append("&RoleArn=").append(request.roleArn.c_str());
+        query += formatQuery("&RoleArn", request.roleArn);
     if (!request.roleSessionName.empty())
-        query.append("&RoleSessionName=").append(request.roleSessionName.c_str());
+        query += formatQuery("&RoleSessionName", request.roleSessionName);
     int i = 0;
     for (const auto& policyArn : request.policyArns)
     {
         if (!policyArn.empty())
         {
-            query.append("&PolicyArns.member.").append(QString::number(++i))
-                .append("=").append(policyArn.c_str());
+            query += formatQuery(
+                std::string("&PolicyArns.member.").append(std::to_string(++i)),
+                policyArn);
         }
     }
     if (!request.policy.empty())
-        query.append("&Policy=").append(request.policy.c_str());
+        query += formatQuery("&Policy", request.policy);
     if (request.durationSeconds > 0)
-        query.append("&DurationSeconds=").append(QString::number(request.durationSeconds));
+        query += formatQuery("&DurationSeconds", request.durationSeconds);
     if (!request.externalId.empty())
-        query.append("&ExternalId=").append(request.externalId.c_str());
+        query += formatQuery("&ExternalId", request.externalId);
     if (!request.serialNumber.empty())
-        query.append("&SerialNumer=").append(request.serialNumber.c_str());
+        query += formatQuery("&SerialNumer", request.serialNumber);
     if (!request.tokenCode.empty())
-        query.append("&TokenCode=").append(request.tokenCode.c_str());
+        query += formatQuery("&TokenCode", request.tokenCode);
 
     return query;
 }
