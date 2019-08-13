@@ -2,7 +2,6 @@
 
 #include <optional>
 
-#include <QtCore/QDateTime>
 #include <QtCore/QPointer>
 
 #include <analytics/db/analytics_db_types.h>
@@ -33,6 +32,8 @@
 #include <nx/analytics/analytics_logging_ini.h>
 
 #include <nx/fusion/model_functions.h>
+
+#include <nx/utils/datetime.h>
 
 namespace nx::vms::client::desktop {
 
@@ -115,9 +116,9 @@ std::optional<std::pair<ObjectMetadataPacketPtr, ObjectMetadata>> findObjectMeta
 
 QString approximateDebugTime(microseconds value)
 {
-    const auto valueMs = duration_cast<milliseconds>(value).count();
-    return QDateTime::fromMSecsSinceEpoch(valueMs).toString("hh:mm:ss.zzz")
-        + " (" + QString::number(valueMs) +")";
+    const auto valueMs = duration_cast<milliseconds>(value);
+    return nx::utils::timestampToDebugString(valueMs, "hh:mm:ss.zzz")
+        + " (" + QString::number(valueMs.count()) +")";
 }
 
 } // namespace
