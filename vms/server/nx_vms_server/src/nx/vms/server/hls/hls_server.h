@@ -142,6 +142,7 @@ private:
         const Qn::UserAccessData& accessRight,
         const QString& requestedPlaylistPath,
         const QString& sessionID,
+        const QnUuid& clientUuid,
         const std::multimap<QString, QString>& requestParams,
         const QnSecurityCamResourcePtr& camResource,
         const QnVideoCameraPtr& videoCamera,

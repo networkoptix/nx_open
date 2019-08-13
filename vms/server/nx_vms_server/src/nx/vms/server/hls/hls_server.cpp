@@ -508,10 +508,13 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
             }
         }
 
+        QnUuid clientUuid = QnUuid::fromStringSafe(request.getCookieValue("x-runtime-guid"));
+
         const nx::network::http::StatusCode::Value result = createSession(
             accessRights,
             request.requestLine.url.path(),
             sessionID,
+            clientUuid,
             requestParams,
             camResource,
             videoCamera,
@@ -936,6 +939,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
     const Qn::UserAccessData& accessRights,
     const QString& requestedPlaylistPath,
     const QString& sessionID,
+    const QnUuid& clientUuid,
     const std::multimap<QString, QString>& requestParams,
     const QnSecurityCamResourcePtr& camResource,
     const QnVideoCameraPtr& videoCamera,
@@ -1009,23 +1013,11 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
                 std::make_shared<ArchivePlaylistManager>(
                     serverModule(),
                     camResource,
+                    clientUuid,
                     params.startTimestamp.get(),
                     kChunkCountInArchivePlaylist,
                     duration_cast<microseconds>(newHlsSession->targetDuration()),
                     quality);
-            if (!archivePlaylistManager->initialize())
-            {
-                mediaStreamEvent = archivePlaylistManager->lastError().toMediaStreamEvent();
-                NX_DEBUG(this, "Failed to initialize archive playlist for camera: %1, error: %2",
-                    camResource->getUniqueId(), toString(mediaStreamEvent));
-                if (mediaStreamEvent)
-                {
-                    error->errorString = toString(mediaStreamEvent);
-                    error->error = QnRestResult::Forbidden;
-                    return nx::network::http::StatusCode::ok;
-                }
-                return nx::network::http::StatusCode::internalServerError;
-            }
 
             newHlsSession->setPlaylistManager(quality, archivePlaylistManager);
         }
