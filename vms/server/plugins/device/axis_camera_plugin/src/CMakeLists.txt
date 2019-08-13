@@ -11,7 +11,10 @@ add_library(axis_camera_plugin SHARED ${source_files})
 
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Network REQUIRED)
-target_link_libraries(axis_camera_plugin PRIVATE Qt5::Core Qt5::Network)
+target_link_libraries(axis_camera_plugin PRIVATE
+    Qt5::Core
+    Qt5::Network
+)
 
 target_include_directories(axis_camera_plugin PRIVATE ../../../src) #< SDK headers.
 

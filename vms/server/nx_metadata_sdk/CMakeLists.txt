@@ -62,7 +62,7 @@ if(targetDevice STREQUAL ${default_target_device})
     # The tests will be built: inform about that.
     set(sample_tests_message " and running unit tests")
 else()
-    set(sample_tests_trigger "--no-tests")
+    set(sampleTestsTrigger "--no-tests")
 endif()
 
 if(targetDevice STREQUAL "windows-x64")
@@ -96,7 +96,7 @@ add_custom_command(OUTPUT ${zip_file}
     COMMAND ${CMAKE_COMMAND} -E echo
         "  Building samples${sample_tests_message} - see ${sample_build_log}"
     COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir}
-        ${sample_build_script} ${sample_tests_trigger} ${compilingOptions}
+        ${sample_build_script} ${sampleTestsTrigger} ${compilingOptions}
         >${sample_build_log} 2>&1
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${sdk_dir}-build #< Delete sdk build dir.
 
