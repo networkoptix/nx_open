@@ -43,14 +43,25 @@ void AuthProvider::getAuthenticationResponse(
 }
 
 void AuthProvider::resolveUserDigest(
-    const api::UserDigest& digest,
+    const api::UserAuthorization& authorization,
     std::function<void(api::ResultCode, api::CredentialsDescriptor)> completionHandler)
 {
     executeRequest(
         kAuthResolveUserDigest,
-        digest,
+        authorization,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::CredentialsDescriptor()));
+}
+
+void AuthProvider::getSystemAccessLevel(
+    const api::UserAuthorization& authorization,
+    std::function<void(api::ResultCode, api::SystemAccess)> completionHandler)
+{
+    executeRequest(
+        kAuthSystemAccessLevel,
+        authorization,
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::SystemAccess()));
 }
 
 } // namespace nx::cloud::db::client

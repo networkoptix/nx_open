@@ -19,8 +19,9 @@ void serializeToUrlQuery(const AuthRequest&, QUrlQuery* const urlQuery);
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cloud::db::api::ObjectType)
 
-#define UserDigest_Fields (requestMethod)(requestAuthorization)
+#define UserAuthorization_Fields (requestMethod)(requestAuthorization)
 #define CredentialsDescriptor_Fields (status)(objectType)(objectId)
+#define SystemAccess_Fields (accessRole)
 
 #define AuthInfoRecord_Fields (nonce)(intermediateResponse)(expirationTime)
 #define AuthInfo_Fields (records)
@@ -29,7 +30,7 @@ static constexpr char kVmsUserAuthInfoAttributeName[] = "cloudUserAuthentication
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (NonceData)(AuthRequest)(AuthResponse) \
-        (UserDigest)(CredentialsDescriptor) \
+        (UserAuthorization)(CredentialsDescriptor)(SystemAccess) \
         (AuthInfoRecord)(AuthInfo),
     (json))
 

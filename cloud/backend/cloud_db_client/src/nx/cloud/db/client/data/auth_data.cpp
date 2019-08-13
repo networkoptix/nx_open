@@ -42,7 +42,7 @@ void serializeToUrlQuery(const AuthRequest& authRequest, QUrlQuery* const urlQue
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (NonceData)(AuthRequest)(AuthResponse) \
-        (UserDigest)(CredentialsDescriptor) \
+        (UserAuthorization)(CredentialsDescriptor)(SystemAccess) \
         (AuthInfoRecord)(AuthInfo),
     (json),
     _Fields,

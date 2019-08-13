@@ -24,8 +24,12 @@ public:
         std::function<void(api::ResultCode, api::AuthResponse)> completionHandler) override;
 
     virtual void resolveUserDigest(
-        const api::UserDigest& digest,
+        const api::UserAuthorization& authorization,
         std::function<void(api::ResultCode, api::CredentialsDescriptor)> completionHandler) override;
+
+    virtual void getSystemAccessLevel(
+        const api::UserAuthorization& authorization,
+        std::function<void(api::ResultCode, api::SystemAccess)> completionHandler) override;
 };
 
 } // namespace nx::cloud::db::client

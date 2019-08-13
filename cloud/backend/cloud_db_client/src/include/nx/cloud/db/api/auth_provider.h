@@ -61,7 +61,7 @@ public:
     }
 };
 
-class UserDigest
+class UserAuthorization
 {
 public:
     /**
@@ -94,6 +94,12 @@ public:
     std::string objectId;
 };
 
+class SystemAccess
+{
+public:
+    SystemAccessRole accessRole = SystemAccessRole::none;
+};
+
 /**
  * Provides some temporary hashes which can be used by mediaserver
  *   to authenticate requests using cloud account credentials.
@@ -122,8 +128,12 @@ public:
         std::function<void(api::ResultCode, api::AuthResponse)> completionHandler) = 0;
 
     virtual void resolveUserDigest(
-        const api::UserDigest& digest,
+        const api::UserAuthorization& digest,
         std::function<void(api::ResultCode, api::CredentialsDescriptor)> completionHandler) = 0;
+
+    virtual void getSystemAccessLevel(
+        const api::UserAuthorization& authorization,
+        std::function<void(api::ResultCode, api::SystemAccess)> completionHandler) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
