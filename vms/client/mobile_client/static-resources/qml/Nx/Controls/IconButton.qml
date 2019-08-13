@@ -67,8 +67,6 @@ Control
 
         function mouseOutsideButton(mouse)
         {
-            var x = mouse.x
-            var y = mouse.y
             return mouse.x < 0 || mouse.y < 0
                 || mouse.x >= control.width || mouse.y >= control.height
         }
