@@ -29,9 +29,9 @@
 </div>
 
 <div class="panel-body text-center panel-body-big" ng-if="stepIs('start')">
-    <div ng-class="{'vertical-bottom':!settings.liteClient, 'master-description': settings.liteClient}">
+    <div>
         <h2>Comenzar con {{Config.productName}}</h2>
-        <p>Por favor, configure el servidor primero.<br>
+        <p class="master-description">Por favor, configure el servidor primero.<br>
             Elija una opción.</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
         <button class="btn btn-primary" autofocus ng-click="next()">Configuración del nuevo sistema</button>
@@ -292,7 +292,7 @@
                    uib-typeahead-show-hint="true"
                    uib-typeahead-focus-first="false"
                    uib-typeahead-focus
- placeholder="URL del Sistema existente (https: // host: puerto)"
+ placeholder="URL del Sistema existente (https://host:port)"
                    ng-change="clearRemoteError()"
                    required
  class="form-control">

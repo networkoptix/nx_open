@@ -29,18 +29,22 @@ class LocalConnectionFactory;
 class QnSimpleHttpConnectionListener;
 class Appserver2Process;
 
-class Appserver2Process: public QnLongRunnable
+class Appserver2Process:
+    public QObject,
+    public QnStoppable
 {
     Q_OBJECT
 
 public:
     Appserver2Process(int argc, char **argv);
+    virtual ~Appserver2Process() = default;
 
-    void setOnStartedEventHandler(nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
+    virtual void pleaseStop() override;
+
+    void setOnStartedEventHandler(
+        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
 
     int exec();
-    virtual void run() override;
-    virtual void pleaseStop() override;
 
     QnCommonModule* commonModule() const;
     ec2::AbstractECConnection* ecConnection();

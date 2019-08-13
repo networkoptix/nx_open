@@ -19,7 +19,7 @@ def main():
     args = parser.parse_args()
 
     with open(args.config, 'r') as f:
-        config = yaml.load(f)
+        config = yaml.load(f, Loader=yaml.SafeLoader)
 
     collect_qml_dependencies(config['qt_directory'], args.source, args.qml_root, args.output)
 

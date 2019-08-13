@@ -61,6 +61,8 @@ class QnTwoWayAudioWidget;
 
 struct QnHtmlTextItemOptions;
 
+namespace nx::analytics::db { struct Filter; }
+
 /**
  * Widget to show media from a camera or disk file (from QnMediaResource).
  */
@@ -183,6 +185,8 @@ public:
     void setAnalyticsFilterRect(const QRectF& value);
 
     nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider() const;
+
+    void setAnalyticsFilter(const nx::analytics::db::Filter& value);
 
 signals:
     void motionSelectionChanged();

@@ -7,7 +7,6 @@
 #include <api/test_api_requests.h>
 #include <rest/server/json_rest_result.h>
 #include <nx/network/url/url_builder.h>
-#include <nx/vms/server/event/extended_rule_processor.h>
 
 using namespace nx::vms::event;
 using namespace nx::test;
@@ -41,25 +40,8 @@ TEST(EventRules, httpPostAction)
     auto dbError = connection->getEventRulesManager(Qn::kSystemAccess)->saveSync(rule);
     ASSERT_EQ(ec2::ErrorCode::ok, dbError);
 
-    do
-    {
-        const auto rules = launcher.serverModule()->eventRuleProcessor()->rules();
-        if (std::any_of(rules.cbegin(), rules.cend(),
-            [](const auto& rule)
-            {
-                return rule->actionType() == ActionType::execHttpRequestAction;
-            }))
-        {
-            break;
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    }
-    while (true);
-
     QnJsonRestResult result;
-    NX_TEST_API_GET(&launcher, "/api/createEvent?event_type=userDefinedEvent&caption=123",
-        &result);
+    NX_TEST_API_GET(&launcher, "/api/createEvent?event_type=userDefinedEvent&caption=123", &result);
 
     bool newUserFound = false;
     nx::vms::api::UserDataList users;

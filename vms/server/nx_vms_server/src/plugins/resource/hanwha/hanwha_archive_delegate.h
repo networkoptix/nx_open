@@ -61,7 +61,6 @@ private:
 
 private:
     const std::shared_ptr<HanwhaSharedResourceContext> m_resourceContext;
-    std::unique_ptr<QnThumbnailsArchiveDelegate> m_thumbnailsDelegate;
     std::shared_ptr<HanwhaStreamReader> m_streamReader;
     bool m_rateControlEnabled = true;
     qint64 m_startTimeUsec = AV_NOPTS_VALUE;

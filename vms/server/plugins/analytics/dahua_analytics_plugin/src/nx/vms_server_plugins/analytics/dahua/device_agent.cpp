@@ -54,10 +54,11 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 void DeviceAgent::doSetNeededMetadataTypes(
     Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
+    *outResult = Result<void>();
     if (neededMetadataTypes->isEmpty())
         stopFetchingMetadata();
-
-    *outResult = startFetchingMetadata(neededMetadataTypes);
+    else
+        *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
 Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)

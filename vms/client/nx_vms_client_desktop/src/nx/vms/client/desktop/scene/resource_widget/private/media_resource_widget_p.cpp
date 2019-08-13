@@ -8,6 +8,8 @@
 #include <core/resource/client_camera.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
+#include <nx/streaming/abstract_archive_stream_reader.h>
+
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
 #include <nx/client/core/media/consuming_motion_metadata_provider.h>
@@ -21,6 +23,10 @@
 #include <nx/analytics/metadata_log_parser.h>
 
 #include <nx/utils/guarded_callback.h>
+
+using nx::vms::api::StreamDataFilter;
+using nx::vms::api::StreamDataFilters;
+using namespace std::chrono;
 
 namespace nx::vms::client::desktop {
 
@@ -197,6 +203,54 @@ QSharedPointer<media::AbstractMetadataConsumer>
     return getMetadataConsumer(analyticsMetadataProvider.data());
 }
 
+void MediaResourceWidgetPrivate::setMotionEnabled(bool enabled)
+{
+    setStreamDataFilter(nx::vms::api::StreamDataFilter::motion, enabled);
+}
+
+bool MediaResourceWidgetPrivate::isAnalyticsEnabled() const
+{
+    if (!isAnalyticsSupported || m_forceDisabledAnalytics)
+        return false;
+
+    if (const auto reader = display()->archiveReader())
+        return reader->streamDataFilter().testFlag(StreamDataFilter::objectDetection);
+
+    return false;
+}
+
+void MediaResourceWidgetPrivate::setAnalyticsEnabled(bool enabled)
+{
+    setStreamDataFilter(nx::vms::api::StreamDataFilter::objectDetection, enabled);
+
+    if (enabled)
+    {
+        display()->camDisplay()->setForcedVideoBufferLength(
+            milliseconds(ini().analyticsVideoBufferLengthMs));
+    }
+    else
+    {
+        analyticsController->clearAreas();
+
+        // Earlier we didn't unset forced video buffer length to avoid micro-freezes required to
+        // fill in the video buffer on succeeding analytics mode activations. But it looks like this
+        // mode causes a lot of glitches when enabled, so we'd prefer to leave on a safe side.
+        display()->camDisplay()->setForcedVideoBufferLength(milliseconds::zero());
+    }
+}
+
+void MediaResourceWidgetPrivate::setAnalyticsFilter(const nx::analytics::db::Filter& value)
+{
+    m_forceDisabledAnalytics = !resource || (!value.deviceIds.empty()
+        && std::find(value.deviceIds.cbegin(), value.deviceIds.cend(), resource->getId())
+            == value.deviceIds.cend());
+
+    if (m_forceDisabledAnalytics)
+        analyticsController->clearAreas();
+
+    analyticsController->setFilter(value);
+}
+
 void MediaResourceWidgetPrivate::updateIsPlayingLive()
 {
     setIsPlayingLive(m_display && m_display->camDisplay()->isRealTimeSource());
@@ -305,6 +359,38 @@ void MediaResourceWidgetPrivate::requestAnalyticsObjectsExistence()
                 requestAnalyticsObjectsExistence();
         });
     connection->lookupObjectTracks(filter, /*isLocal*/ false, callback, this->thread());
+}
+
+void MediaResourceWidgetPrivate::setStreamDataFilter(StreamDataFilter filter, bool on)
+{
+    if (auto reader = display()->archiveReader())
+    {
+        StreamDataFilters filters = reader->streamDataFilter();
+        filters.setFlag(filter, on);
+        if (filters.testFlag(StreamDataFilter::motion)
+            || filters.testFlag(StreamDataFilter::objectDetection))
+        {
+            // Ensure filters are consistent.
+            filters.setFlag(StreamDataFilter::media);
+        }
+        setStreamDataFilters(filters);
+    }
+}
+
+void MediaResourceWidgetPrivate::setStreamDataFilters(StreamDataFilters filters)
+{
+    auto reader = display()->archiveReader();
+    if (!reader)
+        return;
+
+    if (!reader->setStreamDataFilter(filters))
+        return;
+
+     const auto positionUsec = display()->camDisplay()->getExternalTime();
+     if (positionUsec == AV_NOPTS_VALUE || positionUsec == DATETIME_NOW)
+         return;
+
+    reader->jumpTo(/*mksek*/ positionUsec, /*skipTime*/ positionUsec);
 }
 
 } // namespace nx::vms::client::desktop

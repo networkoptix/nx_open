@@ -19,6 +19,7 @@ namespace {
 constexpr int kMillisecondsInSeconds = 1000;
 constexpr int kMillisecondsInDay = 60 * 60 * 24 * 1000;
 constexpr int kDefaultDaysOffset = -7;
+constexpr std::chrono::milliseconds kCurrentDateCheckInterval{1000};
 
 
 QDate defaultStartDate()
@@ -36,6 +37,37 @@ QDate maxAllowedDate()
 {
     // 1 day forward should cover all local timezones diffs.
     return QDate::currentDate().addDays(1);
+}
+
+class QnCurrentDateMonitor: public QObject
+{
+    Q_OBJECT
+    using base_type = QObject;
+
+public:
+    QnCurrentDateMonitor(QObject *parent);
+    virtual ~QnCurrentDateMonitor() = default;
+
+signals:
+    void currentDateChanged();
+
+private:
+    QDate m_prevDate;
+};
+
+QnCurrentDateMonitor::QnCurrentDateMonitor(QObject *parent) :
+    QObject(parent), m_prevDate(QDate::currentDate())
+{
+    auto timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, [this](){
+        auto currentDate = QDate::currentDate();
+        if (currentDate == m_prevDate)
+            return;
+        m_prevDate = currentDate;
+        emit currentDateChanged();
+    });
+
+    timer->start(kCurrentDateCheckInterval);
 }
 
 }
@@ -56,6 +88,10 @@ QnDateRangeWidget::QnDateRangeWidget(QWidget* parent):
         &QnDateRangeWidget::updateRange);
     connect(ui->dateEditTo, &QDateEdit::userDateChanged, this,
         &QnDateRangeWidget::updateRange);
+
+    auto currentDateMonitor = new QnCurrentDateMonitor(this);
+    connect(currentDateMonitor, &QnCurrentDateMonitor::currentDateChanged,
+        this, &QnDateRangeWidget::updateAllowedRange);
 }
 
 QnDateRangeWidget::~QnDateRangeWidget()
@@ -141,3 +177,5 @@ QDate QnDateRangeWidget::displayDate(qint64 timestampMs) const
     const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
     return timeWatcher->displayTime(timestampMs).date();
 }
+
+#include "date_range_widget.moc"
