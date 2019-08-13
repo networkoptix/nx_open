@@ -24,6 +24,7 @@ static constexpr char kSystemsMergedToASpecificSystem[] = "/cdb/system/{systemId
 
 static constexpr char kAuthGetNoncePath[] = "/cdb/auth/getNonce";
 static constexpr char kAuthGetAuthenticationPath[] = "/cdb/auth/getAuthentication";
+static constexpr char kAuthResolveUserDigest[] = "/cdb/auth_provider/resource";
 
 static constexpr char kSubscribeToSystemEventsPath[] = "/cdb/event/subscribe";
 

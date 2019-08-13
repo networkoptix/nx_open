@@ -14,15 +14,18 @@ public:
 
     virtual void getCdbNonce(
         std::function<void(api::ResultCode, api::NonceData)> completionHandler) override;
-    
+
     virtual void getCdbNonce(
         const std::string& systemId,
         std::function<void(api::ResultCode, api::NonceData)> completionHandler) override;
-    
+
     virtual void getAuthenticationResponse(
         const api::AuthRequest& authRequest,
         std::function<void(api::ResultCode, api::AuthResponse)> completionHandler) override;
-};
 
+    virtual void resolveUserDigest(
+        const api::UserDigest& digest,
+        std::function<void(api::ResultCode, api::CredentialsDescriptor)> completionHandler) override;
+};
 
 } // namespace nx::cloud::db::client

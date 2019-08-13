@@ -61,6 +61,39 @@ public:
     }
 };
 
+class UserDigest
+{
+public:
+    /**
+     * HTTP method from the user request.
+     */
+    std::string requestMethod;
+
+    /**
+     * The "Authorization" header value from the user request. E.g., see [rfc7616] for the spec.
+     */
+    std::string requestAuthorization;
+};
+
+enum class ObjectType
+{
+    none = 0,
+    account,
+    system,
+};
+
+class CredentialsDescriptor
+{
+public:
+    api::ResultCode status = api::ResultCode::ok;
+    ObjectType objectType = ObjectType::none;
+
+    /**
+     * email for account. Id for a system.
+     */
+    std::string objectId;
+};
+
 /**
  * Provides some temporary hashes which can be used by mediaserver
  *   to authenticate requests using cloud account credentials.
@@ -80,14 +113,20 @@ public:
     virtual void getCdbNonce(
         const std::string& systemId,
         std::function<void(api::ResultCode, api::NonceData)> completionHandler) = 0;
-    
+
     /**
      * NOTE: If authRequest.realm value is unknown to CDB, request will fail.
      */
     virtual void getAuthenticationResponse(
         const api::AuthRequest& authRequest,
         std::function<void(api::ResultCode, api::AuthResponse)> completionHandler) = 0;
+
+    virtual void resolveUserDigest(
+        const api::UserDigest& digest,
+        std::function<void(api::ResultCode, api::CredentialsDescriptor)> completionHandler) = 0;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 class AuthInfoRecord
 {

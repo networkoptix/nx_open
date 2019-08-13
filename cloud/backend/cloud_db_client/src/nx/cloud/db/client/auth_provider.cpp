@@ -42,4 +42,15 @@ void AuthProvider::getAuthenticationResponse(
         std::bind(completionHandler, std::placeholders::_1, api::AuthResponse()));
 }
 
+void AuthProvider::resolveUserDigest(
+    const api::UserDigest& digest,
+    std::function<void(api::ResultCode, api::CredentialsDescriptor)> completionHandler)
+{
+    executeRequest(
+        kAuthResolveUserDigest,
+        digest,
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::CredentialsDescriptor()));
+}
+
 } // namespace nx::cloud::db::client
