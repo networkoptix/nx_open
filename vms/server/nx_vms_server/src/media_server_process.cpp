@@ -3710,6 +3710,7 @@ void MediaServerProcess::stopObjects()
     serverModule()->stop();
 
     m_generalTaskTimer.reset();
+    m_serverStartedTimer.reset();
     m_udtInternetTrafficTimer.reset();
     m_createDbBackupTimer.reset();
 
@@ -4060,6 +4061,8 @@ void MediaServerProcess::connectSignals()
 
     m_generalTaskTimer = std::make_unique<QTimer>();
     connect(m_generalTaskTimer.get(), SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
+    m_serverStartedTimer = std::make_unique<QTimer>();
+    connect(m_serverStartedTimer.get(), SIGNAL(timeout()), this, SLOT(writeServerStartedEvent()), Qt::DirectConnection);
 
     m_udtInternetTrafficTimer = std::make_unique<QTimer>();
     connect(m_udtInternetTrafficTimer.get(), &QTimer::timeout,
@@ -4341,7 +4344,10 @@ void MediaServerProcess::startObjects()
         serverModule()->licenseWatcher()->start();
 
     commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
-    writeServerStartedEvent();
+
+    // Write server started event with delay. In case of client has time to reconnect, it could display it on the right panel.
+    m_serverStartedTimer->setSingleShot(true);
+    m_serverStartedTimer->start(serverModule()->settings().serverStartedEventTimeoutMs());
 }
 
 std::map<QString, QVariant> MediaServerProcess::confParamsFromSettings() const

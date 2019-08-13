@@ -14,6 +14,7 @@ namespace nx::vms::server::db::test
 TEST(ServerStartedEvent, serverStartedEvent)
 {
     MediaServerLauncher launcher;
+    launcher.addSetting(QnServer::serverStartedEventTimeoutMsName, "1");
     for (int i = 1; i <= 2; ++i)
     {
         ASSERT_TRUE(launcher.start());
@@ -23,8 +24,20 @@ TEST(ServerStartedEvent, serverStartedEvent)
         filter.eventType = EventType::serverStartEvent;
         filter.period.setEndTimeMs(QnTimePeriod::kMaxTimeValue);
         auto db = launcher.serverModule()->serverDb();
-        auto result = db->getActions(filter);
+
+        nx::utils::ElapsedTimer timer;
+        timer.restart();
+        vms::event::ActionDataList result;
+        while(1)
+        {
+            result = db->getActions(filter);
+            if (result.size() == i || timer.hasExpired(std::chrono::seconds(10)))
+                break;
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        };
+
         ASSERT_EQ(i, result.size());
+
         launcher.stop();
     }
 }
