@@ -51,7 +51,7 @@ Page
                     var dialog = Workflow.openStandardDialog(
                         "", qsTr("What to do with currently saved passwords?"),
                         [
-                            "Keep",
+                            qsTr("Keep"),
                             { "id": "DELETE", "text": qsTr("Delete") }
                         ], true)
 
