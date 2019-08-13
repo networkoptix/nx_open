@@ -327,7 +327,7 @@ bool PluginManager::processPluginEntryPointForNewSdk(
         else
         {
             QString errorDescription = stringBuilder
-                ? lm(": %1").args(stringBuilder->buildPluginInfoString())
+                ? lm(": %1").args(stringBuilder->buildPluginInfoString()).toQString()
                 : QString();
 
             return storeNotLoadedPluginInfo(pluginInfo, Status::notLoadedBecauseOfError,

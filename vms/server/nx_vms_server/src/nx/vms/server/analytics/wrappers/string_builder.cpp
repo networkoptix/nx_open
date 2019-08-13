@@ -90,7 +90,9 @@ QString StringBuilder::buildViolationPluginInfoString() const
         toHumanReadableString(m_sdkObjectDescription.sdkObjectType()),
         toHumanReadableString(m_sdkMethod),
         toHumanReadableString(m_violation.type),
-        m_violation.details.isEmpty() ? QString() : lm(", details: %1").args(m_violation.details));
+        m_violation.details.isEmpty()
+            ? QString()
+            : lm(", details: %1").args(m_violation.details).toQString());
 }
 
 QString StringBuilder::buildErrorPluginInfoString() const
@@ -124,7 +126,9 @@ QString StringBuilder::buildViolationFullString() const
         toHumanReadableString(m_sdkMethod),
         m_sdkObjectDescription.descriptionString(),
         toHumanReadableString(m_violation.type),
-        m_violation.details.isEmpty() ? QString() : lm(", details: %1").args(m_violation.details));
+        m_violation.details.isEmpty()
+            ? QString()
+            : lm(", details: %1").args(m_violation.details).toQString());
 }
 
 QString StringBuilder::buildViolationShortString() const
