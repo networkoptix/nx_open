@@ -26,7 +26,7 @@ if(NOT developerBuild AND NOT dw_edge1 IN_LIST skipConfigurationChecks)
 endif()
 
 if(NOT developerBuild AND NOT customizations_for_nx1 IN_LIST skipConfigurationChecks)
-    set(_nx1_customizations default vista)
+    set(_nx1_customizations default default_cn default_zh_CN vista)
     if(targetDevice STREQUAL "bpi" AND NOT customization IN_LIST _nx1_customizations)
         string(REPLACE ";" ", " _nx1_customizations "${_nx1_customizations}")
         nx_fail_configuration_check(customizations_for_nx1
