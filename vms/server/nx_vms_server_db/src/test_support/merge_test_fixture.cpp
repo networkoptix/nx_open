@@ -78,7 +78,6 @@ void SystemMergeFixture::waitUntilAllServersAreInterconnected()
 
 void SystemMergeFixture::waitUntilAllServersSynchronizedData()
 {
-    std::this_thread::sleep_for(std::chrono::seconds(5));
     for (;;)
     {
         if (PeerWrapper::allPeersHaveSameTransactionLog(m_servers))

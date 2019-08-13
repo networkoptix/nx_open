@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.100",
+    "version": "1.0.1.103",
     "data": [
         {
             "keys": [
@@ -3565,14 +3565,15 @@
         {
             "_comment1": "Cameras that (sometimes) mix their model and vendor",
             "keys": [
-                "GV-BX2700|Geovision"
+                "GV-BX2700|Geovision",
+                "GV-BX2700Geovision|Geovision"
             ],
             "swapVendorAndModel":  true
         },
         {
             "_comment1": "Cameras that should not use Media2 (and should not try to detect Media2 support)",
             "keys": [
-                "Geovision|GV-BX2700"
+                "Geovision|GV-BX2700*"
             ],
             "onvifIgnoreMedia2":  true
         }
