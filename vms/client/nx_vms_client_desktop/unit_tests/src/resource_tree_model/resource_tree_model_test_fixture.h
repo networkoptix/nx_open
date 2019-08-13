@@ -34,11 +34,13 @@ protected:
     QnAviResourcePtr addMediaResource(const QString& path) const;
     QnFileLayoutResourcePtr addFileLayoutResource(const QString& path,
         bool isEncrypted = false) const;
-    QnLayoutResourcePtr addLayoutResource(const QString& name) const;
+    QnLayoutResourcePtr addLayoutResource(const QString& name,
+        const QnUuid& parentId = QnUuid()) const;
+    QnWebPageResourcePtr addWebPageResource(const QString& name) const;
 
     void logout() const;
-    void loginAsAdmin(const QString& name) const;
-    void loginAsLiveViewer(const QString& name) const;
+    QnUserResourcePtr loginAsAdmin(const QString& name) const;
+    QnUserResourcePtr loginAsLiveViewer(const QString& name) const;
 
     using KeyValue = std::pair<int, QVariant>;
     using KeyValueVector = std::vector<KeyValue>;

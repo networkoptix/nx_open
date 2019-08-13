@@ -7,6 +7,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/file_layout_resource.h>
+#include <core/resource/webpage_resource.h>
 
 using namespace nx;
 using namespace nx::vms::api;
@@ -100,13 +101,25 @@ QnFileLayoutResourcePtr ResourceTreeModelTest::addFileLayoutResource(
     return fileLayoutResource;
 }
 
-QnLayoutResourcePtr ResourceTreeModelTest::addLayoutResource(const QString& name) const
+QnLayoutResourcePtr ResourceTreeModelTest::addLayoutResource(
+    const QString& name,
+    const QnUuid& parentId) const
 {
     QnLayoutResourcePtr layoutResource(new QnLayoutResource(commonModule()));
     layoutResource->setName(name);
     layoutResource->setIdUnsafe(QnUuid::createUuid());
+    layoutResource->setParentId(parentId);
     resourcePool()->addResource(layoutResource);
     return layoutResource;
+}
+
+QnWebPageResourcePtr ResourceTreeModelTest::addWebPageResource(const QString& name) const
+{
+    QnWebPageResourcePtr webPageResource(new QnWebPageResource());
+    webPageResource->setName(name);
+    webPageResource->setIdUnsafe(QnUuid::createUuid());
+    resourcePool()->addResource(webPageResource);
+    return webPageResource;
 }
 
 void ResourceTreeModelTest::logout() const
@@ -115,22 +128,27 @@ void ResourceTreeModelTest::logout() const
     resourcePool()->removeResources(resourcePool()->getResourcesWithFlag(Qn::remote));
 }
 
-void ResourceTreeModelTest::loginAsAdmin(const QString& name) const
+QnUserResourcePtr ResourceTreeModelTest::loginAsAdmin(const QString& name) const
 {
     logout();
     auto user = addUser(name, GlobalPermission::adminPermissions);
     m_accessController->setUser(user);
+    return user;
 }
 
-void ResourceTreeModelTest::loginAsLiveViewer(const QString& name) const
+QnUserResourcePtr ResourceTreeModelTest::loginAsLiveViewer(const QString& name) const
 {
     logout();
     auto user = addUser(name, GlobalPermission::liveViewerPermissions);
     m_accessController->setUser(user);
+    return user;
 }
 
 QAbstractItemModel* ResourceTreeModelTest::model() const
 {
+    // TODO: #vbreus This method should return subtree model that mocking actual subtree
+    // representation done by setting root node to the view (which is absent within
+    // test environment).
     return m_resourceTreeProxyModel.get();
 }
 
