@@ -3136,7 +3136,7 @@ rest::Handle QnMediaResourceWidget::invokeTrigger(
 
     const auto responseHandler =
         [this, resultHandler, id]
-        (bool success, rest::Handle handle, const QnJsonRestResult& result)
+            (bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             success = success && result.error == QnRestResult::NoError;
 
