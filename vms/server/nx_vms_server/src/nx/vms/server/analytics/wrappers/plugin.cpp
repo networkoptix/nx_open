@@ -57,7 +57,7 @@ wrappers::EnginePtr Plugin::createEngine(const resource::AnalyticsEngineResource
     {
         return handleViolation(
             SdkMethod::createEngine,
-            Violation::nullEngine,
+            {ViolationType::nullEngine, /*violationDetails*/ QString()},
             /*returnValue*/ nullptr);
     }
 

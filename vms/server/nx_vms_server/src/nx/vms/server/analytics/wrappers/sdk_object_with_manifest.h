@@ -71,7 +71,7 @@ protected:
     template<typename GenericError, typename ReturnType>
     ReturnType handleGenericError(
         SdkMethod sdkMethod,
-        GenericError error,
+        const GenericError& error,
         ReturnType returnValue) const
     {
         StringBuilder stringBuilder(sdkMethod, sdkObjectDescription(), error);
@@ -98,7 +98,7 @@ protected:
     template<typename ReturnType>
     ReturnType handleViolation(
         SdkMethod sdkMethod,
-        const Violation violation,
+        const Violation& violation,
         ReturnType returnValue) const
     {
         return handleGenericError(sdkMethod, violation, returnValue);

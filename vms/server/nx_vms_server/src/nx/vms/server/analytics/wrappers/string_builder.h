@@ -37,7 +37,7 @@ private:
     const SdkMethod m_sdkMethod = SdkMethod::undefined;
     const SdkObjectDescription m_sdkObjectDescription;
     const sdk_support::Error m_error;
-    const Violation m_violation = Violation::undefined;
+    const Violation m_violation;
 
 };
 

@@ -58,20 +58,28 @@ enum class SdkMethod
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SdkMethod);
 
-enum class Violation
+enum class ViolationType
 {
     undefined,
     internalViolation,
     nullManifest,
     nullManifestString,
     emptyManifestString,
-    deserializationError,
+    invalidJsonStructure,
+    invalidJson,
+    manifestLogicalError,
 
     nullEngine,
     nullDeviceAgent,
 };
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Violation);
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ViolationType);
+
+struct Violation
+{
+    ViolationType type = ViolationType::undefined;
+    QString details;
+};
 
 using ProcessorErrorHandler = std::function<void(const sdk_support::Error&)>;
 
@@ -84,5 +92,5 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (nx::vms::server::analytics::wrappers::SdkMethod), (lexical))
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (nx::vms::server::analytics::wrappers::Violation), (lexical))
+    (nx::vms::server::analytics::wrappers::ViolationType), (lexical))
 

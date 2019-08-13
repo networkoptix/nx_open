@@ -13,6 +13,8 @@
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/event/events/events_fwd.h>
 
+#include <nx/fusion/serialization/json.h>
+
 namespace nx::vms::server::analytics::wrappers {
 
 using ManifestProcessorViolationHandler = std::function<void(Violation)>;
@@ -40,7 +42,9 @@ public:
     {
         if (!NX_ASSERT(sdkObject))
         {
-            m_violationHandler(Violation::internalViolation);
+            m_violationHandler({
+                ViolationType::internalViolation,
+                "SDK object is unavailable while retrieving manifest"});
             return std::nullopt;
         }
 
@@ -49,7 +53,7 @@ public:
             manifest = loadManifestStringFromSdkObject(sdkObject);
 
         dumpManifestStringToFile(manifest);
-        return validateManifest(manifest);
+        return processManifest(manifest);
     }
 
 private:
@@ -77,7 +81,9 @@ private:
     {
         if (!NX_ASSERT(sdkObject))
         {
-            m_violationHandler(Violation::internalViolation);
+            m_violationHandler({
+                ViolationType::internalViolation,
+                "SDK object is unavailable while retrieving manifest"});
             return nullptr;
         }
 
@@ -111,29 +117,97 @@ private:
             stringToDump);
 
         if (!dumpIsSuccessful)
-            m_violationHandler(Violation::internalViolation);
+        {
+            m_violationHandler({
+                ViolationType::internalViolation,
+                "Unable to dump manifest to file"});
+        }
     }
 
-    std::optional<Manifest> validateManifest(
+    std::optional<Manifest> processManifest(
         const sdk::Ptr<const sdk::IString> manifestString) const
     {
         if (!manifestString)
-            m_violationHandler(Violation::nullManifest);
+        {
+            m_violationHandler(
+                {ViolationType::nullManifest, /*violationDetails*/ QString()});
+            return std::nullopt;
+        }
 
         const char* const manifestCString = manifestString->str();
         if (!manifestCString)
-            m_violationHandler(Violation::nullManifestString);
+        {
+            m_violationHandler(
+                {ViolationType::nullManifestString, /*violationDetails*/ QString()});
+            return std::nullopt;
+        }
 
         if (*manifestCString == '\0')
-            m_violationHandler(Violation::emptyManifestString);
+        {
+            m_violationHandler(
+                {ViolationType::emptyManifestString, /*violationDetails*/ QString()});
+            return std::nullopt;
+        }
 
-        bool success = false;
-        const auto manifest = QJson::deserialized<Manifest>(manifestCString, {}, &success);
+        const std::optional<Manifest> deserializedManifest = deserializeManifest(manifestCString);
 
-        if (!success)
-            m_violationHandler(Violation::deserializationError);
+        if (!deserializedManifest)
+            return std::nullopt;
 
-        return manifest;
+        if (!validateManifest(*deserializedManifest))
+            return std::nullopt;
+
+        return deserializedManifest;
+    }
+
+    std::optional<Manifest> deserializeManifest(const QString& manifestString) const
+    {
+        Manifest result;
+
+        QJsonValue jsonValue;
+        if (!QJsonDetail::deserialize_json(manifestString.toUtf8(), &jsonValue))
+        {
+            m_violationHandler(
+                {ViolationType::invalidJson, /*violationDetails*/ QString()});
+            return std::nullopt;
+        }
+
+        QnJsonContext ctx;
+        if (!QJson::deserialize(&ctx, jsonValue, &result))
+        {
+            m_violationHandler(
+                {ViolationType::invalidJsonStructure, /*violationDetails*/ QString()});
+            return std::nullopt;
+        }
+
+        return result;
+    }
+
+    bool validateManifest(const Manifest& manifest) const
+    {
+        const auto errorList = validate(manifest);
+
+        if (!errorList.empty())
+        {
+            m_violationHandler({
+                ViolationType::manifestLogicalError,
+                buildManifestValidationDetails(errorList)});
+        }
+
+        return errorList.empty();
+    }
+
+    QString buildManifestValidationDetails(
+        const std::vector<nx::vms::api::analytics::ManifestError>& manifestErrors) const
+    {
+        QString result;
+        for (const auto& error: manifestErrors)
+        {
+            result += lm("Error: %1, details: %2;\n").args(
+                toHumanReadableString(error.errorType), error.additionalInfo);
+        }
+
+        return result;
     }
 
 private:

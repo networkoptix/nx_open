@@ -20,18 +20,36 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::server::analytics::wrappers, 
     (nx::vms::server::analytics::wrappers::SdkMethod::isCompatible, "isCompatible")
     (nx::vms::server::analytics::wrappers::SdkMethod::obtainDeviceAgent, "obtainDeviceAgent")
     (nx::vms::server::analytics::wrappers::SdkMethod::executeAction, "executeAction")
-    (nx::vms::server::analytics::wrappers::SdkMethod::setNeededMetadataTypes,
-        "setNeededMetadataTypes")
+    (
+        nx::vms::server::analytics::wrappers::SdkMethod::setNeededMetadataTypes,
+        "setNeededMetadataTypes"
+    )
     (nx::vms::server::analytics::wrappers::SdkMethod::pushDataPacket, "pushDataPacket")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::server::analytics::wrappers, Violation,
-    (nx::vms::server::analytics::wrappers::Violation::undefined, "undefined")
-    (nx::vms::server::analytics::wrappers::Violation::internalViolation, "internalViolation")
-    (nx::vms::server::analytics::wrappers::Violation::nullManifest, "nullManifest")
-    (nx::vms::server::analytics::wrappers::Violation::nullManifestString, "nullManifestString")
-    (nx::vms::server::analytics::wrappers::Violation::emptyManifestString, "emptyManifestString")
-    (nx::vms::server::analytics::wrappers::Violation::deserializationError, "deserializationError")
-    (nx::vms::server::analytics::wrappers::Violation::nullEngine, "nullEngine")
-    (nx::vms::server::analytics::wrappers::Violation::nullDeviceAgent, "nullDeviceAgent")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::server::analytics::wrappers, ViolationType,
+    (nx::vms::server::analytics::wrappers::ViolationType::undefined, "undefined")
+    (
+        nx::vms::server::analytics::wrappers::ViolationType::internalViolation,
+        "internalViolation")
+    (nx::vms::server::analytics::wrappers::ViolationType::nullManifest, "nullManifest")
+    (
+        nx::vms::server::analytics::wrappers::ViolationType::nullManifestString,
+        "nullManifestString"
+    )
+    (
+        nx::vms::server::analytics::wrappers::ViolationType::emptyManifestString,
+        "emptyManifestString"
+    )
+    (nx::vms::server::analytics::wrappers::ViolationType::invalidJson, "invalidJson")
+    (
+        nx::vms::server::analytics::wrappers::ViolationType::invalidJsonStructure,
+        "invalidJsonStructure"
+    )
+    (
+        nx::vms::server::analytics::wrappers::ViolationType::manifestLogicalError,
+        "manifestLogicalError"
+    )
+    (nx::vms::server::analytics::wrappers::ViolationType::nullEngine, "nullEngine")
+    (nx::vms::server::analytics::wrappers::ViolationType::nullDeviceAgent, "nullDeviceAgent")
 )

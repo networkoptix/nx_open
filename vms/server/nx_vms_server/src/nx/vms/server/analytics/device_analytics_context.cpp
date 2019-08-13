@@ -10,6 +10,8 @@
 #include <nx/vms/server/analytics/frame_converter.h>
 #include <nx/vms/server/analytics/data_packet_adapter.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
+#include <nx/vms/server/sdk_support/conversion_utils.h>
+#include <nx/vms/server/sdk_support/file_utils.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
 

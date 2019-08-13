@@ -15,23 +15,30 @@ static QString toHumanReadableString(SdkMethod sdkMethod)
     return QnLexical::serialized(sdkMethod) + "()";
 }
 
-static QString toHumanReadableString(Violation violation)
+static QString toHumanReadableString(ViolationType violation)
 {
     switch (violation)
     {
-        case Violation::internalViolation:
+        case ViolationType::internalViolation:
             return "internal violation";
-        case Violation::nullManifest:
+        case ViolationType::nullManifest:
             return "Manifest is null";
-        case Violation::nullManifestString:
+        case ViolationType::nullManifestString:
             return "Manifest string is null";
-        case Violation::emptyManifestString:
+        case ViolationType::emptyManifestString:
             return "Manifest string is empty";
-        case Violation::deserializationError:
-            return "Manifest deserialization error - wrong format";
-        case Violation::nullEngine:
+        case ViolationType::invalidJson:
+            return "Manifest deserialization error - manifest is not a valid JSON";
+        case ViolationType::invalidJsonStructure:
+        {
+            return "Manifest deserialization error - unable to deserialize provided JSON to the "
+                "Manifest structure";
+        }
+        case ViolationType::manifestLogicalError:
+            return "Manifest contains logical errors";
+        case ViolationType::nullEngine:
             return "Engine is null while no error present";
-        case Violation::nullDeviceAgent:
+        case ViolationType::nullDeviceAgent:
             return "DeviceAgent is null while no error present";
         default:
             NX_ASSERT(false);
@@ -63,7 +70,7 @@ StringBuilder::StringBuilder(
 
 QString StringBuilder::buildLogString() const
 {
-    if (m_violation != Violation::undefined)
+    if (m_violation.type != ViolationType::undefined)
         return buildViolationFullString();
 
     return buildErrorFullString();
@@ -71,7 +78,7 @@ QString StringBuilder::buildLogString() const
 
 QString StringBuilder::buildPluginDiagnosticEventCaption() const
 {
-    if (m_violation != Violation::undefined)
+    if (m_violation.type != ViolationType::undefined)
         return buildViolationShortString();
 
     return buildErrorShortString();
@@ -79,7 +86,7 @@ QString StringBuilder::buildPluginDiagnosticEventCaption() const
 
 QString StringBuilder::buildPluginDiagnosticEventDescription() const
 {
-    if (m_violation != Violation::undefined)
+    if (m_violation.type != ViolationType::undefined)
         return buildViolationFullString();
 
     return buildErrorFullString();
@@ -87,11 +94,12 @@ QString StringBuilder::buildPluginDiagnosticEventDescription() const
 
 QString StringBuilder::buildViolationFullString() const
 {
-    return lm("Method %1::%2 of [%3] violated its contract: %4").args(
+    return lm("Method %1::%2 of [%3] violated its contract: %4%5").args(
         toHumanReadableString(m_sdkObjectDescription.sdkObjectType()),
         toHumanReadableString(m_sdkMethod),
         m_sdkObjectDescription.descriptionString(),
-        toHumanReadableString(m_violation));
+        toHumanReadableString(m_violation.type),
+        m_violation.details.isEmpty() ? QString() : lm(", details: %1").args(m_violation.details));
 }
 
 QString StringBuilder::buildViolationShortString() const

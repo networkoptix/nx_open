@@ -11,6 +11,8 @@
 
 #include <nx/vms/server/analytics/wrappers/plugin.h>
 #include <nx/vms/server/analytics/wrappers/engine.h>
+#include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>

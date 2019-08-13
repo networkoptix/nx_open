@@ -20,6 +20,7 @@
 #include <nx/vms/server/analytics/metadata_handler.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/analytics/device_agent_handler.h>
+#include <nx/vms/server/sdk_support/types.h>
 
 #include <nx/vms/server/analytics/wrappers/fwd.h>
 #include <nx/analytics/metadata_logger.h>
