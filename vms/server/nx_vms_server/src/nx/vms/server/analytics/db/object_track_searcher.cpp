@@ -373,15 +373,6 @@ void ObjectTrackSearcher::fetchTracksFromDb(
     if (m_filter.maxObjectTracksToSelect > 0)
         limitExpr = "LIMIT " + std::to_string(m_filter.maxObjectTracksToSelect);
 
-    std::string timeRangeExpr =
-        "t.track_end_ms >= " + std::to_string(m_filter.timePeriod.startTimeMs);
-
-    if (!m_filter.timePeriod.isInfinite())
-    {
-        timeRangeExpr +=
-            " AND t.track_start_ms <= " + std::to_string(m_filter.timePeriod.endTimeMs());
-    }
-
     auto query = queryContext->connection()->createQuery();
     query->setForwardOnly(true);
     query->prepare(lm(R"sql(
@@ -391,16 +382,12 @@ void ObjectTrackSearcher::fetchTracksFromDb(
             (SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
                 ua.content AS content, best_shot_timestamp_ms, best_shot_rect
             FROM track t, unique_attributes ua, track_group tg
-            WHERE t.attributes_id=ua.id AND t.id=tg.track_id AND %1 AND %2
+            WHERE t.attributes_id=ua.id AND t.id=tg.track_id AND %1
             ORDER BY track_start_ms DESC
-            %3)
-        ORDER BY track_start_ms %4
-    )sql").args(
-        timeRangeExpr,
-        objectGroupFilter.toString(),
-        limitExpr,
+            %2)
+        ORDER BY track_start_ms %3
+    )sql").args(objectGroupFilter.toString(), limitExpr,
         m_filter.sortOrder == Qt::AscendingOrder ? "ASC" : "DESC"));
-
     objectGroupFilter.bindFields(&query->impl());
 
     query->exec();
