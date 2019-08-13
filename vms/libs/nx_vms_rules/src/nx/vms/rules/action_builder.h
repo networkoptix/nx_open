@@ -32,11 +32,15 @@ public:
     void setAggregationInterval(std::chrono::seconds interval);
     std::chrono::seconds aggregationInterval() const;
 
+    void connectSignals();
+
 signals:
     void action(const ActionPtr& action);
+    void stateChanged();
 
 private:
     void onTimeout();
+    void updateState();
 
 private:
     QnUuid m_id;
@@ -44,6 +48,7 @@ private:
     QHash<QString, ActionField*> m_fields;
     std::chrono::seconds m_interval = std::chrono::seconds(0);
     QTimer m_timer;
+    bool m_updateInProgress = false;
 };
 
 } // namespace nx::vms::rules

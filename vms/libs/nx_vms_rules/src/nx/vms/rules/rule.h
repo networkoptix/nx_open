@@ -7,8 +7,10 @@ namespace nx::vms::rules {
 class EventFilter;
 class ActionBuilder;
 
-class NX_VMS_RULES_API Rule
+class NX_VMS_RULES_API Rule: public QObject
 {
+    Q_OBJECT
+
 public:
     Rule(const QnUuid& id);
     ~Rule();
@@ -37,6 +39,14 @@ public:
     void setSchedule(const QByteArray& schedule);
     QByteArray schedule() const;
 
+    void connectSignals();
+
+signals:
+    void stateChanged();
+
+private:
+    void updateState();
+
 private:
     QnUuid m_id;
 
@@ -47,6 +57,8 @@ private:
     QString m_comment;
     bool m_enabled;
     QByteArray m_schedule;
+
+    bool m_updateInProgress = false;
 };
 
 } // namespace nx::vms::rules
