@@ -36,6 +36,7 @@ struct BookmarkSearchWidget::Private
 
     nx::utils::ScopedConnections connections;
 
+    // Request bookmarks in the visible range to check if something is to be added in between.
     void updateVisiblePeriod(BookmarkSearchWidget* q)
     {
         if (q->isVisible()
@@ -68,8 +69,8 @@ struct BookmarkSearchWidget::Private
 
                 if (endTime <= 0ms)
                     period.durationMs = QnTimePeriod::kInfiniteDuration;
-                else
-                    period.setEndTime(endTime);
+                else // All visible bookmarks can have the same start time, so adding offset.
+                    period.setEndTime(endTime + 1ms);
             }
 
             NX_ASSERT(period.isValid());

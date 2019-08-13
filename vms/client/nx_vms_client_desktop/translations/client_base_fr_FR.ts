@@ -7414,6 +7414,9 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Applying changes...</source>
       <translation>Application des modifications...</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>

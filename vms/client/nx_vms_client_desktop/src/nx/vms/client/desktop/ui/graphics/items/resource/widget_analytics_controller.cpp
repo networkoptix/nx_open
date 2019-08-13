@@ -2,7 +2,10 @@
 
 #include <optional>
 
+#include <QtCore/QDateTime>
 #include <QtCore/QPointer>
+
+#include <analytics/db/analytics_db_types.h>
 
 #include <common/common_module.h>
 
@@ -110,6 +113,13 @@ std::optional<std::pair<ObjectMetadataPacketPtr, ObjectMetadata>> findObjectMeta
     return std::nullopt;
 }
 
+QString approximateDebugTime(microseconds value)
+{
+    const auto valueMs = duration_cast<milliseconds>(value).count();
+    return QDateTime::fromMSecsSinceEpoch(valueMs).toString("hh:mm:ss.zzz")
+        + " (" + QString::number(valueMs) +")";
+}
+
 } // namespace
 
 class WidgetAnalyticsController::Private: public QObject, public QnCommonModuleAware
@@ -127,6 +137,8 @@ public:
 
         QRectF futureRectangle;
         microseconds futureRectangleTimestamp = 0us;
+
+        ObjectMetadata rawData;
     };
 
     static AreaHighlightOverlayWidget::AreaInformation areaInfoFromObject(
@@ -137,7 +149,7 @@ public:
     QnLayoutResourcePtr layoutResource() const;
 
     ObjectInfo& addOrUpdateObject(const ObjectMetadata& object);
-    void removeArea(ObjectInfo& object);
+    void removeArea(const ObjectInfo& object);
 
     void updateObjectAreas(microseconds timestamp);
 
@@ -154,6 +166,9 @@ public:
 
     microseconds averageMetadataPeriod = 1s;
     std::unique_ptr<nx::analytics::MetadataLogger> logger;
+
+    Filter filter;
+    microseconds lastTimestamp{};
 };
 
 AreaHighlightOverlayWidget::AreaInformation WidgetAnalyticsController::Private::areaInfoFromObject(
@@ -191,10 +206,12 @@ WidgetAnalyticsController::Private::ObjectInfo&
     objectInfo.basicDescription = objectDescription(settings->briefAttributes(objectMetadata));
     objectInfo.description = objectDescription(settings->visibleAttributes(objectMetadata));
 
+    objectInfo.rawData = objectMetadata;
+
     return objectInfo;
 }
 
-void WidgetAnalyticsController::Private::removeArea(ObjectInfo& objectInfo)
+void WidgetAnalyticsController::Private::removeArea(const ObjectInfo& objectInfo)
 {
     areaHighlightWidget->removeArea(objectInfo.id);
 }
@@ -203,6 +220,12 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
 {
     for (const auto& objectInfo: objectInfoById)
     {
+        if (!filter.acceptsMetadata(objectInfo.rawData))
+        {
+            areaHighlightWidget->removeArea(objectInfo.id);
+            continue;
+        }
+
         auto areaInfo = areaInfoFromObject(objectInfo);
 
         if (ini().enableObjectMetadataInterpolation)
@@ -330,9 +353,15 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
     if (microseconds period = calculateAverageMetadataPeriod(objectMetadataPackets); period > 0us)
         d->averageMetadataPeriod = period;
 
-    NX_VERBOSE(this, "Size of metadata list for resource %1: %2",
+    NX_VERBOSE(this,
+        "\n\n"
+        "Updating analytics objects; current timestamp %1\n"
+        "Size of metadata list for resource %2: %3\n"
+        "Average request period %4",
+        approximateDebugTime(timestamp),
         d->mediaResourceWidget->resource()->toResourcePtr()->getId(),
-        objectMetadataPackets.size());
+        objectMetadataPackets.size(),
+        duration_cast<milliseconds>(d->averageMetadataPeriod));
 
     // If the plugin provides duration, approximate prolongation is not needed.
     bool currentMetadataHasDuration = false;
@@ -356,6 +385,11 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
                 objectInfo.startTimestamp = microseconds(metadata->timestampUs);
                 objectInfo.endTimestamp = d->metadataEndTimestamp(metadata);
                 objectInfo.futureRectangleTimestamp = objectInfo.startTimestamp;
+                NX_VERBOSE(this, "\nAdded object\n%1\nat %2\nDuration: %3 - %4",
+                    objectInfo.basicDescription,
+                    objectInfo.rectangle,
+                    approximateDebugTime(objectInfo.startTimestamp),
+                    approximateDebugTime(objectInfo.endTimestamp));
             }
 
             objectMetadataPackets.removeFirst();
@@ -373,7 +407,11 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
 
             // Prolong area existance if needed.
             if (!currentMetadataHasDuration)
+            {
                 it->endTimestamp = std::max(it->endTimestamp, d->metadataEndTimestamp(packet));
+                NX_VERBOSE(this, "Prolonged object %1 to %2 based on the future object",
+                    it->basicDescription, approximateDebugTime(it->endTimestamp));
+            }
 
             // Update geometry approximation information.
             it->futureRectangle = objectMetadata.boundingBox;
@@ -383,6 +421,8 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         // Cleanup areas which should not be visible right now.
         if (timestamp < it->startTimestamp || timestamp > it->endTimestamp)
         {
+            NX_VERBOSE(this, "Cleanup object %1 as it does not fit into timestamp window",
+                it->basicDescription);
             d->removeArea(*it);
             it = d->objectInfoById.erase(it);
         }
@@ -392,6 +432,9 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         }
     }
 
+    NX_VERBOSE(this, "%1 objects are currently visible", d->objectInfoById.size());
+
+    d->lastTimestamp = timestamp;
     d->updateObjectAreas(timestamp);
 }
 
@@ -410,6 +453,22 @@ void WidgetAnalyticsController::setAnalyticsMetadataProvider(
 void WidgetAnalyticsController::setAreaHighlightOverlayWidget(AreaHighlightOverlayWidget* widget)
 {
     d->areaHighlightWidget = widget;
+}
+
+const WidgetAnalyticsController::Filter& WidgetAnalyticsController::filter() const
+{
+    return d->filter;
+}
+
+void WidgetAnalyticsController::setFilter(const Filter& value)
+{
+    if (d->filter == value)
+        return;
+
+    d->filter = value;
+
+    if (d->lastTimestamp != 0us)
+        d->updateObjectAreas(d->lastTimestamp);
 }
 
 } // namespace nx::vms::client::desktop

@@ -193,7 +193,9 @@ QList<QnAbstractCompressedMetadataPtr> CachingMetadataConsumer::metadataRange(
 
 void CachingMetadataConsumer::processMetadata(const QnAbstractCompressedMetadataPtr& metadata)
 {
-    NX_VERBOSE(this, "Metadata packet received, type %1", (int)metadata->metadataType);
+    NX_VERBOSE(this, "Metadata packet received, type %1, timestamp %2",
+        (int)metadata->metadataType,
+        metadata->timestamp);
 
     const auto channel = static_cast<int>(metadata->channelNumber);
     if (d->cachePerChannel.size() <= channel)

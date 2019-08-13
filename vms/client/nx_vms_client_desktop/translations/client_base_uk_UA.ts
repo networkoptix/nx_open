@@ -2114,7 +2114,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No event rules</source>
-      <translation>Немає Правил Подій</translation>
+      <translation>Немає правил події</translation>
     </message>
     <message>
       <source>Filter by devices...</source>
@@ -2231,11 +2231,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Device Diagnostics</source>
-      <translation>Діагностика Пристроїв</translation>
+      <translation>Діагностика Пристрою</translation>
     </message>
     <message>
       <source>Camera Diagnostics</source>
-      <translation>Діагностика Камер</translation>
+      <translation>Діагностика Камери</translation>
     </message>
     <message>
       <source>Confirming device is accessible.</source>
@@ -2247,11 +2247,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Confirming target device provides media stream.</source>
-      <translation>Вибраний пристрій надає медіа-потік.</translation>
+      <translation>Вибраний пристрій надає медіа потік.</translation>
     </message>
     <message>
       <source>Confirming target camera provides media stream.</source>
-      <translation>Вибрана камера надає медіа-потік.</translation>
+      <translation>Вибрана камера надає медіа потік.</translation>
     </message>
     <message>
       <source>Diagnostics for I/O module %1</source>
@@ -2319,7 +2319,7 @@ to view more bookmarks</source>
       <source>%n devices found</source>
       <translation>
         <numerusform>Знайдено %n пристрій</numerusform>
-        <numerusform>Знайдено %n пристрої</numerusform>
+        <numerusform>Знайдено %n пристроїв</numerusform>
         <numerusform>Знайдено %n пристроїв</numerusform>
         <numerusform>Знайдено %n пристроїв</numerusform>
       </translation>
@@ -2357,12 +2357,12 @@ to view more bookmarks</source>
     <message>
       <source>Devices List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation>Список пристроїв %1</translation>
+      <translation>Список Пристроїв %1</translation>
     </message>
     <message>
       <source>Cameras List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation>Список камер %1</translation>
+      <translation>Список Камер %1</translation>
     </message>
   </context>
   <context>
@@ -2389,11 +2389,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>IP/Name</source>
-      <translation>IP/Ім’я хоста</translation>
+      <translation>IP/ Ім’я хоста</translation>
     </message>
     <message>
       <source>MAC address</source>
-      <translation>MAC-адреса</translation>
+      <translation>MAC- адреса</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2412,7 +2412,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>Запис або детектор руху вимкнено для %1</translation>
+      <translation>Запис або детекцiя руху вимкненi для %1</translation>
     </message>
   </context>
   <context>
@@ -2438,11 +2438,11 @@ to view more bookmarks</source>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>New Password</source>
-      <translation>Новий пароль</translation>
+      <translation>Новий Пароль</translation>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation>Повторіть пароль</translation>
+      <translation>Повторіть Пароль</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -2450,7 +2450,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation>Пароль має містити принаймні 8 різних типів символів.</translation>
+      <translation>Пароль повинен бути не менше 8 символів і містити різні типи символів.</translation>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
@@ -2472,7 +2472,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>Підтвердження паролю</translation>
+      <translation>Підтвердження Паролю</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -2480,11 +2480,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Current Password</source>
-      <translation>Поточний пароль</translation>
+      <translation>Поточний Пароль</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one.</source>
-      <translation>Щоб змінити свій пароль, введіть існуючий.</translation>
+      <translation>Щоб змінити свій пароль, введіть поточний пароль.</translation>
     </message>
     <message>
       <source>Invalid current password.</source>
@@ -2495,11 +2495,11 @@ to view more bookmarks</source>
     <name>QnClockLabel</name>
     <message>
       <source>Server Time</source>
-      <translation>Час серверу</translation>
+      <translation>Час Сервера</translation>
     </message>
     <message>
       <source>Local System Time</source>
-      <translation>Місцевий час системи</translation>
+      <translation>Місцевий Час Системи</translation>
     </message>
   </context>
   <context>
@@ -2508,48 +2508,48 @@ to view more bookmarks</source>
       <source>Connect to your Systems
 from anywhere with any
 devices</source>
-      <translation>Підключайтеся до систем
-з будь-якого місця
-з будь-яких пристроїв</translation>
+      <translation>Підключіться до ваших Систем
+з будь-якого місця на будь-якому
+пристрої</translation>
     </message>
     <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Відключити систему від %1</translation>
+      <translation>Відключити Систему від %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Відкрити портал %1</translation>
+      <translation>Відкрити %1 Портал</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Створити обліковий запис %1</translation>
+      <translation>Створити %1 Обліковий Запис</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Підключити систему до %1...</translation>
+      <translation>Підключити Систему до %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Створити 
-обліковий запис %1</translation>
+      <translation>Створити %1
+обліковий запис</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Підключити
-систему до %1</translation>
+      <translation>Підключити Систему
+до %1</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Детальніше про %1</translation>
+      <translation>Дізнайтеся більше про %1</translation>
     </message>
   </context>
   <context>
@@ -2560,12 +2560,12 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation>Обліковий запис ще не активовано.</translation>
+      <translation>Обліковий запис не активовано.</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation>Будь ласка, увійдіть до %1 і дотримуйтесь інструкцій.</translation>
+      <translation>Будь ласка, увійдіть в обліковий запис %1 і дотримуйтесь наданих інструкцій.</translation>
     </message>
     <message>
       <source>Invalid password</source>
@@ -2642,7 +2642,7 @@ to %1</source>
     <message>
       <source>Failed to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Не вдалося підключити систему до %1</translation>
+      <translation>Не вдалося підключити Систему до %1</translation>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
@@ -2653,15 +2653,15 @@ to %1</source>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>You are trying to connect to incompatible Server.</source>
-      <translation>Ви намагаєтеся підключитися до несумісного серверу.</translation>
+      <translation>Ви намагаєтеся підключитись до несумісного Сервера.</translation>
     </message>
     <message>
       <source>Connection details that you have entered are incorrect, please try again.</source>
-      <translation>Введені дані для підключення некоректні, спробуйте знову.</translation>
+      <translation>Введені дані для підключення некоректні, будь ласка, спробуйте знову.</translation>
     </message>
     <message>
       <source>If this error persists, please contact your VMS administrator.</source>
-      <translation>Якщо помилка залишається, зверніться до адміністратора системи.</translation>
+      <translation>Якщо ця помилка не зникає, будь ласка, зв’яжіться зі своїм адміністратором VMS.</translation>
     </message>
     <message>
       <source>Compatibility mode for versions lower than %1 is not supported.</source>
@@ -2669,7 +2669,7 @@ to %1</source>
     </message>
     <message>
       <source>Please close the application and start it again using the shortcut in the start menu.</source>
-      <translation>Будь ласка закрийте додаток і запустіть його, використовуючи ярлик в меню Пуск.</translation>
+      <translation>Будь ласка, закрийте додаток і запустіть його знову, використовуючи ярлик в меню Пуск.</translation>
     </message>
     <message>
       <source>Server has a different version:</source>
@@ -7615,6 +7615,9 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>Застосування змін...</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>

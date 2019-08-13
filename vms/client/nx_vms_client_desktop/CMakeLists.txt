@@ -41,6 +41,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
     ADDITIONAL_MOCABLES
         src/nx/vms/client/desktop/system_administration/widgets/analytics_settings_widget.cpp
         src/nx/vms/client/desktop/ui/common/global_tool_tip.cpp
+        src/ui/widgets/common/date_range_widget.cpp
     OTHER_SOURCES
         ${QML_FILES}
     PUBLIC_LIBS
