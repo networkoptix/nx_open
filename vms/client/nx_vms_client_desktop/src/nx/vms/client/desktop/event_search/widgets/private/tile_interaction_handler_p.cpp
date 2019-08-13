@@ -99,7 +99,7 @@ TileInteractionHandler::TileInteractionHandler(EventRibbon* parent):
                 {
                     if (isSyncOn())
                     {
-                        navigateToSource(index, false /*instantMessages*/);
+                        navigateToSource(index, /*instantMessages*/ false);
                     }
                     else
                     {
@@ -107,7 +107,7 @@ TileInteractionHandler::TileInteractionHandler(EventRibbon* parent):
                         m_navigateDelayed->setCallback(
                             [this, index = QPersistentModelIndex(index)]()
                             {
-                                navigateToSource(index, true /*instantMessages*/);
+                                navigateToSource(index, /*instantMessages*/ true);
                             });
 
                         m_navigateDelayed->requestOperation();
@@ -117,14 +117,14 @@ TileInteractionHandler::TileInteractionHandler(EventRibbon* parent):
             else if ((button == Qt::LeftButton && modifiers.testFlag(Qt::ControlModifier))
                 || button == Qt::MiddleButton)
             {
-                openSource(index, true /*inNewTab*/, false /*fromDoubleClick*/);
+                openSource(index, /*inNewTab*/ true, /*fromDoubleClick*/ false);
             }
         });
 
     connect(m_ribbon.data(), &EventRibbon::doubleClicked, this,
         [this](const QModelIndex& index)
         {
-            openSource(index, false /*inNewTab*/, true /*fromDoubleClick*/);
+            openSource(index, /*inNewTab*/ false, /*fromDoubleClick*/ true);
         });
 
     connect(m_ribbon.data(), &EventRibbon::dragStarted,
