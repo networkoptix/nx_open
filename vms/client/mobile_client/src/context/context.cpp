@@ -115,6 +115,15 @@ QnContext::QnContext(QObject* parent) :
         };
 
     connect(qApp->screens().first(), &QScreen::geometryChanged, this, updateMarginsCallback);
+
+    using UserWatcher = nx::vms::client::core::UserWatcher;
+    const auto userWatcher = commonModule()->instance<UserWatcher>();
+    connect(userWatcher, &UserWatcher::userNameChanged, this,
+        [this, userWatcher]()
+        {
+            if (userWatcher->userName().isEmpty())
+                m_uiController->disconnectFromSystem();
+        });
 }
 
 QnContext::~QnContext() {}
