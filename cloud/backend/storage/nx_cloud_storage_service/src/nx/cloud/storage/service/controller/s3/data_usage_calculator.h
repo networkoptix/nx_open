@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <nx/cloud/storage/service/api/result.h>
+#include <nx/cloud/aws/api_types.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/url.h>
 #include <nx/utils/move_only_func.h>
@@ -40,13 +41,25 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    void initializeS3Clients(const std::vector<Bucket>& buckets);
+    struct Context
+    {
+        Bucket bucket;
+        std::unique_ptr<aws::s3::ApiClient> client;
+        int runningSize = 0;
+    };
+
+    void initializeS3Clients(std::vector<Bucket> buckets);
+
+    void getBucketSize(
+        Context* context,
+        const std::string continuationToken);
+
+    void calculateFailed(const aws::Result& result);
 
 private:
     network::http::Credentials m_credentials;
     nx::utils::MoveOnlyFunc<void(api::Result, int /*bytesUsed*/)> m_handler;
-    std::vector<std::unique_ptr<aws::s3::ApiClient>> m_s3Clients;
-    std::atomic_int m_size = 0;
+    std::vector<Context> m_contexts;
     std::atomic_int m_responses = 0;
 };
 

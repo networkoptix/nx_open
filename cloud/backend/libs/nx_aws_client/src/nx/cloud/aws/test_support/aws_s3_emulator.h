@@ -7,7 +7,7 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <nx/cloud/aws/s3/list_bucket_result.h>
+#include <nx/cloud/aws/s3/list_bucket_request.h>
 
 namespace nx::cloud::aws::s3::test {
 

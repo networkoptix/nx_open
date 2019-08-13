@@ -13,6 +13,8 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/url.h>
 
+#include "list_bucket_request.h"
+
 namespace nx::cloud::aws::s3 {
 
 class NX_AWS_CLIENT_API ApiClient:
@@ -55,9 +57,12 @@ public:
     void getLocation(nx::utils::MoveOnlyFunc<void(Result, std::string/*location*/)> handler);
 
     /**
-     * Get the number of bytes being stored at https://BucketName.s3.amazonaws.com/{pathPrefix}.
+     * Implementation of the GET Bucket(List Objects) v2 api call:
+     * https://docs.aws.amazon.com/AmazonS3/latest/API/v2-RESTBucketGET.html
      */
-    void getBucketSize(nx::utils::MoveOnlyFunc<void(Result, int/*bytes*/)> handler);
+    void listBucket(
+        const ListBucketRequest& request,
+        nx::utils::MoveOnlyFunc<void(Result, ListBucketResult)> handler);
 
 private:
     std::tuple<nx::String, bool> calculateAuthorizationHeader(
@@ -66,12 +71,7 @@ private:
         const std::string& region,
         const std::string& service) override;
 
-    void getBucketSizeInternal(
-        int runningTotalSize,
-        const std::string& continuationToken,
-        nx::utils::MoveOnlyFunc<void(Result, int/*bytes*/)> handler);
-
-    QString formatQuery(QString key, QString value);
+    QString buildQuery(const ListBucketRequest& request);
 };
 
 } // namespace nx::cloud::aws::s3

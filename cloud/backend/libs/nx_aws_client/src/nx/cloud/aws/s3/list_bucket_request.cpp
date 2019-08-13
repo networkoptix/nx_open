@@ -1,4 +1,4 @@
-#include "list_bucket_result.h"
+#include "list_bucket_request.h"
 
 namespace nx::cloud::aws {
 

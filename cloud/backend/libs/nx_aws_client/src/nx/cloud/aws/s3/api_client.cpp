@@ -4,11 +4,12 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 
+
+#include "nx/cloud/aws/format_query.h"
 #include "nx/cloud/aws/http_request_paths.h"
 #include "aws_signature_v4.h"
 #include "http_request_paths.h"
 #include "location_constraint.h"
-#include "list_bucket_result.h"
 
 namespace nx::cloud::aws::s3 {
 
@@ -98,13 +99,17 @@ void ApiClient::getLocation(
         });
 }
 
-void ApiClient::getBucketSize(
-    nx::utils::MoveOnlyFunc<void(Result, int)> handler)
+void ApiClient::listBucket(
+    const ListBucketRequest& request,
+    nx::utils::MoveOnlyFunc<void(Result, ListBucketResult)> handler)
 {
-    getBucketSizeInternal(0, {}, std::move(handler));
+    doAwsApiCall<ListBucketResult>(
+        nx::network::http::Method::get,
+        nx::network::url::Builder(m_url).setPath(aws::http::kRootPath).setQuery(buildQuery(request)),
+        std::move(handler));
 }
 
-std::tuple<nx::String, bool> nx::cloud::aws::s3::ApiClient::calculateAuthorizationHeader(
+std::tuple<nx::String, bool> ApiClient::calculateAuthorizationHeader(
     const network::http::Request& request,
     const network::http::Credentials& credentials,
     const std::string& region,
@@ -118,49 +123,27 @@ std::tuple<nx::String, bool> nx::cloud::aws::s3::ApiClient::calculateAuthorizati
         service);
 }
 
-void ApiClient::getBucketSizeInternal(
-    int runningTotalSize,
-    const std::string& continuationToken,
-    nx::utils::MoveOnlyFunc<void(Result, int)> handler)
+QString ApiClient::buildQuery(const ListBucketRequest& request)
 {
-    QString query(http::kListTypeQuery);
-    auto path = m_url.path();
-    if (!path.isEmpty())
-    {
-        query.append("&").append(
-            formatQuery(http::kPrefix, path[0] == '/' && path.size() > 1 ? path.mid(1) : path));
-    }
-    if (!continuationToken.empty())
-        query.append("&").append(formatQuery(http::kContinuationToken, continuationToken.c_str()));
+    QString query;
+    query.reserve(1024);
 
-    doAwsApiCall<ListBucketResult>(
-        nx::network::http::Method::get,
-        nx::network::url::Builder(m_url).setPath(aws::http::kRootPath).setQuery(query),
-        [this, handler = std::move(handler), runningTotalSize](auto result, auto listBucketResult) mutable
-    {
-        if (!result.ok())
-            return handler(std::move(result), 0);
+    query += http::kListTypeQuery;
+    if (!request.delimiter.empty())
+        query += formatQuery("&delimiter", request.delimiter);
+    if (!request.encodingType.empty())
+        query += formatQuery("&encoding-type", request.encodingType);
+    if (request.maxKeys > 0)
+        query += formatQuery("&max-keys", request.maxKeys);
+    if (!request.prefix.empty())
+        query += formatQuery("&prefix", request.prefix);
+    if (!request.continuationToken.empty())
+        query += formatQuery("&continuation-token", request.continuationToken);
+    query += formatQuery("&fetch-owner", request.fetchOwner);
+    if (!request.startAfter.empty())
+    query += formatQuery("&start-after", request.startAfter);
 
-        int size = runningTotalSize;
-        for (const auto& content : listBucketResult.contents)
-            size += content.size;
-
-        if (!listBucketResult.isTruncated)
-            return handler(ResultCode::ok, size);
-
-        // if isTruncated is true, then nextContinuationToken should not be empty
-        if (listBucketResult.nextContinuationToken.empty())
-            return handler(Result(ResultCode::error, "Missing continuation token"), 0);
-
-        getBucketSizeInternal(size, listBucketResult.nextContinuationToken, std::move(handler));
-    });
-}
-
-QString ApiClient::formatQuery(QString key, QString value)
-{
-    QString s;
-    s.reserve(key.size() + value.size() + 1);
-    return s.append(key).append("=").append(value);
+    return query;
 }
 
 } // namespace nx::cloud::aws::s3

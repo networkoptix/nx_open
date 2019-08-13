@@ -11,6 +11,19 @@ namespace nx::cloud::aws {
 
 namespace s3 {
 
+struct NX_AWS_CLIENT_API ListBucketRequest
+{
+    std::string delimiter;
+    std::string encodingType;
+    int maxKeys = 0; //< If left 0, aws uses 1000
+    std::string prefix;
+    std::string continuationToken;
+    bool fetchOwner;
+    std::string startAfter;
+};
+
+//-------------------------------------------------------------------------------------------------
+
 struct NX_AWS_CLIENT_API Contents
 {
     std::string key;
