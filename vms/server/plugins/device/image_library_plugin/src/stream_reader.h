@@ -1,10 +1,6 @@
-/**********************************************************
-* 04 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef ILP_STREAM_READER_H
-#define ILP_STREAM_READER_H
+#pragma once
 
 #include <stdint.h>
 
@@ -15,7 +11,6 @@
 
 #include <plugins/plugin_tools.h>
 #include "mutex.h"
-
 
 class DirContentsManager;
 
@@ -79,5 +74,3 @@ private:
     void readDirContents();
     void moveCursorToNextFrame();
 };
-
-#endif  //ILP_STREAM_READER_H

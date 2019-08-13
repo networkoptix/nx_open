@@ -54,7 +54,7 @@ esac
 )
 cd "$BUILD_DIR" #< Set the required current directory after exiting the subshell above.
 
-ARTIFACT=$(find "$BUILD_DIR" -name "*$PLUGIN_NAME.dll" -o -name "*$PLUGIN_NAME.so")
+ARTIFACT=$(find "$BUILD_DIR" -name "$PLUGIN_NAME.dll" -o -name "lib$PLUGIN_NAME.so")
 if [ ! -f "$ARTIFACT" ]
 then
     echo "ERROR: Failed to build plugin."

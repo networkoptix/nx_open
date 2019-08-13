@@ -1,9 +1,9 @@
 # Executes at the build phase. Creates and populates the SDK directory to be zipped.
 
 # Receive variable values from the calling CMakeList.txt.
+set(sdk_name @sdk_name@)
 set(CMAKE_CURRENT_BINARY_DIR @CMAKE_CURRENT_BINARY_DIR@)
 set(CMAKE_SOURCE_DIR @CMAKE_SOURCE_DIR@)
-set(PYTHON_EXECUTABLE @PYTHON_EXECUTABLE@)
 set(copied_static_origin @copied_static_origin@)
 set(copied_static_files @copied_static_files@)
 set(copied_nx_kit_origin @copied_nx_kit_origin@)
@@ -14,10 +14,10 @@ set(copied_nx_sdk_unit_tests_origin @copied_nx_sdk_unit_tests_origin@)
 set(copied_nx_sdk_unit_tests_files @copied_nx_sdk_unit_tests_files@)
 set(copied_sample_origin @copied_sample_origin@)
 set(copied_sample_files @copied_sample_files@)
+set(copied_sample_target @copied_sample_target@)
 set(copied_sample_unit_tests_origin @copied_sample_unit_tests_origin@)
 set(copied_sample_unit_tests_files @copied_sample_unit_tests_files@)
-
-set(sdk_name @sdk_name@)
+set(copied_sample_unit_tests_target @copied_sample_unit_tests_target@)
 
 include(${CMAKE_SOURCE_DIR}/cmake/utils.cmake)
 
@@ -32,8 +32,9 @@ nx_copy_always(${copied_nx_sdk_src_nx_origin} "${copied_nx_sdk_src_nx_files}"
 nx_copy_always(${copied_nx_sdk_unit_tests_origin} "${copied_nx_sdk_unit_tests_files}"
     ${target_dir}/unit_tests)
 nx_copy_always(${copied_sample_origin} "${copied_sample_files}"
-    ${target_dir}/samples/stub_analytics_plugin/src)
+    ${target_dir}/samples/${copied_sample_target})
 nx_copy_always(${copied_sample_unit_tests_origin} "${copied_sample_unit_tests_files}"
-    ${target_dir}/samples/stub_analytics_plugin/unit_tests/src)
+    ${target_dir}/samples/${copied_sample_unit_tests_target})
+    
 nx_copy_always(${CMAKE_SOURCE_DIR}/open "${CMAKE_SOURCE_DIR}/open/license_mpl2.md"
     ${target_dir})

@@ -1,7 +1,4 @@
-/**********************************************************
-* 12 apr 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "axis_relayio_manager.h"
 
@@ -16,7 +13,6 @@
 #include "axis_cam_params.h"
 #include "axis_camera_plugin.h"
 #include "sync_http_client.h"
-
 
 AxisRelayIOManager::AxisRelayIOManager(
     AxisCameraManager* cameraManager,
