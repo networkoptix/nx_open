@@ -100,6 +100,15 @@ QnFileLayoutResourcePtr ResourceTreeModelTest::addFileLayoutResource(
     return fileLayoutResource;
 }
 
+QnLayoutResourcePtr ResourceTreeModelTest::addLayoutResource(const QString& name) const
+{
+    QnLayoutResourcePtr layoutResource(new QnLayoutResource(commonModule()));
+    layoutResource->setName(name);
+    layoutResource->setIdUnsafe(QnUuid::createUuid());
+    resourcePool()->addResource(layoutResource);
+    return layoutResource;
+}
+
 void ResourceTreeModelTest::logout() const
 {
     m_accessController->setUser(QnUserResourcePtr());
@@ -110,6 +119,13 @@ void ResourceTreeModelTest::loginAsAdmin(const QString& name) const
 {
     logout();
     auto user = addUser(name, GlobalPermission::adminPermissions);
+    m_accessController->setUser(user);
+}
+
+void ResourceTreeModelTest::loginAsLiveViewer(const QString& name) const
+{
+    logout();
+    auto user = addUser(name, GlobalPermission::liveViewerPermissions);
     m_accessController->setUser(user);
 }
 

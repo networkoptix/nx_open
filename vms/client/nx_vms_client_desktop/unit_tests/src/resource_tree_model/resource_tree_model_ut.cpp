@@ -152,12 +152,12 @@ TEST_F(ResourceTreeModelTest, localFilesNodeVisibility)
     // the resource tree depends not only model state, but also on the root node set to the view.
     // Need to figure out how to achieve one to one correspondence of testing environment model and
     // actually displayed hierarchy.
-    ASSERT_TRUE(getIndexByData(lookupData).size() == 1);
+    ASSERT_EQ(getIndexByData(lookupData).size(), 1);
     loginAsAdmin(userName);
-    ASSERT_TRUE(getIndexByData(lookupData).size() == 1);
+    ASSERT_EQ(getIndexByData(lookupData).size(), 1);
     logout();
     // Same as above.
-    ASSERT_TRUE(getIndexByData(lookupData).size() == 1);
+    ASSERT_EQ(getIndexByData(lookupData).size(), 1);
 }
 
 TEST_F(ResourceTreeModelTest, localFilesAreSortedAlphanumerically)
@@ -270,8 +270,8 @@ TEST_F(ResourceTreeModelTest, offlineMediaResourcesAreNotDisplayed)
 
     // Define node lookup data.
     const KeyValueVector localFilesNodeLookupData =
-    {{Qt::DisplayRole, "Local Files"},
-    {Qn::ResourceIconKeyRole, QnResourceIconCache::LocalResources}};
+        {{Qt::DisplayRole, "Local Files"},
+        {Qn::ResourceIconKeyRole, QnResourceIconCache::LocalResources}};
 
     // Setup resources.
     loginAsAdmin(userName);
@@ -304,13 +304,13 @@ TEST_F(ResourceTreeModelTest, localResourceVisibilityTransitions)
     // Perform actions.
     const auto mediaResource = addMediaResource(resourceFilePath);
     mediaResource->setStatus(Qn::Online);
-    ASSERT_TRUE(getIndexByData(lookupData).size() == 1);
+    ASSERT_EQ(getIndexByData(lookupData).size(), 1);
 
     mediaResource->setStatus(Qn::Offline);
-    ASSERT_TRUE(getIndexByData(lookupData).size() == 0);
+    ASSERT_EQ(getIndexByData(lookupData).size(), 0);
 
     mediaResource->setStatus(Qn::Online);
-    ASSERT_TRUE(getIndexByData(lookupData).size() == 1);
+    ASSERT_EQ(getIndexByData(lookupData).size(), 1);
 }
 
 TEST_F(ResourceTreeModelTest, localResourcesIconsAndGrouping)
@@ -324,8 +324,8 @@ TEST_F(ResourceTreeModelTest, localResourcesIconsAndGrouping)
 
     // Define node lookup data.
     const KeyValueVector localFilesNodeLookupData =
-    {{Qt::DisplayRole, "Local Files"},
-    {Qn::ResourceIconKeyRole, QnResourceIconCache::LocalResources}};
+        {{Qt::DisplayRole, "Local Files"},
+        {Qn::ResourceIconKeyRole, QnResourceIconCache::LocalResources}};
 
     // Setup resources.
     loginAsAdmin(userName);
@@ -380,8 +380,8 @@ TEST_F(ResourceTreeModelTest, mediaResourceOnlyFilenameDisplayed)
 
     // Define node lookup data.
     const KeyValueVector localFilesNodeLookupData =
-    {{Qt::DisplayRole, "Local Files"},
-    {Qn::ResourceIconKeyRole, QnResourceIconCache::LocalResources}};
+        {{Qt::DisplayRole, "Local Files"},
+        {Qn::ResourceIconKeyRole, QnResourceIconCache::LocalResources}};
 
     // Setup resources.
     loginAsAdmin(userName);
@@ -404,4 +404,48 @@ TEST_F(ResourceTreeModelTest, mediaResourceOnlyFilenameDisplayed)
     // Check result.
     ASSERT_TRUE(testSnapshot(params) == referenceSnapshot)
         << snapshotsOutputString(testSnapshot(params), referenceSnapshot);
+}
+
+TEST_F(ResourceTreeModelTest, webPagesNodeAreAlwaysDisplayedIfLoggedIn)
+{
+    // Define string constants.
+    static constexpr auto adminUserName = "test_admin";
+    static constexpr auto liveViewerUserName = "test_live_viewer";
+
+    // Define reference data.
+    const KeyValueVector webPagesNodeLookupData =
+        {{Qt::DisplayRole, "Web Pages"},
+        {Qn::ResourceIconKeyRole, QnResourceIconCache::WebPages}};
+
+    // Perform actions.
+    loginAsAdmin(adminUserName);
+    ASSERT_EQ(getIndexByData(webPagesNodeLookupData).size(), 1);
+
+    loginAsLiveViewer(liveViewerUserName);
+    ASSERT_EQ(getIndexByData(webPagesNodeLookupData).size(), 1);
+
+    logout();
+    ASSERT_EQ(getIndexByData(webPagesNodeLookupData).size(), 0);
+}
+
+TEST_F(ResourceTreeModelTest, layoutsNodeAreDisplayedOnlyIfLayotsExist)
+{
+    // Define string constants.
+    static constexpr auto userName = "test_user";
+    static constexpr auto layoutName = "layout";
+
+    // Define reference data.
+    const KeyValueVector layoutsNodeLookupData =
+        {{Qt::DisplayRole, "Layouts"},
+        {Qn::ResourceIconKeyRole, QnResourceIconCache::Layouts}};
+
+    // Perform actions.
+    loginAsAdmin(userName);
+    ASSERT_EQ(getIndexByData(layoutsNodeLookupData).size(), 0);
+
+    addLayoutResource(layoutName);
+    ASSERT_EQ(getIndexByData(layoutsNodeLookupData).size(), 1);
+
+    logout();
+    ASSERT_EQ(getIndexByData(layoutsNodeLookupData).size(), 0);
 }
