@@ -3,7 +3,6 @@
 #include <nx/vms/api/base_manifest_validation_test.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
-
 namespace nx::vms::api::analytics {
 
 static const int kNumberOfEntriesToTransform = 3;

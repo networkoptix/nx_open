@@ -261,7 +261,6 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventLevel)
 Q_DECLARE_FLAGS(EventLevels, EventLevel)
 Q_DECLARE_OPERATORS_FOR_FLAGS(EventLevels)
 
-
 enum class PredefinedPluginEventType
 {
     undefined,

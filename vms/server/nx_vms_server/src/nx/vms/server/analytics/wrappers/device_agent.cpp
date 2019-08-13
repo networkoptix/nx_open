@@ -20,7 +20,6 @@
 #include <nx/vms/server/analytics/wrappers/manifest_processor.h>
 #include <nx/vms/server/analytics/wrappers/settings_processor.h>
 
-
 namespace nx::vms::server::analytics::wrappers {
 
 using namespace nx::sdk;

@@ -21,7 +21,8 @@
 
 namespace nx::vms::server::sdk_support {
 
-// String utils -----------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+// String utils
 
 template<typename T>
 T fromSdkString(const sdk::Ptr<const sdk::IString> sdkString)
@@ -40,8 +41,8 @@ sdk::Ptr<const sdk::IString> toSdkString(const QString& str);
 
 sdk::Ptr<const sdk::IString> toSdkString(const std::string& str);
 
-
-// String list utils ------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+// String list utils
 
 template<typename Container>
 Container fromSdkStringList(const sdk::Ptr<const sdk::IStringList> sdkStringList)
@@ -72,7 +73,8 @@ const sdk::Ptr<const sdk::IStringList> toSdkStringList(const Container& stringLi
     return result;
 }
 
-// String map utils -------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+// String map utils
 
 template<typename Map>
 sdk::Ptr<const sdk::IStringMap> toSdkStringMap(const Map& stringMap)
@@ -100,7 +102,8 @@ Map fromSdkStringMap(sdk::Ptr<const sdk::IStringMap> sdkStringMap)
     return result;
 }
 
-// Metadata types utils ---------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+// Metadata types utils
 
 sdk::Ptr<const sdk::analytics::IMetadataTypes> toSdkMetadataTypes(
     const MetadataTypes& metadataTypes);
@@ -108,7 +111,8 @@ sdk::Ptr<const sdk::analytics::IMetadataTypes> toSdkMetadataTypes(
 MetadataTypes fromSdkMetadataTypes(
     const sdk::Ptr<const sdk::analytics::IMetadataTypes>& sdkMetadataTypes);
 
-// Pixel format utils -----------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+// Pixel format utils
 
 nx::vms::api::analytics::PixelFormat fromSdkPixelFormat(
     nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat sdkPixelFormat);
