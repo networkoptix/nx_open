@@ -2,7 +2,7 @@
 
 #include <nx/network/http/http_types.h>
 
-#include <nx/cloud/aws/aws_signature_v4.h>
+#include <nx/cloud/aws/s3/aws_signature_v4.h>
 
 namespace nx::cloud::aws::test {
 
@@ -113,7 +113,7 @@ private:
 
 TEST_F(AwsSignatureV4, GET_request_signature)
 {
-    const auto [signature, result] = SignatureCalculator().calculateSignature(
+    const auto [signature, result] = s3::SignatureCalculator().calculateSignature(
         prepareGetRequest(), credentials(), "us-east-1", "s3");
 
     ASSERT_TRUE(result);
@@ -124,7 +124,7 @@ TEST_F(AwsSignatureV4, GET_request_signature)
 
 TEST_F(AwsSignatureV4, GET_request_authorization_header)
 {
-    const auto [header, result] = SignatureCalculator().calculateAuthorizationHeader(
+    const auto [header, result] = s3::SignatureCalculator().calculateAuthorizationHeader(
         prepareGetRequest(), credentials(), "us-east-1", "s3");
 
     ASSERT_TRUE(result);
@@ -137,7 +137,7 @@ TEST_F(AwsSignatureV4, GET_request_authorization_header)
 
 TEST_F(AwsSignatureV4, GET_request_with_query_1_authorization_header)
 {
-    const auto [header, result] = SignatureCalculator().calculateAuthorizationHeader(
+    const auto [header, result] = s3::SignatureCalculator().calculateAuthorizationHeader(
         prepareGetRequestWithQuery1(), credentials(), "us-east-1", "s3");
 
     ASSERT_TRUE(result);
@@ -150,7 +150,7 @@ TEST_F(AwsSignatureV4, GET_request_with_query_1_authorization_header)
 
 TEST_F(AwsSignatureV4, GET_request_with_query_2_authorization_header)
 {
-    const auto [header, result] = SignatureCalculator().calculateAuthorizationHeader(
+    const auto [header, result] = s3::SignatureCalculator().calculateAuthorizationHeader(
         prepareGetRequestWithQuery2(), credentials(), "us-east-1", "s3");
 
     ASSERT_TRUE(result);
@@ -163,7 +163,7 @@ TEST_F(AwsSignatureV4, GET_request_with_query_2_authorization_header)
 
 TEST_F(AwsSignatureV4, PUT_request_authorization_header)
 {
-    const auto [header, result] = SignatureCalculator().calculateAuthorizationHeader(
+    const auto [header, result] = s3::SignatureCalculator().calculateAuthorizationHeader(
         preparePutRequest(), credentials(), "us-east-1", "s3");
 
     ASSERT_TRUE(result);
