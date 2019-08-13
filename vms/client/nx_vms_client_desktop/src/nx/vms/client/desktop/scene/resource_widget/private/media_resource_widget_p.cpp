@@ -210,7 +210,7 @@ void MediaResourceWidgetPrivate::setMotionEnabled(bool enabled)
 
 bool MediaResourceWidgetPrivate::isAnalyticsEnabled() const
 {
-    if (!isAnalyticsSupported)
+    if (!isAnalyticsSupported || m_forceDisabledAnalytics)
         return false;
 
     if (const auto reader = display()->archiveReader())
@@ -237,6 +237,18 @@ void MediaResourceWidgetPrivate::setAnalyticsEnabled(bool enabled)
         // mode causes a lot of glitches when enabled, so we'd prefer to leave on a safe side.
         display()->camDisplay()->setForcedVideoBufferLength(milliseconds::zero());
     }
+}
+
+void MediaResourceWidgetPrivate::setAnalyticsFilter(const nx::analytics::db::Filter& value)
+{
+    m_forceDisabledAnalytics = !resource || (!value.deviceIds.empty()
+        && std::find(value.deviceIds.cbegin(), value.deviceIds.cend(), resource->getId())
+            == value.deviceIds.cend());
+
+    if (m_forceDisabledAnalytics)
+        analyticsController->clearAreas();
+
+    analyticsController->setFilter(value);
 }
 
 void MediaResourceWidgetPrivate::updateIsPlayingLive()
@@ -374,13 +386,16 @@ void MediaResourceWidgetPrivate::setStreamDataFilters(StreamDataFilters filters)
     if (!reader->setStreamDataFilter(filters))
         return;
 
-    const auto positionUsec = display()->camDisplay()->getExternalTime();
-    const auto isPaused = reader->isMediaPaused();
-
-    if (isPaused)
-        reader->jumpTo(/*mksek*/ positionUsec, /*skipTime*/ positionUsec);
-    else
-        reader->jumpTo(/*mksek*/ positionUsec, /*skipTime*/ 0);
+    // TODO: #gdm This block is temporarily disabled because it breaks everything when SYNC=OFF.
+    // Needs investigation and fixing.
+    //
+    // const auto positionUsec = display()->camDisplay()->getExternalTime();
+    // const auto isPaused = reader->isMediaPaused();
+    //
+    // if (isPaused)
+    //     reader->jumpTo(/*mksek*/ positionUsec, /*skipTime*/ positionUsec);
+    // else
+    //     reader->jumpTo(/*mksek*/ positionUsec, /*skipTime*/ 0);
 }
 
 } // namespace nx::vms::client::desktop

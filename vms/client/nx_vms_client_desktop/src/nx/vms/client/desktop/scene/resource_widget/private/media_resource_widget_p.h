@@ -17,6 +17,7 @@ class QnSingleCamLicenseStatusHelper;
 class QnWorkbenchAccessController;
 
 namespace nx::analytics { class MetadataLogParser; }
+namespace nx::analytics::db { struct Filter; }
 
 namespace nx::vms::client::desktop {
 
@@ -76,6 +77,8 @@ public:
     bool isAnalyticsEnabled() const;
     void setAnalyticsEnabled(bool enabled);
 
+    void setAnalyticsFilter(const nx::analytics::db::Filter& value);
+
 signals:
     void stateChanged();
     void licenseStatusChanged();
@@ -109,6 +112,7 @@ private:
     bool m_isOffline = false;
     bool m_isUnauthorized = false;
     bool m_analyticsObjectsFound = false;
+    bool m_forceDisabledAnalytics = false;
 };
 
 } // namespace nx::vms::client::desktop

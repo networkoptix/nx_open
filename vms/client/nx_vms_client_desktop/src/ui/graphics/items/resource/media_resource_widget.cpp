@@ -2778,6 +2778,11 @@ nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr
     return d->analyticsMetadataProvider;
 }
 
+void QnMediaResourceWidget::setAnalyticsFilter(const nx::analytics::db::Filter& value)
+{
+    d->setAnalyticsFilter(value);
+}
+
 void QnMediaResourceWidget::updateWatermark()
 {
     // Ini guard; remove on release. Default watermark is invisible.
