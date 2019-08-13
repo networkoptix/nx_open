@@ -35,7 +35,7 @@ public:
         MediaQuality streamQuality);
     virtual ~ArchivePlaylistManager();
 
-    virtual size_t generateChunkList(
+    virtual CameraDiagnostics::Result generateChunkList(
         std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
         bool* const endOfStreamReached) const override;
 
@@ -65,9 +65,9 @@ private:
     /** Archive chunk, that holds last found position. */
     QnAbstractArchiveDelegate::ArchiveChunkInfo m_currentArchiveChunk;
 
-    QnAbstractArchiveDelegatePtr createDelegate();
-    void generateChunksIfNeeded();
-    bool addOneMoreChunk();
+    CameraDiagnostics::Result createDelegate(QnAbstractArchiveDelegatePtr& result);
+    CameraDiagnostics::Result generateChunksIfNeeded();
+    CameraDiagnostics::Result addOneMoreChunk();
 };
 
 /** Using std::shared_ptr for std::shared_ptr::unique(). */

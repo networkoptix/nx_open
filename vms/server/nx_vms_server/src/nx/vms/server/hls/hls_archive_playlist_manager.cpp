@@ -54,7 +54,7 @@ ArchivePlaylistManager::~ArchivePlaylistManager()
 {
 }
 
-QnAbstractArchiveDelegatePtr ArchivePlaylistManager::createDelegate()
+CameraDiagnostics::Result ArchivePlaylistManager::createDelegate(QnAbstractArchiveDelegatePtr& result)
 {
     QnAbstractArchiveDelegatePtr archiveDelegate(m_camResource->createArchiveDelegate());
     if (archiveDelegate)
@@ -64,18 +64,17 @@ QnAbstractArchiveDelegatePtr ArchivePlaylistManager::createDelegate()
     {
         archiveDelegate = QnAbstractArchiveDelegatePtr(new QnServerArchiveDelegate(serverModule())); // default value
         if (!archiveDelegate->open(m_camResource, serverModule()->archiveIntegrityWatcher()))
-            return nullptr;
+            return archiveDelegate->lastError();
     }
     if (!archiveDelegate->setQuality(
         m_streamQuality == MEDIA_Quality_High ? MEDIA_Quality_ForceHigh : m_streamQuality,
         true,
         QSize()))
     {
-        return nullptr;
+        return archiveDelegate->lastError();
     }
     archiveDelegate->setPlaybackMode(PlaybackMode::ThumbNails);
 
-    QnAbstractArchiveDelegatePtr result;
     if (archiveDelegate->getFlags().testFlag(QnAbstractArchiveDelegate::Flag_CanProcessMediaStep))
         result = archiveDelegate;
     else
@@ -92,7 +91,7 @@ QnAbstractArchiveDelegatePtr ArchivePlaylistManager::createDelegate()
         if (!nextData)
         {
             m_prevChunkEndTimestamp = -1;
-            return nullptr;
+            return archiveDelegate->lastError();
         }
 
         m_prevChunkEndTimestamp = nextData->timestamp;
@@ -100,28 +99,21 @@ QnAbstractArchiveDelegatePtr ArchivePlaylistManager::createDelegate()
 
         m_initialPlaylistCreated = false;
     }
-    if (archiveDelegate->lastError().errorCode != CameraDiagnostics::ErrorCode::noError)
-    {
-        NX_ERROR(this, "Failed to initialize archive delegate, error code: %1",
-            archiveDelegate->lastError().errorCode);
-        return nullptr;
-    }
-
-    return result;
+    return archiveDelegate->lastError();
 }
 
-size_t ArchivePlaylistManager::generateChunkList(
+CameraDiagnostics::Result ArchivePlaylistManager::generateChunkList(
     std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
     bool* const endOfStreamReached) const
 {
     QnMutexLocker lk(&m_mutex);
 
-    const_cast<ArchivePlaylistManager*>(this)->generateChunksIfNeeded();
+    auto status = const_cast<ArchivePlaylistManager*>(this)->generateChunksIfNeeded();
 
     std::copy(m_chunks.cbegin(), m_chunks.cend(), std::back_inserter(*chunkList));
     if (endOfStreamReached)
         *endOfStreamReached = m_eof;
-    return m_chunks.size();
+    return status;
 }
 
 int ArchivePlaylistManager::getMaxBitrate() const
@@ -130,41 +122,45 @@ int ArchivePlaylistManager::getMaxBitrate() const
     return -1;
 }
 
-void ArchivePlaylistManager::generateChunksIfNeeded()
+CameraDiagnostics::Result ArchivePlaylistManager::generateChunksIfNeeded()
 {
     if (!m_initialPlaylistCreated)
     {
         //creating initial playlist
-        for (size_t i = 0; i < m_maxChunkNumberInPlaylist; ++i)
+        for (size_t i = 0; i < m_maxChunkNumberInPlaylist && !m_eof; ++i)
         {
-            if (!addOneMoreChunk())
-                break;
+            auto status = addOneMoreChunk();
+            if (!status)
+                return status;
         }
         m_initialPlaylistCreated = true;
         m_playlistUpdateTimer.start();
         m_timerCorrection = 0;
     }
-    else
+    else if (!m_eof)
     {
         if ((m_playlistUpdateTimer.elapsed() * kUsecPerMs - m_timerCorrection) > m_prevGeneratedChunkDuration)
         {
-            if (addOneMoreChunk())
-                m_timerCorrection += m_prevGeneratedChunkDuration;
+            auto status = addOneMoreChunk();
+            if (!status)
+                return status;
+            m_timerCorrection += m_prevGeneratedChunkDuration;
         }
     }
+    return CameraDiagnostics::Result(CameraDiagnostics::ErrorCode::noError);
 }
 
-bool ArchivePlaylistManager::addOneMoreChunk()
+CameraDiagnostics::Result ArchivePlaylistManager::addOneMoreChunk()
 {
-    if (m_eof)
-        return false;
     if (!m_delegate)
     {
-        m_delegate = createDelegate();
-        if (!m_delegate)
+        auto status = createDelegate(m_delegate);
+        if (!status || !m_delegate)
         {
-            NX_ERROR(this, "Failed to create archive delegate");
-            return false;
+            NX_ERROR(this, "Failed to create archive delegate, error code: %1", status.errorCode);
+            m_delegate.reset();
+            m_prevChunkEndTimestamp = 0;
+            return status;
         }
     }
 
@@ -177,14 +173,14 @@ bool ArchivePlaylistManager::addOneMoreChunk()
             //end of archive reached
             //TODO/HLS: #ak end of archive is moving forward constantly, so need just imply some delay
             m_eof = true;
-            return false;
+            return m_delegate->lastError();
         }
         if (nextData->timestamp != m_prevChunkEndTimestamp)
             break;
     }
     NX_ASSERT(nextData->timestamp != m_prevChunkEndTimestamp);
     if (nextData->timestamp == m_prevChunkEndTimestamp)
-        return false;
+        return m_delegate->lastError();
 
     const qint64 currentChunkEndTimestamp = nextData->timestamp;
 
@@ -234,7 +230,7 @@ bool ArchivePlaylistManager::addOneMoreChunk()
         m_delegate.reset();
     }
 
-    return true;
+    return CameraDiagnostics::Result(CameraDiagnostics::ErrorCode::noError);
 }
 
 } // namespace nx::vms::server::hls
