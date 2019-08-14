@@ -91,7 +91,7 @@ private:
     bool m_missingUncompressedFrameWarningIssued = false;
     Qn::ResourceStatus m_previousDeviceStatus = Qn::ResourceStatus::NotDefined;
     nx::utils::FrequencyRestrictedCall<void, int, QnUuid> m_throwPluginEvent;
-    int m_framesSkipped = 0;
+    std::map<QnUuid, int> m_skippedFrameCountByEngine;
 };
 
 } // namespace nx::vms::server::analytics

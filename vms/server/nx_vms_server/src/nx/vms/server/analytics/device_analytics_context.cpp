@@ -309,10 +309,10 @@ static QString getEngineLogLabel(QnMediaServerModule* serverModule, QnUuid engin
 
     const auto parentPlugin = engineResource->plugin();
     if (!NX_ASSERT(parentPlugin))
-        return lm("Analytics Engine %1 of unknown Plugin").arg(engineResource->getName());
+        return lm("Analytics Engine %1 of unknown Plugin").arg(engineResource->getId());
 
     return lm("Analytics Engine %1 of Plugin %2").args(
-        engineResource->getName(), parentPlugin->manifest().id);
+        engineResource->getId(), parentPlugin->getName());
 }
 
 static std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat>
@@ -352,6 +352,11 @@ void DeviceAnalyticsContext::putFrame(
     for (auto& entry: m_bindings)
     {
         const QnUuid engineId = entry.first;
+        if (m_skippedFrameCountByEngine[engineId] > 0)
+        {
+            if (m_throwPluginEvent(m_skippedFrameCountByEngine[engineId], engineId))
+                m_skippedFrameCountByEngine[engineId] = 0;
+        }
 
         auto& binding = entry.second;
         if (!binding->isStreamConsumer())
@@ -372,10 +377,8 @@ void DeviceAnalyticsContext::putFrame(
             }
             else
             {
-                // TODO: Skip frames until next key frame (if case of using compressed frames).
-                ++m_framesSkipped;
-                if (m_throwPluginEvent(m_framesSkipped, engineId))
-                    m_framesSkipped = 0;
+                // TODO: Skip frames until a next key frame (if case of using compressed frames).
+                ++m_skippedFrameCountByEngine[engineId];
             }
         }
         else
@@ -387,10 +390,15 @@ void DeviceAnalyticsContext::putFrame(
 
 void DeviceAnalyticsContext::reportSkippedFrames(int framesSkipped, QnUuid engineId) const
 {
-    QString caption = lm("Analytics: skipped %1 video frames").args(framesSkipped);
+    QString caption = lm("Analytics: skipped %1 video frame%2").args(
+        framesSkipped,
+        framesSkipped > 1 ? "s" : "");
+
     QString description =
-        lm("Skipped %1 video frames for %2 from camera %3 (%4): queue overflow.").args(
+        lm("Skipped %1 video frame%2 for %3 from camera %4 %5: queue overflow. "
+            "Probably the Plugin is working too slow").args(
             framesSkipped,
+            framesSkipped > 1 ? "s" : "",
             getEngineLogLabel(serverModule(), engineId),
             m_device->getUserDefinedName(),
             m_device->getId());
