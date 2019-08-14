@@ -332,7 +332,7 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
 sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
 {
     const auto deviceAgentManifest = m_deviceAgent->manifest();
-    if (!NX_ASSERT(deviceAgentManifest, "Got invlaid device agent manifest"))
+    if (!deviceAgentManifest)
         return {};
 
     const auto ruleWatcher = serverModule()->analyticsEventRuleWatcher();
