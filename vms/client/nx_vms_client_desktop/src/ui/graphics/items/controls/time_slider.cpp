@@ -1003,6 +1003,7 @@ void QnTimeSlider::setOption(Option option, bool value)
 
 void QnTimeSlider::setTimeRange(milliseconds min, milliseconds max)
 {
+    NX_VERBOSE(this, "Set time range: %1 - %2", min, max);
     setRange(min.count(), max.count());
 }
 
@@ -1182,6 +1183,7 @@ milliseconds QnTimeSlider::value() const
 
 void QnTimeSlider::setValue(milliseconds value, bool keepInWindow)
 {
+    NX_VERBOSE(this, "Set value to %1 (keep in window: %2)", value, keepInWindow);
     {
         /* To not change tooltip visibility in setValue or setWindow: */
         QScopedValueRollback<bool> updateRollback(m_updatingValue, true);
@@ -1912,7 +1914,14 @@ bool QnTimeSlider::isLive() const
 
 void QnTimeSlider::updateLive()
 {
-    m_isLive = m_liveSupported && !m_selecting && value() == maximum();
+    const bool isLive = m_liveSupported && !m_selecting && value() == maximum();
+    if (m_isLive == isLive)
+        return;
+
+    NX_VERBOSE(this, "Live changed to %1", isLive);
+    if (!isLive)
+        NX_VERBOSE(this, "Value %1 while maximum is %2", value(), maximum());
+    m_isLive = isLive;
 }
 
 milliseconds QnTimeSlider::msecsPerPixel() const
