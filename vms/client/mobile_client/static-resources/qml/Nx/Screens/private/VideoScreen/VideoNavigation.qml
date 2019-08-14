@@ -23,7 +23,7 @@ Item
     property real controlsOpacity: 1.0
     property alias animatePlaybackControls: playbackControlsOpacityBehaviour.enabled
     property bool canViewArchive: true
-    property int buttonsPanelHeight: buttonsPanel.visible ? buttonsPanel.height : 0
+    property int buttonsPanelHeight: buttonsPanel.visible ? buttonsPanel.overallHeight : 0
 
     property alias motionSearchMode: motionSearchModeButton.checked
     property alias motionFilter: cameraChunkProvider.motionFilter
@@ -37,7 +37,7 @@ Item
     signal switchToPreviousCamera()
 
     implicitWidth: parent ? parent.width : 0
-    implicitHeight: navigator.height + buttonsPanel.height
+    implicitHeight: navigator.height + buttonsPanel.overallHeight
     anchors.bottom: parent ? parent.bottom : undefined
 
     onDrawingRoiChanged: updateWarningTextTimer.restart()
@@ -201,7 +201,7 @@ Item
             anchors.fill: navigator
             drag.axis: Drag.YAxis
             drag.minimumY: 0
-            drag.maximumY: buttonsPanel.height
+            drag.maximumY: buttonsPanel.overallHeight
             drag.filterChildren: true
             drag.threshold: 10
 
@@ -297,6 +297,7 @@ Item
 
                 property bool resumeWhenDragFinished: false
 
+                bottomOverlap: 16
                 motionSearchMode: videoNavigation.motionSearchMode
                 serverTimeZoneShift: controller.resourceHelper.serverTimeOffset;
                 enabled: d.hasArchive
@@ -446,9 +447,13 @@ Item
                 readonly property real minimalWidth: width - (zoomButtonsRow.x + zoomButtonsRow.width)
                 readonly property bool showZoomControls: actionButtonsPanel.contentWidth < minimalWidth
 
+                readonly property real overallHeight: buttonsPanel.height + timeline.bottomOverlap
+                readonly property real childrenCenterOffset: -timeline.bottomOverlap / 2
                 width: parent.width
-                height: visible ? 56 : 0
+                height: visible ? 56 - timeline.bottomOverlap: 0
                 anchors.top: timeline.bottom
+                anchors.topMargin: timeline.bottomOverlap
+
                 background: Item {}
                 padding: 4
                 z: 1
@@ -465,6 +470,7 @@ Item
                     padding: 0
                     visible: videoNavigation.canViewArchive
                     anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: buttonsPanel.childrenCenterOffset
                     icon.source: lp("/images/calendar.png")
                     enabled: d.hasArchive
                     onClicked:
@@ -483,6 +489,7 @@ Item
                     checkable: true
                     anchors.left:  calendarButton.right
                     anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: buttonsPanel.childrenCenterOffset
                     icon.source: lp("/images/motion.svg")
                     icon.width: 24
                     icon.height: 24
@@ -503,7 +510,9 @@ Item
                 {
                     id: zoomButtonsRow
 
-                    anchors.centerIn: parent
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: buttonsPanel.childrenCenterOffset
                     visible: (buttonsPanel.showZoomControls || !d.liveMode)
                         && videoNavigation.canViewArchive
 
@@ -534,6 +543,7 @@ Item
 
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: buttonsPanel.childrenCenterOffset
                     text: qsTr("LIVE")
                     labelPadding: 0
                     rightPadding: 0
@@ -590,6 +600,7 @@ Item
                     anchors.rightMargin: -4
 
                     anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: buttonsPanel.childrenCenterOffset
 
                     Binding
                     {
@@ -777,7 +788,7 @@ Item
         width: parent.width
         anchors.top: parent.bottom
         color: "black"
-        height: buttonsPanel.height
+        height: buttonsPanel.overallHeight
     }
 
     CalendarPanel
