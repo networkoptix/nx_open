@@ -28,17 +28,20 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/dialogs/common/message_box.h>
 
-#include <nx/analytics/descriptor_manager.h>
-#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/common/dialogs/web_view_dialog.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/analytics_search_list_model.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
+
+#include <nx/analytics/descriptor_manager.h>
+
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/string.h>
+#include <nx/utils/std/algorithm.h>
 
 namespace nx::vms::client::desktop {
 
@@ -58,6 +61,7 @@ public:
     void setFilterRect(const QRectF& value);
 
     bool areaSelectionEnabled() const;
+    QString selectedObjectType() const;
 
     void resetFilters();
 
@@ -67,6 +71,8 @@ public:
         const analytics::db::ObjectTrack& object,
         const QnVirtualCameraResourcePtr& camera) const;
 
+    AnalyticsEntitiesTreeBuilder::NodePtr objectsTree;
+
 private:
     void setupTypeSelection();
     void updateTypeMenu();
@@ -75,12 +81,12 @@ private:
     void setAreaSelectionEnabled(bool value);
     void updateAreaButtonAppearance();
 
-    void updateAvailableObjectTypes();
-
     QAction* addMenuAction(QMenu* menu, const QString& title, const QString& objectType);
 
     bool requestPluginActionSettings(const QJsonObject& settingsModel,
         QMap<QString, QString>& settingsValues) const;
+
+    void setSelectedObjectType(const QString& value);
 
 private:
     AnalyticsSearchListModel* const m_model;
@@ -89,7 +95,6 @@ private:
     QMenu* const m_objectTypeMenu;
     QPointer<QAction> m_defaultAction;
     bool m_areaSelectionEnabled = false;
-    nx::utils::PendingOperation m_updateObjectTypesOperation;
 
     using ObjectTypeDescriptors = std::map<QString, nx::vms::api::analytics::ObjectTypeDescriptor>;
     struct EngineInfo
@@ -150,6 +155,11 @@ bool AnalyticsSearchWidget::areaSelectionEnabled() const
     return d->areaSelectionEnabled();
 }
 
+QString AnalyticsSearchWidget::selectedObjectType() const
+{
+    return d->selectedObjectType();
+}
+
 QString AnalyticsSearchWidget::placeholderText(bool constrained) const
 {
     return constrained ? tr("No objects") : tr("No objects detected");
@@ -168,7 +178,7 @@ bool AnalyticsSearchWidget::calculateAllowance() const
     if (!hasPermissions)
         return false;
 
-    return !commonModule()->analyticsObjectTypeDescriptorManager()->descriptors().empty();
+    return !d->objectsTree->children.empty();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -183,14 +193,30 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
 {
     NX_CRITICAL(m_model);
 
-    m_updateObjectTypesOperation.setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
-    m_updateObjectTypesOperation.setInterval(1ms);
-    m_updateObjectTypesOperation.setCallback(
-        [this]()
+    auto updateObjectTypesMenuOperation = new nx::utils::PendingOperation(
+        [this]
         {
+            auto analyticsObjectsSearchTreeBuilder =
+                this->q->commonModule()->instance<AnalyticsObjectsSearchTreeBuilder>();
+            objectsTree = analyticsObjectsSearchTreeBuilder->objectTypesTree();
+
             this->q->updateAllowance();
-            updateTypeMenu();
-        });
+            if (this->q->isAllowed())
+                updateTypeMenu();
+        },
+        100ms,
+        this);
+    updateObjectTypesMenuOperation->fire();
+    updateObjectTypesMenuOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
+
+    connect(q->commonModule()->instance<AnalyticsObjectsSearchTreeBuilder>(),
+        &AnalyticsObjectsSearchTreeBuilder::objectTypesTreeChanged,
+        updateObjectTypesMenuOperation,
+        &nx::utils::PendingOperation::requestOperation);
+
+    connect(m_model, &AbstractSearchListModel::isOnlineChanged,
+        updateObjectTypesMenuOperation,
+        &nx::utils::PendingOperation::requestOperation);
 
     setupTypeSelection();
     setupAreaSelection();
@@ -198,38 +224,8 @@ AnalyticsSearchWidget::Private::Private(AnalyticsSearchWidget* q):
     connect(q, &AbstractSearchWidget::textFilterChanged,
         m_model, &AnalyticsSearchListModel::setFilterText);
 
-    // Update analytics events submenu when servers are added to or removed from the system.
-    const auto handleServerAddedOrRemoved =
-        [this](const QnResourcePtr& resource)
-        {
-            if (!m_model->isOnline())
-                return;
-
-            const auto flags = resource->flags();
-            if (flags.testFlag(Qn::server) && !flags.testFlag(Qn::fake))
-                updateAvailableObjectTypes();
-        };
-
-    auto serverChangesListener = new QnResourceChangesListener(q);
-    serverChangesListener->connectToResources<QnMediaServerResource>(
-        &QnMediaServerResource::propertyChanged,
-        this, &Private::updateAvailableObjectTypes);
-
-    connect(q->resourcePool(), &QnResourcePool::resourceAdded, this, handleServerAddedOrRemoved);
-    connect(q->resourcePool(), &QnResourcePool::resourceRemoved, this, handleServerAddedOrRemoved);
-
-    connect(m_model, &AbstractSearchListModel::isOnlineChanged, this,
-        [this](bool isOnline)
-        {
-            if (isOnline)
-                updateAvailableObjectTypes();
-        });
-
     connect(m_model, &AnalyticsSearchListModel::pluginActionRequested,
         this, &Private::executePluginAction);
-
-    if (m_model->isOnline())
-        updateAvailableObjectTypes();
 }
 
 QRectF AnalyticsSearchWidget::Private::filterRect() const
@@ -253,14 +249,23 @@ bool AnalyticsSearchWidget::Private::areaSelectionEnabled() const
     return m_areaSelectionEnabled;
 }
 
+QString AnalyticsSearchWidget::Private::selectedObjectType() const
+{
+    return m_model->selectedObjectType();
+}
+
+void AnalyticsSearchWidget::Private::setSelectedObjectType(const QString& value)
+{
+    if (m_model->selectedObjectType() == value)
+        return;
+
+    m_model->setSelectedObjectType(value);
+    emit q->selectedObjectTypeChanged();
+}
+
 void AnalyticsSearchWidget::Private::resetFilters()
 {
     m_typeSelectionButton->deactivate();
-}
-
-void AnalyticsSearchWidget::Private::updateAvailableObjectTypes()
-{
-    m_updateObjectTypesOperation.requestOperation();
 }
 
 void AnalyticsSearchWidget::Private::setupTypeSelection()
@@ -280,90 +285,52 @@ void AnalyticsSearchWidget::Private::setupTypeSelection()
 
 void AnalyticsSearchWidget::Private::updateTypeMenu()
 {
+    NX_ASSERT(!objectsTree->children.empty());
+
     m_typeSelectionButton->setDeactivatedText(tr("Any type"));
     m_typeSelectionButton->setIcon(qnSkin->icon("text_buttons/analytics.png"));
-
-    using namespace nx::vms::event;
 
     const QString currentSelection = m_model->selectedObjectType();
     bool currentSelectionStillAvailable = false;
 
-    const auto objectTypeDescriptors = q->commonModule()->analyticsObjectTypeDescriptorManager()
-        ->descriptors();
-    const auto engineDescriptors = q->commonModule()->analyticsEngineDescriptorManager()
-        ->descriptors();
+    auto addItemRecursive = nx::utils::y_combinator(
+        [this, currentSelection, &currentSelectionStillAvailable]
+        (auto addItemRecursive, auto parent, auto root) -> void
+            {
+                using NodeType = AnalyticsEntitiesTreeBuilder::NodeType;
+
+                for (auto node: root->children)
+                {
+                    // Leaf node - object type.
+                    if (node->nodeType == NodeType::objectType)
+                    {
+                        addMenuAction(parent, node->text, node->entityId);
+
+                        if (!currentSelectionStillAvailable
+                            && currentSelection == node->entityId)
+                        {
+                            currentSelectionStillAvailable = true;
+                        }
+                    }
+                    else
+                    {
+                        NX_ASSERT(!node->children.empty());
+                        auto menu = parent->addMenu(node->text);
+                        q->fixMenuFlags(menu);
+
+                        addItemRecursive(menu, node);
+                    }
+                }
+            });
 
     WidgetUtils::clearMenu(m_objectTypeMenu);
 
     m_defaultAction = addMenuAction(m_objectTypeMenu, tr("Any type"), {});
-
-    const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
-    QSet<QnUuid> enabledEngines;
-    for (const auto& camera: cameras)
-        enabledEngines.unite(camera->enabledAnalyticsEngines());
-
-    if (!objectTypeDescriptors.empty())
-    {
-        m_objectTypeMenu->addSeparator();
-
-        QHash<QnUuid, EngineInfo> engineById;
-        for (const auto& [engineId, engineDescriptor]: engineDescriptors)
-        {
-            if (enabledEngines.contains(engineId))
-                engineById[engineId].name = engineDescriptor.name;
-        }
-
-        for (const auto&[objectTypeId, objectTypeDescriptor]: objectTypeDescriptors)
-        {
-            for (const auto& scope: objectTypeDescriptor.scopes)
-            {
-                if (enabledEngines.contains(scope.engineId))
-                {
-                    engineById[scope.engineId].objectTypes
-                        .emplace(objectTypeId, objectTypeDescriptor);
-                }
-            }
-        }
-
-        QList<EngineInfo> engines;
-        for (const auto& engineInfo: engineById)
-            engines.push_back(engineInfo);
-
-        std::sort(engines.begin(), engines.end());
-        const bool multipleEnginesArePresent = engines.size() > 1;
-
-        QMenu* currentMenu = m_objectTypeMenu;
-        for (const auto& engine: engines)
-        {
-            if (multipleEnginesArePresent)
-            {
-                currentMenu->setWindowFlags(
-                    currentMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
-
-                const auto engineName = engine.name.isEmpty()
-                    ? QString("<%1>").arg(tr("unnamed analytics engine"))
-                    : engine.name;
-
-                currentMenu = m_objectTypeMenu->addMenu(engineName);
-            }
-
-            for (const auto& [objectTypeId, objectTypeDescriptor]: engine.objectTypes)
-            {
-                addMenuAction(currentMenu,
-                    objectTypeDescriptor.name,
-                    objectTypeDescriptor.id);
-
-                if (!currentSelectionStillAvailable
-                    && currentSelection == objectTypeDescriptor.getId())
-                {
-                    currentSelectionStillAvailable = true;
-                }
-            }
-        }
-    }
+    m_objectTypeMenu->addSeparator();
+    addItemRecursive(m_objectTypeMenu, objectsTree);
 
     if (!currentSelectionStillAvailable)
-        m_model->setSelectedObjectType({});
+        m_typeSelectionButton->deactivate();
 }
 
 void AnalyticsSearchWidget::Private::setupAreaSelection()
@@ -431,7 +398,7 @@ QAction* AnalyticsSearchWidget::Private::addMenuAction(
                 ? SelectableTextButton::State::deactivated
                 : SelectableTextButton::State::unselected);
 
-            m_model->setSelectedObjectType(objectType);
+            setSelectedObjectType(objectType);
         });
 
     return action;

@@ -29,9 +29,9 @@
 </div>
 
 <div class="panel-body text-center panel-body-big" ng-if="stepIs('start')">
-    <div ng-class="{'vertical-bottom':!settings.liteClient, 'master-description': settings.liteClient}">
+    <div>
         <h2>{{Config.productName}} indítása</h2>
-        <p>Kérjük először állítsa be a szervert.<br>
+        <p class="master-description">Kérjük először állítsa be a szervert.<br>
             Válasszon egy opciót.</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
         <button class="btn btn-primary" autofocus ng-click="next()">Új rendszer beállítása</button>

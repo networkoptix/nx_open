@@ -2650,8 +2650,10 @@ void QnWorkbenchNavigator::updatePlaybackMask()
     const auto content = selectedExtraContent();
     QnTimePeriodList playbackMask;
 
-    if (content != Qn::RecordingContent
-        && (ini().enableAnalyticsPlaybackMask || content != Qn::AnalyticsContent))
+    const bool playbackMaskDisabled = content == Qn::RecordingContent
+        || (content == Qn::AnalyticsContent && !ini().enableAnalyticsPlaybackMask);
+
+    if (!playbackMaskDisabled)
     {
         if (ini().enableSyncedChunksForExtraContent)
         {

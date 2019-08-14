@@ -5931,10 +5931,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Kişisel bilgiler içermez ve tamamen anonimdir.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Failover sunucusu bu ayardan bağımsız olarak kamera durum güncellemelerini isteyebilir.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Cihazların ve sunucuların otomatik aranmasını ve cihaz durum kontrollerini etkinleştir</translation>
     </message>
@@ -5945,6 +5941,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Etkinleştirildiğinde sistem sürekli yeni kamera ve sunucuları arar ayrıca durum güncellemesi için kameralarla iletişim kurar.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Failover sunucusu bu ayardan bağımsız olarak kamera durum güncellemelerini isteyebilir.</translation>
     </message>
   </context>
   <context>
@@ -5964,44 +5964,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Spread Sheet (CSV) Dosyası</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Sunucu</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Uzaklık</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Gün</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Zaman dilimi</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Zaman</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Hiçbir sunucunun İnternet erişimi yok. Zaman senkronize edilmiyor.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>VMS zamanı internet üzerinden senkronize edilmektedir ve yerel zaman sunucusuna bağlı değildir.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>VMS zamanı seçilen suncular için yerel zaman sunucusundan senkronize edilmektedir ve diğer sunucular yerel zaman sunucusuna bağlı değildir.</translation>
     </message>
   </context>
   <context>
@@ -7393,10 +7355,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Seçilen alanda</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>isim verilmemiş analitik motoru</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>Eklenti eylemi yürütülemedi</translation>
     </message>
@@ -7450,17 +7408,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Applying changes...</source>
       <translation>Değişiklikleri Uygula...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>I/O modülünün gelişmiş ayarları mevcut değil</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Kameranın gelişmiş ayarları mevcut değil</translation>
     </message>
   </context>
   <context>
@@ -8608,11 +8555,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>Bazı sunucular güncelleme işlemini tamamlamadı. Yine de sonlandırılsın mı?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 güncellenmiş versiyonda yeniden başlatılacak.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>

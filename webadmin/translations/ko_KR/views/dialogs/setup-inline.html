@@ -29,9 +29,9 @@
 </div>
 
 <div class="panel-body text-center panel-body-big" ng-if="stepIs('start')">
-    <div ng-class="{'vertical-bottom':!settings.liteClient, 'master-description': settings.liteClient}">
+    <div>
         <h2>{{Config.productName}} 시작</h2>
-        <p>먼저 서버를 구성 하십시오. <br>옵션을 선택입니다.</p>
+        <p class="master-description">먼저 서버를 구성 하십시오. <br>옵션을 선택입니다.</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
         <button class="btn btn-primary" autofocus ng-click="next()">신규 시스템 설정</button>
 

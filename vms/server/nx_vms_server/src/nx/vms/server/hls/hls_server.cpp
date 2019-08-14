@@ -17,6 +17,7 @@
 
 #include <nx/network/http/http_content_type.h>
 #include <nx/network/hls/hls_types.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/utils/byte_stream/pipeline.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/byte_stream/pipeline.h>
@@ -62,6 +63,19 @@ static constexpr int kDefaultPrimaryStreamBitrate = 4 * 1024 * 1024;
 
 size_t HttpLiveStreamingProcessor::m_minPlaylistSizeToStartStreaming =
     nx::vms::server::Settings::kDefaultHlsPlaylistPreFillChunks;
+
+nx::network::http::StatusCode::Value cameraResultToHttp(
+    const CameraDiagnostics::Result& status, QnJsonRestResult* error)
+{
+    auto mediaStreamEvent = status.toMediaStreamEvent();
+    if (mediaStreamEvent)
+    {
+        error->errorString = toString(mediaStreamEvent);
+        error->error = QnRestResult::Forbidden;
+        return nx::network::http::StatusCode::ok;
+    }
+    return nx::network::http::StatusCode::internalServerError;
+}
 
 HttpLiveStreamingProcessor::HttpLiveStreamingProcessor(
     QnMediaServerModule* serverModule,
@@ -508,10 +522,14 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
             }
         }
 
+        QnUuid clientUuid = QnUuid::fromStringSafe(request.getCookieValue(
+            Qn::EC2_RUNTIME_GUID_HEADER_NAME.toLower()));
+
         const nx::network::http::StatusCode::Value result = createSession(
             accessRights,
             request.requestLine.url.path(),
             sessionID,
+            clientUuid,
             requestParams,
             camResource,
             videoCamera,
@@ -542,7 +560,10 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
         return nx::network::http::StatusCode::forbidden;
     }
 
-    ensureChunkCacheFilledEnoughForPlayback(session, session->streamQuality());
+    response->statusLine.statusCode = ensureChunkCacheFilledEnoughForPlayback(
+        session, session->streamQuality(), error);
+    if (response->statusLine.statusCode != nx::network::http::StatusCode::ok)
+        return static_cast<nx::network::http::StatusCode::Value>(response->statusLine.statusCode);
 
     QByteArray serializedPlaylist;
     if (chunkedParamIter == requestParams.end())
@@ -553,7 +574,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
     else
     {
         response->statusLine.statusCode = getChunkedPlaylist(
-            session, request, camResource, requestParams, &serializedPlaylist);
+            session, request, camResource, requestParams, &serializedPlaylist, error);
     }
 
     if (response->statusLine.statusCode != nx::network::http::StatusCode::ok)
@@ -648,7 +669,8 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
     const nx::network::http::Request& request,
     const QnSecurityCamResourcePtr& camResource,
     const std::multimap<QString, QString>& requestParams,
-    QByteArray* serializedPlaylist)
+    QByteArray* serializedPlaylist,
+    QnJsonRestResult* error)
 {
     NX_ASSERT(session);
 
@@ -670,7 +692,13 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
         return nx::network::http::StatusCode::notFound;
     }
 
-    const size_t chunksGenerated = playlistManager->generateChunkList(&chunkList, &isPlaylistClosed);
+    auto status = playlistManager->generateChunkList(&chunkList, &isPlaylistClosed);
+    if (!status)
+    {
+        NX_WARNING(this, "Failed to generate chunks list of resource %1, error code: %2",
+            camResource->getUniqueId(), status.errorCode);
+        return cameraResultToHttp(status, error);;
+    }
     if (chunkList.empty())   //no chunks generated
     {
         NX_WARNING(this, lm("Failed to get chunks of resource %1")
@@ -678,8 +706,8 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
         return nx::network::http::StatusCode::noContent;
     }
 
-    NX_VERBOSE(this, lm("Prepared playlist of resource %1 (%2 chunks)")
-        .args(camResource->getUniqueId()).arg(chunksGenerated));
+    NX_VERBOSE(this, "Prepared playlist of resource %1 (%2 chunks)",
+        camResource->getUniqueId(), chunkList.size());
 
     nx::network::hls::Playlist playlist;
     NX_ASSERT(!chunkList.empty());
@@ -936,6 +964,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
     const Qn::UserAccessData& accessRights,
     const QString& requestedPlaylistPath,
     const QString& sessionID,
+    const QnUuid& clientUuid,
     const std::multimap<QString, QString>& requestParams,
     const QnSecurityCamResourcePtr& camResource,
     const QnVideoCameraPtr& videoCamera,
@@ -1009,23 +1038,11 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::createSession(
                 std::make_shared<ArchivePlaylistManager>(
                     serverModule(),
                     camResource,
+                    clientUuid,
                     params.startTimestamp.get(),
                     kChunkCountInArchivePlaylist,
                     duration_cast<microseconds>(newHlsSession->targetDuration()),
                     quality);
-            if (!archivePlaylistManager->initialize())
-            {
-                mediaStreamEvent = archivePlaylistManager->lastError().toMediaStreamEvent();
-                NX_DEBUG(this, "Failed to initialize archive playlist for camera: %1, error: %2",
-                    camResource->getUniqueId(), toString(mediaStreamEvent));
-                if (mediaStreamEvent)
-                {
-                    error->errorString = toString(mediaStreamEvent);
-                    error->error = QnRestResult::Forbidden;
-                    return nx::network::http::StatusCode::ok;
-                }
-                return nx::network::http::StatusCode::internalServerError;
-            }
 
             newHlsSession->setPlaylistManager(quality, archivePlaylistManager);
         }
@@ -1070,14 +1087,15 @@ int HttpLiveStreamingProcessor::estimateStreamBitrate(
     return bandwidth;
 }
 
-void HttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback(
+nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback(
     Session* const session,
-    MediaQuality streamQuality)
+    MediaQuality streamQuality,
+    QnJsonRestResult* error)
 {
     static const size_t PLAYLIST_CHECK_TIMEOUT_MS = 1000;
 
     if (!session->isLive())
-        return; //TODO #ak investigate archive streaming (likely, there is no such problem there)
+        return nx::network::http::StatusCode::ok; //TODO #ak investigate archive streaming (likely, there is no such problem there)
 
     //TODO #ak proper handling of MEDIA_Quality_Auto
     if (streamQuality == MEDIA_Quality_Auto)
@@ -1086,9 +1104,13 @@ void HttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback(
     //if no chunks in cache, waiting for cache to be filled
     std::vector<hls::AbstractPlaylistManager::ChunkData> chunkList;
     bool isPlaylistClosed = false;
-    size_t chunksGenerated = session->playlistManager(streamQuality)
-        ->generateChunkList(&chunkList, &isPlaylistClosed);
-    if (chunksGenerated < m_minPlaylistSizeToStartStreaming)
+    auto status = session->playlistManager(streamQuality)->generateChunkList(&chunkList, &isPlaylistClosed);
+    if (!status)
+    {
+        NX_WARNING(this, "Failed to generate chunks list, error code: %2", status.errorCode);
+        return cameraResultToHttp(status, error);
+    }
+    if (chunkList.size() < m_minPlaylistSizeToStartStreaming)
     {
         //no chunks generated, waiting for at least one chunk to be generated
         QElapsedTimer monotonicTimer;
@@ -1096,17 +1118,22 @@ void HttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback(
         while ((quint64)monotonicTimer.elapsed() < session->targetDuration().count() * (m_minPlaylistSizeToStartStreaming + 2))
         {
             chunkList.clear();
-            chunksGenerated = session->playlistManager(streamQuality)
-                ->generateChunkList(&chunkList, &isPlaylistClosed);
-            if (chunksGenerated >= m_minPlaylistSizeToStartStreaming)
+            status = session->playlistManager(streamQuality)->generateChunkList(
+                &chunkList, &isPlaylistClosed);
+            if (!status)
             {
-                NX_VERBOSE(this, lm("HLS cache has been prefilled with %1 chunks")
-                    .args(chunksGenerated));
+                NX_WARNING(this, "Failed to generate chunks list, error code: %2",status.errorCode);
+                return cameraResultToHttp(status, error);
+            }
+            if (chunkList.size() >= m_minPlaylistSizeToStartStreaming)
+            {
+                NX_VERBOSE(this, "HLS cache has been prefilled with %1 chunks", chunkList.size());
                 break;
             }
             QThread::msleep(PLAYLIST_CHECK_TIMEOUT_MS);
         }
     }
+    return nx::network::http::StatusCode::ok;
 }
 
 AVCodecID HttpLiveStreamingProcessor::detectAudioCodecId(

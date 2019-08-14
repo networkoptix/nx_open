@@ -454,10 +454,14 @@ void AbstractSearchWidget::Private::setupTimeSelection()
 
     // Setup day change watcher.
 
-    m_dayChangeTimer->setInterval(1s);
+    m_dayChangeTimer->start(1s);
 
-    connect(m_dayChangeTimer.data(), &QTimer::timeout,
-        this, &Private::updateCurrentTimePeriod);
+    connect(m_dayChangeTimer.data(), &QTimer::timeout, this,
+        [this]()
+        {
+            updateCurrentTimePeriod();
+            setCurrentDate(qnSyncTime->currentDateTime().date());
+        });
 }
 
 void AbstractSearchWidget::Private::setupCameraSelection()
@@ -622,7 +626,7 @@ void AbstractSearchWidget::Private::setAllowed(bool value)
 
 void AbstractSearchWidget::Private::goToLive()
 {
-    if (m_mainModel->liveSupported())
+    if (m_mainModel->effectiveLiveSupported())
         m_mainModel->setLive(true);
 
     ui->ribbon->scrollBar()->setValue(0);
@@ -661,11 +665,6 @@ void AbstractSearchWidget::Private::setSelectedPeriod(Period value)
     m_previousPeriod = m_period;
     m_period = value;
     updateCurrentTimePeriod();
-
-    if (m_period == Period::day || m_period == Period::week || m_period == Period::month)
-        m_dayChangeTimer->start();
-    else
-        m_dayChangeTimer->stop();
 }
 
 QnTimePeriod AbstractSearchWidget::Private::currentTimePeriod() const
@@ -944,6 +943,23 @@ void AbstractSearchWidget::Private::updatePlaceholderVisibility()
     m_placeholderOpacityAnimation->setEasingCurve(kPlaceholderFadeEasing);
     m_placeholderOpacityAnimation->setDuration(kPlaceholderFadeDuration.count() * delta);
     m_placeholderOpacityAnimation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void AbstractSearchWidget::Private::setCurrentDate(const QDate& value)
+{
+    if (m_currentDate == value)
+        return;
+
+    m_currentDate = value;
+
+    const auto model = ui->ribbon->model();
+    const auto range = ui->ribbon->visibleRange();
+
+    if (range.isEmpty() || !NX_ASSERT(model))
+        return;
+
+    emit model->dataChanged(
+        model->index(range.lower()), model->index(range.upper()), {Qn::TimestampTextRole});
 }
 
 } // namespace nx::vms::client::desktop

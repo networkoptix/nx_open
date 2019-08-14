@@ -1,6 +1,7 @@
 #include "event_search_widget.h"
 
 #include <algorithm>
+#include <chrono>
 
 #include <QtCore/QPointer>
 #include <QtCore/QVector>
@@ -17,15 +18,18 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#include <nx/vms/client/desktop/analytics/analytics_events_tree.h>
+#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/strings_helper.h>
 
+#include <nx/utils/pending_operation.h>
 #include <nx/utils/string.h>
 #include <nx/utils/std/algorithm.h>
+
+using namespace std::chrono;
 
 namespace nx::vms::client::desktop {
 
@@ -82,30 +86,25 @@ EventSearchWidget::Private::Private(EventSearchWidget* q):
 
     setupTypeSelection();
 
-    // Update analytics events submenu when servers are added to or removed from the system.
-    const auto handleServerChanges =
-        [this](const QnResourcePtr& resource)
+    auto updateAnalyticsSubmenuOperation = new nx::utils::PendingOperation(
+        [this]
         {
-            if (!m_eventModel->isOnline())
-                return;
-
-            const auto flags = resource->flags();
-            if (flags.testFlag(Qn::server) && !flags.testFlag(Qn::fake))
+            if (m_eventModel->isOnline())
                 updateAnalyticsMenu();
-        };
+        },
+        100ms,
+        this);
+    updateAnalyticsSubmenuOperation->fire();
+    updateAnalyticsSubmenuOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
 
-    connect(q->resourcePool(), &QnResourcePool::resourceAdded, this, handleServerChanges);
-    connect(q->resourcePool(), &QnResourcePool::resourceRemoved, this, handleServerChanges);
+    connect(m_eventModel, &AbstractSearchListModel::isOnlineChanged,
+        updateAnalyticsSubmenuOperation,
+        &nx::utils::PendingOperation::requestOperation);
 
-    connect(m_eventModel, &AbstractSearchListModel::isOnlineChanged, this,
-        [this](bool isOnline)
-        {
-            if (isOnline)
-                updateAnalyticsMenu();
-        });
-
-    if (m_eventModel->isOnline())
-        updateAnalyticsMenu();
+    connect(q->commonModule()->instance<AnalyticsEventsSearchTreeBuilder>(),
+        &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
+        updateAnalyticsSubmenuOperation,
+        &nx::utils::PendingOperation::requestOperation);
 
     // Disable server event selection when selected cameras differ from "Any camera".
     connect(q, &AbstractSearchWidget::cameraSetChanged, this,
@@ -248,7 +247,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
         [this, currentSelection, &currentSelectionStillAvailable]
         (auto addItemRecursive, auto parent, auto root) -> void
         {
-            using NodeType = AnalyticsEventsTreeBuilder::NodeType;
+            using NodeType = AnalyticsEntitiesTreeBuilder::NodeType;
 
             for (auto node: root->children)
             {
@@ -256,10 +255,10 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
                 if (node->nodeType == NodeType::eventType)
                 {
                     addMenuAction(parent, node->text, EventType::analyticsSdkEvent,
-                        node->eventTypeId);
+                        node->entityId);
 
                     if (!currentSelectionStillAvailable
-                        && currentSelection == node->eventTypeId)
+                        && currentSelection == node->entityId)
                     {
                         currentSelectionStillAvailable = true;
                     }
@@ -286,11 +285,11 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
     if (NX_ASSERT(analyticsMenu))
     {
         using namespace nx::vms::event;
-        using namespace nx::analytics;
 
-        AnalyticsEventsTreeBuilder eventsTreeBuilder(q->commonModule());
-        const auto root = eventsTreeBuilder.compatibleTreeUnion(
-            q->resourcePool()->getAllCameras({}, /*ignoreDesktopCameras*/ true));
+        auto analyticsEventsSearchTreeBuilder =
+            q->commonModule()->instance<AnalyticsEventsSearchTreeBuilder>();
+
+        const auto root = analyticsEventsSearchTreeBuilder->eventTypesTree();
 
         WidgetUtils::clearMenu(analyticsMenu);
 
@@ -312,7 +311,7 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
     m_analyticsEventsSingleAction->setVisible(!hasAnalyticsMenu);
 
     if (!currentSelectionStillAvailable)
-        m_eventModel->setSelectedSubType({});
+        m_typeSelectionButton->deactivate();
 }
 
 // ------------------------------------------------------------------------------------------------

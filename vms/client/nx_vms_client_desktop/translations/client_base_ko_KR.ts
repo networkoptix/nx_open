@@ -5870,10 +5870,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>개인 정보는 포함되지 않으며 완전히 익명입니다.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
     </message>
@@ -5884,6 +5880,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>장애 조치가 활성화 된 경우 서버는이 설정에 관계없이 카메라 상태 업데이트를 계속 요청할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -5903,44 +5903,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation type="unfinished">Spread Sheet (CSV) File</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>서버</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>오프셋</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>날짜</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>시간대</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>시간</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>인터넷에 액세스 할 수있는 서버가 없습니다. 시간이 동기화되지 않습니다.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
     </message>
   </context>
   <context>
@@ -7294,10 +7256,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">In selected area</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation type="unfinished">Failed to execute plugin action</translation>
     </message>
@@ -7350,17 +7308,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>변경 적용</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>이 장치는고급 설정 없음</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>이 카메라는고급 설정 없음</translation>
     </message>
   </context>
   <context>
@@ -7626,11 +7573,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>모션 감지가 비활성화되어, 모든 &quot;동작&quot; 및 &quot;동작 + Lo-Res&quot; 스케줄 녹화가 &quot;항상&amp;quot 으로 변경됩니다;</translation>
+      <translation>모션 감지가 비활성화되어, 모든 &quot;동작&quot; 및 &quot;동작 + Lo-Res&quot; 스케줄 녹화가 &quot;항상&quot; 으로 변경됩니다;</translation>
     </message>
     <message>
       <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>듀얼 스트리밍이 비활성화 되어있어, 모든 &quot;Motion + Lo-Res&quot; 스케줄 녹화가 &quot;항상&amp;quot 으로 변경됩니다;</translation>
+      <translation>듀얼 스트리밍이 비활성화 되어있어, 모든 &quot;Motion + Lo-Res&quot; 스케줄 녹화가 &quot;항상&quot; 으로 변경됩니다;</translation>
     </message>
   </context>
   <context>
@@ -8492,11 +8439,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>일부 서버에서는 업데이트 프로세스가 완료되지 않았습니다. 그래도 종료하시겠습니까?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 업데이트 버전을 다시 시작 됩니다.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>

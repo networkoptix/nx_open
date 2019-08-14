@@ -75,30 +75,6 @@ static const auto upperBoundPredicate =
         return left > startTime(right);
     };
 
-bool acceptedByTextFilter(const nx::common::metadata::ObjectMetadata& item, const QString& filter)
-{
-    if (filter.isEmpty())
-        return true;
-
-    const auto checkWord =
-        [filter](const QString& word)
-        {
-            return word.startsWith(filter, Qt::CaseInsensitive);
-        };
-
-    return std::any_of(item.attributes.cbegin(), item.attributes.cend(),
-        [checkWord](const nx::common::metadata::Attribute& attribute) -> bool
-        {
-            if (checkWord(attribute.name))
-                return true;
-
-            const auto words = attribute.value.split(QRegularExpression("\\s+"),
-                QString::SkipEmptyParts);
-
-            return std::any_of(words.cbegin(), words.cend(), checkWord);
-        });
-}
-
 } // namespace
 
 AnalyticsSearchListModel::Private::Private(AnalyticsSearchListModel* q):
@@ -490,7 +466,7 @@ void AnalyticsSearchListModel::Private::setLiveReceptionActive(bool value)
 void AnalyticsSearchListModel::Private::processMetadata()
 {
     // Don't start receiving live data until first archive fetch is finished.
-    if (m_data.empty() && !m_liveReceptionActive && (fetchInProgress() || q->canFetchMore()))
+    if (m_data.empty() && (fetchInProgress() || q->canFetchMore()))
         return;
 
     // Completely stop metadata reception if paused.
@@ -550,6 +526,13 @@ void AnalyticsSearchListModel::Private::processMetadata()
             return {};
         };
 
+    nx::analytics::db::Filter filter;
+    filter.freeText = m_filterText;
+    if (m_filterRect.isValid())
+        filter.boundingBox = m_filterRect;
+    if (!m_selectedObjectType.isEmpty())
+        filter.objectTypeId.push_back(m_selectedObjectType);
+
     for (const auto& packets: packetsBySource)
     {
         for (const auto& metadata: packets)
@@ -593,12 +576,8 @@ void AnalyticsSearchListModel::Private::processMetadata()
                     continue;
                 }
 
-                if ((!m_selectedObjectType.isEmpty() && m_selectedObjectType != item.typeId)
-                    || (m_filterRect.isValid() && !m_filterRect.intersects(item.boundingBox))
-                    || !acceptedByTextFilter(item, m_filterText))
-                {
+                if (!filter.acceptsMetadata(item))
                     continue;
-                }
 
                 ObjectTrack newTrack;
                 newTrack.id = item.trackId;

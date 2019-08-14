@@ -6057,10 +6057,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>אינו כולל מידע אישי והוא אנונימי לחלוטין.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>אמצעי שרת Failover עשויים לבקש עדכוני סטטוס של המצלמה ללא קשר להגדרה זו.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>אפשר גילוי אוטומטי של מכשירים ושרתים ובדיקת סטטוס התקנים</translation>
     </message>
@@ -6071,6 +6067,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>כאשר מאופשר, המערכת מגלה מצלמות חדשות ושרתים חדשים, ושולחת בקשות לעדכון סטטוס מצלמות.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
     </message>
   </context>
   <context>
@@ -6090,44 +6090,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>קובץ גיליון אלקטרוני (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>שרת</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>היסט</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>תאריך</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>אזור זמן</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>שעה</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>אין אף שרת עם גישה לאינטרנט. הזמן אינו מסונכרן.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>זמן המערכת מסונכרן עם האינטרנט ואינו תלוי בזמן המקומי בשרתים.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>זמן המערכת מסונכרן עם הזמן המקומי בשרתים שנבחרו ואינו תלוי בזמן המקומי בשרתים אחרים.</translation>
     </message>
   </context>
   <context>
@@ -7595,10 +7557,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>באזור שנבחר</translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>מנוע אנליטיקה ללא שם</translation>
-    </message>
-    <message>
       <source>Failed to execute plugin action</source>
       <translation>ביצוע פעולת תוסף נכשלה</translation>
     </message>
@@ -7654,17 +7612,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>מחיל שינויים...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>אין הגדרות מתקדמות למודול קלט/פלט זה</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>למצלמה זו אין הגדרות מתקדמות</translation>
     </message>
   </context>
   <context>
@@ -8844,11 +8791,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>חלק מהשרתים לא השלימו את העדכון, לסיים בכל מקרה?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 יופעל מחדש לגרסה המעודכנת.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -10235,7 +10177,7 @@ By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
       <translation>נתוני אנליטיקה אמורים להיות מאוחסנים מקומית ועשויים לצרוך מאות ג'יגבייטים.
 כשאשר מיקום האחסון נבחר, החלפת מיקום זה אינה פשוטה ותהיה כרוכה לרוב באיבוד הנתונים הקיימים. אנו ממליצים לבחור בקפידה את מקום האחסון ושיהיה במחיצה שונה משל מערכת ההפעלה על מנת להימנע מכשלי מערכת פוטנציאלים.
-כברירת מחדל, נתוני האנליטיקה מאוחסנים בתיקיית שרת המדיה.
+כברירת מחדל נתונים אנליטיים יאוחסנו ב- %1.
 אתה יכול לשנות את זה דרך תווית "ניהול אחסון" תחת "הגדרות שרת".</translation>
     </message>
   </context>

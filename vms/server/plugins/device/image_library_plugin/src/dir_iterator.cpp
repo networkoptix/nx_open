@@ -1,7 +1,4 @@
-/**********************************************************
-* 04 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "dir_iterator.h"
 
@@ -21,7 +18,6 @@
 #include <list>
 
 #include "wildcard_match.h"
-
 
 namespace FsEntryType
 {

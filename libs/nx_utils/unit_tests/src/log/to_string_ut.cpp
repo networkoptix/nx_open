@@ -174,7 +174,7 @@ TEST(ToString, Pointers)
     assertPtrToString<CustomDebuggableType>("nx::utils::test::CustomDebuggableType(0x*)");
     assertPtrToString<CustomDebuggableType>("nx::utils::test::CustomDebuggableType(0x*)");
     assertPtrToString<std::optional<CustomDebuggableType>>(
-        "std::optional<nx::utils::test::CustomDebuggableType>(0x*)");
+        "std*::optional<nx::utils::test::CustomDebuggableType>(0x*)");
     assertPtrToString<QSize>("QSize(0x*)");
 
     std::unique_ptr<CustomBase> base(new CustomBase);

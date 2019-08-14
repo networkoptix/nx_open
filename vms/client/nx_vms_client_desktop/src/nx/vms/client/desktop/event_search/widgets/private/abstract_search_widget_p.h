@@ -5,6 +5,7 @@
 #include <optional>
 #include <vector>
 
+#include <QtCore/QDate>
 #include <QtCore/QList>
 #include <QtCore/QHash>
 #include <QtCore/QPointer>
@@ -101,6 +102,8 @@ private:
 
     QString currentDeviceText() const;
 
+    void setCurrentDate(const QDate& value);
+
 private:
     const QScopedPointer<AbstractSearchListModel> m_mainModel;
     const QScopedPointer<BusyIndicatorModel> m_headIndicatorModel;
@@ -142,6 +145,8 @@ private:
     std::vector<DeviceDependentAction> m_deviceDependentActions;
 
     std::optional<bool> m_isAllowed; //< std::optional for lazy initialization.
+
+    QDate m_currentDate;
 };
 
 inline uint qHash(AbstractSearchWidget::Period source)

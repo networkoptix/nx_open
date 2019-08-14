@@ -1,7 +1,4 @@
-/**********************************************************
-* 05 sep 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "ilp_video_packet.h"
 
@@ -10,7 +7,6 @@
 #include <cstdlib>
 
 #include <nx/kit/utils.h>
-
 
 ILPVideoPacket::ILPVideoPacket(
     int channelNumber,
@@ -99,7 +95,7 @@ const void* ILPVideoPacket::data() const
 //!Implementation of nxpl::MediaDataPacket::dataSize
 unsigned int ILPVideoPacket::dataSize() const
 {
-    return m_bufSize;
+    return (int) m_bufSize;
 }
 
 //!Implementation of nxpl::MediaDataPacket::channelNumber

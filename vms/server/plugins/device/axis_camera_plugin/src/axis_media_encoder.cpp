@@ -1,7 +1,4 @@
-/**********************************************************
-* 3 apr 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "axis_media_encoder.h"
 
@@ -15,7 +12,6 @@
 #include "axis_camera_plugin.h"
 #include "axis_cam_params.h"
 #include "sync_http_client.h"
-
 
 //min known fps of axis camera (in case we do not know model)
 static const float MIN_AXIS_CAMERA_FPS = 8.0;
@@ -111,7 +107,7 @@ int AxisMediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* i
     }
 
     *infoListCount = std::min<int>(
-        m_supportedResolutions.size(),
+        (int) m_supportedResolutions.size(),
         nxcip::MAX_RESOLUTION_LIST_SIZE);
     memcpy(
         infoList,

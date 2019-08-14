@@ -12,8 +12,7 @@ namespace sdk {
 namespace analytics {
 
 /**
- * Interface for a DeviceAgent that requires input (e.g. audio or video stream) from the Engine
- * plugin container.
+ * Interface for a DeviceAgent that requires input (e.g. audio or video stream) from the Device.
  */
 class IConsumingDeviceAgent: public Interface<IConsumingDeviceAgent, IDeviceAgent>
 {
@@ -21,7 +20,7 @@ public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IConsumingDeviceAgent"); }
 
     /**
-     * Supplies data to the engine. Called from a worker thread.
+     * Supplies data to the Engine. Called from a worker thread.
      *
      * @param dataPacket Never null. Has a valid timestamp >= 0.
      */

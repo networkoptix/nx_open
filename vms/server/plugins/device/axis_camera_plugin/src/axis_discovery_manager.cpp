@@ -1,7 +1,4 @@
-/**********************************************************
-* 2 apr 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "axis_discovery_manager.h"
 
@@ -16,7 +13,6 @@
 #include "axis_camera_manager.h"
 #include "axis_camera_plugin.h"
 #include "sync_http_client.h"
-
 
 AxisCameraDiscoveryManager::AxisCameraDiscoveryManager()
 :
@@ -134,7 +130,7 @@ int AxisCameraDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, co
     if( modelName.isEmpty() || mac.isEmpty() )
         return 0;
 
-    memset( cameras, 0, sizeof(*cameras) );
+    memset( (void*) cameras, 0, sizeof(*cameras) );
     strncpy( cameras->uid, mac.constData(), sizeof(cameras->uid)-1 );
     strncpy( cameras->modelName, modelName.constData(), sizeof(cameras->modelName)-1 );
     strncpy( cameras->firmware, firmware.constData(), sizeof(cameras->firmware)-1 );
@@ -197,7 +193,7 @@ int AxisCameraDiscoveryManager::fromMDNSData(
 
     smac = smac.toUpper();
 
-    memset( cameraInfo, 0, sizeof(*cameraInfo) );
+    memset( (void*) cameraInfo, 0, sizeof(*cameraInfo) );
     strncpy( cameraInfo->uid, smac.constData(), sizeof(cameraInfo->uid)-1 );
     strncpy( cameraInfo->modelName, name.constData(), sizeof(cameraInfo->modelName)-1 );
     strncpy( cameraInfo->defaultLogin, AXIS_DEFAULT_LOGIN, sizeof(cameraInfo->defaultLogin)-1 );

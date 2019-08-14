@@ -823,6 +823,17 @@ protected:
         m_filter.freeText = attributeDictionary().getRandomText();
     }
 
+    void invertTextFilterCase()
+    {
+        if (!m_effectiveLookupFilter)
+            m_effectiveLookupFilter = m_filter;
+
+        if (m_effectiveLookupFilter->freeText.front().isLower())
+            m_effectiveLookupFilter->freeText = m_effectiveLookupFilter->freeText.toUpper();
+        else
+            m_effectiveLookupFilter->freeText = m_effectiveLookupFilter->freeText.toLower();
+    }
+
     void addRandomBoundingBoxToFilter()
     {
         m_filter.boundingBox = QRectF(
@@ -948,7 +959,10 @@ protected:
 
     void whenLookupObjectTracks()
     {
-        base_type::whenLookupObjectTracks(m_filter);
+        if (!m_effectiveLookupFilter)
+            m_effectiveLookupFilter = m_filter;
+
+        base_type::whenLookupObjectTracks(*m_effectiveLookupFilter);
     }
 
     void whenLookupByEmptyFilter()
@@ -1042,6 +1056,7 @@ protected:
 
 private:
     Filter m_filter;
+    std::optional<Filter> m_effectiveLookupFilter;
     QnUuid m_specificObjectTrackId;
     QnTimePeriod m_specificObjectTrackTimePeriod;
 
@@ -1127,6 +1142,15 @@ TEST_F(AnalyticsDbLookup, sort_lookup_result_by_timestamp_descending)
 TEST_F(AnalyticsDbLookup, full_text_search)
 {
     whenLookupByRandomTextFoundInData();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbLookup, full_text_search_case_insensitive)
+{
+    addRandomTextFoundInDataToFilter();
+    invertTextFilterCase();
+    whenLookupObjectTracks();
+
     thenResultMatchesExpectations();
 }
 

@@ -105,7 +105,7 @@ def main():
     args = parser.parse_args()
 
     with open(args.config, 'r') as f:
-        config = yaml.load(f)
+        config = yaml.load(f, Loader=yaml.SafeLoader)
 
     output_file = os.path.join(
         args.output, config['client_update_distribution_name']) + '.zip'

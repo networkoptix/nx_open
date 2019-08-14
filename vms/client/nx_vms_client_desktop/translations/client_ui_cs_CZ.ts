@@ -315,7 +315,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>na další den</translation>
     </message>
   </context>
   <context>
@@ -660,17 +660,17 @@
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>Port vlastních médií</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>Věřit časové značce kamery</translation>
     </message>
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Preferovaný typ přednastavení PTZ:</translation>
     </message>
     <message>
       <location/>
@@ -685,22 +685,22 @@
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>Nativní předvolby kamery nebudou dostupné.</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Tato kamera podporuje otáčení a naklápění</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Tato kamera podporuje zoom</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>Detekce pohybu během importu archivu</translation>
     </message>
   </context>
   <context>
@@ -1039,7 +1039,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>Nápověda</translation>
     </message>
     <message>
       <location/>
@@ -1084,7 +1084,7 @@
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Přidat zařízení</translation>
     </message>
     <message>
       <location/>
@@ -1102,12 +1102,12 @@
     <message>
       <location/>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>Nesouhlasím</translation>
     </message>
     <message>
       <location/>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>Přijmout</translation>
     </message>
   </context>
   <context>
@@ -1243,7 +1243,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>Chránit heslem</translation>
     </message>
     <message>
       <location/>
@@ -1607,7 +1607,7 @@
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>Minimální velikost mřížky</translation>
     </message>
   </context>
   <context>
@@ -1668,12 +1668,12 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Vyhledat časový limit</translation>
     </message>
     <message>
       <location/>
       <source>Admin DN or CN</source>
-      <translation type="unfinished">Admin DN or CN</translation>
+      <translation>Správce DN nebo CN</translation>
     </message>
   </context>
   <context>
@@ -1973,7 +1973,7 @@
     <message>
       <location/>
       <source>Check for update</source>
-      <translation type="unfinished">Check for update</translation>
+      <translation>Zkontrolovat aktualizace</translation>
     </message>
     <message>
       <location/>
@@ -1998,7 +1998,7 @@
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Stáhnout a nainstalovat</translation>
     </message>
     <message>
       <location/>
@@ -2013,7 +2013,7 @@
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Pokročilé nastavení</translation>
     </message>
     <message>
       <location/>
@@ -2026,12 +2026,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
       <source>Show all layouts</source>
-      <translation type="unfinished">Show all layouts</translation>
+      <translation>Zobrazit všechna rozvržení</translation>
     </message>
     <message>
       <location/>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>Vybrat rozvržení</translation>
     </message>
   </context>
   <context>
@@ -2044,7 +2044,7 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Nová virtuální kamera...</translation>
     </message>
   </context>
   <context>
@@ -2113,22 +2113,22 @@
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>Úroveň:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>CHYBA</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>VAROVÁNÍ</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>INFO</translation>
     </message>
   </context>
   <context>
@@ -2277,7 +2277,7 @@
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>Restartovat na novou verzi po dokončení</translation>
     </message>
   </context>
   <context>
@@ -2647,7 +2647,7 @@
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>Přetažením libovolného obrázku nebo videa do okna aplikace je přehrajte</translation>
     </message>
   </context>
   <context>
@@ -2766,7 +2766,7 @@
     <message>
       <location/>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
+      <translation>Omezit dobu trvání relace</translation>
     </message>
   </context>
   <context>
@@ -3011,7 +3011,7 @@
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>Základní prognóza údajů zaznamenaných během</translation>
     </message>
   </context>
   <context>
@@ -3059,12 +3059,12 @@
     <message>
       <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+      <translation>Analytická data budou nadále ukládána do deaktivovaného úložiště.</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>Nahrávání na nepovolené úložiště se zastaví. Smazání zastaralých záznamů však bude pokračovat.</translation>
     </message>
     <message>
       <location/>
@@ -3074,7 +3074,7 @@
     <message>
       <location/>
       <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>Analytická data mohou zabírat velké množství místa. Doporučujeme místo systémového oddílu zvolit jiné umístění.</translation>
     </message>
   </context>
   <context>
@@ -3183,34 +3183,21 @@
     </message>
   </context>
   <context>
-    <name>TimeServerSelectionWidget</name>
+    <name>TimeSynchronizationWidget</name>
     <message>
-      <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>Sync time with the Internet</source>
+      <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
+      <source>Sync Time with the Internet</source>
       <translation>Synchronizace času s internetem</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeSynchronizationWidget</name>
-    <message>
-      <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
-      <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Čas VMS</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>Nesynchronizovat čas mezi servery</translation>
     </message>
   </context>
   <context>
@@ -3318,7 +3305,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>Detekce pohybu</translation>
     </message>
   </context>
   <context>

@@ -17,14 +17,14 @@ echo on
     mkdir "%BUILD_DIR%" || goto :end
     cd "%BUILD_DIR%" || goto :end
 
-    cmake "%SOURCE_DIR%" -Ax64 -Tv140,host=x64 || goto :end
+    cmake "%SOURCE_DIR%" -Ax64 -Tv140,host=x64 %* || goto :end
     cmake --build . || goto :end
 @echo off
 
 set ARTIFACT=%BUILD_DIR%\Debug\%PLUGIN_NAME%.dll
 if not exist "%ARTIFACT%" (
     echo ERROR: Failed to build plugin.
-    set ERRORLEVEL=42 && goto :end
+    set ERRORLEVEL=64 && goto :end
 )
 
 if [%1] == [--no-tests] echo: && echo NOTE: Unit tests were not run. && goto :skip_tests

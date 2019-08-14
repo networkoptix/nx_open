@@ -1,13 +1,13 @@
 {
     "language_name": "Suomi",
     "dialogs": {
-        "okButton": "OK",
+        "okButton": "Ok",
         "openLink": "Käytä tätä linkkiä",
         "openLinkWithTitle": "Voit käydä tällä linkillä osoitteessa {{title}}"
     },
     "setup": {
-        "createAccount": "Luo tili",
-        "errorNoHDD": "Tämä laite on tarkoitettu asennettavaksi kiintolevyaseman kanssa. <br>                Ota laite pois päältä ja asenna kiintolevyasema.",
+        "createAccount": "luo tili",
+        "errorNoHDD": "Tämä laite on tarkoitettu asennettavaksi kiintolevyaseman kanssa.<br>Ota laite pois päältä ja asenna kiintolevyasema.",
         "errorNoNetwork": "Tämä laite tarvitsee verkkoyhteyden.<br>Liitä se paikalliseen verkkoon tai Internetiin"
     },
     "passwordRequirements": {
@@ -38,7 +38,7 @@
         "confirmRestoreSettingsNotNetwork": "Palauta palvelimen asetukset? Arkisto- ja verkkoasetukset tallennetaan.",
         "unavailable": "Ei saatavilla",
         "unsafePortConfirm": "Ei ole turvallista käyttää alle 1025 portin numeroa. Palvelin ei ehkä ole käytettävissä. Jatka joka tapauksessa?",
-        "confirmDisconnectFromCloud": "Irrota järjestelmä %PRODUCT_NAME%",
+        "confirmDisconnectFromCloud": "Irrota järjestelmä {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Kaikki pilvipalvelun käyttäjät poistetaan.</span><br><br>Järjestelmä on käytettävissä paikallisen verkon kautta paikallisen järjestelmänvalvojan tilillä.",
         "confirmDisconnectFromCloudAction": "Katkaise yhteys",
         "disconnectedFromCloudSuccess": "Järjestelmä on irrotettu {{CLOUD_NAME}} onnistuneesti",
@@ -136,10 +136,10 @@
     },
     "join": {
         "SystemIsUnreacheble": "Järjestelmä ei ole tavoitettavissa tai sitä ei ole.",
-        "incorrectCurrentPassword": "Virheellinen nykyinen salasana",
-        "incorrectRemotePassword": "Käyttäjätunnus tai salasana on virheellinen",
+        "incorrectCurrentPassword": "Virheellinen nykyinen salasana.",
+        "incorrectRemotePassword": "Käyttäjätunnus tai salasana on virheellinen.",
         "incompatibleVersion": "Järjestelmä ei ole tavoitettavissa, sitä ei ole olemassa tai sillä on yhteensopimaton versio.",
-        "wrongUrl": "Palvelimeen ei saada yhteyttä",
+        "wrongUrl": "Palvelimeen ei saada yhteyttä.",
         "newSystemError": "Järjestelmiä ei voi yhdistää. Etäjärjestelmää ei ole määritetty.",
         "safeMode": "Järjestelmiä ei voi yhdistää. Etäjärjestelmä on vika sieto tilassa.",
         "configError": "Järjestelmiä ei voi yhdistää. Etäjärjestelmä on vika sieto tilassa.",
@@ -148,13 +148,13 @@
         "cloudHostConflict": "Järjestelmiä ei voi yhdistää, koska palvelimet on rakennettu erilaisilla pilvipalvelimilla",
         "licenceError": "Varoitus! Olet yhdistämässä järjestelmiä Starter-lisensseihin. Järjestelmää kohti on sallittu vain yksi Starter-lisenssi, joten toinen lisenssi poistetaan käytöstä. Yhdistä silti?",
         "duplicateServersError": "Järjestelmiä ei voi yhdistää, koska niissä on vähintään yksi palvelin, jolla on sama tunnus. Poista tämä palvelin ja yritä uudelleen.",
-        "connectionFailed": "Yhdistäminen epäonnistui",
+        "connectionFailed": "Yhdistäminen epäonnistui: ",
         "unknownError": "Tuntematon virhe",
         "mergeFailed": "Yhdistäminen epäonnistui",
         "mergeSucceed": "Yhdistäminen onnistunut.",
         "newSystemDisplayName": "Uusi järjestelmä",
-        "incompatibleProtocol": "Yhteensopimaton versio.",
-        "incompatibleCloudHost": "Pilven yhteensopivuusongelma",
+        "incompatibleProtocol": "yhteensopimaton versio",
+        "incompatibleCloudHost": "pilven yhteensopivuusongelma",
         "incompatibleCloudState": "pilvi kytketty"
     },
     "login": {
@@ -165,12 +165,12 @@
         "cannotGetUser": "Palvelinvirhe: ei voi hakea nykyisiä käyttäjätietoja"
     },
     "offlineDialog": {
-        "serverOffline": "Palvelin pois käytöstä"
+        "serverOffline": "palvelin pois käytöstä"
     },
     "restartDialog": {
         "serverStarting": "palvelin käynnistyy",
-        "serverRestarting": "Palvelin käynnistyy uudelleen!",
-        "serverOffline": "Palvelin pois käytöstä"
+        "serverRestarting": "palvelin käynnistyy uudelleen",
+        "serverOffline": "palvelin pois käytöstä"
     },
     "fileUpload": {
         "started": "Päivitys käynnistettiin onnistuneesti. Se vie useita minuutteja",

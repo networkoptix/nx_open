@@ -9,12 +9,12 @@ set(depends mediaserver server_plugins) #< Not required technically, but useful 
 message(STATUS "Generating files for Metadata SDK")
 
 set(sdk_name metadata_sdk)
-set(zip_file ${distribution_output_dir}/${metadata_sdk_distribution_name}.zip)
+set(zip_file ${distribution_output_dir}/${${sdk_name}_distribution_name}.zip)
 set(sdk_dir ${CMAKE_CURRENT_BINARY_DIR}/${sdk_name})
 set(logs_dir ${CMAKE_BINARY_DIR}/build_logs)
-set(sample_build_log ${logs_dir}/metadata_sdk_sample_build.log)
-set(doxygen_log ${logs_dir}/metadata_sdk_doxygen.log)
-set(zip_log ${logs_dir}/metadata_sdk_zip.log)
+set(sample_build_log ${logs_dir}/${sdk_name}_sample_build.log)
+set(doxygen_log ${logs_dir}/${sdk_name}_doxygen.log)
+set(zip_log ${logs_dir}/${sdk_name}_zip.log)
 
 # Collect source files for statically prepared files.
 set(copied_static_origin ${CMAKE_CURRENT_SOURCE_DIR}/files)
@@ -31,10 +31,12 @@ set(copied_nx_sdk_unit_tests_origin ${CMAKE_SOURCE_DIR}/vms/libs/nx_sdk/unit_tes
 file(GLOB_RECURSE copied_nx_sdk_unit_tests_files ${copied_nx_sdk_unit_tests_origin}/*)
 
 # Collect source files for the sample - Stub Analytics Plugin.
-set(copied_sample_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics/stub_analytics_plugin)
-set(copied_sample_origin ${copied_sample_dir}/src)
+set(copied_sample_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics)
+set(copied_sample_target stub_analytics_plugin/src)
+set(copied_sample_origin ${copied_sample_dir}/${copied_sample_target})
 file(GLOB_RECURSE copied_sample_files ${copied_sample_origin}/*)
-set(copied_sample_unit_tests_origin ${copied_sample_dir}/unit_tests/src)
+set(copied_sample_unit_tests_target stub_analytics_plugin/unit_tests/src)
+set(copied_sample_unit_tests_origin ${copied_sample_dir}/${copied_sample_unit_tests_target})
 file(GLOB_RECURSE copied_sample_unit_tests_files ${copied_sample_unit_tests_origin}/*)
 
 set(copy_sdk_files_script ${CMAKE_CURRENT_BINARY_DIR}/copy_sdk_files.cmake)
@@ -48,7 +50,7 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
     set(sample_build_script "build_sample.bat")
 else()
-    message(FATAL_ERROR "Building SDK sample(s) supported only for Windows and Linux.")
+    message(FATAL_ERROR "Building SDK sample(s) supported only on Windows and Linux.")
 endif()
 
 # On developer workstations, when not cross-compiling, unit tests for SDK samples will be run
@@ -60,7 +62,7 @@ if(targetDevice STREQUAL ${default_target_device})
     # The tests will be built: inform about that.
     set(sample_tests_message " and running unit tests")
 else()
-    set(sample_tests_trigger "--no-tests")
+    set(sampleTestsTrigger "--no-tests")
 endif()
 
 if(targetDevice STREQUAL "windows-x64")
@@ -70,18 +72,18 @@ else()
         OR targetDevice STREQUAL "bpi"
         OR targetDevice STREQUAL "edge1"
     )
-        set(sdkToolchainFileName "linux_arm32")
+        set(toolchainFile "linux_arm32")
     elseif(targetDevice STREQUAL "linux_arm64")
-        set(sdkToolchainFileName "linux_arm64")
+        set(toolchainFile "linux_arm64")
     elseif(targetDevice STREQUAL "linux-x64")
-        set(sdkToolchainFileName "linux_x64")
+        set(toolchainFile "linux_x64")
     endif()
 
     set(compilingOptions -DPACKAGES_DIR=${PACKAGES_DIR})
 
-    if(sdkToolchainFileName)
+    if(toolchainFile)
         set(compilingOptions ${compilingOptions}
-            -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/toolchains/${sdkToolchainFileName}.cmake)
+            -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/toolchains/${toolchainFile}.cmake)
     endif()
 endif()
 
@@ -94,7 +96,7 @@ add_custom_command(OUTPUT ${zip_file}
     COMMAND ${CMAKE_COMMAND} -E echo
         "  Building samples${sample_tests_message} - see ${sample_build_log}"
     COMMAND ${CMAKE_COMMAND} -E chdir ${sdk_dir}
-        ${sample_build_script} ${sample_tests_trigger} ${compilingOptions}
+        ${sample_build_script} ${sampleTestsTrigger} ${compilingOptions}
         >${sample_build_log} 2>&1
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${sdk_dir}-build #< Delete sdk build dir.
 

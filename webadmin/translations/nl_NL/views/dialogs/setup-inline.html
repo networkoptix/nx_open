@@ -29,9 +29,9 @@
 </div>
 
 <div class="panel-body text-center panel-body-big" ng-if="stepIs('start')">
-    <div ng-class="{'vertical-bottom':!settings.liteClient, 'master-description': settings.liteClient}">
+    <div>
         <h2>Aan de slag met {{Config.productName}}</h2>
-        <p>Gelieve eerst de server configureren. <br>Kies een optie.</p>
+        <p class="master-description">Gelieve eerst de server configureren. <br>Kies een optie.</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
         <button class="btn btn-primary" autofocus ng-click="next()">Installatie nieuw systeem</button>
 
