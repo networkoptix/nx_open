@@ -123,6 +123,12 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
 
     connect(m_downloader.get(), &Downloader::downloadFailed,
         this, &ServerUpdateTool::atDownloadFailed);
+
+    connect(m_downloader.get(), &Downloader::downloadFinished,
+        this, &ServerUpdateTool::atDownloadFinished);
+
+    connect(m_downloader.get(), &Downloader::downloadStalledChanged,
+        this, &ServerUpdateTool::atDownloadStalled);
 }
 
 ServerUpdateTool::~ServerUpdateTool()
@@ -143,10 +149,15 @@ void ServerUpdateTool::resumeTasks()
 struct StoredState
 {
     QString file;
-    int state;
+    int state = 0;
+    bool wasPushingManualPackages = false;
+    // Update version we have initiated update for.
+    QString version;
+    // Id of the system we have initiated update for.
+    QnUuid systemId;
 };
 
-#define StoredState_Fields (file)(state)
+#define StoredState_Fields (file)(state)(wasPushingManualPackages)(version)(systemId)
 QN_FUSION_DECLARE_FUNCTIONS(StoredState, (json))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(StoredState, (json), StoredState_Fields)
 
@@ -174,6 +185,11 @@ void ServerUpdateTool::loadInternalState()
                 NX_DEBUG(this, "loadInternalState() - got state %1, going to 'initial'", state);
                 m_offlineUpdaterState = OfflineUpdateState::initial;
         }
+
+        auto systemId = helpers::currentSystemLocalId(resourcePool()->commonModule());
+        m_initiatedUpdate = stored.systemId == systemId;
+        if (m_initiatedUpdate && m_offlineUpdaterState != OfflineUpdateState::initial)
+            NX_VERBOSE(this, "loadInternalState() we have initiated update to this system.");
     }
     else
     {
@@ -187,10 +203,25 @@ void ServerUpdateTool::saveInternalState()
     StoredState stored;
     stored.file = m_localUpdateFile;
     stored.state = (int)m_offlineUpdaterState;
+    stored.wasPushingManualPackages = m_wasPushingManualPackages;
+    if (m_initiatedUpdate)
+    {
+        stored.systemId = helpers::currentSystemLocalId(resourcePool()->commonModule());
+        stored.version = m_remoteUpdateManifest.version;
+    }
+    else
+    {
+        stored.systemId = {};
+    }
 
     QByteArray raw;
     QJson::serialize(stored, &raw);
     qnSettings->setSystemUpdaterState(raw);
+}
+
+bool ServerUpdateTool::hasInitiatedThisUpdate() const
+{
+    return m_initiatedUpdate;
 }
 
 std::future<nx::update::UpdateContents> ServerUpdateTool::checkUpdateFromFile(const QString& file)
@@ -425,25 +456,26 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
         info.url = package.url;
 
         NX_ASSERT(info.isValid());
+        m_issuedDownloads.insert(package.file);
+        m_activeDownloads.insert(std::make_pair(package.file, 0));
+        // NOTE: It can emit signals like 'downloadFinished'. So we be sure we have filled in
+        // m_activeDownloads and m_issuedDownloads
         auto code = m_downloader->addFile(info);
+        QString file =  m_downloader->filePath(package.file);
+        package.localFile = file;
         m_downloader->startDownloads();
         using Code = vms::common::p2p::downloader::ResultCode;
-        QString file =  m_downloader->filePath(package.file);
-        m_issuedDownloads.insert(package.file);
-        package.localFile = file;
 
         switch (code)
         {
             case Code::ok:
                 NX_VERBOSE(this, "startManualDownloads() - downloading package %1 from url %2",
                     info.name, package.url);
-                m_activeDownloads.insert(std::make_pair(package.file, 0));
                 break;
             case Code::fileAlreadyExists:
             case Code::fileAlreadyDownloaded:
             {
                 auto fileInfo = m_downloader->fileInformation(package.file);
-                m_activeDownloads.insert(std::make_pair(package.file, 0));
                 atDownloaderStatusChanged(fileInfo);
                 break;
             }
@@ -454,7 +486,8 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
                 NX_VERBOSE(this,
                     "startManualDownloads() - failed start downloading package %1: %2",
                     info.name, error);
-                m_failedDownloads.insert(file);
+                m_activeDownloads.erase(package.file);
+                emit atDownloadFailed(package.file);
                 break;
             }
         }
@@ -856,6 +889,11 @@ bool ServerUpdateTool::requestStartUpdate(
         auto callback = [this](bool success, rest::Handle /*requestId*/)
             {
                 auto error = success ? InternalError::noError : InternalError::networkError;
+                if (success)
+                {
+                    m_initiatedUpdate = true;
+                    saveInternalState();
+                }
                 emit startUpdateComplete(success, toString(error));
             };
         connection->updateActionStart(info, nx::utils::guarded(this, callback));
@@ -1160,23 +1198,17 @@ void ServerUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
                 << ") - status changed to " << fileInformation.status;
             emit packageDownloadFailed(*package, "Update file is not found");
             m_activeDownloads.erase(it);
-            m_failedDownloads.insert(it->first);
             break;
         case FileInformation::Status::uploading:
             break;
         case FileInformation::Status::downloaded:
-            NX_VERBOSE(this) << "atDownloaderStatusChanged("<< fileInformation.name
-                << ") - finally downloaded it to" << m_downloader->filePath(fileInformation.name);
-            m_activeDownloads.erase(it);
-            m_completeDownloads.insert(it->first);
-            emit packageDownloaded(*package);
+            atDownloadFinished(fileInformation.name);
             break;
         case FileInformation::Status::corrupted:
             NX_VERBOSE(this) << "atDownloaderStatusChanged("<< fileInformation.name
                 << ") - status changed to " << fileInformation.status;
-            emit packageDownloadFailed(*package, "Update file is corrupted");
             m_activeDownloads.erase(it);
-            m_failedDownloads.insert(it->first);
+            emit packageDownloadFailed(*package, "Update file is corrupted");
             break;
         case FileInformation::Status::downloading:
             it->second = fileInformation.calculateDownloadProgress();
@@ -1198,15 +1230,44 @@ void ServerUpdateTool::atDownloadFailed(const QString& fileName)
     auto package = findPackageForFile(fileName);
     if (package)
     {
-        NX_ERROR(this)
-            << "atDownloadFailed(" << fileName << ") - failed to download update package.";
+        NX_ERROR(this, "atDownloadFailed(%1) - failed to download update package.", fileName);
+        emit packageDownloadFailed(*package, "Update file is corrupted");
     }
     else
     {
-        NX_ERROR(this)
-            << "atDownloadFailed(" << fileName << ") - did not found a package for a file."
-            << "Why were we downloading this file?";
+        NX_ERROR(this, "atDownloadFailed(%1) - did not found a package for a file. "
+            "Why were we downloading this file?", fileName);
     }
+}
+
+void ServerUpdateTool::atDownloadFinished(const QString& fileName)
+{
+    auto it = m_activeDownloads.find(fileName);
+    if (it == m_activeDownloads.end())
+    {
+        NX_ERROR(this, "atDownloadFinished(%1) - Did not found a file in m_activeDownloads",
+            fileName);
+        return;
+    }
+
+    for (auto& package: m_manualPackages)
+    {
+        if (package.file == fileName)
+        {
+            m_activeDownloads.erase(it);
+            m_completeDownloads.insert(it->first);
+            QString file =  m_downloader->filePath(fileName);
+            package.localFile = file;
+
+            emit packageDownloaded(package);
+            return;
+        }
+    }
+}
+
+void ServerUpdateTool::atDownloadStalled(const QString& fileName, bool stalled)
+{
+    NX_ERROR(this, "atDownloadStalled(%1) - stalled=%2", fileName, stalled);
 }
 
 nx::utils::Url getServerUrl(QnCommonModule* commonModule, QString path)
