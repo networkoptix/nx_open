@@ -17,8 +17,10 @@ extern "C"
 
 #include <common/common_globals.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+#include "decoders/video/ffmpeg_video_decoder.h"
 
 class CLVideoDecoderOutput;
+
 namespace nx { namespace metrics { struct Storage; } }
 
 /*!
@@ -142,7 +144,7 @@ class QnTranscoder: public QObject
     Q_OBJECT
 
 public:
-    QnTranscoder(nx::metrics::Storage* metrics);
+    QnTranscoder(const DecoderConfig& decoderConfig, nx::metrics::Storage* metrics);
     virtual ~QnTranscoder();
 
     enum TranscodeMethod {TM_DirectStreamCopy, TM_FfmpegTranscode, TM_QuickSyncTranscode, TM_OpenCLTranscode, TM_Dummy};
@@ -243,6 +245,7 @@ protected:
     virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result) = 0;
     virtual int finalizeInternal(QnByteArray* const result) = 0;
 
+    DecoderConfig m_decoderConfig;
     QSharedPointer<QnFfmpegVideoTranscoder> m_vTranscoder;
     QnAudioTranscoderPtr m_aTranscoder;
     AVCodecID m_videoCodec;

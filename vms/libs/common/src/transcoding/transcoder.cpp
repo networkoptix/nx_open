@@ -185,8 +185,9 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
 // ---------------------- QnTranscoder -------------------------
 
-QnTranscoder::QnTranscoder(nx::metrics::Storage* metrics)
+QnTranscoder::QnTranscoder(const DecoderConfig& decoderConfig, nx::metrics::Storage* metrics)
     :
+    m_decoderConfig(decoderConfig),
     m_videoCodec(AV_CODEC_ID_NONE),
     m_audioCodec(AV_CODEC_ID_NONE),
     m_videoStreamCopy(false),
@@ -372,7 +373,7 @@ int QnTranscoder::setVideoCodec(
         case TM_FfmpegTranscode:
         {
             ffmpegTranscoder = new QnFfmpegVideoTranscoder(
-                DecoderConfig(),
+                m_decoderConfig,
                 m_metrics,
                 codec);
 
