@@ -535,7 +535,7 @@ namespace {
 
 using namespace nx::vms_server_plugins::analytics::stub;
 
-static const std::string kPluginManifest = R"json(
+static const std::string kPluginManifest = /*suppress newline*/ 1 + R"json(
 {
     "id": "nx.stub",
     "name": "Stub analytics plugin",
