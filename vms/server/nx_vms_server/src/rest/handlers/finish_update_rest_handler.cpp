@@ -25,7 +25,7 @@ bool QnFinishUpdateRestHandler::allPeersUpdatedSuccessfully() const
     try
     {
         const auto updateInfo = serverModule()->updateManager()->updateInformation(
-            UpdateManager::InformationCategory::target);
+            UpdateManager::InformationCategory::target).value();
 
         return ifParticipantPredicate
             && std::all_of(

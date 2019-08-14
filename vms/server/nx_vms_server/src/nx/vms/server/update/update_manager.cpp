@@ -173,38 +173,34 @@ void UpdateManager::install(const QnAuthSession& authInfo)
     m_installer.install(authInfo);
 }
 
-update::Information UpdateManager::updateInformation(
+std::optional<update::Information> UpdateManager::updateInformation(
     UpdateManager::InformationCategory category) const
 {
     update::Information information;
-    std::optional<nx::update::FindPackageResult> result;
+    nx::update::FindPackageResult result;
 
-    switch (category)
+    if (category == InformationCategory::installed)
     {
-        case InformationCategory::target:
-            result = nx::update::fromByteArray(
-                globalSettings()->targetUpdateInformation(),
-                &information,
-                nullptr);
-            break;
-        case InformationCategory::installed:
-            result = nx::update::fromByteArray(
-                globalSettings()->installedUpdateInformation(),
-                &information,
-                nullptr);
-            break;
+        result = nx::update::fromByteArray(
+            globalSettings()->installedUpdateInformation(),
+            &information,
+            nullptr);
+    }
+    else
+    {
+        result = nx::update::fromByteArray(
+            globalSettings()->targetUpdateInformation(),
+            &information,
+            nullptr);
     }
 
-    NX_ASSERT(result);
-    if (*result != nx::update::FindPackageResult::ok)
+    if (result != nx::update::FindPackageResult::ok)
     {
-        throw std::runtime_error(
-            "Failed to deserialize \""
-                + toString(category).toStdString()
-                + "\" update information");
+        NX_DEBUG(this, "Failed to deserialize \"%1\" update information", toString(category));
+        return {};
     }
 
-    return information;
+    return {information};
 }
 
 void UpdateManager::finish()
@@ -216,15 +212,8 @@ void UpdateManager::finish()
 
 void UpdateManager::onGlobalUpdateSettingChanged()
 {
-    try
-    {
-        m_targetUpdateInfo = updateInformation(InformationCategory::target);
-    }
-    catch (...)
-    {
-        m_targetUpdateInfo = {};
-    }
-
+    m_targetUpdateInfo = updateInformation(InformationCategory::target).value_or(
+        update::Information{});
     start();
 }
 
