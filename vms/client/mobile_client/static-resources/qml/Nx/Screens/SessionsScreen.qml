@@ -253,13 +253,21 @@ Page
             message, qsTr("Check your network connection or contact a system administrator"))
     }
 
-    Connections
+    function resetSearch()
     {
-        target: ConnectionController
-        onConnectingChanged:
-        {
-            if (target.connecting)
-                searchEdit.text = ""
-        }
+        searchEdit.text = ""
+        if (!sessionsList.count)
+            return
+
+        sessionsList.positionViewAtBeginning()
+        sessionsList.contentY += searchPanel.visible ? searchEdit.height : 0
     }
+
+    onVisibleChanged:
+    {
+        if (visible)
+            resetSearch()
+    }
+
+    Component.onCompleted: resetSearch()
 }
