@@ -46,12 +46,11 @@ int QnMultiserverThumbnailRestHandler::executeGet(
     QByteArray& result, QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
 {
-    const auto previousPriority = QThread::currentThread()->priority();
     QThread::currentThread()->setPriority(QThread::LowPriority);
     auto threadPriorityGuard = nx::utils::makeScopeGuard(
-        [previousPriority]()
+        []()
         {
-            QThread::currentThread()->setPriority(previousPriority);
+            QThread::currentThread()->setPriority(QThread::NormalPriority);
         });
 
 
