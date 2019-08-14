@@ -5,6 +5,7 @@
 #include <nx/cloud/storage/service/api/bucket.h>
 #include <nx/sql/query_context.h>
 
+#include "base_manager.h"
 #include "command.h"
 #include "s3/permissions_tester.h"
 
@@ -28,7 +29,7 @@ namespace controller {
 
 using AddBucketHandler = nx::utils::MoveOnlyFunc<void(api::Result, api::Bucket)>;
 
-class BucketManager
+class BucketManager: public BaseManager
 {
 public:
     BucketManager(const conf::Settings& settings, model::Model* model);
@@ -53,33 +54,10 @@ private:
         api::AddBucketRequest request,
         AddBucketHandler handler);
 
-    nx::sql::DBResult addBucketAndSynchronize(
-        nx::sql::QueryContext* queryContext,
-        const api::Bucket& bucket);
-
-    nx::sql::DBResult removeBucketAndSynchronize(
-        nx::sql::QueryContext* queryContext,
-        const std::string& bucketName);
-
-    void insertReceivedRecord(
-        nx::sql::QueryContext* queryContext,
-        const std::string& /*clusterId*/,
-        clusterdb::engine::Command<api::Bucket> command);
-
-    void removeReceivedRecord(
-        nx::sql::QueryContext* queryContext,
-        const std::string& /*clusterId*/,
-        clusterdb::engine::Command<std::string> command);
-
-    void onPermissionsTestDone(
-        api::Result result,
-        std::string region,
-        api::AddBucketRequest request,
-        std::shared_ptr<s3::PermissionsTester> permissionsTester,
-        AddBucketHandler handler);
-
     std::shared_ptr<s3::PermissionsTester> createPermissionsTest(const std::string& bucketName);
     void removePermissionsTest(const std::shared_ptr<s3::PermissionsTester>& permissionsTester);
+
+    void registerSyncEngineCommandHandlers();
 
 private:
     const conf::Settings& m_settings;
