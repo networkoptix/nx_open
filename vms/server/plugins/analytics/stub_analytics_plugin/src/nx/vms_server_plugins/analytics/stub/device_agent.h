@@ -141,6 +141,8 @@ private:
 
         std::atomic<bool> throwPluginDiagnosticEvents{false};
         std::atomic<bool> leakFrames{false};
+        std::atomic<std::chrono::milliseconds> additionalFrameProcessingDelay{
+            std::chrono::milliseconds::zero()};
     };
 
     DeviceAgentSettings m_deviceAgentSettings;

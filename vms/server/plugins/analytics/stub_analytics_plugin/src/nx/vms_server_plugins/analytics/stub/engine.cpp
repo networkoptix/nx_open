@@ -323,6 +323,13 @@ std::string Engine::manifestString() const
                         "caption": "Force a memory leak when proccessing a video frame",
                         "defaultValue": false,
                         "value": false
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": ")json" + kAdditionalFrameProcessingDelayMs + R"json(",
+                        "caption": "Additional frame processing delay, ms",
+                        "defaultValue": 0,
+                        "value": 0
                     }
                 ]
             },
