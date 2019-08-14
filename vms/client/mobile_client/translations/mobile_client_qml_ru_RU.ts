@@ -627,7 +627,7 @@
     </message>
     <message>
       <source>Keep</source>
-      <translation>Оставить</translation>
+      <translation>Сохранить</translation>
     </message>
   </context>
   <context>
