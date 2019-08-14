@@ -18,7 +18,7 @@ TEST(ServerStartedEvent, serverStartedEvent)
     for (int i = 1; i <= 2; ++i)
     {
         ASSERT_TRUE(launcher.start());
-        launcher.serverModule()->eventRuleProcessor()->waitForDone();
+        launcher.serverModule()->eventRuleProcessor()->waitForRulesUpdate();
 
         QnEventLogFilterData filter;
         filter.eventType = EventType::serverStartEvent;

@@ -125,6 +125,6 @@ int QnExternalEventRestHandler::executeGet(
     {
         result.setError(QnRestResult::InvalidParameter, errStr);
     }
-    serverModule()->eventRuleProcessor()->waitForDone();
+    serverModule()->eventRuleProcessor()->waitForRulesUpdate();
     return nx::network::http::StatusCode::ok;
 }

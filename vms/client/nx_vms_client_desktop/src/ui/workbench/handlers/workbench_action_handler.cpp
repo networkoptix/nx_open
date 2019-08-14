@@ -458,8 +458,35 @@ void ActionHandler::addToLayout(
 
     qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemTimeRole, params.time);
 
+    if (params.timelineWindow.isValid())
+    {
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            data.uuid, Qn::ItemSliderWindowRole, params.timelineWindow);
+    }
+
+    if (params.timelineSelection.isValid())
+    {
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            data.uuid, Qn::ItemSliderSelectionRole, params.timelineSelection);
+    }
+
+    if (!params.motionSelection.empty())
+    {
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            data.uuid, Qn::ItemMotionSelectionRole, params.motionSelection);
+    }
+
+    if (params.analyticsSelection.isValid())
+    {
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            data.uuid, Qn::ItemAnalyticsSelectionRole, params.analyticsSelection);
+    }
+
     if (params.frameDistinctionColor.isValid())
-        qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemFrameDistinctionColorRole, params.frameDistinctionColor);
+    {
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            data.uuid, Qn::ItemFrameDistinctionColorRole, params.frameDistinctionColor);
+    }
 
     if (!params.zoomWindowRectangleVisible)
     {
@@ -869,6 +896,14 @@ void ActionHandler::at_openInLayoutAction_triggered()
             AddToLayoutParams addParams;
             addParams.usePosition = !position.isNull();
             addParams.position = position;
+            addParams.timelineWindow =
+                parameters.argument<QnTimePeriod>(Qn::ItemSliderWindowRole);
+            addParams.timelineSelection =
+                parameters.argument<QnTimePeriod>(Qn::ItemSliderSelectionRole);
+            addParams.motionSelection =
+                parameters.argument<QList<QRegion>>(Qn::ItemMotionSelectionRole);
+            addParams.analyticsSelection =
+                parameters.argument<QRectF>(Qn::ItemAnalyticsSelectionRole);
 
             // Live viewers must not open items on archive position
             if (accessController()->hasGlobalPermission(GlobalPermission::viewArchive))
@@ -2626,6 +2661,8 @@ void ActionHandler::confirmAnalyticsStorageLocation()
                 QDialogButtonBox::ButtonRole::ResetRole, Qn::ButtonAccent::NoAccent);
             const auto ok = msgBox.addButton(tr("OK"),
                 QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Standard);
+
+            msgBox.setEscapeButton(ok); //< Used to close the dialog by ESC / "X" button on Mac
 
             msgBox.exec();
 

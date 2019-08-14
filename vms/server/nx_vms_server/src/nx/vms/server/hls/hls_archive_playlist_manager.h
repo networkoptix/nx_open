@@ -45,7 +45,6 @@ private:
     const QnSecurityCamResourcePtr m_camResource;
     QnUuid m_clientUuid;
     qint64 m_startTimestamp;
-    qint64 m_currentTimestamp;
     unsigned int m_maxChunkNumberInPlaylist;
     std::chrono::microseconds m_targetDuration;
     qint64 m_getNextIFrameLoopMaxSize;

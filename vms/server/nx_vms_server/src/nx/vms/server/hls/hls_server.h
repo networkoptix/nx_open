@@ -160,6 +160,7 @@ private:
     nx::network::http::StatusCode::Value ensureChunkCacheFilledEnoughForPlayback(
         Session* const session,
         MediaQuality streamQuality,
+        const QnSecurityCamResourcePtr& camResource,
         QnJsonRestResult* error);
 
     AVCodecID detectAudioCodecId(

@@ -46,6 +46,9 @@ private:
 
     bool isSyncOn() const;
 
+    QHash<int, QVariant> setupDropActionParameters(
+        const QnResourceList& resources, const QVariant& timestamp) const;
+
 private:
     const QPointer<EventRibbon> m_ribbon;
     const QScopedPointer<nx::utils::PendingOperation> m_showPendingMessages;

@@ -124,7 +124,7 @@ public slots:
     */
     void executeAction(const vms::event::AbstractActionPtr& action);
 
-    void waitForDone();
+    void waitForRulesUpdate();
 protected:
     virtual void prepareAdditionActionParams(const vms::event::AbstractActionPtr& action) = 0;
 

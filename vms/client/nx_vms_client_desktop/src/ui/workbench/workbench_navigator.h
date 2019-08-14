@@ -153,7 +153,9 @@ public:
 
     QnCameraDataManager* cameraDataManager() const;
 
-    void clearTimeSelection();
+    QnTimePeriod timelineWindow() const;
+    QnTimePeriod timelineSelection() const;
+    void clearTimelineSelection();
 
 signals:
     void currentWidgetAboutToBeChanged();
@@ -219,7 +221,10 @@ protected slots:
     void updateCalendar();
 
     void updateLive();
+
+    bool calculateIsLiveSupported() const;
     void updateLiveSupported();
+
     void updatePlaying();
     void updatePlayingSupported();
     void updateSpeed();

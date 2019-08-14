@@ -561,7 +561,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getPlaylist(
     }
 
     response->statusLine.statusCode = ensureChunkCacheFilledEnoughForPlayback(
-        session, session->streamQuality(), error);
+        session, session->streamQuality(), camResource, error);
     if (response->statusLine.statusCode != nx::network::http::StatusCode::ok)
         return static_cast<nx::network::http::StatusCode::Value>(response->statusLine.statusCode);
 
@@ -688,7 +688,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
     {
         NX_WARNING(this, lm("Got request to not available %1 quality of camera %2")
             .args(QLatin1String(streamQuality == MEDIA_Quality_High ? "hi" : "lo"),
-                camResource->getUniqueId()));
+                camResource));
         return nx::network::http::StatusCode::notFound;
     }
 
@@ -696,13 +696,12 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getChunkedPlayl
     if (!status)
     {
         NX_WARNING(this, "Failed to generate chunks list of resource %1, error code: %2",
-            camResource->getUniqueId(), status.errorCode);
-        return cameraResultToHttp(status, error);;
+            camResource, status.errorCode);
+        return cameraResultToHttp(status, error);
     }
     if (chunkList.empty())   //no chunks generated
     {
-        NX_WARNING(this, lm("Failed to get chunks of resource %1")
-            .args(camResource->getUniqueId()));
+        NX_WARNING(this, "Failed to get chunks of resource %1", camResource);
         return nx::network::http::StatusCode::noContent;
     }
 
@@ -1090,6 +1089,7 @@ int HttpLiveStreamingProcessor::estimateStreamBitrate(
 nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback(
     Session* const session,
     MediaQuality streamQuality,
+    const QnSecurityCamResourcePtr& camResource,
     QnJsonRestResult* error)
 {
     static const size_t PLAYLIST_CHECK_TIMEOUT_MS = 1000;
@@ -1107,7 +1107,8 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::ensureChunkCach
     auto status = session->playlistManager(streamQuality)->generateChunkList(&chunkList, &isPlaylistClosed);
     if (!status)
     {
-        NX_WARNING(this, "Failed to generate chunks list, error code: %2", status.errorCode);
+        NX_WARNING(this, "Failed to generate chunks list, camera: %1, error code: %2",
+            camResource, status.errorCode);
         return cameraResultToHttp(status, error);
     }
     if (chunkList.size() < m_minPlaylistSizeToStartStreaming)
@@ -1122,7 +1123,8 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::ensureChunkCach
                 &chunkList, &isPlaylistClosed);
             if (!status)
             {
-                NX_WARNING(this, "Failed to generate chunks list, error code: %2",status.errorCode);
+                NX_WARNING(this, "Failed to generate chunks list, camera: %1, error code: %2",
+                    camResource, status.errorCode);
                 return cameraResultToHttp(status, error);
             }
             if (chunkList.size() >= m_minPlaylistSizeToStartStreaming)

@@ -1565,13 +1565,17 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
 void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channel, const QRectF &rect)
 {
     const auto timestamp = m_renderer->lastDisplayedTimestamp(channel);
+    const bool currentCamera = navigator()->currentResource() == resource()->toResource();
 
     if (options().testFlag(DisplayMotion))
     {
         ensureMotionSelectionCache();
 
-        paintMotionGrid(painter, channel, rect,
-            d->motionMetadataProvider->metadata(timestamp, channel));
+        const auto metadata = !ini().applyCameraFilterToSceneItems || currentCamera
+            ? d->motionMetadataProvider->metadata(timestamp, channel)
+            : nx::vms::client::core::MetaDataV1Ptr();
+
+        paintMotionGrid(painter, channel, rect, metadata);
 
         // Motion search region.
         const bool isActiveWidget = navigator()->currentMediaWidget() == this;
@@ -3135,8 +3139,7 @@ rest::Handle QnMediaResourceWidget::invokeTrigger(
         return rest::Handle();
 
     const auto responseHandler =
-        [this, resultHandler, id]
-        (bool success, rest::Handle handle, const QnJsonRestResult& result)
+        [this, resultHandler, id](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
             success = success && result.error == QnRestResult::NoError;
 

@@ -310,7 +310,7 @@ public:
         "media data absolute timestamps"
     };
     Option<MultiThreadDecodePolicy> multiThreadDecodePolicy{this, "multiThreadDecodePolicy",
-        MultiThreadDecodePolicy::disabled,
+        MultiThreadDecodePolicy::autoDetect,
         "Multiple thread decoding policy {auto, disabled, enabled}, used for RTSP streaming with "
         "transcoding and motion estimation"
     };
