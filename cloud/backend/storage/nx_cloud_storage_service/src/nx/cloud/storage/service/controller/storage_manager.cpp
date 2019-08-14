@@ -87,7 +87,7 @@ void StorageManager::AddStorageContext::initializeStorage(
     storage.id = QnUuid::createUuid().toSimpleString().toStdString();
     storage.totalSpace = request.totalSpace;
     storage.freeSpace = request.totalSpace;
-    storage.ioDevices.emplace_back(api::Device{});
+    storage.ioDevices.emplace_back(api::Device());
     storage.ioDevices.back().type = kStorageType;
     storage.ioDevices.back().dataUrl =
         network::url::Builder(service::utils::bucketUrl(bucket.name)).setPath(storage.id);
@@ -136,7 +136,7 @@ void StorageManager::addStorage(
     {
         return handler(
             utils::badRequest(lm("Invalid storage size: %1").arg(request.totalSpace)),
-            api::Storage{});
+            api::Storage());
     }
 
     auto addStorageContext = std::make_shared<AddStorageContext>();
@@ -157,7 +157,7 @@ void StorageManager::addStorage(
 
             addStorageContext->initializeStorage(bucket, request);
 
-            return manipulateDbAndSynchronize<command::SaveStorage>(
+            return modifyDbAndSynchronize<command::SaveStorage>(
                 queryContext,
                 addStorageContext->storage,
                 std::bind(&AbstractStorageDao::addStorage, m_storageDao, _1, _2));
@@ -170,11 +170,11 @@ void StorageManager::addStorage(
                 error.error = lm("addStorage failed with sql error: %1")
                     .arg(toString(dbResult)).toStdString();
                 NX_ERROR(this, error.error);
-                return handler(std::move(error), api::Storage{});
+                return handler(std::move(error), api::Storage());
             }
 
             if (addStorageContext->bucketLookupResult.resultCode != api::ResultCode::ok)
-                return handler(std::move(addStorageContext->bucketLookupResult), api::Storage{});
+                return handler(std::move(addStorageContext->bucketLookupResult), api::Storage());
 
             handler(api::Result(), std::move(addStorageContext->storage));
         });
@@ -196,7 +196,7 @@ void StorageManager::removeStorage(
         m_settings.database().synchronization.clusterId,
         [this, storageId](auto queryContext)
         {
-            return manipulateDbAndSynchronize<command::RemoveStorage>(
+            return modifyDbAndSynchronize<command::RemoveStorage>(
                 queryContext,
                 storageId,
                 std::bind(&AbstractStorageDao::removeStorage, m_storageDao, _1, _2));
@@ -233,7 +233,7 @@ void StorageManager::getCredentials(
         [this, storageId, handler = std::move(handler)](auto result, auto storage) mutable
         {
             if (result.resultCode != api::ResultCode::ok)
-                return handler(std::move(result), api::StorageCredentials{});
+                return handler(std::move(result), api::StorageCredentials());
 
             getCredentialsForStorage(std::move(storage), std::move(handler));
         }
@@ -246,7 +246,7 @@ void StorageManager::getStorage(
     GetStorageHandler handler)
 {
     if (storageId.empty())
-        return handler(utils::badRequest("Empty storageId"), api::Storage{});
+        return handler(utils::badRequest("Empty storageId"), api::Storage());
 
     auto storage = std::make_shared<std::optional<api::Storage>>();
 
@@ -265,11 +265,11 @@ void StorageManager::getStorage(
                 error.error = lm("readStorage(%1) failed with sql error: %2")
                     .args(storageId, toString(dbResult)).toStdString();
                 NX_ERROR(this, error.error);
-                return handler(std::move(error), api::Storage{});
+                return handler(std::move(error), api::Storage());
             }
 
             if (!*storage)
-                return handler(api::Result(api::ResultCode::notFound), api::Storage{});
+                return handler(api::Result(api::ResultCode::notFound), api::Storage());
 
             // TODO where to get information about storage type?
             for (auto& device : (*storage)->ioDevices)
@@ -296,18 +296,18 @@ void StorageManager::getCredentialsForStorage(
     m_stsClient->assumeRole(
         request,
         [this, handler = std::move(handler), storage = std::move(storage)](
-            aws::Result result,
-            aws::sts::AssumeRoleResult assumeRoleResult)
+            auto awsResult,
+            auto assumeRoleResult)
         {
-            if (!result.ok())
+            if (!awsResult.ok())
             {
-                NX_ERROR(this, "sts:AssumeRole failed: %1", result.text());
-                return handler(utils::toResult(result), api::StorageCredentials{});
+                NX_ERROR(this, "sts:AssumeRole failed: %1", awsResult.text());
+                return handler(utils::toResult(awsResult), api::StorageCredentials());
             }
 
             api::StorageCredentials credentials;
-            credentials.login = assumeRoleResult.credentials.accessKeyId;
-            credentials.password = assumeRoleResult.credentials.secretAccessKey;
+            credentials.login = std::move(assumeRoleResult.credentials.accessKeyId);
+            credentials.password = std::move(assumeRoleResult.credentials.secretAccessKey);
             credentials.durationSeconds =
                 (int) m_settings.aws().storageCredentialsDuration.count();
             for (const auto& ioDevice : storage.ioDevices)
@@ -336,7 +336,7 @@ std::pair<api::Result, api::Bucket> StorageManager::findBucketByRegion(
         api::Result error(api::ResultCode::notFound);
         error.error = lm("No bucket found in region: %1").arg(region).toStdString();
         NX_VERBOSE(this, error.error);
-        return std::make_pair(std::move(error), api::Bucket{});
+        return std::make_pair(std::move(error), api::Bucket());
     }
 
     return std::make_pair(api::Result(), std::move(*chosenBucket));
@@ -353,7 +353,7 @@ std::pair<api::Result, api::Bucket> StorageManager::findClosestBucket(
         error.error = lm("Failed to resolve client IP %1 to a location")
             .arg(clientEndpoint.address.toString()).toStdString();
         NX_VERBOSE(this, error.error);
-        return std::make_pair(std::move(error), api::Bucket{});
+        return std::make_pair(std::move(error), api::Bucket());
     }
 
     std::multimap<nx::geo_ip::Kilometers, api::Bucket> bucketsByDistance;
@@ -374,7 +374,7 @@ std::pair<api::Result, api::Bucket> StorageManager::findClosestBucket(
         api::Result error(api::ResultCode::internalError);
         error.error = "No available buckets to use for adding storage";
         NX_ERROR(this, error.error);
-        return std::make_pair(std::move(error), api::Bucket{});
+        return std::make_pair(std::move(error), api::Bucket());
     }
 
     return std::make_pair(api::Result(), bucketsByDistance.begin()->second);
@@ -419,7 +419,7 @@ void StorageManager::calculateDataUsage(
             removeDataUsageCalculator(calculator);
 
             if (result.resultCode != api::ResultCode::ok)
-                return handler(std::move(result), api::Storage{});
+                return handler(std::move(result), api::Storage());
 
             storage.freeSpace = std::max(0, storage.totalSpace - bytesUsed);
 
