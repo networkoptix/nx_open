@@ -60,6 +60,7 @@ private:
     bool checkExecutable(const QString& executableName) const;
     State checkContents(const QString& outputPath) const;
     QString workDir() const;
+    void stopInstallationTimerAsync();
 
 private:
     update::detail::ZipExtractor m_extractor;

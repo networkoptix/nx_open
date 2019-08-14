@@ -8,6 +8,7 @@
 #include <translation/datetime_formatter.h>
 
 #include <client/client_settings.h>
+#include <nx/vms/client/desktop/common/utils/current_date_monitor.h>
 
 #include <core/resource/media_server_resource.h>
 
@@ -19,8 +20,8 @@ namespace {
 constexpr int kMillisecondsInSeconds = 1000;
 constexpr int kMillisecondsInDay = 60 * 60 * 24 * 1000;
 constexpr int kDefaultDaysOffset = -7;
-constexpr std::chrono::milliseconds kCurrentDateCheckInterval{1000};
 
+using CurrentDateMonitor = nx::vms::client::desktop::CurrentDateMonitor;
 
 QDate defaultStartDate()
 {
@@ -39,38 +40,7 @@ QDate maxAllowedDate()
     return QDate::currentDate().addDays(1);
 }
 
-class QnCurrentDateMonitor: public QObject
-{
-    Q_OBJECT
-    using base_type = QObject;
-
-public:
-    QnCurrentDateMonitor(QObject *parent);
-    virtual ~QnCurrentDateMonitor() = default;
-
-signals:
-    void currentDateChanged();
-
-private:
-    QDate m_prevDate;
-};
-
-QnCurrentDateMonitor::QnCurrentDateMonitor(QObject *parent) :
-    QObject(parent), m_prevDate(QDate::currentDate())
-{
-    auto timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, [this](){
-        auto currentDate = QDate::currentDate();
-        if (currentDate == m_prevDate)
-            return;
-        m_prevDate = currentDate;
-        emit currentDateChanged();
-    });
-
-    timer->start(kCurrentDateCheckInterval);
-}
-
-}
+} // namespace
 
 QnDateRangeWidget::QnDateRangeWidget(QWidget* parent):
     base_type(parent),
@@ -89,8 +59,8 @@ QnDateRangeWidget::QnDateRangeWidget(QWidget* parent):
     connect(ui->dateEditTo, &QDateEdit::userDateChanged, this,
         &QnDateRangeWidget::updateRange);
 
-    auto currentDateMonitor = new QnCurrentDateMonitor(this);
-    connect(currentDateMonitor, &QnCurrentDateMonitor::currentDateChanged,
+    auto currentDateMonitor = new CurrentDateMonitor(this);
+    connect(currentDateMonitor, &CurrentDateMonitor::currentDateChanged,
         this, &QnDateRangeWidget::updateAllowedRange);
 }
 
@@ -177,5 +147,3 @@ QDate QnDateRangeWidget::displayDate(qint64 timestampMs) const
     const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
     return timeWatcher->displayTime(timestampMs).date();
 }
-
-#include "date_range_widget.moc"

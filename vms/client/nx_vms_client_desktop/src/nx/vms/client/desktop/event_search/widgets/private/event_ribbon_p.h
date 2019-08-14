@@ -16,6 +16,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QSharedPointer>
 
+#include <client_core/connection_context_aware.h>
 #include <ui/common/notification_levels.h>
 #include <ui/style/helper.h>
 
@@ -31,7 +32,9 @@ class QVariantAnimation;
 
 namespace nx::vms::client::desktop {
 
-class EventRibbon::Private: public QObject
+class EventRibbon::Private:
+    public QObject,
+    public QnConnectionContextAware
 {
     Q_OBJECT
     using PrivateSignal = EventRibbon::QPrivateSignal;
@@ -124,6 +127,7 @@ private:
     void loadNextPreview();
     bool isNextPreviewLoadAllowed() const;
     void handleLoadingEnded(ResourceThumbnailProvider* provider); //< Provider may be destroying.
+    int maxSimultaneousPreviewLoads() const;
 
     int scrollValue() const;
     int totalTopMargin() const; //< Top margin and viewport header.

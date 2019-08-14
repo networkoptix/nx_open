@@ -2313,7 +2313,21 @@ void QnWorkbenchNavigator::updateLoaderPeriods(const QnMediaResourcePtr& resourc
     updatePlaybackMask();
 }
 
-void QnWorkbenchNavigator::clearTimeSelection()
+QnTimePeriod QnWorkbenchNavigator::timelineWindow() const
+{
+    return m_timeSlider
+        ? QnTimePeriod::fromInterval(m_timeSlider->windowStart(), m_timeSlider->windowEnd())
+        : QnTimePeriod();
+}
+
+QnTimePeriod QnWorkbenchNavigator::timelineSelection() const
+{
+    return m_timeSlider && m_timeSlider->isSelectionValid()
+        ? QnTimePeriod::fromInterval(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd())
+        : QnTimePeriod();
+}
+
+void QnWorkbenchNavigator::clearTimelineSelection()
 {
     if (m_timeSlider)
         m_timeSlider->setSelectionValid(false);

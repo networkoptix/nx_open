@@ -20,7 +20,7 @@ QString timestampToRfc2822(milliseconds timestamp)
     return timestampToRfc2822(timestamp.count());
 }
 
-QString timestampToDebugString(qint64 timestampMs)
+QString timestampToDebugString(qint64 timestampMs, const QString& format)
 {
     if (timestampMs == 0)
         return "0";
@@ -28,13 +28,15 @@ QString timestampToDebugString(qint64 timestampMs)
     if (timestampMs == DATETIME_NOW)
         return "LIVE";
 
+    static const QString kDefaultFormat("dd.MM.yyyy HH:mm:ss.zzz UTC");
+
     const auto dateTime = QDateTime::fromMSecsSinceEpoch(timestampMs, Qt::UTC);
-    return dateTime.toString("dd.MM.yyyy HH:mm:ss.zzz UTC");
+    return dateTime.toString(format.isEmpty() ? kDefaultFormat : format);
 }
 
-QString timestampToDebugString(milliseconds timestamp)
+QString timestampToDebugString(milliseconds timestamp, const QString& format)
 {
-    return timestampToDebugString(timestamp.count());
+    return timestampToDebugString(timestamp.count(), format);
 }
 
 } // namespace utils
