@@ -49,6 +49,11 @@ namespace nx {
     const char* const SystemCommands::kDomainSocket = "/tmp/syscmd_socket3f64fa";
 #endif
 
+#ifdef Q_OS_MAC
+#define stat64 stat
+#define statvfs64 statvfs
+#endif
+
 namespace {
 
 static std::string formatImpl(const char* pstr, std::stringstream& out)
@@ -335,20 +340,20 @@ int SystemCommands::open(const std::string& path, int mode)
 
 int64_t SystemCommands::freeSpace(const std::string& path)
 {
-    struct statvfs stat;
+    struct statvfs64 stat;
     int64_t result = -1;
 
-    if (statvfs(path.c_str(), &stat) == 0)
+    if (statvfs64(path.c_str(), &stat) == 0)
         result = stat.f_bavail * (int64_t) stat.f_bsize;
     else
-        perror("freeSpace: statvfs failed:");
+        perror("freeSpace: statvfs64 failed:");
 
     return result;
 }
 
 int64_t SystemCommands::totalSpace(const std::string& path)
 {
-    struct statvfs stat;
+    struct statvfs64 stat;
     int64_t result = -1;
 
     if (statvfs(path.c_str(), &stat) == 0)
@@ -356,7 +361,7 @@ int64_t SystemCommands::totalSpace(const std::string& path)
     else
     {
         char buf[1024];
-        snprintf(buf, sizeof(buf), "totalSpace: statvfs failed for the path: %s", path.c_str());
+        snprintf(buf, sizeof(buf), "totalSpace: statvfs64 failed for the path: %s", path.c_str());
         perror(buf);
     }
 
@@ -370,9 +375,9 @@ bool SystemCommands::isPathExists(const std::string& path)
 
 SystemCommands::Stats SystemCommands::stat(const std::string& path)
 {
-    struct stat buf;
+    struct stat64 buf;
     Stats result;
-    result.exists = ::stat(path.c_str(), &buf) == 0;
+    result.exists = ::stat64(path.c_str(), &buf) == 0;
 
     if (result.exists)
     {
@@ -393,7 +398,7 @@ std::string SystemCommands::serializedFileList(const std::string& path)
 {
     DIR *dir = opendir(path.c_str());
     struct dirent *entry;
-    struct stat statBuf;
+    struct stat64 statBuf;
     std::stringstream out;
     char pathBuf[2048];
     ssize_t pathBufLen;
@@ -418,7 +423,7 @@ std::string SystemCommands::serializedFileList(const std::string& path)
         strncpy(pathBuf + pathBufLen, entry->d_name,
             std::max<int>((ssize_t) sizeof(pathBuf) - pathBufLen, 0));
 
-        if (::stat(pathBuf, &statBuf) != 0)
+        if (::stat64(pathBuf, &statBuf) != 0)
             continue;
 
         out << pathBuf << "," << (S_ISDIR(statBuf.st_mode) ? statBuf.st_size : 0) << ","
@@ -439,9 +444,9 @@ int64_t SystemCommands::fileSize(const std::string& path)
 std::string SystemCommands::devicePath(const std::string& path)
 {
 #ifdef Q_OS_LINUX
-    struct stat statBuf;
+    struct stat64 statBuf;
     std::string result;
-    if (::stat(path.c_str(), &statBuf) == 0)
+    if (::stat64(path.c_str(), &statBuf) == 0)
     {
         std::ifstream partitionsFile("/proc/partitions");
         if (partitionsFile.is_open())
