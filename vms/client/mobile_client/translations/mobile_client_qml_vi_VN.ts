@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi" sourcelanguage="en">
   <context>
+    <name>ActionButtonsHint</name>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Lịch trình bị vô hiêu hóa</translation>
+    </message>
+  </context>
+  <context>
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
@@ -29,6 +36,10 @@
     <message>
       <source>Offline</source>
       <translation>Ẩn</translation>
+    </message>
+    <message>
+      <source>I/O module</source>
+      <translation>I/O Module</translation>
     </message>
   </context>
   <context>
@@ -325,13 +336,6 @@
     </message>
   </context>
   <context>
-    <name>LiveVideoNavigation</name>
-    <message>
-      <source>LIVE</source>
-      <translation>Trực tiếp</translation>
-    </message>
-  </context>
-  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -359,6 +363,14 @@
     <message>
       <source>Incompatible server version %1</source>
       <translation>Phiên bản máy chủ không tương thích %1</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Quá nhiều lần thử. Vui lòng thử lại sau một phút.</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation>Kết nối với máy chủ này từ trình duyệt web hoặc máy tính để bàn để cài đặt</translation>
     </message>
   </context>
   <context>
@@ -479,7 +491,7 @@
     </message>
   </context>
   <context>
-    <name>SearchToolBar</name>
+    <name>SearchEdit</name>
     <message>
       <source>Search</source>
       <translation>Tìm kiếm</translation>
@@ -586,6 +598,10 @@
       <comment>%1 is a system name</comment>
       <translation>Không thể kết nối với Hệ thống &quot;%1&quot;</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Không tìm thấy kết quả nào</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -595,7 +611,7 @@
     </message>
     <message>
       <source>Live previews in the cameras list</source>
-      <translation>Xem trước trực tiếp trong danh sách máy ảnh</translation>
+      <translation>Xem trước trực tiếp trong danh sách camera</translation>
     </message>
     <message>
       <source>Save passwords for servers</source>
@@ -608,6 +624,10 @@
     <message>
       <source>Delete</source>
       <translation>Xóa bỏ</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Giữ</translation>
     </message>
   </context>
   <context>
@@ -769,6 +789,10 @@
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>Trong mô-đun I / O ứng dụng này chỉ có thể được sử dụng làm thiết bị đầu vào âm thanh. Để sử dụng nó làm mô-đun điều khiển, vui lòng sử dụng phiên bản dành cho máy tính để bàn %1</translation>
     </message>
+    <message>
+      <source>No live stream</source>
+      <translation type="unfinished">No live stream</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -818,6 +842,10 @@
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
       <translation>Khu vực tùy chỉnh không hợp lệ. Vui lòng vẽ lại.</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Âm thanh</translation>
     </message>
   </context>
   <context>

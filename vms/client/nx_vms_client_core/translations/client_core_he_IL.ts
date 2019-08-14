@@ -21,11 +21,11 @@
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>קילובייט</numerusform>
+        <numerusform>שני קילובייטים</numerusform>
+        <numerusform>קילובייטים</numerusform>
         <numerusform>קילובייט</numerusform>
-        <numerusform>קילובייט</numerusform>
-        <numerusform>Kilobytes</numerusform>
       </translation>
     </message>
     <message>
@@ -36,11 +36,11 @@
     <message numerus="yes">
       <source>Megabytes</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
-        <numerusform>מגה בייט</numerusform>
-        <numerusform>מגה בייט</numerusform>
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
+      <translation>
+        <numerusform>מגהבייט</numerusform>
+        <numerusform>מגהבייט</numerusform>
+        <numerusform>מגהבייט</numerusform>
+        <numerusform>מגהבייט</numerusform>
       </translation>
     </message>
     <message>
@@ -51,11 +51,11 @@
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
-        <numerusform>ג 'יגה בייט</numerusform>
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
-        <numerusform>Gigabytes</numerusform>
+      <translation>
+        <numerusform>ג'יגה-בייט</numerusform>
+        <numerusform>ג'יגה-בייט</numerusform>
+        <numerusform>ג'יגה-בייט</numerusform>
+        <numerusform>ג'יגה-בייט</numerusform>
       </translation>
     </message>
     <message>
@@ -66,11 +66,11 @@
     <message numerus="yes">
       <source>Terabytes</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
-        <numerusform>טרה-בתים</numerusform>
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
-        <numerusform>Terabytes</numerusform>
+      <translation>
+        <numerusform>טרה-בייט</numerusform>
+        <numerusform>טרה-בייטים</numerusform>
+        <numerusform>טרה-בייטים</numerusform>
+        <numerusform>טרה-בייטים</numerusform>
       </translation>
     </message>
     <message>
@@ -81,11 +81,11 @@
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
-        <numerusform>פטאביטים</numerusform>
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
-        <numerusform>Petabytes</numerusform>
+      <translation>
+        <numerusform>פטאבייט</numerusform>
+        <numerusform>פטאבייטים</numerusform>
+        <numerusform>פטאבייטים</numerusform>
+        <numerusform>פטאבייטים</numerusform>
       </translation>
     </message>
     <message>
