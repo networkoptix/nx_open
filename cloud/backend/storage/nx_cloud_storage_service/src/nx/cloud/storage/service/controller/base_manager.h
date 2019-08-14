@@ -37,7 +37,7 @@ protected:
     }
 
     template<typename Command, typename DbFunc>
-    nx::sql::DBResult manipulateDbAndSynchronize(
+    nx::sql::DBResult modifyDbAndSynchronize(
         nx::sql::QueryContext* queryContext,
         const typename Command::Data& data,
         DbFunc dbFunc)

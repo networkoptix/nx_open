@@ -40,7 +40,7 @@ void BucketManager::addBucket(const api::AddBucketRequest& request, AddBucketHan
     using namespace std::placeholders;
 
     if (request.name.empty())
-        return handler(utils::badRequest("Empty bucket name"), api::Bucket{});
+        return handler(utils::badRequest("Empty bucket name"), api::Bucket());
 
     auto permissionsTester = createPermissionsTest(request.name);
 
@@ -55,7 +55,7 @@ void BucketManager::addBucket(const api::AddBucketRequest& request, AddBucketHan
             {
                 NX_ERROR(this, "S3 permissions test failed: %1, %2",
                     toString(result.resultCode), result.error);
-                return handler(std::move(result), api::Bucket{});
+                return handler(std::move(result), api::Bucket());
             }
 
             addBucketToDb(std::move(region), std::move(request), std::move(handler));
@@ -82,7 +82,7 @@ void BucketManager::listBuckets(
                 error.error = lm("listBuckets failed with sql error: %1")
                     .arg(toString(dbResult)).toStdString();
                 NX_VERBOSE(this, error.error);
-                return handler(std::move(error), api::Buckets{});
+                return handler(std::move(error), api::Buckets());
             }
 
             handler(api::Result(), std::move(*buckets));
@@ -97,7 +97,7 @@ void BucketManager::removeBucket(
         m_settings.database().synchronization.clusterId,
         [this, bucketName](auto queryContext)
         {
-            return manipulateDbAndSynchronize<command::RemoveBucket>(
+            return modifyDbAndSynchronize<command::RemoveBucket>(
                 queryContext,
                 bucketName,
                 std::bind(&AbstractBucketDao::removeBucket, m_bucketDao, _1, _2));
@@ -138,7 +138,7 @@ void BucketManager::addBucketToDb(
         m_settings.database().synchronization.clusterId,
         [this, bucket](auto queryContext)
         {
-            return manipulateDbAndSynchronize<command::SaveBucket>(
+            return modifyDbAndSynchronize<command::SaveBucket>(
                 queryContext,
                 *bucket,
                 std::bind(&AbstractBucketDao::addBucket, m_bucketDao, _1, _2));
@@ -151,7 +151,7 @@ void BucketManager::addBucketToDb(
                 error.error =
                     std::string("addBucket failed with sql error: ") + toString(dbResult);
                 NX_VERBOSE(this, error.error);
-                return handler(std::move(error), api::Bucket{});
+                return handler(std::move(error), api::Bucket());
             }
 
             handler(api::Result(), std::move(*bucket));
