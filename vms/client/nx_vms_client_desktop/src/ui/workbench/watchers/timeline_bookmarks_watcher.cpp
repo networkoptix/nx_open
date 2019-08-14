@@ -158,7 +158,7 @@ void QnTimelineBookmarksWatcher::setupTimelineWindowQuery()
         kUpdateTimelineWindowQueryPeriodMs,
         this);
 
-    m_timelineWindowQueryFilter.sparsing = {true, navigator()->timeSlider()->msecsPerPixel()};
+    m_timelineWindowQueryFilter.sparsing = QnBookmarkSparsingOptions{true, navigator()->timeSlider()->msecsPerPixel()};
     m_timelineWindowQueryFilter.limit = kMaxTimelineWindowBookmarksCount;
 
     connect(navigator()->timeSlider(), &QnTimeSlider::windowChanged, this,
@@ -178,7 +178,8 @@ void QnTimelineBookmarksWatcher::setupTimelineWindowQuery()
     connect(navigator()->timeSlider(), &QnTimeSlider::msecsPerPixelChanged, this,
         [this]()
         {
-            m_timelineWindowQueryFilter.sparsing = {true, navigator()->timeSlider()->msecsPerPixel()};
+            m_timelineWindowQueryFilter.sparsing = QnBookmarkSparsingOptions {
+                true, navigator()->timeSlider()->msecsPerPixel()};
             if (m_timelineWindowQuery)
             {
                 auto filter = m_timelineWindowQuery->filter();
