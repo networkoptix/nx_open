@@ -6,6 +6,9 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/frequency_restricted_call.h>
+
+#include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/analytics/abstract_video_data_receptor.h>
@@ -25,6 +28,8 @@ class DeviceAnalyticsContext:
     public /*mixin*/ nx::vms::server::ServerModuleAware,
     public AbstractVideoDataReceptor
 {
+    Q_OBJECT
+
     using base_type = nx::vms::server::ServerModuleAware;
 
 public:
@@ -47,6 +52,9 @@ public:
         const QnConstCompressedVideoDataPtr& compressedFrame,
         const CLConstVideoDecoderOutputPtr& uncompressedFrame) override;
 
+signals:
+    void pluginDiagnosticEventTriggered(const nx::vms::event::PluginDiagnosticEventPtr&) const;
+
 private:
     void at_deviceStatusChanged(const QnResourcePtr& resource);
     void at_deviceUpdated(const QnResourcePtr& resource);
@@ -55,6 +63,8 @@ private:
 
     std::optional<QVariantMap> loadSettingsFromFile(
         const resource::AnalyticsEngineResourcePtr& engine) const;
+
+    void reportSkippedFrames(int framesSkipped, QnUuid engineId) const;
 
 private:
     void subscribeToDeviceChanges();
@@ -80,6 +90,8 @@ private:
     AbstractVideoDataReceptor::NeededUncompressedPixelFormats m_cachedUncompressedPixelFormats;
     bool m_missingUncompressedFrameWarningIssued = false;
     Qn::ResourceStatus m_previousDeviceStatus = Qn::ResourceStatus::NotDefined;
+    nx::utils::FrequencyRestrictedCall<void, int, QnUuid> m_throwPluginEvent;
+    int m_framesSkipped = 0;
 };
 
 } // namespace nx::vms::server::analytics

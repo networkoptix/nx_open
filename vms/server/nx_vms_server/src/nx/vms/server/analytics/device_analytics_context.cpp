@@ -3,6 +3,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <plugins/vms_server_plugins_ini.h>
+#include <utils/common/synctime.h>
 
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
@@ -14,6 +15,9 @@
 #include <nx/vms/server/sdk_support/file_utils.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
+#include <nx/vms/server/event/event_connector.h>
+
+#include <nx/vms/event/events/plugin_diagnostic_event.h>
 
 #include <nx/sdk/helpers/to_string.h>
 
@@ -22,6 +26,8 @@
 namespace nx::vms::server::analytics {
 
 using namespace nx::vms::server;
+
+static const std::chrono::seconds kMinSkippedFramesReportingInterval(30);
 
 static bool isAliveStatus(Qn::ResourceStatus status)
 {
@@ -49,8 +55,18 @@ DeviceAnalyticsContext::DeviceAnalyticsContext(
     const QnVirtualCameraResourcePtr& device)
     :
     base_type(serverModule),
-    m_device(device)
+    m_device(device),
+    m_throwPluginEvent(
+        [this](int framesSkipped, QnUuid engineId)
+        {
+            reportSkippedFrames(framesSkipped, engineId);
+        },
+        kMinSkippedFramesReportingInterval)
 {
+    connect(this, &DeviceAnalyticsContext::pluginDiagnosticEventTriggered,
+        serverModule->eventConnector(), &event::EventConnector::at_pluginDiagnosticEvent,
+        Qt::QueuedConnection);
+
     subscribeToDeviceChanges();
     subscribeToRulesChanges();
 }
@@ -356,8 +372,10 @@ void DeviceAnalyticsContext::putFrame(
             }
             else
             {
-                NX_INFO(this, "Skipped video frame for %1 from camera %2: queue overflow.",
-                    getEngineLogLabel(serverModule(), engineId), m_device->getId());
+                // TODO: Skip frames until next key frame (if case of using compressed frames).
+                ++m_framesSkipped;
+                if (m_throwPluginEvent(m_framesSkipped, engineId))
+                    m_framesSkipped = 0;
             }
         }
         else
@@ -365,6 +383,29 @@ void DeviceAnalyticsContext::putFrame(
             NX_VERBOSE(this, "Video frame not sent to DeviceAgent: see the log above.");
         }
     }
+}
+
+void DeviceAnalyticsContext::reportSkippedFrames(int framesSkipped, QnUuid engineId) const
+{
+    QString caption = lm("Analytics: skipped %1 video frames").args(framesSkipped);
+    QString description =
+        lm("Skipped %1 video frames for %2 from camera %3 (%4): queue overflow.").args(
+            framesSkipped,
+            getEngineLogLabel(serverModule(), engineId),
+            m_device->getUserDefinedName(),
+            m_device->getId());
+
+    nx::vms::event::PluginDiagnosticEventPtr pluginDiagnosticEvent(
+        new nx::vms::event::PluginDiagnosticEvent(
+            qnSyncTime->currentUSecsSinceEpoch(),
+            engineId,
+            caption,
+            description,
+            nx::vms::api::EventLevel::WarningEventLevel,
+            m_device));
+
+    emit pluginDiagnosticEventTriggered(pluginDiagnosticEvent);
+    NX_INFO(this, description);
 }
 
 void DeviceAnalyticsContext::at_deviceStatusChanged(const QnResourcePtr& resource)
