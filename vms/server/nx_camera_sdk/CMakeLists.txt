@@ -34,21 +34,23 @@ set(copied_nx_sdk_src_files
     ${copied_nx_sdk_src_origin}/nx/sdk/ptr.h
 )
 
+set(copied_samples_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/device)
+
 # Collect source files for the sample 1 - Axis Camera Plugin.
 set(copied_sample_1_target axis_camera_plugin)
-set(copied_sample_1_origin ${CMAKE_SOURCE_DIR}/vms/server/plugins/device/${copied_sample_1_target})
+set(copied_sample_1_origin ${copied_samples_dir}/${copied_sample_1_target})
 file(GLOB_RECURSE copied_sample_1_files ${copied_sample_1_origin}/src/*)
 list(APPEND copied_sample_1_files ${copied_sample_1_origin}/readme.md)
 
 # Collect source files for the sample 2 - Image Library Plugin.
 set(copied_sample_2_target image_library_plugin)
-set(copied_sample_2_origin ${CMAKE_SOURCE_DIR}/vms/server/plugins/device/${copied_sample_2_target})
+set(copied_sample_2_origin ${copied_samples_dir}/${copied_sample_2_target})
 file(GLOB_RECURSE copied_sample_2_files ${copied_sample_2_origin}/src/*)
 list(APPEND copied_sample_2_files ${copied_sample_2_origin}/readme.md)
 
 # Collect source files for the sample 3 - RPi Camera Plugin.
 set(copied_sample_3_target rpi_camera_plugin)
-set(copied_sample_3_origin ${CMAKE_SOURCE_DIR}/vms/server/plugins/device/${copied_sample_3_target})
+set(copied_sample_3_origin ${copied_samples_dir}/${copied_sample_3_target})
 file(GLOB_RECURSE copied_sample_3_files ${copied_sample_3_origin}/src/*)
 list(APPEND copied_sample_3_files ${copied_sample_3_origin}/readme.md)
 

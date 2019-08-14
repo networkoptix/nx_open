@@ -90,17 +90,17 @@ passed to cmake):
 build_samples* -DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>
 ```
         
-On Windows, after CMake generation phase, Visual Studio GUI can be used to compile the sample:
-open `../nx_sdk-build/<sample_name>/<sample_name>.sln` and build the `ALL_BUILD` project. Make
+On Windows, after CMake generation phase, Visual Studio GUI can be used to compile a sample:
+open `..\nx_camera_sdk-build\<sample_name>\<sample_name>.sln` and build the `ALL_BUILD` project. Make
 sure that the platform combo-box is set to "x64".
 
 After successful build, locate the built artifacts:
 ```
 # Windows:
-..\nx_sdk-build\<sample_name>\Debug\<sample_name>.dll
+..\nx_camera_sdk-build\<sample_name>\Debug\<sample_name>.dll
 
 # Linux:
-../nx_sdk-build/<sample_name>/lib<sample_name>.so
+../nx_camera_sdk-build/<sample_name>/lib<sample_name>.so
 ```
 
 To install a plugin, just copy its library file to the dedicated folder in the VMS Server
@@ -112,7 +112,7 @@ C:\Program Files\<vms-installation-dir>\MediaServer\plugins\
 # Linux:
 /opt/<vms-installation-dir>/mediaserver/bin/plugins/
 ```
-ATTENTION: After copying the plugin library, the Server has to be restarted.
+ATTENTION: After copying a plugin library, the Server has to be restarted.
 
 ---------------------------------------------------------------------------------------------------
 ## Compatibility and Breaking Changes
