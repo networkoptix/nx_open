@@ -121,7 +121,7 @@ void UpdateInstaller::prepareAsync(const QString& path)
 
 void UpdateInstaller::install(const QnAuthSession& authInfo)
 {
-    m_installationTimer->stop();
+    stopInstallationTimerAsync();
 
     if (const auto currentState = state(); currentState != UpdateInstaller::State::ok)
     {
@@ -172,12 +172,13 @@ void UpdateInstaller::installDelayed()
 
     NX_INFO(this, "Delayed installation requested. Starting in %1ms",
         m_installationTimer->interval());
-    m_installationTimer->start();
+
+    QTimer::singleShot(0, m_installationTimer.get(), qOverload<>(&QTimer::start));
 }
 
 void UpdateInstaller::stopSync(bool clearAndReset)
 {
-    m_installationTimer->stop();
+    stopInstallationTimerAsync();
 
     NX_MUTEX_LOCKER lock(&m_mutex);
     while (m_state == State::inProgress)
@@ -308,7 +309,7 @@ void UpdateInstaller::setStateLocked(UpdateInstaller::State state)
     }
 
     if (state != State::ok)
-        m_installationTimer->stop();
+        stopInstallationTimerAsync();
 }
 
 bool UpdateInstaller::cleanInstallerDirectory()
@@ -395,6 +396,11 @@ QString UpdateInstaller::workDir() const
     // This path will look like /tmp/nx_isntaller-server_guid/
     // We add server_guid to allow to run multiple servers on a single machine.
     return closeDirPath(dataDirectoryPath()) + "nx_installer-" + selfPath;
+}
+
+void UpdateInstaller::stopInstallationTimerAsync()
+{
+    QTimer::singleShot(0, m_installationTimer.get(), &QTimer::stop);
 }
 
 } // namespace nxvms::server
