@@ -323,6 +323,13 @@ std::string Engine::manifestString() const
                         "caption": "Force a memory leak when proccessing a video frame",
                         "defaultValue": false,
                         "value": false
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": ")json" + kAdditionalFrameProcessingDelayMs + R"json(",
+                        "caption": "Additional frame processing delay, ms",
+                        "defaultValue": 0,
+                        "value": 0
                     }
                 ]
             },
@@ -535,7 +542,7 @@ namespace {
 
 using namespace nx::vms_server_plugins::analytics::stub;
 
-static const std::string kPluginManifest = R"json(
+static const std::string kPluginManifest = /*suppress newline*/ 1 + R"json(
 {
     "id": "nx.stub",
     "name": "Stub analytics plugin",

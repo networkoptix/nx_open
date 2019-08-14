@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+
+#include <nx/vms/api/analytics/manifest_error.h>
 #include <nx/vms/api/analytics/manifest_items.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
@@ -34,6 +37,8 @@ struct NX_VMS_API DeviceAgentManifest
     /** Groups used to group Object and Event types declared by this manifest. */
     QList<Group> groups;
 };
+
+NX_VMS_API std::vector<ManifestError> validate(const DeviceAgentManifest& deviceAgentManifest);
 
 #define DeviceAgentManifest_Fields \
     (supportedEventTypeIds)(supportedObjectTypeIds)(eventTypes)(objectTypes)(groups)
