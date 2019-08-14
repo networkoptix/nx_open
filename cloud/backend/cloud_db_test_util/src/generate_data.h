@@ -2,9 +2,7 @@
 
 #include <string>
 
-namespace nx {
-namespace cdb {
-namespace client {
+namespace nx::cloud::db::client {
 
 int generateSystems(
     const std::string& cdbUrl,
@@ -12,6 +10,4 @@ int generateSystems(
     const std::string& password,
     int testSystemsToGenerate);
 
-} // namespace client
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db::client

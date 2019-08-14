@@ -4,9 +4,9 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/string.h>
 
-namespace nx {
-namespace cdb {
-namespace test {
+#include <nx/vms/api/protocol_version.h>
+
+namespace nx::cloud::db::test {
 
 LoadEmulator::LoadEmulator(
     const std::string& cdbUrl,
@@ -68,7 +68,7 @@ void LoadEmulator::onSystemListReceived(
 
 void LoadEmulator::openConnections()
 {
-    QUrl cdbUrl(QString::fromStdString(m_cdbUrl));
+    nx::utils::Url cdbUrl(QString::fromStdString(m_cdbUrl));
     const network::SocketAddress cdbEndpoint = network::url::getEndpoint(cdbUrl);
 
     std::size_t systemIndex = 0;
@@ -83,7 +83,7 @@ void LoadEmulator::openConnections()
             system.id,
             system.authKey,
             KeepAlivePolicy::enableKeepAlive,
-            nx_ec::EC2_PROTO_VERSION);
+            nx::vms::api::protocolVersion());
 
         ++systemIndex;
         if (systemIndex == m_systems.systems.size())
@@ -91,6 +91,4 @@ void LoadEmulator::openConnections()
     }
 }
 
-} // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db::test

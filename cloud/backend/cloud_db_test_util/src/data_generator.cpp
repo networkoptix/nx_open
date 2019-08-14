@@ -8,9 +8,7 @@
 
 #include <utils/common/app_info.h>
 
-namespace nx {
-namespace cdb {
-namespace test {
+namespace nx::cloud::db::test {
 
 constexpr int kMaxConcurrentRequests = 50;
 
@@ -41,7 +39,7 @@ void DataGenerator::prepareSystemsToAdd(int systemCount)
     {
         SystemContext systemContext;
         systemContext.registrationData.customization = QnAppInfo::customizationName().toStdString();
-        systemContext.registrationData.name = 
+        systemContext.registrationData.name =
             "load_test_system_" + utils::generateRandomName(8).toStdString();
         m_systemsToRegister.push_back(std::move(systemContext));
     }
@@ -61,7 +59,7 @@ void DataGenerator::startAddSystemRequests(const QnMutexLockerBase& /*lock*/)
     {
         m_systemsBeingRegistered.push_back(std::move(*it));
         it = m_systemsToRegister.erase(it);
-        
+
         auto systemBeingRegisteredIter = --m_systemsBeingRegistered.end();
         m_cdbClient.systemManager()->bindSystem(
             systemBeingRegisteredIter->registrationData,
@@ -129,6 +127,4 @@ void DataGenerator::onSystemActivated(
     m_cond.wakeAll();
 }
 
-} // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db::test

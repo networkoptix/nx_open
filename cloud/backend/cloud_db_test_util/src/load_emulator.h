@@ -7,11 +7,9 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
-#include <test_support/transaction_connection_helper.h>
+#include <nx/cloud/db/test_support/transaction_connection_helper.h>
 
-namespace nx {
-namespace cdb {
-namespace test {
+namespace nx::cloud::db::test {
 
 class LoadEmulator
 {
@@ -43,6 +41,4 @@ private:
     void openConnections();
 };
 
-} // namespace test
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db::test

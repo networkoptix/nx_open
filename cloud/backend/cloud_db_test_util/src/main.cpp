@@ -4,6 +4,7 @@
 
 #include <nx/network/socket_global.h>
 #include <nx/utils/argument_parser.h>
+#include <nx/utils/timer_manager.h>
 
 #include <utils/common/command_line_parser.h>
 

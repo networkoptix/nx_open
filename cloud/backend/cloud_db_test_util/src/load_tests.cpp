@@ -5,9 +5,7 @@
 
 #include "load_emulator.h"
 
-namespace nx {
-namespace cdb {
-namespace client {
+namespace nx::cloud::db::client {
 
 int establishManyConnections(
     const std::string& cdbUrl,
@@ -49,7 +47,7 @@ int makeApiRequests(
 
     std::vector<nx::network::http::AsyncHttpClientPtr> requests;
     requests.resize(connectionCount);
-    QUrl url(QString::fromStdString(cdbUrl));
+    nx::utils::Url url(QString::fromStdString(cdbUrl));
     url.setPath("/cdb/account/get");
 
     std::atomic<int> failedRequests(0);
@@ -101,6 +99,4 @@ int makeApiRequests(
     return 0;
 }
 
-} // namespace client
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db::client

@@ -3,9 +3,7 @@
 #include <chrono>
 #include <string>
 
-namespace nx {
-namespace cdb {
-namespace client {
+namespace nx::cloud::db::client {
 
 int establishManyConnections(
     const std::string& cdbUrl,
@@ -21,6 +19,4 @@ int makeApiRequests(
     int connectionCount,
     std::chrono::milliseconds maxDelayBeforeConnect);
 
-} // namespace client
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db::client
