@@ -5,6 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
+#include <ui/workbench/watchers/workbench_item_bookmarks_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
 
@@ -47,14 +48,22 @@ QAction* BookmarkSearchSynchronizer::bookmarksAction() const
 
 void BookmarkSearchSynchronizer::updateTimelineBookmarks()
 {
-    auto watcher = context()->instance<QnTimelineBookmarksWatcher>();
-    if (!watcher || !m_bookmarkSearchWidget)
+    if (!m_bookmarkSearchWidget)
         return;
 
     const auto camera = navigator()->currentResource().dynamicCast<QnVirtualCameraResource>();
     const bool relevant = camera && m_bookmarkSearchWidget->cameras().contains(camera);
 
-    watcher->setTextFilter(relevant ? m_bookmarkSearchWidget->textFilter() : QString());
+    const auto cameraSetType = m_bookmarkSearchWidget->selectedCameras();
+    const auto cameras = cameraSetType == AbstractSearchWidget::Cameras::current
+        ? m_bookmarkSearchWidget->cameras()
+        : QnVirtualCameraResourceSet();
+
+    if (auto watcher = context()->instance<QnTimelineBookmarksWatcher>())
+        watcher->setTextFilter(relevant ? m_bookmarkSearchWidget->textFilter() : QString());
+
+    if (auto watcher = context()->instance<QnWorkbenchItemBookmarksWatcher>())
+        watcher->setDisplayFilter(cameras, m_bookmarkSearchWidget->textFilter());
 };
 
 } // namespace nx::vms::client::desktop

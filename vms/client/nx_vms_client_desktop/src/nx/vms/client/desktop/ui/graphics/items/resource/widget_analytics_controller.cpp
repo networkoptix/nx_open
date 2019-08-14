@@ -170,6 +170,7 @@ public:
 
     Filter filter;
     microseconds lastTimestamp{};
+    QSet<QnUuid> relevantCameraIds;
 };
 
 AreaHighlightOverlayWidget::AreaInformation WidgetAnalyticsController::Private::areaInfoFromObject(
@@ -221,7 +222,11 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
 {
     for (const auto& objectInfo: objectInfoById)
     {
-        if (!filter.acceptsMetadata(objectInfo.rawData))
+        const auto relevantCamera = relevantCameraIds.empty()
+            || relevantCameraIds.contains(mediaResourceWidget->resource()->toResourcePtr()->getId());
+
+        if ((ini().applyCameraFilterToSceneItems && !relevantCamera)
+            || (relevantCamera && !filter.acceptsMetadata(objectInfo.rawData)))
         {
             areaHighlightWidget->removeArea(objectInfo.id);
             continue;
@@ -467,6 +472,10 @@ void WidgetAnalyticsController::setFilter(const Filter& value)
         return;
 
     d->filter = value;
+    d->relevantCameraIds.clear();
+
+    for (const auto& id: value.deviceIds)
+        d->relevantCameraIds.insert(id);
 
     if (d->lastTimestamp != 0us)
         d->updateObjectAreas(d->lastTimestamp);

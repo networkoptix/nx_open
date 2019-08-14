@@ -75,7 +75,7 @@ IfParticipantPredicate makeIfParticipantPredicate(
     try
     {
         const auto updateInfo = updateManager->updateInformation(
-            UpdateManager::InformationCategory::target);
+            UpdateManager::InformationCategory::target).value();
 
         const auto participants =
             forcedParticipants.isEmpty() ? updateInfo.participants : forcedParticipants;

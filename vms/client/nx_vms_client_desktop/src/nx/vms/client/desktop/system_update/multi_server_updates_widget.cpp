@@ -1227,7 +1227,10 @@ void MultiServerUpdatesWidget::atCancelUpdateComplete(bool success, const QStrin
             messageBox->setStandardButtons(QDialogButtonBox::Ok);
             messageBox->exec();
             QSet<QnUuid> peersIssued = m_stateTracker->peersIssued();
-            setTargetState(WidgetUpdateState::readyInstall, peersIssued);
+            if (m_widgetState == WidgetUpdateState::cancelingDownload)
+                setTargetState(WidgetUpdateState::downloading, peersIssued);
+            else
+                setTargetState(WidgetUpdateState::readyInstall, peersIssued);
         }
     }
 
@@ -1435,16 +1438,25 @@ void MultiServerUpdatesWidget::atServerPackageDownloadFailed(
     // This handler is used when client downloads packages for the servers without internet.
     if (m_widgetState == WidgetUpdateState::downloading)
     {
-        NX_INFO(this)
-            << "atServerPackageDownloadFailed() - failed to download server package"
-            << package.file << "error:" << error;
-        m_stateTracker->setTaskError(package.targets, "OfflineDownloadError");
+        if (m_serverUpdateTool->hasInitiatedThisUpdate())
+        {
+            NX_ERROR(this,
+                "atServerPackageDownloadFailed() - failed to download server package \"%1\", "
+                "error: %2", package.file, error);
+            m_stateTracker->setTaskError(package.targets, "OfflineDownloadError");
+        }
+        else
+        {
+            NX_WARNING(this,
+                "atServerPackageDownloadFailed() - failed to download server package \"%1\", "
+                "error: %2. This client can ignore this problem.", package.file, error);
+        }
     }
     else
     {
-        NX_INFO(this)
-            << "atServerPackageDownloadFailed() - failed to download server package"
-            << package.file << "and widget is not in downloading state" << "error:" << error;
+        NX_INFO(this,
+            "atServerPackageDownloadFailed() - failed to download server package \"%1\" "
+            "and widget is not in downloading state. Error: %2", package.file, error);
     }
 }
 
@@ -1708,7 +1720,9 @@ void MultiServerUpdatesWidget::processInitialCheckState()
             }
 
             setTargetState(WidgetUpdateState::downloading, targets);
-            if (!m_updateInfo.manualPackages.empty())
+            // TODO: We should check whether we have initiated an update. Maybe we should
+            // not start manual uploads.
+            if (!m_updateInfo.manualPackages.empty() && m_updateInfo.noServerWithInternet)
                 m_serverUpdateTool->startManualDownloads(m_updateInfo);
         }
         else if (!serversHaveDownloaded.empty() || !serversWithError.empty())
@@ -2594,6 +2608,7 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
             ServerUpdateTool::ProgressInfo info = calculateActionProgress();
             debugState << lm("progress=%1 of %2, active=%3, done=%4").args(info.current, info.max, info.active, info.done);
         }
+
         if (m_widgetState == WidgetUpdateState::installing
             || m_widgetState == WidgetUpdateState::installingStalled)
         {
@@ -2601,6 +2616,10 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
                 m_serverUpdateTool->getInstallDuration());
             debugState << QString("duration=%1").arg(installDuration.count());
         }
+
+        if (m_updateInfo.isValidToInstall() && m_updateInfo.noServerWithInternet)
+            debugState << QString("noServerWithInternet");
+
         QString debugText = debugState.join("<br>");
         if (debugText != ui->debugStateLabel->text())
             ui->debugStateLabel->setText(debugText);
