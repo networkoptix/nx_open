@@ -174,14 +174,14 @@ QVariantMap DeviceAnalyticsContext::prepareSettings(
     if (!engine)
     {
         NX_WARNING(this,
-            "Unable to access an Engine with; id %1 while preparing settings", engineId);
+            "Unable to access the Engine with id %1 while preparing settings", engineId);
         return {};
     }
 
     std::optional<QVariantMap> effectiveSettings;
     if (pluginsIni().analyticsSettingsSubstitutePath[0] != '\0')
     {
-        NX_WARNING(this, "Trying to load settings for the DeviceAgent from the file. "
+        NX_WARNING(this, "Trying to load settings for a DeviceAgent from the file. "
             "Device: %1 (%2), Engine: %3 (%4)",
             m_device->getUserDefinedName(),
             m_device->getId(),
@@ -264,7 +264,7 @@ QVariantMap DeviceAnalyticsContext::getSettings(const QString& engineId) const
     if (!engine)
     {
         NX_WARNING(this,
-            "Unable to access engine %1 while gettings DeviceAgent settings",
+            "Unable to access the Engine %1 while getting a DeviceAgent settings",
             analyticsEngineId);
 
         return QVariantMap();
@@ -276,7 +276,7 @@ QVariantMap DeviceAnalyticsContext::getSettings(const QString& engineId) const
 
     if (!binding)
     {
-        NX_DEBUG(this, "No device analytics binding for device %1 and engine %2",
+        NX_DEBUG(this, "No DeviceAnalyticsBinding for the Device %1 and the Engine %2",
             m_device, engineId);
 
         return jsonEngine.values();
@@ -395,7 +395,7 @@ void DeviceAnalyticsContext::reportSkippedFrames(int framesSkipped, QnUuid engin
         framesSkipped > 1 ? "s" : "");
 
     QString description =
-        lm("Skipped %1 video frame%2 for %3 from camera %4 %5: queue overflow. "
+        lm("Skipped %1 video frame%2 for %3 from Device %4 %5: queue overflow. "
             "Probably the Plugin is working too slow").args(
             framesSkipped,
             framesSkipped > 1 ? "s" : "",
@@ -419,7 +419,7 @@ void DeviceAnalyticsContext::reportSkippedFrames(int framesSkipped, QnUuid engin
 void DeviceAnalyticsContext::at_deviceStatusChanged(const QnResourcePtr& resource)
 {
     auto device = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!NX_ASSERT(device, "Invalid device"))
+    if (!NX_ASSERT(device, "Invalid Device"))
         return;
 
     const auto currentDeviceStatus = device->getStatus();
@@ -434,7 +434,7 @@ void DeviceAnalyticsContext::at_deviceStatusChanged(const QnResourcePtr& resourc
 void DeviceAnalyticsContext::at_deviceUpdated(const QnResourcePtr& resource)
 {
     auto device = resource.dynamicCast<QnVirtualCameraResource>();
-    if (!NX_ASSERT(device, "Invalid device"))
+    if (!NX_ASSERT(device, "Invalid Device"))
         return;
 
     const auto isAlive = isDeviceAlive();
@@ -463,7 +463,7 @@ void DeviceAnalyticsContext::at_devicePropertyChanged(
     auto device = resource.dynamicCast<QnVirtualCameraResource>();
     if (!device)
     {
-        NX_ASSERT(false, "Invalid device");
+        NX_ASSERT(false, "Invalid Device");
         return;
     }
 
@@ -471,7 +471,7 @@ void DeviceAnalyticsContext::at_devicePropertyChanged(
     {
         NX_DEBUG(
             this,
-            lm("Credentials have been changed for resource %1 (%2)")
+            lm("Credentials have been changed for the Device %1 (%2)")
                 .args(device->getName(), device->getId()));
 
         at_deviceUpdated(device);

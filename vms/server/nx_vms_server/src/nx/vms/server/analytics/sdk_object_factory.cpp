@@ -47,11 +47,11 @@ const nx::utils::log::Tag kLogTag{typeid(nx::vms::server::analytics::SdkObjectFa
 
 PluginManager* getPluginManager(QnMediaServerModule* serverModule)
 {
-    if (!NX_ASSERT(serverModule, "Can't access the server module"))
+    if (!NX_ASSERT(serverModule, "Can't access ServerModule"))
         return nullptr;
 
     const auto pluginManager = serverModule->pluginManager();
-    NX_ASSERT(pluginManager, "Can't access the plugin manager");
+    NX_ASSERT(pluginManager, "Can't access PluginManager");
     return pluginManager;
 }
 
@@ -59,28 +59,28 @@ ec2::AbstractAnalyticsManagerPtr getAnalyticsManager(QnMediaServerModule* server
 {
     if (!serverModule)
     {
-        NX_ASSERT(false, "Can't access the server module");
+        NX_ASSERT(false, "Can't access the ServerModule");
         return nullptr;
     }
 
     const auto commonModule = serverModule->commonModule();
     if (!commonModule)
     {
-        NX_ASSERT(false, "Can't access the common module");
+        NX_ASSERT(false, "Can't access CommonModule");
         return nullptr;
     }
 
     auto ec2Connection = commonModule->ec2Connection();
     if (!ec2Connection)
     {
-        NX_ASSERT(false, "Can't access the ec2 connection");
+        NX_ASSERT(false, "Can't access the Ec2Connection");
         return nullptr;
     }
 
     auto analyticsManager = ec2Connection->getAnalyticsManager(Qn::kSystemAccess);
     if (!analyticsManager)
     {
-        NX_ASSERT(false, "Can't access the analytics manager");
+        NX_ASSERT(false, "Can't access AnalyticsManager");
         return nullptr;
     }
 
@@ -150,7 +150,7 @@ bool SdkObjectFactory::initPluginResources()
         const auto id = QnUuid::fromArbitraryData(pluginManifest->id);
         sdkPluginsById.emplace(id, analyticsPlugin);
 
-        NX_DEBUG(this, "Creating an analytics plugin resource. Id: %1; Name: %2",
+        NX_DEBUG(this, "Creating an Analytics Plugin resource. Id: %1; Name: %2",
             id, pluginManifest->name);
 
         auto& data = pluginDataById[id];
@@ -164,7 +164,7 @@ bool SdkObjectFactory::initPluginResources()
     const auto resPool = resourcePool();
     if (!resPool)
     {
-        NX_ERROR(this, "Can't access the resource pool");
+        NX_ERROR(this, "Can't access ResourcePool");
         return false;
     }
 
@@ -178,8 +178,8 @@ bool SdkObjectFactory::initPluginResources()
         if (!pluginResource)
         {
             NX_WARNING(this,
-                "Unable to find a plugin resource in the resource pool. "
-                "Plugin name: %1, plugin Id: %2",
+                "Unable to find a Plugin resource in the resource pool. "
+                "Plugin name: %1, Plugin Id: %2",
                 pluginData.name, pluginData.id);
             continue;
         }
@@ -203,7 +203,7 @@ bool SdkObjectFactory::initPluginResources()
         const bool result = pluginResource->init();
         if (!result)
         {
-            NX_WARNING(this, "Error while initializing plugin resource %1", pluginResource);
+            NX_WARNING(this, "Error while initializing the Plugin resource %1", pluginResource);
             continue;
         }
         pluginResource->setStatus(Qn::Online);
@@ -262,7 +262,8 @@ bool SdkObjectFactory::initEngineResources()
             else
             {
                 NX_WARNING(this,
-                    "Unable to find Analytics Engine Resource in Resource Pool for Engine %1 (%2)",
+                    "Unable to find an Analytics Engine Resource in Resource Pool "
+                    "for the Engine %1 (%2)",
                     engineData.name, engineData.id);
             }
         }

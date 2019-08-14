@@ -111,7 +111,7 @@ std::optional<nx::vms::api::analytics::PluginManifest>
 
 CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
 {
-    NX_DEBUG(this, lm("Initializing analytics engine resource %1 (%2)").args(getName(), getId()));
+    NX_DEBUG(this, lm("Initializing Analytics Engine resource %1 (%2)").args(getName(), getId()));
 
     if (!m_sdkEngine)
         return CameraDiagnostics::InternalServerErrorResult("SDK Engine object is not set");
@@ -131,11 +131,11 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
 
     const auto manifest = m_sdkEngine->manifest();
     if (!manifest)
-        return CameraDiagnostics::PluginErrorResult("Can't obtain engine manifest");
+        return CameraDiagnostics::PluginErrorResult("Can't obtain Engine Manifest");
 
     auto parentPlugin = plugin().dynamicCast<resource::AnalyticsPluginResource>();
     if (!parentPlugin)
-        return CameraDiagnostics::PluginErrorResult("Can't find parent plugin");
+        return CameraDiagnostics::PluginErrorResult("Can't find parent Plugin");
 
     const auto pluginManifest = parentPlugin->manifest();
 

@@ -243,7 +243,7 @@ bool PluginManager::storeNotLoadedPluginInfo(
     pluginInfo->status = status;
     pluginInfo->errorCode = errorCode;
 
-    pluginInfo->statusMessage = lm("%1%2 Server plugin [%3]%4: %5").args(
+    pluginInfo->statusMessage = lm("%1%2 Server Plugin [%3]%4: %5").args(
         isOk ? "Skipped loading" : "Failed loading",
         pluginInfo->optionality == Optionality::optional ? " optional" : "",
         pluginInfo->libraryFilename,

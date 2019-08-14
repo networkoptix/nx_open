@@ -95,7 +95,7 @@ bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
     {
         NX_DEBUG(
             this,
-            "There is no SDK device agent for device %1 (%2), and engine %3 (%4)",
+            "There is no SDK DeviceAgent for the Device %1 (%2) and the Engine %3 (%4)",
             m_device->getUserDefinedName(), m_device->getId(),
             m_engine->getName(), m_engine->getId());
 
@@ -112,7 +112,7 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
         const auto deviceAgent = createDeviceAgent();
         if (!deviceAgent)
         {
-            NX_ERROR(this, "Device agent creation failed, device %1 (%2)",
+            NX_ERROR(this, "DeviceAgent creation failed for the Device %1 (%2)",
                 m_device->getUserDefinedName(), m_device->getId());
             return false;
         }
@@ -138,7 +138,7 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
     {
         NX_ERROR(
             this,
-            "No device agent exitsts for device %1 (%2) and engine %3 (%4)",
+            "No DeviceAgent exitsts for the Device %1 (%2) and the Engine %3 (%4)",
             m_device->getUserDefinedName(),
             m_device->getId(),
             m_engine->getName(),
@@ -172,7 +172,7 @@ QVariantMap DeviceAnalyticsBinding::getSettings() const
 
     if (!deviceAgent)
     {
-        NX_WARNING(this, "Can't access device agent for device %1 (%2) and engine %3 (%4)",
+        NX_WARNING(this, "Can't access DeviceAgent for the Device %1 (%2) and the Engine %3 (%4)",
             m_device->getUserDefinedName(),
             m_device->getId(),
             m_engine->getName(),
@@ -195,7 +195,7 @@ void DeviceAnalyticsBinding::setSettingsInternal(const QVariantMap& settings)
 {
     if (!m_deviceAgent)
     {
-        NX_DEBUG(this, "Can't access device agent for device %1 (%2) and engine %3 (%4)",
+        NX_DEBUG(this, "Can't access DeviceAgent for the Device %1 (%2) and the Engine %3 (%4)",
             m_device->getUserDefinedName(),
             m_device->getId(),
             m_engine->getName(),
@@ -272,13 +272,13 @@ wrappers::DeviceAgentPtr DeviceAnalyticsBinding::createDeviceAgent()
 
     NX_DEBUG(
         this,
-        lm("Creating DeviceAgent for device %1 (%2)")
+        lm("Creating a DeviceAgent for the Device %1 (%2)")
             .args(m_device->getUserDefinedName(), m_device->getId()));
 
     const auto sdkEngine = m_engine->sdkEngine();
     if (!sdkEngine)
     {
-        NX_WARNING(this, lm("Can't access SDK engine object for engine %1 (%2)")
+        NX_WARNING(this, lm("Can't access an SDK Engine object for the Engine %1 (%2)")
             .args(m_engine->getName(), m_engine->getId()));
         return nullptr;
     }
@@ -292,7 +292,7 @@ wrappers::DeviceAgentPtr DeviceAnalyticsBinding::createDeviceAgent()
 
 nx::sdk::Ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandler()
 {
-    if (!NX_ASSERT(m_engine, "No analytics engine is set"))
+    if (!NX_ASSERT(m_engine, "No Analytics Engine is set"))
         return nullptr;
 
     auto handler = nx::sdk::makePtr<DeviceAgentHandler>(
@@ -315,8 +315,11 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
     const auto parentPlugin = m_engine->plugin();
     if (!parentPlugin)
     {
-        NX_ERROR(this, "Can't access parent analytics plugin, device %1 (%2)",
-            m_device->getUserDefinedName(), m_device->getId());
+        NX_ERROR(this,
+            "Can't access the parent Analytics Plugin for the Device %1 (%2) "
+            "and the Engine %3 (%4)",
+            m_device->getUserDefinedName(), m_device->getId(),
+            m_engine->getName(), m_engine->getId());
         return false;
     }
 
@@ -336,7 +339,7 @@ sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
         return {};
 
     const auto ruleWatcher = serverModule()->analyticsEventRuleWatcher();
-    if (!NX_ASSERT(ruleWatcher, "Can't access analytics rule watcher"))
+    if (!NX_ASSERT(ruleWatcher, "Can't access Analytics RuleWatcher"))
         return {};
 
     sdk_support::MetadataTypes result;
@@ -370,7 +373,7 @@ bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
     // Returning true means the data has been processed.
     if (!m_deviceAgent)
     {
-        NX_WARNING(this, lm("Device agent is not created for device %1 (%2) and engine %3")
+        NX_WARNING(this, lm("DeviceAgent is not created for the Device %1 (%2) and the Engine %3")
             .args(m_device->getUserDefinedName(), m_device->getId(), m_engine->getName()));
 
         return true;

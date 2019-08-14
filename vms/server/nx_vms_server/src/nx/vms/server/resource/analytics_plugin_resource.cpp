@@ -30,14 +30,14 @@ analytics::wrappers::PluginPtr AnalyticsPluginResource::sdkPlugin() const
 
 CameraDiagnostics::Result AnalyticsPluginResource::initInternal()
 {
-    NX_DEBUG(this, "Initializing analytics plugin resource %1 (%2)", getName(), getId());
+    NX_DEBUG(this, "Initializing Analytics Plugin resource %1 (%2)", getName(), getId());
 
     if (!m_sdkPlugin)
-        return CameraDiagnostics::InternalServerErrorResult("SDK plugin object is not set");
+        return CameraDiagnostics::InternalServerErrorResult("SDK Plugin object is not set");
 
     const auto manifest = m_sdkPlugin->manifest();
     if (!manifest)
-        return CameraDiagnostics::PluginErrorResult("Can't deserialize engine manifest");
+        return CameraDiagnostics::PluginErrorResult("Can't deserialize Plugin Manifest");
 
     nx::analytics::DescriptorManager descriptorManager(commonModule());
     descriptorManager.updateFromPluginManifest(*manifest);
