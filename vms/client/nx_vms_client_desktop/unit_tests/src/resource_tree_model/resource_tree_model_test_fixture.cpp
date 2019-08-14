@@ -3,11 +3,13 @@
 #include <QtCore/QFileInfo>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource/videowall_resource.h>
 
 using namespace nx;
 using namespace nx::vms::api;
@@ -120,6 +122,27 @@ QnWebPageResourcePtr ResourceTreeModelTest::addWebPageResource(const QString& na
     webPageResource->setIdUnsafe(QnUuid::createUuid());
     resourcePool()->addResource(webPageResource);
     return webPageResource;
+}
+
+QnVideoWallResourcePtr ResourceTreeModelTest::addVideoWallResource(const QString& name) const
+{
+    QnVideoWallResourcePtr videoWallResource(new QnVideoWallResource(commonModule()));
+    videoWallResource->setName(name);
+    videoWallResource->setIdUnsafe(QnUuid::createUuid());
+    resourcePool()->addResource(videoWallResource);
+    return videoWallResource;
+}
+
+LayoutTourData ResourceTreeModelTest::addLayoutTour(
+    const QString& name,
+    const QnUuid& parentId) const
+{
+    LayoutTourData tourData;
+    tourData.id = QnUuid::createUuid();
+    tourData.parentId = parentId;
+    tourData.name = name;
+    commonModule()->layoutTourManager()->addOrUpdateTour(tourData);
+    return tourData;
 }
 
 void ResourceTreeModelTest::logout() const

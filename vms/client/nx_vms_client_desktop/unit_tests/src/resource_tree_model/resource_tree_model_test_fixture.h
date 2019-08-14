@@ -6,6 +6,7 @@
 #include <client_core/client_core_module.h>
 #include <client/client_module.h>
 #include <api/global_settings.h>
+#include <nx/vms/api/data/layout_tour_data.h>
 
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -37,6 +38,9 @@ protected:
     QnLayoutResourcePtr addLayoutResource(const QString& name,
         const QnUuid& parentId = QnUuid()) const;
     QnWebPageResourcePtr addWebPageResource(const QString& name) const;
+    QnVideoWallResourcePtr addVideoWallResource(const QString& name) const;
+    nx::vms::api::LayoutTourData addLayoutTour(const QString& name,
+        const QnUuid& parentId = QnUuid()) const;
 
     void logout() const;
     QnUserResourcePtr loginAsAdmin(const QString& name) const;
