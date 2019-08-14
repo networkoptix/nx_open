@@ -37,6 +37,7 @@
 #   include <dirent.h>
 #   ifdef __APPLE__
 #      include <sys/mount.h>
+#      include <sigar/sigar.h>
 #   endif
 #endif
 
@@ -932,10 +933,78 @@ float QnFileStorageResource::getAvarageWritingUsage() const
     return writer ? writer->getAvarageUsage() : 0;
 }
 
-#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
+#if defined(Q_OS_WIN)
 bool QnFileStorageResource::isStorageDirMounted() const
 {
-    return true;    //common check is enough on Windows and macOS
+    return true;    //common check is enough on Windows
+}
+
+#elif defined(Q_OS_MAC)
+
+namespace {
+
+QStringList getMountPoints()
+{
+    QStringList mountPoints;
+
+    sigar_t *sigarproclist = nullptr;
+    sigar_open(&sigarproclist);
+    if (!sigarproclist)
+        return mountPoints;
+
+    sigar_file_system_list_t fileSystems;
+    if (sigar_file_system_list_get(sigarproclist, &fileSystems) != SIGAR_OK)
+        return mountPoints;
+
+    for(uint i = 0; i < fileSystems.number; i++)
+        mountPoints << QLatin1String(fileSystems.data[i].dir_name);
+
+    sigar_close(sigarproclist);
+
+    return mountPoints;
+}
+
+} // namespace <anonymous>
+
+bool QnFileStorageResource::isStorageDirMounted() const
+{
+    QStringList mountPoints = getMountPoints();
+    NX_DEBUG(this, lit("isStorageDirMounted local=%1 path=%2")
+            .arg(getLocalPathSafe())
+            .arg(getPath()));
+    auto path = getLocalPathSafe();
+    if (path.isEmpty())
+        path = getPath();
+
+    NX_DEBUG(this, lit("isStorageDirMounted path=%1")
+            .arg(path));
+
+    // struct stat pathStat;
+    // if (::stat(path.c_str(), &pathStat) != 0)
+    //     return false;
+
+    const QString notResolvedStoragePath = closeDirPath(path);
+    const QString& storagePath = QDir(notResolvedStoragePath).absolutePath();
+
+    for(const QString& mountPoint: mountPoints)
+    {
+        const QString& mountPointCanonical = QDir(closeDirPath(mountPoint)).canonicalPath();
+
+        if(mountPointCanonical == path)
+            return true;
+
+    //     struct stat mountPointStat;
+    //     if (::stat(mountPointCanonical.toStdString().c_str(), &mountPointStat) != 0)
+    //         continue;
+
+    //     NX_DEBUG(this, lit("isStorageDirMounted mountPointCanonical %1 compare %2 %3")
+    //         .arg(mountPointCanonical).arg(mountPointStat.st_dev).arg(pathStat.st_dev));
+
+    //     if(mountPointStat.st_dev == pathStat.st_dev)
+    //         return true;
+    }
+
+    return true;
 }
 
 #else
