@@ -115,7 +115,8 @@ bool Filter::operator==(const Filter& right) const
         && objectTrackId == right.objectTrackId
         && timePeriod == right.timePeriod
         && freeText == right.freeText
-        && sortOrder == right.sortOrder;
+        && sortOrder == right.sortOrder
+        && deviceIds == right.deviceIds;
 }
 
 bool Filter::operator!=(const Filter& right) const
