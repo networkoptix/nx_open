@@ -16,7 +16,7 @@ from requests.auth import HTTPDigestAuth
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-MEDIASERVER_VERSION = '3.1.0.17256'
+MEDIASERVER_VERSION = '3.1.0.17256-optix1'
 CLOUD_CONNECT_TEST_UTIL_VERSION = '18.3.0.20101'
 RETRY_TIMEOUT = 10  # seconds
 
@@ -548,7 +548,7 @@ class CloudSession(object):
 
 
 @contextmanager
-def mediaserver():
+def mediaserver(cloud_host):
     image = "009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/mediaserver:{}".format(MEDIASERVER_VERSION)
 
     client = docker.client.from_env()
@@ -557,7 +557,7 @@ def mediaserver():
                 '/srv/containers/mediaserver/var': {'bind': '/opt/networkoptix/mediaserver/var', 'mode': 'rw'}}
 
     log.info('Running mediaserver')
-    container = client.containers.run(image, ports={7001: 7001},volumes=volumes,  detach=True)
+    container = client.containers.run(image, ports={7001: 7001},volumes=volumes, command=[cloud_host], detach=True)
 
     try:
         mediaserver_ip = client.containers.get(container.id).attrs['NetworkSettings']['IPAddress']
@@ -612,7 +612,7 @@ def main():
     if len(sys.argv) == 3:
         debug = sys.argv[2] == "debug"
 
-    with mediaserver():
+    with mediaserver(host):
         session = CloudSession(host, debug)
         status = session.run_tests()
         session.close()
