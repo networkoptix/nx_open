@@ -44,7 +44,7 @@ Item
                 return
 
             ScrollBar.vertical = verticalScrollBar
-            verticalScrollBar = Qt.binding(function() { return scrollView.kThreeRowsScrollStep })
+            verticalScrollBar.stepSize = Qt.binding(function() { return scrollView.kThreeRowsScrollStep })
         }
 
         Flickable
