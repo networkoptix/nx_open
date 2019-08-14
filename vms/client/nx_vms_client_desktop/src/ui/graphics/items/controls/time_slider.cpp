@@ -1915,9 +1915,9 @@ void QnTimeSlider::updateLive()
     m_isLive = m_liveSupported && !m_selecting && value() == maximum();
 }
 
-qreal QnTimeSlider::msecsPerPixel() const
+milliseconds QnTimeSlider::msecsPerPixel() const
 {
-    return m_msecsPerPixel;
+    return milliseconds(qint64(m_msecsPerPixel));
 }
 
 void QnTimeSlider::updateMSecsPerPixel()

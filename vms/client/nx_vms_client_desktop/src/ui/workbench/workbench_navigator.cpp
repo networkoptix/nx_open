@@ -1614,7 +1614,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
                     && m_currentWidget->resource()->flags().testFlag(Qn::local_media)
                     && !m_currentWidget->resource()->flags().testFlag(Qn::sync);
 
-                if (qAbs(delta) < m_timeSlider->msecsPerPixel() ||
+                if (qAbs(delta) < m_timeSlider->msecsPerPixel().count() ||
                     (canOmitAnimation && delta * speed() < 0))
                 {
                     // If distance is less than 1 pixel or we catch up backwards on
