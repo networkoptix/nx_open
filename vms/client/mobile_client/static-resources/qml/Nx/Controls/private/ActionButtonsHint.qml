@@ -163,7 +163,7 @@ Rectangle
         hideTimer.restart()
     }
 
-    function hide(delayed)
+    function hide()
     {
         hideTimer.stop()
         control.state = "hidden"
