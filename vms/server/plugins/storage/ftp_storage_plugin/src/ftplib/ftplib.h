@@ -30,6 +30,7 @@
 #if defined(_WIN32)
 #include <winsock2.h>
 #include <windows.h>
+#pragma warning(disable: 4996) //< Disable warnings "...  deprecated API...".
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
