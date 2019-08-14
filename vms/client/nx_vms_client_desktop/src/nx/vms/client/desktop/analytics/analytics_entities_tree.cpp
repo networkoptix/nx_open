@@ -48,7 +48,7 @@ NodePtr buildEventTypesTree(QnCommonModule* commonModule, ScopedEventTypeIds sco
         engine->engineId = engineId;
         root->children.push_back(engine);
 
-        for (const auto& [groupId, eventTypeIds] : eventTypeIdsByGroup)
+        for (const auto& [groupId, eventTypeIds]: eventTypeIdsByGroup)
         {
             NodePtr parentNode = engine;
 
@@ -112,7 +112,7 @@ NodePtr buildObjectTypesTree(QnCommonModule* commonModule, ScopedObjectTypeIds s
                 parentNode = group;
             }
 
-            for (const auto& objectTypeId : objectTypeIds)
+            for (const auto& objectTypeId: objectTypeIds)
             {
                 const auto objectTypeDescriptor =
                     objectTypeDescriptorManager->descriptor(objectTypeId);
