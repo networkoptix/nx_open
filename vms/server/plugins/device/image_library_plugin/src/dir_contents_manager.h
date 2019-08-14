@@ -1,10 +1,6 @@
-/**********************************************************
-* 04 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef DIR_CONTENTS_MANAGER_H
-#define DIR_CONTENTS_MANAGER_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -12,7 +8,6 @@
 #include <camera/camera_plugin.h>
 
 #include "mutex.h"
-
 
 //!Manages information about image directory contents: Provides file list, generates timestamps of files, keep track of directory contents
 class DirContentsManager
@@ -39,5 +34,3 @@ private:
 
     void readDirContents();
 };
-
-#endif  //DIR_CONTENTS_MANAGER_H

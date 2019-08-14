@@ -98,13 +98,13 @@ namespace nxcip
 
         CameraInfo(const CameraInfo& value)
         {
-            strncpy(modelName, value.modelName, sizeof(modelName) - 1);
-            strncpy(firmware, value.firmware, sizeof(firmware) - 1);
-            strncpy(uid, value.uid, sizeof(uid) - 1);
-            strncpy(url, value.url, sizeof(url) - 1);
-            strncpy(auxiliaryData, value.auxiliaryData, sizeof(auxiliaryData) - 1);
-            strncpy(defaultLogin, value.defaultLogin, sizeof(defaultLogin) - 1);
-            strncpy(defaultPassword, value.defaultPassword, sizeof(defaultPassword) - 1);
+            strncpy(modelName, value.modelName, sizeof(modelName));
+            strncpy(firmware, value.firmware, sizeof(firmware));
+            strncpy(uid, value.uid, sizeof(uid));
+            strncpy(url, value.url, sizeof(url));
+            strncpy(auxiliaryData, value.auxiliaryData, sizeof(auxiliaryData));
+            strncpy(defaultLogin, value.defaultLogin, sizeof(defaultLogin));
+            strncpy(defaultPassword, value.defaultPassword, sizeof(defaultPassword));
         }
     };
 

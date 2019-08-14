@@ -1,10 +1,6 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef IMAGE_LIBRARY_PLUGIN_H
-#define IMAGE_LIBRARY_PLUGIN_H
+#pragma once
 
 #include <plugins/plugin_tools.h>
 
@@ -73,5 +69,3 @@ private:
     nxpt::CommonRefManager m_refManager;
     std::unique_ptr<DiscoveryManager> m_discoveryManager;
 };
-
-#endif  //IMAGE_LIBRARY_PLUGIN_H

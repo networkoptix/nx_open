@@ -1,7 +1,4 @@
-/**********************************************************
-* 12 sep 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "motion_data_picture.h"
 
@@ -9,7 +6,6 @@
 #include <cstring>
 
 #include <nx/kit/utils.h>
-
 
 MotionDataPicture::MotionDataPicture()
 :
@@ -71,19 +67,19 @@ int MotionDataPicture::planeCount() const
 //!Width (pixels)
 int MotionDataPicture::width() const
 {
-    return m_width;
+    return (int) m_width;
 }
 
 //!Height (pixels)
 int MotionDataPicture::height() const
 {
-    return m_height;
+    return (int) m_height;
 }
 
 //!Length of horizontal line in bytes
 int MotionDataPicture::xStride( int /*planeNumber*/ ) const
 {
-    return m_stride;
+    return (int) m_stride;
 }
 
 //!Returns pointer to horizontal line \a lineNumber (starting with 0)
