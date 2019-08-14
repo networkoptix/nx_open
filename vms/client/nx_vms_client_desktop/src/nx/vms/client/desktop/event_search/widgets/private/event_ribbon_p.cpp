@@ -9,8 +9,10 @@
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QApplication>
 
+#include <common/common_module.h>
 #include <client/client_globals.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <recording/time_period.h>
 #include <ui/common/notification_levels.h>
 #include <ui/common/read_only.h>
@@ -55,7 +57,7 @@ static constexpr auto kFadeCurtainColorName = "dark3";
 
 static constexpr milliseconds kPreviewCheckInterval = 100ms;
 
-static constexpr milliseconds kPreviewLoadTimeout = 15s;
+static constexpr milliseconds kPreviewLoadTimeout = 1min;
 
 /*
  * Tiles can have optional timed auto-close mode.
@@ -69,8 +71,12 @@ static constexpr milliseconds kVisibleAutoCloseDelay = 20s;
 static constexpr milliseconds kInvisibleAutoCloseDelay = 80s;
 
 static const auto kTilePreviewLoadInterval = milliseconds(ini().tilePreviewLoadIntervalMs);
-static const int kMaxSimultaneousTilePreviewLoads = std::clamp(
-    ini().maxSimultaneousTilePreviewLoads, 1, 15);
+
+static const int kMaxSimultaneousPreviewLoadsOverride = std::clamp(
+    ini().maxSimultaneousTilePreviewLoads, 0, 15);
+
+static constexpr int kMaxSimultaneousPreviewLoads = 8;
+static constexpr int kMaxSimultaneousArmPreviewLoads = 3;
 
 static const int kMaximumThumbnailWidth = ini().rightPanelMaxThumbnailWidth;
 
@@ -386,7 +392,7 @@ ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
                             timer->deleteLater();
                         }));
 
-                    NX_ASSERT(m_loadingPreviews.size() <= kMaxSimultaneousTilePreviewLoads);
+                    NX_ASSERT(m_loadingPreviews.size() <= maxSimultaneousPreviewLoads());
                     break;
                 }
 
@@ -409,9 +415,19 @@ void EventRibbon::Private::handleLoadingEnded(ResourceThumbnailProvider* provide
 
 bool EventRibbon::Private::isNextPreviewLoadAllowed() const
 {
-    return m_loadingPreviews.size() < kMaxSimultaneousTilePreviewLoads
+    return m_loadingPreviews.size() < maxSimultaneousPreviewLoads()
         && (kTilePreviewLoadInterval <= 0ms || m_sinceLastPreviewRequest.hasExpired(
             kTilePreviewLoadInterval));
+}
+
+int EventRibbon::Private::maxSimultaneousPreviewLoads() const
+{
+    if (kMaxSimultaneousPreviewLoadsOverride > 0)
+        return kMaxSimultaneousPreviewLoadsOverride;
+
+    return QnMediaServerResource::isArmServer(commonModule()->currentServer())
+        ? kMaxSimultaneousArmPreviewLoads
+        : kMaxSimultaneousPreviewLoads;
 }
 
 void EventRibbon::Private::ensureWidget(int index)

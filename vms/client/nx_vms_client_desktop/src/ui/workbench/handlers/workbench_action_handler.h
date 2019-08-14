@@ -81,6 +81,10 @@ protected:
         qreal rotation = 0.0;
         nx::vms::api::ImageCorrectionData contrastParams;
         nx::vms::api::DewarpingData dewarpingParams;
+        QnTimePeriod timelineWindow;
+        QnTimePeriod timelineSelection;
+        QList<QRegion> motionSelection;
+        QRectF analyticsSelection;
     };
 
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params);
