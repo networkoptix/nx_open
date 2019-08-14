@@ -354,8 +354,8 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
     if (microseconds period = calculateAverageMetadataPeriod(objectMetadataPackets); period > 0us)
         d->averageMetadataPeriod = period;
 
-    NX_VERBOSE(this,
-        "\n\n"
+    NX_DEBUG(this,
+        "\n"
         "Updating analytics objects; current timestamp %1\n"
         "Size of metadata list for resource %2: %3\n"
         "Average request period %4",
