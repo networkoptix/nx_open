@@ -1422,6 +1422,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
 
     if (!d->mediaRes)
         return nx::network::http::StatusCode::notFound;
+    if (!d->dataProcessor)
+        return nx::network::http::StatusCode::notFound; //< SetParameter without play or describe.
 
     QList<QByteArray> parameters = d->requestBody.split('\n');
     for(const QByteArray& parameter: parameters)

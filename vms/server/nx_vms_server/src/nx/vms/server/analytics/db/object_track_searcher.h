@@ -109,7 +109,7 @@ private:
 
     nx::sql::Filter prepareTrackFilterSqlExpression();
 
-    std::vector<ObjectTrack> loadTracks(nx::sql::AbstractSqlQuery* query);
+    std::vector<ObjectTrack> loadTracks(nx::sql::AbstractSqlQuery* query, int limit = 0);
     ObjectTrack loadTrack(nx::sql::AbstractSqlQuery* query);
 
     void filterTrack(std::vector<ObjectPosition>* const track);
