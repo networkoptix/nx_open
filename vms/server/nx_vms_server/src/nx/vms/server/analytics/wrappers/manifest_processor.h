@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include <core/resource/camera_resource.h>
 
 #include <nx/sdk/i_string.h>
@@ -8,6 +10,7 @@
 #include <nx/vms/server/sdk_support/file_utils.h>
 #include <nx/vms/server/sdk_support/conversion_utils.h>
 #include <nx/vms/server/analytics/wrappers/types.h>
+#include <plugins/vms_server_plugins_ini.h>
 
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
@@ -194,11 +197,12 @@ private:
                 buildManifestValidationDetails(errorList)});
         }
 
-        return errorList.empty();
+        return std::none_of(errorList.cbegin(), errorList.cend(),
+            [](const auto& manifestError) { return isCriticalManifestError(manifestError); });
     }
 
-    QString buildManifestValidationDetails(
-        const std::vector<nx::vms::api::analytics::ManifestError>& manifestErrors) const
+    static QString buildManifestValidationDetails(
+        const std::vector<api::analytics::ManifestError>& manifestErrors)
     {
         QString result;
         for (int i = 0; i < manifestErrors.size(); ++i)
@@ -213,6 +217,21 @@ private:
         }
 
         return result;
+    }
+
+    static bool isCriticalManifestError(
+        const api::analytics::ManifestError& manifestError)
+    {
+        if (manifestError.errorType == api::analytics::ManifestErrorType::noError)
+            return false;
+
+        if (pluginsIni().enableStrictManifestValidationMode)
+            return true;
+
+        if (manifestError.errorType == api::analytics::ManifestErrorType::emptyPluginId)
+            return true;
+
+        return false;
     }
 
 private:
