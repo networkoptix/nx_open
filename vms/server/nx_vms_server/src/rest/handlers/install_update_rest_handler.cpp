@@ -2,6 +2,7 @@
 #include "private/multiserver_request_helper.h"
 #include "private/multiserver_update_request_helpers.h"
 #include <rest/server/rest_connection_processor.h>
+#include <rest/helpers/permissions_helper.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
@@ -158,8 +159,11 @@ int QnInstallUpdateRestHandler::executePost(
     const QnRestConnectionProcessor* processor)
 {
     const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
-        processor->resourcePool(),
-        params);
+        processor->resourcePool(), params);
+
+    const auto accessRights = processor->accessRights();
+    if (!QnPermissionsHelper::hasOwnerPermissions(serverModule()->resourcePool(), accessRights))
+        return nx::network::http::StatusCode::forbidden;
 
     m_onTriggeredCallback();
 
