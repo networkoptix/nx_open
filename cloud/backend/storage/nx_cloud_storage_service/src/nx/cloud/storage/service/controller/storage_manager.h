@@ -2,11 +2,12 @@
 
 #include <nx/utils/move_only_func.h>
 #include <nx/cloud/storage/service/api/add_storage.h>
+#include <nx/cloud/storage/service/api/add_system.h>
 #include <nx/cloud/storage/service/api/bucket.h>
 #include <nx/cloud/storage/service/api/result.h>
 #include <nx/cloud/storage/service/api/storage.h>
 #include <nx/cloud/storage/service/api/storage_credentials.h>
-#include <nx/cloud/storage/service/api/add_system.h>
+#include <nx/cloud/storage/service/api/system.h>
 #include <nx/sql/query_context.h>
 #include <nx/utils/basic_factory.h>
 
@@ -28,11 +29,7 @@ namespace conf { class Settings; }
 
 namespace model {
 
-namespace dao
-{
-    class AbstractStorageDao;
-    struct System;
-} // namespace dao
+namespace dao { class AbstractStorageDao; }
 
 class Database;
 class Model;
@@ -73,6 +70,16 @@ public:
     void getCredentials(
         const std::string& storageId,
         nx::utils::MoveOnlyFunc<void(api::Result, api::StorageCredentials)> handler);
+
+    void addSystem(
+        const std::string& storageId,
+        const api::AddSystemRequest& request,
+        nx::utils::MoveOnlyFunc<void(api::Result, api::System)> handler);
+
+    void removeSystem(
+        const std::string& storageId,
+        const std::string& systemId,
+        nx::utils::MoveOnlyFunc<void(api::Result)> handler);
 
 private:
     void getStorage(

@@ -2,6 +2,9 @@
 
 #include <nx/sql/query_context.h>
 
+#include <nx/cloud/storage/service/api/storage.h>
+#include <nx/cloud/storage/service/api/system.h>
+
 #include "nx/cloud/storage/service/model/database.h"
 #include "nx/cloud/storage/service/utils.h"
 
@@ -13,6 +16,7 @@ static constexpr char kId[] = "id";
 static constexpr char kRegion[] = "region";
 static constexpr char kTotalSpace[] = "total_space";
 static constexpr char kUrl[] = "url";
+static constexpr char kSystemId[] = "system_id";
 
 static constexpr char kIdBinding[] = ":id";
 static constexpr char kTotalSpaceBinding[] = ":total_space";
@@ -20,6 +24,7 @@ static constexpr char kRegionBinding[] = ":region";
 static constexpr char kUrlBinding[] = ":url";
 static constexpr char kStorageIdBinding[] = ":storage_id";
 static constexpr char kBucketNameBinding[] = ":bucket_name";
+static constexpr char kSystemIdBinding[] = ":system_id";
 
 static constexpr char kAddStorage[] = R"sql(
 
@@ -56,6 +61,21 @@ DELETE FROM storages WHERE id=:id
 static constexpr char kRemoveStorageBucketRelations[] = R"sql(
 
 DELETE FROM storage_bucket_relation WHERE storage_id=:storage_id
+
+)sql";
+
+static constexpr char kAddStorageSystemRelation[] = R"sql(
+
+INSERT INTO storage_system_relation(storage_id, system_id)
+VALUES(:storage_id, :system_id)
+
+)sql";
+
+static constexpr char kRemoveStorageSystemRelation[] = R"sql(
+
+DELETE FROM storage_system_relation
+    WHERE
+storage_id=:storage_id AND system_id=:system_id
 
 )sql";
 
@@ -116,6 +136,28 @@ void StorageDao::removeStorage(
     auto query = queryContext->connection()->createQuery();
     query->prepare(kRemoveStorage);
     query->bindValue(kIdBinding, storageId);
+    query->exec();
+}
+
+void StorageDao::addSystem(
+    nx::sql::QueryContext* queryContext,
+    const api::System& system)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(kAddStorageSystemRelation);
+    query->bindValue(kStorageIdBinding, system.storageId);
+    query->bindValue(kSystemIdBinding, system.id);
+    query->exec();
+}
+
+void StorageDao::removeSystem(
+    nx::sql::QueryContext* queryContext,
+    const api::System& system)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(kRemoveStorageSystemRelation);
+    query->bindValue(kStorageIdBinding, system.storageId);
+    query->bindValue(kSystemIdBinding, system.id);
     query->exec();
 }
 

@@ -14,7 +14,8 @@ namespace nx::cloud::storage::service::view::http {
 
 namespace {
 
-static constexpr char kStorageIdParam[] = "id";
+static constexpr char kStorageId[] = "storageId";
+static constexpr char kSystemId[] = "systemId";
 static constexpr char kBucketNameParam[] = "name";
 
 } // namespace
@@ -94,21 +95,34 @@ void Server::registerStorageApiHandlers()
             std::bind(&controller::StorageManager::addStorage, m_storageManager, _1, _2, _3),
             network::http::Method::put);
 
-    registerRequestProcessor<RequestHandler<void, api::Storage, RestArgFetcher<kStorageIdParam>>>(
+    registerRequestProcessor<RequestHandler<void, api::Storage, RestArgFetcher<kStorageId>>>(
         api::kStorageId,
         std::bind(&controller::StorageManager::readStorage, m_storageManager, _1, _2),
         network::http::Method::get);
 
-    registerRequestProcessor<RequestHandler<void, void, RestArgFetcher<kStorageIdParam>>>(
+    registerRequestProcessor<RequestHandler<void, void, RestArgFetcher<kStorageId>>>(
         api::kStorageId,
         std::bind(&controller::StorageManager::removeStorage, m_storageManager, _1, _2),
         network::http::Method::delete_);
 
     registerRequestProcessor<
-        RequestHandler<void, api::StorageCredentials, RestArgFetcher<kStorageIdParam>>>(
+        RequestHandler<void, api::StorageCredentials, RestArgFetcher<kStorageId>>>(
             api::kStorageCredentials,
             std::bind(&controller::StorageManager::getCredentials, m_storageManager, _1, _2),
             network::http::Method::get);
+
+    registerRequestProcessor<
+        RequestHandler<api::AddSystemRequest, api::System, RestArgFetcher<kStorageId>>>(
+            api::kStorageIdSystems,
+            std::bind(&controller::StorageManager::addSystem, m_storageManager, _1, _2, _3),
+            network::http::Method::put);
+
+    registerRequestProcessor<
+        RequestHandler<
+            void, void, RestArgFetcher<kStorageId>, RestArgFetcher<kSystemId>>>(
+            api::kStorageIdSystemId,
+            std::bind(&controller::StorageManager::removeSystem, m_storageManager, _1, _2, _3),
+            network::http::Method::delete_);
 }
 
 void Server::registerBucketApiHandlers()

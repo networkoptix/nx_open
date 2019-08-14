@@ -2,12 +2,14 @@
 
 #include <nx/network/http/generic_api_client.h>
 
+#include "add_system.h"
 #include "add_bucket.h"
 #include "add_storage.h"
 #include "bucket.h"
 #include "result.h"
 #include "storage.h"
 #include "storage_credentials.h"
+#include "system.h"
 
 namespace nx::cloud::storage::service::api {
 
@@ -32,6 +34,16 @@ public:
 
     void removeStorage(
         const std::string& storageId,
+        nx::utils::MoveOnlyFunc<void(ResultCode)> handler);
+
+    void addSystem(
+        const std::string& storageId,
+        const AddSystemRequest& request,
+        nx::utils::MoveOnlyFunc<void(ResultCode, System)> handler);
+
+    void removeSystem(
+        const std::string& storageId,
+        const std::string& systemId,
         nx::utils::MoveOnlyFunc<void(ResultCode)> handler);
 
     void listCameras(

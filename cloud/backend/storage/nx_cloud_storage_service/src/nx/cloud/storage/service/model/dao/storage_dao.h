@@ -1,12 +1,20 @@
 #pragma once
 
-#include <nx/cloud/storage/service/api/add_storage.h>
-#include <nx/cloud/storage/service/api/storage.h>
 #include <nx/utils/basic_factory.h>
 
 namespace nx::sql { class QueryContext; }
 
-namespace nx::cloud::storage::service::model {
+namespace nx::cloud::storage::service {
+
+namespace api {
+
+struct Device;
+struct Storage;
+struct System;
+
+} // namespace api
+
+namespace model {
 
 namespace dao {
 
@@ -29,6 +37,14 @@ public:
     virtual void removeStorage(
         nx::sql::QueryContext* queryContext,
         const std::string& storageId) = 0;
+
+    virtual void addSystem(
+        nx::sql::QueryContext* queryContext,
+        const api::System& system) = 0;
+
+    virtual void removeSystem(
+        nx::sql::QueryContext* queryContext,
+        const api::System& system) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -49,6 +65,14 @@ public:
     virtual void removeStorage(
         nx::sql::QueryContext* queryContext,
         const std::string& storageId) override;
+
+    virtual void addSystem(
+        nx::sql::QueryContext* queryContext,
+        const api::System& system) override;
+
+    virtual void removeSystem(
+        nx::sql::QueryContext* queryContext,
+        const api::System& system) override;
 
 private:
     void addStorageBucketRelation(
@@ -84,4 +108,5 @@ private:
 };
 
 } // namespace dao
-} // namespace nx::cloud::storage::service::model
+} // namespace model
+} // namespace nx::cloud::storage::service

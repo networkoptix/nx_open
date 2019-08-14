@@ -27,6 +27,12 @@ CREATE TABLE storage_bucket_relation(
     region VARCHAR(128) NOT NULL
 );
 
+CREATE TABLE storage_system_relation(
+    storage_id VARCHAR(256),
+    system_id VARCHAR(256),
+    PRIMARY KEY(storage_id, system_id)
+);
+
 CREATE INDEX idx_storage_id ON `storage_bucket_relation`(storage_id);
 CREATE INDEX idx_bucket_name ON `storage_bucket_relation`(bucket_name);
 

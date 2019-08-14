@@ -21,7 +21,8 @@ bool Storage::operator==(const Storage& other) const
     return id == other.id
         && totalSpace == other.totalSpace
         && freeSpace == other.freeSpace
-        && ioDevices == other.ioDevices;
+        && ioDevices == other.ioDevices
+        && systems == other.systems;
 }
 
 } // namespace nx::cloud::storage::service::api

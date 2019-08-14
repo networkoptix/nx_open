@@ -50,6 +50,28 @@ void Client::removeStorage(
         std::move(handler));
 }
 
+void Client::addSystem(
+    const std::string& storageId,
+    const AddSystemRequest& request,
+    nx::utils::MoveOnlyFunc<void(ResultCode, System)> handler)
+{
+    base_type::template makeAsyncCall<System>(
+        Method::put,
+        rest::substituteParameters(api::kStorageIdSystems, {storageId}),
+        std::move(handler));
+}
+
+void Client::removeSystem(
+    const std::string& storageId,
+    const std::string& systemId,
+    nx::utils::MoveOnlyFunc<void(ResultCode)> handler)
+{
+    base_type::template makeAsyncCall<void>(
+        Method::delete_,
+        rest::substituteParameters(api::kStorageIdSystemId, {storageId, systemId}),
+        std::move(handler));
+}
+
 void Client::listCameras(
     const std::string& storageId,
     nx::utils::MoveOnlyFunc<void(ResultCode, std::vector<std::string>)> handler)
