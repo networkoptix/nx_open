@@ -13,6 +13,9 @@
 
 namespace nx::cloud::storage::service::controller {
 
+using namespace std::placeholders;
+using namespace model::dao;
+
 namespace {
 
 // TODO should this be a setting?
@@ -81,15 +84,14 @@ void StorageManager::AddStorageContext::initializeStorage(
     const api::Bucket& bucket,
     const api::AddStorageRequest& request)
 {
-    storage = api::Storage{};
-    storage->id = QnUuid::createUuid().toSimpleString().toStdString();
-    storage->totalSpace = request.totalSpace;
-    storage->freeSpace = request.totalSpace;
-    storage->ioDevices.emplace_back(api::Device{});
-    storage->ioDevices.back().type = kStorageType;
-    storage->ioDevices.back().dataUrl =
-        network::url::Builder(service::utils::bucketUrl(bucket.name)).setPath(storage->id);
-    storage->ioDevices.back().region = bucket.region;
+    storage.id = QnUuid::createUuid().toSimpleString().toStdString();
+    storage.totalSpace = request.totalSpace;
+    storage.freeSpace = request.totalSpace;
+    storage.ioDevices.emplace_back(api::Device{});
+    storage.ioDevices.back().type = kStorageType;
+    storage.ioDevices.back().dataUrl =
+        network::url::Builder(service::utils::bucketUrl(bucket.name)).setPath(storage.id);
+    storage.ioDevices.back().region = bucket.region;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -100,6 +102,9 @@ StorageManager::StorageManager(
     model::Model* model,
     BucketManager* bucketManager)
     :
+    BaseManager(
+        settings.database().synchronization.clusterId,
+        &model->database().synchronizationEngine()),
     m_settings(settings),
     m_database(&model->database()),
     m_storageDao(&model->storageDao()),
@@ -152,7 +157,10 @@ void StorageManager::addStorage(
 
             addStorageContext->initializeStorage(bucket, request);
 
-            return addStorageAndSynchronize(queryContext, *addStorageContext->storage);
+            return manipulateDbAndSynchronize<command::SaveStorage>(
+                queryContext,
+                addStorageContext->storage,
+                std::bind(&AbstractStorageDao::addStorage, m_storageDao, _1, _2));
         },
         [this, handler = std::move(handler), addStorageContext](auto dbResult)
         {
@@ -168,7 +176,7 @@ void StorageManager::addStorage(
             if (addStorageContext->bucketLookupResult.resultCode != api::ResultCode::ok)
                 return handler(std::move(addStorageContext->bucketLookupResult), api::Storage{});
 
-            handler(api::Result(), std::move(*addStorageContext->storage));
+            handler(api::Result(), std::move(addStorageContext->storage));
         });
 }
 
@@ -184,16 +192,16 @@ void StorageManager::removeStorage(
     if (storageId.empty())
         return handler(utils::badRequest("Empty storageId"));
 
-    auto storage = std::make_shared<std::optional<api::Storage>>();
-
     m_database->synchronizationEngine().transactionLog().startDbTransaction(
         m_settings.database().synchronization.clusterId,
-        [this, storageId, storage](auto queryContext)
+        [this, storageId](auto queryContext)
         {
-            *storage = removeStorageAndSynchronize(queryContext, storageId);
-            return nx::sql::DBResult::ok;
+            return manipulateDbAndSynchronize<command::RemoveStorage>(
+                queryContext,
+                storageId,
+                std::bind(&AbstractStorageDao::removeStorage, m_storageDao, _1, _2));
         },
-        [this, storageId, handler = std::move(handler), storage](auto dbResult)
+        [this, storageId, handler = std::move(handler)](auto dbResult)
         {
             if (dbResult != nx::sql::DBResult::ok)
             {
@@ -203,9 +211,6 @@ void StorageManager::removeStorage(
                 NX_ERROR(this, error.error);
                 return handler(std::move(error));
             }
-
-            if (!*storage)
-                return handler(api::Result(api::ResultCode::notFound));
 
             handler(api::Result());
         });
@@ -310,40 +315,6 @@ void StorageManager::getCredentialsForStorage(
 
             handler(api::Result(), std::move(credentials));
         });
-}
-
-nx::sql::DBResult StorageManager::addStorageAndSynchronize(
-    nx::sql::QueryContext* queryContext,
-    const api::Storage& storage)
-{
-    m_storageDao->addStorage(queryContext, storage);
-
-    m_database->synchronizationEngine().transactionLog()
-        .generateTransactionAndSaveToLog<command::SaveStorage>(
-            queryContext,
-            m_settings.database().synchronization.clusterId,
-            storage);
-
-    return nx::sql::DBResult::ok;
-}
-
-std::optional<api::Storage> StorageManager::removeStorageAndSynchronize(
-    nx::sql::QueryContext* queryContext,
-    const std::string& storageId)
-{
-    auto storage = m_storageDao->readStorage(queryContext, storageId);
-    if (!storage)
-        return std::nullopt;
-
-    m_storageDao->removeStorage(queryContext, storageId);
-
-    m_database->synchronizationEngine().transactionLog()
-        .generateTransactionAndSaveToLog<command::RemoveStorage>(
-            queryContext,
-            m_settings.database().synchronization.clusterId,
-            storageId);
-
-    return storage;
 }
 
 std::pair<api::Result, api::Bucket> StorageManager::findBucketByRegion(
@@ -474,28 +445,11 @@ void StorageManager::removeDataUsageCalculator(
 
 void StorageManager::registerSyncEngineCommandHandlers()
 {
-    using namespace std::placeholders;
-
     registerCommandHandler<command::SaveStorage>(
-        std::bind(&model::dao::AbstractStorageDao::addStorage, m_storageDao, _1, _2));
+        std::bind(&AbstractStorageDao::addStorage, m_storageDao, _1, _2));
 
     registerCommandHandler<command::RemoveStorage>(
-        std::bind(&model::dao::AbstractStorageDao::removeStorage, m_storageDao, _1, _2));
-
-    registerCommandHandler<command::SaveSystem>(
-        std::bind(&model::dao::AbstractStorageDao::addSystem, m_storageDao, _1, _2));
-}
-
-template<typename Command, typename HandlerFunc>
-void StorageManager::registerCommandHandler(HandlerFunc handler)
-{
-    m_database->synchronizationEngine().incomingCommandDispatcher()
-        .registerCommandHandler<Command>(
-            [handler = std::move(handler)](auto queryContext, auto /*clusterId*/, auto command)
-            {
-                handler(queryContext, command.params);
-                return nx::sql::DBResult::ok;
-            });
+        std::bind(&AbstractStorageDao::removeStorage, m_storageDao, _1, _2));
 }
 
 } // namespace nx::cloud::storage::service::controller

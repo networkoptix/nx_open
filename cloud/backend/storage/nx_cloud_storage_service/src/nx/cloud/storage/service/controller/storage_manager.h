@@ -6,6 +6,7 @@
 #include <nx/cloud/storage/service/api/result.h>
 #include <nx/cloud/storage/service/api/storage.h>
 #include <nx/cloud/storage/service/api/storage_credentials.h>
+#include <nx/cloud/storage/service/api/add_system.h>
 #include <nx/sql/query_context.h>
 #include <nx/utils/basic_factory.h>
 
@@ -27,7 +28,12 @@ namespace conf { class Settings; }
 
 namespace model {
 
-namespace dao { class AbstractStorageDao; }
+namespace dao
+{
+    class AbstractStorageDao;
+    struct System;
+} // namespace dao
+
 class Database;
 class Model;
 
@@ -37,7 +43,8 @@ namespace controller {
 
 using GetStorageHandler = nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)>;
 
-class StorageManager
+class StorageManager:
+    public BaseManager
 {
 public:
     StorageManager(
@@ -77,14 +84,6 @@ private:
         api::Storage storage,
         nx::utils::MoveOnlyFunc<void(api::Result, api::StorageCredentials)> handler);
 
-    nx::sql::DBResult addStorageAndSynchronize(
-        nx::sql::QueryContext* queryContext,
-        const api::Storage& storage);
-
-    std::optional<api::Storage> removeStorageAndSynchronize(
-        nx::sql::QueryContext* queryContext,
-        const std::string& storageId);
-
     std::pair<api::Result, api::Bucket> findBucketByRegion(
         const std::vector<api::Bucket>& buckets,
         const std::string& request);
@@ -104,14 +103,11 @@ private:
 
     void registerSyncEngineCommandHandlers();
 
-    template<typename Command, typename HandlerFunc>
-    void registerCommandHandler(HandlerFunc handlerFunc);
-
 private:
     struct AddStorageContext
     {
         api::Result bucketLookupResult;
-        std::optional<api::Storage> storage;
+        api::Storage storage;
 
         void initializeStorage(
             const api::Bucket& bucket,
