@@ -20,6 +20,7 @@
 #include <utils/common/synctime.h>
 
 #include <nx/utils/datetime.h>
+#include <nx/vms/client/desktop/ini.h>
 
 using namespace std::chrono;
 
@@ -115,16 +116,16 @@ public:
 
     ~WidgetData();
 
+    void sendBookmarksToOverlay();
+
 private:
     void updatePos(qint64 posMs);
 
     void updateQueryFilter();
 
-    void updateBookmarksAtPosition();
-
     void updateBookmarks(const QnCameraBookmarkList &newBookmarks);
 
-    void sendBookmarksToOverlay();
+    void updateBookmarksAtPosition();
 
 private:
     const QnTimelineBookmarksWatcherPtr m_timelineWatcher;
@@ -259,14 +260,26 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::sendBookmarksToOverlay()
         return;
 
     QnCameraBookmarkList bookmarksToDisplay;
-    for (const auto &bookmark: m_bookmarksAtPos.bookmarkList())
-    {
-        if (bookmark.name.trimmed().isEmpty() && bookmark.description.trimmed().isEmpty())
-            continue;
+    const bool relevantCamera =
+        m_parent->m_cameraFilter.empty() || m_parent->m_cameraFilter.contains(m_camera);
 
-        bookmarksToDisplay << bookmark;
-        if (bookmarksToDisplay.size() >= kBookmarksDisplayLimit)
-            break;
+    if (relevantCamera || !nx::vms::client::desktop::ini().applyCameraFilterToSceneItems)
+    {
+        QnCameraBookmarkSearchFilter filter;
+        filter.text = relevantCamera ? m_parent->m_textFilter : QString();
+
+        for (const auto& bookmark: m_bookmarksAtPos.bookmarkList())
+        {
+            if (bookmark.name.trimmed().isEmpty() && bookmark.description.trimmed().isEmpty())
+                continue;
+
+            if (!filter.checkBookmark(bookmark))
+                continue;
+
+            bookmarksToDisplay << bookmark;
+            if (bookmarksToDisplay.size() >= kBookmarksDisplayLimit)
+                break;
+        }
     }
 
     if (m_displayedBookmarks == bookmarksToDisplay)
@@ -334,4 +347,17 @@ QnBookmarkColors QnWorkbenchItemBookmarksWatcher::bookmarkColors() const
 void QnWorkbenchItemBookmarksWatcher::setBookmarkColors(const QnBookmarkColors &colors)
 {
     m_colors = colors;
+}
+
+void QnWorkbenchItemBookmarksWatcher::setDisplayFilter(
+    const QnVirtualCameraResourceSet& cameraFilter, const QString& textFilter)
+{
+    if (m_textFilter == textFilter && m_cameraFilter == cameraFilter)
+        return;
+
+    m_cameraFilter = cameraFilter;
+    m_textFilter = textFilter;
+
+    for (auto& widgetData: m_widgetDataHash)
+        widgetData->sendBookmarksToOverlay();
 }
