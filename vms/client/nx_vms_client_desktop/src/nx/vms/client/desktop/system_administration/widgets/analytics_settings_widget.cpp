@@ -393,5 +393,5 @@ bool AnalyticsSettingsWidget::shouldBeVisible() const
 
 } // namespace nx::vms::client::desktop
 
-// Hack to make Q_OBJECT macro work in the cpp file.
+// Force Q_OBJECT macro work in the cpp file. Implemented the same way as it was in QMake.
 #include "analytics_settings_widget.moc"
