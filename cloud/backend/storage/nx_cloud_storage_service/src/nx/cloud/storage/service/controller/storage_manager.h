@@ -95,22 +95,17 @@ private:
 
     std::optional<nx::geo_ip::Location> resolveLocation(const std::string& ipAddress);
 
-    void insertReceivedRecord(
-        nx::sql::QueryContext* queryContext,
-        const std::string& /*clusterId*/,
-        clusterdb::engine::Command<api::Storage> command);
-
-    void removeReceivedRecord(
-        nx::sql::QueryContext* queryContext,
-        const std::string& /*clusterId*/,
-        clusterdb::engine::Command<std::string> command);
-
     void calculateDataUsage(
         api::Storage storage,
         nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler);
 
     std::shared_ptr<s3::DataUsageCalculator> createDataUsageCalculator();
     void removeDataUsageCalculator(const std::shared_ptr<s3::DataUsageCalculator>& calculator);
+
+    void registerSyncEngineCommandHandlers();
+
+    template<typename Command, typename HandlerFunc>
+    void registerCommandHandler(HandlerFunc handlerFunc);
 
 private:
     struct AddStorageContext

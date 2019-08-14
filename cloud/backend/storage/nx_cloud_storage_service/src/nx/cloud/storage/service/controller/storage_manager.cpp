@@ -111,21 +111,7 @@ StorageManager::StorageManager(
             kStsUrl,
             m_settings.aws().credentials))
 {
-    m_database->synchronizationEngine().incomingCommandDispatcher()
-        .registerCommandHandler<command::SaveStorage>(
-            [this](auto&& ... args)
-            {
-                insertReceivedRecord(std::forward<decltype(args)>(args)...);
-                return nx::sql::DBResult::ok;
-            });
-
-    m_database->synchronizationEngine().incomingCommandDispatcher()
-        .registerCommandHandler<command::RemoveStorage>(
-            [this](auto&& ... args)
-            {
-                removeReceivedRecord(std::forward<decltype(args)>(args)...);
-                return nx::sql::DBResult::ok;
-            });
+    registerSyncEngineCommandHandlers();
 }
 
 StorageManager::~StorageManager()
@@ -437,22 +423,6 @@ std::optional<nx::geo_ip::Location> StorageManager::resolveLocation(const std::s
     return std::nullopt;
 }
 
-void StorageManager::insertReceivedRecord(
-    nx::sql::QueryContext* queryContext,
-    const std::string& /*clusterId*/,
-    clusterdb::engine::Command<api::Storage> command)
-{
-    m_storageDao->addStorage(queryContext, command.params);
-}
-
-void StorageManager::removeReceivedRecord(
-    nx::sql::QueryContext* queryContext,
-    const std::string& /*clusterId*/,
-    clusterdb::engine::Command<std::string> command)
-{
-    m_storageDao->removeStorage(queryContext, command.params);
-}
-
 void StorageManager::calculateDataUsage(
     api::Storage storage,
     nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler)
@@ -500,6 +470,32 @@ void StorageManager::removeDataUsageCalculator(
 {
     QnMutexLocker lock(&m_mutex);
     m_dataUsageCalculators.erase(calculator);
+}
+
+void StorageManager::registerSyncEngineCommandHandlers()
+{
+    using namespace std::placeholders;
+
+    registerCommandHandler<command::SaveStorage>(
+        std::bind(&model::dao::AbstractStorageDao::addStorage, m_storageDao, _1, _2));
+
+    registerCommandHandler<command::RemoveStorage>(
+        std::bind(&model::dao::AbstractStorageDao::removeStorage, m_storageDao, _1, _2));
+
+    registerCommandHandler<command::SaveSystem>(
+        std::bind(&model::dao::AbstractStorageDao::addSystem, m_storageDao, _1, _2));
+}
+
+template<typename Command, typename HandlerFunc>
+void StorageManager::registerCommandHandler(HandlerFunc handler)
+{
+    m_database->synchronizationEngine().incomingCommandDispatcher()
+        .registerCommandHandler<Command>(
+            [handler = std::move(handler)](auto queryContext, auto /*clusterId*/, auto command)
+            {
+                handler(queryContext, command.params);
+                return nx::sql::DBResult::ok;
+            });
 }
 
 } // namespace nx::cloud::storage::service::controller
