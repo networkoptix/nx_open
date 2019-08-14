@@ -356,7 +356,7 @@ int64_t SystemCommands::totalSpace(const std::string& path)
     struct statvfs64 stat;
     int64_t result = -1;
 
-    if (statvfs(path.c_str(), &stat) == 0)
+    if (statvfs64(path.c_str(), &stat) == 0)
         result = stat.f_blocks * (int64_t) stat.f_frsize;
     else
     {

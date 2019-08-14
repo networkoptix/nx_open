@@ -346,7 +346,7 @@ uint64_t DirIterator::entrySize() const
     if( m_impl->entrySize == (uint64_t)-1 )
     {
         //performing stat here, because unneeded stat call can greately slow down directory traversal
-        struct stat st;
+        struct stat64 st;
         memset( &st, 0, sizeof(st) );
         if( ::stat64( (m_impl->dir + "/" + m_impl->entryPath).c_str(), &st ) )
             return 0;
