@@ -20,6 +20,9 @@
 
 #include "wildcard_match.h"
 
+#ifdef __APPLE__
+#define stat64 stat
+#endif
 
 namespace FsEntryType
 {
@@ -345,7 +348,7 @@ uint64_t DirIterator::entrySize() const
         //performing stat here, because unneeded stat call can greately slow down directory traversal
         struct stat st;
         memset( &st, 0, sizeof(st) );
-        if( ::stat( (m_impl->dir + "/" + m_impl->entryPath).c_str(), &st ) )
+        if( ::stat64( (m_impl->dir + "/" + m_impl->entryPath).c_str(), &st ) )
             return 0;
         m_impl->entrySize = st.st_size;
     }
