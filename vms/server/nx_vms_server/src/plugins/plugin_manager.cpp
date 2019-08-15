@@ -22,7 +22,10 @@
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/error.h>
 #include <nx/vms/server/sdk_support/to_string.h>
+#include <nx/vms/server/analytics/wrappers/plugin.h>
 #include <nx/vms/api/analytics/plugin_manifest.h>
+
+#include <media_server/media_server_module.h>
 
 #include "vms_server_plugins_ini.h"
 #include "plugin_loading_context.h"
@@ -30,6 +33,7 @@
 using namespace nx::sdk;
 using nx::vms::server::sdk_support::RefCountableRegistry;
 using nx::vms::api::PluginInfo;
+using namespace nx::vms::server::analytics;
 
 static QStringList stringToListViaComma(const QString& s)
 {
@@ -39,7 +43,8 @@ static QStringList stringToListViaComma(const QString& s)
     return list;
 }
 
-PluginManager::PluginManager(QObject* parent): QObject(parent)
+PluginManager::PluginManager(QnMediaServerModule* serverModule):
+    ServerModuleAware(serverModule)
 {
     libContext().setName("nx_vms_server");
     libContext().setRefCountableRegistry(
@@ -238,7 +243,7 @@ bool PluginManager::storeNotLoadedPluginInfo(
     pluginInfo->status = status;
     pluginInfo->errorCode = errorCode;
 
-    pluginInfo->statusMessage = lm("%1%2 Server plugin [%3]%4: %5").args(
+    pluginInfo->statusMessage = lm("%1%2 Server Plugin [%3]%4: %5").args(
         isOk ? "Skipped loading" : "Failed loading",
         pluginInfo->optionality == Optionality::optional ? " optional" : "",
         pluginInfo->libraryFilename,
@@ -283,43 +288,6 @@ bool PluginManager::storeLoadedPluginInfo(
     return true;
 }
 
-namespace {
-
-/** On error, fills PluginInfo and logs the message. */
-class ManifestLogger: public nx::vms::server::sdk_support::AbstractManifestLogger
-{
-public:
-    ManifestLogger(QString* outErrorMessage): m_outErrorMessage(outErrorMessage) {}
-
-    virtual void log(
-        const QString& manifestStr,
-        const nx::vms::server::sdk_support::Error& error) override
-    {
-        if (error.isOk())
-            return;
-
-        *m_outErrorMessage = toString(error);
-
-        // TODO: #dmishin Improve: here the error is logged before the plugin status message.
-        if (manifestStr.isEmpty())
-        {
-            NX_ERROR(typeid(PluginManager), "Received empty plugin manifest");
-        }
-        else
-        {
-            QString logMessage = "Received bad plugin manifest; lines (enquoted and escaped):\n";
-            for (const auto& line: manifestStr.split('\n'))
-                logMessage.append(QLatin1String((nx::kit::utils::toString(line) + "\n").c_str()));
-            NX_ERROR(typeid(PluginManager), logMessage);
-        }
-    }
-
-private:
-    QString* m_outErrorMessage;
-};
-
-} // namespace
-
 bool PluginManager::processPluginEntryPointForNewSdk(
     IPlugin::EntryPointFunc entryPointFunc, PluginInfoPtr pluginInfo)
 {
@@ -339,14 +307,17 @@ bool PluginManager::processPluginEntryPointForNewSdk(
 
     pluginInfo->mainInterface = MainInterface::nx_sdk_IPlugin;
 
+    NX_ASSERT(!pluginInfo->libName.isEmpty());
     if (const auto analyticsPlugin = plugin->queryInterface<nx::sdk::analytics::IPlugin>())
     {
-        pluginInfo->mainInterface = MainInterface::nx_sdk_analytics_IPlugin;
+        const auto plugin = std::make_shared<wrappers::Plugin>(
+            serverModule(),
+            analyticsPlugin,
+            pluginInfo->libName);
 
-        QString manifestErrorMessage;
-        if (const auto manifest = nx::vms::server::sdk_support::manifestFromSdkObject<
-            nx::vms::api::analytics::PluginManifest>(
-                analyticsPlugin, std::make_unique<ManifestLogger>(&manifestErrorMessage)))
+        std::unique_ptr<wrappers::StringBuilder> stringBuilder;
+        pluginInfo->mainInterface = MainInterface::nx_sdk_analytics_IPlugin;
+        if (const auto manifest = plugin->manifest(&stringBuilder))
         {
             pluginInfo->name = manifest->name;
             pluginInfo->description = manifest->description;
@@ -355,8 +326,13 @@ bool PluginManager::processPluginEntryPointForNewSdk(
         }
         else
         {
+            QString errorDescription = stringBuilder
+                ? lm(": %1").args(stringBuilder->buildPluginInfoString()).toQString()
+                : QString();
+
             return storeNotLoadedPluginInfo(pluginInfo, Status::notLoadedBecauseOfError,
-                Error::badManifest, "Invalid manifest: " + manifestErrorMessage);
+                Error::badManifest,
+                lm("Invalid manifest%1").args(errorDescription));
         }
     }
 

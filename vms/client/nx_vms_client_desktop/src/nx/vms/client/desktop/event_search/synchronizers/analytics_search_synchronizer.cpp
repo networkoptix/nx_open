@@ -208,7 +208,9 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
     }
 
     m_filter = {};
-    if (m_analyticsSearchWidget->selectedCameras() != AbstractSearchWidget::Cameras::all)
+    const auto cameraSetType = m_analyticsSearchWidget->selectedCameras();
+    if (cameraSetType != AbstractSearchWidget::Cameras::all
+        && cameraSetType != AbstractSearchWidget::Cameras::layout)
     {
         for (const auto& camera: m_analyticsSearchWidget->cameras())
             m_filter.deviceIds.push_back(camera->getId());

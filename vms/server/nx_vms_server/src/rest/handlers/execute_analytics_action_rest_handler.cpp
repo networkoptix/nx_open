@@ -13,8 +13,10 @@
 #include <nx/sdk/uuid.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/vms/server/sdk_support/utils.h>
+#include <nx/vms/server/sdk_support/conversion_utils.h>
 #include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/vms/server/sdk_support/result_holder.h>
+#include <nx/vms/server/analytics/wrappers/engine.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/helpers/object_track_info.h>
@@ -27,10 +29,12 @@
 
 #include <plugins/settings.h>
 
-using namespace nx::vms::server;
-using namespace nx::analytics::db;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using namespace nx::analytics::db;
+using namespace nx::vms::server;
+using namespace nx::vms::server::analytics;
+using namespace nx::vms_server_plugins::utils;
 
 template<typename T>
 using ResultHolder = nx::vms::server::sdk_support::ResultHolder<T>;
@@ -86,12 +90,11 @@ class Action: public RefCountable<IAction>
 public:
     Action(const ExtendedAnalyticsActionData& actionData, AnalyticsActionResult* actionResult):
         m_actionId(actionData.action.actionId.toStdString()),
-        m_objectTrackId(
-            nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(actionData.action.objectTrackId)),
-        m_deviceId(nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(actionData.action.deviceId)),
+        m_objectTrackId(fromQnUuidToSdkUuid(actionData.action.objectTrackId)),
+        m_deviceId(fromQnUuidToSdkUuid(actionData.action.deviceId)),
         m_timestampUs(actionData.action.timestampUs),
         m_objectTrackInfo(makeObjectTrackInfo(actionData)),
-        m_params(nx::vms::server::sdk_support::toIStringMap(actionData.action.params)),
+        m_params(sdk_support::toSdkStringMap(actionData.action.params)),
         m_actionResult(actionResult)
     {
         NX_ASSERT(m_actionResult);
@@ -139,7 +142,7 @@ private:
     const Ptr<IObjectTrackInfo> m_objectTrackInfo;
     const Ptr<const IStringMap> m_params;
 
-    AnalyticsActionResult* const m_actionResult;
+    AnalyticsActionResult* const m_actionResult = nullptr;
 };
 
 } // namespace
@@ -395,15 +398,15 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
     static const QString kNoSdkEngineToExecuteActionMessage(
         "No SDK engine to execute the action has been provided");
 
-    const auto sdkEngine = actionData.engine->sdkEngine();
+    const wrappers::EnginePtr sdkEngine = actionData.engine->sdkEngine();
     if (!NX_ASSERT(sdkEngine, kNoSdkEngineToExecuteActionMessage))
         return kNoSdkEngineToExecuteActionMessage;
 
-    const ResultHolder<void> result = sdkEngine->executeAction(action.get());
+    const bool result = sdkEngine->executeAction(action);
 
     // By this time, the Engine either already called Action::handleResult(), or is not going to
     // do it.
-    return result.isOk() ? QString() : sdk_support::toErrorString(result);
+    return result ? QString() : QString("Error has happened during action execution");
 }
 
 std::optional<nx::analytics::db::ObjectPosition>
@@ -620,18 +623,5 @@ std::optional<LookupResult> QnExecuteAnalyticsActionRestHandler::makeDatabaseReq
     }
 
     return std::get<1>(result);
-}
-
-std::unique_ptr<sdk_support::AbstractManifestLogger>
-QnExecuteAnalyticsActionRestHandler::makeLogger(
-    resource::AnalyticsEngineResourcePtr engineResource) const
-{
-    const QString messageTemplate(
-        "Error occurred while fetching Engine manifest for engine: {:engine}: {:error}");
-
-    return std::make_unique<sdk_support::ManifestLogger>(
-        typeid(*this), //< Using the same tag for all instances.
-        messageTemplate,
-        std::move(engineResource));
 }
 

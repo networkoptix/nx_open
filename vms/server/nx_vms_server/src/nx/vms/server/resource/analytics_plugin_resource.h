@@ -1,14 +1,14 @@
 #pragma once
 
-#include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/analytics/wrappers/fwd.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
 
-#include <nx/sdk/analytics/i_plugin.h>
-#include <nx/sdk/ptr.h>
+namespace nx::vms::server {
 
-#include <nx/vms/server/sdk_support/loggers.h>
+namespace analytics::wrappers { class Plugin; }
 
-namespace nx::vms::server::resource {
+namespace resource {
 
 class AnalyticsPluginResource:
     public nx::vms::common::AnalyticsPluginResource,
@@ -19,18 +19,18 @@ class AnalyticsPluginResource:
 public:
     AnalyticsPluginResource(QnMediaServerModule* serverModule);
 
-    void setSdkPlugin(nx::sdk::Ptr<nx::sdk::analytics::IPlugin> plugin);
+    void setSdkPlugin(analytics::wrappers::PluginPtr sdkPlugin);
 
-    nx::sdk::Ptr<nx::sdk::analytics::IPlugin> sdkPlugin() const;
+    analytics::wrappers::PluginPtr sdkPlugin() const;
 
-private:
-    std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger() const;
+    QString libName() const;
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
 private:
-    nx::sdk::Ptr<nx::sdk::analytics::IPlugin> m_sdkPlugin;
+    analytics::wrappers::PluginPtr m_sdkPlugin;
 };
 
-} // namespace nx::vms::server::resource
+} // namespace resource
+} // namespace nx::vms::server

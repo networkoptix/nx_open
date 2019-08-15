@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <optional>
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/update/update_information.h>
@@ -39,7 +40,7 @@ public:
     bool startUpdateInstallation(const QList<QnUuid>& participants);
     void install(const QnAuthSession& authInfo);
 
-    update::Information updateInformation(InformationCategory category) const noexcept(false);
+    std::optional<update::Information> updateInformation(InformationCategory category) const;
 
     void finish();
 

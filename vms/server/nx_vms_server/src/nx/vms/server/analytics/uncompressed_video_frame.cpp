@@ -2,6 +2,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/server/sdk_support/utils.h>
+#include <nx/vms/server/sdk_support/conversion_utils.h>
 
 namespace nx::vms::server::analytics {
 

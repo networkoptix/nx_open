@@ -7,6 +7,8 @@
 #include <mutex>
 #include <chrono>
 #include <ctime>
+#include <thread>
+#include <type_traits>
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
@@ -19,6 +21,7 @@
 #include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/settings_response.h>
+#include <nx/sdk/helpers/error.h>
 
 #include "utils.h"
 #include "stub_analytics_plugin_ini.h"
@@ -187,12 +190,18 @@ Result<const IStringMap*> DeviceAgent::settingsReceived()
 /** @param func Name of the caller for logging; supply __func__. */
 void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* func)
 {
+    if (m_deviceAgentSettings.additionalFrameProcessingDelay.load()
+        > std::chrono::milliseconds::zero())
+    {
+        std::this_thread::sleep_for(m_deviceAgentSettings.additionalFrameProcessingDelay.load());
+    }
+
     NX_OUTPUT << func << "(): timestamp " << videoFrame->timestampUs() << " us;"
         << " frame #" << m_frameCounter;
 
     if (m_deviceAgentSettings.leakFrames)
     {
-        NX_PRINT << "Intentionally creating a memomry leak with IDataPacket @"
+        NX_PRINT << "Intentionally creating a memory leak with IDataPacket @"
             << nx::kit::utils::toString(videoFrame);
         videoFrame->addRef();
     }
@@ -629,14 +638,15 @@ void DeviceAgent::dumpSomeFrameBytes(
 void DeviceAgent::parseSettings()
 {
     auto assignIntegerSetting =
-        [this](const std::string& parameterName, std::atomic<int>* target)
+        [this](const std::string& parameterName, auto target)
         {
             using namespace nx::kit::utils;
             int result = 0;
             const auto parameterValueString = settingValue(parameterName);
             if (fromString(parameterValueString, &result))
             {
-                *target = result;
+                using AtomicValueType = decltype(target->load());
+                target->store(AtomicValueType{result});
             }
             else
             {
@@ -665,6 +675,10 @@ void DeviceAgent::parseSettings()
     assignIntegerSetting(
         kNumberOfObjectsToGenerateSetting,
         &m_deviceAgentSettings.numberOfObjectsToGenerate);
+
+    assignIntegerSetting(
+        kAdditionalFrameProcessingDelayMs,
+        &m_deviceAgentSettings.additionalFrameProcessingDelay);
 }
 
 void DeviceAgent::updateObjectGenerationParameters()

@@ -2662,6 +2662,8 @@ void ActionHandler::confirmAnalyticsStorageLocation()
             const auto ok = msgBox.addButton(tr("OK"),
                 QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Standard);
 
+            msgBox.setEscapeButton(ok); //< Used to close the dialog by ESC / "X" button on Mac
+
             msgBox.exec();
 
             if (msgBox.clickedButton() == openSettings)
