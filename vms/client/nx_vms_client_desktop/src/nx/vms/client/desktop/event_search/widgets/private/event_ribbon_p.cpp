@@ -4,6 +4,7 @@
 #include <chrono>
 
 #include <QtCore/QAbstractListModel>
+#include <QtCore/QScopedValueRollback>
 #include <QtGui/QWheelEvent>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QScrollBar>
@@ -381,6 +382,9 @@ ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
     connect(provider, &ImageProvider::statusChanged, this,
         [this, provider](Qn::ThumbnailStatus status)
         {
+            if (provider == m_providerLoadingFromCache)
+                return;
+
             switch (status)
             {
                 case Qn::ThumbnailStatus::Loading:
@@ -1510,8 +1514,13 @@ void EventRibbon::Private::loadNextPreview()
         if (!tile->widget || !tile->widget->isPreviewLoadNeeded() || !NX_ASSERT(tile->preview))
             continue;
 
-        if (tile->preview->tryLoad())
-            continue;
+        {
+            QScopedValueRollback<ResourceThumbnailProvider*> loadingFromCacheGuard(
+                m_providerLoadingFromCache, tile->preview.get());
+
+            if (tile->preview->tryLoad())
+                continue;
+        }
 
         if (isNextPreviewLoadAllowed(tile->preview.get()))
         {
