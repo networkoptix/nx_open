@@ -122,10 +122,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(
             treeView->setDefaultSpacePressIgnored(true);
             item_view_utils::autoToggleOnRowClick(treeView, QnResourceListModel::CheckColumn);
             if (singlePick)
-            {
-                treeView->setItemDelegateForColumn(
-                    QnResourceListModel::CheckColumn, radioButtonDelegate);
-            }
+                treeView->setProperty(style::Properties::kItemViewRadioButtons, true);
         };
 
     setupTreeView(ui->localTreeView);
@@ -251,7 +248,8 @@ void LayoutSelectionDialog::setLocalLayouts(const QnResourceList& layouts,
         if (m_localSelectionMode == ModeLimited)
         {
             ui->localGroupBox->setHidden(selected == 0);
-            ui->localTreeView->setItemDelegate(makeRedDelegate(this));
+            ui->localTreeView->setItemDelegateForColumn(
+                QnResourceListModel::NameColumn, makeRedDelegate(this));
         }
     }
     else
