@@ -18,8 +18,6 @@
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
-#include <nx/utils/std/cppnx.h>
-
 namespace nx {
 namespace vms_server_plugins {
 namespace analytics {
@@ -68,11 +66,12 @@ EventMetadataPacket* createCommonEventMetadataPacket(
     return packet;
 }
 
-template<class T, size_t N, class Check = std::enable_if_t<!std::is_same<const char*, T>::value>>
-std::array<T, N> makeEventSearchKeys(const std::array<T, N>& src)
+template<class T, class Check = std::enable_if_t<!std::is_same<const char*, T>::value>>
+std::vector<T> makeEventSearchKeys(const std::vector<T>& src)
 {
-    std::array<T, N> result;
-    std::transform(src.begin(), src.end(), result.begin(),
+    std::vector<T> result;
+    result.reserve(src.size());
+    std::transform(src.begin(), src.end(), std::back_inserter(result),
         [](const auto& item)
         {
             static const T prefix("\n");
@@ -82,8 +81,8 @@ std::array<T, N> makeEventSearchKeys(const std::array<T, N>& src)
     return result;
 }
 
-static const auto kEventMessageKeys = nx::utils::make_array<QByteArray>(
-    "ip", "unitname", "datetime", "dts", "type", "info", "id", "rulesname", "rulesdts");
+static const auto kEventMessageKeys = std::vector<QByteArray>{
+    "ip", "unitname", "datetime", "dts", "type", "info", "id", "rulesname", "rulesdts"};
 
 static const auto kEventMessageSearchKeys = makeEventSearchKeys(kEventMessageKeys);
 
