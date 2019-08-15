@@ -32,9 +32,9 @@
 #include <sys/un.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#else
+#else // Q_OS_LINUX
 #include <QtGlobal> // for Q_UNUSED
-#endif
+#endif // Q_OS_LINUX
 
 namespace nx {
 
@@ -52,7 +52,7 @@ namespace nx {
 #ifdef Q_OS_MAC
 #define stat64 stat
 #define statvfs64 statvfs
-#endif
+#endif // Q_OS_MAC
 
 namespace {
 
@@ -128,7 +128,7 @@ static std::string makeCredentialsFile(
 
     return "";
 }
-#endif
+#endif // Q_OS_LINUX
 
 } // namespace
 
@@ -154,7 +154,7 @@ bool SystemCommands::checkOwnerPermissions(const std::string& path)
     static const std::set<std::string> kForbiddenOwnershipPrefixes = {
 #ifdef Q_OS_MAC
         "/private/var/vm", "/Volumes/Recovery",
-#endif
+#endif // Q_OS_MAC
         "/bin", "/boot", "/cdrom", "/dev", "/etc", "/lib", "/lib64", "/proc", "/root", "/run",
         "/sbin", "/snap", "/srv", "/sys", "/usr", "/var"};
 
@@ -243,13 +243,13 @@ SystemCommands::MountCode SystemCommands::mount(
     if (!credentialsFile.empty())
         unlink(credentialsFile.c_str());
     return result;
-#else
+#else // Q_OS_LINUX
     Q_UNUSED(url);
     Q_UNUSED(directory);
     Q_UNUSED(username);
     Q_UNUSED(password);
     return MountCode::otherError;
-#endif
+#endif // Q_OS_LINUX
 }
 
 SystemCommands::UnmountCode SystemCommands::unmount(const std::string& directory)
@@ -288,10 +288,10 @@ SystemCommands::UnmountCode SystemCommands::unmount(const std::string& directory
     }
 
     return result;
-#else
+#else // Q_OS_LINUX
     Q_UNUSED(directory);
     return UnmountCode::noPermissions;
-#endif
+#endif // Q_OS_LINUX
 }
 
 bool SystemCommands::changeOwner(const std::string& path, int uid, int gid, bool isRecursive)
@@ -477,9 +477,9 @@ std::string SystemCommands::devicePath(const std::string& path)
     }
 
     return result;
-#else
+#else // Q_OS_LINUX
     return path;
-#endif
+#endif // Q_OS_LINUX
 }
 
 std::string SystemCommands::serializedDmiInfo()
@@ -544,9 +544,9 @@ std::string SystemCommands::serializedDmiInfo()
     }
 
     return result;
-#else
+#else // Q_OS_LINUX
     return "";
-#endif
+#endif // Q_OS_LINUX
 }
 
 std::string SystemCommands::lastError() const
