@@ -56,6 +56,7 @@ Controller::Controller(
         &m_dbInstanceController.queryExecutor(),
         m_emailManager.get(),
         &m_ec2SynchronizationEngine),
+    m_authDataProviders({&m_accountManager, &m_systemManager}),
     m_systemCapabilitiesProvider(
         &m_systemManager,
         &m_ec2SynchronizationEngine.connectionManager()),
@@ -71,6 +72,7 @@ Controller::Controller(
         &m_accountManager,
         &m_systemManager,
         m_tempPasswordManager,
+        m_authDataProviders,
         &m_vmsP2pCommandBus),
     m_maintenanceManager(
         &m_ec2SynchronizationEngine,
@@ -225,11 +227,8 @@ void Controller::initializeSecurity()
     m_transportSecurityManager =
         std::make_unique<AccessBlocker>(m_settings);
 
-    std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
-    authDataProviders.push_back(&m_accountManager);
-    authDataProviders.push_back(&m_systemManager);
     m_authenticationManager = std::make_unique<AuthenticationManager>(
-        std::move(authDataProviders),
+        m_authDataProviders,
         *m_authRestrictionList,
         m_streeManager,
         m_transportSecurityManager.get());

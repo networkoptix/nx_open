@@ -82,6 +82,23 @@ enum class ObjectType
     system,
 };
 
+constexpr static const char* toString(ObjectType type)
+{
+    switch (type)
+    {
+        case ObjectType::account:
+            return "account";
+
+        case ObjectType::system:
+            return "system";
+
+        case ObjectType::none:
+            return "none";
+    }
+
+    return "unknown";
+}
+
 class CredentialsDescriptor
 {
 public:
@@ -127,8 +144,8 @@ public:
         const api::AuthRequest& authRequest,
         std::function<void(api::ResultCode, api::AuthResponse)> completionHandler) = 0;
 
-    virtual void resolveUserDigest(
-        const api::UserAuthorization& digest,
+    virtual void resolveUserCredentials(
+        const api::UserAuthorization& authorization,
         std::function<void(api::ResultCode, api::CredentialsDescriptor)> completionHandler) = 0;
 
     virtual void getSystemAccessLevel(

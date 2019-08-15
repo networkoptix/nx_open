@@ -57,6 +57,7 @@ public:
             &m_accountManager,
             &m_systemSharingManager,
             m_temporaryAccountPasswordManager,
+            std::vector<AbstractAuthenticationDataProvider*>(),
             &m_vmsP2pCommandBusStub);
     }
 

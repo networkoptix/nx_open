@@ -27,7 +27,7 @@ template<typename Input = void, typename Output = void>
 class BasicHttpRequestHandler:
     public nx::network::http::AbstractFusionRequestHandler<Input, Output>
 {
-    using base_type = 
+    using base_type =
         nx::network::http::AbstractFusionRequestHandler<Input, Output>;
 
 public:
@@ -43,6 +43,16 @@ public:
     }
 
 protected:
+    bool authorize(
+        const nx::network::http::RequestContext& requestContext,
+        nx::utils::stree::ResourceContainer* const authzInfo)
+    {
+        return authorize(
+            requestContext,
+            nx::utils::stree::ResourceContainer(),
+            authzInfo);
+    }
+
     bool authorize(
         const nx::network::http::RequestContext& requestContext,
         const nx::utils::stree::AbstractResourceReader& dataToAuthorize,
@@ -123,7 +133,13 @@ public:
         nx::network::http::RequestContext requestContext,
         Input inputData) override
     {
-        if (!this->authorize(requestContext, inputData, &requestContext.authInfo))
+        bool authzResult = false;
+        if constexpr (std::is_base_of_v<nx::utils::stree::AbstractResourceReader, Input>)
+            authzResult = this->authorize(requestContext, inputData, &requestContext.authInfo);
+        else
+            authzResult = this->authorize(requestContext, &requestContext.authInfo);
+
+        if (!authzResult)
             return;
 
         processRequest(

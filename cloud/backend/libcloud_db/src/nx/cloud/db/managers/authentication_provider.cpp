@@ -5,6 +5,7 @@
 #include <openssl/md5.h>
 
 #include <nx/cloud/db/api/cloud_nonce.h>
+#include <nx/cloud/db/client/data/types.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
@@ -15,6 +16,7 @@
 #include <nx/clusterdb/engine/command_log.h>
 
 #include "temporary_account_password_manager.h"
+#include "../access_control/authentication_helper.h"
 #include "../dao/user_authentication_data_object_factory.h"
 #include "../settings.h"
 #include "../stree/cdb_ns.h"
@@ -29,6 +31,7 @@ AuthenticationProvider::AuthenticationProvider(
     AbstractAccountManager* accountManager,
     AbstractSystemSharingManager* systemSharingManager,
     const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager,
+    std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
     ec2::AbstractVmsP2pCommandBus* vmsP2pCommandBus)
 :
     m_settings(settings),
@@ -37,6 +40,7 @@ AuthenticationProvider::AuthenticationProvider(
     m_systemSharingManager(systemSharingManager),
     m_temporaryAccountCredentialsManager(temporaryAccountCredentialsManager),
     m_authenticationDataObject(dao::UserAuthenticationDataObjectFactory::instance().create()),
+    m_authDataProviders(std::move(authDataProviders)),
     m_vmsP2pCommandBus(vmsP2pCommandBus)
 {
     m_accountManager->addExtension(this);
@@ -119,6 +123,44 @@ void AuthenticationProvider::getAuthenticationResponse(
             auto response = prepareAuthenticationResponse(systemId, authRequest);
             completionHandler(std::get<0>(response), std::get<1>(response));
         });
+}
+
+void AuthenticationProvider::resolveUserCredentials(
+    const AuthorizationInfo& /*authzInfo*/,
+    const api::UserAuthorization& authorization,
+    std::function<void(api::Result, api::CredentialsDescriptor)> completionHandler)
+{
+    NX_VERBOSE(this, "Resolving authorization: %1, %2",
+        authorization.requestMethod, authorization.requestAuthorization);
+
+    HttpDigestAuthenticator authenticator(
+        authorization.requestMethod,
+        authorization.requestAuthorization);
+
+    nx::utils::stree::ResourceContainer attributes;
+    const auto authResult = authenticator.authenticateInDataManagers(
+        m_authDataProviders,
+        &attributes);
+
+    api::CredentialsDescriptor response;
+    response.status = authResult;
+
+    if (authResult == api::ResultCode::ok)
+    {
+        fillAuthObjectDescriptor(attributes, &response);
+
+        NX_DEBUG(this, "Authorization: (%1, %2) resolved to %3 %4",
+            authorization.requestMethod, authorization.requestAuthorization,
+            response.objectType, response.objectId);
+    }
+    else
+    {
+        NX_DEBUG(this, "Resolve of authorization: (%1, %2) failed: %3",
+            authorization.requestMethod, authorization.requestAuthorization,
+            QnLexical::serialized(authResult));
+    }
+
+    completionHandler(api::ResultCode::ok, std::move(response));
 }
 
 nx::sql::DBResult AuthenticationProvider::afterSharingSystem(
@@ -465,6 +507,26 @@ void AuthenticationProvider::startCheckForExpiredAuthRecordsTimer(sql::DBResult 
             ? m_settings.auth().continueUpdatingExpiredAuthPeriod
             : m_settings.auth().checkForExpiredAuthPeriod,
         std::bind(&AuthenticationProvider::checkForExpiredAuthRecordsAsync, this));
+}
+
+void AuthenticationProvider::fillAuthObjectDescriptor(
+    const nx::utils::stree::ResourceContainer& attributes,
+    api::CredentialsDescriptor* descriptor)
+{
+    if (auto email = attributes.get<std::string>(attr::authAccountEmail))
+    {
+        descriptor->objectType = api::ObjectType::account;
+        descriptor->objectId = *email;
+    }
+    else if (auto systemId = attributes.get<std::string>(attr::authSystemId))
+    {
+        descriptor->objectType = api::ObjectType::system;
+        descriptor->objectId = *systemId;
+    }
+    else
+    {
+        NX_ASSERT(false);
+    }
 }
 
 } // namespace nx::cloud::db

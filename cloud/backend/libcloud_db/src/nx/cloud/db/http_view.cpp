@@ -304,6 +304,11 @@ void HttpView::registerApiHandlers(
         &AuthenticationProvider::getAuthenticationResponse, authProvider,
         EntityType::account, DataActionType::fetch);
 
+    registerHttpHandler(
+        kAuthResolveUserCredentials,
+        &AuthenticationProvider::resolveUserCredentials, authProvider,
+        EntityType::account, DataActionType::fetch);
+
     //---------------------------------------------------------------------------------------------
     ec2SynchronizationEngine->registerHttpApi(
         kEc2TransactionConnectionPathPrefix, &m_httpMessageDispatcher);

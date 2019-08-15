@@ -23,7 +23,7 @@ public:
         const api::AuthRequest& authRequest,
         std::function<void(api::ResultCode, api::AuthResponse)> completionHandler) override;
 
-    virtual void resolveUserDigest(
+    virtual void resolveUserCredentials(
         const api::UserAuthorization& authorization,
         std::function<void(api::ResultCode, api::CredentialsDescriptor)> completionHandler) override;
 

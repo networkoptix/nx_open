@@ -42,12 +42,12 @@ void AuthProvider::getAuthenticationResponse(
         std::bind(completionHandler, std::placeholders::_1, api::AuthResponse()));
 }
 
-void AuthProvider::resolveUserDigest(
+void AuthProvider::resolveUserCredentials(
     const api::UserAuthorization& authorization,
     std::function<void(api::ResultCode, api::CredentialsDescriptor)> completionHandler)
 {
     executeRequest(
-        kAuthResolveUserDigest,
+        kAuthResolveUserCredentials,
         authorization,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::CredentialsDescriptor()));
