@@ -1,12 +1,13 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
-#include <camera/camera_plugin.h>
+#include "device/device_data.h"
 
 namespace nx::usb_cam::device::audio {
 
-void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount);
+void selectAudioDevices(std::vector<DeviceData>& devices);
 bool pluggedIn(const std::string& devicePath);
 void uninitialize();
 
