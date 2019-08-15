@@ -108,7 +108,7 @@ std::vector<DeviceData> getDeviceList()
         // state only.
         std::string uniqueId = std::to_string(nameIndex) + "-" + name;
 
-        devices.push_back(DeviceData(name, path, uniqueId));
+        devices.emplace_back(name, path, uniqueId);
         pMoniker->Release();
     }
     pEnum->Release();
