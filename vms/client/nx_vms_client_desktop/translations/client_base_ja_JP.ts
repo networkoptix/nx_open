@@ -2022,7 +2022,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
+      <translation>カメラ識別子が汎用イベントURLで使用されている場合、強制承認は汎用イベントに対してのみ機能します</translation>
     </message>
   </context>
   <context>
@@ -5546,8 +5546,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>現在の分析データは自動的に別の場所に移動されず、アクセスできなくなります。保持して後で手動で移動するか、完全に削除できます。
+分析データを別の保管場所に移動する場合は、移動作業を進める前にサポートに連絡してください。</translation>
     </message>
   </context>
   <context>
@@ -5883,7 +5883,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>フェールオーバーが有効になっている場合、サーバーはこの設定に関係なくカメラステータスの更新を要求する場合があります。</translation>
     </message>
   </context>
   <context>
@@ -9240,11 +9240,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>リモートファイル &quot;%1&quot; が破損しています</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>サーバーにはすでにこのファイル &quot;%1&quot; があります</translation>
     </message>
   </context>
   <context>
@@ -9767,21 +9767,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>&quot;%1&quot; で分析データの保管場所を確認してください</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>利用可能な最大のパーティション</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>分析データベースはローカルドライブにのみ保存する必要があり、大量のスペースを占有する可能性があります。
+分析データの保存場所を選択すると、既存のデータを失わずに簡単に変更することはできません。深刻なシステムの誤動作を引き起こす可能性があるため、場所を慎重に選択し、システムパーティションの使用を避けることをお勧めします。
+デフォルトでは、分析データは %1に保存されます。
+サーバー設定ダイアログの &quot;ストレージ管理&quot; タブで別のストレージの場所を選択できます。</translation>
     </message>
   </context>
   <context>
