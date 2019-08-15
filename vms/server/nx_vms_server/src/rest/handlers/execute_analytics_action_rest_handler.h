@@ -5,11 +5,11 @@
 #include "nx/vms/api/analytics/engine_manifest.h"
 #include "api/model/analytics_actions.h"
 #include <nx/vms/server/server_module_aware.h>
-#include <nx/vms/server/sdk_support/loggers.h>
 
 #include <api/model/analytics_actions.h>
 #include <analytics/db/abstract_storage.h>
 #include <transcoding/filters/abstract_image_filter.h>
+#include <nx/vms/server/resource/resource_fwd.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
 
@@ -75,6 +75,4 @@ private:
     std::optional<nx::analytics::db::LookupResult> makeDatabaseRequest(
         const nx::analytics::db::Filter& filter);
 
-    std::unique_ptr<nx::vms::server::sdk_support::AbstractManifestLogger> makeLogger(
-        nx::vms::server::resource::AnalyticsEngineResourcePtr engineResource) const;
 };

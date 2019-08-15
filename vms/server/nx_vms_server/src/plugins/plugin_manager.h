@@ -16,6 +16,8 @@
 
 #include <nx/vms/api/data/analytics_data.h>
 
+#include <nx/vms/server/server_module_aware.h>
+
 class QDir;
 class QFileInfo;
 
@@ -26,12 +28,14 @@ class QFileInfo;
  *
  * NOTE: Methods of this class are thread-safe.
  */
-class PluginManager: public QObject
+class PluginManager:
+    public QObject,
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 
 public:
-    PluginManager(QObject* parent);
+    PluginManager(QnMediaServerModule* parent);
 
     virtual ~PluginManager();
 

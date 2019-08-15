@@ -117,7 +117,7 @@ build_sample_arm32.sh
 ```
 
 On Windows, after CMake generation phase, Visual Studio GUI can be used to compile the sample:
-open `../metadata_sdk-build/stub_analytics_plugin.sln` and build the `ALL_BUILD` project. Make
+open `..\metadata_sdk-build\stub_analytics_plugin.sln` and build the `ALL_BUILD` project. Make
 sure that the platform combo-box is set to "x64".
 
 After successful build, locate the main built artifact:

@@ -98,7 +98,7 @@ RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
     start();
 }
 
-void RuleProcessor::waitForDone()
+void RuleProcessor::waitForRulesUpdate()
 {
     QnMutexLocker lock(&m_mutex);
     while(m_updatingRulesCount > 0)
