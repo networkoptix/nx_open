@@ -10,6 +10,7 @@ message(STATUS "Generating files for Storage SDK")
 
 set(sdk_name storage_sdk)
 set(zip_file ${distribution_output_dir}/${storage_sdk_distribution_name}.zip)
+set(server_resource_zip_file ${CMAKE_CURRENT_BINARY_DIR}/../storage_sdk.zip)
 set(sdk_dir ${CMAKE_CURRENT_BINARY_DIR}/${sdk_name})
 set(logs_dir ${CMAKE_BINARY_DIR}/build_logs)
 set(sample_build_log ${logs_dir}/${sdk_name}_sample_build.log)
@@ -76,10 +77,10 @@ else()
             -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/toolchains/${toolchainFile}.cmake
         )
     endif()
-endif()
+endif() 
 
 # Command to be executed at the build phase.
-add_custom_command(OUTPUT ${zip_file}
+add_custom_command(OUTPUT ${zip_file} ${server_resource_zip_file}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${logs_dir}
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${sdk_dir} #< Delete old sdk dir (if any).
     COMMAND ${CMAKE_COMMAND} -P ${copy_sdk_files_script} #< Create and populate sdk dir.
@@ -99,6 +100,8 @@ add_custom_command(OUTPUT ${zip_file}
         "  Zipping SDK - see ${zip_log}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} #< Needed for zipping.
     COMMAND ${CMAKE_COMMAND} -E tar cvf ${zip_file} --format=zip ${sdk_name} >${zip_log}
+
+    COMMAND ${CMAKE_COMMAND} -E copy ${zip_file} ${server_resource_zip_file}
 
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${sdk_dir} #< Delete sdk dir.
 

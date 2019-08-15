@@ -55,12 +55,21 @@ add_custom_command(
         ${apidoctool_params}
 )
 
+set(old_sdk_static_resources "")
+if(TARGET nx_storage_sdk)
+    set(old_sdk_static_resources ${old_sdk_static_resources}
+        ${CMAKE_CURRENT_BINARY_DIR}/../storage_sdk.zip)
+endif()
+if(TARGET nx_sdk)
+    set(old_sdk_static_resources ${old_sdk_static_resources}
+        ${CMAKE_CURRENT_BINARY_DIR}/../sdk.zip)
+endif()
+
 set(static_resources
     ${CMAKE_CURRENT_BINARY_DIR}/api.xml
     ${CMAKE_CURRENT_BINARY_DIR}/api.json
     ${customization_dir}/license.html
-    ${NX_SDK_PACKAGE}
-    ${NX_STORAGE_SDK_PACKAGE}
+    ${old_sdk_static_resources}
     ${CMAKE_SOURCE_DIR}/specific_features.txt
 )
 set_source_files_properties(${static_resources} PROPERTIES RESOURCE_ALIAS_PREFIX static/)
