@@ -86,6 +86,13 @@ static QString toMsString(Time time)
     return QString::number(duration_cast<milliseconds>(time).count());
 }
 
+static microseconds vmsSystemTimeNow()
+{
+    return qnSyncTime //< Is null in unit tests.
+        ? microseconds{qnSyncTime->currentUSecsSinceEpoch()}
+        : duration_cast<microseconds>(system_clock::now().time_since_epoch());
+}
+
 /**
  * Before building the string, asserts that the input string does not contain `;` or non-printable
  * chars.
@@ -143,8 +150,8 @@ MetadataLogger::~MetadataLogger()
     using namespace std::chrono;
 
     logLine(lm("Finished logging at %1 ms (VMS System time %2 ms)").args(
-        duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count(),
-        qnSyncTime->currentMSecsSinceEpoch()));
+        toMsString(system_clock::now().time_since_epoch()),
+        toMsString(vmsSystemTimeNow())));
 }
 
 void MetadataLogger::pushData(
@@ -214,12 +221,12 @@ QString MetadataLogger::buildFrameLogString(
     const FrameInfo& frameInfo,
     const QString& additionalInfoStr) const
 {
-    const microseconds currentTime{qnSyncTime->currentUSecsSinceEpoch()};
+    const microseconds vmsSystemTime = vmsSystemTimeNow();
 
     return "frameTimestampMs " + toMsString(frameInfo.timestamp) + ", "
-        + "currentTimeMs " + toMsString(currentTime) + ", "
+        + "currentTimeMs " + toMsString(vmsSystemTime) + ", "
         + "diffFromPrevMs " + toMsString(frameInfo.timestamp - m_prevFrameTimestamp) + ", "
-        + "diffFromCurrentTimeMs " + toMsString(frameInfo.timestamp - currentTime)
+        + "diffFromCurrentTimeMs " + toMsString(frameInfo.timestamp - vmsSystemTime)
         + additionalInfoStr;
 }
 
@@ -227,18 +234,14 @@ QString MetadataLogger::buildObjectMetadataLogString(
     const ObjectMetadataPacket& metadataPacket,
     const QString& additionalInfoStr) const
 {
-    const microseconds currentTime{
-        qnSyncTime //< Is null in unit tests.
-            ? qnSyncTime->currentUSecsSinceEpoch()
-            : duration_cast<microseconds>(system_clock::now().time_since_epoch()).count()
-    };
+    const microseconds vmsSystemTime = vmsSystemTimeNow();
     const microseconds currentPacketTimestamp{metadataPacket.timestampUs};
     const microseconds diffFromPrev = currentPacketTimestamp - m_prevObjectMetadataPacketTimestamp;
 
     return "metadataTimestampMs " + toMsString(currentPacketTimestamp) + ", "
-        + "currentTimeMs " + toMsString(currentTime) + ", "
+        + "currentTimeMs " + toMsString(vmsSystemTime) + ", "
         + "diffFromPrevMs " + toMsString(diffFromPrev) + ", "
-        + "diffFromCurrentTimeMs " + toMsString(currentPacketTimestamp - currentTime)
+        + "diffFromCurrentTimeMs " + toMsString(currentPacketTimestamp - vmsSystemTime)
         + additionalInfoStr
         + "; objects: " + QString::number(metadataPacket.objectMetadataList.size())
         + makeObjectsLogLinesIfNeeded(metadataPacket.objectMetadataList);
