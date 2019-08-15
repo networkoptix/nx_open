@@ -95,34 +95,36 @@ void EventsStorage::save(common::metadata::ConstObjectMetadataPacketPtr packet)
 {
     using namespace std::chrono;
 
+    NX_VERBOSE(this, "Saving packet %1", *packet);
+
     QElapsedTimer t;
     t.restart();
 
-    NX_VERBOSE(this, "Saving packet %1", *packet);
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_maxRecordedTimestamp = std::max<milliseconds>(
-            m_maxRecordedTimestamp,
-            duration_cast<milliseconds>(microseconds(packet->timestampUs)));
-    }
-
     QnMutexLocker lock(&m_mutex);
+
+    NX_VERBOSE(this, "Saving packet (1). %1ms", t.elapsed());
+
+    m_maxRecordedTimestamp = std::max<milliseconds>(
+        m_maxRecordedTimestamp,
+        duration_cast<milliseconds>(microseconds(packet->timestampUs)));
+
     savePacketDataToCache(lock, packet);
     ObjectTrackDataSaver detectionDataSaver = takeDataToSave(lock, /*flush*/ false);
     lock.unlock();
 
+    if (detectionDataSaver.empty())
+    {
+        NX_VERBOSE(this, "Saving packet (2) took %1ms", t.elapsed());
+        return;
+    }
+
     QnMutexLocker dbLock(&m_dbControllerMutex);
+
+    NX_VERBOSE(this, "Saving packet (3). %1ms", t.elapsed());
 
     if (!m_dbController)
     {
         NX_DEBUG(this, "Attempt to write to non-initialized analytics DB");
-        return;
-    }
-
-    if (detectionDataSaver.empty())
-    {
-        NX_VERBOSE(this, "Saving packet (1) took %1ms", t.elapsed());
         return;
     }
 
@@ -136,7 +138,7 @@ void EventsStorage::save(common::metadata::ConstObjectMetadataPacketPtr packet)
         [this](sql::DBResult resultCode) { logDataSaveResult(resultCode); },
         kSaveEventQueryAggregationKey);
 
-    NX_VERBOSE(this, "Saving packet (2) took %1ms", t.elapsed());
+    NX_VERBOSE(this, "Saving packet (4) took %1ms", t.elapsed());
 }
 
 void EventsStorage::createLookupCursor(
