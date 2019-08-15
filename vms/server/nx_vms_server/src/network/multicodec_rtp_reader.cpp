@@ -272,10 +272,21 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataInternal()
         if (!result)
             continue;
 
+        auto secResource = getResource().dynamicCast<QnSecurityCamResource>();
+        bool ignoreRtcpReports = false;
+        if (secResource)
+        {
+            ignoreRtcpReports = secResource->resourceData().value<bool>(
+                ResourceDataKey::kIgnoreRtcpReports, false);
+        }
+        nx::streaming::rtp::RtcpSenderReport rtcpReport;
+        if (!ignoreRtcpReports && track.ioDevice)
+            rtcpReport = track.ioDevice->getSenderReport();
+
         result->timestamp = m_timeHelper.getTime(
             qnSyncTime->currentTimePoint(),
             result->timestamp,
-            track.ioDevice ? track.ioDevice->getSenderReport() : nx::streaming::rtp::RtcpSenderReport(),
+            rtcpReport,
             track.onvifExtensionTimestamp,
             track.parser->getFrequency(),
             m_role == Qn::CR_LiveVideo,

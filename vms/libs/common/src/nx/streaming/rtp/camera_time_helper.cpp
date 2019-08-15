@@ -116,12 +116,13 @@ microseconds CameraTimeHelper::getTime(
     if ((isPrimaryStream || useLocalOffset) && deviation >= m_resyncThreshold)
     {
         NX_DEBUG(this,
-            "ResourceId: %1. Resync camera time, deviation %2ms, cameraTime: %3ms, isPrimaryStream %4, useLocalOffset %5",
+            "ResourceId: %1. Resync camera time, deviation %2ms, cameraTime: %3ms, isPrimaryStream %4, useLocalOffset %5, rtcp rtp timestamp: %6",
             m_resourceId,
             deviation.count() / 1000,
             cameraTime.count() / 1000,
             isPrimaryStream,
-            useLocalOffset);
+            useLocalOffset,
+            senderReport.rtpTimestamp);
         offset.value = currentTime - cameraTime;
         callback(EventType::ResyncToLocalTime);
     }
