@@ -293,6 +293,11 @@ void ResourceThumbnailProvider::doLoadAsync()
         d->baseProvider->loadAsync();
 }
 
+QnResourcePtr ResourceThumbnailProvider::resource() const
+{
+    return d->request.resource;
+}
+
 std::chrono::microseconds ResourceThumbnailProvider::timestamp() const
 {
     if (const auto cameraProvider = qobject_cast<CameraThumbnailProvider*>(d->baseProvider.get()))

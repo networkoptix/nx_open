@@ -72,12 +72,6 @@ static constexpr milliseconds kInvisibleAutoCloseDelay = 80s;
 
 static const auto kTilePreviewLoadInterval = milliseconds(ini().tilePreviewLoadIntervalMs);
 
-static const int kMaxSimultaneousPreviewLoadsOverride = std::clamp(
-    ini().maxSimultaneousTilePreviewLoads, 0, 15);
-
-static constexpr int kMaxSimultaneousPreviewLoads = 8;
-static constexpr int kMaxSimultaneousArmPreviewLoads = 3;
-
 static const int kMaximumThumbnailWidth = ini().rightPanelMaxThumbnailWidth;
 
 QSize minimumWidgetSize(QWidget* widget)
@@ -90,6 +84,21 @@ QSize minimumWidgetSize(QWidget* widget)
 bool shouldAnimateTile(const QModelIndex& index)
 {
     return !index.data(Qt::DisplayRole).toString().isEmpty();
+}
+
+int maxSimultaneousPreviewLoads(const QnMediaServerResourcePtr& server)
+{
+    return QnMediaServerResource::isArmServer(server)
+        ? std::clamp(ini().maxSimultaneousTilePreviewLoadsArm, 1, 5)
+        : std::clamp(ini().maxSimultaneousTilePreviewLoads, 1, 15);
+}
+
+QnMediaServerResourcePtr previewServer(const ResourceThumbnailProvider* provider)
+{
+    const auto resource = provider->resource();
+    return resource
+        ? resource->getParentResource().dynamicCast<QnMediaServerResource>()
+        : QnMediaServerResourcePtr();
 }
 
 } // namespace
@@ -382,17 +391,23 @@ ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
                         kPreviewLoadTimeout,
                         provider);
 
-                    m_loadingPreviews.insert(provider, QSharedPointer<QTimer>(timeoutTimer,
-                        [](QTimer* timer)
-                        {
-                            if (!timer)
-                                return;
+                    const auto server = previewServer(provider);
 
-                            timer->stop();
-                            timer->deleteLater();
-                        }));
+                    m_loadingByProvider.insert(provider, {server,
+                        QSharedPointer<QTimer>(timeoutTimer,
+                            [](QTimer* timer)
+                            {
+                                if (!timer)
+                                    return;
 
-                    NX_ASSERT(m_loadingPreviews.size() <= maxSimultaneousPreviewLoads());
+                                timer->stop();
+                                timer->deleteLater();
+                            })});
+
+                    auto& serverData = m_loadingByServer[server];
+                    ++serverData.loadingCounter;
+
+                    NX_ASSERT(serverData.loadingCounter <= maxSimultaneousPreviewLoads(server));
                     break;
                 }
 
@@ -409,25 +424,32 @@ ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
 
 void EventRibbon::Private::handleLoadingEnded(ResourceThumbnailProvider* provider)
 {
-    if (m_loadingPreviews.remove(provider))
-        loadNextPreview();
+    const auto previewData = m_loadingByProvider.find(provider);
+    if (previewData == m_loadingByProvider.end())
+        return;
+
+    const auto serverData = m_loadingByServer.find(previewData->server);
+    if (NX_ASSERT(serverData != m_loadingByServer.end()))
+    {
+        --serverData->loadingCounter;
+        NX_ASSERT(serverData->loadingCounter >= 0);
+        if (serverData->loadingCounter <= 0)
+            m_loadingByServer.erase(serverData);
+    }
+
+    m_loadingByProvider.erase(previewData);
+    loadNextPreview();
 }
 
-bool EventRibbon::Private::isNextPreviewLoadAllowed() const
+bool EventRibbon::Private::isNextPreviewLoadAllowed(const ResourceThumbnailProvider* provider) const
 {
-    return m_loadingPreviews.size() < maxSimultaneousPreviewLoads()
+    if (!NX_ASSERT(provider))
+        return false;
+
+    const auto server = previewServer(provider);
+    return m_loadingByServer.value(server).loadingCounter < maxSimultaneousPreviewLoads(server)
         && (kTilePreviewLoadInterval <= 0ms || m_sinceLastPreviewRequest.hasExpired(
             kTilePreviewLoadInterval));
-}
-
-int EventRibbon::Private::maxSimultaneousPreviewLoads() const
-{
-    if (kMaxSimultaneousPreviewLoadsOverride > 0)
-        return kMaxSimultaneousPreviewLoadsOverride;
-
-    return QnMediaServerResource::isArmServer(commonModule()->currentServer())
-        ? kMaxSimultaneousArmPreviewLoads
-        : kMaxSimultaneousPreviewLoads;
 }
 
 void EventRibbon::Private::ensureWidget(int index)
@@ -1491,12 +1513,12 @@ void EventRibbon::Private::loadNextPreview()
         if (tile->preview->tryLoad())
             continue;
 
-        if (isNextPreviewLoadAllowed())
+        if (isNextPreviewLoadAllowed(tile->preview.get()))
         {
             tile->preview->loadAsync();
             m_sinceLastPreviewRequest.restart();
         }
-        else if (m_loadingPreviews.empty())
+        else if (m_loadingByProvider.empty())
         {
             m_previewLoad->requestOperation();
             break;
