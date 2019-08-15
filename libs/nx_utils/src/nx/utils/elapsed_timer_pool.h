@@ -11,12 +11,13 @@ namespace nx {
 namespace utils {
 
 /**
- * Does not use any external thread.
- * Timers are processed and reported by ElapsedTimerPool::processTimers call.
+ * The pool of elapsed (delay-based) timers.
+ * Does not use any external thread. Timers are processed and reported by
+ * ElapsedTimerPool::processTimers call.
  * NOTE: Not thread-safe.
  */
 template<typename TimerId>
-// requires Less_than_comparable<TimerId> && is_copy_constructible<TimerId>
+// requires less_than_comparable<TimerId> && is_copy_constructible<TimerId>
 class ElapsedTimerPool
 {
 public:
@@ -57,7 +58,7 @@ public:
     }
 
     /**
-     * Executes timerFunction with appropriate finished timers within this class.
+     * Executes timerFunction with appropriate finished timers within this method.
      */
     void processTimers()
     {
