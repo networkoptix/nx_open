@@ -75,6 +75,8 @@ static const auto kTilePreviewLoadInterval = milliseconds(ini().tilePreviewLoadI
 
 static const int kMaximumThumbnailWidth = ini().rightPanelMaxThumbnailWidth;
 
+static constexpr int kNumAnimatedTilesAtInsertion = 3;
+
 QSize minimumWidgetSize(QWidget* widget)
 {
     return widget->minimumSizeHint()
@@ -650,6 +652,7 @@ void EventRibbon::Private::insertNewTiles(
     int currentPosition = position;
 
     const bool animated = updateMode == UpdateMode::animated;
+    const int animatedEnd = qMin(index + kNumAnimatedTilesAtInsertion, end);
 
     for (int i = index; i < end; ++i)
     {
@@ -666,7 +669,7 @@ void EventRibbon::Private::insertNewTiles(
             m_deadlines[modelIndex] = QDeadlineTimer(kInvisibleAutoCloseDelay);
 
         currentPosition += kDefaultTileSpacing;
-        if (!(animated && tile->animated))
+        if (!(animated && tile->animated && i < animatedEnd))
             currentPosition += tile->height;
 
         if (tile->importance != Importance())
@@ -703,7 +706,7 @@ void EventRibbon::Private::insertNewTiles(
     // Animated shift of subsequent tiles.
     if (animated)
     {
-        for (int i = index; i < end; ++i)
+        for (int i = index; i < animatedEnd; ++i)
         {
             const auto& tile = m_tiles[i];
             if (!tile->animated)
