@@ -12,14 +12,14 @@
 #include "log.h"
 #include "vfs.h"
 
-namespace {
-
 #if defined (_WIN32)
 #   include <windows.h>
 #elif defined (__linux__)
 #   include <unistd.h>
 #   include <sys/types.h>
 #endif
+
+namespace {
 
 std::string getAppDir()
 {

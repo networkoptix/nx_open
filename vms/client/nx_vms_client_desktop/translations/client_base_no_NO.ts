@@ -950,7 +950,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Unpin Calendar</source>
-      <translation type="unfinished">Unpin Calendar</translation>
+      <translation>Løsne kalenderen</translation>
     </message>
   </context>
   <context>

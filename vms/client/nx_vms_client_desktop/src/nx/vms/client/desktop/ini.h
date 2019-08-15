@@ -134,9 +134,12 @@ struct Ini: nx::kit::IniConfig
         "after appearing.");
     NX_INI_INT(0, tilePreviewLoadIntervalMs,
         "Right Panel tiles will not request previews more often than this period, milliseconds.");
-    NX_INI_INT(0, maxSimultaneousTilePreviewLoads,
+    NX_INI_INT(6, maxSimultaneousTilePreviewLoads,
         "Right Panel tab will not request simultaneously more previews than this number.\n"
-        "Valid range: [1, 15]; 0 means automatic selection.");
+        "Valid range: [1, 15].");
+    NX_INI_INT(3, maxSimultaneousTilePreviewLoadsArm,
+        "Right Panel tab will not request simultaneously more previews than this number\n"
+        "from ARM server. Valid range: [1, 5].");
     NX_INI_FLAG(0, enableSyncedChunksForExtraContent,
         "Whether to show motion and analytics chunks in the synced area of the timeline.");
     NX_INI_INT(0, clientWebServerPort,
@@ -188,10 +191,10 @@ struct Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(1, enableAnalyticsPlaybackMask, "Enable playback mode of analytics chunks only.");
 
-    NX_INI_FLAG(1, applyCameraFilterToSceneItems, "This flag controls display of specific data\n"
+    NX_INI_FLAG(0, applyCameraFilterToSceneItems, "This flag controls display of specific data\n"
         "on scene items for cameras not satisfying Right Panel camera filter.\n"
-        "If this flag isn't set, full data without any additional filtering is displayed.\n"
-        "If this flag is set, no data is displayed for such items.");
+        "If this flag isn't set, specific data satisfying other filters is displayed.\n"
+        "If this flag is set, no data is displayed.");
 };
 
 inline Ini& ini()

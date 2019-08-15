@@ -5947,7 +5947,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>Si Failover está activado, el servidor puede solicitar actualizaciones de estado de la cámara independientemente de esta configuración.</translation>
     </message>
   </context>
   <context>
