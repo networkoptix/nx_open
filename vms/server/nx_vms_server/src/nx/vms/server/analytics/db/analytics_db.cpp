@@ -40,6 +40,11 @@ EventsStorage::~EventsStorage()
     if (!m_dbController)
         return;
 
+    {
+        QnMutexLocker lock(&m_dbControllerMutex);
+        m_stopped = true;
+    }
+
     // Flushing all cached data.
     // Since update queries are queued all scheduled requests will be completed before flush.
     std::promise<ResultCode> done;
@@ -273,7 +278,7 @@ void EventsStorage::markDataAsDeprecated(
     NX_VERBOSE(this, "Cleaning data of device %1 up to timestamp %2",
         deviceId, oldestDataToKeepTimestamp.count());
 
-    scheduleDataCleanup(deviceId, oldestDataToKeepTimestamp);
+    scheduleDataCleanup(lock, deviceId, oldestDataToKeepTimestamp);
 }
 
 void EventsStorage::flush(StoreCompletionHandler completionHandler)
@@ -360,6 +365,9 @@ bool EventsStorage::readMaximumEventTimestamp()
 
 bool EventsStorage::readMinimumEventTimestamp(std::chrono::milliseconds* outResult)
 {
+    // TODO: The mutex is locked here for the duration of DB query which is a long lock.
+    // Long locks should not happen.
+
     QnMutexLocker dbLock(&m_dbControllerMutex);
 
     if (!m_dbController)
@@ -409,53 +417,6 @@ bool EventsStorage::loadDictionaries()
     }
 
     return true;
-}
-
-void EventsStorage::updateDictionariesIfNeeded(
-    nx::sql::QueryContext* queryContext,
-    const common::metadata::ObjectMetadataPacket& packet,
-    const common::metadata::ObjectMetadata& objectMetadata)
-{
-    m_deviceDao.insertOrFetch(queryContext, packet.deviceId);
-    m_objectTypeDao.insertOrFetch(queryContext, objectMetadata.typeId);
-}
-
-void EventsStorage::insertEvent(
-    sql::QueryContext* queryContext,
-    const common::metadata::ObjectMetadataPacket& packet,
-    const common::metadata::ObjectMetadata& objectMetadata,
-    int64_t attributesId,
-    int64_t /*timePeriodId*/)
-{
-    sql::SqlQuery insertEventQuery(queryContext->connection());
-    insertEventQuery.prepare(QString::fromLatin1(R"sql(
-        INSERT INTO event(timestamp_usec_utc, duration_usec,
-            device_id, object_type_id, object_id, attributes_id,
-            box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y)
-        VALUES(:timestampMs, :durationMs, :deviceId,
-            :objectTypeId, :trackId, :attributesId,
-            :boxTopLeftX, :boxTopLeftY, :boxBottomRightX, :boxBottomRightY)
-    )sql"));
-    insertEventQuery.bindValue(":timestampMs", packet.timestampUs / kUsecInMs);
-    insertEventQuery.bindValue(":durationMs", packet.durationUs / kUsecInMs);
-    insertEventQuery.bindValue(":deviceId", m_deviceDao.deviceIdFromGuid(packet.deviceId));
-    insertEventQuery.bindValue(
-        ":objectTypeId",
-        (long long) m_objectTypeDao.objectTypeIdFromName(objectMetadata.typeId));
-    insertEventQuery.bindValue(
-        ":trackId",
-        QnSql::serialized_field(objectMetadata.trackId));
-
-    insertEventQuery.bindValue(":attributesId", (long long) attributesId);
-
-    const auto packedBoundingBox = packRect(objectMetadata.boundingBox);
-
-    insertEventQuery.bindValue(":boxTopLeftX", packedBoundingBox.topLeft().x());
-    insertEventQuery.bindValue(":boxTopLeftY", packedBoundingBox.topLeft().y());
-    insertEventQuery.bindValue(":boxBottomRightX", packedBoundingBox.bottomRight().x());
-    insertEventQuery.bindValue(":boxBottomRightY", packedBoundingBox.bottomRight().y());
-
-    insertEventQuery.exec();
 }
 
 void EventsStorage::savePacketDataToCache(
@@ -526,6 +487,7 @@ void EventsStorage::reportCreateCursorCompletion(
 }
 
 void EventsStorage::scheduleDataCleanup(
+    const QnMutexLockerBase&,
     QnUuid deviceId,
     std::chrono::milliseconds oldestDataToKeepTimestamp)
 {
@@ -545,7 +507,9 @@ void EventsStorage::scheduleDataCleanup(
             if (cleaner.clean(queryContext) == Cleaner::Result::incomplete)
             {
                 NX_VERBOSE(this, "Could not clean all data in one run. Scheduling another one");
-                scheduleDataCleanup(deviceId, oldestDataToKeepTimestamp);
+                QnMutexLocker lock(&m_dbControllerMutex);
+                if (!m_stopped)
+                    scheduleDataCleanup(lock, deviceId, oldestDataToKeepTimestamp);
             }
 
             return nx::sql::DBResult::ok;

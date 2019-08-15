@@ -14,7 +14,7 @@ class QnNxRtpParser: public VideoStreamParser
 {
 public:
     /** @param debugSourceId Human-readable stream source id for logging. */
-    QnNxRtpParser(QnUuid devivceId);
+    QnNxRtpParser(QnUuid deviceId);
 
     virtual void setSdpInfo(const Sdp::Media& /*sdp*/) override {};
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;

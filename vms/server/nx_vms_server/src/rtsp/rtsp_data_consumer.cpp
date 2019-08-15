@@ -34,7 +34,7 @@ bool needSecondaryStream(MediaQuality q)
 
 static const int kTcpSendBlockSize = 1024 * 16;
 static const int kRtpTcpHeaderSize = 4;
-static const uint32_t kMetaDataSsrc = 40000;
+static const uint32_t kMetadataSsrc = 40000;
 
 } // namespace
 
@@ -89,29 +89,40 @@ void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
 {
     if (!resource)
         return;
-    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
+
+    const auto camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return;
 
     if (nx::analytics::loggingIni().isLoggingEnabled())
     {
-        m_primaryLogger = std::make_unique<nx::analytics::MetadataLogger>(
-            "rtsp_consumer_",
+        m_primarypProcessDataLogger = std::make_unique<nx::analytics::MetadataLogger>(
+            "rtsp_consumer_process_data_",
             camera->getId(),
             /*engineId*/ QnUuid(),
-            nx::vms::api::StreamIndex::primary);
+            StreamIndex::primary);
 
-        m_secondaryLogger = std::make_unique<nx::analytics::MetadataLogger>(
-            "rtsp_consumer_",
+        m_secondaryProcessDataLogger = std::make_unique<nx::analytics::MetadataLogger>(
+            "rtsp_consumer_process_data_",
             camera->getId(),
             /*engineId*/ QnUuid(),
-            nx::vms::api::StreamIndex::secondary);
+            StreamIndex::secondary);
+
+        m_primarypPutDataLogger = std::make_unique<nx::analytics::MetadataLogger>(
+            "rtsp_consumer_put_data_",
+            camera->getId(),
+            /*engineId*/ QnUuid(),
+            StreamIndex::primary);
+
+        m_secondaryPutDataLogger = std::make_unique<nx::analytics::MetadataLogger>(
+            "rtsp_consumer_put_data_",
+            camera->getId(),
+            /*engineId*/ QnUuid(),
+            StreamIndex::secondary);
     }
 
-    auto videoLayout = camera->getVideoLayout();
-    if (!videoLayout)
-        return;
-    m_videoChannels = (quint32) videoLayout->channelCount();
+    if (const auto videoLayout = camera->getVideoLayout())
+        m_videoChannels = (quint32) videoLayout->channelCount();
 }
 
 QnRtspDataConsumer::~QnRtspDataConsumer()
@@ -256,6 +267,19 @@ void QnRtspDataConsumer::cleanupQueueToPos(QnDataPacketQueue::RandomAccess<>& un
 
 void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
+    if (const auto abstractMediaData =
+        std::dynamic_pointer_cast<QnAbstractMediaData>(nonConstData))
+    {
+        const bool isSecondaryProvider =
+            abstractMediaData->flags & QnAbstractMediaData::MediaFlags_LowQuality;
+        const auto& logger = (ini().analyzeSecondaryStream || isSecondaryProvider)
+            ? m_secondaryPutDataLogger
+            : m_primarypPutDataLogger;
+
+        if (logger)
+            logger->pushData(abstractMediaData, lm("Queue size %1").args(m_dataQueue.size()));
+    }
+
     if (!needData(nonConstData))
         return;
 
@@ -371,7 +395,7 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
             m_sendBuffer.resize(m_sendBuffer.size() + kRtpTcpHeaderSize);
         char* rtpHeaderPtr = m_sendBuffer.data() + m_sendBuffer.size();
         m_sendBuffer.resize(m_sendBuffer.size() + nx::streaming::rtp::RtpHeader::kSize);
-        nx::streaming::rtp::buildRtpHeader(rtpHeaderPtr, kMetaDataSsrc, metadata.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, metadataTrack->sequence);
+        nx::streaming::rtp::buildRtpHeader(rtpHeaderPtr, kMetadataSsrc, metadata.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, metadataTrack->sequence);
         m_sendBuffer.write(metadata);
 
         if (m_owner->isTcpMode())
@@ -569,12 +593,12 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         }
     }
 
-    const auto& logger = ini().analyzeSecondaryStream || isSecondaryProvider
-        ? m_secondaryLogger
-        : m_primaryLogger;
+    const auto& logger = (ini().analyzeSecondaryStream || isSecondaryProvider)
+        ? m_secondaryProcessDataLogger
+        : m_primarypProcessDataLogger;
 
     if (logger)
-        logger->pushData(media);
+        logger->pushData(media, lm("Queue size %1").args(m_dataQueue.size()));
 
     int trackNum = media->channelNumber;
     if (!m_multiChannelVideo && media->dataType == QnAbstractMediaData::VIDEO)
