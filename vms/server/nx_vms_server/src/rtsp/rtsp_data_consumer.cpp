@@ -34,7 +34,7 @@ bool needSecondaryStream(MediaQuality q)
 
 static const int kTcpSendBlockSize = 1024 * 16;
 static const int kRtpTcpHeaderSize = 4;
-static const uint32_t kMetaDataSsrc = 40000;
+static const uint32_t kMetadataSsrc = 40000;
 
 } // namespace
 
@@ -371,7 +371,7 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
             m_sendBuffer.resize(m_sendBuffer.size() + kRtpTcpHeaderSize);
         char* rtpHeaderPtr = m_sendBuffer.data() + m_sendBuffer.size();
         m_sendBuffer.resize(m_sendBuffer.size() + nx::streaming::rtp::RtpHeader::kSize);
-        nx::streaming::rtp::buildRtpHeader(rtpHeaderPtr, kMetaDataSsrc, metadata.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, metadataTrack->sequence);
+        nx::streaming::rtp::buildRtpHeader(rtpHeaderPtr, kMetadataSsrc, metadata.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, metadataTrack->sequence);
         m_sendBuffer.write(metadata);
 
         if (m_owner->isTcpMode())
