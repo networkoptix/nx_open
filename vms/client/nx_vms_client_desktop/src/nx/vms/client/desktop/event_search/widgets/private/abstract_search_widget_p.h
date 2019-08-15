@@ -69,6 +69,7 @@ public:
     void setPlaceholderPixmap(const QPixmap& value);
     SelectableTextButton* createCustomFilterButton();
 
+    bool updateFetchDirection(); //< Returns true if new data fetch is required.
     void requestFetchIfNeeded();
     void resetFilters();
 

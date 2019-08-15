@@ -187,6 +187,9 @@ void AbstractSearchWidget::Private::setupModels()
     connect(m_mainModel.data(), &QAbstractItemModel::rowsInserted,
         this, &Private::handleItemCountChanged);
 
+    connect(m_mainModel.data(), &AbstractSearchListModel::liveAboutToBeCommitted,
+        this, &Private::updateFetchDirection);
+
     using FetchDirection = AbstractSearchListModel::FetchDirection;
     using UpdateMode = EventRibbon::UpdateMode;
 
@@ -813,10 +816,10 @@ void AbstractSearchWidget::Private::updateCurrentCameras()
     }
 }
 
-void AbstractSearchWidget::Private::requestFetchIfNeeded()
+bool AbstractSearchWidget::Private::updateFetchDirection()
 {
-    if (!ui->ribbon->isVisible() || !model())
-        return;
+    if (!m_mainModel)
+        return false;
 
     const auto scrollBar = ui->ribbon->scrollBar();
 
@@ -825,9 +828,18 @@ void AbstractSearchWidget::Private::requestFetchIfNeeded()
     else if (scrollBar->value() == scrollBar->minimum())
         setFetchDirection(AbstractSearchListModel::FetchDirection::later);
     else
-        return; //< Scroll bar is not at the beginning nor the end.
+    {
+        setFetchDirection(AbstractSearchListModel::FetchDirection::earlier);
+        return false; //< Scroll bar is not at the beginning nor the end.
+    }
 
-    m_fetchMoreOperation->requestOperation();
+    return true;
+}
+
+void AbstractSearchWidget::Private::requestFetchIfNeeded()
+{
+    if (ui->ribbon->isVisible() && updateFetchDirection())
+        m_fetchMoreOperation->requestOperation();
 }
 
 void AbstractSearchWidget::Private::resetFilters()

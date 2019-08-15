@@ -334,6 +334,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
     if (!actionHasId)
         m_uuidHashes[action->getRuleId()][resource].insert(eventData.id);
+
+    // TODO: #vkutin Introduce maximum count and truncate to it if needed.
 }
 
 void NotificationListModel::Private::removeNotification(const vms::event::AbstractActionPtr& action)
