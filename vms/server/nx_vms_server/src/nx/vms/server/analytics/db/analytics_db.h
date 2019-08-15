@@ -75,6 +75,7 @@ private:
     ObjectTrackCache m_objectTrackCache;
     ObjectTrackAggregator m_trackAggregator;
     ObjectTrackGroupDao m_trackGroupDao;
+    bool m_stopped = false;
 
     bool ensureDbDirIsWritable(const QString& path);
 
@@ -110,6 +111,7 @@ private:
         CreateCursorCompletionHandler completionHandler);
 
     void scheduleDataCleanup(
+        const QnMutexLockerBase&,
         QnUuid deviceId,
         std::chrono::milliseconds oldestDataToKeepTimestamp);
 

@@ -40,6 +40,11 @@ EventsStorage::~EventsStorage()
     if (!m_dbController)
         return;
 
+    {
+        QnMutexLocker lock(&m_dbControllerMutex);
+        m_stopped = true;
+    }
+
     // Flushing all cached data.
     // Since update queries are queued all scheduled requests will be completed before flush.
     std::promise<ResultCode> done;
@@ -273,7 +278,7 @@ void EventsStorage::markDataAsDeprecated(
     NX_VERBOSE(this, "Cleaning data of device %1 up to timestamp %2",
         deviceId, oldestDataToKeepTimestamp.count());
 
-    scheduleDataCleanup(deviceId, oldestDataToKeepTimestamp);
+    scheduleDataCleanup(lock, deviceId, oldestDataToKeepTimestamp);
 }
 
 void EventsStorage::flush(StoreCompletionHandler completionHandler)
@@ -360,6 +365,9 @@ bool EventsStorage::readMaximumEventTimestamp()
 
 bool EventsStorage::readMinimumEventTimestamp(std::chrono::milliseconds* outResult)
 {
+    // TODO: The mutex is locked here for the duration of DB query which is a long lock.
+    // Long locks should not happen.
+
     QnMutexLocker dbLock(&m_dbControllerMutex);
 
     if (!m_dbController)
@@ -526,6 +534,7 @@ void EventsStorage::reportCreateCursorCompletion(
 }
 
 void EventsStorage::scheduleDataCleanup(
+    const QnMutexLockerBase&,
     QnUuid deviceId,
     std::chrono::milliseconds oldestDataToKeepTimestamp)
 {
@@ -545,7 +554,9 @@ void EventsStorage::scheduleDataCleanup(
             if (cleaner.clean(queryContext) == Cleaner::Result::incomplete)
             {
                 NX_VERBOSE(this, "Could not clean all data in one run. Scheduling another one");
-                scheduleDataCleanup(deviceId, oldestDataToKeepTimestamp);
+                QnMutexLocker lock(&m_dbControllerMutex);
+                if (!m_stopped)
+                    scheduleDataCleanup(lock, deviceId, oldestDataToKeepTimestamp);
             }
 
             return nx::sql::DBResult::ok;
