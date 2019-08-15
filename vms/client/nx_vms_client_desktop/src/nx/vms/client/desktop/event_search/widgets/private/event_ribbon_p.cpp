@@ -652,7 +652,9 @@ void EventRibbon::Private::insertNewTiles(
     int currentPosition = position;
 
     const bool animated = updateMode == UpdateMode::animated;
-    const int animatedEnd = qMin(index + kNumAnimatedTilesAtInsertion, end);
+    const int animatedEnd = animated
+        ? qMin(index + kNumAnimatedTilesAtInsertion, end)
+        : index;
 
     for (int i = index; i < end; ++i)
     {
@@ -669,7 +671,7 @@ void EventRibbon::Private::insertNewTiles(
             m_deadlines[modelIndex] = QDeadlineTimer(kInvisibleAutoCloseDelay);
 
         currentPosition += kDefaultTileSpacing;
-        if (!(animated && tile->animated && i < animatedEnd))
+        if (!tile->animated || i >= animatedEnd)
             currentPosition += tile->height;
 
         if (tile->importance != Importance())
@@ -704,39 +706,36 @@ void EventRibbon::Private::insertNewTiles(
         m_scrollBar->setValue(m_scrollBar->value() + delta);
 
     // Animated shift of subsequent tiles.
-    if (animated)
+    for (int i = index; i < animatedEnd; ++i)
     {
-        for (int i = index; i < animatedEnd; ++i)
-        {
-            const auto& tile = m_tiles[i];
-            if (!tile->animated)
-                continue;
+        const auto& tile = m_tiles[i];
+        if (!tile->animated)
+            continue;
 
-            // This is to prevent all inserted tiles appearing on the screen at once.
-            static constexpr qreal kStartingFraction = 0.25;
+        // This is to prevent all inserted tiles appearing on the screen at once.
+        static constexpr qreal kStartingFraction = 0.25;
 
-            AnimationPtr animator(new QVariantAnimation());
-            static const auto kAnimationId = ui::workbench::Animations::Id::RightPanelTileInsertion;
-            animator->setEasingCurve(qnWorkbenchAnimations->easing(kAnimationId));
-            animator->setDuration(qnWorkbenchAnimations->timeLimit(kAnimationId));
-            animator->setStartValue(kStartingFraction);
-            animator->setEndValue(1.0);
-            animator->start(QAbstractAnimation::DeleteWhenStopped);
+        AnimationPtr animator(new QVariantAnimation());
+        static const auto kAnimationId = ui::workbench::Animations::Id::RightPanelTileInsertion;
+        animator->setEasingCurve(qnWorkbenchAnimations->easing(kAnimationId));
+        animator->setDuration(qnWorkbenchAnimations->timeLimit(kAnimationId));
+        animator->setStartValue(kStartingFraction);
+        animator->setEndValue(1.0);
+        animator->start(QAbstractAnimation::DeleteWhenStopped);
 
-            connect(animator.get(), &QObject::destroyed, this,
-                [this]()
-                {
-                    const auto index = m_animations.take(static_cast<QVariantAnimation*>(sender()));
-                    if (!index.isValid())
-                        return;
-                    const auto& tile = m_tiles[index.row()];
-                    if (tile->insertAnimation.get() == sender())
-                        tile->insertAnimation.release();
-                });
+        connect(animator.get(), &QObject::destroyed, this,
+            [this]()
+            {
+                const auto index = m_animations.take(static_cast<QVariantAnimation*>(sender()));
+                if (!index.isValid())
+                    return;
+                const auto& tile = m_tiles[index.row()];
+                if (tile->insertAnimation.get() == sender())
+                    tile->insertAnimation.release();
+            });
 
-            m_animations.insert(animator.get(), m_model->index(i));
-            tile->insertAnimation.reset(animator.release());
-        }
+        m_animations.insert(animator.get(), m_model->index(i));
+        tile->insertAnimation.reset(animator.release());
     }
 
     updateGuard.rollback();
