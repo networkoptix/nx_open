@@ -138,6 +138,15 @@ MetadataLogger::MetadataLogger(
         NX_WARNING(this, "Unable to open output file %1 for logging", logFileName);
 }
 
+MetadataLogger::~MetadataLogger()
+{
+    using namespace std::chrono;
+
+    logLine(lm("Finished logging at %1 ms (VMS System time %2 ms)").args(
+        duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count(),
+        qnSyncTime->currentMSecsSinceEpoch()));
+}
+
 void MetadataLogger::pushData(
     const QnConstAbstractMediaDataPtr& data,
     const QString& additionalInfo)
@@ -147,8 +156,9 @@ void MetadataLogger::pushData(
 
     if (data->dataType == QnAbstractMediaData::DataType::VIDEO)
     {
-        pushFrameInfo(
-            {microseconds(data->timestamp)}, buildAdditionalInfoStr(__func__, additionalInfo));
+        const FrameInfo frameInfo{microseconds(data->timestamp)};
+        logLine(buildFrameLogString(frameInfo, buildAdditionalInfoStr(__func__, additionalInfo)));
+        m_prevFrameTimestamp = frameInfo.timestamp;
     }
     else if (data->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA)
     {

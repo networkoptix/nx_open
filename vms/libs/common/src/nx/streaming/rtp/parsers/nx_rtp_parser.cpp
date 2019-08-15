@@ -222,6 +222,7 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
             m_nextDataPacket->timestamp =
                 qFromBigEndian(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
 
+            logMediaData(m_nextDataPacket);
         }
 
         NX_ASSERT(m_nextDataPacketBuffer);
@@ -229,8 +230,6 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
 
         if (m_nextDataPacket->dataType == QnAbstractMediaData::VIDEO)
             m_lastFramePtsUs = m_nextDataPacket->timestamp;
-
-        logMediaData(m_nextDataPacket);
 
         if (rtpHeader->marker)
         {
