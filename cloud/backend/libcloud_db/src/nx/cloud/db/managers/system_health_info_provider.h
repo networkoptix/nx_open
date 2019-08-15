@@ -14,6 +14,7 @@
 #include "../access_control/auth_types.h"
 #include "../dao/rdb/system_health_history_data_object.h"
 #include "../data/system_data.h"
+#include "../settings.h"
 
 namespace nx::clusterdb::engine { class ConnectionManager; }
 
@@ -40,6 +41,7 @@ class SystemHealthInfoProvider:
 {
 public:
     SystemHealthInfoProvider(
+        const conf::Settings& settings,
         clusterdb::engine::ConnectionManager* ec2ConnectionManager,
         nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager);
     virtual ~SystemHealthInfoProvider() override;
@@ -52,6 +54,7 @@ public:
         std::function<void(api::Result, api::SystemHealthHistory)> completionHandler) override;
 
 private:
+    const conf::Settings& m_settings;
     clusterdb::engine::ConnectionManager* m_ec2ConnectionManager;
     nx::sql::AbstractAsyncSqlQueryExecutor* const m_dbManager;
     nx::utils::Counter m_startedAsyncCallsCounter;
@@ -67,6 +70,7 @@ private:
 
 using SystemHealthInfoProviderFactoryFunction =
     std::unique_ptr<AbstractSystemHealthInfoProvider>(
+        const conf::Settings& settings,
         clusterdb::engine::ConnectionManager* ec2ConnectionManager,
         nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager);
 
@@ -82,6 +86,7 @@ public:
 
 private:
     std::unique_ptr<AbstractSystemHealthInfoProvider> defaultFactory(
+        const conf::Settings& settings,
         clusterdb::engine::ConnectionManager* ec2ConnectionManager,
         nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager);
 };
