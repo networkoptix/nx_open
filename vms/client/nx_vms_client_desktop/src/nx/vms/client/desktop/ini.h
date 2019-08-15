@@ -188,10 +188,10 @@ struct Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(1, enableAnalyticsPlaybackMask, "Enable playback mode of analytics chunks only.");
 
-    NX_INI_FLAG(1, applyCameraFilterToSceneItems, "This flag controls display of specific data\n"
+    NX_INI_FLAG(0, applyCameraFilterToSceneItems, "This flag controls display of specific data\n"
         "on scene items for cameras not satisfying Right Panel camera filter.\n"
-        "If this flag isn't set, full data without any additional filtering is displayed.\n"
-        "If this flag is set, no data is displayed for such items.");
+        "If this flag isn't set, specific data satisfying other filters is displayed.\n"
+        "If this flag is set, no data is displayed.");
 };
 
 inline Ini& ini()

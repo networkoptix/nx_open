@@ -222,11 +222,11 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
 {
     for (const auto& objectInfo: objectInfoById)
     {
-        const auto relevantCamera = relevantCameraIds.empty()
+        const bool relevantCamera = relevantCameraIds.empty()
             || relevantCameraIds.contains(mediaResourceWidget->resource()->toResourcePtr()->getId());
 
         if ((ini().applyCameraFilterToSceneItems && !relevantCamera)
-            || (relevantCamera && !filter.acceptsMetadata(objectInfo.rawData)))
+            || !filter.acceptsMetadata(objectInfo.rawData, /*checkBoundingBox*/ relevantCamera))
         {
             areaHighlightWidget->removeArea(objectInfo.id);
             continue;

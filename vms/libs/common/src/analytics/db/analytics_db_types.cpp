@@ -93,10 +93,11 @@ bool Filter::acceptsAttributes(const std::vector<nx::common::metadata::Attribute
         });
 }
 
-bool Filter::acceptsMetadata(const nx::common::metadata::ObjectMetadata& metadata) const
+bool Filter::acceptsMetadata(
+    const nx::common::metadata::ObjectMetadata& metadata, bool checkBoundingBox) const
 {
     return acceptsObjectType(metadata.typeId)
-        && acceptsBoundingBox(metadata.boundingBox)
+        && (!checkBoundingBox || acceptsBoundingBox(metadata.boundingBox))
         && acceptsAttributes(metadata.attributes);
 }
 
