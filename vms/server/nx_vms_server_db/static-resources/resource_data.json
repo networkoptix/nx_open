@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.103",
+    "version": "1.0.1.106",
     "data": [
         {
             "keys": [
@@ -2314,6 +2314,12 @@
         },
         {
             "keys": [
+                "Speco|O4VLD5"
+            ],
+            "ignoreRtcpReports": true
+        },
+        {
+            "keys": [
                 "DW|*|A*", "CPRO|*|A*"
             ],
             "showUrl": true,
@@ -3573,7 +3579,8 @@
         {
             "_comment1": "Cameras that should not use Media2 (and should not try to detect Media2 support)",
             "keys": [
-                "Geovision|GV-BX2700*"
+                "Geovision|GV-BX2700*",
+                "GV-BX2700|Geovision"
             ],
             "onvifIgnoreMedia2":  true
         }

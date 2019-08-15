@@ -88,6 +88,9 @@ bool VideoStream::isVideoCompressed()
 void VideoStream::updateUrl(const std::string& url)
 {
     std::scoped_lock<std::mutex> lock(m_mutex);
+    if (url == m_url)
+        return;
+
     NX_DEBUG(this, "update url: %1", url);
     m_needReinitialization = true;
     m_url = url;
