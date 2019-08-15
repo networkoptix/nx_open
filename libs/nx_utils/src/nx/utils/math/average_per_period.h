@@ -35,7 +35,10 @@ public:
     {
         const auto cumulativeValue = m_cumulativeValuePerPeriod.getSumPerLastPeriod();
         const auto valueCount = m_valueCountPerPeriod.getSumPerLastPeriod();
-        return static_cast<Value>(valueCount == 0 ? Value(0) : cumulativeValue / valueCount);
+        if (valueCount == 0)
+            return Value(0);
+        else
+            return static_cast<Value>(cumulativeValue / valueCount);
     }
 
 private:
