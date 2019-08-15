@@ -12,7 +12,11 @@
     "/paxton_plugin/",
     "/tests/",
     "/translation/",
+    "/vms/translation/",
     "/webadmin/",
-    "*.py"
+    "distribution",
+    "*.py",
+    "*.png",
+    ".hg*"
   ]
 }
