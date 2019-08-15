@@ -3,6 +3,8 @@
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 #include <nx/sdk/analytics/helpers/metadata_types.h>
 
+#include <nx/utils/log/assert.h>
+
 namespace nx::vms::server::sdk_support {
 
 using namespace nx::sdk;

@@ -101,6 +101,8 @@ signals:
     void fetchFinished(FetchResult result, QPrivateSignal);
     void liveChanged(bool isLive, QPrivateSignal);
     void livePausedChanged(bool isPaused, QPrivateSignal);
+    void liveAboutToBeCommitted(QPrivateSignal);
+    void liveCommitted(QPrivateSignal);
     void camerasAboutToBeChanged(QPrivateSignal);
     void camerasChanged(QPrivateSignal);
     void isOnlineChanged(bool isOnline, QPrivateSignal);
@@ -127,6 +129,18 @@ protected:
                 [model, result]() { emit model->fetchFinished(*result, {}); }))
         {
             emit model->fetchCommitStarted(direction, {});
+        }
+    };
+
+    // Live commit must be guarded by this object.
+    // It emits liveAboutToBeCommitted/liveCommitted signals.
+    struct ScopedLiveCommit: public nx::utils::SharedGuard
+    {
+        explicit ScopedLiveCommit(AbstractSearchListModel* model):
+            nx::utils::SharedGuard(nx::utils::SharedGuardCallback(
+                [model]() { emit model->liveCommitted({}); }))
+        {
+            emit model->liveAboutToBeCommitted({});
         }
     };
 

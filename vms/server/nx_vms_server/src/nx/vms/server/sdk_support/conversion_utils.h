@@ -19,6 +19,10 @@
 
 #include <nx/utils/range_adapters.h>
 
+extern "C" {
+#include <libavformat/avformat.h>
+}
+
 namespace nx::vms::server::sdk_support {
 
 //-------------------------------------------------------------------------------------------------
