@@ -83,22 +83,6 @@ private:
 
     bool loadDictionaries();
 
-    /**
-     * @return Inserted event id.
-     * Throws on error.
-     */
-    void insertEvent(
-        nx::sql::QueryContext* queryContext,
-        const common::metadata::ObjectMetadataPacket& packet,
-        const common::metadata::ObjectMetadata& objectMetadata,
-        int64_t attributesId,
-        int64_t timePeriodId);
-
-    void updateDictionariesIfNeeded(
-        nx::sql::QueryContext* queryContext,
-        const common::metadata::ObjectMetadataPacket& packet,
-        const common::metadata::ObjectMetadata& objectMetadata);
-
     void savePacketDataToCache(
         const QnMutexLockerBase& /*lock*/,
         const common::metadata::ConstObjectMetadataPacketPtr& packet);

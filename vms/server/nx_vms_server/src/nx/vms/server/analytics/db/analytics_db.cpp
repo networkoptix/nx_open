@@ -419,53 +419,6 @@ bool EventsStorage::loadDictionaries()
     return true;
 }
 
-void EventsStorage::updateDictionariesIfNeeded(
-    nx::sql::QueryContext* queryContext,
-    const common::metadata::ObjectMetadataPacket& packet,
-    const common::metadata::ObjectMetadata& objectMetadata)
-{
-    m_deviceDao.insertOrFetch(queryContext, packet.deviceId);
-    m_objectTypeDao.insertOrFetch(queryContext, objectMetadata.typeId);
-}
-
-void EventsStorage::insertEvent(
-    sql::QueryContext* queryContext,
-    const common::metadata::ObjectMetadataPacket& packet,
-    const common::metadata::ObjectMetadata& objectMetadata,
-    int64_t attributesId,
-    int64_t /*timePeriodId*/)
-{
-    sql::SqlQuery insertEventQuery(queryContext->connection());
-    insertEventQuery.prepare(QString::fromLatin1(R"sql(
-        INSERT INTO event(timestamp_usec_utc, duration_usec,
-            device_id, object_type_id, object_id, attributes_id,
-            box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y)
-        VALUES(:timestampMs, :durationMs, :deviceId,
-            :objectTypeId, :trackId, :attributesId,
-            :boxTopLeftX, :boxTopLeftY, :boxBottomRightX, :boxBottomRightY)
-    )sql"));
-    insertEventQuery.bindValue(":timestampMs", packet.timestampUs / kUsecInMs);
-    insertEventQuery.bindValue(":durationMs", packet.durationUs / kUsecInMs);
-    insertEventQuery.bindValue(":deviceId", m_deviceDao.deviceIdFromGuid(packet.deviceId));
-    insertEventQuery.bindValue(
-        ":objectTypeId",
-        (long long) m_objectTypeDao.objectTypeIdFromName(objectMetadata.typeId));
-    insertEventQuery.bindValue(
-        ":trackId",
-        QnSql::serialized_field(objectMetadata.trackId));
-
-    insertEventQuery.bindValue(":attributesId", (long long) attributesId);
-
-    const auto packedBoundingBox = packRect(objectMetadata.boundingBox);
-
-    insertEventQuery.bindValue(":boxTopLeftX", packedBoundingBox.topLeft().x());
-    insertEventQuery.bindValue(":boxTopLeftY", packedBoundingBox.topLeft().y());
-    insertEventQuery.bindValue(":boxBottomRightX", packedBoundingBox.bottomRight().x());
-    insertEventQuery.bindValue(":boxBottomRightY", packedBoundingBox.bottomRight().y());
-
-    insertEventQuery.exec();
-}
-
 void EventsStorage::savePacketDataToCache(
     const QnMutexLockerBase& /*lock*/,
     const common::metadata::ConstObjectMetadataPacketPtr& packet)
