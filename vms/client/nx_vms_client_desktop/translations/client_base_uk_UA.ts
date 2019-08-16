@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="uk" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Будь-який тип</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Виберіть область</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Виберіть ділянку на відео...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>У вибраній ділянці</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Не вдалося виконати дії плагіна</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Введіть параметри</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Дія вимагає заповнення деяких параметрів.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1012,6 +1043,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Будь-ласка, повторно введіть пароль для Розкладки %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Події сервера</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Аналітика подій</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Будь-яка подія</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Будь-яка проблема з пристроєм</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Будь-яка проблема з камерою</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Будь-яка подія сервера</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Проблеми з пристроями</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Проблеми з камерою</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Подія Аналітики</translation>
     </message>
   </context>
   <context>
@@ -7543,34 +7613,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n об'єкти</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Будь-який тип</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Виберіть область</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Виберіть ділянку на відео...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>У вибраній ділянці</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Не вдалося виконати дії плагіна</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Введіть параметри</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Дія вимагає заповнення деяких параметрів.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -8193,42 +8235,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>Події сервера</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Аналітика подій</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Будь-яка проблема з пристроєм</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Будь-яка проблема з камерою</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Будь-яка подія сервера</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Проблеми з пристроями</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Проблеми з камерою</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Будь-яка подія</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Подія Аналітики</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>Немає подій</translation>

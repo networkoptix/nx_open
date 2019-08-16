@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh-CN" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>任何类型</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>选择区域</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>选择视频中的某区域...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>在选定区域</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>无法执行插件操作</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>输入参数。</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>操作需要填入参数。</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1013,6 +1044,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>请重新输入布局 %1密码：</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>服务器事件</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>分析事件</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>任一事件</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>任一设备问题</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>任一摄像机问题</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>任一服务器事件</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>设备问题</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>摄像机问题</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>任一分析事件</translation>
     </message>
   </context>
   <context>
@@ -7240,34 +7310,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n 物件</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>任何类型</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>选择区域</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>选择视频中的某区域...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>在选定区域</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>无法执行插件操作</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>输入参数。</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>操作需要填入参数。</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7854,42 +7896,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>服务器事件</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>分析事件</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>任一设备问题</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>任一摄像机问题</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>任一服务器事件</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>设备问题</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>摄像机问题</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>任一事件</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>任一分析事件</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>无事件</translation>

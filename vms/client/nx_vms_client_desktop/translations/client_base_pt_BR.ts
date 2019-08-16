@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pt-BR" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Qualquer tipo</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Selecione a área</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Selecione uma área no vídeo...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Na área selecionada</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Falha ao executar a ação do plug-in</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Inserir parâmetros</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Ação requer alguns parâmetros a serem preenchidos.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1013,6 +1044,45 @@ para ver mais favoritos</translation>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Por favor, re-digite a senha para o layout %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Eventos do servidor</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Análises</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Qualquer evento</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Qualquer problema de dispositivo</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Qualquer problema da câmera</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Qualquer evento do servidor</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Problemas do dispositivo</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Problemas da câmera</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Qualquer evento de análise</translation>
     </message>
   </context>
   <context>
@@ -7344,34 +7414,6 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
         <numerusform>%n objetos</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Qualquer tipo</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Selecione a área</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Selecione uma área no vídeo...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Na área selecionada</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Falha ao executar a ação do plug-in</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Inserir parâmetros</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Ação requer alguns parâmetros a serem preenchidos.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7970,42 +8012,6 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>Eventos do servidor</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Análises</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Qualquer problema de dispositivo</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Qualquer problema da câmera</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Qualquer evento do servidor</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Problemas do dispositivo</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Problemas da câmera</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Qualquer evento</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Qualquer evento de análise</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>Sem eventos</translation>

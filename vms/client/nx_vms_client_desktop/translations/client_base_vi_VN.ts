@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Bất kỳ loại nào</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Chọn khu vực</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Chọn một số khu vực trên video...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Trong khu vực được chọn</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Không thể thực thi plugin</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Nhập tham số</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Hành động yêu cầu một số tham số được điền.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1012,6 +1043,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Vui lòng nhập lại mật khẩu cho bố cục %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Sự kiện máy chủ</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Sự kiện phân tích</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Bất kỳ sự kiện nào</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Bất kỳ sự cố thiết bị</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Bất kỳ vấn đề camera</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Bất kỳ sự kiện máy chủ</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Sự cố thiết bị</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Sự cố camera</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Bất kỳ sự kiện phân tích</translation>
     </message>
   </context>
   <context>
@@ -7238,34 +7308,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
         <numerusform>%n đối tượng</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Bất kỳ loại nào</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Chọn khu vực</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Chọn một số khu vực trên video...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Trong khu vực được chọn</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Không thể thực thi plugin</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Nhập tham số</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Hành động yêu cầu một số tham số được điền.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7852,42 +7894,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>Sự kiện máy chủ</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Sự kiện phân tích</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Bất kỳ sự cố thiết bị</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Bất kỳ vấn đề camera</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Bất kỳ sự kiện máy chủ</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Sự cố thiết bị</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Sự cố camera</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Bất kỳ sự kiện nào</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Bất kỳ sự kiện phân tích</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>Không có sự kiện</translation>

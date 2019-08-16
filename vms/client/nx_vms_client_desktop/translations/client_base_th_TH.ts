@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="th" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>ทุกชนิด</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>เลือกพื้นที่</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>เลือกบางพื้นที่ในวิดีโอ</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>ในพื้นที่ที่เลือก</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>ไม่สามารถดำเนินการกับปลั๊กอินได้</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>ป้อนพารามิเตอร์</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>การดำเนินการต้องเติมพารามิเตอร์บางอย่าง</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1012,6 +1043,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>กรุณาใส่รหัสผ่านใหม่สำหรับเลย์เอาต์ %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>เหตุการณ์เซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>วิเคราะห์เหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>ทุกเหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>ปัญหาเกี่ยวกับกล้อง</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>เหตุการณ์ของเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>ปัญหาของกล้อง</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>วิเคราะห์เหตุการณ์</translation>
     </message>
   </context>
   <context>
@@ -7238,34 +7308,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n วัตถุ</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>ทุกชนิด</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>เลือกพื้นที่</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>เลือกบางพื้นที่ในวิดีโอ</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>ในพื้นที่ที่เลือก</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>ไม่สามารถดำเนินการกับปลั๊กอินได้</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>ป้อนพารามิเตอร์</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>การดำเนินการต้องเติมพารามิเตอร์บางอย่าง</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7852,42 +7894,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>เหตุการณ์เซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>วิเคราะห์เหตุการณ์</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>ปัญหาเกี่ยวกับกล้อง</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>เหตุการณ์ของเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>ปัญหาของกล้อง</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>ทุกเหตุการณ์</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>วิเคราะห์เหตุการณ์</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>ไม่พบเหตุการณ์</translation>

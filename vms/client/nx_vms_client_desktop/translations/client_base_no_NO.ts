@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="no" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Hvilken som helst type</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Velg område</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Velg et område på videoen...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>I valgt område</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Kunne ikke utføre plugin-handlingen</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Angi parametere</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Handling krever at noen parametere fylles ut.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1013,6 +1044,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Vennligst tast inn passord for layout %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Server-hendelser</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Analyse-hendelser</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Enhver hendelse</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Ethvert enhetsproblem</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Ethvert kameraproblem</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Enhver serverhendelse</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Enhetsproblemer</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Kameraproblemer</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Enhver analysehendelse</translation>
     </message>
   </context>
   <context>
@@ -7344,34 +7414,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
         <numerusform>%n objekter</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Hvilken som helst type</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Velg område</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Velg et område på videoen...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>I valgt område</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Kunne ikke utføre plugin-handlingen</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Angi parametere</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Handling krever at noen parametere fylles ut.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7970,42 +8012,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>Server-hendelser</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Analyse-hendelser</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Ethvert enhetsproblem</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Ethvert kameraproblem</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Enhver serverhendelse</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Enhetsproblemer</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Kameraproblemer</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Enhver hendelse</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Enhver analysehendelse</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>Ingen hendelser</translation>
