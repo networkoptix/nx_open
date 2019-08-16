@@ -7,7 +7,7 @@ namespace nx::vms::api::analytics {
 enum class ManifestErrorType
 {
     noError = 0,
-    emptyPluginId =  1 << 0,
+    emptyPluginId = 1 << 0,
     emptyPluginName = 1 << 1,
     emptyPluginDescription = 1 << 2,
     emptyPluginVersion = 1 << 3,

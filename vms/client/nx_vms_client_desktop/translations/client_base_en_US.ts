@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+        <source>Any type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select some area on the video...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In selected area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to execute plugin action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Action requires some parameters to be filled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
         <source>Backup newly added devices</source>
@@ -1012,6 +1043,45 @@ to view more bookmarks</source>
     <message>
         <source>Please re-enter password for layout %1:</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+        <source>Server events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any device issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any camera issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any server event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device issues</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera issues</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any analytics event</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7337,34 +7407,6 @@ If you intended to move analytics data to another storage location, please conta
             <numerusform>%n objects</numerusform>
         </translation>
     </message>
-    <message>
-        <source>Any type</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select area</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select some area on the video...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>In selected area</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failed to execute plugin action</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enter parameters</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Action requires some parameters to be filled.</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7963,42 +8005,6 @@ If you intended to move analytics data to another storage location, please conta
 </context>
 <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-        <source>Server events</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Analytics events</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any device issue</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any camera issue</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any server event</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Device issues</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera issues</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any event</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any analytics event</source>
-        <translation></translation>
-    </message>
     <message>
         <source>No events</source>
         <translation></translation>

@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="de" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Jeder Typ</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Bereich auswählen</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Wählen Sie einen Bereich im Video aus...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Im ausgewählten Bereich</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Pluginaktion konnte nicht ausgeführt werden</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Parameter eingeben</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Die Aktion erfordert, dass einige Parameter ausgefüllt werden.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1012,6 +1043,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Bitte geben Sie das Passwort für das Layout %1 erneut ein:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Serverereignisse</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Analytik-Ereignisse</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Jedes Ereignis</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Jedes Geräteproblem</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Jedes Kameraproblem</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Jedes Serverereignis</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Geräteprobleme</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Kameraprobleme</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Jedes Analytikereignis</translation>
     </message>
   </context>
   <context>
@@ -7339,34 +7409,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
         <numerusform>%n Objekte</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Jeder Typ</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Bereich auswählen</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Wählen Sie einen Bereich im Video aus...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Im ausgewählten Bereich</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Pluginaktion konnte nicht ausgeführt werden</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Parameter eingeben</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Die Aktion erfordert, dass einige Parameter ausgefüllt werden.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7965,42 +8007,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>Serverereignisse</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Analytik-Ereignisse</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Jedes Geräteproblem</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Jedes Kameraproblem</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Jedes Serverereignis</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Geräteprobleme</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Kameraprobleme</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Jedes Ereignis</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Jedes Analytikereignis</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>Keine Ereignisse</translation>

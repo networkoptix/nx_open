@@ -9,7 +9,6 @@ static const int kNumberOfEntriesToTransform = 3;
 
 class DeviceAgentManifestValidationTest: public BaseManifestValidationTest<DeviceAgentManifest>
 {
-
 protected:
     void givenCorrectManifest()
     {
@@ -28,7 +27,7 @@ protected:
         transformSomeEntries(inOutList, kNumberOfEntriesToTransform, transformationFunc);
     }
 
-//-------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
 
     void givenManifestWithEmptyEventTypeIds()
     {
@@ -68,7 +67,7 @@ protected:
         m_manifest.eventTypes.push_back(eventType);
     }
 
-//-------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
 
     void givenManifestWithEmptyObjectTypeIds()
     {
@@ -108,7 +107,7 @@ protected:
         m_manifest.objectTypes.push_back(objectType);
     }
 
-//-------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
 
     void givenManifestWithEmptyGroupIds()
     {
@@ -129,9 +128,6 @@ protected:
     {
         makeIncorrectManifest(&m_manifest.groups, [](auto entry) { entry->name = "name"; });
     }
-
-//-------------------------------------------------------------------------------------------------
-
 };
 
 TEST_F(DeviceAgentManifestValidationTest, correctManifestProducesNoErrors)

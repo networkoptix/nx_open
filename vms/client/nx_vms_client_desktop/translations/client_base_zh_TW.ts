@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh-TW" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>任何類型</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>選取範圍</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>選擇影片上的某區域。</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>在選定區域</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>套件執行失敗</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>輸入參數</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>動作需要填入參數。</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1013,6 +1044,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>請重新輸入佈局 %1密碼：</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>伺服器事件</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>分析事件</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>任一事件</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>任一裝置問題</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>任一攝影機問題</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>任一伺服器事件</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>設備問題</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>攝影機問題</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>任一分析事件</translation>
     </message>
   </context>
   <context>
@@ -5888,7 +5958,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>如果備援已啟用，無論設定為何，伺服器仍可請求攝影機更新狀態。</translation>
     </message>
   </context>
   <context>
@@ -7244,34 +7314,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n 物件</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>任何類型</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>選取範圍</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>選擇影片上的某區域。</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>在選定區域</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>套件執行失敗</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>輸入參數</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>動作需要填入參數。</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7858,42 +7900,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>伺服器事件</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>分析事件</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>任一裝置問題</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>任一攝影機問題</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>任一伺服器事件</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>設備問題</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>攝影機問題</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>任一事件</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>任一分析事件</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>沒有事件</translation>

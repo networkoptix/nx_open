@@ -36,6 +36,7 @@ using ObjectTypeDescriptorMap = std::map<
 
 using ScopedEventTypeIds = std::map<EngineId, std::map<GroupId, std::set<EventTypeId>>>;
 using ScopedObjectTypeIds = std::map<EngineId, std::map<GroupId, std::set<ObjectTypeId>>>;
+using ScopedEntityTypeIds = std::map<EngineId, std::map<GroupId, std::set<QString>>>;
 
 using ActionTypeDescriptorMap = std::map<
     EngineId,

@@ -53,6 +53,14 @@ public:
         }
     };
 
+    struct UnresolvedEntity
+    {
+        QnUuid engineId;
+        QString entityId;
+    };
+
+    using UnresolvedEntities = std::vector<UnresolvedEntity>;
+
     using NodeFilter = std::function<bool(NodePtr)>;
 
     /**
@@ -69,7 +77,8 @@ public:
      */
     static NodePtr eventTypesForRulesPurposes(
         QnCommonModule* commonModule,
-        const QnVirtualCameraResourceList& devices);
+        const QnVirtualCameraResourceList& devices,
+        const UnresolvedEntities& additionalUnresolvedEventTypes);
 };
 
 class AnalyticsEventsSearchTreeBuilder: public QObject, public QnCommonModuleAware

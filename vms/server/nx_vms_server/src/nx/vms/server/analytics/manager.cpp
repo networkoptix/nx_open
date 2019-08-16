@@ -133,11 +133,11 @@ void Manager::at_resourceRemoved(const QnResourcePtr& resource)
 {
     if (!resource)
     {
-        NX_VERBOSE(this, "Receieved a null resource.");
+        NX_VERBOSE(this, "Receieved a null Resource.");
         return;
     }
 
-    NX_VERBOSE(this, "The resource %1 (%2) has been removed.",
+    NX_VERBOSE(this, "The Resource %1 (%2) has been removed.",
         resource->getName(), resource->getId());
 
     resource->disconnect(this);
@@ -314,7 +314,7 @@ void Manager::registerMetadataSink(
     if (!device)
     {
         NX_ERROR(this,
-            "Can't register metadata sink for the resource %1 (%2), the resource is not a Device",
+            "Can't register metadata sink for the Resource %1 (%2), the resource is not a Device",
             deviceResource->getName(), deviceResource->getId());
         return;
     }
@@ -469,7 +469,7 @@ void Manager::updateCompatibilityWithDevices(const AnalyticsEngineResourcePtr& e
     const auto sdkEngine = engine->sdkEngine();
     if (!sdkEngine || !sdkEngine->isValid())
     {
-        NX_DEBUG(this, "The Engine resource %1 (%2) has no assigned SDK Engine",
+        NX_DEBUG(this, "The Engine Resource %1 (%2) has no assigned SDK Engine",
             engine->getName(), engine->getId());
         return;
     }

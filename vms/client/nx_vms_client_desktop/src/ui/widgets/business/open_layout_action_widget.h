@@ -38,8 +38,7 @@ private:
     enum class LayoutWarning
     {
         NoWarning,
-        MissingAccess,  //< Some users have no access
-        NobodyHasAccess,   //< No user has an access
+        LocalResource  //< Selected local resource and multiple users
     };
 
     // Warnings for picked users.
@@ -47,8 +46,9 @@ private:
     enum class UserWarning
     {
         NoWarning,
-        LocalResource,  //< Selected local resource and multiple users
-        EmptyRoles  //< Selected some roles, but there are no users in them
+        EmptyRoles,  //< Selected some roles, but there are no users in them
+        MissingAccess,  //< Some users have no access
+        NobodyHasAccess   //< No user has an access
     };
 
     void displayWarning(LayoutWarning warning);

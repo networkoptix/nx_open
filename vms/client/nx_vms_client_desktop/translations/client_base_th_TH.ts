@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="th" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>ทุกชนิด</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>เลือกพื้นที่</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>เลือกบางพื้นที่ในวิดีโอ</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>ในพื้นที่ที่เลือก</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>ไม่สามารถดำเนินการกับปลั๊กอินได้</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>ป้อนพารามิเตอร์</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>การดำเนินการต้องเติมพารามิเตอร์บางอย่าง</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1015,6 +1046,45 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>เหตุการณ์เซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>วิเคราะห์เหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>ทุกเหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>ปัญหาเกี่ยวกับกล้อง</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>เหตุการณ์ของเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>ปัญหาของกล้อง</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>วิเคราะห์เหตุการณ์</translation>
+    </message>
+  </context>
+  <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
@@ -2022,7 +2092,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
+      <translation>การรับทราบแรงจะทำงานเฉพาะกับเหตุการณ์ทั่วไปหากมีการใช้ตัวดัดแปลงกล้องใน URL เหตุการณ์ทั่วไป</translation>
     </message>
   </context>
   <context>
@@ -5545,8 +5615,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>ข้อมูลการวิเคราะห์ปัจจุบันจะไม่ถูกย้ายไปที่อื่นโดยอัตโนมัติและจะไม่สามารถเข้าถึงได้ คุณสามารถเก็บมันและย้ายด้วยตนเองในภายหลังหรือลบอย่างถาวร
+หากคุณต้องการย้ายข้อมูลการวิเคราะห์ไปยังที่เก็บข้อมูลอื่นโปรดติดต่อฝ่ายสนับสนุนก่อนดำเนินการต่อ</translation>
     </message>
   </context>
   <context>
@@ -5882,7 +5952,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>หากเปิดใช้งาน Failover เซิร์ฟเวอร์อาจยังร้องขอการอัพเดตสถานะกล้องโดยไม่คำนึงถึงการตั้งค่านี้</translation>
     </message>
   </context>
   <context>
@@ -7238,34 +7308,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n วัตถุ</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>ทุกชนิด</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>เลือกพื้นที่</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>เลือกบางพื้นที่ในวิดีโอ</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>ในพื้นที่ที่เลือก</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>ไม่สามารถดำเนินการกับปลั๊กอินได้</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>ป้อนพารามิเตอร์</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>การดำเนินการต้องเติมพารามิเตอร์บางอย่าง</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7803,7 +7845,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Add %n Devices</source>
       <translation>
-        <numerusform>เพิ่มอุปกรณ์</numerusform>
+        <numerusform>เพิ่ม %n อุปกรณ์</numerusform>
       </translation>
     </message>
     <message>
@@ -7852,42 +7894,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>เหตุการณ์เซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>วิเคราะห์เหตุการณ์</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>ปัญหาเกี่ยวกับกล้อง</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>เหตุการณ์ของเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>ปัญหาของกล้อง</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>ทุกเหตุการณ์</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>วิเคราะห์เหตุการณ์</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>ไม่พบเหตุการณ์</translation>
@@ -9240,11 +9246,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>รีโมตไฟล์ &quot;%1&quot; เสียหาย</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>เซิร์ฟเวอร์แล้วมีไฟล์นี้ &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9767,21 +9773,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>ยืนยันที่เก็บสินค้าเพื่อจัดเก็บข้อมูลการวิเคราะห์ใน &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>พาร์ติชันที่มีขนาดใหญ่ที่สุด</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>ฐานข้อมูลการวิเคราะห์ควรเก็บไว้ในไดรฟ์ในเครื่องเท่านั้นและอาจใช้พื้นที่จำนวนมาก
+เมื่อเลือกสถานที่จัดเก็บข้อมูลการวิเคราะห์แล้วจะไม่สามารถเปลี่ยนแปลงได้อย่างง่ายดายโดยไม่สูญเสียข้อมูลที่มีอยู่ เราแนะนำให้เลือกตำแหน่งที่ตั้งอย่างระมัดระวังและหลีกเลี่ยงการใช้พาร์ติชันระบบเนื่องจากอาจทำให้ระบบทำงานผิดปกติอย่างรุนแรง
+โดยค่าเริ่มต้นข้อมูลการวิเคราะห์จะถูกเก็บไว้ใน %1
+คุณสามารถเลือกที่เก็บข้อมูลอื่นได้ในแท็บ &quot;การจัดการที่เก็บ&quot; ของกล่องโต้ตอบการตั้งค่าเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>

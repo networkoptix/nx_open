@@ -46,7 +46,7 @@ struct NX_VMS_API EngineManifest
         QString id; /**< Id of the action type, like "vendor.pluginName.actionName". */
         QString name; /**< Action name to be shown to the user. */
 
-        // Empty list means that the action supports any type of objects
+        // Empty list means that the Action supports any type of objects.
         QList<QString> supportedObjectTypeIds;
         QJsonObject parametersModel;
         Requirements requirements;

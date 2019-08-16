@@ -24,7 +24,9 @@ AnalyticsSdkEventModel::~AnalyticsSdkEventModel()
 {
 }
 
-void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& cameras)
+void AnalyticsSdkEventModel::loadFromCameras(
+    const QnVirtualCameraResourceList& cameras,
+    const nx::vms::event::EventParameters& currentEventParameters)
 {
     auto addItem =
         [this](QStandardItem* parent, AnalyticsEntitiesTreeBuilder::NodePtr node)
@@ -54,9 +56,16 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
             }
         });
 
+
     const auto root = AnalyticsEntitiesTreeBuilder::eventTypesForRulesPurposes(
         commonModule(),
-        cameras);
+        cameras,
+        {
+            {
+                currentEventParameters.getAnalyticsEngineId(),
+                currentEventParameters.getAnalyticsEventTypeId()
+            }
+        });
 
     beginResetModel();
     clear();
