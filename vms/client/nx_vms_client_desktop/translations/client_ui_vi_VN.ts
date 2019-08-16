@@ -3074,7 +3074,7 @@
     <message>
       <location/>
       <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>Dữ liệu phân tích có thể chiếm một lượng lớn không gian. Chúng tôi khuyên bạn nên chọn một vị trí khác cho nó thay vì phân vùng hệ thống.</translation>
     </message>
   </context>
   <context>

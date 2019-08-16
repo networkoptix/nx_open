@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>全てのタイプ</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>エリア選択</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>ビデオ上のエリアを選択してください</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>選択されたエリア</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>プラグインアクションの実行に失敗しました</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>パラメータを入力</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>アクションにはいくつかのパラメータ入力が必要です</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1012,6 +1043,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>レイアウト %1 のパスワードを再入力してください</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>サーバーイベント</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>分析イベント</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>全イベント</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>全デバイス障害</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>全カメラ障害</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>全サーバーイベント</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>デバイスの問題</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>カメラの問題</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>全分析イベント</translation>
     </message>
   </context>
   <context>
@@ -7239,34 +7309,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n オブジェクト</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>全てのタイプ</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>エリア選択</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>ビデオ上のエリアを選択してください</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>選択されたエリア</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>プラグインアクションの実行に失敗しました</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>パラメータを入力</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>アクションにはいくつかのパラメータ入力が必要です</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7853,42 +7895,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>サーバーイベント</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>分析イベント</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>全デバイス障害</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>全カメラ障害</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>全サーバーイベント</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>デバイスの問題</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>カメラの問題</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>全イベント</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>全分析イベント</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>イベントなし</translation>

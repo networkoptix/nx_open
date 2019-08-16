@@ -910,6 +910,7 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
 
         localInfo.data.peer.persistentId = m_dbInstanceId;
         runtimeInfoManager->updateLocalItem(localInfo);
+        commonModule()->setDbId(m_dbInstanceId);
     } // end of DB update
 
     m_queryCachePool.reset();
@@ -964,7 +965,6 @@ bool QnDbManager::syncLicensesBetweenDB()
         if (saveLicense(license, m_sdbStatic) != ErrorCode::ok)
             return false;
     }
-    commonModule()->setDbId(m_dbInstanceId);
     return true;
 }
 

@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="he" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>כל סוג</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>בחר אזור</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>בחר אזור כלשהו בווידאו...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>באזור שנבחר</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>ביצוע פעולת תוסף נכשלה</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>הזן נתונים</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>הפעולה דורשת להזין מספר נתונים.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1012,6 +1043,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>הזן מחדש את הסיסמה עבור פריסה %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>אירועי שרת</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>ארוע אנליטיקה</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>כל אירוע</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>כל בעיה בהתקן</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>כל בעיה במצלמה</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>כל אירוע שרת</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>בעיות בהתקן</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>בעיות במצלמה</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>כל אירוע אנליטיקה</translation>
     </message>
   </context>
   <context>
@@ -7540,34 +7610,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n אובייקטים</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>כל סוג</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>בחר אזור</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>בחר אזור כלשהו בווידאו...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>באזור שנבחר</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>ביצוע פעולת תוסף נכשלה</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>הזן נתונים</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>הפעולה דורשת להזין מספר נתונים.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -8190,42 +8232,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>אירועי שרת</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>ארוע אנליטיקה</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>כל בעיה בהתקן</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>כל בעיה במצלמה</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>כל אירוע שרת</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>בעיות בהתקן</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>בעיות במצלמה</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>כל אירוע</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>כל אירוע אנליטיקה</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>אין אירועים</translation>

@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="tr" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Her tip</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Alan seç</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Videodaki bazı alanları seçin...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Seçilen alanda</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Eklenti eylemi yürütülemedi</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Parametre girin</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Aksiyon için bazı parametrelerin doldurulması gereklidir.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1012,6 +1043,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Lütfen %1 düzeni için şifreyi tekrar girin:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Sunucu olayları</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Analitik olayları</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Herhangi bir etkinlik</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Herhangi bir cihaz sorunu</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Herhangi bir kamera sorunu</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Herhangi bir sunucu etkinliği</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Cihaz sorunları</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Kamera sorunları</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Herhangi bir analitik olayı</translation>
     </message>
   </context>
   <context>
@@ -7338,34 +7408,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
         <numerusform>%n nesneler</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Her tip</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Alan seç</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Videodaki bazı alanları seçin...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Seçilen alanda</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Eklenti eylemi yürütülemedi</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Parametre girin</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Aksiyon için bazı parametrelerin doldurulması gereklidir.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7964,42 +8006,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>Sunucu olayları</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Analitik olayları</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Herhangi bir cihaz sorunu</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Herhangi bir kamera sorunu</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Herhangi bir sunucu etkinliği</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Cihaz sorunları</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Kamera sorunları</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Herhangi bir etkinlik</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Herhangi bir analitik olayı</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>Olay yok</translation>

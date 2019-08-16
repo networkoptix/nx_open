@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Любой тип</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Выберите область</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Выберите область на видео...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>В выбранной области</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Не удалось выполнить действие плагина</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Введите параметры</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Действие требует заполнения некоторых параметров.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1013,6 +1044,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Пожалуйста, введите пароль для раскладки %1 еще раз:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>События сервера</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>События аналитики</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Любое событие</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Любая проблема с устройством</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Любая проблема с камерой</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Любое событие сервера</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Проблемы с устройством</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Проблемы с камерой</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Любое событие аналитики</translation>
     </message>
   </context>
   <context>
@@ -7544,34 +7614,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n объектов</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Любой тип</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Выберите область</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Выберите область на видео...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>В выбранной области</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Не удалось выполнить действие плагина</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Введите параметры</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Действие требует заполнения некоторых параметров.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -8194,42 +8236,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>События сервера</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>События аналитики</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Любая проблема с устройством</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Любая проблема с камерой</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Любое событие сервера</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Проблемы с устройством</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Проблемы с камерой</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Любое событие</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Любое событие аналитики</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>Нет событий</translation>
