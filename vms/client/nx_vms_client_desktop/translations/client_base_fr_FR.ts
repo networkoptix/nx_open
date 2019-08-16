@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Tous Types</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Sélectionner zone</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Sélectionner une zone sur la vidéo...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Dans la zone sélectionnée</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Échec d’exécution d'action plugin</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Entrer paramètres</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Action nécessite que certains paramètres soient remplis.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1013,6 +1044,45 @@ pour afficher plus de signets</translation>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Veuillez saisir le mot de passe pour la mise en page %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Événements serveur</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Événements analytiques</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Tout événement</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Tout problème périphérique</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Tout problème caméra</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Tout événement serveur</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Problèmes périphérique</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Problèmes caméra</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Tout événement d'analyse</translation>
     </message>
   </context>
   <context>
@@ -7344,34 +7414,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
         <numerusform>%n objets</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Tous Types</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Sélectionner zone</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Sélectionner une zone sur la vidéo...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Dans la zone sélectionnée</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Échec d’exécution d'action plugin</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Entrer paramètres</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Action nécessite que certains paramètres soient remplis.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7970,42 +8012,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>Événements serveur</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Événements analytiques</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Tout problème périphérique</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Tout problème caméra</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Tout événement serveur</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Problèmes périphérique</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Problèmes caméra</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Tout événement</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Tout événement d'analyse</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>Aucun événement</translation>

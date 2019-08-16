@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="es-ES" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Cualquier tipo</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Seleccionar area</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Seleccione un área en el video...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>En area seleccionada</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>No se pudo ejecutar plugin de acción</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Introducir parametros</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>La acción requiere que algunos parámetros sean llenados.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1012,6 +1043,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Por favor vuelva a ingresar la contraseña para el diseño %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Eventos del servidor</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Eventos analíticos</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Cualquier evento</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Cualquier problema del dispositivo</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Cualquier problema con la cámara</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Cualquier evento del servidor</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Problemas con el dispositivo</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Problemas con la cámara</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Cualquier evento analítico</translation>
     </message>
   </context>
   <context>
@@ -7341,34 +7411,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
         <numerusform>%n objetos</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Cualquier tipo</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Seleccionar area</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Seleccione un área en el video...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>En area seleccionada</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>No se pudo ejecutar plugin de acción</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Introducir parametros</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>La acción requiere que algunos parámetros sean llenados.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7967,42 +8009,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>Eventos del servidor</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Eventos analíticos</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Cualquier problema del dispositivo</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Cualquier problema con la cámara</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Cualquier evento del servidor</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Problemas con el dispositivo</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Problemas con la cámara</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Cualquier evento</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Cualquier evento analítico</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>No hay eventos</translation>

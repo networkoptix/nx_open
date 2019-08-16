@@ -81,17 +81,9 @@ void OpenLayoutActionWidget::displayWarning(LayoutWarning warning)
 
     switch (warning)
     {
-        case LayoutWarning::MissingAccess:
-            setWarningStyle(ui->warningForUsers);
-            ui->warningForLayouts->setText(
-                tr("Some users do not have access to the selected layout. "
-                    "Action will not work for them."));
-            break;
-        case LayoutWarning::NobodyHasAccess:
-            setWarningStyle(ui->warningForUsers);
-            ui->warningForLayouts->setText(
-                tr("None of selected users have access to the selected layout. "
-                    "Action will not work."));
+        case LayoutWarning::LocalResource:
+            setWarningStyle(ui->warningForLayouts);
+            ui->warningForLayouts->setText(tr("Local layouts can only be shown to their owners."));
             break;
         case LayoutWarning::NoWarning:
             break;
@@ -107,13 +99,23 @@ void OpenLayoutActionWidget::displayWarning(UserWarning warning)
 
     switch (warning)
     {
-        case UserWarning::LocalResource:
-            setWarningStyle(ui->warningForUsers);
-            ui->warningForUsers->setText(tr("Local layouts can only be shown to their owners."));
-            break;
         case UserWarning::EmptyRoles:
             setWarningStyle(ui->warningForUsers);
-            ui->warningForUsers->setText(tr("None of selected user roles contain users. Action will not work."));
+            ui->warningForUsers->setText(
+                tr("None of selected user roles contain users. Action will not work."));
+            break;
+        case UserWarning::MissingAccess:
+            setWarningStyle(ui->warningForUsers);
+            ui->warningForUsers->setText(
+                tr("Some users do not have access to the selected layout. "
+                    "Action will not work for them."));
+            break;
+        case UserWarning::NobodyHasAccess:
+            setWarningStyle(ui->warningForUsers);
+            ui->warningForUsers->setText(
+                tr("None of selected users have access to the selected layout. "
+                    "Action will not work."));
+            break;
         case UserWarning::NoWarning:
             break;
     }
@@ -146,27 +148,32 @@ void OpenLayoutActionWidget::checkWarnings()
             if (!accessManager->hasPermission(user, layout, Qn::ReadPermission))
                 ++noAccess;
 
-            if (parentResource && parentResource->getParentId() != user->getId())
+            if (parentResource && parentResource->getId() != user->getId())
                 othersLocal = true;
         }
     }
 
-    if (noAccess > 0)
+    if (othersLocal)
     {
-        displayWarning(noAccess == users.size() ? LayoutWarning::NobodyHasAccess : LayoutWarning::MissingAccess);
+        displayWarning(LayoutWarning::LocalResource);
         foundLayoutWarning = true;
     }
 
-    if (rolesSelected && !users.size())
+    // Right now we show layout warning only if a local layout is selected.
+    // According to the spec, we shouldn't show additional user warnings in this case.
+    if (!foundLayoutWarning)
     {
-        displayWarning(UserWarning::EmptyRoles);
-        foundUserWarning = true;
-    }
+        if (noAccess > 0)
+        {
+            displayWarning(noAccess == users.size() ? UserWarning::NobodyHasAccess : UserWarning::MissingAccess);
+            foundUserWarning = true;
+        }
 
-    if (othersLocal)
-    {
-        displayWarning(UserWarning::LocalResource);
-        foundUserWarning = true;
+        if (rolesSelected && !users.size())
+        {
+            displayWarning(UserWarning::EmptyRoles);
+            foundUserWarning = true;
+        }
     }
 
     if (!foundUserWarning)

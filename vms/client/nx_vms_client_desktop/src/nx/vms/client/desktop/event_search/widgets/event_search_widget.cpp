@@ -38,6 +38,7 @@ namespace nx::vms::client::desktop {
 
 class EventSearchWidget::Private: public QObject
 {
+    Q_DECLARE_TR_FUNCTIONS(EventSearchWidget::Private)
     EventSearchWidget* const q;
     SelectableTextButton* const m_typeSelectionButton;
     EventSearchListModel* const m_eventModel;

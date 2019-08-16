@@ -7,16 +7,13 @@
 
 namespace {
 
+/**
+ * Explicitly forbid HTTP2 connections.
+ */
 class Http1NetworkAccessManager: public QNetworkAccessManager
 {
 public:
     using QNetworkAccessManager::QNetworkAccessManager;
-
-    static Http1NetworkAccessManager* instance()
-    {
-        static Http1NetworkAccessManager instance;
-        return &instance;
-    }
 
 protected:
     virtual QNetworkReply* createRequest(Operation op, const QNetworkRequest& request,
@@ -32,7 +29,7 @@ protected:
 
 QnWebPage::QnWebPage(QObject* parent): base_type(parent)
 {
-    setNetworkAccessManager(Http1NetworkAccessManager::instance());
+    setNetworkAccessManager(new Http1NetworkAccessManager(this));
 
     connect(networkAccessManager(), &QNetworkAccessManager::sslErrors, this,
         [this](QNetworkReply* reply, const QList<QSslError>& errors)
