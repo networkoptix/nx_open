@@ -113,7 +113,7 @@ void LoadEmulator::openConnection(
 
 void LoadEmulator::handleConnectionFailure(
     int connectionId,
-    ::ec2::QnTransactionTransportBase::State state)
+    ::ec2::QnTransactionTransportBase::State /*state*/)
 {
     if (!m_replaceFailedConnection)
         return;
