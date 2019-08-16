@@ -4636,11 +4636,6 @@ void QnPlOnvifResource::setOutputPortStateNonSafe(
     return /*true*/;
 }
 
-QnMutex* QnPlOnvifResource::getStreamConfMutex()
-{
-    return &m_streamConfMutex;
-}
-
 void QnPlOnvifResource::beforeConfigureStream(Qn::ConnectionRole /*role*/)
 {
     QnMutexLocker lock(&m_streamConfMutex);

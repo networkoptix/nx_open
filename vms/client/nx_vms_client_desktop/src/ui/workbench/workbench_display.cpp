@@ -1232,8 +1232,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
     {
-        if (startDisplay)
-            mediaWidget->display()->start();
         if (mediaWidget->display()->archiveReader())
         {
             if (item->layout()->resource() && !item->layout()->resource()->getLocalRange().isEmpty())
@@ -1260,6 +1258,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 qnClientModule->radassController()->registerConsumer(mediaWidget->display()->camDisplay());
 
         }
+        if (startDisplay)
+            mediaWidget->display()->start();
 
         integrations::registerWidget(mediaWidget);
     }

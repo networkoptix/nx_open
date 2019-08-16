@@ -152,6 +152,7 @@ private:
 
     std::vector<QnByteArray*> m_demuxedData;
     int m_numberOfVideoChannels;
+    bool m_ignoreRtcpReports = false;
     nx::streaming::rtp::CameraTimeHelper m_timeHelper;
     bool m_pleaseStop;
     QElapsedTimer m_rtcpReportTimer;
