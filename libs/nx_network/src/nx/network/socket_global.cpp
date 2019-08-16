@@ -1,9 +1,11 @@
 #include "socket_global.h"
 
 #include <map>
+#include <optional>
 
 #include <udt/udt.h>
 
+#include <nx/utils/debug.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "aio/aio_service.h"
@@ -107,6 +109,8 @@ struct SocketGlobalsImpl
 #endif
     std::unique_ptr<UdtInitializer> udtInitializer;
 
+    std::optional<nx::utils::debug::OnAboutToBlockHandler> onAboutToBlockHandler;
+
     aio::PollSetFactory pollSetFactory;
     std::unique_ptr<AddressResolver> addressResolver;
     AioServiceGuard aioServiceGuard;
@@ -144,6 +148,12 @@ SocketGlobals::~SocketGlobals()
 
     m_impl->debugIniReloadTimer->pleaseStopSync();
     m_impl->addressResolver->pleaseStopSync();
+
+    if (m_impl->onAboutToBlockHandler)
+    {
+        nx::utils::debug::setOnAboutToBlockHandler(
+            *std::exchange(m_impl->onAboutToBlockHandler, std::nullopt));
+    }
 
     m_impl.reset();
 
@@ -331,6 +341,9 @@ void SocketGlobals::initializeNetworking()
         m_impl->udtInitializer = std::make_unique<UdtInitializer>();
 
     m_impl->aioServiceGuard.initialize();
+
+    m_impl->onAboutToBlockHandler = nx::utils::debug::setOnAboutToBlockHandler(
+        []() { NX_ASSERT(!aioService().isInAnyAioThread()); });
 
 #ifdef ENABLE_SSL
     ssl::initOpenSSLGlobalLock();
