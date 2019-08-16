@@ -5884,7 +5884,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>如果备援移转已启用，无论设定为何，服务器仍可请求摄像机更新状态。</translation>
     </message>
   </context>
   <context>
