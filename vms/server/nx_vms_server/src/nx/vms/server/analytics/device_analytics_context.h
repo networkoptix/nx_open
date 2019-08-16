@@ -12,6 +12,7 @@
 #include <nx/vms/server/resource/resource_fwd.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/analytics/abstract_video_data_receptor.h>
+#include <nx/vms/server/sdk_support/file_utils.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 
 #include <nx/sdk/ptr.h>
@@ -61,11 +62,6 @@ private:
     void at_devicePropertyChanged(const QnResourcePtr& resource, const QString& propertyName);
     void at_rulesUpdated(const QSet<QnUuid>& affectedResources);
 
-    std::optional<QVariantMap> loadSettingsFromFile(
-        const resource::AnalyticsEngineResourcePtr& engine) const;
-
-    void reportSkippedFrames(int framesSkipped, QnUuid engineId) const;
-
 private:
     void subscribeToDeviceChanges();
     void subscribeToRulesChanges();
@@ -79,6 +75,14 @@ private:
     bool isEngineAlreadyBound(const resource::AnalyticsEngineResourcePtr& engine) const;
 
     QVariantMap prepareSettings(const QnUuid& engineId, const QVariantMap& settings);
+    std::optional<QVariantMap> loadSettingsFromFile(
+        const resource::AnalyticsEngineResourcePtr& engine) const;
+
+    std::optional<QVariantMap> loadSettingsFromSpecificFile(
+        const resource::AnalyticsEngineResourcePtr& engine,
+        sdk_support::FilenameGenerationOptions filenameGenerationOptions) const;
+
+    void reportSkippedFrames(int framesSkipped, QnUuid engineId) const;
 
 private:
     mutable QnMutex m_mutex;
