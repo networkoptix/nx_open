@@ -297,6 +297,8 @@ systemctl enable $COMPANY_NAME-mediaserver || exit $?
 
 startServer()
 {
+    local SERVER_PID
+
     if [[ $WITH_ROOT_TOOL == 'true' ]]
     then
         systemctl start $COMPANY_NAME-root-tool || return $?
@@ -305,13 +307,15 @@ startServer()
     systemctl start $COMPANY_NAME-mediaserver
 
     sleep 1
-    if ! PID=$(pidof mediaserver-bin)
+    if ! SERVER_PID=$(pidof mediaserver-bin)
     then
         echo "ERROR: Server process not found though 'systemd ... start' reported success." >&2
         exit 1
     fi
 
-    echo "Started service with PID $PID."
+    local -ci SERVER_UID=$(ps -h -eo uid -q $SERVER_PID) #< Get UID of proccess with $SERVER_PID.
+
+    echo "Started service with PID=$SERVER_PID, UID=$SERVER_UID."
 }
 
 if [[ $RUNTIME != "docker" ]]
