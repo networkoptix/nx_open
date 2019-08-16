@@ -155,6 +155,7 @@ class CloudSession(object):
         self.cloud_connect_test_util_version = configuration['cloud_connect_test_util_version']
         self.metric_namespace = configuration['metric_namespace']
         self.email_sqs_queue_name = configuration['email_sqs_queue_name']
+        self.dynamodb_table = configuration['dynamodb_table']
 
         self.base_url = 'https://{}'.format(self.host)
         self.session = requests.Session()
@@ -272,7 +273,7 @@ class CloudSession(object):
         )
 
         dynamodb = boto3.resource('dynamodb')
-        table = dynamodb.Table('prod-health-records')
+        table = dynamodb.Table(self.dynamodb_table)
         table.put_item(Item=self._dynamodb_item())
 
     def run_tests(self):
