@@ -8,6 +8,8 @@
 
 #include <alsa/asoundlib.h>
 
+#include <nx/utils/log/log.h>
+
 namespace nx::usb_cam::device::audio::detail {
 
 namespace {
@@ -66,9 +68,9 @@ struct DeviceDescriptor
             && ioType == rhs.ioType;
     }
 
-    bool isCameraAudioInput(const nxcip::CameraInfo& info) const
+    bool isCameraAudioInput(const DeviceData& device) const
     {
-        std::string modelName(info.modelName);
+        std::string modelName(device.name);
         return
             (modelName.find(name) != std::string::npos
             || name.find(modelName) != std::string::npos)
@@ -158,51 +160,40 @@ static std::vector<DeviceDescriptor> getDevices()
 
 } // namespace
 
-void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
+void selectAudioDevices(std::vector<DeviceData>& devices)
 {
-    std::vector<DeviceDescriptor> devices = getDevices();
+    std::vector<DeviceDescriptor> audioDevices = getDevices();
     std::map<DeviceDescriptor*, bool> audioTaken;
     std::vector<DeviceDescriptor*> defaults;
-    std::vector<nxcip::CameraInfo*> muteCameras;
 
-    for (int i = 0; i < (int)devices.size(); ++i)
+    for (int i = 0; i < (int)audioDevices.size(); ++i)
     {
-        audioTaken.insert(std::pair<DeviceDescriptor*, bool>(&devices[i], false));
+        NX_DEBUG(NX_SCOPE_TAG, "Found audio device, name [%1], path: %2",
+            audioDevices[i].name, audioDevices[i].path);
 
-        if ((devices[i].isDefault || devices[i].sysDefault) && devices[i].isInput())
-            defaults.push_back(&devices[i]);
+        audioTaken.insert(std::pair<DeviceDescriptor*, bool>(&audioDevices[i], false));
+        if ((audioDevices[i].isDefault || audioDevices[i].sysDefault) && audioDevices[i].isInput())
+            defaults.push_back(&audioDevices[i]);
     }
 
-    for (auto camera = cameras; camera < cameras + cameraCount; ++camera)
+    for (auto& device: devices)
     {
         bool mute = true;
-        for (int j = 0; j < (int)devices.size(); ++j)
+        for (int j = 0; j < (int)audioDevices.size(); ++j)
         {
-            DeviceDescriptor * device = &devices[j];
-            if (!audioTaken[device] && device->isCameraAudioInput(*camera) && device->sysDefault)
+            DeviceDescriptor* audioDevice = &audioDevices[j];
+            if (!audioTaken[audioDevice] && audioDevice->isCameraAudioInput(device) && audioDevice->sysDefault)
             {
                 mute = false;
-                audioTaken[device] = true;
-                strncpy(
-                    camera->auxiliaryData,
-                    device->path.c_str(),
-                    sizeof(camera->auxiliaryData) - 1);
+                audioTaken[audioDevice] = true;
+                device.audioPath = audioDevice->path;
                 break;
             }
         }
-        if (mute)
-            muteCameras.push_back(camera);
-    }
+        if (mute && !defaults.empty())
+            device.audioPath = defaults[0]->path;
 
-    if (!muteCameras.empty() && !defaults.empty())
-    {
-        for (const auto & muteCamera : muteCameras)
-        {
-            strncpy(
-                muteCamera->auxiliaryData,
-                defaults[0]->path.c_str(),
-                sizeof(muteCamera->auxiliaryData) - 1);
-        }
+        NX_DEBUG(NX_SCOPE_TAG, "Selected audio device: [%1]", device.toString());
     }
 }
 

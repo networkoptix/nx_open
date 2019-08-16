@@ -30,7 +30,7 @@ int QnTestCameraStreamReader::receiveData(quint8* buffer, int size)
     int done = 0;
     while (done < size)
     {
-        int bytesRead = m_socket->recv(buffer + done, size - done);
+        const int bytesRead = m_socket->recv(buffer + done, size - done);
         if (bytesRead < 1)
             return bytesRead;
         done += bytesRead;
