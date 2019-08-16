@@ -9,7 +9,6 @@ static const int kNumberOfEntriesToTransform = 3;
 
 class EngineManifestValidationTest: public BaseManifestValidationTest<EngineManifest>
 {
-
 protected:
     void givenCorrectManifest()
     {
@@ -27,7 +26,7 @@ protected:
         transformSomeEntries(inOutList, kNumberOfEntriesToTransform, transformationFunc);
     }
 
-//-------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
 
     void givenManifestWithEmptyEventTypeIds()
     {
@@ -49,7 +48,7 @@ protected:
         makeIncorrectManifest(&m_manifest.eventTypes, [](auto entry) { entry->name = "name"; });
     }
 
-//-------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
 
     void givenManifestWithEmptyObjectTypeIds()
     {
@@ -71,7 +70,7 @@ protected:
         makeIncorrectManifest(&m_manifest.objectTypes, [](auto entry) { entry->name = "name"; });
     }
 
-//-------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
 
     void givenManifestWithEmptyGroupIds()
     {
@@ -93,7 +92,7 @@ protected:
         makeIncorrectManifest(&m_manifest.groups, [](auto entry) { entry->name = "name"; });
     }
 
-//-------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
 
     void givenManifestWithEmptyObjectActionIds()
     {

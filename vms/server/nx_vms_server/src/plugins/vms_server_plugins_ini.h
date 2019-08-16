@@ -74,7 +74,7 @@ struct PluginsIniConfig: public nx::kit::IniConfig
         "depends on this value: NX_KIT_ASSERT() for stderr, NX_ASSERT() for the Server log.");
 
     NX_INI_FLAG(0, enableStrictManifestValidationMode,
-        "If set then any error in a manifest leads to the Plugin/Engine/DeviceAgent rejection");
+        "If set then any error in a manifest leads to the Plugin/Engine/DeviceAgent rejection.");
 };
 
 inline PluginsIniConfig& pluginsIni()
