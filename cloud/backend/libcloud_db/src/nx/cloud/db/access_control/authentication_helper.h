@@ -94,7 +94,7 @@ private:
     const nx::network::http::Request& m_request;
     nx::network::http::server::AuthenticationCompletionHandler m_handler;
 
-    HttpDigestAuthenticator m_authenticationHelperXXX;
+    HttpDigestAuthenticator m_httpDigestAuthenticator;
     std::tuple<network::HostAddress, std::string> m_userLockKey;
     nx::utils::stree::ResourceContainer m_authTraversalResult;
 

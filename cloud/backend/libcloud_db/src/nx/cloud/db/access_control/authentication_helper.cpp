@@ -149,24 +149,24 @@ AuthenticationHelper::AuthenticationHelper(
     m_connection(connection),
     m_request(request),
     m_handler(std::move(handler)),
-    m_authenticationHelperXXX(
+    m_httpDigestAuthenticator(
         m_request.requestLine.method.toStdString(),
         getHeaderValue(m_request.headers, header::Authorization::NAME).toStdString())
 {
     m_userLockKey = std::make_tuple(
         connection.clientEndpoint().address,
-        m_authenticationHelperXXX.username());
+        m_httpDigestAuthenticator.username());
 }
 
 bool AuthenticationHelper::userLocked() const
 {
     return m_transportSecurityManager->isBlocked(
-        m_connection, m_authenticationHelperXXX.username());
+        m_connection, m_httpDigestAuthenticator.username());
 }
 
 bool AuthenticationHelper::requestContainsValidDigest() const
 {
-    return m_authenticationHelperXXX.requestContainsValidDigest();
+    return m_httpDigestAuthenticator.requestContainsValidDigest();
 }
 
 void AuthenticationHelper::reportSuccess(
@@ -176,7 +176,7 @@ void AuthenticationHelper::reportSuccess(
     m_transportSecurityManager->onAuthenticationSuccess(
         authenticationType,
         m_connection,
-        m_authenticationHelperXXX.username(),
+        m_httpDigestAuthenticator.username(),
         m_request);
 
     nx::utils::swapAndCall(
@@ -191,13 +191,13 @@ void AuthenticationHelper::reportFailure(
     std::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate)
 {
     NX_VERBOSE(this, "Authentication failed (username %1). %2",
-        m_authenticationHelperXXX.username(), toString(resultCode));
+        m_httpDigestAuthenticator.username(), toString(resultCode));
 
     m_transportSecurityManager->onAuthenticationFailure(
         authenticationType,
         m_connection,
         request,
-        m_authenticationHelperXXX.username());
+        m_httpDigestAuthenticator.username());
 
     nx::utils::swapAndCall(
         m_handler,
@@ -208,8 +208,8 @@ void AuthenticationHelper::queryStaticAuthenticationRulesTree(
     const StreeManager& stree)
 {
     nx::utils::stree::ResourceContainer inputRes;
-    if (!m_authenticationHelperXXX.username().empty())
-        inputRes.put(attr::userName, nx::String(m_authenticationHelperXXX.username().c_str()));
+    if (!m_httpDigestAuthenticator.username().empty())
+        inputRes.put(attr::userName, nx::String(m_httpDigestAuthenticator.username().c_str()));
     SocketResourceReader socketResources(*m_connection.socket());
     HttpRequestResourceReader httpRequestResources(m_request);
     const auto authSearchInputData = nx::utils::stree::MultiSourceResourceReader(
@@ -252,7 +252,7 @@ api::ResultCode AuthenticationHelper::authenticateRequestDigest(
     }
     else
     {
-        authResultCode = m_authenticationHelperXXX.authenticateInDataManagers(
+        authResultCode = m_httpDigestAuthenticator.authenticateInDataManagers(
             authDataProviders,
             authProperties);
     }
@@ -306,14 +306,14 @@ bool AuthenticationHelper::streeQueryFoundPasswordMatchesRequestDigest()
 {
     if (auto foundHa1 = m_authTraversalResult.get(attr::ha1))
     {
-        if (m_authenticationHelperXXX.validateHa1Func()(foundHa1.get().toString().toLatin1()))
+        if (m_httpDigestAuthenticator.validateHa1Func()(foundHa1.get().toString().toLatin1()))
             return true;
     }
 
     if (auto password = m_authTraversalResult.get(attr::userPassword))
     {
-        if (m_authenticationHelperXXX.validateHa1Func()(calcHa1(
-                m_authenticationHelperXXX.username().c_str(),
+        if (m_httpDigestAuthenticator.validateHa1Func()(calcHa1(
+                m_httpDigestAuthenticator.username().c_str(),
                 nx::network::AppInfo::realm().toUtf8(),
                 password.get().toString())))
         {
