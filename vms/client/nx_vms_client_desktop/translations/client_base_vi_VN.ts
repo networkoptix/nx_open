@@ -7070,6 +7070,34 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Chọn khu vực trên video để lọc kết quả</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Trong khu vực được chọn</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Camera đã chọn</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Thiết bị được chọn</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Chọn phương tiện</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>không xác định</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9074,14 +9102,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Chọn khu vực trên video để lọc kết quả</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Trong khu vực được chọn</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Không có chuyển động</translation>
     </message>
@@ -9094,23 +9114,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>
         <numerusform>%n sự kiện chuyển động</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Camera đã chọn</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Thiết bị được chọn</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Chọn phương tiện</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>không xác định</translation>
     </message>
   </context>
   <context>

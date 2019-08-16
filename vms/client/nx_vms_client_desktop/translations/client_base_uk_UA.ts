@@ -7369,6 +7369,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Виберіть область відео, щоб фільтрувати результати</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>У вибраній ділянці</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Вибрана камера</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Вибраний пристрій</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Вибрані медіа</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ні</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9436,14 +9464,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Виберіть область відео, щоб фільтрувати результати</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>У вибраній ділянці</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Немає руху</translation>
     </message>
@@ -9459,23 +9479,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n події руху</numerusform>
         <numerusform>%n події руху</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Вибрана камера</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Вибраний пристрій</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Вибрані медіа</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ні</translation>
     </message>
   </context>
   <context>

@@ -7174,6 +7174,34 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Välj område på videon för att filtrera resultat</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>I markerat område</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Vald kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Vald enhet</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Vald media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ingen</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9199,14 +9227,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Välj område på videon för att filtrera resultat</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>I markerat område</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Ingen rörelse</translation>
     </message>
@@ -9220,23 +9240,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
         <numerusform>%n rörelsehändelser</numerusform>
         <numerusform>%n rörelsehändelser</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Vald kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Vald enhet</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Vald media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ingen</translation>
     </message>
   </context>
   <context>

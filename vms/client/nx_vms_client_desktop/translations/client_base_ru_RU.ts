@@ -7370,6 +7370,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Выберите область на видео для фильтрации результатов</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>В выбранной области</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Выбранная камера</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Выбранное устройство</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Выбранные медиа</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>нет</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9437,14 +9465,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Выберите область на видео для фильтрации результатов</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>В выбранной области</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Нет движения</translation>
     </message>
@@ -9460,23 +9480,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n событий движения</numerusform>
         <numerusform>%n событий движения</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Выбранная камера</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Выбранное устройство</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Выбранные медиа</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>нет</translation>
     </message>
   </context>
   <context>

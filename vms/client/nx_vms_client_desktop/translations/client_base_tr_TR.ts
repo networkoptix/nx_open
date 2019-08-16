@@ -7168,6 +7168,34 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Sonuçları filtrelemek için videodan bir alan seçin</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Seçilen alanda</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Seçilen kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Seçilen cihazlar</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Seçilen medya</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>hiçbiri</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9193,14 +9221,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Sonuçları filtrelemek için videodan bir alan seçin</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Seçilen alanda</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Hareket yok</translation>
     </message>
@@ -9214,23 +9234,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
         <numerusform>%n hareket etkinliği</numerusform>
         <numerusform>%n hareket etkinliği</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Seçilen kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Seçilen cihaz</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Seçilen medya</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>hiçbiri</translation>
     </message>
   </context>
   <context>

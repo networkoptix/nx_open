@@ -7367,6 +7367,34 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Chcete-li filtrovat výsledky, vyberte oblast na videu</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Ve vybrané oblasti</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Vybraná kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Vybrané zařízení</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Vybrat média</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>žádný</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9434,14 +9462,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Chcete-li filtrovat výsledky, vyberte oblast na videu</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Ve vybrané oblasti</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Žádný pohyb</translation>
     </message>
@@ -9457,23 +9477,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
         <numerusform>%n události pohybu</numerusform>
         <numerusform>%n události pohybu</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Vybraná kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Vybrané zařízení</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Vybrat média</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>žádný</translation>
     </message>
   </context>
   <context>
