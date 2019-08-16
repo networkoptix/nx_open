@@ -103,7 +103,7 @@ public:
             nx::cloud::db::api::ResultCode::notImplemented, nx::cloud::db::api::AuthResponse()));
     }
 
-    virtual void resolveUserDigest(
+    virtual void resolveUserCredentials(
         const nx::cloud::db::api::UserAuthorization& authorization,
         std::function<void(nx::cloud::db::api::ResultCode, nx::cloud::db::api::CredentialsDescriptor)> completionHandler) override
     {
