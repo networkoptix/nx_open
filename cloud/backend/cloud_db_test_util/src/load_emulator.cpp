@@ -213,7 +213,7 @@ void LoadTest::openConnection(
 
 void LoadTest::handleConnectionFailure(
     int connectionId,
-    ::ec2::QnTransactionTransportBase::State /*state*/)
+    ::ec2::QnTransactionTransportBase::State state)
 {
     if (!m_replaceFailedConnection)
         return;
@@ -224,7 +224,8 @@ void LoadTest::handleConnectionFailure(
     if (it == m_connections.end())
         return;
 
-    NX_INFO(this, "Reopening connection %1:%2", it->second.id, it->second.authKey);
+    NX_INFO(this, "Connection to %1:%2 ended up in state %3. Reopening",
+        it->second.id, it->second.authKey, ::ec2::QnTransactionTransportBase::toString(state));
 
     openConnection(lock, it->second);
 
