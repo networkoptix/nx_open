@@ -52,6 +52,7 @@ using namespace std::chrono;
 
 class AnalyticsSearchWidget::Private: public QObject
 {
+    Q_DECLARE_TR_FUNCTIONS(AnalyticsSearchWidget::Private)
     AnalyticsSearchWidget* const q;
 
 public:
