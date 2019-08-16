@@ -231,12 +231,15 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(const QnUuid &resource
     return result;
 }
 
-QByteArray downloadFileWithRetry(CLHttpStatus& status, const QString& fileName, const QString& host, int port, unsigned int timeout, const QAuthenticator& auth)
+QByteArray downloadFileWithRetry(int& status, const QString& fileName, const QString& host, int port, unsigned int timeout, const QAuthenticator& auth)
 {
     QByteArray rez;
-    for (int i = 0; i < 4; ++i) {
-        rez = downloadFile(status, fileName, host, port, timeout, auth);
-        if (status != CL_HTTP_SERVICEUNAVAILABLE)
+    for (int i = 0; i < 4; ++i)
+    {
+        QUrl url = lit("http://%1:%2/%3").arg(host).arg(port).arg(fileName);
+        url.setUserName(auth.user());
+        url.setPassword(auth.password());
+        if (nx_http::downloadFileSync(url, &status, &rez) == SystemError::noError)
             break;
         QnSleep::msleep(nx::utils::random::number(0, 50));
     }
@@ -255,7 +258,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
     QString devUrl = QString(lit("http://%1:%2")).arg(url.host()).arg(url.port(80));
     int timeout = 2000;
 
-    CLHttpStatus status;
+    int status = 0;
     QString model = QLatin1String(downloadFileWithRetry(status, QLatin1String("get?model"), host, port, timeout, auth));
 
     if (model.isEmpty())
