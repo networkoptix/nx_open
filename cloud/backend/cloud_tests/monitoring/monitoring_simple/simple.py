@@ -343,7 +343,7 @@ class CloudSession(object):
         log.info('Running image: {} command: {}'.format(image, command))
 
         client = docker.client.from_env()
-        container = client.containers.run(image, command, detach=True)
+        container = client.containers.run(image, '{} {}'.format(self.host, command), detach=True)
         status = container.wait()
         log.info('Container exited with exit status {}'.format(status))
         out = container.logs(stdout=True, stderr=True)
