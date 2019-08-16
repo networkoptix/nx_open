@@ -12,6 +12,8 @@ class QnResourceListModel;
 
 namespace nx::vms::client::desktop {
 
+class AccessValidator;
+
 /**
  * A widget to edit parameters for openLayoutAction
  * Provides UI to:
@@ -61,7 +63,7 @@ private:
     // Can return nullptr.
     QnLayoutResourcePtr getSelectedLayout();
 
-    QnUserResourceList getSelectedUsers(bool& rolesSelected);
+    std::pair<QnUserResourceList, QList<QnUuid>> getSelectedUsersAndRoles();
 
     // Updates button state according to selected layouts.
     void updateLayoutsButton();
@@ -75,6 +77,8 @@ private:
     QScopedPointer<Ui::OpenLayoutActionWidget> ui;
 
     QnLayoutResourcePtr m_selectedLayout;
+
+    AccessValidator* m_validator;
 };
 
 } // namespace nx::vms::client::desktop
