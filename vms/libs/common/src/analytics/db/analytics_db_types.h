@@ -113,7 +113,8 @@ struct Filter
     bool acceptsObjectType(const QString& typeId) const;
     bool acceptsBoundingBox(const QRectF& boundingBox) const;
     bool acceptsAttributes(const std::vector<nx::common::metadata::Attribute>& attributes) const;
-    bool acceptsMetadata(const nx::common::metadata::ObjectMetadata& metadata) const;
+    bool acceptsMetadata(const nx::common::metadata::ObjectMetadata& metadata,
+        bool checkBoundingBox = true) const;
 
     bool operator==(const Filter& right) const;
     bool operator!=(const Filter& right) const;

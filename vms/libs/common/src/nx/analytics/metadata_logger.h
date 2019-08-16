@@ -20,6 +20,8 @@ public:
         QnUuid engineId,
         nx::vms::api::StreamIndex = nx::vms::api::StreamIndex::undefined);
 
+    ~MetadataLogger();
+
     void pushData(
         const QnConstAbstractMediaDataPtr& data,
         const QString& additionalInfo = QString());

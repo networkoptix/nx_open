@@ -6070,7 +6070,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>אמצעי שרת Failover עשויים לבקש עדכוני סטטוס של המצלמה ללא קשר להגדרה זו.</translation>
     </message>
   </context>
   <context>

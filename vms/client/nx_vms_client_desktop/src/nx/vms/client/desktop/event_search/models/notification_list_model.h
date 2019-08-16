@@ -14,6 +14,9 @@ public:
     explicit NotificationListModel(QnWorkbenchContext* context, QObject* parent = nullptr);
     virtual ~NotificationListModel() override;
 
+    int maximumCount() const;
+    void setMaximumCount(int value);
+
 protected:
     virtual bool defaultAction(const QModelIndex& index) override;
 

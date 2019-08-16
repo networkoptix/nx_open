@@ -125,9 +125,8 @@ private:
 
     ResourceThumbnailProvider* createPreviewProvider(const nx::api::ResourceImageRequest& request);
     void loadNextPreview();
-    bool isNextPreviewLoadAllowed() const;
+    bool isNextPreviewLoadAllowed(const ResourceThumbnailProvider* provider) const;
     void handleLoadingEnded(ResourceThumbnailProvider* provider); //< Provider may be destroying.
-    int maxSimultaneousPreviewLoads() const;
 
     int scrollValue() const;
     int totalTopMargin() const; //< Top margin and viewport header.
@@ -222,7 +221,20 @@ private:
     nx::utils::ImplPtr<nx::utils::PendingOperation> m_previewLoad;
     nx::utils::ElapsedTimer m_sinceLastPreviewRequest;
 
-    QHash<ResourceThumbnailProvider*, QSharedPointer<QTimer>> m_loadingPreviews;
+    struct PreviewLoadData
+    {
+        QnMediaServerResourcePtr server;
+        QSharedPointer<QTimer> timeout;
+    };
+
+    struct ServerLoadData
+    {
+        int loadingCounter = 0;
+    };
+
+    QHash<ResourceThumbnailProvider*, PreviewLoadData> m_loadingByProvider;
+    QHash<QnMediaServerResourcePtr, ServerLoadData> m_loadingByServer;
+    ResourceThumbnailProvider* m_providerLoadingFromCache = nullptr;
 };
 
 } // namespace nx::vms::client::desktop
