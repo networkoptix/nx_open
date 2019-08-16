@@ -1,6 +1,6 @@
 #include "bucket_api_ut.h"
 
-#include <nx/cloud/discovery/node.h>
+#include <nx/cloud/storage/service/settings.h>
 
 namespace nx::cloud::storage::service::api::test {
 
@@ -200,11 +200,11 @@ TEST_F(BucketApi, add_bucket)
     andAddedBucketMatchesExpectedBucket();
 }
 
-TEST_F(BucketApi, fails_to_add_unknown_bucket)
+TEST_F(BucketApi, DISABLED_fails_to_add_unknown_bucket)
 {
     whenAddUnknownBucket();
 
-    thenAddBucketResponseIs(ResultCode::awsApiError);
+    thenAddBucketResponseIs(ResultCode::notFound);
 }
 
 

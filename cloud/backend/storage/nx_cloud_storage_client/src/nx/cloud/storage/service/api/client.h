@@ -88,13 +88,17 @@ Client::ResultCode Client::getResultCode(
     if (systemErrorCode != SystemError::noError)
         return toResultCode(systemErrorCode);
 
-    if (!fusionRequestResult.resultCode.isEmpty())
-        return toResultCode(fusionRequestResult);
-
     if (!response)
         return api::ResultCode::networkError;
 
-    return toResultCode(response);
+    auto result = toResultCode(response);
+    if (result.resultCode != api::ResultCode::ok)
+    {
+        result.error = fusionRequestResult.errorText.toStdString();
+        return result;
+    }
+
+    return toResultCode(fusionRequestResult);
 }
 
 } // namespace nx::cloud::storage::service::api

@@ -3,12 +3,14 @@
 #include <nx/network/socket_common.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/cloud/aws/sts/api_client.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 #include "nx/cloud/storage/service/settings.h"
 #include "nx/cloud/storage/service/utils.h"
 #include "nx/cloud/storage/service/model/model.h"
 #include "nx/cloud/storage/service/model/database.h"
 #include "nx/cloud/storage/service/model/dao/storage_dao.h"
+#include "nx/cloud/storage/service/view/http/cloud_db_resource.h"
 #include "utils.h"
 
 namespace nx::cloud::storage::service::controller {
@@ -18,7 +20,7 @@ using namespace model::dao;
 
 namespace {
 
-// TODO should this be a setting?
+// TODO should this be a setting? It is the aws global sts endpoint, but there are regional ones...
 static constexpr char kStsUrl[] = "https://sts.amazonaws.com";
 static constexpr char kStorageType[] = "awss3";
 
@@ -81,6 +83,7 @@ static std::string buildStorageAccessPolicy(
 } // namespace
 
 void StorageManager::AddStorageContext::initializeStorage(
+    const std::string& cloudDbAccountOwner,
     const api::Bucket& bucket,
     const api::AddStorageRequest& request)
 {
@@ -92,6 +95,7 @@ void StorageManager::AddStorageContext::initializeStorage(
     storage.ioDevices.back().dataUrl =
         network::url::Builder(service::utils::bucketUrl(bucket.name)).setPath(storage.id);
     storage.ioDevices.back().region = bucket.region;
+    storage.owner = cloudDbAccountOwner;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -128,6 +132,7 @@ StorageManager::~StorageManager()
 }
 
 void StorageManager::addStorage(
+    const nx::utils::stree::ResourceContainer& authInfo,
     const network::SocketAddress& clientEndpoint,
     const api::AddStorageRequest& request,
     GetStorageHandler handler)
@@ -139,11 +144,16 @@ void StorageManager::addStorage(
             api::Storage());
     }
 
+
+    std::string cloudDbAccountOwner;
+    if (!authInfo.get(view::http::CloudDbResource::accountOwner, &cloudDbAccountOwner))
+        return handler(utils::badRequest("Empty Cloud DB account owner"), api::Storage());
+
     auto addStorageContext = std::make_shared<AddStorageContext>();
 
     m_database->synchronizationEngine().transactionLog().startDbTransaction(
         m_settings.database().synchronization.clusterId,
-        [this, addStorageContext, request, clientEndpoint](auto queryContext)
+        [this, addStorageContext, request, clientEndpoint, cloudDbAccountOwner](auto queryContext)
         {
             auto buckets = m_bucketManager->fetchBuckets(queryContext);
 
@@ -155,7 +165,7 @@ void StorageManager::addStorage(
             if (addStorageContext->bucketLookupResult.resultCode != api::ResultCode::ok)
                 return nx::sql::DBResult::ok;
 
-            addStorageContext->initializeStorage(bucket, request);
+            addStorageContext->initializeStorage(cloudDbAccountOwner, bucket, request);
 
             return modifyDbAndSynchronize<command::SaveStorage>(
                 queryContext,

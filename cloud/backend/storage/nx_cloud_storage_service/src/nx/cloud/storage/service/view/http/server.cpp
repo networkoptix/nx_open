@@ -90,10 +90,11 @@ void Server::registerStorageApiHandlers()
     using namespace nx::network::http::server::rest;
 
     registerRequestProcessor<
-        RequestHandler<api::AddStorageRequest, api::Storage, ClientEndpointFetcher>>(
-            api::kStorages,
-            std::bind(&controller::StorageManager::addStorage, m_storageManager, _1, _2, _3),
-            network::http::Method::put);
+        RequestHandler<
+            api::AddStorageRequest, api::Storage, AuthInfoFetcher, ClientEndpointFetcher>>(
+                api::kStorages,
+                std::bind(&controller::StorageManager::addStorage, m_storageManager, _1, _2, _3, _4),
+                network::http::Method::put);
 
     registerRequestProcessor<RequestHandler<void, api::Storage, RestArgFetcher<kStorageId>>>(
         api::kStorageId,
@@ -120,9 +121,9 @@ void Server::registerStorageApiHandlers()
     registerRequestProcessor<
         RequestHandler<
             void, void, RestArgFetcher<kStorageId>, RestArgFetcher<kSystemId>>>(
-            api::kStorageIdSystemId,
-            std::bind(&controller::StorageManager::removeSystem, m_storageManager, _1, _2, _3),
-            network::http::Method::delete_);
+                api::kStorageIdSystemId,
+                std::bind(&controller::StorageManager::removeSystem, m_storageManager, _1, _2, _3),
+                network::http::Method::delete_);
 }
 
 void Server::registerBucketApiHandlers()

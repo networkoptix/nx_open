@@ -28,11 +28,12 @@ struct NX_CLOUD_STORAGE_CLIENT_API Storage
     int freeSpace = 0;
     std::vector<Device> ioDevices;
     std::vector<std::string> systems;
+    std::string owner;
 
     bool operator==(const Storage& other) const;
 };
 
-#define Storage_Fields (id)(totalSpace)(freeSpace)(ioDevices)(systems)
+#define Storage_Fields (id)(totalSpace)(freeSpace)(ioDevices)(systems)(owner)
 
 QN_FUSION_DECLARE_FUNCTIONS(Storage, (ubjson)(json), NX_CLOUD_STORAGE_CLIENT_API)
 

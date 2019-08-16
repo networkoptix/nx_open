@@ -8,6 +8,7 @@
 #include <QString>
 
 #include "http_types.h"
+#include "../app_info.h"
 
 namespace nx {
 namespace network {
@@ -169,6 +170,16 @@ BufferType NX_NETWORK_API calcResponseFromIntermediate(
     size_t intermediateResponseNonceLen,
     const BufferType& nonceTrailer,
     const BufferType& ha2);
+
+/**
+ * Generates nonce according to rfc7616
+ */
+StringType NX_NETWORK_API generateNonce(
+    const StringType& eTag = BufferType());
+
+header::WWWAuthenticate NX_NETWORK_API generateWwwAuthenticateHeader(
+    const StringType& nonce,
+    const StringType& realm = AppInfo::realm().toUtf8());
 
 } // namespace nx
 } // namespace network

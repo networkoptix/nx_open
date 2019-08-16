@@ -17,7 +17,8 @@ CREATE TABLE buckets(
 
 CREATE TABLE storages(
     id VARCHAR(256) PRIMARY KEY,
-    total_space INT NOT NULL
+    total_space INT NOT NULL,
+    owner VARCHAR(256) NOT NULL
 );
 
 CREATE TABLE storage_bucket_relation(

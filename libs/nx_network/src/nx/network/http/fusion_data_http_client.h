@@ -161,7 +161,12 @@ protected:
             !response ||
             !StatusCode::isSuccessCode(response->statusLine.statusCode))
         {
-            m_lastFusionRequestResult = QJson::deserialized<FusionRequestResult>(msgBody);
+            bool ok = false;
+            m_lastFusionRequestResult = QJson::deserialized(msgBody, FusionRequestResult(), &ok);
+            // The message body has already been fetched to try and deserialize this structure.
+            // If it failed, there may still be an error message in the body that should be saved.
+            if (!ok)
+                m_lastFusionRequestResult.errorText = msgBody;
         }
     }
 

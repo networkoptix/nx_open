@@ -17,6 +17,7 @@ static constexpr char kRegion[] = "region";
 static constexpr char kTotalSpace[] = "total_space";
 static constexpr char kUrl[] = "url";
 static constexpr char kSystemId[] = "system_id";
+static constexpr char kOwner[] = "owner";
 
 static constexpr char kIdBinding[] = ":id";
 static constexpr char kTotalSpaceBinding[] = ":total_space";
@@ -25,11 +26,12 @@ static constexpr char kUrlBinding[] = ":url";
 static constexpr char kStorageIdBinding[] = ":storage_id";
 static constexpr char kBucketNameBinding[] = ":bucket_name";
 static constexpr char kSystemIdBinding[] = ":system_id";
+static constexpr char kOwnerBinding[] = ":owner";
 
 static constexpr char kAddStorage[] = R"sql(
 
-INSERT INTO storages (id, total_space)
-VALUES(:id, :total_space)
+INSERT INTO storages (id, total_space, owner)
+VALUES(:id, :total_space, :owner)
 
 )sql";
 
@@ -82,8 +84,9 @@ storage_id=:storage_id AND system_id=:system_id
 api::Storage toStorage(nx::sql::AbstractSqlQuery* query)
 {
     api::Storage storage;
-    storage.id = query->value(kId).toByteArray().toStdString();
+    storage.id = query->value(kId).toString().toStdString();
     storage.totalSpace = query->value(kTotalSpace).toInt();
+    storage.owner = query->value(kOwner).toString().toStdString();
     return storage;
 }
 
@@ -100,6 +103,7 @@ void StorageDao::addStorage(
     query->prepare(kAddStorage);
     query->bindValue(kIdBinding, storage.id);
     query->bindValue(kTotalSpaceBinding, storage.totalSpace);
+    query->bindValue(kOwnerBinding, storage.owner);
     query->exec();
 
     addStorageBucketRelation(queryContext, storage);

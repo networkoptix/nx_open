@@ -1,6 +1,9 @@
 #include "bucket_api_ut.h"
 
 #include <nx/network/url/url_builder.h>
+#include <nx/cloud/storage/service/test_support/cloud_db_emulator.h>
+#include <nx/cloud/storage/service/settings.h>
+#include <nx/cloud/db/api/cdb_client.h>
 
 namespace nx::cloud::storage::service::api::test {
 
@@ -9,21 +12,26 @@ namespace{
 static constexpr char kFileContents[] = "hello world";
 
 class CloudDBAuthenticationForwarderStub:
-    public network::http::server::AbstractAuthenticationManager
+    public service::view::http::CloudDbAuthenticationForwarder
 {
+    using base_type = service::view::http::CloudDbAuthenticationForwarder;
 public:
-    CloudDBAuthenticationForwarderStub(nx::utils::SyncQueue<bool>* authenticationEvent):
+    CloudDBAuthenticationForwarderStub(
+        const conf::CloudDb& settings,
+        nx::utils::SyncQueue<bool>* authenticationEvent)
+        :
+        base_type(settings),
         m_authenticationEvent(authenticationEvent)
     {
     }
 
     virtual void authenticate(
-        const network::http::HttpServerConnection& /*connection*/,
-        const network::http::Request& /*request*/,
+        const network::http::HttpServerConnection& connection,
+        const network::http::Request& request,
         network::http::server::AuthenticationCompletionHandler completionHandler) override
     {
         m_authenticationEvent->push(true);
-        completionHandler(network::http::server::SuccessfulAuthenticationResult());
+        base_type::authenticate(connection, request, std::move(completionHandler));
     }
 
 private:
@@ -52,13 +60,36 @@ protected:
     {
         m_cloudDBAuthenticationFactoryFuncBak =
             view::http::CloudDbAuthenticationFactory::instance().setCustomFunc(
-                [this](const auto& /*settings*/)
+                [this](const auto& settings)
                 {
                     return std::make_unique<CloudDBAuthenticationForwarderStub>(
+                        settings.cloudDb(),
                         &m_cloudDbAuthenticationEvent);
                 });
 
+        ASSERT_TRUE(m_cloudDb.bindAndListen());
+
+        addArg("-cloud_db/url", m_cloudDb.url().toStdString());
+
         base_type::SetUp();
+    }
+
+    void givenCloudDbAccount()
+    {
+        using namespace nx::network::http;
+
+        m_expectedCloudDbOwner = "owner1";
+        Credentials credentials1(
+            m_expectedCloudDbOwner.c_str(),
+            PasswordAuthToken("owner1Password"));
+        m_cloudDb.addAccount(m_expectedCloudDbOwner.c_str(), credentials1).addSystem("system1");
+
+        auto cloudStorageUrl = m_cloudStorage->httpUrl();
+        cloudStorageUrl.setUserName(m_expectedCloudDbOwner.c_str());
+        cloudStorageUrl.setPassword("owner1Password");
+
+        m_cloudStorageClient = std::make_unique<Client>(cloudStorageUrl);
+        m_cloudStorageClient->setRequestTimeout(std::chrono::milliseconds(0));
     }
 
     void givenMultipleAddedBuckets()
@@ -73,6 +104,7 @@ protected:
         thenRequestIsForwardedToCloudDb();
         thenAddStorageResponseIs(ResultCode::ok);
         andBucketHasCloudStorageCountUpdated(1);
+        andAddedStorageHasExpectedOwner();
 
         const auto& prefix = m_lastStorageAdded.id;
         m_lastBucketCreated->saveOrReplaceFile(prefix + "/f.txt", kFileContents);
@@ -127,6 +159,16 @@ protected:
             });
     }
 
+    void whenGetCredentials()
+    {
+        m_cloudStorageClient->getCredentials(
+            m_lastStorageAdded.id,
+            [this](auto result, auto credentials)
+            {
+                m_getCredentialsResponse.push({std::move(result), std::move(credentials)});
+            });
+    }
+
     void thenRequestIsForwardedToCloudDb()
     {
         ASSERT_TRUE(m_cloudDbAuthenticationEvent.pop());
@@ -160,6 +202,13 @@ protected:
         ASSERT_EQ(ResultCode::ok, result.resultCode);
     }
 
+    void thenGetCredentialsSucceeds()
+    {
+        auto [result, credentials] = m_getCredentialsResponse.pop();
+        ASSERT_EQ(api::ResultCode::ok, result.resultCode);
+        m_lastCredentialsGotten = std::move(credentials);
+    }
+
     void andBucketHasCloudStorageCountUpdated(int cloudStorageCount)
     {
         whenListBuckets();
@@ -173,6 +222,11 @@ protected:
         ASSERT_NE(it, buckets.end());
     }
 
+    void andAddedStorageHasExpectedOwner()
+    {
+        ASSERT_EQ(m_lastStorageAdded.owner, m_expectedCloudDbOwner);
+    }
+
     void andStorageServiceHasMultipleStorages()
     {
         ASSERT_TRUE((int) m_addedStorages.size() > 1);
@@ -181,6 +235,7 @@ protected:
             readStorage(storage.id);
             thenReadStorageSucceeds();
             ASSERT_EQ(storage.id, m_lastStorageRead.id);
+            ASSERT_EQ(storage.owner, m_lastStorageRead.owner);
         }
     }
 
@@ -227,6 +282,8 @@ private:
     }
 
 private:
+    service::test::CloudDbEmulator m_cloudDb;
+    std::string m_expectedCloudDbOwner;
     nx::utils::SyncQueue<std::pair<Result, Storage>> m_addStorageResponse;
     nx::utils::SyncQueue<std::pair<Result, Storage>> m_readStorageResponse;
     nx::utils::SyncQueue<Result> m_removeStorageResponse;
@@ -242,6 +299,7 @@ private:
 
 TEST_F(StorageApi, add_storage_by_region)
 {
+    givenCloudDbAccount();
     givenAddedBucket();
 
     whenAddStorageWithRegion();
@@ -250,10 +308,12 @@ TEST_F(StorageApi, add_storage_by_region)
     thenAddStorageResponseIs(ResultCode::ok);
 
     andBucketHasCloudStorageCountUpdated(1);
+    andAddedStorageHasExpectedOwner();
 }
 
 TEST_F(StorageApi, add_storage_by_client_location)
 {
+    givenCloudDbAccount();
     givenMultipleAddedBuckets();
 
     whenAddStorageWithoutRegion();
@@ -261,10 +321,12 @@ TEST_F(StorageApi, add_storage_by_client_location)
     thenAddStorageResponseIs(ResultCode::ok);
 
     andBucketChosenForStorageIsClosestToClient();
+    andAddedStorageHasExpectedOwner();
 }
 
 TEST_F(StorageApi, add_multiple_storages_to_the_same_bucket)
 {
+    givenCloudDbAccount();
     givenAddedBucket();
 
     whenAddMultipleStorages(2);
@@ -278,6 +340,8 @@ TEST_F(StorageApi, add_multiple_storages_to_the_same_bucket)
 
 TEST_F(StorageApi, fails_to_add_storage_with_unknown_region)
 {
+    givenCloudDbAccount();
+    //Intentionally missing added bucket
     whenAddStorageWithUnknownRegion();
 
     thenRequestIsForwardedToCloudDb();
@@ -286,6 +350,7 @@ TEST_F(StorageApi, fails_to_add_storage_with_unknown_region)
 
 TEST_F(StorageApi, rejects_add_storage_with_invalid_storage_size)
 {
+    givenCloudDbAccount();
     givenAddedBucket();
 
     whenAddStorageWithInvalidSize();
@@ -295,6 +360,7 @@ TEST_F(StorageApi, rejects_add_storage_with_invalid_storage_size)
 
 TEST_F(StorageApi, read_storage)
 {
+    givenCloudDbAccount();
     givenAddedBucket();
     givenAddedStorage();
 
@@ -308,6 +374,7 @@ TEST_F(StorageApi, read_storage)
 
 TEST_F(StorageApi, remove_storage)
 {
+    givenCloudDbAccount();
     givenAddedBucket();
     givenAddedStorage();
 

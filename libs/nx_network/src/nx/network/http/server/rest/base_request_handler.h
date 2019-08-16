@@ -30,6 +30,18 @@ public:
     }
 };
 
+class AuthInfoFetcher
+{
+public:
+    using type = nx::utils::stree::ResourceContainer;
+
+    typename type operator()(
+        const network::http::RequestContext& requestContext) const
+    {
+        return requestContext.authInfo;
+    }
+};
+
 template<typename Result, typename Data>
 struct CompletionHandlerDeclarator
 {

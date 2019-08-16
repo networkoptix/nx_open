@@ -17,6 +17,8 @@
 
 namespace nx {
 
+namespace utils::stree { class ResourceContainer; }
+
 namespace network { class SocketAddress; }
 
 namespace cloud {
@@ -51,6 +53,7 @@ public:
     ~StorageManager();
 
     void addStorage(
+        const nx::utils::stree::ResourceContainer& authInfo,
         const network::SocketAddress& clientEndpoint,
         const api::AddStorageRequest& request,
         GetStorageHandler handler);
@@ -117,6 +120,7 @@ private:
         api::Storage storage;
 
         void initializeStorage(
+            const std::string& cloudDbAccountOwner,
             const api::Bucket& bucket,
             const api::AddStorageRequest& request);
     };
