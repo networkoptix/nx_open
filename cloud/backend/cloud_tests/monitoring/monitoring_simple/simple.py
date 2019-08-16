@@ -156,7 +156,7 @@ class CloudSession(object):
         self.metric_namespace = configuration['metric_namespace']
         self.email_sqs_queue_name = configuration['email_sqs_queue_name']
 
-        self.base_url = 'https://{}'.format(host)
+        self.base_url = 'https://{}'.format(self.host)
         self.session = requests.Session()
 
         self.cloud_sender = 'Nx Cloud <service@networkoptix.com>'
