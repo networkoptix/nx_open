@@ -78,7 +78,7 @@ void CloudDbEmulator::registerHttpApi()
 
     m_server.httpMessageDispatcher().registerRequestProcessorFunc(
         Method::post,
-        cloud::db::kAuthResolveUserDigest,
+        cloud::db::kAuthResolveUserCredentials,
         std::bind(&CloudDbEmulator::resolveUserDigest, this, _1, _2));
 
     m_server.httpMessageDispatcher().registerRequestProcessorFunc(

@@ -48,7 +48,7 @@ void CloudDbAuthenticationForwarder::authenticateWithCloudDb(
     using namespace std::placeholders;
 
     auto* cdbClient = createAuthenticationRequest(std::move(completionHandler));
-    cdbClient->authProvider()->resolveUserDigest(
+    cdbClient->authProvider()->resolveUserCredentials(
         userAuth,
         [this, cdbClient](
             auto cdbResult,
