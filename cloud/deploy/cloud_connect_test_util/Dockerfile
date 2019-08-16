@@ -3,10 +3,13 @@ FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:3.0.2
 COPY stage/ /opt/networkoptix/cloud_connect_test_util/
 
 COPY docker/nx_network.ini /tmp/nx_network.ini
+COPY docker/entrypoint.sh /opt/networkoptix/mediaserver/bin/
+COPY docker/patch-cloud-host.sh docker/utils.sh /usr/local/bin/
 
 ENV QT_PLUGIN_PATH=/opt/networkoptix/cloud_connect_test_util/bin \
     LD_LIBRARY_PATH=/opt/networkoptix/cloud_connect_test_util/lib
 
+WORKDIR "/opt/networkoptix/mediaserver"
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--", "/opt/networkoptix/cloud_connect_test_util/bin/cloud_connect_test_util"]
 
 ARG VERSION
