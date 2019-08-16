@@ -58,7 +58,8 @@ void Client::addSystem(
     base_type::template makeAsyncCall<System>(
         Method::put,
         rest::substituteParameters(api::kStorageIdSystems, {storageId}),
-        std::move(handler));
+        std::move(handler),
+        request);
 }
 
 void Client::removeSystem(
