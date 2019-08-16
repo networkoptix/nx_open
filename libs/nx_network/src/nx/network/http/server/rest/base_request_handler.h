@@ -11,7 +11,7 @@ class RestArgFetcher
 public:
     using type = std::string;
 
-    std::string operator()(
+    type operator()(
         const network::http::RequestContext& requestContext) const
     {
         return requestContext.requestPathParams.getByName(name);
@@ -23,7 +23,7 @@ class ClientEndpointFetcher
 public:
     using type = network::SocketAddress;
 
-    network::SocketAddress operator()(
+    type operator()(
         const network::http::RequestContext& requestContext) const
     {
         return requestContext.connection->clientEndpoint();
@@ -35,7 +35,7 @@ class AuthInfoFetcher
 public:
     using type = nx::utils::stree::ResourceContainer;
 
-    typename type operator()(
+    type operator()(
         const network::http::RequestContext& requestContext) const
     {
         return requestContext.authInfo;

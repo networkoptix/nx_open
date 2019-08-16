@@ -95,16 +95,22 @@ void CloudDbEmulator::resolveUserDigest(
     if (!owner)
         return completionHandler(StatusCode::badRequest);
 
-    auto it = m_accounts.find(*owner);
-    if (m_accounts.find(*owner) == m_accounts.end())
-        return completionHandler(StatusCode::notFound);
-
+    RequestResult result(StatusCode::ok);
     CredentialsDescriptor credentials;
+
+    if (m_accounts.find(*owner) == m_accounts.end())
+    {
+        credentials.status = ResultCode::notFound;
+        result.dataSource = std::make_unique<BufferSource>(
+            "application/json",
+            QJson::serialized(credentials));
+        return completionHandler(std::move(result));
+    }
+
     credentials.objectId = std::move(*owner);
     credentials.objectType = ObjectType::account;
     credentials.status = ResultCode::ok;
 
-    RequestResult result(StatusCode::ok);
     result.dataSource = std::make_unique<BufferSource>(
         "application/json",
         QJson::serialized(credentials));

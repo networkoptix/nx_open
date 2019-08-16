@@ -19,7 +19,7 @@ CloudDbAuthenticationForwarder::CloudDbAuthenticationForwarder(const conf::Cloud
 }
 
 void CloudDbAuthenticationForwarder::authenticate(
-    const HttpServerConnection& connection,
+    const HttpServerConnection& /*connection*/,
     const Request& request,
     server::AuthenticationCompletionHandler completionHandler)
 {
