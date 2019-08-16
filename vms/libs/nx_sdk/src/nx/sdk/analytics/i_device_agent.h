@@ -76,7 +76,7 @@ public:
      * method and merges the received values with the ones in its database.
      *
      * @return Result containing (in case of success) information about settings that are stored on
-     *     the plugin side. Errors corresponding to particular settings should be placed in the
+     *     the plugin side. Errors corresponding to the particular settings should be placed in the
      *     ISettingsResponse object. A faulty result must be returned only in case of a general
      *     failure that affects the settings retrieval procedure. The result should contain null if
      *     the Engine has no plugin-side settings.

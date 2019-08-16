@@ -71,6 +71,9 @@ enum class ViolationType
 
     nullEngine,
     nullDeviceAgent,
+
+    inconsistentActionResult,
+    invalidActionResultUrl,
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ViolationType);

@@ -35,12 +35,12 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 template<typename Value>
-struct ResultHolder
+struct RefCountableResultHolder
 {
 public:
-    ResultHolder(Result<Value>&& result): result(std::move(result)) {}
+    RefCountableResultHolder(Result<Value>&& result): result(std::move(result)) {}
 
-    ~ResultHolder()
+    ~RefCountableResultHolder()
     {
         toPtr(result.value()); //< releaseRef
         toPtr(result.error().errorMessage()); //< releaseRef
@@ -51,16 +51,17 @@ public:
     const Result<Value> result;
 };
 
-class VoidResultHolder
+template<typename Value>
+class ResultHolder
 {
 public:
-    VoidResultHolder(Result<void>&& result): result(std::move(result)) {}
+    ResultHolder(Result<Value>&& result): result(std::move(result)) {}
 
-    ~VoidResultHolder() { toPtr(result.error().errorMessage()); /*< releaseRef */ }
+    ~ResultHolder() { toPtr(result.error().errorMessage()); /*< releaseRef */ }
 
     bool isOk() const { return result.isOk(); }
 
-    const Result<void> result;
+    const Result<Value> result;
 };
 
 static std::string trimString(const std::string& s)
@@ -78,7 +79,7 @@ static std::string trimString(const std::string& s)
 
 static void testEngineManifest(IEngine* engine)
 {
-    const ResultHolder<const IString*> result{engine->manifest()};
+    const RefCountableResultHolder<const IString*> result{engine->manifest()};
 
     ASSERT_TRUE(result.isOk());
     const auto manifest = result.result.value();
@@ -99,7 +100,7 @@ static void testEngineManifest(IEngine* engine)
 
 static void testDeviceAgentManifest(IDeviceAgent* deviceAgent)
 {
-    const ResultHolder<const IString*> result{deviceAgent->manifest()};
+    const RefCountableResultHolder<const IString*> result{deviceAgent->manifest()};
     ASSERT_TRUE(result.isOk());
 
     const auto manifest = result.result.value();
@@ -122,14 +123,14 @@ static void testEngineSettings(IEngine* engine)
 
     {
         // Test assigning empty settings.
-        const ResultHolder<const IStringMap*> result{
+        const RefCountableResultHolder<const IStringMap*> result{
             engine->setSettings(makePtr<StringMap>().get())};
         ASSERT_TRUE(result.isOk());
     }
 
     {
         // Test assigning some settings
-        const ResultHolder<const IStringMap*> result{
+        const RefCountableResultHolder<const IStringMap*> result{
             engine->setSettings(settings.get())};
         ASSERT_TRUE(result.isOk());
     }
@@ -143,14 +144,14 @@ static void testDeviceAgentSettings(IDeviceAgent* deviceAgent)
 
     {
         // Test assigning empty settings.
-        const ResultHolder<const IStringMap*> result{
+        const RefCountableResultHolder<const IStringMap*> result{
             deviceAgent->setSettings(makePtr<StringMap>().get())};
         ASSERT_TRUE(result.isOk());
     }
 
     {
         // Test assigning some settings.
-        const ResultHolder<const IStringMap*> result{
+        const RefCountableResultHolder<const IStringMap*> result{
             deviceAgent->setSettings(settings.get())};
         ASSERT_TRUE(result.isOk());
     }
@@ -175,40 +176,6 @@ public:
         return m_params.get();
     }
 
-    virtual void handleResult(const char* actionUrl, const char* messageToUser) override
-    {
-        m_handleResultCalled = true;
-
-        if (m_expectedNonNullActionUrl)
-        {
-            ASSERT_TRUE(actionUrl != nullptr);
-            const std::string expectedUrlPrefix = "http://";
-            ASSERT_EQ(0, std::string(actionUrl).compare(
-                0, expectedUrlPrefix.size(), expectedUrlPrefix));
-        }
-        else
-        {
-            ASSERT_TRUE(actionUrl == nullptr);
-        }
-
-        if (m_expectedNonNullMessageToUser)
-        {
-            ASSERT_TRUE(messageToUser != nullptr);
-            ASSERT_TRUE(messageToUser[0] != '\0');
-        }
-        else
-        {
-            ASSERT_TRUE(messageToUser == nullptr);
-        }
-    }
-
-    void assertExpectedState() const
-    {
-        ASSERT_FALSE(
-            (m_expectedNonNullActionUrl || m_expectedNonNullMessageToUser)
-            && !m_handleResultCalled);
-    }
-
     void setParams(const std::vector<std::pair<std::string, std::string>>& params)
     {
         m_params.reset(new StringMap());
@@ -226,22 +193,90 @@ public:
     Uuid m_objectTrackId;
     Uuid m_deviceId;
     int64_t m_timestampUs = 0;
-    bool m_handleResultCalled = false;
-    bool m_expectedNonNullActionUrl = false;
-    bool m_expectedNonNullMessageToUser = false;
 
 private:
     Ptr<StringMap> m_params;
 };
 
+enum class ExpectedActionResult
+{
+    error,
+    actionUrl,
+    messageToUser,
+};
+
+template<class RefCountableString>
+static bool stringIsNullOrEmpty(int line, const RefCountableString& s)
+{
+    ASSERT_FALSE_AT_LINE(line, s && !s->str()); //< IString::str() contract violated.
+
+    return s == nullptr || s->str()[0] == '\0';
+}
+
+static void testExecuteAction(
+    int line,
+    IEngine* engine,
+    Ptr<const IAction> action,
+    ExpectedActionResult expectedActionResult)
+{
+    const ResultHolder<IAction::Result> resultHolder{engine->executeAction(action.get())};
+
+    const auto& value = resultHolder.result.value();
+    const auto& error = resultHolder.result.error();
+
+    switch (expectedActionResult)
+    {
+        case ExpectedActionResult::error:
+            ASSERT_FALSE_AT_LINE(line, resultHolder.isOk());
+
+            // Testing nx_sdk internal consistency.
+            ASSERT_FALSE_AT_LINE(line, error.errorCode() == ErrorCode::noError);
+            ASSERT_FALSE_AT_LINE(line, stringIsNullOrEmpty(line, error.errorMessage()));
+            ASSERT_FALSE_AT_LINE(line, value.actionUrl);
+            ASSERT_FALSE_AT_LINE(line, value.messageToUser);
+            break;
+
+        case ExpectedActionResult::actionUrl:
+        {
+            ASSERT_TRUE_AT_LINE(line, resultHolder.isOk());
+
+            ASSERT_FALSE_AT_LINE(line, stringIsNullOrEmpty(line, value.actionUrl));
+            static const std::string kExpectedUrlPrefix = "http://";
+            ASSERT_EQ_AT_LINE(line, 0, std::string(value.actionUrl->str()).compare(
+                0, kExpectedUrlPrefix.size(), kExpectedUrlPrefix));
+
+            ASSERT_TRUE_AT_LINE(line, stringIsNullOrEmpty(line, value.messageToUser));
+
+            // Testing nx_sdk internal consistency.
+            ASSERT_TRUE_AT_LINE(line, error.errorCode() == ErrorCode::noError);
+            ASSERT_FALSE_AT_LINE(line, error.errorMessage());
+            break;
+        }
+
+        case ExpectedActionResult::messageToUser:
+            ASSERT_TRUE_AT_LINE(line, resultHolder.isOk());
+
+            ASSERT_TRUE_AT_LINE(line, stringIsNullOrEmpty(line, value.actionUrl));
+
+            ASSERT_FALSE_AT_LINE(line, stringIsNullOrEmpty(line, value.messageToUser));
+
+            // Testing nx_sdk internal consistency.
+            ASSERT_TRUE_AT_LINE(line, error.errorCode() == ErrorCode::noError);
+            ASSERT_FALSE_AT_LINE(line, error.errorMessage());
+            break;
+
+        default:
+            ASSERT_TRUE(false); //< Internal error.
+    }
+}
+#define TEST_EXECUTE_ACTION(...) testExecuteAction(__LINE__, __VA_ARGS__)
+
 static void testExecuteActionNonExisting(IEngine* engine)
 {
-    auto action = makePtr<Action>();
+    const auto action = makePtr<Action>();
     action->m_actionId = "non_existing_actionId";
 
-    const VoidResultHolder result{engine->executeAction(action.get())};
-    ASSERT_TRUE(!result.isOk());
-    action->assertExpectedState();
+    TEST_EXECUTE_ACTION(engine, action, ExpectedActionResult::error);
 }
 
 static void testExecuteActionAddToList(IEngine* engine)
@@ -255,11 +290,8 @@ static void testExecuteActionAddToList(IEngine* engine)
         {"testComboBox", "value1"},
         {"testCheckBox", "false"}
     });
-    action->m_expectedNonNullMessageToUser = true;
 
-    const VoidResultHolder result{engine->executeAction(action.get())};
-    ASSERT_TRUE(result.isOk());
-    action->assertExpectedState();
+    TEST_EXECUTE_ACTION(engine, action, ExpectedActionResult::messageToUser);
 }
 
 static void testExecuteActionAddPerson(IEngine* engine)
@@ -267,11 +299,8 @@ static void testExecuteActionAddPerson(IEngine* engine)
     const auto action = makePtr<Action>();
     action->m_actionId = "nx.stub.addPerson";
     action->m_objectTrackId = Uuid();
-    action->m_expectedNonNullActionUrl = true;
 
-    const VoidResultHolder result{engine->executeAction(action.get())};
-    ASSERT_TRUE(result.isOk());
-    action->assertExpectedState();
+    TEST_EXECUTE_ACTION(engine, action, ExpectedActionResult::actionUrl);
 }
 
 class DeviceAgentHandler: public nx::sdk::RefCountable<IDeviceAgent::IHandler>
@@ -364,7 +393,7 @@ TEST(stub_analytics_plugin, test)
 
     plugin->setUtilityProvider(makePtr<UtilityProvider>().get());
 
-    const ResultHolder<IEngine*> result{plugin->createEngine()};
+    const RefCountableResultHolder<IEngine*> result{plugin->createEngine()};
     ASSERT_TRUE(result.isOk());
 
     const auto engine = result.result.value();
@@ -372,7 +401,7 @@ TEST(stub_analytics_plugin, test)
     ASSERT_TRUE(engine->queryInterface<IEngine>());
 
     testEngineManifest(engine);
- LL testEngineSettings(engine);
+    testEngineSettings(engine);
 
     testExecuteActionNonExisting(engine);
     testExecuteActionAddToList(engine);
@@ -380,7 +409,7 @@ TEST(stub_analytics_plugin, test)
 
     const auto deviceInfo = makePtr<DeviceInfo>();
     deviceInfo->setId("TEST");
-    const ResultHolder<IDeviceAgent*> deviceAgentResult{
+    const RefCountableResultHolder<IDeviceAgent*> deviceAgentResult{
         engine->obtainDeviceAgent(deviceInfo.get())};
     ASSERT_TRUE(deviceAgentResult.isOk());
 
@@ -398,12 +427,12 @@ TEST(stub_analytics_plugin, test)
     deviceAgent->setHandler(handler.get());
 
     const auto metadataTypes = makePtr<MetadataTypes>();
-    const VoidResultHolder setNeededMetadataTypesResult{
+    const ResultHolder<void> setNeededMetadataTypesResult{
         deviceAgent->setNeededMetadataTypes(metadataTypes.get())};
     ASSERT_TRUE(setNeededMetadataTypesResult.isOk());
 
     const auto compressedVideoPacket = makePtr<CompressedVideoPacket>();
-    const VoidResultHolder pushDataPacketResult{
+    const ResultHolder<void> pushDataPacketResult{
         deviceAgent->pushDataPacket(compressedVideoPacket.get())};
     ASSERT_TRUE(pushDataPacketResult.isOk());
 }
