@@ -83,6 +83,10 @@ private:
         nx::sql::QueryContext* queryContext,
         const std::string& storageId);
 
+    std::vector<std::string> getSystems(
+        nx::sql::QueryContext* queryContext,
+        const std::string& storageId);
+
     void removeStorageBucketRelations(
         nx::sql::QueryContext* queryContext,
         const std::string& storageId);

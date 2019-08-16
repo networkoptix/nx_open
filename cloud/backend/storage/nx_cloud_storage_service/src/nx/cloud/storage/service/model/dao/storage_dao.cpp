@@ -81,6 +81,15 @@ storage_id=:storage_id AND system_id=:system_id
 
 )sql";
 
+static constexpr char kFetchSystemsForStorage[] = R"sql(
+
+SELECT system_id FROM storage_system_relation
+    WHERE
+storage_id=:storage_id
+
+
+)sql";
+
 api::Storage toStorage(nx::sql::AbstractSqlQuery* query)
 {
     api::Storage storage;
@@ -127,6 +136,7 @@ std::optional<api::Storage> StorageDao::readStorage(
         return std::nullopt;
 
     storage.ioDevices = getStorageDevices(queryContext, storageId);
+    storage.systems = getSystems(queryContext, storageId);
 
     return storage;
 }
@@ -198,6 +208,22 @@ std::vector<api::Device> StorageDao::getStorageDevices(
     }
 
     return devices;
+}
+
+std::vector<std::string> StorageDao::getSystems(
+    nx::sql::QueryContext* queryContext,
+    const std::string& storageId)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(kFetchSystemsForStorage);
+    query->bindValue(kStorageIdBinding, storageId);
+    query->exec();
+
+    std::vector<std::string> systems;
+    while (query->next())
+        systems.emplace_back(query->value(kSystemId).toString().toStdString());
+
+    return systems;
 }
 
 void StorageDao::removeStorageBucketRelations(

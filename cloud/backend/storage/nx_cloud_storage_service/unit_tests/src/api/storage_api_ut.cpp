@@ -110,6 +110,22 @@ protected:
         m_lastBucketCreated->saveOrReplaceFile(prefix + "/f.txt", kFileContents);
     }
 
+    void givenAddedSystem(const std::string& systemId = std::string())
+    {
+        whenAddSystem(systemId);
+        thenAddSystemResponseIs(ResultCode::ok);
+        andAddedSystemHasExpectedData();
+    }
+
+    void givenMultipleAddedSystems()
+    {
+        for (int i = 0; i < 2; ++i)
+        {
+            m_expectedSystems.emplace_back(std::string("system-") + std::to_string(i));
+            givenAddedSystem(m_expectedSystems.back());
+        }
+    }
+
     void whenAddStorageWithRegion(std::string region = {})
     {
         if (region.empty())
@@ -169,15 +185,22 @@ protected:
             });
     }
 
-    void whenAddSystem()
+    void whenAddSystem(const std::string& systemId = std::string())
     {
-        m_expectedSystem = "system-1";
-        m_cloudStorageClient->addSystem(
-            m_lastStorageAdded.id,
-            {m_expectedSystem},
-            [this](auto result, auto system)
+        m_expectedSystem = systemId;
+        if (m_expectedSystem.empty())
+            m_expectedSystem = "some-system";
+        addSystem(m_lastStorageAdded.id, {m_expectedSystem});
+    }
+
+    void whenRemoveSystem()
+    {
+        m_cloudStorageClient->removeSystem(
+            m_lastSystemAdded.storageId,
+            m_lastSystemAdded.id,
+            [this](auto result)
             {
-                m_addSystemResponse.push({std::move(result), std::move(system)});
+                m_removeSystemResponse.push(std::move(result));
             });
     }
 
@@ -225,6 +248,12 @@ protected:
         auto [result, system] = m_addSystemResponse.pop();
         ASSERT_EQ(resultCode, result.resultCode);
         m_lastSystemAdded = std::move(system);
+    }
+
+    void thenRemoveStorageResponseIs(ResultCode resultCode)
+    {
+        auto result = m_removeSystemResponse.pop();
+        ASSERT_EQ(resultCode, result.resultCode);
     }
 
     void andBucketHasCloudStorageCountUpdated(int cloudStorageCount)
@@ -284,6 +313,36 @@ protected:
         ASSERT_EQ(m_lastSystemAdded.storageId, m_lastStorageAdded.id);
     }
 
+    void andSystemIsAddedToStorage()
+    {
+        readStorage(m_lastSystemAdded.storageId);
+        thenReadStorageSucceeds();
+
+        const auto& systems = m_lastStorageRead.systems;
+        auto it = std::find(systems.begin(), systems.end(), m_lastSystemAdded.id);
+        ASSERT_NE(it, systems.end());
+    }
+
+    void andSystemIsRemovedFromStorage()
+    {
+        readStorage(m_lastSystemAdded.storageId);
+        thenReadStorageSucceeds();
+
+        const auto& systems = m_lastStorageRead.systems;
+        auto it = std::find(systems.begin(), systems.end(), m_lastSystemAdded.id);
+        ASSERT_EQ(it, systems.end());
+    }
+
+    void andReadStorageContainsExpectedSystems()
+    {
+        const auto& systems = m_lastStorageRead.systems;
+        for (const auto& system : m_expectedSystems)
+        {
+            auto it = std::find(systems.begin(), systems.end(), system);
+            ASSERT_NE(it, systems.end());
+        }
+    }
+
 private:
     void readStorage(const std::string& storageId)
     {
@@ -305,6 +364,17 @@ private:
             });
     }
 
+    void addSystem(const std::string& storageId, const AddSystemRequest& request)
+    {
+        m_cloudStorageClient->addSystem(
+            storageId,
+            request,
+            [this](auto result, auto system)
+            {
+                m_addSystemResponse.push({std::move(result), std::move(system)});
+            });
+    }
+
 private:
     service::test::CloudDbEmulator m_cloudDb;
     std::string m_expectedCloudDbOwner;
@@ -313,12 +383,14 @@ private:
     nx::utils::SyncQueue<Result> m_removeStorageResponse;
     nx::utils::SyncQueue<std::pair<Result, StorageCredentials>>m_getCredentialsResponse;
     nx::utils::SyncQueue<std::pair<Result, System>>m_addSystemResponse;
+    nx::utils::SyncQueue<Result> m_removeSystemResponse;
     Storage m_lastStorageAdded;
     std::vector<Storage> m_addedStorages;
     Storage m_lastStorageRead;
     Storage m_lastStorageRemoved;
     StorageCredentials m_lastCredentialsGotten;
     std::string m_expectedSystem;
+    std::vector<std::string> m_expectedSystems;
     System m_lastSystemAdded;
     service::test::S3Bucket* m_expectedBucket = nullptr;
 
@@ -433,9 +505,40 @@ TEST_F(StorageApi, add_system_storage_relation)
     givenAddedStorage();
 
     whenAddSystem();
+    thenRequestIsForwardedToCloudDb();
 
     thenAddSystemResponseIs(ResultCode::ok);
+
     andAddedSystemHasExpectedData();
+    andSystemIsAddedToStorage();
+}
+
+TEST_F(StorageApi, remove_system_storage_relation)
+{
+    givenCloudDbAccount();
+    givenAddedBucket();
+    givenAddedStorage();
+    givenAddedSystem();
+
+    whenRemoveSystem();
+    thenRequestIsForwardedToCloudDb();
+
+    thenRemoveStorageResponseIs(ResultCode::ok);
+
+    andSystemIsRemovedFromStorage();
+}
+
+TEST_F(StorageApi, read_storage_lists_multiple_systems)
+{
+    givenCloudDbAccount();
+    givenAddedBucket();
+    givenAddedStorage();
+    givenMultipleAddedSystems();
+
+    whenReadStorage();
+    thenReadStorageSucceeds();
+
+    andReadStorageContainsExpectedSystems();
 }
 
 } // namespace nx::cloud::storage::service::api::test
