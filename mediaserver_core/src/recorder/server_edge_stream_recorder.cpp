@@ -81,7 +81,8 @@ void QnServerEdgeStreamRecorder::beforeProcessData(const QnConstAbstractMediaDat
 
     if (media->dataType == QnAbstractMediaData::DataType::EMPTY_DATA)
     {
-        m_endOfRecordingHandler();
+        if (m_endOfRecordingHandler)
+            m_endOfRecordingHandler();
         return;
     }
 
