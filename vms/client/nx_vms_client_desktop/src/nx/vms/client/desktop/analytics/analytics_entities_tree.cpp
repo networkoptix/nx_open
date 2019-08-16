@@ -1,5 +1,7 @@
 #include "analytics_entities_tree.h"
 
+#include <type_traits>
+
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -11,12 +13,16 @@
 
 #include <nx/analytics/properties.h>
 #include <nx/analytics/descriptor_manager.h>
+#include <nx/analytics/helpers.h>
 
 #include <nx/utils/std/algorithm.h>
+
+#include <nx/utils/data_structures/map_helper.h>
 
 namespace nx::vms::client::desktop {
 
 using namespace nx::analytics;
+using namespace nx::vms::api;
 
 using Node = AnalyticsEntitiesTreeBuilder::Node;
 using NodePtr = AnalyticsEntitiesTreeBuilder::NodePtr;
@@ -30,13 +36,65 @@ NodePtr makeNode(NodeType nodeType, const QString& text = QString())
     return NodePtr(new Node(nodeType, text));
 }
 
-NodePtr buildEventTypesTree(QnCommonModule* commonModule, ScopedEventTypeIds scopedEventTypeIds)
+template<typename Entity>
+auto managerByEntityType(QnCommonModule* commonModule)
+{
+    if constexpr (std::is_same_v<Entity, analytics::EventTypeDescriptor>)
+        return commonModule->analyticsEventTypeDescriptorManager();
+    else if constexpr (std::is_same_v<Entity, analytics::ObjectTypeDescriptor>)
+        return commonModule->analyticsObjectTypeDescriptorManager();
+    else if constexpr (std::is_same_v<Entity, analytics::GroupDescriptor>)
+        return commonModule->analyticsGroupDescriptorManager();
+    else if constexpr (std::is_same_v<Entity, analytics::EngineDescriptor>)
+        return commonModule->analyticsEngineDescriptorManager();
+    else if constexpr (std::is_same_v<Entity, analytics::PluginDescriptor>)
+        return commonModule->analyticsPluginDescriptorManager();
+    else
+        return nullptr;
+}
+
+
+template<typename Entity>
+ScopedEntityTypeIds resolveEntities(
+    QnCommonModule* commonModule,
+    const AnalyticsEntitiesTreeBuilder::UnresolvedEntities& entities)
+{
+    const auto manager = managerByEntityType<Entity>(commonModule);
+    if (!NX_ASSERT(manager))
+        return ScopedEntityTypeIds();
+
+    ScopedEventTypeIds result;
+    for (const auto& entity: entities)
+    {
+        const auto descriptor = manager->descriptor(entity.entityId);
+        if (!descriptor)
+            continue;
+
+        for (const auto& scope: descriptor->scopes)
+        {
+            if (scope.engineId == entity.engineId)
+                result[entity.engineId][scope.groupId].insert(descriptor->id);
+        }
+    }
+
+    return result;
+}
+
+NodePtr buildEventTypesTree(
+    QnCommonModule* commonModule,
+    ScopedEventTypeIds scopedEventTypeIds,
+    const AnalyticsEntitiesTreeBuilder::UnresolvedEntities& additionalEntities = {})
 {
     const auto engineDescriptorManager = commonModule->analyticsEngineDescriptorManager();
     const auto groupDescriptorManager = commonModule->analyticsGroupDescriptorManager();
     const auto eventTypeDescriptorManager = commonModule->analyticsEventTypeDescriptorManager();
 
     auto root = makeNode(NodeType::root);
+
+    const auto resolvedEntities =
+        resolveEntities<analytics::EventTypeDescriptor>(commonModule, additionalEntities);
+
+    MapHelper::merge(&scopedEventTypeIds, resolvedEntities, mergeEntityIds);
 
     for (const auto& [engineId, eventTypeIdsByGroup]: scopedEventTypeIds)
     {
@@ -185,11 +243,14 @@ NodePtr AnalyticsEntitiesTreeBuilder::filterTree(NodePtr root, NodeFilter exclud
 
 NodePtr AnalyticsEntitiesTreeBuilder::eventTypesForRulesPurposes(
     QnCommonModule* commonModule,
-    const QnVirtualCameraResourceList& devices)
+    const QnVirtualCameraResourceList& devices,
+    const UnresolvedEntities& additionalUnresolvedEventTypes)
 {
-    return buildEventTypesTree(commonModule,
+    return buildEventTypesTree(
+        commonModule,
         commonModule->analyticsEventTypeDescriptorManager()
-            ->compatibleEventTypeIdsIntersection(devices));
+            ->compatibleEventTypeIdsIntersection(devices),
+        additionalUnresolvedEventTypes);
 }
 
 //-------------------------------------------------------------------------------------------------

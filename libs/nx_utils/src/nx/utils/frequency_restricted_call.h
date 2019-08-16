@@ -31,7 +31,6 @@ protected:
 template<typename Result, typename... Args>
 class FrequencyRestrictedCall: public FrequencyRestrictedCallBase<Result, Args...>
 {
-
 public:
     using FrequencyRestrictedCallBase<Result, Args...>::FrequencyRestrictedCallBase;
 
@@ -50,7 +49,6 @@ public:
 template<typename... Args>
 class FrequencyRestrictedCall<void, Args...>: public FrequencyRestrictedCallBase<void, Args...>
 {
-
 public:
     using FrequencyRestrictedCallBase<void, Args...>::FrequencyRestrictedCallBase;
 

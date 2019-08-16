@@ -43,7 +43,6 @@ private:
     const SdkObjectDescription m_sdkObjectDescription;
     const sdk_support::Error m_error;
     const Violation m_violation;
-
 };
 
 } // namespace nx::vms::server::analytics::wrappers
