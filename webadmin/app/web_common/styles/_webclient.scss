@@ -262,7 +262,7 @@ table.webclient-window>tbody>tr>td{
         background-color: $light5 !important;
       }
     }
-    
+
     &>*{
       text-align: center;
       display: inline-block;
@@ -280,7 +280,7 @@ table.webclient-window>tbody>tr>td{
     border-bottom: 1px solid $light6;
     line-height: 44px;
     color: $dark9;
-    
+
     &:hover{
       background-color: $light2;
     }
@@ -519,7 +519,7 @@ table.webclient-window>tbody>tr>td{
       & > :not(:first-child){
         width: 140px;
       }
-      
+
       input{
         border: 1px solid rgba($light16,0.2);
         margin-bottom: 3px;
@@ -552,7 +552,7 @@ table.webclient-window>tbody>tr>td{
 
   &-info{
     color: $dark9 !important;
-    
+
     &.buffer{
       padding-bottom: 3px;
     }
@@ -776,7 +776,7 @@ table.webclient-window>tbody>tr>td{
     height: 1px;
     background-color: $light16;
     opacity: 0.2;
-    
+
     &.buffer{
       margin-top:4px;
     }
@@ -945,15 +945,23 @@ table.webclient-window>tbody>tr>td{
   cursor: pointer;
 }
 
+.cameras-panel-wrapper{
+  @media (max-width: 767px) {
+    position : absolute;
+    width    : 100% !important;
+    height   : 100% !important;
+    display  : none; // visible list messes up iPhone height calc
+  }
+
+  &.on-top {
+    z-index : 99; /* Keeps the cameras-panel above the video player and preloads for mobile. */
+    display : block !important;
+  }
+}
+
 @media (max-width: 767px){
   .visible-xs.back-button{
     display: inline-block !important;
-  }
-
-  .cameras-panel-wrapper{
-    z-index: 3; /* Keeps the cameras-panel above the video player and preloads for mobile. */
-    position: absolute;
-    width: 100% !important;
   }
 
   .cameras-panel{
