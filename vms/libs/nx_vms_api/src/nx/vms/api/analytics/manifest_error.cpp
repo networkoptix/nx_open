@@ -85,53 +85,53 @@ QString toHumanReadableString(ManifestErrorType errorType)
 {
     switch (errorType)
     {
-    case nx::vms::api::analytics::ManifestErrorType::noError:
-        return "";
-    case nx::vms::api::analytics::ManifestErrorType::emptyPluginId:
-        return "Plugin id is empty";
-    case nx::vms::api::analytics::ManifestErrorType::emptyPluginName:
-        return "Plugin name is empty";
-    case nx::vms::api::analytics::ManifestErrorType::emptyPluginDescription:
-        return "Plugin description is empty";
-    case nx::vms::api::analytics::ManifestErrorType::emptyPluginVersion:
-        return "Plugin version is empty";
-    case nx::vms::api::analytics::ManifestErrorType::emptyPluginVendor:
-        return "Plugin vendor is empty";
-    case nx::vms::api::analytics::ManifestErrorType::emptyObjectActionId:
-        return "Object Action id is empty";
-    case nx::vms::api::analytics::ManifestErrorType::emptyObjectActionName:
-        return "Object Action name is empty";
-    case nx::vms::api::analytics::ManifestErrorType::duplicatedObjectActionId:
-        return "Multiple Object Actions have the same id";
-    case nx::vms::api::analytics::ManifestErrorType::duplicatedObjectActionName:
-        return "Multiple Object Actions have the same id";
-    case nx::vms::api::analytics::ManifestErrorType::emptyEventTypeId:
-        return "Event Type id is empty";
-    case nx::vms::api::analytics::ManifestErrorType::emptyEventTypeName:
-        return "Event Type name is empty";
-    case nx::vms::api::analytics::ManifestErrorType::duplicatedEventTypeId:
-        return "Multiple Event Types have the same id";
-    case nx::vms::api::analytics::ManifestErrorType::duplicatedEventTypeName:
-        return "Multiple Event Types have the same name";
-    case nx::vms::api::analytics::ManifestErrorType::emptyObjectTypeId:
-        return "Object Type id is empty";
-    case nx::vms::api::analytics::ManifestErrorType::emptyObjectTypeName:
-        return "Object Type name is empty";
-    case nx::vms::api::analytics::ManifestErrorType::duplicatedObjectTypeId:
-        return "Multiple Object Types have the same id";
-    case nx::vms::api::analytics::ManifestErrorType::duplicatedObjectTypeName:
-        return "Multiple Object Types have the same name";
-    case nx::vms::api::analytics::ManifestErrorType::emptyGroupId:
-        return "Group id is empty";
-    case nx::vms::api::analytics::ManifestErrorType::emptyGroupName:
-        return "Group name is empty";
-    case nx::vms::api::analytics::ManifestErrorType::duplicatedGroupId:
-        return "Multiple Groups have the same id";
-    case nx::vms::api::analytics::ManifestErrorType::duplicatedGroupName:
-        return "Multiple Groups have the same name";
-    default:
-        NX_ASSERT(false);
-        return QString();
+        case ManifestErrorType::noError:
+            return "";
+        case ManifestErrorType::emptyPluginId:
+            return "Plugin id is empty";
+        case ManifestErrorType::emptyPluginName:
+            return "Plugin name is empty";
+        case ManifestErrorType::emptyPluginDescription:
+            return "Plugin description is empty";
+        case ManifestErrorType::emptyPluginVersion:
+            return "Plugin version is empty";
+        case ManifestErrorType::emptyPluginVendor:
+            return "Plugin vendor is empty";
+        case ManifestErrorType::emptyObjectActionId:
+            return "Object Action id is empty";
+        case ManifestErrorType::emptyObjectActionName:
+            return "Object Action name is empty";
+        case ManifestErrorType::duplicatedObjectActionId:
+            return "Multiple Object Actions have the same id";
+        case ManifestErrorType::duplicatedObjectActionName:
+            return "Multiple Object Actions have the same id";
+        case ManifestErrorType::emptyEventTypeId:
+            return "Event Type id is empty";
+        case ManifestErrorType::emptyEventTypeName:
+            return "Event Type name is empty";
+        case ManifestErrorType::duplicatedEventTypeId:
+            return "Multiple Event Types have the same id";
+        case ManifestErrorType::duplicatedEventTypeName:
+            return "Multiple Event Types have the same name";
+        case ManifestErrorType::emptyObjectTypeId:
+            return "Object Type id is empty";
+        case ManifestErrorType::emptyObjectTypeName:
+            return "Object Type name is empty";
+        case ManifestErrorType::duplicatedObjectTypeId:
+            return "Multiple Object Types have the same id";
+        case ManifestErrorType::duplicatedObjectTypeName:
+            return "Multiple Object Types have the same name";
+        case ManifestErrorType::emptyGroupId:
+            return "Group id is empty";
+        case ManifestErrorType::emptyGroupName:
+            return "Group name is empty";
+        case ManifestErrorType::duplicatedGroupId:
+            return "Multiple Groups have the same id";
+        case ManifestErrorType::duplicatedGroupName:
+            return "Multiple Groups have the same name";
+        default:
+            NX_ASSERT(false);
+            return QString();
     }
 }
 

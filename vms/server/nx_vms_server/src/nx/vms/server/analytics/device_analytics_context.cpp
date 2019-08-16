@@ -390,11 +390,11 @@ void DeviceAnalyticsContext::putFrame(
 
 void DeviceAnalyticsContext::reportSkippedFrames(int framesSkipped, QnUuid engineId) const
 {
-    QString caption = lm("Analytics: skipped %1 video frame%2").args(
+    const QString caption = lm("Analytics: skipped %1 video frame%2").args(
         framesSkipped,
         framesSkipped > 1 ? "s" : "");
 
-    QString description =
+    const QString description =
         lm("Skipped %1 video frame%2 for %3 from Device %4 %5: queue overflow. "
             "Probably the Plugin is working too slow").args(
             framesSkipped,
@@ -403,7 +403,7 @@ void DeviceAnalyticsContext::reportSkippedFrames(int framesSkipped, QnUuid engin
             m_device->getUserDefinedName(),
             m_device->getId());
 
-    nx::vms::event::PluginDiagnosticEventPtr pluginDiagnosticEvent(
+    const nx::vms::event::PluginDiagnosticEventPtr pluginDiagnosticEvent(
         new nx::vms::event::PluginDiagnosticEvent(
             qnSyncTime->currentUSecsSinceEpoch(),
             engineId,

@@ -21,7 +21,6 @@ namespace nx::vms::server::analytics::wrappers {
 template<typename MainSdkObject, typename ManifestType>
 class SdkObjectWithManifest: public /*mixin*/ ServerModuleAware
 {
-
 public:
     SdkObjectWithManifest(
         QnMediaServerModule* serverModule,

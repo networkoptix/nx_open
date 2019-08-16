@@ -25,7 +25,6 @@ using ManifestProcessorViolationHandler = std::function<void(Violation)>;
 template<typename Manifest>
 class ManifestProcessor
 {
-
 public:
     ManifestProcessor(
         DebugSettings debugSettings,
