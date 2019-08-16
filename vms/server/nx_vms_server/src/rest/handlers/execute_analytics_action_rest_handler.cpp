@@ -88,30 +88,19 @@ Ptr<IObjectTrackInfo> makeObjectTrackInfo(
 class Action: public RefCountable<IAction>
 {
 public:
-    Action(const ExtendedAnalyticsActionData& actionData, AnalyticsActionResult* actionResult):
+    Action(const ExtendedAnalyticsActionData& actionData):
         m_actionId(actionData.action.actionId.toStdString()),
         m_objectTrackId(fromQnUuidToSdkUuid(actionData.action.objectTrackId)),
         m_deviceId(fromQnUuidToSdkUuid(actionData.action.deviceId)),
         m_timestampUs(actionData.action.timestampUs),
         m_objectTrackInfo(makeObjectTrackInfo(actionData)),
-        m_params(sdk_support::toSdkStringMap(actionData.action.params)),
-        m_actionResult(actionResult)
+        m_params(sdk_support::toSdkStringMap(actionData.action.params))
     {
-        NX_ASSERT(m_actionResult);
     }
 
     virtual const char* actionId() const override { return m_actionId.c_str(); }
 
-    virtual int64_t timestampUs() const
-    {
-        return m_timestampUs;
-    }
-
-    virtual void handleResult(const char* actionUrl, const char* messageToUser) override
-    {
-        m_actionResult->actionUrl = actionUrl;
-        m_actionResult->messageToUser = messageToUser;
-    }
+    virtual int64_t timestampUs() const override { return m_timestampUs; }
 
 protected:
     virtual void getObjectTrackId(Uuid* outValue) const override { *outValue = m_objectTrackId; }
@@ -141,8 +130,6 @@ private:
 
     const Ptr<IObjectTrackInfo> m_objectTrackInfo;
     const Ptr<const IStringMap> m_params;
-
-    AnalyticsActionResult* const m_actionResult = nullptr;
 };
 
 } // namespace
@@ -212,7 +199,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
     if (!errorMessage.isEmpty())
     {
         result.setError(QnJsonRestResult::CantProcessRequest,
-            lm("Engine %1 failed to execute action: %2").args(engineResource, errorMessage));
+            lm("Engine %1 failed to execute Action: %2").args(engineResource, errorMessage));
     }
 
     result.setReply(actionResult);
@@ -394,7 +381,7 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
     if (!NX_ASSERT(actionData.engine, kNoEngineToExecuteActionMessage))
         return kNoEngineToExecuteActionMessage;
 
-    const auto action = makePtr<Action>(actionData, outActionResult);
+    const auto action = makePtr<Action>(actionData);
     static const QString kNoSdkEngineToExecuteActionMessage(
         "No SDK engine to execute the action has been provided");
 
@@ -402,11 +389,12 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
     if (!NX_ASSERT(sdkEngine, kNoSdkEngineToExecuteActionMessage))
         return kNoSdkEngineToExecuteActionMessage;
 
-    const bool result = sdkEngine->executeAction(action);
+    const wrappers::Engine::ExecuteActionResult executeActionResult =
+        sdkEngine->executeAction(action);
 
-    // By this time, the Engine either already called Action::handleResult(), or is not going to
-    // do it.
-    return result ? QString() : QString("Error has happened during action execution");
+    if (executeActionResult.errorMessage.isEmpty()) //< Successfully executed the Action.
+        *outActionResult = executeActionResult.actionResult;
+    return executeActionResult.errorMessage;
 }
 
 std::optional<nx::analytics::db::ObjectPosition>

@@ -161,7 +161,8 @@ QString AnalyticsEngineResource::libName() const
 std::optional<QVariantMap> AnalyticsEngineResource::loadSettingsFromFile() const
 {
     const auto loadSettings =
-        [this](bool isEngineSpecificFilename) -> std::optional<QVariantMap>
+        [this](sdk_support::FilenameGenerationOptions filenameGenerationOptions)
+            -> std::optional<QVariantMap>
         {
             const QString settingsFilename = sdk_support::debugFileAbsolutePath(
                 pluginsIni().analyticsSettingsSubstitutePath,
@@ -169,7 +170,7 @@ std::optional<QVariantMap> AnalyticsEngineResource::loadSettingsFromFile() const
                     plugin().dynamicCast<resource::AnalyticsPluginResource>(),
                     toSharedPointer(this),
                     QnVirtualCameraResourcePtr(),
-                    isEngineSpecificFilename)) + "_settings.json";
+                    filenameGenerationOptions)) + "_settings.json";
 
             std::optional<QString> settingsString = sdk_support::loadStringFromFile(
                 nx::utils::log::Tag(typeid(this)),
@@ -181,11 +182,12 @@ std::optional<QVariantMap> AnalyticsEngineResource::loadSettingsFromFile() const
             return sdk_support::toQVariantMap(*settingsString);
         };
 
-    const std::optional<QVariantMap> result = loadSettings(/*isEngineSpecificFilename*/ true);
+    const std::optional<QVariantMap> result = loadSettings(
+        sdk_support::FilenameGenerationOption::engineSpecific);
     if (result)
         return result;
 
-    return loadSettings(/*isEngineSpecificFilename*/ false);
+    return loadSettings(sdk_support::FilenameGenerationOptions());
 }
 
 } // nx::vms::server::resource

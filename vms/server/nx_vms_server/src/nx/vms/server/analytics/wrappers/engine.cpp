@@ -144,22 +144,55 @@ wrappers::DeviceAgentPtr Engine::obtainDeviceAgent(QnVirtualCameraResourcePtr de
         libName());
 }
 
-bool Engine::executeAction(Ptr<IAction> action)
+Engine::ExecuteActionResult Engine::executeAction(Ptr<const IAction> action)
 {
     const Ptr<IEngine> engine = sdkObject();
     if (!NX_ASSERT(engine))
-        return false;
+        return ExecuteActionResult("INTERNAL ERROR: Missing Engine object");
 
-    const ResultHolder<void> result = engine->executeAction(action.get());
+    const ResultHolder<IAction::Result> result = engine->executeAction(action.get());
+
     if (!result.isOk())
     {
+        const auto error = Error::fromResultHolder(result);
         return handleError(
-            SdkMethod::executeAction,
-            Error::fromResultHolder(result),
-            /*returnValue*/ false);
+            SdkMethod::executeAction, error,
+            /*returnValue*/ makeErrorString(SdkMethod::executeAction, error));
     }
 
-    return true;
+    const AnalyticsActionResult actionResult{
+        fromSdkString<QString>(result.value().actionUrl),
+        fromSdkString<QString>(result.value().messageToUser)
+    };
+
+    if (!actionResult.actionUrl.isEmpty() && !actionResult.messageToUser.isEmpty())
+    {
+        const Violation violation{
+            ViolationType::inconsistentActionResult,
+            lm("Both values are returned: actionUrl = \"%1\" and messageToUser = \"%2\"")
+                .args(actionResult.actionUrl, actionResult.messageToUser)
+        };
+        return handleViolation(
+            SdkMethod::executeAction, violation,
+            /*returnValue*/ makeErrorString(SdkMethod::executeAction, violation));
+    }
+
+    if (!actionResult.actionUrl.isEmpty())
+    {
+        const QUrl url(actionResult.actionUrl);
+        if (!url.isValid())
+        {
+            const Violation violation{
+                ViolationType::invalidActionResultUrl,
+                lm("Invalid Action result URL: \"%1\"").args(actionResult.actionUrl)
+            };
+            return handleViolation(
+                SdkMethod::executeAction, violation,
+                /*returnValue*/ makeErrorString(SdkMethod::executeAction, violation));
+        }
+    }
+
+    return actionResult;
 }
 
 void Engine::setHandler(sdk::Ptr<sdk::analytics::IEngine::IHandler> handler)

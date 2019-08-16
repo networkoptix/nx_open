@@ -47,8 +47,9 @@ protected:
     virtual void doObtainDeviceAgent(
         nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*>* outResult,
         const nx::sdk::IDeviceInfo* deviceInfo) override;
-    virtual void doExecuteAction(nx::sdk::Result<void>* outResult,
-        nx::sdk::analytics::IAction* action) override;
+    virtual void doExecuteAction(
+        nx::sdk::Result<nx::sdk::analytics::IAction::Result>* outResult,
+        const nx::sdk::analytics::IAction* action) override;
 
 private:
     void readAllowedPortNames();

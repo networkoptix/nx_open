@@ -85,7 +85,7 @@ void Engine::getManifest(Result<const IString*>* outResult) const
     *outResult = new String(manifestString());
 }
 
-void Engine::doExecuteAction(Result<void>* outResult, IAction* action)
+void Engine::doExecuteAction(Result<IAction::Result>* outResult, const IAction* action)
 {
     if (!action)
     {
@@ -115,24 +115,13 @@ void Engine::doExecuteAction(Result<void>* outResult, IAction* action)
 
     NX_OUTPUT << "}";
 
-    std::string actionUrl;
-    std::string messageToUser;
-
-    const auto result = executeAction(
+    *outResult = executeAction(
         action->actionId(),
         action->objectTrackId(),
         action->deviceId(),
         action->timestampUs(),
         action->objectTrackInfo(),
-        params,
-        &actionUrl,
-        &messageToUser);
-
-    const char* const actionUrlPtr = actionUrl.empty() ? nullptr : actionUrl.c_str();
-    const char* const messageToUserPtr = messageToUser.empty() ? nullptr : messageToUser.c_str();
-    action->handleResult(actionUrlPtr, messageToUserPtr);
-
-    *outResult = result;
+        params);
 }
 
 void Engine::setHandler(IEngine::IHandler* handler)

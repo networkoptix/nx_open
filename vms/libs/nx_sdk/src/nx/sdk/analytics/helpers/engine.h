@@ -72,15 +72,13 @@ protected:
      * @param outActionUrl If set by this call, Client will open this URL in an embedded browser.
      * @param outMessageToUser If set by this call, Client will show this text to the user.
      */
-    virtual Result<void> executeAction(
+    virtual Result<IAction::Result> executeAction(
         const std::string& /*actionId*/,
         Uuid /*objectTrackId*/,
         Uuid /*deviceId*/,
         int64_t /*timestampUs*/,
         Ptr<IObjectTrackInfo> /*trackInfo*/,
-        const std::map<std::string, std::string>& /*params*/,
-        std::string* /*outActionUrl*/,
-        std::string* /*outMessageToUser*/)
+        const std::map<std::string, std::string>& /*params*/)
     {
         return {};
     }
@@ -111,9 +109,13 @@ public:
 protected:
     virtual void doSetSettings(
         Result<const IStringMap*>* outResult, const IStringMap* settings) override;
+
     virtual void getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const override;
+
     virtual void getManifest(Result<const IString*>* outResult) const override;
-    virtual void doExecuteAction(Result<void>* outResult, IAction* action) override;
+
+    virtual void doExecuteAction(
+        Result<IAction::Result>* outResult, const IAction* action) override;
 
 private:
     mutable std::mutex m_mutex;
