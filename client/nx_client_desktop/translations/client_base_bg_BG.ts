@@ -542,7 +542,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Edit...</source>
-      <translation type="unfinished">Edit...</translation>
+      <translation>Редактиране...</translation>
     </message>
     <message>
       <source>Rename</source>
@@ -6963,11 +6963,11 @@ to %1</translation>
     <name>QnUserListModelPrivate</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Собственик</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation type="unfinished">Administrator</translation>
+      <translation>Администратор</translation>
     </message>
     <message>
       <source>View live video</source>
@@ -7002,7 +7002,7 @@ to %1</translation>
     <name>QnUserManagementWidget</name>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Редактиране</translation>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>

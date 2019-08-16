@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>未知錯誤.</translation>
+      <translation>未知的錯誤.</translation>
     </message>
     <message>
       <source>Unexpected network error. Please check your Internet connection and try again.</source>

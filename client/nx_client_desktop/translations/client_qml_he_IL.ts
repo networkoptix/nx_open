@@ -27,7 +27,7 @@
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation>כניסה</translation>
+      <translation>שם משתמש</translation>
     </message>
     <message>
       <source>Password</source>
@@ -35,7 +35,7 @@
     </message>
     <message>
       <source>Save password</source>
-      <translation>שמור סיסמא</translation>
+      <translation>שמור סיסמה</translation>
     </message>
     <message>
       <source>Auto-login</source>
@@ -43,7 +43,7 @@
     </message>
     <message>
       <source>Connect</source>
-      <translation>התחבר</translation>
+      <translation>חיבור</translation>
     </message>
   </context>
   <context>
@@ -74,6 +74,14 @@
     <message>
       <source>New Server</source>
       <translation>שרת חדש</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>ערוך</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>הסתר את</translation>
     </message>
   </context>
   <context>

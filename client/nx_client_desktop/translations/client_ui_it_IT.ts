@@ -202,7 +202,7 @@
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation>Guardare l'archivio</translation>
+      <translation>Visualizzare l'archivio</translation>
     </message>
     <message>
       <location/>
@@ -212,7 +212,7 @@
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>Guardare il live</translation>
+      <translation>Visualizzare Live</translation>
     </message>
     <message>
       <location/>
@@ -257,7 +257,7 @@
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation>Cancella Filtro</translation>
+      <translation>Cancella filtro</translation>
     </message>
     <message>
       <location/>
@@ -450,7 +450,7 @@
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation>Cancella Filtro</translation>
+      <translation>Cancella filtro</translation>
     </message>
   </context>
   <context>
@@ -760,27 +760,27 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Tipo preset PTZ preferito:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Sistema</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Nativo</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Questa telecamera supporta pan e tilt</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Questa telecamera supporta lo zoom</translation>
     </message>
   </context>
   <context>
@@ -1029,7 +1029,7 @@
     <message>
       <location/>
       <source>Refresh</source>
-      <translation>Aggiornare</translation>
+      <translation>Ricaricare</translation>
     </message>
     <message>
       <location/>
@@ -1236,7 +1236,7 @@
     <message>
       <location/>
       <source>Camera</source>
-      <translation>Telecamera</translation>
+      <translation>Telecamera / e</translation>
     </message>
     <message>
       <location/>
@@ -1508,7 +1508,7 @@
     <message>
       <location/>
       <source>Testing...</source>
-      <translation>Test...</translation>
+      <translation>Verifica...</translation>
     </message>
     <message>
       <location/>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Timeout ricerca (s)</translation>
     </message>
   </context>
   <context>
@@ -1681,12 +1681,12 @@
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation>Attivare la licenza gratuita</translation>
+      <translation>Attiva la licenza gratuita</translation>
     </message>
     <message>
       <location/>
       <source>Activate License</source>
-      <translation>Attivare la licenza</translation>
+      <translation>Attiva la licenza</translation>
     </message>
     <message>
       <location/>
@@ -2213,7 +2213,7 @@
     <message>
       <location/>
       <source>Add</source>
-      <translation>Aggiungi</translation>
+      <translation>Inserisci</translation>
     </message>
     <message>
       <location/>
@@ -2477,7 +2477,7 @@
     <message>
       <location/>
       <source>Screen</source>
-      <translation>Schermate</translation>
+      <translation>Schermo</translation>
     </message>
   </context>
   <context>
@@ -2741,7 +2741,7 @@
     <message>
       <location/>
       <source>Web Page</source>
-      <translation>Pagina Web</translation>
+      <translation>Pagina web</translation>
     </message>
     <message>
       <location/>
@@ -2840,7 +2840,7 @@
     <message>
       <location/>
       <source>OK</source>
-      <translation>Ok</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <location/>
@@ -3070,7 +3070,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation>Data e ora</translation>
+      <translation>Timestamp</translation>
     </message>
     <message>
       <location/>
@@ -3160,7 +3160,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
       <source>Motion Detection</source>
-      <translation>Rilevamento di movimento</translation>
+      <translation>Rilevamento del movimento</translation>
     </message>
     <message>
       <location/>
@@ -3191,7 +3191,7 @@
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation>Caricare un file...</translation>
+      <translation>Carica File...</translation>
     </message>
     <message>
       <location/>

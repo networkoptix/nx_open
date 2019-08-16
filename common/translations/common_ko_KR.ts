@@ -6,7 +6,7 @@
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation>언어</translation>
+      <translation>한국어</translation>
     </message>
   </context>
   <context>
@@ -686,19 +686,19 @@
     <name>QnStreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation>최하</translation>
+      <translation>최저</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>낮은</translation>
+      <translation>저해상도</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>일반</translation>
+      <translation>일반화</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>높은</translation>
+      <translation>고해상도</translation>
     </message>
     <message>
       <source>Best</source>
@@ -851,7 +851,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>분</translation>
+      <translation>월</translation>
     </message>
     <message>
       <source>y</source>

@@ -40,8 +40,8 @@
             <span class="text">ou</span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">Ajouter au système existant</button><br>
-        <small>(si {{Config.productName}} est déjà configuré)</small><br>
+        <button class="btn btn-default" ng-click="skip()">Add to Existing System</button><br>
+        <small>(if {{Config.productName}} has been already setup)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -298,7 +298,7 @@
         <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Login" required>
+                   placeholder="Identifiant" required>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
@@ -369,7 +369,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>Système prêt à l’emploi</h2>
-    <p>Login</p>
+    <p>Identifiant</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Paramètres de compte et de partage</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="ouvrir {{Config.cloud.productName}}"
@@ -468,7 +468,7 @@
             <div class="text-center"><b>Utiliser l'application {{Config.productName}}</b></div>
             <div class="col-xs-6 text-right">Hôte</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
             <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">Identifiant</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
             <div class="col-xs-6 text-right">Mot de passe</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>

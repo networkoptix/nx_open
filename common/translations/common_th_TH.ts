@@ -710,7 +710,7 @@
     </message>
     <message>
       <source>Undefined</source>
-      <translation>ไม่ชัดเจน</translation>
+      <translation>ไม่ได้กำหนด</translation>
     </message>
     <message>
       <source>Lst</source>
@@ -821,7 +821,7 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
+      <translation>มิลลิวินาที</translation>
     </message>
     <message>
       <source>s</source>
@@ -831,7 +831,7 @@
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
+      <translation>น.</translation>
     </message>
     <message>
       <source>h</source>
@@ -861,7 +861,7 @@
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msec</translation>
+      <translation>มิลลิวินาที</translation>
     </message>
     <message>
       <source>sec</source>

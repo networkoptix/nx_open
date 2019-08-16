@@ -104,7 +104,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>Гаразд</translation>
+      <translation>ОК</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -603,8 +603,8 @@
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n пристрій</numerusform>
-        <numerusform>%n пристрої</numerusform>
+        <numerusform>%n пристроїв</numerusform>
+        <numerusform>%n пристроїв</numerusform>
         <numerusform>%n пристроїв</numerusform>
         <numerusform>%n пристроїв</numerusform>
       </translation>
@@ -653,8 +653,8 @@
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n модуль вводу / виводу</numerusform>
-        <numerusform>%n модуль вводу / виводу</numerusform>
+        <numerusform>%n модулів вводу / виводу</numerusform>
+        <numerusform>%n модулів вводу / виводу</numerusform>
         <numerusform>%n модулів вводу / виводу</numerusform>
         <numerusform>%n модулів вводу / виводу</numerusform>
       </translation>
@@ -662,7 +662,7 @@
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n модуль вводу / виводу</numerusform>
+        <numerusform>%n модулів вводу / виводу</numerusform>
         <numerusform>%n модулів вводу / виводу</numerusform>
         <numerusform>%n модулів вводу / виводу</numerusform>
         <numerusform>%n модулів вводу / виводу</numerusform>
@@ -678,7 +678,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>Модуль вводу-виводу</translation>
+      <translation>Модуль вводу/виводу</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -716,7 +716,7 @@
     <name>QnStreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation>Найнижчі</translation>
+      <translation>Найнижча</translation>
     </message>
     <message>
       <source>Low</source>
@@ -728,7 +728,7 @@
     </message>
     <message>
       <source>High</source>
-      <translation>Висока</translation>
+      <translation>Високий</translation>
     </message>
     <message>
       <source>Best</source>
@@ -736,7 +736,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation>Попередньо встановлене</translation>
+      <translation>Пресет</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -861,12 +861,12 @@
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation>хв</translation>
+      <translation>м</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation>г</translation>
+      <translation>ч</translation>
     </message>
     <message>
       <source>d</source>
@@ -932,30 +932,30 @@
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>мілісекуна</numerusform>
-        <numerusform>мілісекунди</numerusform>
-        <numerusform>мілісекунди</numerusform>
-        <numerusform>мілісекунди</numerusform>
+        <numerusform>мілісекунд</numerusform>
+        <numerusform>мілісекунд</numerusform>
+        <numerusform>мілісекунд</numerusform>
+        <numerusform>мілісекунд</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>секунда</numerusform>
-        <numerusform>секунди</numerusform>
-        <numerusform>секунди</numerusform>
-        <numerusform>секунди</numerusform>
+        <numerusform>секунд</numerusform>
+        <numerusform>секунд</numerusform>
+        <numerusform>секунд</numerusform>
+        <numerusform>секунд</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>хвилина</numerusform>
-        <numerusform>хвилина</numerusform>
-        <numerusform>хвилина</numerusform>
-        <numerusform>хвилина</numerusform>
+        <numerusform>хвилини</numerusform>
+        <numerusform>хвилини</numerusform>
+        <numerusform>хвилини</numerusform>
+        <numerusform>хвилини</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -973,7 +973,7 @@
       <comment>Full suffix for displaying days</comment>
       <translation>
         <numerusform>день</numerusform>
-        <numerusform>дні</numerusform>
+        <numerusform>днів</numerusform>
         <numerusform>днів</numerusform>
         <numerusform>днів</numerusform>
       </translation>

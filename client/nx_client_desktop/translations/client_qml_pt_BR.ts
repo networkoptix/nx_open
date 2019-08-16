@@ -27,7 +27,7 @@
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <source>Password</source>
@@ -35,7 +35,7 @@
     </message>
     <message>
       <source>Save password</source>
-      <translation>Guardar password</translation>
+      <translation>Guardar senha</translation>
     </message>
     <message>
       <source>Auto-login</source>
@@ -65,7 +65,7 @@
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>OFF-LINE</translation>
+      <translation>OFFLINE</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
@@ -73,7 +73,15 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation>Novo Servidor</translation>
+      <translation>Novo servidor</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Editar</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Ocultar</translation>
     </message>
   </context>
   <context>
@@ -88,7 +96,7 @@
     </message>
     <message>
       <source>Loading...</source>
-      <translation>A Carregar...</translation>
+      <translation>A carregar...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>

@@ -11,7 +11,7 @@
     <message>
       <location/>
       <source>Information</source>
-      <translation>Інформація</translation>
+      <translation>Інформація про продукт</translation>
     </message>
     <message>
       <location/>
@@ -138,7 +138,7 @@
     <message>
       <location/>
       <source>Instant</source>
-      <translation>Миттєво</translation>
+      <translation>Миттєвий</translation>
     </message>
   </context>
   <context>
@@ -305,7 +305,7 @@
     <message>
       <location/>
       <source>Start</source>
-      <translation>Почати</translation>
+      <translation>Починається</translation>
     </message>
   </context>
   <context>
@@ -554,7 +554,7 @@
     <message>
       <location/>
       <source>Brand</source>
-      <translation>Бренд</translation>
+      <translation>Виробник</translation>
     </message>
     <message>
       <location/>
@@ -670,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>За замовчуванням</translation>
+      <translation>Скинути налаштування</translation>
     </message>
     <message>
       <location/>
@@ -796,7 +796,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
       <source>Add Device...</source>
-      <translation>Додати пристрій...</translation>
+      <translation>Додати Пристрій...</translation>
     </message>
   </context>
   <context>
@@ -827,7 +827,7 @@
     <message>
       <location/>
       <source>FPS</source>
-      <translation>Кадрів в секунду</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <location/>
@@ -867,7 +867,7 @@
     <message>
       <location/>
       <source>Copy Schedule...</source>
-      <translation>Копіювати розклад...</translation>
+      <translation>Копіювати Розклад...</translation>
     </message>
     <message>
       <location/>
@@ -1039,7 +1039,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Правила події...</translation>
+      <translation>Правила Подій...</translation>
     </message>
   </context>
   <context>
@@ -1057,7 +1057,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Ім'я користувача</translation>
+      <translation>Логін</translation>
     </message>
     <message>
       <location/>
@@ -1241,7 +1241,7 @@
     <message>
       <location/>
       <source>Source camera</source>
-      <translation>Початкова камера</translation>
+      <translation>Source camera</translation>
     </message>
   </context>
   <context>
@@ -1897,7 +1897,7 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation>Нова портативна камера...</translation>
+      <translation>Нова портативнаякамера...</translation>
     </message>
     <message>
       <location/>
@@ -1915,7 +1915,7 @@
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
       <source>Manage...</source>
-      <translation>Налаштувати...</translation>
+      <translation>Управління...</translation>
     </message>
     <message>
       <location/>
@@ -2045,7 +2045,7 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation>Приєднати до відеостіни...</translation>
+      <translation>Приєднати до Відеостіни...</translation>
     </message>
     <message>
       <location/>
@@ -2134,7 +2134,7 @@
     <message>
       <location filename="../src/ui/dialogs/merge_systems_dialog.ui"/>
       <source>Merge Systems...</source>
-      <translation>Об'єднати системи...</translation>
+      <translation>Об'єднати Системи...</translation>
     </message>
     <message>
       <location/>
@@ -2172,7 +2172,7 @@
     <message>
       <location/>
       <source>Play</source>
-      <translation>Відтворити</translation>
+      <translation>Перегляд</translation>
     </message>
     <message>
       <location/>
@@ -2226,7 +2226,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
       <source>Cancel</source>
-      <translation>Відміна</translation>
+      <translation>Відмінити</translation>
     </message>
     <message>
       <location/>
@@ -2277,7 +2277,7 @@
     <message>
       <location/>
       <source>New User...</source>
-      <translation>Створити користувача...</translation>
+      <translation>Новий користувач...</translation>
     </message>
     <message>
       <location/>
@@ -2287,7 +2287,7 @@
     <message>
       <location/>
       <source>Clear Selection</source>
-      <translation>Очистити виділення</translation>
+      <translation>Очистити Вибір</translation>
     </message>
     <message>
       <location/>
@@ -2457,7 +2457,7 @@
     <message>
       <location/>
       <source>Browse...</source>
-      <translation>Перегляд...</translation>
+      <translation>Огляд...</translation>
     </message>
     <message>
       <location/>
@@ -2513,7 +2513,7 @@
     <message>
       <location/>
       <source>Test...</source>
-      <translation>Перевірка...</translation>
+      <translation>Тестування...</translation>
     </message>
     <message>
       <location/>
@@ -2845,7 +2845,7 @@
     <message>
       <location/>
       <source>Cancel</source>
-      <translation>Відміна</translation>
+      <translation>Відмінити</translation>
     </message>
   </context>
   <context>
@@ -2894,7 +2894,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
       <source>Cancel</source>
-      <translation>Відміна</translation>
+      <translation>Відмінити</translation>
     </message>
     <message>
       <location/>
@@ -2937,7 +2937,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
       <source>Cancel</source>
-      <translation>Відміна</translation>
+      <translation>Відмінити</translation>
     </message>
   </context>
   <context>
@@ -3191,12 +3191,12 @@
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation>Завантажити файл...</translation>
+      <translation>Завантажити Файл...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation>Завантажити папку...</translation>
+      <translation>Завантажити Папку...</translation>
     </message>
   </context>
   <context>
@@ -3217,7 +3217,7 @@
     <message>
       <location/>
       <source>On</source>
-      <translation>Вкл</translation>
+      <translation>Включити</translation>
     </message>
     <message>
       <location/>

@@ -27,7 +27,7 @@
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation>Iniciar Sesión</translation>
+      <translation>Nombre del usuario</translation>
     </message>
     <message>
       <source>Password</source>
@@ -73,7 +73,15 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation>Nuevo Servidor</translation>
+      <translation>Nuevo servidor</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Editar</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Ocultar</translation>
     </message>
   </context>
   <context>

@@ -75,6 +75,14 @@
       <source>New Server</source>
       <translation>Máy chủ mới</translation>
     </message>
+    <message>
+      <source>Edit</source>
+      <translation>Chỉnh sửa</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Giấu</translation>
+    </message>
   </context>
   <context>
     <name>WelcomeScreen</name>

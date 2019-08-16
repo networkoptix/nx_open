@@ -130,11 +130,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>Podłącz serwer...</translation>
+      <translation>Podłącz do serwera...</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>Odłącz serwer</translation>
+      <translation>Odłącz od serwera</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
@@ -1296,7 +1296,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Permissions</source>
-      <translation>Uprawnienia</translation>
+      <translation>Prawa</translation>
     </message>
   </context>
   <context>
@@ -1418,7 +1418,7 @@ to view more bookmarks</source>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation>Wczytywanie...</translation>
+      <translation>Ładowanie...</translation>
     </message>
     <message>
       <source>Saving...</source>
@@ -1644,7 +1644,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Zalogowanie</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>User updated</source>
@@ -1705,8 +1705,8 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n action(s)</source>
       <translation>
-        <numerusform>%n akcja</numerusform>
-        <numerusform>%n akcje</numerusform>
+        <numerusform>%n akcji</numerusform>
+        <numerusform>%n akcji</numerusform>
         <numerusform>%n akcji</numerusform>
         <numerusform>%n akcji</numerusform>
       </translation>
@@ -1974,9 +1974,9 @@ to view more bookmarks</source>
       <source>%n Server(s)</source>
       <translation>
         <numerusform>%n serwer</numerusform>
-        <numerusform>%n serwery</numerusform>
-        <numerusform>%n serwerów</numerusform>
-        <numerusform>%n serwerów</numerusform>
+        <numerusform>%n serwer</numerusform>
+        <numerusform>%n serwer</numerusform>
+        <numerusform>%n serwer</numerusform>
       </translation>
     </message>
     <message>
@@ -2221,8 +2221,8 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n devices found</source>
       <translation>
-        <numerusform>Znaleziono %n urządzenie</numerusform>
-        <numerusform>Znaleziono %n urządzenia</numerusform>
+        <numerusform>Znaleziono %n urządzeń</numerusform>
+        <numerusform>Znaleziono %n urządzeń</numerusform>
         <numerusform>Znaleziono %n urządzeń</numerusform>
         <numerusform>Znaleziono %n urządzeń</numerusform>
       </translation>
@@ -2250,7 +2250,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Server offline</source>
-      <translation>Serwer odłączony</translation>
+      <translation>Serwer offline</translation>
     </message>
     <message>
       <source>Device adding is possible for online servers only.</source>
@@ -2260,9 +2260,9 @@ to view more bookmarks</source>
       <source>%n devices added.</source>
       <translation>
         <numerusform>Dodano %n urządzenie.</numerusform>
-        <numerusform>Dodano %n urządzenia.</numerusform>
-        <numerusform>Dodano %n urządzeń.</numerusform>
-        <numerusform>Dodano %n urządzeń.</numerusform>
+        <numerusform>Dodano %n urządzenie.</numerusform>
+        <numerusform>Dodano %n urządzenie.</numerusform>
+        <numerusform>Dodano %n urządzenie.</numerusform>
       </translation>
     </message>
     <message>
@@ -2306,7 +2306,7 @@ to view more bookmarks</source>
     <name>QnCameraAdvancedSettingsWidget</name>
     <message>
       <source>Loading...</source>
-      <translation>Wczytywanie...</translation>
+      <translation>Ładowanie...</translation>
     </message>
     <message>
       <source>This I/O module has no advanced settings</source>
@@ -2322,7 +2322,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Web</source>
-      <translation type="unfinished">Web</translation>
+      <translation>Web</translation>
     </message>
     <message>
       <source>No settings</source>
@@ -2444,7 +2444,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
-        <numerusform>Ten identyfikator jest już używany w następującej kamerze: %1</numerusform>
+        <numerusform>Ten identyfikator jest już używany w następujących %n kamerach: %1</numerusform>
         <numerusform>Ten identyfikator jest już używany w następujących %n kamerach: %1</numerusform>
         <numerusform>Ten identyfikator jest już używany w następujących %n kamerach: %1</numerusform>
         <numerusform>Ten identyfikator jest już używany w następujących %n kamerach: %1</numerusform>
@@ -2635,7 +2635,7 @@ to view more bookmarks</source>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
       <source>automatic</source>
-      <translation>automatycznie</translation>
+      <translation>automatyczny</translation>
     </message>
   </context>
   <context>
@@ -2688,7 +2688,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>On</source>
-      <translation>Wł.</translation>
+      <translation>Jeśli</translation>
     </message>
     <message>
       <source>Recording Schedule</source>
@@ -2799,7 +2799,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Device Rules...</source>
-      <translation>Reguły urządzenia...</translation>
+      <translation>Zasady urządzenia...</translation>
     </message>
     <message>
       <source>Devices Rules...</source>
@@ -2984,7 +2984,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>Łączenie z serwerem...</translation>
+      <translation>Podłącz do serwera...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
@@ -3142,7 +3142,7 @@ to %1</source>
     </message>
     <message>
       <source>Restart</source>
-      <translation>Restart</translation>
+      <translation>Uruchom ponownie</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
@@ -3338,11 +3338,11 @@ to %1</source>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Nie można zainicjować enkodera dźwięku.</translation>
+      <translation>Nie można zainicjować enkodera audio.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
-      <translation>Format urządzenia wejściowego %1 nie jest obsługiwany.</translation>
+      <translation>Format próbkowania urządzenia wejściowego %1 nie jest obsługiwany.</translation>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
@@ -3404,7 +3404,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Zaloguj</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3420,7 +3420,7 @@ to %1</source>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>Potwierdź hasło</translation>
+      <translation>Powtórz hasło</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -3487,19 +3487,19 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
       <translation>
-        <numerusform>Dziennik zdarzeń w dniach od %1 do %2 - znaleziono %n zdarzenie</numerusform>
-        <numerusform>Dziennik zdarzeń w dniach od %1 do %2 - znaleziono %n zdarzenia</numerusform>
-        <numerusform>Dziennik zdarzeń w dniach od %1 do %2 - znaleziono %n zdarzeń</numerusform>
-        <numerusform>Dziennik zdarzeń w dniach od %1 do %2 - znaleziono %n zdarzeń</numerusform>
+        <numerusform>Dziennik zdarzeń od %1 do %2 - znaleziono %n zdarzeń</numerusform>
+        <numerusform>Dziennik zdarzeń od %1 do %2 - znaleziono %n zdarzeń</numerusform>
+        <numerusform>Dziennik zdarzeń od %1 do %2 - znaleziono %n zdarzeń</numerusform>
+        <numerusform>Dziennik zdarzeń od %1 do %2 - znaleziono %n zdarzeń</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
         <numerusform>Dziennik zdarzeń w dniu %1 - znaleziono %n zdarzenie</numerusform>
-        <numerusform>Dziennik zdarzeń w dniu %1 - znaleziono %n zdarzenia</numerusform>
-        <numerusform>Dziennik zdarzeń w dniu %1 - znaleziono %n zdarzeń</numerusform>
-        <numerusform>Dziennik zdarzeń w dniu %1 - znaleziono %n zdarzeń</numerusform>
+        <numerusform>Dziennik zdarzeń w dniu %1 - znaleziono %n zdarzenie</numerusform>
+        <numerusform>Dziennik zdarzeń w dniu %1 - znaleziono %n zdarzenie</numerusform>
+        <numerusform>Dziennik zdarzeń w dniu %1 - znaleziono %n zdarzenie</numerusform>
       </translation>
     </message>
     <message>
@@ -3650,7 +3650,7 @@ to %1</source>
     <message>
       <source>Low</source>
       <comment>Failover priority</comment>
-      <translation>Niski</translation>
+      <translation>Niska</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -3660,7 +3660,7 @@ to %1</source>
     <message>
       <source>High</source>
       <comment>Failover priority</comment>
-      <translation>Wysoki</translation>
+      <translation>Wysoka</translation>
     </message>
   </context>
   <context>
@@ -3728,7 +3728,7 @@ to %1</source>
     <message numerus="yes">
       <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
       <translation>
-        <numerusform>Ta kamera aktualnie nie znajduje się na niektórych z wybranych układów. Akcja zadziała dopiero wtedy, gdy kamera zostanie dodana.</numerusform>
+        <numerusform>Te kamery aktualnie nie znajdują się na niektórych z wybranych układów. Akcja zadziała dopiero wtedy, gdy kamery zostaną dodane.</numerusform>
         <numerusform>Te kamery aktualnie nie znajdują się na niektórych z wybranych układów. Akcja zadziała dopiero wtedy, gdy kamery zostaną dodane.</numerusform>
         <numerusform>Te kamery aktualnie nie znajdują się na niektórych z wybranych układów. Akcja zadziała dopiero wtedy, gdy kamery zostaną dodane.</numerusform>
         <numerusform>Te kamery aktualnie nie znajdują się na niektórych z wybranych układów. Akcja zadziała dopiero wtedy, gdy kamery zostaną dodane.</numerusform>
@@ -3860,7 +3860,7 @@ to %1</source>
     <message>
       <source>Disabled</source>
       <comment>IO Port Type</comment>
-      <translation>Wyłączony</translation>
+      <translation>Wyłączone</translation>
     </message>
     <message>
       <source>Input</source>
@@ -4007,7 +4007,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation>Nie udało się wykonać testu.</translation>
+      <translation>Nie można wykonać testu.</translation>
     </message>
     <message>
       <source>Could not load users.</source>
@@ -4226,19 +4226,19 @@ to %1</source>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
       <translation>
-        <numerusform>%1: wymagane co najmniej %n</numerusform>
-        <numerusform>%1: wymagane co najmniej %n</numerusform>
-        <numerusform>%1: wymagane co najmniej %n</numerusform>
-        <numerusform>%1: wymagane co najmniej %n</numerusform>
+        <numerusform>%1: wymaganych co najmniej %n</numerusform>
+        <numerusform>%1: wymaganych co najmniej %n</numerusform>
+        <numerusform>%1: wymaganych co najmniej %n</numerusform>
+        <numerusform>%1: wymaganych co najmniej %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
       <translation>
         <numerusform>%1: %n jest obecnie wykorzystywana</numerusform>
-        <numerusform>%1: %n są obecnie wykorzystywane</numerusform>
-        <numerusform>%1: %n jest obecnie wykorzystywanych</numerusform>
-        <numerusform>%1: %n jest obecnie wykorzystywanych</numerusform>
+        <numerusform>%1: %n jest obecnie wykorzystywana</numerusform>
+        <numerusform>%1: %n jest obecnie wykorzystywana</numerusform>
+        <numerusform>%1: %n jest obecnie wykorzystywana</numerusform>
       </translation>
     </message>
     <message>
@@ -4406,36 +4406,36 @@ to %1</source>
       <source>Use licenses for selected %n devices</source>
       <translation>
         <numerusform>Użyj licencji dla wybranego %n urządzenia</numerusform>
-        <numerusform>Użyj licencji dla wybranych %n urządzeń</numerusform>
-        <numerusform>Użyj licencji dla wybranych %n urządzeń</numerusform>
-        <numerusform>Użyj licencji dla wybranych %n urządzeń</numerusform>
+        <numerusform>Użyj licencji dla wybranego %n urządzenia</numerusform>
+        <numerusform>Użyj licencji dla wybranego %n urządzenia</numerusform>
+        <numerusform>Użyj licencji dla wybranego %n urządzenia</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
       <translation>
         <numerusform>Użyj licencji dla wybranej %n kamery</numerusform>
-        <numerusform>Użyj licencji dla wybranych %n kamer</numerusform>
-        <numerusform>Użyj licencji dla wybranych %n kamer</numerusform>
-        <numerusform>Użyj licencji dla wybranych %n kamer</numerusform>
+        <numerusform>Użyj licencji dla wybranej %n kamery</numerusform>
+        <numerusform>Użyj licencji dla wybranej %n kamery</numerusform>
+        <numerusform>Użyj licencji dla wybranej %n kamery</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
       <translation>
         <numerusform>Użyj licencji dla wybranego %n modułu I/O</numerusform>
-        <numerusform>Użyj licencji dla wybranych %n modułów I/O</numerusform>
-        <numerusform>Użyj licencji dla wybranych %n modułów I/O</numerusform>
-        <numerusform>Użyj licencji dla wybranych %n modułów I/O</numerusform>
+        <numerusform>Użyj licencji dla wybranego %n modułu I/O</numerusform>
+        <numerusform>Użyj licencji dla wybranego %n modułu I/O</numerusform>
+        <numerusform>Użyj licencji dla wybranego %n modułu I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
       <translation>
         <numerusform>Użyj licencji, aby wyświetlać tę kamerę</numerusform>
-        <numerusform>Użyj licencji, aby wyświetlać te %n kamery</numerusform>
-        <numerusform>Użyj licencji, aby wyświetlać te %n kamer</numerusform>
-        <numerusform>Użyj licencji, aby wyświetlać te %n kamer</numerusform>
+        <numerusform>Użyj licencji, aby wyświetlać tę kamerę</numerusform>
+        <numerusform>Użyj licencji, aby wyświetlać tę kamerę</numerusform>
+        <numerusform>Użyj licencji, aby wyświetlać tę kamerę</numerusform>
       </translation>
     </message>
   </context>
@@ -4694,7 +4694,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Ustaw dla %n kamery</numerusform>
         <numerusform>Ustaw dla wszystkich %n kamer</numerusform>
         <numerusform>Ustaw dla wszystkich %n kamer</numerusform>
@@ -4894,9 +4894,9 @@ to %1</source>
       <source>%n more notifications</source>
       <translation>
         <numerusform>%n kolejne powiadomienie</numerusform>
-        <numerusform>%n kolejne powiadomienia</numerusform>
-        <numerusform>%n kolejnych powiadomień</numerusform>
-        <numerusform>%n kolejnych powiadomień</numerusform>
+        <numerusform>%n kolejne powiadomienie</numerusform>
+        <numerusform>%n kolejne powiadomienie</numerusform>
+        <numerusform>%n kolejne powiadomienie</numerusform>
       </translation>
     </message>
   </context>
@@ -5118,10 +5118,10 @@ to %1</source>
     <message numerus="yes">
       <source>about %n minute(s)</source>
       <translation>
-        <numerusform>około %n minutę temu</numerusform>
-        <numerusform>około %n minuty temu</numerusform>
         <numerusform>około %n minut temu</numerusform>
-        <numerusform>około %n minut</numerusform>
+        <numerusform>około %n minut temu</numerusform>
+        <numerusform>około %n minut temu</numerusform>
+        <numerusform>około %n minut temu</numerusform>
       </translation>
     </message>
     <message>
@@ -5187,7 +5187,7 @@ to %1</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>Niski</translation>
+      <translation>Niska</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -5195,7 +5195,7 @@ to %1</source>
     </message>
     <message>
       <source>High</source>
-      <translation>Wysoki</translation>
+      <translation>Wysoka</translation>
     </message>
     <message>
       <source>Highest</source>
@@ -5386,7 +5386,7 @@ to %1</source>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>Motion + Niska rozdzielczość</translation>
+      <translation>Ruch + Niska rozdzielczość</translation>
     </message>
   </context>
   <context>
@@ -5558,7 +5558,7 @@ to %1</source>
     </message>
     <message>
       <source>URL</source>
-      <translation>URL</translation>
+      <translation>Adres URL</translation>
     </message>
     <message>
       <source>Server</source>
@@ -5705,10 +5705,10 @@ to %1</source>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
+        <numerusform>%n Użytkowników</numerusform>
         <numerusform>%n użytkowników</numerusform>
-        <numerusform>%n Użytkowników</numerusform>
-        <numerusform>%n Użytkowników</numerusform>
         <numerusform>%n użytkownik</numerusform>
+        <numerusform>%n użytkowników</numerusform>
       </translation>
     </message>
   </context>
@@ -5729,7 +5729,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n na %1 z użytkowników ma nieprawidłowy adres e-mail</numerusform>
         <numerusform>%n na %1 z użytkowników ma nieprawidłowy adres e-mail</numerusform>
         <numerusform>%n na %1 z użytkowników ma nieprawidłowy adres e-mail</numerusform>
@@ -5742,7 +5742,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n na %1 z dodatkowych adresów e-mail jest nieprawidłowych</numerusform>
         <numerusform>%n na %1 z dodatkowych adresów e-mail jest nieprawidłowych</numerusform>
         <numerusform>%n na %1 z dodatkowych adresów e-mail jest nieprawidłowych</numerusform>
@@ -5991,8 +5991,8 @@ to %1</source>
       <source>Not enough free space at %n Servers:</source>
       <translation>
         <numerusform>Nie ma wystarczającej ilości wolnego miejsca na %n serwerze:</numerusform>
-        <numerusform>Nie ma wystarczającej ilości wolnego miejsca na %n serwerach:</numerusform>
-        <numerusform>Nie ma wystarczającej ilości wolnego miejsca na %n serwerach:</numerusform>
+        <numerusform>Nie ma wystarczającej ilości wolnego miejsca na %n serwerze:</numerusform>
+        <numerusform>Nie ma wystarczającej ilości wolnego miejsca na %n serwerze:</numerusform>
         <numerusform>Nie ma wystarczającej ilości wolnego miejsca na %n serwerze:</numerusform>
       </translation>
     </message>
@@ -6159,7 +6159,7 @@ to %1</source>
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation>Nie można cofnąć tej akcji.</translation>
+      <translation>Nie można cofnąć tej czynności.</translation>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
@@ -6284,7 +6284,7 @@ to %1</source>
     </message>
     <message>
       <source>Network error</source>
-      <translation>Błąd sieci</translation>
+      <translation>Błąd połączenia z siecią</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
@@ -6565,7 +6565,7 @@ to %1</source>
     </message>
     <message>
       <source>Inaccessible</source>
-      <translation>Niedostępny</translation>
+      <translation>Niedostępne</translation>
     </message>
     <message>
       <source>%1 (Checking...)</source>
@@ -6968,7 +6968,7 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h:mm ap</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
   </context>
   <context>
@@ -6987,7 +6987,7 @@ to %1</source>
     </message>
     <message>
       <source>Network error</source>
-      <translation>Błąd sieci</translation>
+      <translation>Błąd połączenia z siecią</translation>
     </message>
   </context>
   <context>
@@ -7023,46 +7023,46 @@ to %1</source>
     <message numerus="yes">
       <source>The problem is caused by %n servers:</source>
       <translation>
-        <numerusform>Problem spowodowany jest przez %n serwer:</numerusform>
         <numerusform>Problem spowodowany jest przez %n serwery:</numerusform>
-        <numerusform>Problem spowodowany jest przez %n serwerów:</numerusform>
+        <numerusform>Problem spowodowany jest przez %n serwery:</numerusform>
+        <numerusform>Problem spowodowany jest przez %n serwery:</numerusform>
         <numerusform>Problem spowodowany jest przez %n serwery:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Na %n serwerze nie ma wolnego miejsca:</numerusform>
-        <numerusform>Na %n serwerach nie ma wolnego miejsca:</numerusform>
-        <numerusform>Na %n serwerach nie ma wolnego miejsca:</numerusform>
-        <numerusform>Na %n serwerach nie ma wolnego miejsca:</numerusform>
+        <numerusform>Na %n serwerze nie ma wolnego miejsca:</numerusform>
+        <numerusform>Na %n serwerze nie ma wolnego miejsca:</numerusform>
+        <numerusform>Na %n serwerze nie ma wolnego miejsca:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
       <translation>
-        <numerusform>%n serwer nie odpowiada:</numerusform>
         <numerusform>%n serwery nie odpowiadają:</numerusform>
-        <numerusform>%n serwerów nie odpowiada:</numerusform>
+        <numerusform>%n serwery nie odpowiadają:</numerusform>
+        <numerusform>%n serwery nie odpowiadają:</numerusform>
         <numerusform>%n serwery nie odpowiadają:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
       <translation>
-        <numerusform>%n serwer jest odłączony od sieci:</numerusform>
         <numerusform>%n serwery są odłączone od sieci:</numerusform>
-        <numerusform>%n serwerów jest odłączonych od sieci:</numerusform>
+        <numerusform>%n serwery są odłączone od sieci:</numerusform>
+        <numerusform>%n serwery są odłączone od sieci:</numerusform>
         <numerusform>%n serwery są odłączone od sieci:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Uwierzytelnianie nie powiodło się dla %n serwera:</numerusform>
-        <numerusform>Uwierzytelnianie nie powiodło się dla %n serwerów:</numerusform>
-        <numerusform>Uwierzytelnianie nie powiodło się dla %n serwerów:</numerusform>
-        <numerusform>Uwierzytelnianie nie powiodło się dla %n serwerów:</numerusform>
+        <numerusform>Uwierzytelnianie nie powiodło się dla %n serwera:</numerusform>
+        <numerusform>Uwierzytelnianie nie powiodło się dla %n serwera:</numerusform>
+        <numerusform>Uwierzytelnianie nie powiodło się dla %n serwera:</numerusform>
       </translation>
     </message>
     <message>
@@ -7230,7 +7230,7 @@ to %1</source>
     </message>
     <message>
       <source>Permissions</source>
-      <translation>Uprawnienia</translation>
+      <translation>Prawa</translation>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
@@ -7257,7 +7257,7 @@ to %1</source>
     </message>
     <message>
       <source>Permissions</source>
-      <translation>Uprawnienia</translation>
+      <translation>Prawa</translation>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
@@ -7341,7 +7341,7 @@ to %1</source>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>Potwierdź hasło</translation>
+      <translation>Powtórz hasło</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -7380,7 +7380,7 @@ to %1</source>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Adres e-mail jest nieprawidłowy.</translation>
+      <translation>Nieprawidłowy adres e-mail.</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -7491,7 +7491,7 @@ to %1</source>
     </message>
     <message>
       <source>URL</source>
-      <translation>URL</translation>
+      <translation>Adres URL</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>
@@ -7517,7 +7517,7 @@ to %1</source>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation>Zakładka</translation>
+      <translation>Utwórz zakładkę</translation>
     </message>
     <message>
       <source>Bookmarks can only be added to an online server.</source>
@@ -7529,7 +7529,7 @@ to %1</source>
     </message>
     <message>
       <source>Server offline</source>
-      <translation>Serwer odłączony</translation>
+      <translation>Serwer offline</translation>
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
@@ -7955,7 +7955,7 @@ to %1</source>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
       <translation>
-        <numerusform>Możesz przesłać ten plik do innej instancji kamery przenośnej.</numerusform>
+        <numerusform>Możesz przesłać te pliki do innej instancji kamery przenośnej.</numerusform>
         <numerusform>Możesz przesłać te pliki do innej instancji kamery przenośnej.</numerusform>
         <numerusform>Możesz przesłać te pliki do innej instancji kamery przenośnej.</numerusform>
         <numerusform>Możesz przesłać te pliki do innej instancji kamery przenośnej.</numerusform>
@@ -8236,10 +8236,10 @@ to %1</source>
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation>
+        <numerusform>Usunąć element?</numerusform>
+        <numerusform>Usunąć %n elementy?</numerusform>
         <numerusform>Usunąć %n elementów?</numerusform>
-        <numerusform>Usunąć %n elementów?</numerusform>
-        <numerusform>Usunąć %n elementów?</numerusform>
-        <numerusform>Usunąć %n elementów?</numerusform>
+        <numerusform>Usunąć %n element?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8301,7 +8301,7 @@ to %1</source>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
       <translation>
-        <numerusform>Niektóre pliki wideo są nadal przesyłane do %n kamery przenośnej:</numerusform>
+        <numerusform>Niektóre pliki wideo są nadal przesyłane do %n kamer przenośnych:</numerusform>
         <numerusform>Niektóre pliki wideo są nadal przesyłane do %n kamer przenośnych:</numerusform>
         <numerusform>Niektóre pliki wideo są nadal przesyłane do %n kamer przenośnych:</numerusform>
         <numerusform>Niektóre pliki wideo są nadal przesyłane do %n kamer przenośnych:</numerusform>
@@ -8312,7 +8312,7 @@ to %1</source>
     <name>SubjectSelectionDialog::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n users</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n użytkownik</numerusform>
         <numerusform>%n użytkownicy</numerusform>
         <numerusform>%n użytkowników</numerusform>
@@ -8669,7 +8669,7 @@ to %1</source>
     <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation>Długi</translation>
+      <translation>Długie</translation>
     </message>
     <message>
       <source>Short</source>
@@ -9038,7 +9038,7 @@ to %1</source>
     <name>nx::client::desktop::ui::workbench::ActionHandler</name>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nie udało się przenieść %n urządzenia</numerusform>
         <numerusform>Nie udało się przenieść %n urządzeń</numerusform>
         <numerusform>Nie udało się przenieść %n urządzeń</numerusform>
@@ -9047,7 +9047,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nie udało się przenieść %n kamery</numerusform>
         <numerusform>Nie udało się przenieść %n kamer</numerusform>
         <numerusform>Nie udało się przenieść %n kamer</numerusform>
@@ -9056,7 +9056,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nie udało się przenieść %n modułu I/O</numerusform>
         <numerusform>Nie udało się przenieść %n modułów I/O</numerusform>
         <numerusform>Nie udało się przenieść %n modułów I/O</numerusform>
@@ -9069,7 +9069,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Serwer &quot;%1&quot; nie może uzyskać dostępu do %n urządzenia. Przenieść je mimo to?</numerusform>
         <numerusform>Serwer &quot;%1&quot; nie może uzyskać dostępu do %n urządzeń. Przenieść je mimo to?</numerusform>
         <numerusform>Serwer &quot;%1&quot; nie może uzyskać dostępu do %n urządzeń. Przenieść je mimo to?</numerusform>

@@ -6,7 +6,7 @@
     <message>
       <location filename="../src/ui/dialogs/about_dialog.ui"/>
       <source>About</source>
-      <translation>Đối với</translation>
+      <translation>Về</translation>
     </message>
     <message>
       <location/>
@@ -26,7 +26,7 @@
     <message>
       <location/>
       <source>Support</source>
-      <translation>Ủng hộ</translation>
+      <translation>Hỗ trợ</translation>
     </message>
     <message>
       <location/>
@@ -290,7 +290,7 @@
     <message>
       <location/>
       <source>Mbit/s</source>
-      <translation>Mbit / s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <location/>
@@ -417,7 +417,7 @@
     <message>
       <location/>
       <source>Description</source>
-      <translation>&amp;miêu tả</translation>
+      <translation>Miêu tả</translation>
     </message>
     <message>
       <location/>
@@ -516,7 +516,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation>Kiểm tra</translation>
+      <translation>Thử</translation>
     </message>
   </context>
   <context>
@@ -524,7 +524,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
       <source>Server is offline</source>
-      <translation>Máy chủ đang ẩn</translation>
+      <translation>máy chủ đang ẩn</translation>
     </message>
     <message>
       <location/>
@@ -670,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>khôi phục mặc định</translation>
+      <translation>Khôi phục mặc định</translation>
     </message>
     <message>
       <location/>
@@ -760,27 +760,27 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Mẫu cài đặt sẵn PTZ thường dùng:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Hệ thống</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Riêng</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Camera này hỗ trợ xoay tròn, nghiêng lên xuống</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Camera này hỗ trợ zoom</translation>
     </message>
   </context>
   <context>
@@ -920,7 +920,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
       <source>Streams Addresses</source>
-      <translation type="unfinished">Streams Addresses</translation>
+      <translation>Địa chỉ luồng</translation>
     </message>
   </context>
   <context>
@@ -936,7 +936,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation>Giữ trạng thái đăng nhập</translation>
+      <translation>Duy trì đăng nhập</translation>
     </message>
   </context>
   <context>
@@ -1039,7 +1039,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Event Rules...</translation>
+      <translation>Quy tắc sự kiện...</translation>
     </message>
   </context>
   <context>
@@ -1103,7 +1103,7 @@
     <message>
       <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>Trong bố cục</translation>
     </message>
   </context>
   <context>
@@ -1111,7 +1111,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>Xuất cài đặt</translation>
+      <translation>Lưu cầu hình cài đặt</translation>
     </message>
     <message>
       <location/>
@@ -1231,17 +1231,17 @@
     <message>
       <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>Trong bố cục</translation>
     </message>
     <message>
       <location/>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Máy chụp hình</translation>
     </message>
     <message>
       <location/>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Máy ảnh nguồn</translation>
     </message>
   </context>
   <context>
@@ -1294,7 +1294,7 @@
     <message>
       <location/>
       <source>None</source>
-      <translation>Không ai</translation>
+      <translation>Không</translation>
     </message>
     <message>
       <location/>
@@ -1442,17 +1442,17 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>Đã khoá</translation>
     </message>
     <message>
       <location/>
       <source>Width</source>
-      <translation type="unfinished">Width</translation>
+      <translation>Chiều rộng</translation>
     </message>
     <message>
       <location/>
       <source>Height</source>
-      <translation type="unfinished">Height</translation>
+      <translation>Chiều cao</translation>
     </message>
     <message>
       <location/>
@@ -1472,7 +1472,7 @@
     <message>
       <location/>
       <source>Minimal Size</source>
-      <translation type="unfinished">Minimal Size</translation>
+      <translation>Kích thước tối thiểu</translation>
     </message>
   </context>
   <context>
@@ -1480,17 +1480,17 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Chọn bố cục</translation>
     </message>
     <message>
       <location/>
       <source>Shared layouts</source>
-      <translation type="unfinished">Shared layouts</translation>
+      <translation>Bố cục được chia sẻ</translation>
     </message>
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
+      <translation>Chọn một số người dùng trong &quot;Hiển thị đến&quot; dòng để hiển thị bố cục trong danh sách này</translation>
     </message>
   </context>
   <context>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Thời gian chờ tìm kiếm</translation>
     </message>
   </context>
   <context>
@@ -1579,7 +1579,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
       <source>Edit Streams...</source>
-      <translation type="unfinished">Edit Streams...</translation>
+      <translation>Chỉnh sửa luồng...</translation>
     </message>
   </context>
   <context>
@@ -1696,12 +1696,12 @@
     <message>
       <location/>
       <source>License Key</source>
-      <translation>Mã bản quyền</translation>
+      <translation>Key bản quyền</translation>
     </message>
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation>Khóa bản quyền không hợp lệ</translation>
+      <translation>Key bản quyền Không hợp lệ</translation>
     </message>
     <message>
       <location/>
@@ -1760,7 +1760,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation>Cổng</translation>
+      <translation>Port</translation>
     </message>
     <message>
       <location/>
@@ -1843,7 +1843,7 @@
     <message>
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation>Địa chỉ IP cho các máy ảnh và máy chủ, nhóm người sử dụng, vv.</translation>
+      <translation>Địa chỉ IP cho các camera và máy chủ, nhóm người sử dụng, vv.</translation>
     </message>
   </context>
   <context>
@@ -2045,7 +2045,7 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation>Đính kèm với bức tường video...</translation>
+      <translation>Gắn vào tường video...</translation>
     </message>
     <message>
       <location/>
@@ -2134,7 +2134,7 @@
     <message>
       <location filename="../src/ui/dialogs/merge_systems_dialog.ui"/>
       <source>Merge Systems...</source>
-      <translation>Kết hợp hệ thống...</translation>
+      <translation>Hợp nhất các hệ thống...</translation>
     </message>
     <message>
       <location/>
@@ -2335,7 +2335,7 @@
     <message>
       <location/>
       <source>Enable timeline on video wall</source>
-      <translation type="unfinished">Enable timeline on video wall</translation>
+      <translation>Kích hoạt dòng thời gian trên tường video</translation>
     </message>
   </context>
   <context>
@@ -2564,7 +2564,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation>Cổng</translation>
+      <translation>Port</translation>
     </message>
   </context>
   <context>
@@ -2671,7 +2671,7 @@
     <message>
       <location/>
       <source>Expert</source>
-      <translation>Chế độ Expert</translation>
+      <translation>Xuất khẩu</translation>
     </message>
     <message>
       <location/>
@@ -2716,7 +2716,7 @@
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>Nhà cung cấp</translation>
+      <translation>Nhà cung cấp:</translation>
     </message>
     <message>
       <location/>
@@ -3016,12 +3016,12 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
+      <translation>Hiển thị hình mờ với tên người dùng qua video</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
+      <translation>Xem trước hình mờ</translation>
     </message>
   </context>
   <context>
@@ -3049,7 +3049,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>Kích thước hình ảnh</translation>
+      <translation>Chiều rộng diện tích</translation>
     </message>
   </context>
   <context>
@@ -3204,7 +3204,7 @@
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>This web page is for C2P integration</source>
-      <translation type="unfinished">This web page is for C2P integration</translation>
+      <translation>Trang web này là để tích hợp C2P</translation>
     </message>
   </context>
   <context>
@@ -3240,7 +3240,7 @@
     <message>
       <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation type="unfinished">Watermark preview</translation>
+      <translation>Xem trước hình mờ</translation>
     </message>
     <message>
       <location/>
@@ -3250,7 +3250,7 @@
     <message>
       <location/>
       <source>Frequency</source>
-      <translation type="unfinished">Frequency</translation>
+      <translation>Tần số</translation>
     </message>
   </context>
 </TS>

@@ -503,7 +503,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation type="unfinished">&amp;Save</translation>
+      <translation>&amp;Save</translation>
     </message>
     <message>
       <source>All Files (*)</source>
@@ -728,7 +728,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation type="unfinished">&amp;Save</translation>
+      <translation>&amp;Save</translation>
     </message>
     <message>
       <source>&amp;Cancel</source>
@@ -897,7 +897,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Save</source>
-      <translation type="unfinished">Save</translation>
+      <translation>Save</translation>
     </message>
     <message>
       <source>Save All</source>

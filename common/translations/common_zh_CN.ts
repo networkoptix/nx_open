@@ -706,7 +706,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation>预置位</translation>
+      <translation>预设</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -851,7 +851,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>分</translation>
+      <translation>月</translation>
     </message>
     <message>
       <source>y</source>
@@ -876,7 +876,7 @@
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation>时</translation>
+      <translation>小时</translation>
     </message>
     <message>
       <source>days</source>
@@ -923,7 +923,7 @@
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>时</numerusform>
+        <numerusform>小时</numerusform>
       </translation>
     </message>
     <message numerus="yes">

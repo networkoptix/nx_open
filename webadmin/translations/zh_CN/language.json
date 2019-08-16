@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "启用更新通知",
         "upnpPortMappingEnabled": "启用UPNP端口映射",
         "useTextEmailFormat": "发送纯文本电子邮件",
-        "useWindowsEmailLineFeed": "在电子邮件中使用Windows换行字元"
+        "useWindowsEmailLineFeed": "在电子邮件中使用Windows换行字元",
+        "maxEventLogRecords": "要保留最多笔在资料库中的事件日志记录。实际未删除记录的数量可能比指定值高出20％。"
     },
     "info": {
         "tabs": {
@@ -156,7 +157,7 @@
     "restartDialog": {
         "serverStarting": "启动服务器",
         "serverRestarting": "服务器正在重新启动 ！",
-        "serverOffline": "服务器已离线"
+        "serverOffline": "服务器离线"
     },
     "fileUpload": {
         "started": "成功更新。它将需要几分钟时间",
@@ -189,7 +190,7 @@
             "expand all servers": "展开所有服务器",
             "stop listening": "停止监听",
             "expand server": "expand server + [server name]",
-            "view": "查看+ [相机名称]"
+            "view": "view + [camera name]"
         },
         "systemOffline": "系统处于离线状态",
         "cameraLinks": {

@@ -27,11 +27,11 @@
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Save password</source>
@@ -61,7 +61,7 @@
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation>INCOMPATIBELE</translation>
+      <translation>NIET COMPATIBEL</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -74,6 +74,14 @@
     <message>
       <source>New Server</source>
       <translation>Nieuwe server</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Aanpassen</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Verbergen</translation>
     </message>
   </context>
   <context>

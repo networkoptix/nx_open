@@ -41,8 +41,8 @@
             <span class="text">ya da</span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">Mevcut sistemi ekleyin</button><br>
-        <small>(if {{Config.productName}} zaten ayarlanmış)</small><br>
+        <button class="btn btn-default" ng-click="skip()">Add to Existing System</button><br>
+        <small>(if {{Config.productName}} has been already setup)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -171,7 +171,7 @@
     <form class="master-controls" name="forms.cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
-                   type="email" placeholder="E-posta" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
+                   type="email" placeholder="Eposta" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"

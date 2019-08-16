@@ -5,19 +5,19 @@
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
-      <translation type="unfinished">Successful.</translation>
+      <translation>Vellykket.</translation>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation type="unfinished">Invalid login or password.</translation>
+      <translation>Ugyldig brukernavn eller passord.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
-      <translation type="unfinished">Requested operation is not allowed with provided credentials.</translation>
+      <translation>Ønsket operasjon er ikke tillatt med oppgitte legitimasjon.</translation>
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
-      <translation type="unfinished">This account is not activated. Please check your email.</translation>
+      <translation>Denne kontoen er ikke aktivert. Vennligst sjekk din e-post.</translation>
     </message>
     <message>
       <source>This account is blocked.</source>
@@ -41,7 +41,7 @@
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
-      <translation type="unfinished">Credentials are no longer valid.</translation>
+      <translation>Legitimasjonen er ikke lenger gyldige.</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Ukjent feil.</translation>
     </message>
     <message>
       <source>Unexpected network error. Please check your Internet connection and try again.</source>
@@ -57,7 +57,7 @@
     </message>
     <message>
       <source>Invalid login.</source>
-      <translation type="unfinished">Invalid login.</translation>
+      <translation>Ugyldig innlogging.</translation>
     </message>
     <message>
       <source>Requested object is not found.</source>
@@ -70,7 +70,7 @@
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Internal %1 error. Please contact support team.</translation>
+      <translation>Intern %1 feil. Ta kontakt med brukerstøtten.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
@@ -88,23 +88,23 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Owner: %1</translation>
+      <translation>Eier: %1</translation>
     </message>
     <message>
       <source>Your System</source>
-      <translation type="unfinished">Your System</translation>
+      <translation>Ditt system</translation>
     </message>
   </context>
   <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>System</translation>
     </message>
     <message>
       <source>System (%1)</source>
       <comment>%1 is ip and port of system</comment>
-      <translation type="unfinished">System (%1)</translation>
+      <translation>System (%1)</translation>
     </message>
   </context>
   <context>
@@ -112,11 +112,11 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Owner: %1</translation>
+      <translation>Eier: %1</translation>
     </message>
     <message>
       <source>Your System</source>
-      <translation type="unfinished">Your System</translation>
+      <translation>Ditt system</translation>
     </message>
   </context>
 </TS>

@@ -16,11 +16,11 @@
     </message>
     <message>
       <source>Hide %1</source>
-      <translation>%1 を隠す</translation>
+      <translation>%1 を非表示</translation>
     </message>
     <message>
       <source>Hide Others</source>
-      <translation>ほかを隠す</translation>
+      <translation>他を非表示</translation>
     </message>
     <message>
       <source>Show All</source>
@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Preferences...</source>
-      <translation>設定...</translation>
+      <translation>環境設定...</translation>
     </message>
     <message>
       <source>Quit %1</source>
@@ -78,7 +78,7 @@
     </message>
     <message>
       <source>Toggle</source>
-      <translation>トグル</translation>
+      <translation>切り替え</translation>
     </message>
     <message>
       <source>Scroll Left</source>
@@ -118,15 +118,15 @@
     </message>
     <message>
       <source>Shows the menu</source>
-      <translation>メニューを表示する</translation>
+      <translation>メニューを表示</translation>
     </message>
     <message>
       <source>Sets the focus</source>
-      <translation>フォーカスをセットする</translation>
+      <translation>フォーカスをセット</translation>
     </message>
     <message>
       <source>Toggles the state</source>
-      <translation>状態を反転させる</translation>
+      <translation>状態を切り替える。</translation>
     </message>
     <message>
       <source>Scrolls to the left</source>
@@ -307,7 +307,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Open the combo box selection popup</source>
-      <translation>コンボボックスの選択用ポップアップを開く</translation>
+      <translation>コンボボックス選択ポップアップを開く</translation>
     </message>
   </context>
   <context>
@@ -408,7 +408,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Failure to write block</source>
-      <translation>書き込みに失敗しました</translation>
+      <translation>ブロックの書き込みに失敗</translation>
     </message>
     <message>
       <source>Cannot create %1 for output</source>
@@ -570,7 +570,7 @@ Please verify the correct file name was given.</source>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation>&apos;%1&apos; は書き込み禁止です
+      <translation>&apos;%1&apos; は書き込み禁止です。
 削除しますか？</translation>
     </message>
     <message>
@@ -628,7 +628,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>未知の値</translation>
+      <translation>不明</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -636,7 +636,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>List of places and bookmarks</source>
-      <translation>アドレスやブックマークのリスト</translation>
+      <translation>アドレスとブックマークのリスト</translation>
     </message>
     <message>
       <source>Files</source>
@@ -683,7 +683,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation>&lt;b&gt; &quot;%1&quot;という名前は使用できません.&lt;/b&gt;&lt;p&gt;文字の数を減らしたり、句読記号を付けずに別の名前を使用してください</translation>
+      <translation>&lt;b&gt; &quot;%1&quot;という名前は使用できません。 &lt;/b&gt;&lt;p&gt;文字数を減らすか、句読記号を付けずに別の名前を使用してください。</translation>
     </message>
     <message>
       <source>Name</source>
@@ -775,7 +775,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>file to open is a directory</source>
-      <translation>ディレクトリを開こうとしました</translation>
+      <translation>開くファイルはディレクトリです</translation>
     </message>
   </context>
   <context>
@@ -790,7 +790,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation>サポートされていない画像形式です</translation>
+      <translation>サポートされていないイメージ形式です</translation>
     </message>
     <message>
       <source>Unable to read image data</source>
@@ -809,7 +809,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Device is not set</source>
-      <translation>デバイスがセットされていません</translation>
+      <translation>デバイスが設定されていません</translation>
     </message>
     <message>
       <source>Device not writable</source>
@@ -817,7 +817,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Unsupported image format</source>
-      <translation>サポートされていない画像形式です</translation>
+      <translation>サポートされていないイメージ形式です</translation>
     </message>
   </context>
   <context>
@@ -878,7 +878,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Hide Details...</source>
-      <translation>詳細を隠す...</translation>
+      <translation>詳細の非表示</translation>
     </message>
     <message>
       <source>OK</source>
@@ -986,7 +986,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation>ファイルではなくディレクトリを参照しています</translation>
+      <translation>ファイル名はディレクトリを参照します</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>

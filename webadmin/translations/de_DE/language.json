@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "Update-Benachrichtigungen aktiviert",
         "upnpPortMappingEnabled": "UPNP-Port-Mapping aktiviert",
         "useTextEmailFormat": "Nur-Text-Emails senden",
-        "useWindowsEmailLineFeed": "Windows-Zeilenumbruch in Emails verwenden"
+        "useWindowsEmailLineFeed": "Windows-Zeilenumbruch in Emails verwenden",
+        "maxEventLogRecords": "Maximale Ereignisprotokollaufzeichnungen, die in der Datenbank gespeichert werden sollen. Die tatsächliche Anzahl der nicht gelöschten Datensätze kann bis zu 20% höher sein als der angegebene Wert."
     },
     "info": {
         "tabs": {
@@ -178,18 +179,18 @@
     },
     "common": {
         "voiceCommands": {
-            "search": "finden + [text für suchleiste]",
-            "pause": "pause",
-            "help": "hilfe | befehle anzeigen",
-            "collapse all servers": "alle server zusammenklappen",
-            "collapse server": "server zusammenklappen + [Servername]",
-            "play": "abspielen",
-            "clear search": "suche zurücksetzen",
-            "live": "live gehen | live anzeigen",
-            "expand all servers": "alle Server erweitern",
-            "stop listening": "abhören stoppen",
-            "expand server": "server erweitern + [Servername]",
-            "view": "ansicht + [kameraname]"
+            "search": "Finden + [Text für Suchleiste]",
+            "pause": "Pause",
+            "help": "Hilfe | Befehle anzeigen",
+            "collapse all servers": "Alle Server zusammenklappen",
+            "collapse server": "Server zusammenklappen + [Servername]",
+            "play": "Abspielen",
+            "clear search": "Suche zurücksetzen",
+            "live": "Live gehen | Live anzeigen",
+            "expand all servers": "Alle Server erweitern",
+            "stop listening": "Abhören stoppen",
+            "expand server": "Server erweitern + [Servername]",
+            "view": "Ansicht + [Kameraname]"
         },
         "systemOffline": "System offline",
         "cameraLinks": {

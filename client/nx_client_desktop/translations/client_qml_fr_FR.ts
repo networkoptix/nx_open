@@ -43,7 +43,7 @@
     </message>
     <message>
       <source>Connect</source>
-      <translation>Connexion</translation>
+      <translation>Connecter</translation>
     </message>
   </context>
   <context>
@@ -74,6 +74,14 @@
     <message>
       <source>New Server</source>
       <translation>Nouveau serveur</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Modifier</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Masquer</translation>
     </message>
   </context>
   <context>

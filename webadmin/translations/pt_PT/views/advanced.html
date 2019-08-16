@@ -135,7 +135,7 @@
             <label class="col-sm-4">Transaction log level</label>
             <div class="col-sm-8">
                 <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">None: Log disabled.</option>
+                    <option value="NONE">Nenhum: log desactivado.</option>
                     <option value="ALWAYS">Always: Log errors, warnings and most important messages.</option>
                     <option value="ERROR">Error: Log errors only.</option>
                     <option value="WARNING">Warning: Log warnings and errors.</option>
@@ -153,7 +153,7 @@
 
     <h1>Advanced system settings</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b> Aviso! </b> Quaisquer alterações nesta página podem fazer com que o servidor funcione incorrectamente.
     </div>
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
@@ -199,7 +199,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Aviso!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Warning!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Restart current server</button>
         </div>

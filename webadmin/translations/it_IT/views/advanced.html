@@ -110,7 +110,7 @@
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Correggere tutte le impostazioni evidenziate per salvarlo</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Salva</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Salvare</button>
         <button class="btn btn-warning" ng-click="cancel()">Annulla</button>
     </form>
 
@@ -147,7 +147,7 @@
         </div>
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Salva</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Salvare</button>
         </div>
     </form>
 
@@ -193,13 +193,13 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Salva</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Salvare</button>
         </div>
 
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Attenzione!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Warning!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Riavvia il server corrente</button>
         </div>

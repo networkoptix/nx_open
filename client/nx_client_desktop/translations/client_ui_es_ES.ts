@@ -47,7 +47,7 @@
     <message>
       <location filename="../src/ui/dialogs/adjust_video_dialog.ui"/>
       <source>Image Enhancement</source>
-      <translation>Mejora la imagen</translation>
+      <translation>Mejora de imagen</translation>
     </message>
     <message>
       <location/>
@@ -212,7 +212,7 @@
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>Ver en vivo</translation>
+      <translation>Vista en vivo</translation>
     </message>
     <message>
       <location/>
@@ -305,7 +305,7 @@
     <message>
       <location/>
       <source>Start</source>
-      <translation>Iniciar</translation>
+      <translation>Comenzar</translation>
     </message>
   </context>
   <context>
@@ -417,7 +417,7 @@
     <message>
       <location/>
       <source>Description</source>
-      <translation>Descripción</translation>
+      <translation>&amp;Descripción</translation>
     </message>
     <message>
       <location/>
@@ -427,7 +427,7 @@
     <message>
       <location/>
       <source>Tags</source>
-      <translation>Etiquetas</translation>
+      <translation>Etiqueta</translation>
     </message>
     <message>
       <location/>
@@ -539,7 +539,7 @@
     <message>
       <location/>
       <source>Address</source>
-      <translation>Dirección</translation>
+      <translation> Dirección </translation>
     </message>
     <message>
       <location/>
@@ -549,7 +549,7 @@
     <message>
       <location/>
       <source>Stop</source>
-      <translation>Parar</translation>
+      <translation>Detener</translation>
     </message>
     <message>
       <location/>
@@ -609,7 +609,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Iniciar Sesión</translation>
+      <translation>Nombre del usuario</translation>
     </message>
     <message>
       <location/>
@@ -670,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Restaurar valores predeterminados</translation>
+      <translation>Restaurar los valores predeterminados</translation>
     </message>
     <message>
       <location/>
@@ -690,7 +690,7 @@
     <message>
       <location/>
       <source>Camera Settings</source>
-      <translation>Configuración de la cámara</translation>
+      <translation>Ajustes de la cámara</translation>
     </message>
     <message>
       <location/>
@@ -715,7 +715,7 @@
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation>Flujo secundario</translation>
+      <translation>Corriente secundaria</translation>
     </message>
     <message>
       <location/>
@@ -760,27 +760,27 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Tipo de preset de PTZ preferido:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Sistema</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Nativo</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Esta cámara soporta movimiento vertical y horizontal</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Esta cámara soporta zoom</translation>
     </message>
   </context>
   <context>
@@ -872,7 +872,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Grabación</translation>
+      <translation>Grabando</translation>
     </message>
     <message>
       <location/>
@@ -936,7 +936,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation>Mantener la sesión activa</translation>
+      <translation>Mantener sesión activa</translation>
     </message>
   </context>
   <context>
@@ -1019,7 +1019,7 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>Registro de Eventos</translation>
+      <translation>Registro de eventos</translation>
     </message>
     <message>
       <location/>
@@ -1057,7 +1057,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Iniciar Sesión</translation>
+      <translation>Nombre del usuario</translation>
     </message>
     <message>
       <location/>
@@ -1111,7 +1111,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>Configuración de exportación</translation>
+      <translation>Exportar Ajustes</translation>
     </message>
     <message>
       <location/>
@@ -1124,7 +1124,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>Exportar Configuración</translation>
+      <translation>Exportar Ajustes</translation>
     </message>
     <message>
       <location/>
@@ -1157,7 +1157,7 @@
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation>Exportar Configuración</translation>
+      <translation>Exportar Ajustes</translation>
     </message>
     <message>
       <location/>
@@ -1274,7 +1274,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Quitar</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <location/>
@@ -1508,7 +1508,7 @@
     <message>
       <location/>
       <source>Testing...</source>
-      <translation>Probando...</translation>
+      <translation>A prueba...</translation>
     </message>
     <message>
       <location/>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Tiempo de espera de búsqueda (s)</translation>
     </message>
   </context>
   <context>
@@ -1625,7 +1625,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Quitar</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <location/>
@@ -1765,7 +1765,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Usuario</translation>
+      <translation>Nombre del usuario</translation>
     </message>
     <message>
       <location/>
@@ -1884,7 +1884,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Grabación</translation>
+      <translation>Grabando</translation>
     </message>
     <message>
       <location/>
@@ -1915,7 +1915,7 @@
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
       <source>Manage...</source>
-      <translation>Dirigir...</translation>
+      <translation>Gestionar...</translation>
     </message>
     <message>
       <location/>
@@ -1989,7 +1989,7 @@
     <message>
       <location/>
       <source>Start Tour</source>
-      <translation>Iniciar Gira</translation>
+      <translation>Empezar Gira</translation>
     </message>
     <message>
       <location/>
@@ -2050,7 +2050,7 @@
     <message>
       <location/>
       <source>Preview</source>
-      <translation>Prevista</translation>
+      <translation>Vista Previa</translation>
     </message>
   </context>
   <context>
@@ -2113,7 +2113,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
       <source>Log in</source>
-      <translation>Iniciar sesión</translation>
+      <translation>Inicia sesión</translation>
     </message>
     <message>
       <location/>
@@ -2172,7 +2172,7 @@
     <message>
       <location/>
       <source>Play</source>
-      <translation>Reproducción</translation>
+      <translation>Reproducir</translation>
     </message>
     <message>
       <location/>
@@ -2641,7 +2641,7 @@
     <message>
       <location/>
       <source>Address</source>
-      <translation>Dirección</translation>
+      <translation> Dirección </translation>
     </message>
     <message>
       <location/>
@@ -2656,7 +2656,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Grabación</translation>
+      <translation>Grabando</translation>
     </message>
     <message>
       <location/>
@@ -2691,7 +2691,7 @@
     <message>
       <location/>
       <source>Fisheye</source>
-      <translation>Ojo de pez</translation>
+      <translation>Fisheye</translation>
     </message>
     <message>
       <location/>
@@ -2716,7 +2716,7 @@
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>Vendedor</translation>
+      <translation>Fabricante</translation>
     </message>
     <message>
       <location/>
@@ -2726,7 +2726,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Iniciar Sesión</translation>
+      <translation>Nombre del usuario</translation>
     </message>
     <message>
       <location/>
@@ -2960,7 +2960,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Iniciar Sesión:</translation>
+      <translation>Usuario:</translation>
     </message>
     <message>
       <location/>
@@ -3075,7 +3075,7 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>Tamaño de la fuente</translation>
+      <translation>Tamaño de la letra</translation>
     </message>
     <message>
       <location/>

@@ -41,8 +41,8 @@
             <span class="text">或</span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">加入到現有的系統</button><br>
-        <small>(如果 {{Config.productName}} 已經被安裝)</small><br>
+        <button class="btn btn-default" ng-click="skip()">Add to Existing System</button><br>
+        <small>(if {{Config.productName}} has been already setup)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -60,7 +60,7 @@
 
         <div class="form-group has-error" ng-if="forms.systemNameForm.systemName.$touched && forms.systemNameForm.systemName.$error.required">
             <div class="help-block">
-                系統名稱為必填欄位
+                必須有系統名稱
             </div>
         </div>
 
@@ -271,7 +271,7 @@
              ng-if= "forms.localForm.$valid &&
                      (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
-                密碼不匹配
+                兩次密碼輸入不一致
             </div>
         </div>
     </form>

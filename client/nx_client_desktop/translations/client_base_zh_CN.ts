@@ -894,7 +894,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>汇出书签</translation>
     </message>
   </context>
   <context>
@@ -952,7 +952,7 @@ to view more bookmarks</source>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation>出现未知的错误。</translation>
+      <translation>未知的错误.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -1100,7 +1100,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Top</source>
-      <translation>上</translation>
+      <translation>顶部</translation>
     </message>
     <message>
       <source>Right Edge</source>
@@ -1108,7 +1108,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>下</translation>
+      <translation>底部</translation>
     </message>
     <message>
       <source>Page Left</source>
@@ -1128,7 +1128,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>左滚动</translation>
+      <translation>向左滚动</translation>
     </message>
     <message>
       <source>Scroll Up</source>
@@ -1136,7 +1136,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>右滚动</translation>
+      <translation>向右滚动</translation>
     </message>
     <message>
       <source>Scroll Down</source>
@@ -1506,7 +1506,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>选择所有</translation>
+      <translation>选择全部</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -1595,7 +1595,7 @@ to view more bookmarks</source>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation>未知错误</translation>
+      <translation>未知的</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -1701,7 +1701,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>描述</translation>
+      <translation>&amp;描述</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -2028,7 +2028,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>&amp;删除</translation>
+      <translation>删除(&amp;D)</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
@@ -2251,7 +2251,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Web</source>
-      <translation type="unfinished">Web</translation>
+      <translation>网络</translation>
     </message>
     <message>
       <source>No settings</source>
@@ -2286,7 +2286,7 @@ to view more bookmarks</source>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation>好</translation>
+      <translation>确定</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
@@ -2414,7 +2414,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>选择所有</translation>
+      <translation>选择全部</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
@@ -2596,7 +2596,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>On</source>
-      <translation>开</translation>
+      <translation>启用</translation>
     </message>
     <message>
       <source>Recording Schedule</source>
@@ -3241,11 +3241,11 @@ to %1</source>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
-      <translation>不支持输入的设备 %1 样本格式。</translation>
+      <translation>不支持此输入设备 %1 示例格式。</translation>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation>无法找到音频编码器&quot;%1&quot;.</translation>
+      <translation>无法找到音频编码器 &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
@@ -3260,11 +3260,11 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>无法找使用视频编码器.</translation>
+      <translation>不能初始化视频编码器。</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>无法找使用视频编码器.</translation>
+      <translation>无法初始化音频编码器.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
@@ -3276,7 +3276,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation>无法找到音频编码器&quot;%1&quot;.</translation>
+      <translation>无法找到音频编码器 &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
@@ -3377,7 +3377,7 @@ to %1</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>选择所有</translation>
+      <translation>选择全部</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3436,7 +3436,7 @@ to %1</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>描述</translation>
+      <translation>&amp;描述</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3733,7 +3733,7 @@ to %1</source>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation>未知错误</translation>
+      <translation>未知的</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -3952,7 +3952,7 @@ to %1</source>
     </message>
     <message>
       <source>Status</source>
-      <translation>授权状态</translation>
+      <translation>状态</translation>
     </message>
     <message>
       <source>Server</source>
@@ -3968,7 +3968,7 @@ to %1</source>
     </message>
     <message>
       <source>OK</source>
-      <translation>确认</translation>
+      <translation>确定</translation>
     </message>
     <message>
       <source>Error</source>
@@ -4163,7 +4163,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>移除</translation>
+      <translation>删除</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4634,11 +4634,11 @@ to %1</source>
     </message>
     <message>
       <source>Enable Secondary Stream</source>
-      <translation>启用副码流</translation>
+      <translation>启用次码流</translation>
     </message>
     <message>
       <source>multiple values</source>
-      <translation>多个值</translation>
+      <translation>多重取值</translation>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
@@ -4661,11 +4661,11 @@ to %1</source>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation>后一帧</translation>
+      <translation>下一帧</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation>开始</translation>
+      <translation>到开始</translation>
     </message>
     <message>
       <source>Next Chunk</source>
@@ -4703,7 +4703,7 @@ to %1</source>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation>穿戴式相机</translation>
+      <translation>穿戴式相机...</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
@@ -4880,7 +4880,7 @@ to %1</source>
     <name>QnProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>取消</translation>
+      <translation>撤消</translation>
     </message>
   </context>
   <context>
@@ -4906,7 +4906,7 @@ to %1</source>
     </message>
     <message>
       <source>Home</source>
-      <translation>初始位置</translation>
+      <translation>首頁</translation>
     </message>
     <message>
       <source>Details</source>
@@ -5308,7 +5308,7 @@ to %1</source>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>所有的摄像机与资源</translation>
+      <translation>摄像机与资源</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
@@ -5316,7 +5316,7 @@ to %1</source>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>共享的布局</translation>
+      <translation>共享视窗</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -5361,7 +5361,7 @@ to %1</source>
     </message>
     <message>
       <source>URL</source>
-      <translation>URL</translation>
+      <translation>URL地址</translation>
     </message>
     <message>
       <source>Server</source>
@@ -5399,7 +5399,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>汇出书签</translation>
     </message>
   </context>
   <context>
@@ -5471,7 +5471,7 @@ to %1</source>
     <name>QnSelectServersButton</name>
     <message>
       <source>Any Server</source>
-      <translation>任何服务器</translation>
+      <translation>所有服务器</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -5496,7 +5496,7 @@ to %1</source>
     </message>
     <message>
       <source>All Users</source>
-      <translation>所有用户</translation>
+      <translation>All 用户</translation>
     </message>
     <message>
       <source>Select Users...</source>
@@ -5568,7 +5568,7 @@ to %1</source>
     <name>QnServerSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>通用</translation>
     </message>
     <message>
       <source>Storage Analytics</source>
@@ -5904,7 +5904,7 @@ to %1</source>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>I/O 模板设置</translation>
+      <translation>I/O模块设置</translation>
     </message>
     <message>
       <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
@@ -6069,7 +6069,7 @@ to %1</source>
     </message>
     <message>
       <source>Network error</source>
-      <translation>网络链接错误</translation>
+      <translation>网络错误</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
@@ -6189,11 +6189,11 @@ to %1</source>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>将选择导出到文件...</translation>
+      <translation>导出选择到文件...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>将选中内容复制到剪贴板</translation>
+      <translation>复制选择到剪贴板</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -6328,7 +6328,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation>在USB存储器上启用了录制</translation>
+      <translation>已启用录像于USB储存装置上</translation>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
@@ -6343,11 +6343,11 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>移除</translation>
+      <translation>删除</translation>
     </message>
     <message>
       <source>Inaccessible</source>
-      <translation>达不到</translation>
+      <translation>不可访问</translation>
     </message>
     <message>
       <source>%1 (Checking...)</source>
@@ -6440,7 +6440,7 @@ to %1</source>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>通用</translation>
     </message>
     <message>
       <source>Licenses</source>
@@ -6881,7 +6881,7 @@ to %1</source>
     <name>QnUserListModelPrivate</name>
     <message>
       <source>Owner</source>
-      <translation>拥有者</translation>
+      <translation>所有者</translation>
     </message>
     <message>
       <source>Administrator</source>
@@ -7252,7 +7252,7 @@ to %1</source>
     </message>
     <message>
       <source>URL</source>
-      <translation>URL</translation>
+      <translation>URL地址</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>
@@ -7278,7 +7278,7 @@ to %1</source>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation>书签</translation>
+      <translation>标记</translation>
     </message>
     <message>
       <source>Bookmarks can only be added to an online server.</source>
@@ -7350,7 +7350,7 @@ to %1</source>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation>系统将于短期内合并</translation>
+      <translation>系统将很快合并</translation>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
@@ -7358,7 +7358,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to merge Systems</source>
-      <translation>无法合并系统</translation>
+      <translation>无法联网系统</translation>
     </message>
     <message>
       <source>Failed to update Server</source>
@@ -7555,7 +7555,7 @@ to %1</source>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>新电视墙...</translation>
+      <translation>新建电视墙...</translation>
     </message>
     <message>
       <source>New Matrix %1</source>
@@ -8256,7 +8256,7 @@ to %1</source>
     </message>
     <message>
       <source>Camera ID</source>
-      <translation>摄像机 ID</translation>
+      <translation>摄像头 ID</translation>
     </message>
     <message>
       <source>Audio Stream</source>
@@ -8405,7 +8405,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>数个书签只能以布局模式汇出。</translation>
     </message>
   </context>
   <context>
@@ -8519,7 +8519,7 @@ to %1</source>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>如果该栏位为空白，事件将维持在触发状态</translation>
+      <translation>如果该栏位为空白, 事件将维持在触发状态。</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
@@ -8584,7 +8584,7 @@ to %1</source>
     </message>
     <message>
       <source>All Users</source>
-      <translation>所有用户</translation>
+      <translation>All 用户</translation>
     </message>
   </context>
   <context>

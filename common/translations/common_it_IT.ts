@@ -104,7 +104,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>Ok</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -658,7 +658,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>Moduli I / O</translation>
+      <translation>Modulo I / O</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -716,7 +716,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation>Predefinito</translation>
+      <translation>Preset</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -730,27 +730,27 @@
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Lo</translation>
+      <translation>Basso</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>Me</translation>
+      <translation>Medio</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Salve</translation>
+      <translation>Alto</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Bst</translation>
+      <translation>Migliore</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Ps</translation>
+      <translation>Preset</translation>
     </message>
   </context>
   <context>
@@ -803,7 +803,7 @@
     <name>QnTCPConnectionProcessor</name>
     <message>
       <source>OK</source>
-      <translation>Ok</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Not Found</source>

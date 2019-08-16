@@ -893,7 +893,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Exporteer bladwijzer...</translation>
     </message>
   </context>
   <context>
@@ -1616,7 +1616,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>User updated</source>
@@ -1677,7 +1677,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n action(s)</source>
       <translation>
-        <numerusform>%n actie</numerusform>
+        <numerusform>%n acties</numerusform>
         <numerusform>%n acties</numerusform>
       </translation>
     </message>
@@ -1872,7 +1872,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
@@ -1935,7 +1935,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n Server(s)</source>
       <translation>
-        <numerusform>%n server</numerusform>
+        <numerusform>%n servers</numerusform>
         <numerusform>%n servers</numerusform>
       </translation>
     </message>
@@ -2048,7 +2048,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>&amp;Verwijderen</translation>
+      <translation>&amp;Verwijder</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
@@ -2394,7 +2394,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
-        <numerusform>Deze ID wordt al gebruikt op de volgende %n camera: %1</numerusform>
+        <numerusform>Deze ID wordt al gebruikt op de volgende %n camera's: %1</numerusform>
         <numerusform>Deze ID wordt al gebruikt op de volgende %n camera's: %1</numerusform>
       </translation>
     </message>
@@ -2797,11 +2797,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation>Kan de eigenschappen voor verschillende draagbare en niet-draagbare camera's niet bewerken.</translation>
+      <translation>Kan eigenschappen voor verschillende draagbare en niet-draagbare camera's niet bewerken.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation>Kan de eigenschappen voor verschillende draagbare camera's niet bewerken.</translation>
+      <translation>Kan eigenschappen voor verschillende draagbare niet bewerken.</translation>
     </message>
   </context>
   <context>
@@ -2939,11 +2939,11 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation>Account aanmaken</translation>
+      <translation>Accounts aanmaken</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -3336,11 +3336,11 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Internal Error</source>
@@ -3570,7 +3570,7 @@ to %1</source>
     <message>
       <source>Low</source>
       <comment>Failover priority</comment>
-      <translation>Lage</translation>
+      <translation>Laag</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -3900,7 +3900,7 @@ to %1</source>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Email</source>
@@ -3939,7 +3939,7 @@ to %1</source>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation>Uitgesteld</translation>
+      <translation>Time-out</translation>
     </message>
     <message>
       <source>Import Selected</source>
@@ -4212,7 +4212,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Verwijderen</translation>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4322,8 +4322,8 @@ to %1</source>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
       <translation>
-        <numerusform>Gebruik encoder licenties om deze %n camera's te bekijken</numerusform>
-        <numerusform>Gebruik encoder licenties om deze %n camera's te bekijken</numerusform>
+        <numerusform>Gebruik licenties om deze %n camera's te bekijken</numerusform>
+        <numerusform>Gebruik licenties om deze %n camera's te bekijken</numerusform>
       </translation>
     </message>
   </context>
@@ -4433,11 +4433,11 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation>Account aanmaken</translation>
+      <translation>Accounts aanmaken</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -4565,7 +4565,7 @@ to %1</source>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation>Lo-Res</translation>
+      <translation>Low-Res</translation>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
@@ -5065,7 +5065,7 @@ to %1</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>Lage</translation>
+      <translation>Laag</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -5373,7 +5373,7 @@ to %1</source>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>Alle camera's en apparaten</translation>
+      <translation>Alle camera's &amp; apparaten</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
@@ -5381,7 +5381,7 @@ to %1</source>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation>Gedeelde schermindelingen</translation>
+      <translation>Gedeelde lay-outs</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -5464,7 +5464,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Exporteer bladwijzer...</translation>
     </message>
   </context>
   <context>
@@ -5536,7 +5536,7 @@ to %1</source>
     <name>QnSelectServersButton</name>
     <message>
       <source>Any Server</source>
-      <translation>Een willekeurige server</translation>
+      <translation>Een willekeurige Server</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -5571,7 +5571,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n gebruikers</numerusform>
+        <numerusform>%n Gebruikers</numerusform>
         <numerusform>%n gebruikers</numerusform>
       </translation>
     </message>
@@ -6050,7 +6050,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -6077,7 +6077,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -6124,7 +6124,7 @@ to %1</source>
     </message>
     <message>
       <source>Success</source>
-      <translation>Succes</translation>
+      <translation>Gelukt</translation>
     </message>
     <message>
       <source>Connection timed out</source>
@@ -6615,7 +6615,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Verbind</translation>
+      <translation>Verbinden</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -6812,7 +6812,7 @@ to %1</source>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM, jjjj</translation>
+      <translation>MMMM jjjj</translation>
     </message>
     <message>
       <source>yyyy</source>
@@ -6942,11 +6942,11 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation>Rol</translation>
+      <translation>Profiel</translation>
     </message>
     <message>
       <source>%1 user</source>
@@ -7008,7 +7008,7 @@ to %1</source>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7016,7 +7016,7 @@ to %1</source>
     </message>
     <message>
       <source>Role</source>
-      <translation>Rol</translation>
+      <translation>Profiel</translation>
     </message>
     <message>
       <source>Email</source>
@@ -7151,7 +7151,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -7179,7 +7179,7 @@ to %1</source>
     </message>
     <message>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -7727,7 +7727,7 @@ to %1</source>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation>Open draagbare camera opnames...</translation>
+      <translation>Open draagbare Camera opnames...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
@@ -8163,7 +8163,7 @@ to %1</source>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation>Er zijn geen gegevens geëxporteerd.</translation>
+      <translation>Geen gegevens geëxporteerd.</translation>
     </message>
     <message>
       <source>Internal error</source>
@@ -8405,7 +8405,7 @@ to %1</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>Lage</translation>
+      <translation>Laag</translation>
     </message>
     <message>
       <source>High</source>
@@ -8482,7 +8482,7 @@ to %1</source>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation>%1 Analytics</translation>
+      <translation>%1 Analyse</translation>
     </message>
   </context>
   <context>
@@ -8521,7 +8521,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Verschillende bladwijzers kunnen alleen als layout worden geëxporteerd.</translation>
     </message>
   </context>
   <context>
@@ -8635,7 +8635,7 @@ to %1</source>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>Als het veld leeg is, wordt de gebeurtenis altijd geactiveerd.</translation>
+      <translation>Als het veld leeg is, wordt het event altijd geactiveerd.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
@@ -8985,7 +8985,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation>Draagbare camera's kunnen niet tussen servers worden verplaatst</translation>
+      <translation>Draagbare camera's kunnen niet van server worden verplaatst</translation>
     </message>
     <message>
       <source>Failed to change password</source>

@@ -41,8 +41,8 @@
             <span class="text">ou</span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">Adicionar ao sistema existente</button><br>
-        <small>(Se {{Config.productName}} já foi configurado)</small><br>
+        <button class="btn btn-default" ng-click="skip()">Add to Existing System</button><br>
+        <small>(if {{Config.productName}} has been already setup)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -60,19 +60,19 @@
 
         <div class="form-group has-error" ng-if="forms.systemNameForm.systemName.$touched && forms.systemNameForm.systemName.$error.required">
             <div class="help-block">
-                É necessário o nome do Sistema
+                O nome do sistema é obrigatório
             </div>
         </div>
 
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('advanced', true)">Definições avançadas do Sistema</a>
+        <a href="" ng-click="next('advanced', true)">Advanced system settings</a>
     </p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('advanced')">
-    <h2>Definições avançadas do Sistema</h2>
+    <h2>Advanced system settings</h2>
     <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
@@ -181,7 +181,7 @@
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
                 <input ng-model="settings.savePassword" type="checkbox">
-                Stay logged in
+                Permanecer logado
             </labe>
         </div>
 
@@ -302,7 +302,7 @@
         <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Login" required>
+                   placeholder="Entrar" required>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
@@ -360,7 +360,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Tentar novamente</button>
+        <button class="btn btn-default" ng-click="retry()">Tente Novamente</button>
     </p>
 </div>
 
@@ -373,7 +373,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>O sistema está pronto para uso</h2>
-    <p>Login</p>
+    <p>Entrar</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Definições de partilha e da conta</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="abrir {{Config.cloud.productName}}"
@@ -404,7 +404,7 @@
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
-        <button class="btn btn-primary" ng-click="retry()">Guardar as definições e reinicar o dispositivo</button>
+        <button class="btn btn-primary" ng-click="retry()">Guardar as definições e reiniciar o dispositivo</button>
     </p>
 </div>
 
@@ -425,7 +425,7 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
-    <h2>Cannot connect to {{Config.cloud.productName}}</h2>
+    <h2>Não é possível conectar a {{Config.cloud.productName}}</h2>
     <p class="master-description">
         Verifique a ligação à internet.
     </p>
@@ -437,7 +437,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Cannot connect to {{Config.cloud.productName}}</h2>
+    <h2>Não é possível conectar a {{Config.cloud.productName}}</h2>
     <p class="master-description">
         {{cloudError}}
     </p>
@@ -454,7 +454,7 @@
         Descrição do erro:{{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Tentar novamente</button>
+        <button class="btn btn-default" ng-click="retry()">Tente Novamente</button>
     </p>
 </div>
 
@@ -473,7 +473,7 @@
             <div class="text-center"><b>Usando a aplicação {{Config.productName}}</b></div>
             <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
             <div class="col-xs-6 text-right">Porto</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">Entrar</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
             <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>

@@ -62,7 +62,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation>Autómatikus</translation>
     </message>
     <message>
       <location/>
@@ -179,7 +179,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation>Autómatikus</translation>
     </message>
     <message>
       <location/>
@@ -192,7 +192,7 @@
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
       <source>Refresh</source>
-      <translation>Frissítés</translation>
+      <translation>Frissít</translation>
     </message>
     <message>
       <location/>
@@ -440,7 +440,7 @@
     <message>
       <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
-      <translation>Frissítés</translation>
+      <translation>Frissít</translation>
     </message>
     <message>
       <location/>
@@ -511,7 +511,7 @@
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation>Eseménynapló...</translation>
+      <translation>Eseménylista...</translation>
     </message>
     <message>
       <location/>
@@ -524,7 +524,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
       <source>Server is offline</source>
-      <translation>A szerver offline</translation>
+      <translation>A szerver offine</translation>
     </message>
     <message>
       <location/>
@@ -534,7 +534,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation>Autómatikus</translation>
     </message>
     <message>
       <location/>
@@ -632,7 +632,7 @@
     <message>
       <location/>
       <source>Refresh</source>
-      <translation>Frissítés</translation>
+      <translation>Frissít</translation>
     </message>
   </context>
   <context>
@@ -655,7 +655,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation>Autómatikus</translation>
     </message>
     <message>
       <location/>
@@ -670,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Visszaállítás alapértelmezettre</translation>
+      <translation>Alapértelmezések visszaállítása</translation>
     </message>
     <message>
       <location/>
@@ -750,7 +750,7 @@
     <message>
       <location/>
       <source>Reset</source>
-      <translation>Visszaállitás</translation>
+      <translation>Törlés</translation>
     </message>
     <message>
       <location/>
@@ -765,12 +765,12 @@
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Rendszer</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Natív</translation>
     </message>
     <message>
       <location/>
@@ -1029,7 +1029,7 @@
     <message>
       <location/>
       <source>Refresh</source>
-      <translation>Frissítés</translation>
+      <translation>Frissít</translation>
     </message>
     <message>
       <location/>
@@ -1274,7 +1274,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Eltávolítás</translation>
+      <translation>Törlés</translation>
     </message>
     <message>
       <location/>
@@ -1467,7 +1467,7 @@
     <message>
       <location/>
       <source>Reset</source>
-      <translation>Visszaállitás</translation>
+      <translation>Törlés</translation>
     </message>
     <message>
       <location/>
@@ -1508,7 +1508,7 @@
     <message>
       <location/>
       <source>Testing...</source>
-      <translation>Tesztelés...</translation>
+      <translation>tesztelés...</translation>
     </message>
     <message>
       <location/>
@@ -1625,7 +1625,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Eltávolítás</translation>
+      <translation>Törlés</translation>
     </message>
     <message>
       <location/>
@@ -1681,7 +1681,7 @@
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation>Ingyenes licenc aktiválása</translation>
+      <translation>Ingyenes licence aktiválása</translation>
     </message>
     <message>
       <location/>
@@ -1874,7 +1874,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Felhasználó:</translation>
+      <translation>Bejelentkezés:</translation>
     </message>
     <message>
       <location/>
@@ -2045,7 +2045,7 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation>Csatlakoztatás videóffalhoz...</translation>
+      <translation>Videófal csatlakoztatása...</translation>
     </message>
     <message>
       <location/>
@@ -2066,7 +2066,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>Könyvjelző</translation>
+      <translation>Könyvjeltő</translation>
     </message>
   </context>
   <context>
@@ -2177,7 +2177,7 @@
     <message>
       <location/>
       <source>Add...</source>
-      <translation>Hozzá &amp;adás...</translation>
+      <translation>Hozzá&amp;adás...</translation>
     </message>
     <message>
       <location/>
@@ -2208,7 +2208,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Eltávolítás</translation>
+      <translation>Törlés</translation>
     </message>
     <message>
       <location/>
@@ -2399,7 +2399,7 @@
     <message>
       <location/>
       <source>s</source>
-      <translation>mp</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
@@ -2508,7 +2508,7 @@
     <message>
       <location/>
       <source>Volume:</source>
-      <translation>Kötet:</translation>
+      <translation>Hangerő:</translation>
     </message>
     <message>
       <location/>
@@ -2756,7 +2756,7 @@
     <message>
       <location/>
       <source>Reset</source>
-      <translation>Visszaállitás</translation>
+      <translation>Törlés</translation>
     </message>
   </context>
   <context>
@@ -2960,7 +2960,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Belépés:</translation>
+      <translation>Bejelentkezés:</translation>
     </message>
     <message>
       <location/>
@@ -3049,7 +3049,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>Terület szélesség</translation>
+      <translation>Terület szélessége</translation>
     </message>
   </context>
   <context>
@@ -3217,7 +3217,7 @@
     <message>
       <location/>
       <source>On</source>
-      <translation>Be</translation>
+      <translation>on</translation>
     </message>
     <message>
       <location/>

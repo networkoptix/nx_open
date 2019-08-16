@@ -6,7 +6,7 @@
     <message>
       <location filename="../src/ui/dialogs/about_dialog.ui"/>
       <source>About</source>
-      <translation>Sobre</translation>
+      <translation>Sobre o</translation>
     </message>
     <message>
       <location/>
@@ -47,7 +47,7 @@
     <message>
       <location filename="../src/ui/dialogs/adjust_video_dialog.ui"/>
       <source>Image Enhancement</source>
-      <translation>Melhoria de Imagem</translation>
+      <translation>Melhoramento de imagem</translation>
     </message>
     <message>
       <location/>
@@ -138,7 +138,7 @@
     <message>
       <location/>
       <source>Instant</source>
-      <translation>Instantâneo</translation>
+      <translation>Instante</translation>
     </message>
   </context>
   <context>
@@ -202,17 +202,17 @@
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation>A visualizar arquivos</translation>
+      <translation>A ver arquivos</translation>
     </message>
     <message>
       <location/>
       <source>Exporting video</source>
-      <translation>A exportar vídeo</translation>
+      <translation>A Exportar vídeo</translation>
     </message>
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>A visualizar em directo</translation>
+      <translation>A ver Live</translation>
     </message>
     <message>
       <location/>
@@ -379,7 +379,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation>Informação do Marcador</translation>
+      <translation>Informação do marcador</translation>
     </message>
     <message>
       <location/>
@@ -506,7 +506,7 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation>Regras de Evento</translation>
+      <translation>Regras do evento</translation>
     </message>
     <message>
       <location/>
@@ -516,7 +516,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation>Testar</translation>
+      <translation>Teste</translation>
     </message>
   </context>
   <context>
@@ -609,12 +609,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <location/>
       <source>Scan</source>
-      <translation>Varredura</translation>
+      <translation>Pesquisar</translation>
     </message>
     <message>
       <location/>
@@ -872,7 +872,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Gravação</translation>
+      <translation>Gravando</translation>
     </message>
     <message>
       <location/>
@@ -928,7 +928,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>Mudar senha</translation>
+      <translation>Mudar Senha</translation>
     </message>
   </context>
   <context>
@@ -954,7 +954,7 @@
     <message>
       <location/>
       <source>Save password</source>
-      <translation>Guardar password</translation>
+      <translation>Guardar senha</translation>
     </message>
   </context>
   <context>
@@ -1039,7 +1039,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Regras do Evento...</translation>
+      <translation>Regras de Evento...</translation>
     </message>
   </context>
   <context>
@@ -1057,7 +1057,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <location/>
@@ -1386,7 +1386,7 @@
     <message>
       <location/>
       <source>No image</source>
-      <translation>Sem imagem</translation>
+      <translation>Nenhuma imagem</translation>
     </message>
   </context>
   <context>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Tempo limite da pesquisa (s)</translation>
     </message>
   </context>
   <context>
@@ -1556,7 +1556,7 @@
     <message>
       <location/>
       <source>Loading...</source>
-      <translation>A Carregar...</translation>
+      <translation>A carregar...</translation>
     </message>
     <message>
       <location/>
@@ -1681,7 +1681,7 @@
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation>Activar Licença Gratuita</translation>
+      <translation>Activar licença gratuita</translation>
     </message>
     <message>
       <location/>
@@ -1696,7 +1696,7 @@
     <message>
       <location/>
       <source>License Key</source>
-      <translation>Chave da Licença</translation>
+      <translation>Chave da Licença:</translation>
     </message>
     <message>
       <location/>
@@ -1760,12 +1760,12 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation>Porto</translation>
+      <translation>Porta</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <location/>
@@ -1775,7 +1775,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation>Testar</translation>
+      <translation>Teste</translation>
     </message>
     <message>
       <location/>
@@ -1788,7 +1788,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation>Aspecto e Ambiente</translation>
+      <translation>Aspecto e Comportamento</translation>
     </message>
     <message>
       <location/>
@@ -1879,12 +1879,12 @@
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>Habilitar áudio</translation>
+      <translation>Activar Áudio</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Em gravação</translation>
+      <translation>Gravando</translation>
     </message>
     <message>
       <location/>
@@ -1897,7 +1897,7 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation>Nova câmara wearable...</translation>
+      <translation>Nova câmera wearable...</translation>
     </message>
     <message>
       <location/>
@@ -2045,7 +2045,7 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation>Assignar a Video Wall...</translation>
+      <translation>Associar a Video Wall...</translation>
     </message>
     <message>
       <location/>
@@ -2066,7 +2066,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>Marcador</translation>
+      <translation>Bookmark</translation>
     </message>
   </context>
   <context>
@@ -2134,7 +2134,7 @@
     <message>
       <location filename="../src/ui/dialogs/merge_systems_dialog.ui"/>
       <source>Merge Systems...</source>
-      <translation>"Fundir" Sistemas... (Merge)</translation>
+      <translation>Fundir Sistemas...</translation>
     </message>
     <message>
       <location/>
@@ -2282,7 +2282,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Obter utilizador a partir do LDAP...</translation>
+      <translation>Obter Utilizador através do LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2368,7 +2368,7 @@
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation>Reset da Velocidade</translation>
+      <translation>Reset Velocidade</translation>
     </message>
   </context>
   <context>
@@ -2564,7 +2564,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation>Porto</translation>
+      <translation>Porta</translation>
     </message>
   </context>
   <context>
@@ -2656,7 +2656,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Gravação</translation>
+      <translation>Gravando</translation>
     </message>
     <message>
       <location/>
@@ -2716,7 +2716,7 @@
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>Fabricante</translation>
+      <translation>Fabricante:</translation>
     </message>
     <message>
       <location/>
@@ -2802,7 +2802,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation>Testar</translation>
+      <translation>Teste</translation>
     </message>
   </context>
   <context>
@@ -2960,7 +2960,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Entrar:</translation>
+      <translation>Login:</translation>
     </message>
     <message>
       <location/>
@@ -3191,12 +3191,12 @@
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation>Enviar Ficheiro...</translation>
+      <translation>Upload de Ficheiro...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation>Enviar Pasta...</translation>
+      <translation>Upload de Pasta...</translation>
     </message>
   </context>
   <context>
@@ -3212,7 +3212,7 @@
     <message>
       <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
       <source>Schedule Settings</source>
-      <translation>Definições da Agenda</translation>
+      <translation>Definições de Agenda</translation>
     </message>
     <message>
       <location/>

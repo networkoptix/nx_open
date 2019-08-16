@@ -40,8 +40,8 @@
             <span class="text">או</span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">הוסף למערכת הקיימת</button><br>
-        <small>(אם {{Config.productName}} כבר הוגדר)</small><br>
+        <button class="btn btn-default" ng-click="skip()">Add to Existing System</button><br>
+        <small>(if {{Config.productName}} has been already setup)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -59,7 +59,7 @@
 
         <div class="form-group has-error" ng-if="forms.systemNameForm.systemName.$touched && forms.systemNameForm.systemName.$error.required">
             <div class="help-block">
-                שם המערכת נדרש
+                נדרש שם מערכת
             </div>
         </div>
 
@@ -170,7 +170,7 @@
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
-                   type="password" autocomplete="new-password" required placeholder="סיסמא" ng-change="clearCloudError()">
+                   type="password" autocomplete="new-password" required placeholder="סיסמה" ng-change="clearCloudError()">
         </div>
 
         <div class="checkbox text-left" ng-if="settings.thickClient">
@@ -223,7 +223,7 @@
                      forms.localForm.localPasswordConfirmation.$touched &&
                      settings.localPasswordConfirmation != settings.localPassword}">
             <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
-                   type="password" autocomplete="new-password" placeholder="הקלד סיסמה בשנית" required>
+                   type="password" autocomplete="new-password" placeholder="הקלד סיסמא בשנית" required>
         </div>
         <div class="checkbox text-left" ng-if="settings.thickClient">
             <labe>
@@ -266,7 +266,7 @@
              ng-if= "forms.localForm.$valid &&
                      (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
-                הסיסמהות אינן תואמות
+                הסיסמאות אינן תואמות
             </div>
         </div>
     </form>
@@ -303,7 +303,7 @@
             <input ng-model="settings.remotePassword"
                    name="remotePassword" autocomplete="new-password" class="form-control" type="password"
                    ng-change="clearRemoteError(true)"
-                   placeholder="סיסמא" required>
+                   placeholder="סיסמה" required>
         </div>
         <div class="form-group has-error"
              ng-if="forms.remoteSystemForm.remoteSystemName.$touched &&  forms.remoteSystemForm.remoteSystemName.$error.required||
@@ -367,7 +367,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>המערכת מוכנה לשימוש</h2>
-    <p>כניסה</p>
+    <p>שם משתמש</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>הגדרות חשבון ושיתוף</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="פתח {{Config.cloud.productName}}"
@@ -441,7 +441,8 @@
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>אין אפשרות להגדיר מערכת</h2>
-    <p class="master-description">משהו השתבש לגמרי. <br>תיאור שגיאה: {{settings.localError}}
+    <p class="master-description">משהו השתבש לגמרי. <br>
+תיאור שגיאה: {{settings.localError}}
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">נסה שוב</button>
@@ -462,7 +463,7 @@
             <div class="text-center"><b>באמצעות יישום {{Config.productName}}</b></div>
             <div class="col-xs-6 text-right">שרת</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
             <div class="col-xs-6 text-right">פורט</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">כניסה</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">שם משתמש</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
             <div class="col-xs-6 text-right">סיסמה</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>

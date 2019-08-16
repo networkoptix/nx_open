@@ -865,11 +865,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation>幾つかのカメラでパスワードを設定する必要があります</translation>
+      <translation>一部のカメラにパスワードを設定する必要があります</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation>ビデオエクスポート...</translation>
+      <translation>動画をエクスポート...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
@@ -983,7 +983,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation>このサーバーのハードウェアIDは、ライセンスがアクティブ化されたハードウェアIDと一致しません</translation>
+      <translation>このライセンスを持つサーバーのハードウェアIDは、ライセンスが有効化されたハードウェアIDと一致しません。</translation>
     </message>
   </context>
   <context>
@@ -1003,31 +1003,31 @@ to view more bookmarks</source>
     <name>ExportSettingsDialog</name>
     <message>
       <source>Chosen settings require transcoding. It will increase CPU usage and may take significant time.</source>
-      <translation>選択した設定にはトランスコードが必要です　 CPU使用量が増加し、時間がかかることがあります</translation>
+      <translation>選択した設定にはトランスコードが必要です。CPU使用量が増加し、時間がかかることがあります。</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>オーディオ トラックと非連続記録をエクスポートするのには、AVI 形式は推奨出来ません</translation>
+      <translation>AVI形式は、オーディオトラック付きの非連続録画をエクスポートするのにはお勧めできません。</translation>
     </message>
     <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
-      <translation>ダウンスケールを避けるため、&quot;マルチビデオ&quot;としてエクスポートする事を推奨します</translation>
+      <translation>ダウンスケールを避けるため、&quot;マルチビデオ&quot;としてエクスポートする事を推奨します。</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>長いビデオをエクスポートしようとしています　ギガバイト以上の空き容量のを必要とし、数分かかることがあります</translation>
+      <translation>長いビデオをエクスポートしようとしています　ギガバイト以上の空き容量を必要とし、完了に数分かかることがあります</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>エクスポートされた.EXEファイルのサイズは4 GBを超えるのでWindowsで開くことはできません %1 Clientでのみ再生できます</translation>
+      <translation>エクスポートされた.EXEファイルのサイズは4 GBを超えるため、Windowsで開くことはできません。%1 Clientでのみ再生できます。</translation>
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation>ローカルファイル、サーバーモニターウィジェット、およびWebページはエクスポートされません</translation>
+      <translation>ローカルファイル、サーバーモニターウィジェット、Webページはエクスポートされません。</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
-      <translation>.NOVと.EXEファイルでは設定を使用できません</translation>
+      <translation>.NOVファイルおよび.EXEファイルでは設定を使用できません。</translation>
     </message>
   </context>
   <context>
@@ -1038,11 +1038,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Matroska</source>
-      <translation>Matroska</translation>
+      <translation>マトリョーシカ</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation>MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Part14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
@@ -1084,7 +1084,7 @@ to view more bookmarks</source>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation>%1 / %2</translation>
+      <translation>%2の%1</translation>
     </message>
   </context>
   <context>
@@ -1099,7 +1099,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Top</source>
-      <translation>上</translation>
+      <translation>上端にスクロール</translation>
     </message>
     <message>
       <source>Right Edge</source>
@@ -1107,7 +1107,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>下</translation>
+      <translation>下端にスクロール</translation>
     </message>
     <message>
       <source>Page Left</source>
@@ -1127,19 +1127,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>左スクロール</translation>
+      <translation>左へスクロール</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation>スクロールアップ</translation>
+      <translation>上へスクロール</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>右スクロール</translation>
+      <translation>右へスクロール</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation>スクロールダウン</translation>
+      <translation>下へスクロール</translation>
     </message>
   </context>
   <context>
@@ -1226,7 +1226,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
       <translation>
-        <numerusform>パスワードは最低でも %n 文字以上にして下さい</numerusform>
+        <numerusform>パスワードは最低でも %n 文字以上必要です</numerusform>
       </translation>
     </message>
     <message>
@@ -1253,7 +1253,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>ラテン文字、数字、およびキーボードシンボル%1のみが許可されます</translation>
+      <translation>英数字およびキーボードの記号%1のみが許可されます。</translation>
     </message>
   </context>
   <context>
@@ -1444,11 +1444,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation>OpenGLの表示でCPU負荷が100％になる問題を回避できます</translation>
+      <translation>OpenGLの表示でCPU負荷が100％になる問題を回避できます。</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation>ライブビューを劣化させない最小値に調整します。バッファが大きいほど、再生はスムーズになりますが、リアルタイムとライブビューの間の遅延が増えます。バッファーを小さくすると遅延が減少しますが、スタッターが発生する可能性があります。</translation>
+      <translation>ライブビューを劣化させない最小値に調整してください。バッファが大きいほど再生はスムーズになりますが、リアルタイムとライブビューの間の遅延が増えます。バッファを小さくすると遅延は減少しますが、スタッターが発生する可能性があります。</translation>
     </message>
   </context>
   <context>
@@ -1505,7 +1505,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>全て選択</translation>
+      <translation>すべてを選択</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -1700,7 +1700,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>説明</translation>
+      <translation>説明(&amp;D)</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -2261,7 +2261,7 @@ to view more bookmarks</source>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation>%1では解析を利用できません</translation>
+      <translation>%1では分析を利用できません</translation>
     </message>
   </context>
   <context>
@@ -2374,7 +2374,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation>いくつかのカメラの画質の問題を修正することができますがビットレート増加の原因となります</translation>
+      <translation>一部のカメラで画質の問題を解決するのに役立ちますが、他のカメラのビットレート増価の原因になります。</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
@@ -2382,7 +2382,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation>サーバーはカメラ設定を変更しません。そのままカメラストリームを受信して​​使用します</translation>
+      <translation>サーバーはカメラ設定を変更しません。そのままカメラストリームを受信して​​使用します。</translation>
     </message>
   </context>
   <context>
@@ -2405,15 +2405,15 @@ to view more bookmarks</source>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>選択したものをクリップボードにコピー</translation>
+      <translation>クリップボードにコピー</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>選択したものをファイルにエクスポート...</translation>
+      <translation>ファイルにエクスポート...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>全て選択</translation>
+      <translation>すべてを選択</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
@@ -2545,7 +2545,7 @@ to view more bookmarks</source>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
       <source>automatic</source>
-      <translation>自動</translation>
+      <translation>オート</translation>
     </message>
   </context>
   <context>
@@ -2573,7 +2573,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation>パスワードは8文字以上で、異なる種類の文字を含む必要があります</translation>
+      <translation>パスワードは8文字以上で、異なる種類の文字を含む必要があります。</translation>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
@@ -2595,7 +2595,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>On</source>
-      <translation>On</translation>
+      <translation>使用</translation>
     </message>
     <message>
       <source>Recording Schedule</source>
@@ -2663,7 +2663,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation>画質設定は圧縮率を決定し、解像度には影響しません。低、中、高、最高は、プリセットのビットレート値です</translation>
+      <translation>画質設定は圧縮率を決定し、解像度には影響しません。低、中、高、最高は、プリセットのビットレート値です。</translation>
     </message>
     <message>
       <source>First choose a recording option, then apply it to day and time blocks on the recording schedule. (0 block is 12:00am to 1:00am, 23 block is 11:00pm to 12:00am.)</source>
@@ -2862,12 +2862,12 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation>アカウントがアクティベートされていません</translation>
+      <translation>アカウントが有効化されていません</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation>%1 にログインし指示に従ってください</translation>
+      <translation>%1 ログインし、表示される指示に従ってください。</translation>
     </message>
     <message>
       <source>Invalid password</source>
@@ -3040,7 +3040,7 @@ to %1</source>
     </message>
     <message>
       <source>Restart</source>
-      <translation>再始動</translation>
+      <translation>再起動</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
@@ -3127,19 +3127,19 @@ to %1</source>
     <name>QnCustomBusinessEventWidget</name>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>フィールドが空の場合は、常にイベントがトリガーされます</translation>
+      <translation>フィールドが空の場合は、常にイベントがトリガーされます。</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>ソースフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+      <translation>ソースフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します。</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>キャプションフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+      <translation>キャプションフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します。</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation>説明フィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+      <translation>説明フィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します。</translation>
     </message>
   </context>
   <context>
@@ -3217,7 +3217,7 @@ to %1</source>
     <name>QnDefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
-      <translation>このカメラはパスワードを設定する必要があります</translation>
+      <translation>このカメラにはパスワードを設定する必要があります。</translation>
     </message>
     <message>
       <source>Some of selected cameras requires password to be set up.</source>
@@ -3240,15 +3240,15 @@ to %1</source>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
-      <translation>入力デバイス %1 のサンプルフォーマットはサポートされません.</translation>
+      <translation>入力デバイス %1 のサンプルフォーマットはサポートされていません。</translation>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation>オーディオエンコーダ&quot;%1&quot; が見つかりませんでした</translation>
+      <translation>オーディオエンコーダ&quot;%1&quot; が見つかりませんでした。</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
-      <translation>プライマリーオーディオ デバイスが選択されていません</translation>
+      <translation>プライマリーオーディオ デバイスが選択されていません。</translation>
     </message>
   </context>
   <context>
@@ -3275,7 +3275,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation>オーディオエンコーダ&quot;%1&quot; が見つかりませんでした</translation>
+      <translation>オーディオエンコーダ&quot;%1&quot; が見つかりませんでした。</translation>
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
@@ -3294,7 +3294,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter password to continue.</source>
-      <translation>続行するにはパスワードを入力します</translation>
+      <translation>パスワードを入力して続行</translation>
     </message>
     <message>
       <source>Set local owner password</source>
@@ -3345,7 +3345,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>すべての %1 ユーザーが削除されます</translation>
+      <translation>すべての %1 ユーザーが削除されます。</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
@@ -3357,7 +3357,7 @@ to %1</source>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>パニック録画モードは、すべてのカメラの録画設定を最大FPSと品質に切り替えます</translation>
+      <translation>パニック録画モードは、すべてのカメラの録画設定を最大FPSと品質に切り替えます。</translation>
     </message>
   </context>
   <context>
@@ -3368,15 +3368,15 @@ to %1</source>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>選択箇所をクリップボードにコピー</translation>
+      <translation>クリップボードにコピー</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>選択箇所をファイルにエクスポート...</translation>
+      <translation>ファイルにエクスポート...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>全て選択</translation>
+      <translation>すべてを選択</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3435,7 +3435,7 @@ to %1</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>説明</translation>
+      <translation>説明(&amp;D)</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3530,7 +3530,7 @@ to %1</source>
     <message>
       <source>Low</source>
       <comment>Failover priority</comment>
-      <translation>低</translation>
+      <translation>低い</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -3540,7 +3540,7 @@ to %1</source>
     <message>
       <source>High</source>
       <comment>Failover priority</comment>
-      <translation>高</translation>
+      <translation>高い</translation>
     </message>
   </context>
   <context>
@@ -3600,7 +3600,7 @@ to %1</source>
     <name>QnFisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
-      <translation>カメラが垂直または水平に正確に取り付けられていない場合は、この設定を使用して歪みを補正します</translation>
+      <translation>カメラが垂直または水平に正確に取り付けられていない場合は、この設定を使用して歪みを補正します。</translation>
     </message>
   </context>
   <context>
@@ -3836,7 +3836,7 @@ to %1</source>
     </message>
     <message>
       <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>&quot;検索フィルター&quot; 以外のLDAP設定を変更すると、すべてのLDAPフェッチユーザーの接続が失われます</translation>
+      <translation>&quot;検索フィルター&quot; 以外のLDAP設定を変更すると、すべてのLDAPフェッチユーザーの接続が失われます。</translation>
     </message>
   </context>
   <context>
@@ -3936,7 +3936,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
-      <translation>ハードウェアID</translation>
+      <translation>ハードウェアIDのロック</translation>
     </message>
   </context>
   <context>
@@ -3987,7 +3987,7 @@ to %1</source>
     </message>
     <message>
       <source>License is expired</source>
-      <translation>ライセンスの期限が切れ</translation>
+      <translation>ライセンスの期限切れ</translation>
     </message>
     <message>
       <source>Expires soon</source>
@@ -4206,11 +4206,11 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>このライセンスは既にアクティベートされハードウェア ID %1 にリンクされています</translation>
+      <translation>このライセンスは既に有効化され、ハードウェア ID %1 にリンクされています</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>このライセンスは既にアクティベートされ %2 のハードウェア ID %1 にリンクされています</translation>
+      <translation>このライセンスは既に有効化され、%2 のハードウェア ID %1 にリンクされています</translation>
     </message>
   </context>
   <context>
@@ -4229,7 +4229,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation>ファイルが開けませんでした</translation>
+      <translation>ファイルが開けませんでした：</translation>
     </message>
     <message>
       <source>All files</source>
@@ -4237,11 +4237,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア ID を送信してください</translation>
+      <translation>アクティベーションキーファイルを取得するには、ライセンスキーと %1 で提供されたハードウェア IDを送信してください</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>アクティベーションキー ファイルを取得するにはライセンス キーと %1 で提供されたハードウェア ID を送信してください</translation>
+      <translation>アクティベーションキーファイルを取得するには、ライセンスキーと %1 で提供されたハードウェア ID を送信してください</translation>
     </message>
   </context>
   <context>
@@ -4358,7 +4358,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation>接続設定の削除</translation>
+      <translation>接続を削除しますか？</translation>
     </message>
     <message>
       <source>There is another connection with the same name.</source>
@@ -4454,11 +4454,11 @@ to %1</source>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>カメラとサーバーのIPアドレスとユーザーの役割を表示</translation>
+      <translation>カメラとサーバーのIPアドレスとユーザーの役割を表示する。</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation>レイアウトツアー開始後にレイアウトに表示する各カメラの時間</translation>
+      <translation>ツアー開始後にレイアウトに表示される各カメラの時間</translation>
     </message>
   </context>
   <context>
@@ -4714,7 +4714,7 @@ to %1</source>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation>名前を空にすることはできません</translation>
+      <translation>名前を入力してください</translation>
     </message>
   </context>
   <context>
@@ -5004,7 +5004,7 @@ to %1</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>低</translation>
+      <translation>低い</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -5012,7 +5012,7 @@ to %1</source>
     </message>
     <message>
       <source>High</source>
-      <translation>高</translation>
+      <translation>高い</translation>
     </message>
     <message>
       <source>Highest</source>
@@ -5138,7 +5138,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GB</translation>
+      <translation>%1 Gb</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -5455,7 +5455,7 @@ to %1</source>
     </message>
     <message>
       <source>All Cameras</source>
-      <translation>全カメラ</translation>
+      <translation>すべてのカメラ</translation>
     </message>
     <message>
       <source>Select devices...</source>
@@ -5595,7 +5595,7 @@ to %1</source>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation>サーバーウェブページ...</translation>
+      <translation>サーバーウェブページ</translation>
     </message>
   </context>
   <context>
@@ -5634,7 +5634,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>フェイルオーバーが有効になっているサーバーは、自動的にオフラインサーバーからカメラを引き継ぎます</translation>
+      <translation>フェイルオーバーが有効になっているサーバーは、自動的にオフラインサーバーからカメラを引き継ぎます。</translation>
     </message>
   </context>
   <context>
@@ -5656,7 +5656,7 @@ to %1</source>
     </message>
     <message>
       <source>Release notes</source>
-      <translation>リリースノート</translation>
+      <translation>更新履歴</translation>
     </message>
     <message>
       <source>You will have to update the client manually using an installer.</source>
@@ -6165,7 +6165,7 @@ to %1</source>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation>パスワードが必要</translation>
+      <translation>パスワードが必要です</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
@@ -6184,15 +6184,15 @@ to %1</source>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation>全て選択</translation>
+      <translation>すべてを選択</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>選択範囲をファイルにエクスポート...</translation>
+      <translation>ファイルにエクスポート...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>選択箇所をクリップボードにコピー</translation>
+      <translation>クリップボードにコピー</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -6331,7 +6331,7 @@ to %1</source>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
-      <translation>アーカイブの再インデックスは、アーカイブやバックアップが紛失または破損した場合、または一部のハードウェアが交換された場合の問題を解決できます</translation>
+      <translation>アーカイブの再インデックスは、アーカイブやバックアップが紛失または破損した場合、または一部のハードウェアが交換された場合に問題を解決できます。</translation>
     </message>
   </context>
   <context>
@@ -6374,7 +6374,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GB</translation>
+      <translation>%1 Gb</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -6631,11 +6631,11 @@ to %1</source>
     </message>
     <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation>カメラのモデルやファームウェアのバージョン、サーバーの数など、システムに関する情報が含まれます</translation>
+      <translation>カメラのモデルやファームウェアのバージョン、サーバーの数など、システムに関する情報が含まれます。</translation>
     </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
-      <translation>個人情報は含まず、完全に匿名です</translation>
+      <translation>いかなる個人情報も含まず、完全に匿名です。</translation>
     </message>
   </context>
   <context>
@@ -6719,22 +6719,22 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>yyyy/MMMM/dd hh:mm</translation>
+      <translation>yyyy MMMM dd hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>yyyy/MMMM/dd hh:mm</translation>
+      <translation>yyyy MMMM dd hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>yyyy/MMMM/dd h ap</translation>
+      <translation>yyyy MMMM dd h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>yyyy/MMMM/dd</translation>
+      <translation>yyyy MMMM dd</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
@@ -6923,7 +6923,7 @@ to %1</source>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation>ユーザーはLDAPサーバーからインポートできます　 LDAPサーバーがオンラインで、アカウントがアクティブな場合のみ、ログインできます</translation>
+      <translation>ユーザーはLDAPサーバーからインポートできます。 LDAPサーバーがオンラインで、アカウントがアクティブな場合のみ、ログインできます。</translation>
     </message>
   </context>
   <context>
@@ -7108,31 +7108,31 @@ to %1</source>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation>パスワードが一致しません</translation>
+      <translation>パスワードが一致しません.</translation>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 ユーザーのemailは既に存在します</translation>
+      <translation>指定されたメールアドレスを持つ%1 ユーザーは既に存在します。</translation>
     </message>
     <message>
       <source>Local users</source>
-      <translation>ローカル ユーザー</translation>
+      <translation>ローカルユーザー</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>ユーザー %1</translation>
+      <translation>%1ユーザー</translation>
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation>%1 はこのシステムに属し、システム管理者によって完全に管理されます</translation>
+      <translation>%1 はこのシステムにのみ属し、システム管理者によって完全に管理されています。</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation>%1 は、多くのシステムへアクセスできます。管理者は、自分の権利のみを管理できます</translation>
+      <translation>%1 は、多くのシステムへアクセスできます。管理者は、自分の権利のみを管理できます。</translation>
     </message>
   </context>
   <context>
@@ -7147,7 +7147,7 @@ to %1</source>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>パスワードを入力してください</translation>
+      <translation>パスワードを入力してください.</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces.</source>
@@ -7210,11 +7210,11 @@ to %1</source>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation>既にアップロードされたファイルは保管されます</translation>
+      <translation>既にアップロードされたファイルは保管されます。</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
-      <translation>(%1 / %2)</translation>
+      <translation>(%2の%1)</translation>
     </message>
     <message>
       <source>Uploading %1...</source>
@@ -7233,7 +7233,7 @@ to %1</source>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation>別のユーザーが現在このカメラに映像をアップロードしています</translation>
+      <translation>別のユーザーが現在このカメラに映像をアップロードしています。</translation>
     </message>
   </context>
   <context>
@@ -7327,7 +7327,7 @@ to %1</source>
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation>ビデオウォールは削除され、終了します</translation>
+      <translation>ビデオウォールはサーバーから削除され、終了します。</translation>
     </message>
   </context>
   <context>
@@ -7523,7 +7523,7 @@ to %1</source>
     <name>QnWorkbenchUpdateWatcher</name>
     <message>
       <source>Release Notes</source>
-      <translation>リリースノート</translation>
+      <translation>更新履歴</translation>
     </message>
     <message>
       <source>%1 version available</source>
@@ -7633,7 +7633,7 @@ to %1</source>
     <name>QnWorkbenchWearableHandler</name>
     <message>
       <source>All files (*.*)</source>
-      <translation>すべてのファイル (*.*)</translation>
+      <translation>すべてのファイル(*.*)</translation>
     </message>
     <message>
       <source>Video (%1)</source>
@@ -7645,15 +7645,15 @@ to %1</source>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation>正しいタイムスタンプを持つビデオファイルのみがサポートされます</translation>
+      <translation>正しいタイムスタンプを持つビデオファイルのみがサポートされています。</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>別のユーザー &quot;%1&quot; が現在このカメラに映像をアップロードしているため、アップロードを開始できませんでした</translation>
+      <translation>別のユーザー &quot;%1&quot; が現在このカメラに映像をアップロードしているため、アップロードを開始できませんでした。</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation>別のユーザーが現在このカメラに映像をアップロードしているため、アップロードを開始できませんでした</translation>
+      <translation>別のユーザーが現在このカメラに映像をアップロードしているため、アップロードを開始できませんでした。</translation>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
@@ -7671,7 +7671,7 @@ to %1</source>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation>MKV、AVI、MP4、またはその他のビデオファイルを使用してください</translation>
+      <translation>MKV、AVI、MP4、またはその他のビデオファイルを使用してください。</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
@@ -7718,30 +7718,30 @@ to %1</source>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
       <translation>
-        <numerusform>選択したファイルは %1に記録されましたが、最後の %n 日に録画されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます</numerusform>
+        <numerusform>選択したファイルは %1に記録されましたが、最後の %n 日に録画されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
       <translation>
-        <numerusform>選択したファイルは %1 から %2の間で記録されましたが、最後の %n 日に記録されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます</numerusform>
+        <numerusform>選択したファイルは %1 から %2の間で記録されましたが、最後の %n 日に記録されたファイルのみをアップロードできます。これはカメラのアーカイブ設定で変更できます。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
       <translation>
-        <numerusform>これらのファイルをアップロードした後に一部の映像が削除されることがあります</numerusform>
+        <numerusform>これらのファイルをアップロードした後、一部の映像が削除されることがあります</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <translation>
-        <numerusform>サーバーストレージには空き容量がほとんどありません。いくつかの古い映像は、空き容量を増やすために削除されることがあります。選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されます</numerusform>
+        <numerusform>サーバーストレージには空き容量がほとんどありません。一部の古い映像は空き容量を増やすために削除されることがあります。選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されます。</numerusform>
       </translation>
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation>これを防ぐために、追加のストレージを追加することができます。また、カメラ設定でアーカイブの保持時間を変更することで、最初に削除する映像を制御することもできます</translation>
+      <translation>これを防ぐために、追加のストレージを追加することができます。また、カメラ設定でアーカイブの保持時間を変更することで、最初に削除する映像を制御することもできます。</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
@@ -7753,27 +7753,27 @@ to %1</source>
     </message>
     <message>
       <source>Make sure there is enough space on server storage.</source>
-      <translation>サーバーストレージに十分なスペースがあることを確認してください</translation>
+      <translation>サーバーストレージに十分なスペースがあることを確認してください。</translation>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
-      <translation>%1 - サポートされていないフォーマット</translation>
+      <translation>%1 はサポートされていないフォーマットです。</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
-      <translation>%1 - タイムスタンプがありません</translation>
+      <translation>%1には タイムスタンプがありません。</translation>
     </message>
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
-      <translation>%1 - カメラのアーカイブ設定より古いです</translation>
+      <translation>%1はカメラのアーカイブ設定より古いです。</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
-      <translation>ファイル %1 は既にアップロードされているビデオの期間と重複します</translation>
+      <translation>%1 は既にアップロードされているビデオの期間と重複します。</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
-      <translation>ファイル %1 は既にアップロードされているビデオの期間と重複します</translation>
+      <translation>%1 は既にアップロードされているビデオの期間と重複します。</translation>
     </message>
     <message>
       <source>Not enough space on server storage</source>
@@ -8006,7 +8006,7 @@ to %1</source>
     <name>nx::client::desktop::AnalyticsActionFactory</name>
     <message>
       <source>Dynamic</source>
-      <translation>動的</translation>
+      <translation>ダイナミック</translation>
     </message>
   </context>
   <context>
@@ -8032,7 +8032,7 @@ to %1</source>
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation>選択した形式は、FFMPEG ライブラリでサポートされていません</translation>
+      <translation>選択した形式は、FFMPEG ライブラリでサポートされていません。</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
@@ -8040,7 +8040,7 @@ to %1</source>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation>ビデオまたはオーディオコーデックが選択された形式と互換性がありません</translation>
+      <translation>ビデオまたはオーディオコーデックは選択された形式と互換性がありません。</translation>
     </message>
     <message>
       <source>File write error.</source>
@@ -8048,7 +8048,7 @@ to %1</source>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation>データはエクスポートされませんでした</translation>
+      <translation>データはエクスポートされませんでした.</translation>
     </message>
     <message>
       <source>Internal error</source>
@@ -8168,7 +8168,7 @@ to %1</source>
     </message>
     <message>
       <source>Image cannot be loaded.</source>
-      <translation>画像を読み取ることができません</translation>
+      <translation>画像を読み取ることができません。</translation>
     </message>
   </context>
   <context>
@@ -8290,11 +8290,11 @@ to %1</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>低</translation>
+      <translation>低い</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>高</translation>
+      <translation>高い</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -8305,7 +8305,7 @@ to %1</source>
     <name>nx::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation>パフォーマンスを向上させるには、レイアウトの解像度を&quot;自動&quot;に設定します</translation>
+      <translation>パフォーマンスを向上させるには、レイアウトの解像度を &quot;自動&quot; に設定します。</translation>
     </message>
   </context>
   <context>
@@ -8313,7 +8313,7 @@ to %1</source>
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
       <translation>
-        <numerusform>ラピッドレビューとしてエクスポートするにはビデオの長さは、最低 %n 秒が必要です</numerusform>
+        <numerusform>ラピッドレビューとしてエクスポートするには、ビデオの長さが最低 %n 秒必要です。</numerusform>
       </translation>
     </message>
   </context>
@@ -8321,7 +8321,7 @@ to %1</source>
     <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation>長さ</translation>
+      <translation>文字数</translation>
     </message>
     <message>
       <source>Short</source>
@@ -8348,7 +8348,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation>サーバーにアップロードされたファイルをチェックできませんでした</translation>
+      <translation>サーバーにアップロードされたファイルを確認できませんでした</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
@@ -8359,7 +8359,7 @@ to %1</source>
     <name>nx::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation>サーバーへのリクエストに失敗しました</translation>
+      <translation>サーバーに要求を送信できませんでした。</translation>
     </message>
   </context>
   <context>
@@ -8390,7 +8390,7 @@ to %1</source>
     <message>
       <source>%1 is in use by another export.</source>
       <comment>%1 is file name</comment>
-      <translation>%1は別のエクスポートによって使用されています</translation>
+      <translation>%1は別のエクスポートによって使用されています。</translation>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
@@ -8404,7 +8404,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation>いくつかのブックマークはレイアウトのみエクスポートされます</translation>
+      <translation>一部のブックマークはレイアウトのみエクスポートされます。</translation>
     </message>
   </context>
   <context>
@@ -8510,27 +8510,27 @@ to %1</source>
     <name>nx::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation>解析イベントは特定のカメラで設定できます</translation>
+      <translation>分析イベントは特定のカメラで設定できます。</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>上のボタンを使用して、サポートされるイベントの一覧を表示するカメラを選択します</translation>
+      <translation>サポートされているイベントのリストを表示するには、上のボタンを使用してカメラを選択してください。</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>フィールドが空の場合は、常にイベントがトリガーされます</translation>
+      <translation>フィールドが空の場合は、常にイベントがトリガーされます。</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>説明フィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+      <translation>説明フィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します。</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>キャプションフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します</translation>
+      <translation>キャプションフィールドに入力したキーワードのいずれかと一致するものがある場合にのみ、イベントが発生します。</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>このフィールドは大文字と小文字を区別します</translation>
+      <translation>このフィールドは大文字と小文字を区別します。</translation>
     </message>
   </context>
   <context>
@@ -8747,7 +8747,7 @@ to %1</source>
     </message>
     <message>
       <source>All files (*.*)</source>
-      <translation>すべてのファイル (*.*)</translation>
+      <translation>すべてのファイル(*.*)</translation>
     </message>
     <message>
       <source>Open File</source>

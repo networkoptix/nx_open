@@ -212,7 +212,7 @@
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>실시간 감시</translation>
+      <translation>라이브 보기</translation>
     </message>
     <message>
       <location/>
@@ -252,7 +252,7 @@
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation>시스템 감사</translation>
+      <translation>감사 추적</translation>
     </message>
     <message>
       <location/>
@@ -305,7 +305,7 @@
     <message>
       <location/>
       <source>Start</source>
-      <translation>시작:</translation>
+      <translation>시작</translation>
     </message>
   </context>
   <context>
@@ -379,7 +379,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation>북마크 정보</translation>
+      <translation>책갈피 정보</translation>
     </message>
     <message>
       <location/>
@@ -511,7 +511,7 @@
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation>이벤트 로그...</translation>
+      <translation>이벤트정보...</translation>
     </message>
     <message>
       <location/>
@@ -524,7 +524,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
       <source>Server is offline</source>
-      <translation>오프라인</translation>
+      <translation>서버가 오프 라인 입니다</translation>
     </message>
     <message>
       <location/>
@@ -604,12 +604,12 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
@@ -670,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>초기값 복구</translation>
+      <translation>기본값 복원</translation>
     </message>
     <message>
       <location/>
@@ -755,32 +755,32 @@
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation>논리 ID</translation>
+      <translation>논리적 ID</translation>
     </message>
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>선호하는 PTZ 사전 설정 유형:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>시스템</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>네이티브</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>이 카메라는 팬 과 틸트를 지원합니다.</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>이 카메라는 줌 기능을 지원합니다.</translation>
     </message>
   </context>
   <context>
@@ -936,7 +936,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation>로그인 상태 유지</translation>
+      <translation>로그인 유지</translation>
     </message>
   </context>
   <context>
@@ -954,7 +954,7 @@
     <message>
       <location/>
       <source>Save password</source>
-      <translation>비밀번호 저장</translation>
+      <translation>패스워드 저장</translation>
     </message>
   </context>
   <context>
@@ -1057,7 +1057,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
@@ -1067,7 +1067,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <location/>
@@ -1274,7 +1274,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>제거</translation>
+      <translation>삭제</translation>
     </message>
     <message>
       <location/>
@@ -1457,7 +1457,7 @@
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation>논리 ID</translation>
+      <translation>논리적 ID</translation>
     </message>
     <message>
       <location/>
@@ -1508,7 +1508,7 @@
     <message>
       <location/>
       <source>Testing...</source>
-      <translation>검사중</translation>
+      <translation>시험...</translation>
     </message>
     <message>
       <location/>
@@ -1528,7 +1528,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <location/>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>검색 제한 시간</translation>
     </message>
   </context>
   <context>
@@ -1625,7 +1625,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>제거</translation>
+      <translation>삭제</translation>
     </message>
     <message>
       <location/>
@@ -1681,12 +1681,12 @@
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation>데모 제품키 인증</translation>
+      <translation>무료 키 인증</translation>
     </message>
     <message>
       <location/>
       <source>Activate License</source>
-      <translation>제품키 인증</translation>
+      <translation>정식 키 인증</translation>
     </message>
     <message>
       <location/>
@@ -1696,7 +1696,7 @@
     <message>
       <location/>
       <source>License Key</source>
-      <translation>인증키:</translation>
+      <translation>인증키</translation>
     </message>
     <message>
       <location/>
@@ -1765,12 +1765,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <location/>
@@ -1803,7 +1803,7 @@
     <message>
       <location/>
       <source>Language</source>
-      <translation>언어:</translation>
+      <translation>언어</translation>
     </message>
     <message>
       <location/>
@@ -1915,7 +1915,7 @@
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
       <source>Manage...</source>
-      <translation>저장...</translation>
+      <translation>조정...</translation>
     </message>
     <message>
       <location/>
@@ -2045,7 +2045,7 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation>비디오 월 첨부...</translation>
+      <translation>비디오 월에 배속...</translation>
     </message>
     <message>
       <location/>
@@ -2066,7 +2066,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>북마크</translation>
+      <translation>북마크(책갈피)</translation>
     </message>
   </context>
   <context>
@@ -2118,7 +2118,7 @@
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation>로그인 상태 유지</translation>
+      <translation>로그인 유지</translation>
     </message>
   </context>
   <context>
@@ -2208,7 +2208,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>제거</translation>
+      <translation>삭제</translation>
     </message>
     <message>
       <location/>
@@ -2282,7 +2282,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>LDAP으로 부터 사용자 정보 가져오기</translation>
+      <translation>LDAP으로 부터 사용자 정보 일기</translation>
     </message>
     <message>
       <location/>
@@ -2335,7 +2335,7 @@
     <message>
       <location/>
       <source>Enable timeline on video wall</source>
-      <translation type="unfinished">Enable timeline on video wall</translation>
+      <translation>비디오 월에 타임 라인 사용</translation>
     </message>
   </context>
   <context>
@@ -2691,7 +2691,7 @@
     <message>
       <location/>
       <source>Fisheye</source>
-      <translation>어안렌즈</translation>
+      <translation>Fisheye</translation>
     </message>
     <message>
       <location/>
@@ -2711,12 +2711,12 @@
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>펌웨어:</translation>
+      <translation>펌웨어</translation>
     </message>
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>제조사:</translation>
+      <translation>수요자</translation>
     </message>
     <message>
       <location/>
@@ -2726,12 +2726,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation>패스워드</translation>
     </message>
     <message>
       <location/>
@@ -3016,12 +3016,12 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
+      <translation>비디오에 사용자 이름을 워터마크로 표시</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
+      <translation>워터 마크 미리보기</translation>
     </message>
   </context>
   <context>
@@ -3240,7 +3240,7 @@
     <message>
       <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation type="unfinished">Watermark preview</translation>
+      <translation>워터 마크 미리보기</translation>
     </message>
     <message>
       <location/>
@@ -3250,7 +3250,7 @@
     <message>
       <location/>
       <source>Frequency</source>
-      <translation type="unfinished">Frequency</translation>
+      <translation>주파수</translation>
     </message>
   </context>
 </TS>

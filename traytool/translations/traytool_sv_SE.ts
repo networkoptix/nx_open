@@ -5,113 +5,113 @@
     <name>QObject</name>
     <message>
       <source>System Tray</source>
-      <translation type="unfinished">System Tray</translation>
+      <translation>Systemfältet</translation>
     </message>
     <message>
       <source>There is no system tray on this system.</source>
-      <translation type="unfinished">There is no system tray on this system.</translation>
+      <translation>Det finns inget systemfält på detta system.</translation>
     </message>
     <message>
       <source>Application will now quit.</source>
-      <translation type="unfinished">Application will now quit.</translation>
+      <translation>Programmet avslutas nu.</translation>
     </message>
   </context>
   <context>
     <name>QnElevationChecker</name>
     <message>
       <source>Insufficient rights to manage services.</source>
-      <translation type="unfinished">Insufficient rights to manage services.</translation>
+      <translation>Otillräckliga rättigheter för att hantera tjänster.</translation>
     </message>
     <message>
       <source>UAC must be enabled to request privileges for non-admin users.</source>
-      <translation type="unfinished">UAC must be enabled to request privileges for non-admin users.</translation>
+      <translation>UAC måste aktiveras för att begära behörighet för icke-administratörer.</translation>
     </message>
   </context>
   <context>
     <name>QnSystrayWindow</name>
     <message>
       <source>Access denied.</source>
-      <translation type="unfinished">Access denied.</translation>
+      <translation>Åtkomst nekad.</translation>
     </message>
     <message>
       <source>Specified database does not exist.</source>
-      <translation type="unfinished">Specified database does not exist.</translation>
+      <translation>Den angivna databasen existerar inte.</translation>
     </message>
     <message>
       <source>Specified parameter is invalid.</source>
-      <translation type="unfinished">Specified parameter is invalid.</translation>
+      <translation>Den angivna parametern är ogiltig.</translation>
     </message>
     <message>
       <source>Could not access installed services</source>
-      <translation type="unfinished">Could not access installed services</translation>
+      <translation>Kunde inte komma åt installerade tjänster</translation>
     </message>
     <message>
       <source>No %1 services installed</source>
-      <translation type="unfinished">No %1 services installed</translation>
+      <translation>Inga %1 tjänster installerade</translation>
     </message>
     <message>
       <source>&amp;Quit</source>
-      <translation type="unfinished">&amp;Quit</translation>
+      <translation>&amp;Avsluta</translation>
     </message>
     <message>
       <source>An error has occurred while trying to access installed services:</source>
-      <translation type="unfinished">An error has occurred while trying to access installed services:</translation>
+      <translation>Ett fel har uppstått när du försöker komma åt installerade tjänster:</translation>
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation type="unfinished">Server has been stopped</translation>
+      <translation>Servern har stoppats</translation>
     </message>
     <message>
       <source>Server has been started</source>
-      <translation type="unfinished">Server has been started</translation>
+      <translation>Server har startats</translation>
     </message>
     <message>
       <source>Server will be stopped. Continue?</source>
-      <translation type="unfinished">Server will be stopped. Continue?</translation>
+      <translation>Servern kommer att stoppas. Fortsätta?</translation>
     </message>
     <message>
       <source>Show Server Log</source>
-      <translation type="unfinished">Show Server Log</translation>
+      <translation>Visa Serverns Logg</translation>
     </message>
     <message>
       <source>Start Server</source>
-      <translation type="unfinished">Start Server</translation>
+      <translation>Starta om servern</translation>
     </message>
     <message>
       <source>Stop Server</source>
-      <translation type="unfinished">Stop Server</translation>
+      <translation>Stoppa servern</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>Serverns webbsida</translation>
     </message>
     <message>
       <source>stopped</source>
-      <translation type="unfinished">stopped</translation>
+      <translation>stoppad</translation>
     </message>
     <message>
       <source>starting</source>
-      <translation type="unfinished">starting</translation>
+      <translation>startar</translation>
     </message>
     <message>
       <source>stopping</source>
-      <translation type="unfinished">stopping</translation>
+      <translation>stoppar</translation>
     </message>
     <message>
       <source>started</source>
-      <translation type="unfinished">started</translation>
+      <translation>startad</translation>
     </message>
     <message>
       <source>resuming</source>
-      <translation type="unfinished">resuming</translation>
+      <translation>återuppta</translation>
     </message>
     <message>
       <source>paused</source>
-      <translation type="unfinished">paused</translation>
+      <translation>pausad</translation>
     </message>
     <message>
       <source>pausing</source>
-      <translation type="unfinished">pausing</translation>
+      <translation>pausar</translation>
     </message>
   </context>
 </TS>

@@ -138,7 +138,7 @@
     <message>
       <location/>
       <source>Instant</source>
-      <translation>Okamžitě</translation>
+      <translation>Okamžitý</translation>
     </message>
   </context>
   <context>
@@ -305,7 +305,7 @@
     <message>
       <location/>
       <source>Start</source>
-      <translation>Spustit</translation>
+      <translation>Začátek</translation>
     </message>
   </context>
   <context>
@@ -450,7 +450,7 @@
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation>Vymazat filtr</translation>
+      <translation>Smazat filtr</translation>
     </message>
   </context>
   <context>
@@ -559,7 +559,7 @@
     <message>
       <location/>
       <source>Model</source>
-      <translation>Typ</translation>
+      <translation>Model</translation>
     </message>
     <message>
       <location/>
@@ -760,27 +760,27 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Preferovaný typ přednastavení PTZ:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Systém</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Výchozí</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Tato kamera podporuje otáčení a naklápění</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Tato kamera podporuje zoom</translation>
     </message>
   </context>
   <context>
@@ -804,7 +804,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
       <source>Fixed duration:</source>
-      <translation>Pevná doba trvání:</translation>
+      <translation>Pevná délka:</translation>
     </message>
     <message>
       <location/>
@@ -936,7 +936,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation>Zůstat přihlášen</translation>
+      <translation>Zůstat trvale přihlášen</translation>
     </message>
   </context>
   <context>
@@ -1111,7 +1111,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>Export nastavení</translation>
+      <translation>Nastavení exportu</translation>
     </message>
     <message>
       <location/>
@@ -1124,7 +1124,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>Export nastavení</translation>
+      <translation>Nastavení exportu</translation>
     </message>
     <message>
       <location/>
@@ -1157,7 +1157,7 @@
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation>Export nastavení</translation>
+      <translation>Nastavení exportu</translation>
     </message>
     <message>
       <location/>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Vyhledat časový limit</translation>
     </message>
   </context>
   <context>
@@ -1561,7 +1561,7 @@
     <message>
       <location/>
       <source>Connection error</source>
-      <translation>Chyba spojení</translation>
+      <translation>Chyba připojení</translation>
     </message>
     <message>
       <location/>
@@ -1999,7 +1999,7 @@
     <message>
       <location/>
       <source>Details</source>
-      <translation>Podrobnosti</translation>
+      <translation>Detaily</translation>
     </message>
     <message>
       <location/>
@@ -2118,7 +2118,7 @@
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation>Zůstat přihlášen</translation>
+      <translation>Zůstat trvale přihlášen</translation>
     </message>
   </context>
   <context>
@@ -2343,7 +2343,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation>Rychlý náhled</translation>
+      <translation>Rychlý přehled</translation>
     </message>
     <message>
       <location/>
@@ -2691,7 +2691,7 @@
     <message>
       <location/>
       <source>Fisheye</source>
-      <translation>Rybí oko</translation>
+      <translation>Fisheye</translation>
     </message>
     <message>
       <location/>
@@ -2706,7 +2706,7 @@
     <message>
       <location/>
       <source>Model</source>
-      <translation>Typ</translation>
+      <translation>Model</translation>
     </message>
     <message>
       <location/>
@@ -3101,7 +3101,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
       <source>Name</source>
-      <translation>Jméno</translation>
+      <translation>Název</translation>
     </message>
     <message>
       <location/>
@@ -3196,7 +3196,7 @@
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation>Nahrát složku...</translation>
+      <translation>Nahrajte složku...</translation>
     </message>
   </context>
   <context>
@@ -3212,7 +3212,7 @@
     <message>
       <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
       <source>Schedule Settings</source>
-      <translation>Nastavení rozvrhu</translation>
+      <translation>Rozvrh nastavení</translation>
     </message>
     <message>
       <location/>

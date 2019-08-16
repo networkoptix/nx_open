@@ -26,7 +26,7 @@
     <message>
       <location/>
       <source>Support</source>
-      <translation>Support</translation>
+      <translation>Ondersteuning</translation>
     </message>
     <message>
       <location/>
@@ -511,7 +511,7 @@
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation>Logboek...</translation>
+      <translation>Gebeurtenissenlog...</translation>
     </message>
     <message>
       <location/>
@@ -604,12 +604,12 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
@@ -760,27 +760,27 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Gewenst PTZ-presettype:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Systeem</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Oorspronkelijke resolutie</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Deze camera ondersteunt pan en tilt</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Deze camera ondersteunt zoomen</translation>
     </message>
   </context>
   <context>
@@ -1039,7 +1039,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Gebeurtenisregels...</translation>
+      <translation>Event regels...</translation>
     </message>
   </context>
   <context>
@@ -1057,7 +1057,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
@@ -1067,7 +1067,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -1528,7 +1528,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Zoek Timeout (s)</translation>
     </message>
   </context>
   <context>
@@ -1686,7 +1686,7 @@
     <message>
       <location/>
       <source>Activate License</source>
-      <translation>Activeer licentie</translation>
+      <translation>Licentie activeren</translation>
     </message>
     <message>
       <location/>
@@ -1765,12 +1765,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -1907,7 +1907,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Draagbare camera&quot; is een virtuele opslag voor videobestanden, die kan worden geüpload naar elke server binnen uw systeem en toegankelijk is voor elke gebruiker.</translation>
+      <translation>&quot;Draagbare Camera&quot; is een virtuele opslag voor videobestanden, die kan worden geüpload naar elke server op uw systeem en toegankelijk is voor elke gebruiker.</translation>
     </message>
   </context>
   <context>
@@ -1989,7 +1989,7 @@
     <message>
       <location/>
       <source>Start Tour</source>
-      <translation>Start tour</translation>
+      <translation>Start Tour</translation>
     </message>
     <message>
       <location/>
@@ -2113,7 +2113,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
       <source>Log in</source>
-      <translation>Log in</translation>
+      <translation>Inloggen</translation>
     </message>
     <message>
       <location/>
@@ -2177,7 +2177,7 @@
     <message>
       <location/>
       <source>Add...</source>
-      <translation>Voeg toe...</translation>
+      <translation>Toevoegen...</translation>
     </message>
     <message>
       <location/>
@@ -2282,7 +2282,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Gebruikers ophalen via LDAP...</translation>
+      <translation>Gebruikers ophalen van LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2343,7 +2343,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation>Versnelde weergave</translation>
+      <translation>Rapid Review</translation>
     </message>
     <message>
       <location/>
@@ -2726,12 +2726,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Wachtwoord</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -3039,7 +3039,7 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>Letter grootte</translation>
+      <translation>Tekstgrootte</translation>
     </message>
     <message>
       <location/>
@@ -3049,7 +3049,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>Breedte van het tekstvak</translation>
+      <translation>Breedte van opmaakgebied</translation>
     </message>
   </context>
   <context>
@@ -3075,7 +3075,7 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>Letter grootte</translation>
+      <translation>Tekstgrootte</translation>
     </message>
     <message>
       <location/>
@@ -3147,7 +3147,7 @@
     <message>
       <location/>
       <source>Role</source>
-      <translation>Rol</translation>
+      <translation>Profiel</translation>
     </message>
     <message>
       <location/>
@@ -3165,7 +3165,7 @@
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation>Beweging detecteren in de geüploade video</translation>
+      <translation>Beweging detecteren in geüploade video</translation>
     </message>
     <message>
       <location/>

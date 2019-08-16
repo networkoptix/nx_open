@@ -61,7 +61,7 @@
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation>НЕСУМІСНИЙ</translation>
+      <translation>НЕСУМІСНА</translation>
     </message>
     <message>
       <source>OFFLINE</source>
@@ -74,6 +74,14 @@
     <message>
       <source>New Server</source>
       <translation>Новий сервер</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Редагувати</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Сховати</translation>
     </message>
   </context>
   <context>

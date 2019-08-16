@@ -75,6 +75,14 @@
       <source>New Server</source>
       <translation>Új szerver</translation>
     </message>
+    <message>
+      <source>Edit</source>
+      <translation>Szerkeztés</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation type="unfinished">Hide</translation>
+    </message>
   </context>
   <context>
     <name>WelcomeScreen</name>

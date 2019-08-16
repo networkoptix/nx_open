@@ -480,7 +480,7 @@
     </message>
     <message>
       <source>Free license</source>
-      <translation>Gratis Licensie</translation>
+      <translation>Gratis Licenties</translation>
     </message>
     <message>
       <source>Time</source>
@@ -584,8 +584,8 @@
     <message numerus="yes">
       <source>%n camera(s)</source>
       <translation>
-        <numerusform>%n camera (s)</numerusform>
-        <numerusform>%n camera (s)</numerusform>
+        <numerusform>%n camera(s)</numerusform>
+        <numerusform>%n camera(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -598,8 +598,8 @@
     <message numerus="yes">
       <source>%n device(s)</source>
       <translation>
-        <numerusform>%n apparaat (en)</numerusform>
-        <numerusform>%n apparaat (en)</numerusform>
+        <numerusform>%n apparaat(en)</numerusform>
+        <numerusform>%n apparaat(en)</numerusform>
       </translation>
     </message>
     <message>
@@ -700,7 +700,7 @@
     </message>
     <message>
       <source>Low</source>
-      <translation>Lage</translation>
+      <translation>Laag</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -725,32 +725,32 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Laagst</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Laag</translation>
+      <translation>L</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>Medium</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Hoog</translation>
+      <translation>H</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Beste</translation>
+      <translation>B</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Preset</translation>
+      <translation>Ps</translation>
     </message>
   </context>
   <context>

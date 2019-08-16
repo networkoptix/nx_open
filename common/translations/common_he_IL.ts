@@ -586,15 +586,15 @@
       <source>%n Camera(s)</source>
       <translation>
         <numerusform>מצלמה %n</numerusform>
-        <numerusform>%n מצלמות</numerusform>
-        <numerusform>%n מצלמות</numerusform>
-        <numerusform>%n מצלמות</numerusform>
+        <numerusform>מצלמה %n</numerusform>
+        <numerusform>מצלמה %n</numerusform>
+        <numerusform>מצלמה %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
       <translation>
-        <numerusform>מצלמה %n</numerusform>
+        <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>
         <numerusform>%n מצלמות</numerusform>
@@ -603,8 +603,8 @@
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>מכשיר %n</numerusform>
-        <numerusform>%n מכשירים</numerusform>
+        <numerusform>%n התקנים</numerusform>
+        <numerusform>%n התקנים</numerusform>
         <numerusform>%n התקנים</numerusform>
         <numerusform>%n התקנים</numerusform>
       </translation>
@@ -716,7 +716,7 @@
     <name>QnStreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation>הנמוכה ביותר</translation>
+      <translation>הנמוך ביותר</translation>
     </message>
     <message>
       <source>Low</source>
@@ -724,7 +724,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation>בינונית</translation>
+      <translation>בינוני</translation>
     </message>
     <message>
       <source>High</source>
@@ -745,32 +745,32 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>הנמוכה ביותר</translation>
+      <translation>נב</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>נמוכה</translation>
+      <translation>נ</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>בינונית</translation>
+      <translation>מ</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>גבוהה</translation>
+      <translation>ג</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>מיטבית</translation>
+      <translation>גב</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>פריסט</translation>
+      <translation>פס</translation>
     </message>
   </context>
   <context>

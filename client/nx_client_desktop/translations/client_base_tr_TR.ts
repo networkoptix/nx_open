@@ -134,7 +134,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>Sunucu bağlantısını kes</translation>
+      <translation>Sunucu ile bağlantıyı kes</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
@@ -893,7 +893,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Yer işaretlerini Dışa Aktar...</translation>
     </message>
   </context>
   <context>
@@ -1280,7 +1280,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Permissions</source>
-      <translation>Erişim İzinleri</translation>
+      <translation>İzinler</translation>
     </message>
   </context>
   <context>
@@ -1356,7 +1356,7 @@ to view more bookmarks</source>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation>TAMAM</translation>
+      <translation>Tamam</translation>
     </message>
   </context>
   <context>
@@ -1677,7 +1677,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n action(s)</source>
       <translation>
-        <numerusform>%n hareket</numerusform>
+        <numerusform>%n hareketler</numerusform>
         <numerusform>%n hareketler</numerusform>
       </translation>
     </message>
@@ -1707,7 +1707,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Date</source>
-      <translation>Gün</translation>
+      <translation>Tarih</translation>
     </message>
     <message>
       <source>Time</source>
@@ -1935,7 +1935,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n Server(s)</source>
       <translation>
-        <numerusform>%n Sunucu</numerusform>
+        <numerusform>%n Sunucular</numerusform>
         <numerusform>%n Sunucular</numerusform>
       </translation>
     </message>
@@ -2017,11 +2017,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation>En Az Bir Aygıt Seçin</translation>
+      <translation>En Az Bir Aygıt Seç</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation>En Az Bir Kamera Seçin</translation>
+      <translation>En Az Bir Kamera Seç</translation>
     </message>
     <message>
       <source>Devices</source>
@@ -2206,7 +2206,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Server offline</source>
-      <translation>Sunucu çevrimdışı</translation>
+      <translation>Sunucu Çevrimdışı</translation>
     </message>
     <message>
       <source>Device adding is possible for online servers only.</source>
@@ -2274,7 +2274,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Web</source>
-      <translation type="unfinished">Web</translation>
+      <translation>Web</translation>
     </message>
     <message>
       <source>No settings</source>
@@ -2296,7 +2296,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select camera</source>
-      <translation>Kamera seçin</translation>
+      <translation>Kamera seç</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
@@ -2310,7 +2310,7 @@ to view more bookmarks</source>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation>TAMAM</translation>
+      <translation>Tamam</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
@@ -2705,7 +2705,7 @@ to view more bookmarks</source>
     <name>QnCameraSettingsDialog</name>
     <message>
       <source>Device Settings</source>
-      <translation>Aygıt Ayarları</translation>
+      <translation>Cihaz Ayarları</translation>
     </message>
     <message>
       <source>Devices Settings</source>
@@ -2737,11 +2737,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Device Rules...</source>
-      <translation>Cihaz kuralları...</translation>
+      <translation>Aygıt Kuralları...</translation>
     </message>
     <message>
       <source>Devices Rules...</source>
-      <translation>Cihazların kuralları...</translation>
+      <translation>Aygıt Kuralları...</translation>
     </message>
     <message>
       <source>Camera Rules...</source>
@@ -2749,15 +2749,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cameras Rules...</source>
-      <translation>Kameraların Kuralları...</translation>
+      <translation>Kamera Kuralları...</translation>
     </message>
     <message>
       <source>I/O Module Rules...</source>
-      <translation>I/O Modül Kuralları...</translation>
+      <translation>I/O Mödül Kuralları...</translation>
     </message>
     <message>
       <source>I/O Modules Rules...</source>
-      <translation>I/O Modüllerinin Kuralları...</translation>
+      <translation>I/O Mödül Kuralları...</translation>
     </message>
     <message numerus="yes">
       <source>Changes to the following %n devices are not saved:</source>
@@ -2935,7 +2935,7 @@ to %1</source>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation>E-posta</translation>
+      <translation>Eposta</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3070,7 +3070,7 @@ to %1</source>
     </message>
     <message>
       <source>Download</source>
-      <translation>İndir</translation>
+      <translation>Karşıdan Yükle</translation>
     </message>
     <message>
       <source>Restart</source>
@@ -3293,11 +3293,11 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>Video Enkoder'ı Başlatılamadı.</translation>
+      <translation>Video Kodlayıcısı Başlatılamadı.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Ses Enkoder'ı Başlatılamadı.</translation>
+      <translation>Ses Kodlayıcısı Başlatılamadı.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
@@ -3356,7 +3356,7 @@ to %1</source>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation>Parolalar uyuşmuyor.</translation>
+      <translation>Şifreler eşleşmiyor.</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -3426,7 +3426,7 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
-        <numerusform>%1 İçin Olay Günlüğü - %n olay(lar) bulundu</numerusform>
+        <numerusform>%1 İçin Olay Günlüğü - %n olay bulundu</numerusform>
         <numerusform>%1 İçin Olay Günlüğü - %n olay bulundu</numerusform>
       </translation>
     </message>
@@ -3778,7 +3778,7 @@ to %1</source>
     <message>
       <source>Disabled</source>
       <comment>IO Port Type</comment>
-      <translation>Devre Dışı</translation>
+      <translation>Devre Dışı Bırak</translation>
     </message>
     <message>
       <source>Input</source>
@@ -3904,7 +3904,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E Posta</translation>
+      <translation>Eposta</translation>
     </message>
     <message>
       <source>DN</source>
@@ -3912,7 +3912,7 @@ to %1</source>
     </message>
     <message>
       <source>Name</source>
-      <translation>Ad</translation>
+      <translation>İsim</translation>
     </message>
   </context>
   <context>
@@ -4009,7 +4009,7 @@ to %1</source>
     </message>
     <message>
       <source>OK</source>
-      <translation>TAMAM</translation>
+      <translation>Tamam</translation>
     </message>
     <message>
       <source>Error</source>
@@ -4029,7 +4029,7 @@ to %1</source>
     </message>
     <message>
       <source>License is expired</source>
-      <translation>Lisan süresi doldu</translation>
+      <translation>Lisans süresi doldu</translation>
     </message>
     <message>
       <source>Expires soon</source>
@@ -4301,21 +4301,21 @@ to %1</source>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation>
-        <numerusform>Seçilen %n Aygıt İçin Lisans Kullan</numerusform>
+        <numerusform>Seçilen %n Aygıt İçin Lisansları Kullan</numerusform>
         <numerusform>Seçilen %n Aygıt İçin Lisansları Kullan</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
       <translation>
-        <numerusform>Seçilen %n Kamera İçin Lisans Kullan</numerusform>
+        <numerusform>Seçilen %n Kamera İçin Lisanslarını Kullan</numerusform>
         <numerusform>Seçilen %n Kamera İçin Lisanslarını Kullan</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
       <translation>
-        <numerusform>Seçilen %n I/O Modülü İçin Lisans Kullan</numerusform>
+        <numerusform>Seçilen %n I/O Modülü İçin Lisanslarını Kullan</numerusform>
         <numerusform>Seçilen %n I/O Modülü İçin Lisanslarını Kullan</numerusform>
       </translation>
     </message>
@@ -4414,7 +4414,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation>Bağlantıyı sil?</translation>
+      <translation>Bağlantıyı silmek istiyor musunuz?</translation>
     </message>
     <message>
       <source>There is another connection with the same name.</source>
@@ -4502,7 +4502,7 @@ to %1</source>
     </message>
     <message>
       <source>No image</source>
-      <translation>Görsel yok</translation>
+      <translation>İmaj yok</translation>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
@@ -4565,7 +4565,7 @@ to %1</source>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation>Düşük-Çözünürlük</translation>
+      <translation>Düşük kalite</translation>
     </message>
     <message>
       <source>Failed to invoke trigger %1 (%2)</source>
@@ -5081,7 +5081,7 @@ to %1</source>
     </message>
     <message>
       <source>Instant</source>
-      <translation>Hızlı</translation>
+      <translation>Derhal</translation>
     </message>
     <message>
       <source>Position</source>
@@ -5411,7 +5411,7 @@ to %1</source>
     </message>
     <message>
       <source>Information</source>
-      <translation>Hakkında</translation>
+      <translation>Bilgi</translation>
     </message>
     <message>
       <source>Rotate</source>
@@ -5460,11 +5460,11 @@ to %1</source>
     </message>
     <message>
       <source>Search</source>
-      <translation>Ara</translation>
+      <translation>Arama</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Yer işaretlerini Dışa Aktar...</translation>
     </message>
   </context>
   <context>
@@ -5502,7 +5502,7 @@ to %1</source>
     <name>QnSearchLineEdit</name>
     <message>
       <source>Search</source>
-      <translation>Ara</translation>
+      <translation>Arama</translation>
     </message>
   </context>
   <context>
@@ -5571,8 +5571,8 @@ to %1</source>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n kullanıcılar</numerusform>
-        <numerusform>%n kullanıcılar</numerusform>
+        <numerusform>%n kullanıcı</numerusform>
+        <numerusform>%n kullanıcı</numerusform>
       </translation>
     </message>
   </context>
@@ -5666,7 +5666,7 @@ to %1</source>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation>Sunucu Web Sayfası</translation>
+      <translation>Sunucu web sayfası</translation>
     </message>
   </context>
   <context>
@@ -5966,7 +5966,7 @@ to %1</source>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
       <source>Device Settings</source>
-      <translation>Aygıt Ayarları</translation>
+      <translation>Cihaz Ayarları</translation>
     </message>
     <message>
       <source>Camera Settings</source>
@@ -6029,11 +6029,11 @@ to %1</source>
     <name>QnSmtpAdvancedSettingsWidget</name>
     <message>
       <source>Auto</source>
-      <translation>Otomatik</translation>
+      <translation>Oto</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-posta</translation>
+      <translation>Eposta</translation>
     </message>
     <message>
       <source>SMTP Server</source>
@@ -6068,7 +6068,7 @@ to %1</source>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
       <source>Email</source>
-      <translation>E-posta</translation>
+      <translation>Eposta</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -6438,7 +6438,7 @@ to %1</source>
     </message>
     <message>
       <source>Backup</source>
-      <translation>Yedek</translation>
+      <translation>Yedekleme</translation>
     </message>
     <message>
       <source>Main</source>
@@ -6519,7 +6519,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E Posta</translation>
+      <translation>Eposta</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -6737,7 +6737,7 @@ to %1</source>
     </message>
     <message>
       <source>Date</source>
-      <translation>Gün</translation>
+      <translation>Tarih</translation>
     </message>
     <message>
       <source>Timezone</source>
@@ -6811,7 +6811,7 @@ to %1</source>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM yyyy</translation>
+      <translation>AAAA yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
@@ -6821,7 +6821,7 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h:mm ap</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
   </context>
   <context>
@@ -6933,7 +6933,7 @@ to %1</source>
     </message>
     <message>
       <source>Name</source>
-      <translation>Ad</translation>
+      <translation>İsim</translation>
     </message>
     <message>
       <source>Local user</source>
@@ -6957,7 +6957,7 @@ to %1</source>
     <name>QnUserListModelPrivate</name>
     <message>
       <source>Owner</source>
-      <translation>Sahibi</translation>
+      <translation>Sahip</translation>
     </message>
     <message>
       <source>Administrator</source>
@@ -7019,7 +7019,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-posta</translation>
+      <translation>Eposta</translation>
     </message>
   </context>
   <context>
@@ -7079,7 +7079,7 @@ to %1</source>
     </message>
     <message>
       <source>Layouts</source>
-      <translation>Ekran düzeni</translation>
+      <translation>Ekran Düzenleri</translation>
     </message>
     <message>
       <source>New Role</source>
@@ -7126,7 +7126,7 @@ to %1</source>
     </message>
     <message>
       <source>Enabled</source>
-      <translation>Etkin</translation>
+      <translation>Etkinleştir</translation>
     </message>
     <message>
       <source>User is disabled</source>
@@ -7170,7 +7170,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-posta</translation>
+      <translation>Eposta</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
@@ -7186,7 +7186,7 @@ to %1</source>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation>Parolalar eşleşmiyor.</translation>
+      <translation>Şifreler eşleşmiyor.</translation>
     </message>
     <message>
       <source>%1 user with specified email already exists.</source>
@@ -7225,7 +7225,7 @@ to %1</source>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>Parola boş olamaz.</translation>
+      <translation>Parola boş bırakılamaz.</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces.</source>
@@ -7368,7 +7368,7 @@ to %1</source>
     </message>
     <message>
       <source>Server offline</source>
-      <translation>Sunucu çevrimdışı</translation>
+      <translation>Sunucu Çevrimdışı</translation>
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
@@ -7390,7 +7390,7 @@ to %1</source>
     <name>QnWorkbenchConnectHandler</name>
     <message>
       <source>Connect to Another Server...</source>
-      <translation>Başka Sunucuya Bağlan...</translation>
+      <translation>Başka bir Sunucuya Bağlan...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
@@ -7629,7 +7629,7 @@ to %1</source>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
-      <translation>Video Duvarı</translation>
+      <translation>Multi Monitör</translation>
     </message>
     <message>
       <source>Video Wall %1</source>
@@ -7637,7 +7637,7 @@ to %1</source>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>Yeni Video Duvarı...</translation>
+      <translation>Yeni Multi Monitör...</translation>
     </message>
     <message>
       <source>New Matrix %1</source>
@@ -8019,8 +8019,8 @@ to %1</source>
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation>
-        <numerusform>%n öğeleri silinsin mi?</numerusform>
-        <numerusform>%n öğeleri silinsin mi?</numerusform>
+        <numerusform>%n öğesi silinsin mi?</numerusform>
+        <numerusform>%n öğesi silinsin mi?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8162,7 +8162,7 @@ to %1</source>
     </message>
     <message>
       <source>No data exported.</source>
-      <translation>Veri dışarı aktarma.</translation>
+      <translation>Dışa aktarılan veri yok.</translation>
     </message>
     <message>
       <source>Internal error</source>
@@ -8400,7 +8400,7 @@ to %1</source>
     <name>nx::client::desktop::RadassActionFactory</name>
     <message>
       <source>Auto</source>
-      <translation>Otomatik</translation>
+      <translation>Oto</translation>
     </message>
     <message>
       <source>Low</source>
@@ -8520,7 +8520,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Birkaç yer imi sadece düzen olarak dışa aktarılabilir.</translation>
     </message>
   </context>
   <context>
@@ -8769,7 +8769,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>E Posta</translation>
+      <translation>Eposta</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>

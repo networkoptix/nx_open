@@ -135,7 +135,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>Kijelentkezés a szerverről</translation>
+      <translation>Lekapcsolódás a szerverről</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
@@ -706,7 +706,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Bezár</translation>
+      <translation>Bezárás</translation>
     </message>
     <message>
       <source>Close All But This</source>
@@ -894,7 +894,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Könyvjelzők exportálása...</translation>
     </message>
   </context>
   <context>
@@ -995,9 +995,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n elrendezések</numerusform>
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n elrendezések</numerusform>
       </translation>
     </message>
   </context>
@@ -1079,9 +1079,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n elrendezések</numerusform>
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n elrendezések</numerusform>
       </translation>
     </message>
     <message>
@@ -1102,7 +1102,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Top</source>
-      <translation>Képernyő teteje</translation>
+      <translation>Fent</translation>
     </message>
     <message>
       <source>Right Edge</source>
@@ -1110,7 +1110,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>Képernyő alja</translation>
+      <translation>Lent</translation>
     </message>
     <message>
       <source>Page Left</source>
@@ -1177,9 +1177,9 @@ több könyvjelző megjelenítéséhez</translation>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A fájlnév nem tartalmazhatja a következő karaktereket:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+        <numerusform>A fájlnév nem tartalmazhatja a következő karaktereket:</numerusform>
       </translation>
     </message>
   </context>
@@ -1515,7 +1515,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Mind kijelölése</translation>
+      <translation>Összes kijelölése</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -1617,7 +1617,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Bejelentkezés</translation>
+      <translation>Felhasználónév</translation>
     </message>
     <message>
       <source>User updated</source>
@@ -1716,7 +1716,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Leírás</translation>
+      <translation>&amp;Leírás</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -2394,9 +2394,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras: %1</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Ez az azonosító már használatban van a következő %n kamerák: %1</numerusform>
-        <numerusform>This ID is already used on the following %n cameras: %1</numerusform>
+        <numerusform>Ez az azonosító már használatban van a következő %n kamerák: %1</numerusform>
       </translation>
     </message>
     <message>
@@ -2441,7 +2441,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Mind kijelölése</translation>
+      <translation>Összes kijelölése</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
@@ -2627,7 +2627,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
       <source>On</source>
-      <translation>Be</translation>
+      <translation>on</translation>
     </message>
     <message>
       <source>Recording Schedule</source>
@@ -3157,7 +3157,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Csatlakozás</translation>
+      <translation>Kapcsolódás</translation>
     </message>
   </context>
   <context>
@@ -3273,7 +3273,7 @@ to %1</source>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Audió encoder inicializálása sikertelen.</translation>
+      <translation>Audió enkóder nem inicializálható.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -3281,7 +3281,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation>&quot;%1&quot; audio enkóder nem található.</translation>
+      <translation>&quot;%1&quot; audio encoder nem található.</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
@@ -3296,11 +3296,11 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>Videó encoder inicializálása sikertelen.</translation>
+      <translation>Videó enkóder nem inicializálható.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Audió encoder inicializálása sikertelen.</translation>
+      <translation>Audió enkóder nem inicializálható.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
@@ -3339,7 +3339,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Bejelentkezés</translation>
+      <translation>Felhasználónév</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3413,7 +3413,7 @@ to %1</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Mind kijelölése</translation>
+      <translation>Összes kijelölése</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3474,7 +3474,7 @@ to %1</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>Leírás</translation>
+      <translation>&amp;Leírás</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3522,7 +3522,7 @@ to %1</source>
     <name>QnExecHttpRequestActionWidget</name>
     <message>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation>Autómatikus</translation>
     </message>
     <message>
       <source>Basic</source>
@@ -3650,9 +3650,9 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message numerus="yes">
       <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Ez a kamera jelenleg nem része a kijelölt elrendezések. A művelet akkor fog működni, ha a kamera hozzáadódik a művelet megindításához.</numerusform>
-        <numerusform>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</numerusform>
+        <numerusform>Ez a kamera jelenleg nem része a kijelölt elrendezések. A művelet akkor fog működni, ha a kamera hozzáadódik a művelet megindításához.</numerusform>
       </translation>
     </message>
   </context>
@@ -3844,7 +3844,7 @@ to %1</source>
     </message>
     <message>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation>Autómatikus</translation>
     </message>
     <message>
       <source>multiple values</source>
@@ -3903,7 +3903,7 @@ to %1</source>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>Bejelentkezés</translation>
+      <translation>Felhasználónév</translation>
     </message>
     <message>
       <source>Email</source>
@@ -4215,7 +4215,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Eltávolítás</translation>
+      <translation>Törlés</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4417,7 +4417,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation>Törli a kapcsolatot?</translation>
+      <translation>Kapcsolat törlése?</translation>
     </message>
     <message>
       <source>There is another connection with the same name.</source>
@@ -4432,7 +4432,7 @@ to %1</source>
     <name>QnLoginToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>Password</source>
@@ -4544,7 +4544,7 @@ to %1</source>
     </message>
     <message>
       <source>Image Enhancement</source>
-      <translation>Képjavítás</translation>
+      <translation>Kép javítása</translation>
     </message>
     <message>
       <source>Hi-Res</source>
@@ -4666,7 +4666,7 @@ to %1</source>
     </message>
     <message>
       <source>Reset</source>
-      <translation>Visszaállitás</translation>
+      <translation>Törlés</translation>
     </message>
     <message>
       <source>Skip</source>
@@ -4674,7 +4674,7 @@ to %1</source>
     </message>
     <message>
       <source>Close</source>
-      <translation>Bezár</translation>
+      <translation>Bezárás</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -4966,7 +4966,7 @@ to %1</source>
     </message>
     <message>
       <source>Home</source>
-      <translation>Otthon</translation>
+      <translation>Saját könyvtár</translation>
     </message>
     <message>
       <source>Details</source>
@@ -5115,7 +5115,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>Válasszon mappát...</translation>
+      <translation>Mappa választása...</translation>
     </message>
     <message>
       <source>Best</source>
@@ -5146,7 +5146,7 @@ to %1</source>
     </message>
     <message>
       <source>Space</source>
-      <translation>Szóköz</translation>
+      <translation>Tárhely</translation>
     </message>
     <message>
       <source>Calendar Days</source>
@@ -5410,7 +5410,7 @@ to %1</source>
     <name>QnResourceWidget</name>
     <message>
       <source>Close</source>
-      <translation>Bezár</translation>
+      <translation>Bezárás</translation>
     </message>
     <message>
       <source>Information</source>
@@ -5467,7 +5467,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Könyvjelzők exportálása...</translation>
     </message>
   </context>
   <context>
@@ -6033,11 +6033,11 @@ to %1</source>
     <name>QnSmtpAdvancedSettingsWidget</name>
     <message>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation>Autómatikus</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>SMTP Server</source>
@@ -6072,7 +6072,7 @@ to %1</source>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -6259,7 +6259,7 @@ to %1</source>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation>Mind kijelölése</translation>
+      <translation>Összes kijelölése</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -6418,7 +6418,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Eltávolítás</translation>
+      <translation>Törlés</translation>
     </message>
     <message>
       <source>Inaccessible</source>
@@ -6442,7 +6442,7 @@ to %1</source>
     </message>
     <message>
       <source>Backup</source>
-      <translation>Biztonsági mentés</translation>
+      <translation>Biztonsági Mentés</translation>
     </message>
     <message>
       <source>Main</source>
@@ -6815,7 +6815,7 @@ to %1</source>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>yyyy MMMM</translation>
+      <translation>HHHH éééé</translation>
     </message>
     <message>
       <source>yyyy</source>
@@ -6945,7 +6945,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Bejelentkezés</translation>
+      <translation>Felhasználónév</translation>
     </message>
     <message>
       <source>Role</source>
@@ -7011,7 +7011,7 @@ to %1</source>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>Bejelentkezés</translation>
+      <translation>Felhasználónév</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7023,7 +7023,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-mail</translation>
     </message>
   </context>
   <context>
@@ -7154,7 +7154,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Bejelentkezés</translation>
+      <translation>Felhasználónév</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -7174,7 +7174,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
@@ -7225,7 +7225,7 @@ to %1</source>
     </message>
     <message>
       <source>Email is not valid.</source>
-      <translation>Nem érvényes email.</translation>
+      <translation>Nem érvényes e-mail.</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -7360,7 +7360,7 @@ to %1</source>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation>Könyvjelző</translation>
+      <translation>Könyvjeltő</translation>
     </message>
     <message>
       <source>Bookmarks can only be added to an online server.</source>
@@ -7610,7 +7610,7 @@ to %1</source>
     <name>QnWorkbenchUpdateWatcher</name>
     <message>
       <source>Release Notes</source>
-      <translation>Megjegyzések</translation>
+      <translation>Verzóinfók</translation>
     </message>
     <message>
       <source>%1 version available</source>
@@ -7633,7 +7633,7 @@ to %1</source>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
-      <translation>Videofal</translation>
+      <translation>Video fal</translation>
     </message>
     <message>
       <source>Video Wall %1</source>
@@ -7641,7 +7641,7 @@ to %1</source>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>Új videofal...</translation>
+      <translation>Új videófal...</translation>
     </message>
     <message>
       <source>New Matrix %1</source>
@@ -7754,9 +7754,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlformátumok nem támogatottak</numerusform>
-        <numerusform>Selected file formats are not supported</numerusform>
+        <numerusform>A kiválasztott fájlformátumok nem támogatottak</numerusform>
       </translation>
     </message>
     <message>
@@ -7765,30 +7765,30 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlok nem tartalmaznak időbélyegzőket</numerusform>
-        <numerusform>Selected files do not have timestamps</numerusform>
+        <numerusform>A kiválasztott fájlok nem tartalmaznak időbélyegzőket</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlok olyan időszakokat tartalmaznak, amelyekre a videókat már korábban feltöltöttek</numerusform>
-        <numerusform>Selected files cover periods for which videos are already being uploaded</numerusform>
+        <numerusform>A kiválasztott fájlok olyan időszakokat tartalmaznak, amelyekre a videókat már korábban feltöltöttek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Feltöltheti ezeket a fájlokat egy hordozható kamera másik példányára.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
+        <numerusform>Feltöltheti ezeket a fájlokat egy hordozható kamera másik példányára.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlok olyan időszakokat tartalmaznak, amelyekre a videókat már korábban feltöltöttek</numerusform>
-        <numerusform>Selected files cover periods for which videos have already been uploaded</numerusform>
+        <numerusform>A kiválasztott fájlok olyan időszakokat tartalmaznak, amelyekre a videókat már korábban feltöltöttek</numerusform>
       </translation>
     </message>
     <message>
@@ -7805,37 +7805,37 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kijelölt fájlok túl régiek</numerusform>
-        <numerusform>Selected files are too old</numerusform>
+        <numerusform>A kijelölt fájlok túl régiek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlt %1 on rögzítették, de csak az utolsó %n napban rögzített fájlok tölthetők fel. Ezt megváltoztathatja a kamera archív beállításaiban.</numerusform>
-        <numerusform>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>A kiválasztott fájlt %1 on rögzítették, de csak az utolsó %n napban rögzített fájlok tölthetők fel. Ezt megváltoztathatja a kamera archív beállításaiban.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>A kiválasztott fájlt %1 és %2 között rögzítették, de csak az utolsó %n napban rögzített fájlok tölthetők fel. Ezt megváltoztathatja a kamera archív beállításaiban.</numerusform>
-        <numerusform>Selected files were recorded between %1 and %2, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</numerusform>
+        <numerusform>A kiválasztott fájlt %1 és %2 között rögzítették, de csak az utolsó %n napban rögzített fájlok tölthetők fel. Ezt megváltoztathatja a kamera archív beállításaiban.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Néhány felvétel törlődhet ezen fájlok feltöltése után</numerusform>
-        <numerusform>Some footage may be deleted after uploading these files</numerusform>
+        <numerusform>Néhány felvétel törlődhet ezen fájlok feltöltése után</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Nincs túl sok szabad hely a szerver tárhelyén. Egyes régi felvételek törlődhetnek, hogy helyet szabadítsanak fel. Ne feledje, hogy ha a kiválasztott fájlok a legrégebbiek a szerveren, akkor a feltöltés után azonnal törlődnek.</numerusform>
-        <numerusform>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</numerusform>
+        <numerusform>Nincs túl sok szabad hely a szerver tárhelyén. Egyes régi felvételek törlődhetnek, hogy helyet szabadítsanak fel. Ne feledje, hogy ha a kiválasztott fájlok a legrégebbiek a szerveren, akkor a feltöltés után azonnal törlődnek.</numerusform>
       </translation>
     </message>
     <message>
@@ -8023,8 +8023,8 @@ to %1</source>
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation>
-        <numerusform>Törli a(z) %n elemet?</numerusform>
-        <numerusform>Törli a(z) %n elemet?</numerusform>
+        <numerusform>Töröl %n elemet?</numerusform>
+        <numerusform>Töröl %n elemet?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8077,9 +8077,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Néhány videofájl(ok) még mindig töltődnek a %n hordozható kamerára:</numerusform>
-        <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
+        <numerusform>Néhány videofájl(ok) még mindig töltődnek a %n hordozható kamerára:</numerusform>
       </translation>
     </message>
   </context>
@@ -8404,7 +8404,7 @@ to %1</source>
     <name>nx::client::desktop::RadassActionFactory</name>
     <message>
       <source>Auto</source>
-      <translation>Auto</translation>
+      <translation>Autómatikus</translation>
     </message>
     <message>
       <source>Low</source>
@@ -8773,7 +8773,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>

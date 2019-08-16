@@ -104,7 +104,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>TAMAM</translation>
+      <translation>Tamam</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -496,7 +496,7 @@
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation>Köprü Lisansları</translation>
+      <translation>Bridge Lisansları</translation>
     </message>
   </context>
   <context>
@@ -577,7 +577,7 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n Kamera(lar)</numerusform>
+        <numerusform>%n Kameralar</numerusform>
         <numerusform>%n Kameralar</numerusform>
       </translation>
     </message>
@@ -585,7 +585,7 @@
       <source>%n camera(s)</source>
       <translation>
         <numerusform>%n kamera</numerusform>
-        <numerusform>%n kameralar</numerusform>
+        <numerusform>%n kamera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -658,7 +658,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Modül</translation>
+      <translation>I/O Modülü</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -712,11 +712,11 @@
     </message>
     <message>
       <source>Best</source>
-      <translation>En İyi</translation>
+      <translation>En iyi</translation>
     </message>
     <message>
       <source>Preset</source>
-      <translation>Standart</translation>
+      <translation>Önayar</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -725,7 +725,7 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>En Düşük</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
@@ -745,12 +745,12 @@
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>En İyi</translation>
+      <translation>Bst</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Standart</translation>
+      <translation>Ps</translation>
     </message>
   </context>
   <context>
@@ -765,7 +765,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Kayıt İçin Akış Çıkışı Ayrılamadı.</translation>
+      <translation>Kayıt İçin Çıkış Akışı Sağlanamadı.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
@@ -803,7 +803,7 @@
     <name>QnTCPConnectionProcessor</name>
     <message>
       <source>OK</source>
-      <translation>TAMAM</translation>
+      <translation>Tamam</translation>
     </message>
     <message>
       <source>Not Found</source>
@@ -836,7 +836,7 @@
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation>sn</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>m</source>

@@ -202,7 +202,7 @@
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation>Przeglądanie archiwum</translation>
+      <translation>Odtwarzanie archiwum</translation>
     </message>
     <message>
       <location/>
@@ -212,7 +212,7 @@
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>Podglądanie na żywo</translation>
+      <translation>Podgląd na żywo</translation>
     </message>
     <message>
       <location/>
@@ -549,12 +549,12 @@
     <message>
       <location/>
       <source>Stop</source>
-      <translation>Stop</translation>
+      <translation>Zatrzymaj</translation>
     </message>
     <message>
       <location/>
       <source>Brand</source>
-      <translation>Marka</translation>
+      <translation>Producent</translation>
     </message>
     <message>
       <location/>
@@ -755,7 +755,7 @@
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation>ID logiczny</translation>
+      <translation>Identyfikator logiczny</translation>
     </message>
     <message>
       <location/>
@@ -1335,7 +1335,7 @@
     <message>
       <location/>
       <source>Rotation</source>
-      <translation>Rotacja</translation>
+      <translation>Obrót</translation>
     </message>
   </context>
   <context>
@@ -1457,7 +1457,7 @@
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation>ID logiczny</translation>
+      <translation>Identyfikator logiczny</translation>
     </message>
     <message>
       <location/>
@@ -1989,7 +1989,7 @@
     <message>
       <location/>
       <source>Start Tour</source>
-      <translation>Rozpocznij trasę</translation>
+      <translation>Rozpocznij cykl</translation>
     </message>
     <message>
       <location/>
@@ -2066,7 +2066,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>Zakładka</translation>
+      <translation>Utwórz zakładkę</translation>
     </message>
   </context>
   <context>
@@ -2287,7 +2287,7 @@
     <message>
       <location/>
       <source>Clear Selection</source>
-      <translation>Wyczyść zaznaczenie</translation>
+      <translation>Wyczyść zaznaczone</translation>
     </message>
     <message>
       <location/>
@@ -2358,7 +2358,7 @@
     <message>
       <location/>
       <source>Speed</source>
-      <translation>Szybkość</translation>
+      <translation>Prędkość</translation>
     </message>
     <message>
       <location/>
@@ -3217,7 +3217,7 @@
     <message>
       <location/>
       <source>On</source>
-      <translation>Wł.</translation>
+      <translation>Jeśli</translation>
     </message>
     <message>
       <location/>

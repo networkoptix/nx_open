@@ -585,25 +585,25 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n Kamera</numerusform>
         <numerusform>%n Kamery</numerusform>
         <numerusform>%n Kamery</numerusform>
-        <numerusform>%n Kamer</numerusform>
+        <numerusform>%n Kamery</numerusform>
+        <numerusform>%n Kamery</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
       <translation>
         <numerusform>%n kamera</numerusform>
-        <numerusform>%n kamery</numerusform>
         <numerusform>%n kamera</numerusform>
-        <numerusform>%n kamer</numerusform>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n urządzeń</numerusform>
+        <numerusform>%n Urządzeń</numerusform>
         <numerusform>%n Urządzeń</numerusform>
         <numerusform>%n Urządzeń</numerusform>
         <numerusform>%n Urządzeń</numerusform>
@@ -613,9 +613,9 @@
       <source>%n device(s)</source>
       <translation>
         <numerusform>%n urządzenie</numerusform>
-        <numerusform>%n urządzenia</numerusform>
         <numerusform>%n urządzenie</numerusform>
-        <numerusform>%n urządzeń</numerusform>
+        <numerusform>%n urządzenie</numerusform>
+        <numerusform>%n urządzenie</numerusform>
       </translation>
     </message>
     <message>
@@ -654,18 +654,18 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n Moduł I/O</numerusform>
-        <numerusform>%n Moduły I/O</numerusform>
         <numerusform>%n Moduł I/O</numerusform>
-        <numerusform>%n Modułów I/O</numerusform>
+        <numerusform>%n Moduł I/O</numerusform>
+        <numerusform>%n Moduł I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n moduł I/O</numerusform>
-        <numerusform>%n moduły I/O</numerusform>
         <numerusform>%n moduł I/O</numerusform>
-        <numerusform>%n modułów I/O</numerusform>
+        <numerusform>%n moduł I/O</numerusform>
+        <numerusform>%n moduł I/O</numerusform>
       </translation>
     </message>
     <message>
@@ -720,7 +720,7 @@
     </message>
     <message>
       <source>Low</source>
-      <translation>Niski</translation>
+      <translation>Niska</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -728,7 +728,7 @@
     </message>
     <message>
       <source>High</source>
-      <translation>Wysoki</translation>
+      <translation>Wysoka</translation>
     </message>
     <message>
       <source>Best</source>
@@ -740,7 +740,7 @@
     </message>
     <message>
       <source>Undefined</source>
-      <translation>Niezdefiniowany</translation>
+      <translation>Niezdefiniowane</translation>
     </message>
     <message>
       <source>Lst</source>
@@ -770,7 +770,7 @@
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Pset</translation>
+      <translation>Ust.</translation>
     </message>
   </context>
   <context>
@@ -886,27 +886,27 @@
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation>r</translation>
+      <translation>L</translation>
     </message>
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
+      <translation>msek</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation>sek.</translation>
+      <translation>sek</translation>
     </message>
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation>min.</translation>
+      <translation>min</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation>godz.</translation>
+      <translation>godz</translation>
     </message>
     <message>
       <source>days</source>
@@ -916,12 +916,12 @@
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation>tyg.</translation>
+      <translation>tyg</translation>
     </message>
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation>mies.</translation>
+      <translation>mies</translation>
     </message>
     <message>
       <source>yrs</source>
@@ -934,7 +934,7 @@
       <translation>
         <numerusform>milisekunda</numerusform>
         <numerusform>milisekundy</numerusform>
-        <numerusform>milisekundy</numerusform>
+        <numerusform>milisekund</numerusform>
         <numerusform>milisekund</numerusform>
       </translation>
     </message>
@@ -942,10 +942,10 @@
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>sekund</numerusform>
-        <numerusform>sek.</numerusform>
+        <numerusform>sekunda</numerusform>
         <numerusform>sekundy</numerusform>
-        <numerusform>sek.</numerusform>
+        <numerusform>sekund</numerusform>
+        <numerusform>sekund</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -954,7 +954,7 @@
       <translation>
         <numerusform>minuta</numerusform>
         <numerusform>minuty</numerusform>
-        <numerusform>minuta</numerusform>
+        <numerusform>minut</numerusform>
         <numerusform>minut</numerusform>
       </translation>
     </message>
@@ -962,9 +962,9 @@
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>godzin</numerusform>
-        <numerusform>godzin</numerusform>
         <numerusform>godzina</numerusform>
+        <numerusform>godziny</numerusform>
+        <numerusform>godzin</numerusform>
         <numerusform>godzin</numerusform>
       </translation>
     </message>
@@ -972,9 +972,9 @@
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>dni</numerusform>
-        <numerusform>dni</numerusform>
         <numerusform>dzień</numerusform>
+        <numerusform>dni</numerusform>
+        <numerusform>dni</numerusform>
         <numerusform>dni</numerusform>
       </translation>
     </message>
@@ -984,7 +984,7 @@
       <translation>
         <numerusform>tydzień</numerusform>
         <numerusform>tygodnie</numerusform>
-        <numerusform>tydzień</numerusform>
+        <numerusform>tygodni</numerusform>
         <numerusform>tygodni</numerusform>
       </translation>
     </message>
@@ -994,7 +994,7 @@
       <translation>
         <numerusform>miesiąc</numerusform>
         <numerusform>miesiące</numerusform>
-        <numerusform>miesiąc</numerusform>
+        <numerusform>miesięcy</numerusform>
         <numerusform>miesięcy</numerusform>
       </translation>
     </message>
@@ -1004,7 +1004,7 @@
       <translation>
         <numerusform>rok</numerusform>
         <numerusform>lata</numerusform>
-        <numerusform>rok</numerusform>
+        <numerusform>lat</numerusform>
         <numerusform>lat</numerusform>
       </translation>
     </message>
@@ -1371,7 +1371,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>

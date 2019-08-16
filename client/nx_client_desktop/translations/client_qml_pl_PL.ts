@@ -65,7 +65,7 @@
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>ODŁĄCZONY</translation>
+      <translation>OFFLINE</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
@@ -74,6 +74,14 @@
     <message>
       <source>New Server</source>
       <translation>Nowy serwer</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Edytuj</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Ukryj</translation>
     </message>
   </context>
   <context>

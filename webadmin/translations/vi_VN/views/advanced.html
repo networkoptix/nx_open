@@ -75,7 +75,7 @@
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
  placeholder="Bộ nhớ dự trữ"/>
-                            <div class="input-group-addon">GB</div>
+                            <div class="input-group-addon">Gb</div>
                         </div>
                     </td>
                     <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
@@ -106,12 +106,12 @@
             Không có ổ lưu trữ chính nào được chọn để ghi - video sẽ không được ghi lại trên máy chủ này.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
+            Lượng không gian dành riêng lớn hơn không gian còn trống. Các cảnh quay video hiện tại có thể được gỡ bỏ để giải phóng dung lượng.
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Sửa chữa tất cả các cài đặt được đánh dấu để lưu nó</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >tiết kiệm</button>
-        <button class="btn btn-warning" ng-click="cancel()">hủy bỏ</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Tiết kiệm</button>
+        <button class="btn btn-warning" ng-click="cancel()">Hủy bỏ</button>
     </form>
 
     <h2>Cài đặt nhật ký</h2>
@@ -135,7 +135,7 @@
             <label class="col-sm-4">Cấp nhật ký giao dịch</label>
             <div class="col-sm-8">
                 <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Không: Vô hiệu hoá log.</option>
+                    <option value="NONE">Không có: Đăng nhập bị vô hiệu.</option>
                     <option value="ALWAYS">Luôn luôn: nhật ký lỗi, cảnh báo và tất cả thông điệp quan trọng.</option>
                     <option value="ERROR">Lỗi: Duy nhất lỗi đăng nhập.</option>
                     <option value="WARNING">Cảnh báo: Đăng nhập cảnh báo và lỗi.</option>
@@ -147,7 +147,7 @@
         </div>
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >tiết kiệm</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Tiết kiệm</button>
         </div>
     </form>
 
@@ -193,13 +193,13 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >tiết kiệm</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Tiết kiệm</button>
         </div>
 
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Sự phản đối!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Warning!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Khởi động lại máy chủ hiện tại</button>
         </div>

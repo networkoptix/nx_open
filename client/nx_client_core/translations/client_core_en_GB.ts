@@ -21,23 +21,23 @@
     </message>
     <message>
       <source>This account is blocked.</source>
-      <translation>This account is blocked.</translation>
+      <translation type="unfinished">This account is blocked.</translation>
     </message>
     <message>
       <source>Requested feature is not implemented.</source>
-      <translation>Requested feature is not implemented.</translation>
+      <translation type="unfinished">Requested feature is not implemented.</translation>
     </message>
     <message>
       <source>Unknown realm.</source>
-      <translation>Unknown realm.</translation>
+      <translation type="unfinished">Unknown realm.</translation>
     </message>
     <message>
       <source>Bad request.</source>
-      <translation>Bad request.</translation>
+      <translation type="unfinished">Bad request.</translation>
     </message>
     <message>
       <source>Invalid nonce.</source>
-      <translation>Invalid nonce.</translation>
+      <translation type="unfinished">Invalid nonce.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
@@ -45,7 +45,7 @@
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation>Invalid data received.</translation>
+      <translation type="unfinished">Invalid data received.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -53,7 +53,7 @@
     </message>
     <message>
       <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation>Unexpected network error. Please check your Internet connection and try again.</translation>
+      <translation type="unfinished">Unexpected network error. Please check your Internet connection and try again.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
@@ -61,11 +61,11 @@
     </message>
     <message>
       <source>Requested object is not found.</source>
-      <translation>Requested object is not found.</translation>
+      <translation type="unfinished">Requested object is not found.</translation>
     </message>
     <message>
       <source>Object already exists.</source>
-      <translation>Object already exists.</translation>
+      <translation type="unfinished">Object already exists.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
@@ -75,12 +75,12 @@
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</translation>
+      <translation type="unfinished">Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Sorry, %1 Service could not process your request. Please try again in a few moments.</translation>
+      <translation type="unfinished">Sorry, %1 Service could not process your request. Please try again in a few moments.</translation>
     </message>
   </context>
   <context>

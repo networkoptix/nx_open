@@ -5,82 +5,82 @@
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
-      <translation type="unfinished">Successful.</translation>
+      <translation>Onnistunut.</translation>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation type="unfinished">Invalid login or password.</translation>
+      <translation>Virheellinen käyttäjätunnus tai salasana.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
-      <translation type="unfinished">Requested operation is not allowed with provided credentials.</translation>
+      <translation>Pyydetty toiminto ei ole sallittua annetuilla käyttöoikeustiedoilla.</translation>
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
-      <translation type="unfinished">This account is not activated. Please check your email.</translation>
+      <translation>Tätä tiliä ei ole aktivoitu. Ole hyvä ja tarkista sähköpostisi.</translation>
     </message>
     <message>
       <source>This account is blocked.</source>
-      <translation type="unfinished">This account is blocked.</translation>
+      <translation>Tili on lukittu.</translation>
     </message>
     <message>
       <source>Requested feature is not implemented.</source>
-      <translation type="unfinished">Requested feature is not implemented.</translation>
+      <translation>Pyydettyä ominaisuutta ei ole toteutettu.</translation>
     </message>
     <message>
       <source>Unknown realm.</source>
-      <translation type="unfinished">Unknown realm.</translation>
+      <translation>Tuntematon alue.</translation>
     </message>
     <message>
       <source>Bad request.</source>
-      <translation type="unfinished">Bad request.</translation>
+      <translation>Virheellinen pyyntö.</translation>
     </message>
     <message>
       <source>Invalid nonce.</source>
-      <translation type="unfinished">Invalid nonce.</translation>
+      <translation>Virheellinen nonce.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
-      <translation type="unfinished">Credentials are no longer valid.</translation>
+      <translation>Käyttäjätunnukset eivät ole enää voimassa.</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation type="unfinished">Invalid data received.</translation>
+      <translation>Virheelliset tiedot vastaanotettu.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Tuntematon virhe.</translation>
     </message>
     <message>
       <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation type="unfinished">Unexpected network error. Please check your Internet connection and try again.</translation>
+      <translation>Odottamaton verkkovirhe. Tarkista Internet-yhteys ja yritä uudelleen.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
-      <translation type="unfinished">Invalid login.</translation>
+      <translation>Virheellinen kirjautuminen.</translation>
     </message>
     <message>
       <source>Requested object is not found.</source>
-      <translation type="unfinished">Requested object is not found.</translation>
+      <translation>Pyydettyä objektia ei löydy.</translation>
     </message>
     <message>
       <source>Object already exists.</source>
-      <translation type="unfinished">Object already exists.</translation>
+      <translation>Objekti on jo olemassa.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Internal %1 error. Please contact support team.</translation>
+      <translation>Sisäinen %1 virhe. Ota yhteyttä tekniseen tukeen.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</translation>
+      <translation>Anteeksi, %1 Palvelu on väliaikaisesti poissa käytöstä. Teemme parhaamme palauttaaksemme sen. Yritä uudelleen myöhemmin.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Sorry, %1 Service could not process your request. Please try again in a few moments.</translation>
+      <translation>Anteeksi, %1 -palvelu ei pystynyt käsittelemään pyyntöäsi. Yritä uudelleen hetken kuluttua.</translation>
     </message>
   </context>
   <context>
@@ -88,23 +88,23 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Owner: %1</translation>
+      <translation>Omistaja: %1</translation>
     </message>
     <message>
       <source>Your System</source>
-      <translation type="unfinished">Your System</translation>
+      <translation>Järjestelmäsi</translation>
     </message>
   </context>
   <context>
     <name>QnDirectSystemsFinder</name>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Järjestelmä</translation>
     </message>
     <message>
       <source>System (%1)</source>
       <comment>%1 is ip and port of system</comment>
-      <translation type="unfinished">System (%1)</translation>
+      <translation>Järjestelmä (%1)</translation>
     </message>
   </context>
   <context>
@@ -112,11 +112,11 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Owner: %1</translation>
+      <translation>Omistaja: %1</translation>
     </message>
     <message>
       <source>Your System</source>
-      <translation type="unfinished">Your System</translation>
+      <translation>Järjestelmäsi</translation>
     </message>
   </context>
 </TS>

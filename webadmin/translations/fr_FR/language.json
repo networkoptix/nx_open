@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "Notifications de mise à jour activées",
         "upnpPortMappingEnabled": "Mappage de port UPNP activé",
         "useTextEmailFormat": "Envoyer des courriels en texte brut",
-        "useWindowsEmailLineFeed": "Utiliser le Windows 'line feed' dans les courriels"
+        "useWindowsEmailLineFeed": "Utiliser le Windows 'line feed' dans les courriels",
+        "maxEventLogRecords": "Nombre maximal d'enregistrements du journal des événements à conserver dans la base de données. La quantité réelle d'enregistrements non supprimés peut dépasser de 20% la valeur spécifiée."
     },
     "info": {
         "tabs": {
@@ -193,13 +194,13 @@
         },
         "systemOffline": "System Hors ligne",
         "cameraLinks": {
-            "copyToClipboard": "copier vers Presse-Papier",
+            "copyToClipboard": "copier vers presse-papier",
             "highStream": "Flux Haut",
             "copyDefaultText": "copier",
             "unknown": "Inconnu",
             "lowStream": "Flux Bas",
             "transcoding": "Transcodage",
-            "copyActiveText": "copié dans le presse-papiers"
+            "copyActiveText": "copié dvers presse-papiers"
         },
         "searchCamPlaceholder": "Recherche",
         "cameraStates": {
@@ -207,7 +208,7 @@
             "ieWin10": "S.V.P, utilisez les navigateurs Edge Microsoft ou Google Chrome.",
             "iosVideoTooLarge": "iOS ne supporte pas une vidéo supérieure à fullHD (2MP : 1920 x 1080).",
             "unauthorized": "Authentification requise",
-            "ubuntuNX": "Ce navigateur ne supporte pas la vidéo à partir de serveurs ARM. S.V.P, utilisez un navigateur Chromium.",
+            "ubuntuNX": "Ce navigateur ne supporte pas la vidéo à partir de serveurs ARM. S.V.P. utilisez un navigateur Chromium.",
             "ieNoWebm": "Veuillez installer <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> pour Internet Explorer.",
             "flashOrWebmRequired": "S.V.P. <a href='https://get.adobe.com/flashplayer/' target='_blank'> installer Adobe Flash</a> ou le <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'> codec WebM</a> pour la lecture vidéo dans Internet Explorer.",
             "noArmSupport": "Ce navigateur ou ce périphérique ne supporte pas la lecture vidéo à partir de serveurs basés sur ARM.",

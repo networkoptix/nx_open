@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "Notifiche di aggiornamento abilitate",
         "upnpPortMappingEnabled": "Funzione UPNP abilitata",
         "useTextEmailFormat": "Invia e-mail di testo",
-        "useWindowsEmailLineFeed": "Utilizza la riga di Windows nei messaggi di posta elettronica"
+        "useWindowsEmailLineFeed": "Utilizza la riga di Windows nei messaggi di posta elettronica",
+        "maxEventLogRecords": "Numero massimo di record del registro degli eventi da conservare nel database. La quantità reale di record non eliminati può essere maggiore del 20% rispetto al valore specificato."
     },
     "info": {
         "tabs": {

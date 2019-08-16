@@ -138,7 +138,7 @@
     <message>
       <location/>
       <source>Instant</source>
-      <translation>เร่งด่วน</translation>
+      <translation>ทางด่วน</translation>
     </message>
   </context>
   <context>
@@ -192,7 +192,7 @@
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
       <source>Refresh</source>
-      <translation>รีเฟส</translation>
+      <translation>รีเฟรส</translation>
     </message>
     <message>
       <location/>
@@ -202,7 +202,7 @@
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation>ดูที่เก็บ</translation>
+      <translation>ดูที่ เก็บไว้</translation>
     </message>
     <message>
       <location/>
@@ -212,7 +212,7 @@
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>ดู ภาพสด</translation>
+      <translation>ดูถ่ายทอดสด</translation>
     </message>
     <message>
       <location/>
@@ -257,7 +257,7 @@
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation>ล้าง ตัวกรอง</translation>
+      <translation>ล้าง Filter</translation>
     </message>
     <message>
       <location/>
@@ -440,7 +440,7 @@
     <message>
       <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
-      <translation>รีเฟรช</translation>
+      <translation>รีเฟรส</translation>
     </message>
     <message>
       <location/>
@@ -450,7 +450,7 @@
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation>ล้าง ตัวกรอง</translation>
+      <translation>ล้าง Filter</translation>
     </message>
   </context>
   <context>
@@ -468,7 +468,7 @@
     <message>
       <location/>
       <source>Action</source>
-      <translation>การกระทำ</translation>
+      <translation>กระทำ</translation>
     </message>
     <message>
       <location/>
@@ -554,7 +554,7 @@
     <message>
       <location/>
       <source>Brand</source>
-      <translation>ยี่ห้อ</translation>
+      <translation>แบรนด์สินค้า</translation>
     </message>
     <message>
       <location/>
@@ -760,27 +760,27 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>ประเภทที่กำหนดไว้ล่วงหน้า PTZ ที่ต้องการ:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>ระบบ</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>พื้นเมือง</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>กล้องนี้รองรับการแพนและเอียง</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>กล้องนี้รองรับการซูม</translation>
     </message>
   </context>
   <context>
@@ -872,7 +872,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation>การบันทึก</translation>
+      <translation>กำลังบันทึก</translation>
     </message>
     <message>
       <location/>
@@ -1024,12 +1024,12 @@
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation>ล้าง ตัวกรอง</translation>
+      <translation>ล้าง Filter</translation>
     </message>
     <message>
       <location/>
       <source>Refresh</source>
-      <translation>รีเฟส</translation>
+      <translation>รีเฟรส</translation>
     </message>
     <message>
       <location/>
@@ -1241,7 +1241,7 @@
     <message>
       <location/>
       <source>Source camera</source>
-      <translation>แหล่งที่มาของกล้อง</translation>
+      <translation>กล้องที่มา</translation>
     </message>
   </context>
   <context>
@@ -1274,7 +1274,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>&amp;ลบ</translation>
+      <translation>เอาออก</translation>
     </message>
     <message>
       <location/>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>ค้นหาหมดเวลา (s)</translation>
     </message>
   </context>
   <context>
@@ -1625,7 +1625,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>ถอนออก</translation>
+      <translation>เอาออก</translation>
     </message>
     <message>
       <location/>
@@ -1686,7 +1686,7 @@
     <message>
       <location/>
       <source>Activate License</source>
-      <translation>เปิดใช้งานใบอนุญาต</translation>
+      <translation>ใบอนุญาติใช้งาน</translation>
     </message>
     <message>
       <location/>
@@ -1696,12 +1696,12 @@
     <message>
       <location/>
       <source>License Key</source>
-      <translation>คีร์ใบอนุญาติ:</translation>
+      <translation>กุญแจรหัส</translation>
     </message>
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation>คีย์สัญญาอนุญาตไม่ถูกต้อง</translation>
+      <translation>ใบอนุญาตไม่ถูกต้อง</translation>
     </message>
     <message>
       <location/>
@@ -1760,7 +1760,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation>พอร์ท</translation>
+      <translation>พอร์ต</translation>
     </message>
     <message>
       <location/>
@@ -1788,7 +1788,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation>รูปลักษณ์ และ การใช้งาน</translation>
+      <translation>รูปลักษณะและความรู้สึก</translation>
     </message>
     <message>
       <location/>
@@ -1874,7 +1874,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>ชื่อผู้ใช้งาน:</translation>
+      <translation>ชื่อผู้ใช้:</translation>
     </message>
     <message>
       <location/>
@@ -1884,12 +1884,12 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation>การบันทึก</translation>
+      <translation>กำลังบันทึก</translation>
     </message>
     <message>
       <location/>
       <source>Expert</source>
-      <translation>เพิ่มเติม</translation>
+      <translation>ระดับผู้เชี่ยวชาญ</translation>
     </message>
   </context>
   <context>
@@ -1915,7 +1915,7 @@
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
       <source>Manage...</source>
-      <translation>การจัดการ...</translation>
+      <translation>จัดการ...</translation>
     </message>
     <message>
       <location/>
@@ -2066,7 +2066,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>ที่คั่นหนังสือ</translation>
+      <translation>บุ๊คมาร์ก</translation>
     </message>
   </context>
   <context>
@@ -2208,7 +2208,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>ลบ</translation>
+      <translation>เอาออก</translation>
     </message>
     <message>
       <location/>
@@ -2472,7 +2472,7 @@
     <message>
       <location/>
       <source>Source</source>
-      <translation>ทรัพยากร</translation>
+      <translation>ต้นทาง</translation>
     </message>
     <message>
       <location/>
@@ -2564,7 +2564,7 @@
     <message>
       <location/>
       <source>Port</source>
-      <translation>พอร์ท</translation>
+      <translation>พอร์ต</translation>
     </message>
   </context>
   <context>
@@ -2651,7 +2651,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>ผู้ดูแลระบบ</translation>
+      <translation>การยืนยันตัวตน</translation>
     </message>
     <message>
       <location/>
@@ -2661,7 +2661,7 @@
     <message>
       <location/>
       <source>Motion</source>
-      <translation>โมชั่น</translation>
+      <translation>การเคลื่อนไหว</translation>
     </message>
     <message>
       <location/>
@@ -2671,7 +2671,7 @@
     <message>
       <location/>
       <source>Expert</source>
-      <translation>ผู้เชี่ยวชาญ</translation>
+      <translation>ระดับผู้เชี่ยวชาญ</translation>
     </message>
     <message>
       <location/>
@@ -2716,7 +2716,7 @@
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>ผู้ติดต่อ:</translation>
+      <translation>ผู้ขาย</translation>
     </message>
     <message>
       <location/>
@@ -3147,7 +3147,7 @@
     <message>
       <location/>
       <source>Role</source>
-      <translation>บทบาท</translation>
+      <translation>สิทธิพิเศษ</translation>
     </message>
     <message>
       <location/>
@@ -3212,7 +3212,7 @@
     <message>
       <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
       <source>Schedule Settings</source>
-      <translation>การตั้งค่าการบันทึก</translation>
+      <translation>กำหนดการตั้งค่า</translation>
     </message>
     <message>
       <location/>

@@ -75,6 +75,14 @@
       <source>New Server</source>
       <translation>เซิร์ฟเวอร์ใหม่</translation>
     </message>
+    <message>
+      <source>Edit</source>
+      <translation>แก้ไข</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>ซ่อน</translation>
+    </message>
   </context>
   <context>
     <name>WelcomeScreen</name>

@@ -21,7 +21,7 @@
         "tabs": {
             "server": "Sunucu",
             "system": "Sistem",
-            "device": "Cihaz"
+            "device": "Aygıt"
         },
         "confirmRestart": "Sunucuyu yeniden başlat?",
         "couldntCheckInternet": "Bulut bağlantısı kontrol edilemedi",
@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "Güncelleştirme bildirimleri etkin",
         "upnpPortMappingEnabled": "UPNP bağlantı noktası eşlemesi etkinleştirildi",
         "useTextEmailFormat": "Düz metin e-postaları gönder",
-        "useWindowsEmailLineFeed": "E-postalarda windows satır beslemesini kulllan"
+        "useWindowsEmailLineFeed": "E-postalarda windows satır beslemesini kulllan",
+        "maxEventLogRecords": "Veritabanında tutulacak maksimum olay günlüğü kaydı. Silinmemiş kayıtların gerçek miktarı belirtilen değerden %20 daha yüksek olabilir."
     },
     "info": {
         "tabs": {
@@ -136,7 +137,7 @@
         "cloudHostConflict": "Sistemler birleştirelemez, çünkü sunucukar farklı barındırıcılarda bulunuyor",
         "licenceError": "Uyarı! starter lisansına sahip sistemleri birleştiriyorsunuz. Sistem başına sadece bir starter lisansa izin verilir buna bağlı olarak ikinci lisans devre dışı kalacaktır. Yinede birleştirilsin mi?",
         "connectionFailed": "Bağlantı başarısız: ",
-        "unknownError": "Bilinmeyen hata",
+        "unknownError": "Bilinmeyen Hata",
         "mergeFailed": "Birleştirme başarısız: ",
         "mergeSucceed": "Birleştirme başarılı.",
         "newSystemDisplayName": "Yeni sistem",
@@ -189,14 +190,14 @@
             "expand all servers": "tüm sunucuları genişlet",
             "stop listening": "dinlemeyi durdur",
             "expand server": "expand server + [server name]",
-            "view": "görüntüle + [kamera adı]"
+            "view": "view + [camera name]"
         },
         "systemOffline": "Sistem çevrimdışı",
         "cameraLinks": {
-            "copyToClipboard": "panoya kopyala",
+            "copyToClipboard": "panoya yapıştır",
             "highStream": "Yüksek çözünürlük",
             "copyDefaultText": "kopyala",
-            "unknown": "Belirtilmemiş",
+            "unknown": "Bilinmeyen",
             "lowStream": "Düşük çözünürlük",
             "transcoding": "Dönüştürme",
             "copyActiveText": "panoya kopyalandı"

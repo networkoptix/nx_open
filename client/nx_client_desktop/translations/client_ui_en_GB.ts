@@ -174,7 +174,7 @@
     <message>
       <location/>
       <source>Min. Days</source>
-      <translation>Min. Days</translation>
+      <translation type="unfinished">Min. Days</translation>
     </message>
     <message>
       <location/>
@@ -184,7 +184,7 @@
     <message>
       <location/>
       <source>Max. Days</source>
-      <translation>Max. Days</translation>
+      <translation type="unfinished">Max. Days</translation>
     </message>
   </context>
   <context>
@@ -765,12 +765,12 @@
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>System</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Native</translation>
     </message>
     <message>
       <location/>
@@ -1236,12 +1236,12 @@
     <message>
       <location/>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Camera</translation>
     </message>
     <message>
       <location/>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Source camera</translation>
     </message>
   </context>
   <context>
@@ -1447,12 +1447,12 @@
     <message>
       <location/>
       <source>Width</source>
-      <translation type="unfinished">Width</translation>
+      <translation>Width</translation>
     </message>
     <message>
       <location/>
       <source>Height</source>
-      <translation type="unfinished">Height</translation>
+      <translation>Height</translation>
     </message>
     <message>
       <location/>
@@ -1897,7 +1897,7 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation>New Wearable Camera...</translation>
+      <translation type="unfinished">New Wearable Camera...</translation>
     </message>
     <message>
       <location/>
@@ -1907,7 +1907,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
     </message>
   </context>
   <context>
@@ -3165,7 +3165,7 @@
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation>Detect motion in uploaded video</translation>
+      <translation type="unfinished">Detect motion in uploaded video</translation>
     </message>
     <message>
       <location/>
@@ -3186,7 +3186,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
       <source>Upload Video</source>
-      <translation>Upload Video</translation>
+      <translation type="unfinished">Upload Video</translation>
     </message>
     <message>
       <location/>

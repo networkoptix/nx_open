@@ -247,7 +247,7 @@
     <message>
       <location/>
       <source>Details</source>
-      <translation>細節</translation>
+      <translation>詳細</translation>
     </message>
     <message>
       <location/>
@@ -511,7 +511,7 @@
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation>事件日誌...</translation>
+      <translation>事件記錄...</translation>
     </message>
     <message>
       <location/>
@@ -609,7 +609,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <location/>
@@ -670,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>恢復預設值</translation>
+      <translation>回復預設值</translation>
     </message>
     <message>
       <location/>
@@ -760,27 +760,27 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>首選PTZ預設類型：</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>系統</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>原生</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>此攝影機支援水平和垂直搖攝</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>此攝影機支援變焦</translation>
     </message>
   </context>
   <context>
@@ -928,7 +928,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>變更密碼</translation>
+      <translation>確定變更管理者密碼</translation>
     </message>
   </context>
   <context>
@@ -1019,7 +1019,7 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>事件記錄</translation>
+      <translation>事件日誌</translation>
     </message>
     <message>
       <location/>
@@ -1057,7 +1057,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <location/>
@@ -1218,7 +1218,7 @@
     <message>
       <location/>
       <source>Size</source>
-      <translation>大小:</translation>
+      <translation>大小</translation>
     </message>
     <message>
       <location/>
@@ -1353,7 +1353,7 @@
     <message>
       <location/>
       <source>Size</source>
-      <translation>大小:</translation>
+      <translation>大小</translation>
     </message>
     <message>
       <location/>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>允許搜尋連線時間 (秒)</translation>
     </message>
   </context>
   <context>
@@ -1696,7 +1696,7 @@
     <message>
       <location/>
       <source>License Key</source>
-      <translation>授權序號:</translation>
+      <translation>授權序號</translation>
     </message>
     <message>
       <location/>
@@ -1765,7 +1765,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <location/>
@@ -1879,7 +1879,7 @@
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>啟用聲音</translation>
+      <translation>允許聲音</translation>
     </message>
     <message>
       <location/>
@@ -2066,7 +2066,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>書籤</translation>
+      <translation>寫入書籤</translation>
     </message>
   </context>
   <context>
@@ -2282,7 +2282,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>從LDAP獲取使用者...</translation>
+      <translation>從LDAP中選取使用者...</translation>
     </message>
     <message>
       <location/>
@@ -2462,7 +2462,7 @@
     <message>
       <location/>
       <source>Resolution</source>
-      <translation>解析度:</translation>
+      <translation>解析度</translation>
     </message>
     <message>
       <location/>
@@ -2513,7 +2513,7 @@
     <message>
       <location/>
       <source>Test...</source>
-      <translation>測試...</translation>
+      <translation>測試…</translation>
     </message>
     <message>
       <location/>
@@ -2651,7 +2651,7 @@
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>驗證</translation>
+      <translation>認證</translation>
     </message>
     <message>
       <location/>
@@ -2661,7 +2661,7 @@
     <message>
       <location/>
       <source>Motion</source>
-      <translation>位移偵測</translation>
+      <translation>位移</translation>
     </message>
     <message>
       <location/>
@@ -2711,12 +2711,12 @@
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>韌體:</translation>
+      <translation>韌體</translation>
     </message>
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>供應商:</translation>
+      <translation>供應商</translation>
     </message>
     <message>
       <location/>
@@ -2726,7 +2726,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <location/>

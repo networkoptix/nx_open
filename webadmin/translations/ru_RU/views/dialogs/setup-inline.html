@@ -40,8 +40,8 @@
             <span class="text">или</span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">Добавить к существующей системе</button><br>
-        <small>(если {{Config.productName}} был уже установлен)</small><br>
+        <button class="btn btn-default" ng-click="skip()">Add to Existing System</button><br>
+        <small>(if {{Config.productName}} has been already setup)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -270,7 +270,7 @@
              ng-if= "forms.localForm.$valid &&
                      (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
-                Введённые пароли не совпадают
+                Пароли не совпадают
             </div>
         </div>
     </form>

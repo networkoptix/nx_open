@@ -6,21 +6,21 @@
         "openLinkWithTitle": "Para {{title}} visite este link"
     },
     "setup": {
-        "createAccount": "create account",
+        "createAccount": "criar conta",
         "errorNoHDD": "Este dispositivo destina-se a funcionar com a unidade de disco rígido instalada.<br>Desligue o dispositivo e instale uma unidade de disco rígido.",
         "errorNoNetwork": "Este dispositivo precisa de ligação de rede para funcionar.<br>Por favor, conecte-o à rede local ou Internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "Password must be at least 8 characters long",
-        "requiredMessage": "Only latin letters, numbers and keyboard symbols are allowed",
-        "weakMessage": "Password should contain different types of symbols",
+        "requiredMessage": "Apenas letras latinas, números e símbolos de teclado são permitidos",
+        "weakMessage": "A senha deve conter diferentes tipos de símbolos",
         "strongMessage": "Senha forte!",
         "commonMessage": "Esta senha está na lista das senhas mais populares"
     },
     "settings": {
         "tabs": {
             "server": "Servidor",
-            "system": "System",
+            "system": "Sistema",
             "device": "Dispositivo"
         },
         "confirmRestart": "Reiniciar o servidor?",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "Não é seguro usar uma porta inferior a 1025. O servidor pode não estar acessível. Continuar mesmo assim?",
         "confirmDisconnectFromCloud": "Desligar o sistema de {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>Todos os utilizadores da Cloud serão apagados.</span><br><br>O Sistema estará acessível através da rede local com conta de administrador local.",
-        "confirmDisconnectFromCloudAction": "Disconnect",
+        "confirmDisconnectFromCloudAction": "Desconectar",
         "disconnectedFromCloudSuccess": "O Sistema foi desconectado de {{CLOUD_NAME}} com sucesso",
         "confirmDisconnectFromSystem": "Desanexar servidor do sistema actual",
         "confirmDisconnectFromSystemAction": "Desanexar",
@@ -66,7 +66,7 @@
         "cloudConnectRelayingEnabled": "Activar retransmissão para conexão Cloud",
         "cloudConnectUdpHolePunchingEnabled": "Activar UDP hole punching para conexão Cloud",
         "cloudHost": "Cloud host",
-        "cloudSystemID": "ID Sistema Cloud",
+        "cloudSystemID": "Id Sistema Cloud",
         "disabledVendors": "\"Vendors\" Desabilitados",
         "ec2AliveUpdateIntervalSec": "Intervalo de actualização \"System alive\" (segundos)",
         "ec2ConnectionKeepAliveTimeoutSec": "Connection keep alive timeout (seconds)",
@@ -76,7 +76,7 @@
         "emailSupportEmail": "E-mail de suporte",
         "enableEdgeRecording": "Activar gravação \"edge\"",
         "eventLogPeriodDays": "Período do log de eventos (dias)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "Apagar perfis de câmaras no init, caso necessário",
+        "hanwhaDeleteProfilesOnInitIfNeeded": "Delete camera profiles on init if needed",
         "ldapAdminDn": "LDAP admin DN",
         "ldapSearchBase": "LDAP search base",
         "ldapSearchFilter": "LDAP search filter",
@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "Notificações de actualização habilitadas",
         "upnpPortMappingEnabled": "Mapeamento de portas UPNP activado",
         "useTextEmailFormat": "Enviar e-mails de texto simples",
-        "useWindowsEmailLineFeed": "Use o feed de linha do Windows em emails"
+        "useWindowsEmailLineFeed": "Use o feed de linha do Windows em emails",
+        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value."
     },
     "info": {
         "tabs": {
@@ -168,7 +169,7 @@
         "selectFiles": "Selecione os ficheiros"
     },
     "advanced": {
-        "free": "Livre",
+        "free": "Gratuito",
         "total": "Total",
         "occupied": "Ocupado",
         "reserved": "Reservado"
@@ -207,12 +208,12 @@
             "ieWin10": "Por favor, utilize browsers Microsoft Edge ou Google Chrome.",
             "iosVideoTooLarge": "O iOS não suporta vídeos maiores que fullHD (2MP: 1920x1080).",
             "unauthorized": "Necessária autenticação",
-            "ubuntuNX": "Este navegador não suporta vídeo de servidores baseados em ARM. Por favor, use o navegador Chromium.",
+            "ubuntuNX": "Este browser não suporta vídeo a partir de servidores baseados em ARM. Por favor, use o browser Chromium.",
             "ieNoWebm": "Por favor, instale <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>codec WebM</a> para o Internet Explorer.",
             "flashOrWebmRequired": "Por favor <a href='https://get.adobe.com/flashplayer/' target='_blank'>instale o Adobe Flash</a> ou o <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>codec WebM</a> para reproduzir vídeo no Internet Explorer.",
             "noArmSupport": "Este navegador ou dispositivo não suporta a reprodução de vídeo a partir de servidores baseados em ARM.",
             "error": "Erro",
-            "offline": "Offline",
+            "offline": "Desligado",
             "noData": "Sem dados",
             "flashRequired": "Por favor, <a href='https://get.adobe.com/flashplayer/' target='_blank'>instale o Adobe Flash</a> para reproduzir vídeos."
         },

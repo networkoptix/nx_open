@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "Powiadomienia o aktualizacji włączone",
         "upnpPortMappingEnabled": "Przekierowywanie portów UPNP włączone",
         "useTextEmailFormat": "Wysyłaj e-maile czystym tekstem",
-        "useWindowsEmailLineFeed": "Używaj w e-mailach znaków końca linii zgodnych z Windows"
+        "useWindowsEmailLineFeed": "Używaj w e-mailach znaków końca linii zgodnych z Windows",
+        "maxEventLogRecords": "Maksymalna liczba wpisów do dziennika zdarzeń przechowywanego w bazie danych. Rzeczywista ilość rekordów może być nawet o 20% wyższa niż podana wartość."
     },
     "info": {
         "tabs": {
@@ -178,17 +179,17 @@
     },
     "common": {
         "voiceCommands": {
-            "search": "find + [text for searchbar]",
+            "search": "szukaj + [tekst paska wyszukiwania]",
             "pause": "pauza",
-            "help": "help | show commands",
+            "help": "pomoc | pokaż polecenia",
             "collapse all servers": "zwiń wszystkie serwery",
-            "collapse server": "collapse server + [server name]",
+            "collapse server": "zwiń serwer + [nazwa serwera]",
             "play": "odtwarzaj",
             "clear search": "wyczyść wyszukiwanie",
-            "live": "go to live | show me live",
+            "live": "podgląd na żywo | pokaż na żywo",
             "expand all servers": "rozwiń wszystkie serwery",
             "stop listening": "przestań słuchać",
-            "expand server": "expand server + [server name]",
+            "expand server": "rozwiń serwer + [nazwa serwera]",
             "view": "pokaż + [nazwa kamery]"
         },
         "systemOffline": "Serwer jest odłączony",
@@ -218,9 +219,9 @@
         },
         "chromeCastWarning": "Chromecast wymaga dużej ilości zasobów i może powodować problemy na serwerze.",
         "resolution": {
-            "high": "Wysoki",
+            "high": "Wysoka",
             "auto": "Auto",
-            "low": "Niski"
+            "low": "Niska"
         }
     }
 }

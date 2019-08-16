@@ -75,6 +75,14 @@
       <source>New Server</source>
       <translation>Neuer Server</translation>
     </message>
+    <message>
+      <source>Edit</source>
+      <translation>Bearbeiten</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Ausblenden</translation>
+    </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
@@ -88,7 +96,7 @@
     </message>
     <message>
       <source>Loading...</source>
-      <translation>Wird geladen...</translation>
+      <translation>Lade...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>

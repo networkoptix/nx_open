@@ -75,6 +75,14 @@
       <source>New Server</source>
       <translation>Nuovo server</translation>
     </message>
+    <message>
+      <source>Edit</source>
+      <translation>Modificare</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Nascondere</translation>
+    </message>
   </context>
   <context>
     <name>WelcomeScreen</name>

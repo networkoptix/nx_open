@@ -480,7 +480,7 @@
     </message>
     <message>
       <source>Free license</source>
-      <translation>Licenças Livres</translation>
+      <translation>Licença gratuita</translation>
     </message>
     <message>
       <source>Time</source>
@@ -577,7 +577,7 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n Câmara</numerusform>
+        <numerusform>%n Câmaras</numerusform>
         <numerusform>%n Câmaras</numerusform>
       </translation>
     </message>
@@ -585,13 +585,13 @@
       <source>%n camera(s)</source>
       <translation>
         <numerusform>%n câmara</numerusform>
-        <numerusform>%n câmaras</numerusform>
+        <numerusform>%n câmara</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n Dispositivo</numerusform>
+        <numerusform>%n Dispositivos</numerusform>
         <numerusform>%n Dispositivos</numerusform>
       </translation>
     </message>
@@ -599,7 +599,7 @@
       <source>%n device(s)</source>
       <translation>
         <numerusform>%n dispositivo</numerusform>
-        <numerusform>%n dispositivos</numerusform>
+        <numerusform>%n dispositivo</numerusform>
       </translation>
     </message>
     <message>
@@ -638,14 +638,14 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n Módulo I/O</numerusform>
-        <numerusform>%n Módulos I/O</numerusform>
+        <numerusform>%n Módulo I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n módulo I/O</numerusform>
-        <numerusform>%n módulos I/O</numerusform>
+        <numerusform>%n módulo I/O</numerusform>
       </translation>
     </message>
     <message>
@@ -704,7 +704,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation>Média</translation>
+      <translation>Médio</translation>
     </message>
     <message>
       <source>High</source>
@@ -730,22 +730,22 @@
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Lo</translation>
+      <translation>Bx</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>Me</translation>
+      <translation>Md</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Hi</translation>
+      <translation>Al</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Bst</translation>
+      <translation>Mel</translation>
     </message>
     <message>
       <source>Ps</source>
@@ -765,7 +765,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Não foi possível alocar o stream para gravação.</translation>
+      <translation>Não foi possível alocar o stream de saída para gravação.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
@@ -891,12 +891,12 @@
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation>dias</translation>
+      <translation>dia</translation>
     </message>
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation>semanas</translation>
+      <translation>sems</translation>
     </message>
     <message>
       <source>mos</source>
@@ -912,16 +912,16 @@
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>milissegundos</numerusform>
-        <numerusform>milissegundos</numerusform>
+        <numerusform>milissegundo</numerusform>
+        <numerusform>milissegundo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>segundo</numerusform>
-        <numerusform>segundo</numerusform>
+        <numerusform>segundos</numerusform>
+        <numerusform>segundos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -929,47 +929,47 @@
       <comment>Full suffix for displaying minutes</comment>
       <translation>
         <numerusform>minutos</numerusform>
-        <numerusform>minuto</numerusform>
+        <numerusform>minutos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>horas</numerusform>
-        <numerusform>horas</numerusform>
+        <numerusform>hora</numerusform>
+        <numerusform>hora</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>dias</numerusform>
-        <numerusform>dias</numerusform>
+        <numerusform>dia</numerusform>
+        <numerusform>dia</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
       <translation>
-        <numerusform>semanas</numerusform>
-        <numerusform>semanas</numerusform>
+        <numerusform>semana</numerusform>
+        <numerusform>semana</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
       <translation>
-        <numerusform>meses</numerusform>
-        <numerusform>meses</numerusform>
+        <numerusform>mês</numerusform>
+        <numerusform>mês</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
       <translation>
-        <numerusform>anos</numerusform>
-        <numerusform>anos</numerusform>
+        <numerusform>ano</numerusform>
+        <numerusform>ano</numerusform>
       </translation>
     </message>
   </context>

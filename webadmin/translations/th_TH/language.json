@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "เปิดใช้งานการแจ้งเตือนการปรับปรุง",
         "upnpPortMappingEnabled": "เปิดใช้การแมปพอร์ต UPnP",
         "useTextEmailFormat": "ส่งอีเมลแบบธรรมดา",
-        "useWindowsEmailLineFeed": "ใช้ฟีดบรรทัดของ Windows ในอีเมล"
+        "useWindowsEmailLineFeed": "ใช้ฟีดบรรทัดของ Windows ในอีเมล",
+        "maxEventLogRecords": "บันทึกเหตุการณ์สูงสุดที่จะเก็บไว้ในฐานข้อมูล จำนวนเรคคอร์ดที่ไม่ถูกลบจริงอาจสูงกว่าค่าที่ระบุได้ถึง 20%"
     },
     "info": {
         "tabs": {

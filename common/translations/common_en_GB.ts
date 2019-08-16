@@ -212,7 +212,7 @@
     </message>
     <message>
       <source>Camera plugin error. %1</source>
-      <translation>Camera plugin error. %1</translation>
+      <translation type="unfinished">Camera plugin error. %1</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
@@ -347,7 +347,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers, error code: %1</source>
-      <translation>Could not allocate sample buffers, error code: %1</translation>
+      <translation type="unfinished">Could not allocate sample buffers, error code: %1</translation>
     </message>
     <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
@@ -480,7 +480,7 @@
     </message>
     <message>
       <source>Free license</source>
-      <translation>Free license</translation>
+      <translation type="unfinished">Free license</translation>
     </message>
     <message>
       <source>Time</source>
@@ -550,7 +550,7 @@
     </message>
     <message>
       <source>Only single license is allowed for this device</source>
-      <translation>Only single license is allowed for this device</translation>
+      <translation type="unfinished">Only single license is allowed for this device</translation>
     </message>
     <message>
       <source>This license type requires higher software version</source>
@@ -576,28 +576,28 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
       <source>%n Camera(s)</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Camera(s)</numerusform>
         <numerusform>%n Camera(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n camera(s)</numerusform>
         <numerusform>%n camera(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n Device(s)</numerusform>
         <numerusform>%n Device(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n device(s)</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n device(s)</numerusform>
         <numerusform>%n device(s)</numerusform>
       </translation>
@@ -636,14 +636,14 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n I/O Module(s)</numerusform>
         <numerusform>%n I/O Module(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>%n I/O module(s)</numerusform>
         <numerusform>%n I/O module(s)</numerusform>
       </translation>
@@ -716,41 +716,41 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation>Preset</translation>
+      <translation type="unfinished">Preset</translation>
     </message>
     <message>
       <source>Undefined</source>
-      <translation>Undefined</translation>
+      <translation type="unfinished">Undefined</translation>
     </message>
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Lst</translation>
+      <translation type="unfinished">Lst</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Lo</translation>
+      <translation type="unfinished">Lo</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>Me</translation>
+      <translation type="unfinished">Me</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Hi</translation>
+      <translation type="unfinished">Hi</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Bst</translation>
+      <translation type="unfinished">Bst</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Ps</translation>
+      <translation type="unfinished">Ps</translation>
     </message>
   </context>
   <context>
@@ -807,23 +807,23 @@
     </message>
     <message>
       <source>Not Found</source>
-      <translation>Not Found</translation>
+      <translation type="unfinished">Not Found</translation>
     </message>
     <message>
       <source>Not Implemented</source>
-      <translation>Not Implemented</translation>
+      <translation type="unfinished">Not Implemented</translation>
     </message>
     <message>
       <source>Unsupported Transport</source>
-      <translation>Unsupported Transport</translation>
+      <translation type="unfinished">Unsupported Transport</translation>
     </message>
     <message>
       <source>Internal Server Error</source>
-      <translation>Internal Server Error</translation>
+      <translation type="unfinished">Internal Server Error</translation>
     </message>
     <message>
       <source>Invalid Parameter</source>
-      <translation>Invalid Parameter</translation>
+      <translation type="unfinished">Invalid Parameter</translation>
     </message>
   </context>
   <context>
@@ -831,7 +831,7 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation>ms</translation>
+      <translation type="unfinished">ms</translation>
     </message>
     <message>
       <source>s</source>
@@ -841,77 +841,77 @@
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation>m</translation>
+      <translation type="unfinished">m</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation>h</translation>
+      <translation type="unfinished">h</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation>d</translation>
+      <translation type="unfinished">d</translation>
     </message>
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation>w</translation>
+      <translation type="unfinished">w</translation>
     </message>
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
+      <translation type="unfinished">M</translation>
     </message>
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation>y</translation>
+      <translation type="unfinished">y</translation>
     </message>
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation>msec</translation>
+      <translation type="unfinished">msec</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation>sec</translation>
+      <translation type="unfinished">sec</translation>
     </message>
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation>min</translation>
+      <translation type="unfinished">min</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation>hrs</translation>
+      <translation type="unfinished">hrs</translation>
     </message>
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation>days</translation>
+      <translation type="unfinished">days</translation>
     </message>
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation>wks</translation>
+      <translation type="unfinished">wks</translation>
     </message>
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation>mos</translation>
+      <translation type="unfinished">mos</translation>
     </message>
     <message>
       <source>yrs</source>
       <comment>Long suffix for displaying years</comment>
-      <translation>yrs</translation>
+      <translation type="unfinished">yrs</translation>
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>milliseconds</numerusform>
         <numerusform>milliseconds</numerusform>
       </translation>
@@ -935,7 +935,7 @@
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>hours</numerusform>
         <numerusform>hours</numerusform>
       </translation>
@@ -943,7 +943,7 @@
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>days</numerusform>
         <numerusform>days</numerusform>
       </translation>
@@ -951,7 +951,7 @@
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>weeks</numerusform>
         <numerusform>weeks</numerusform>
       </translation>
@@ -959,7 +959,7 @@
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>months</numerusform>
         <numerusform>months</numerusform>
       </translation>
@@ -967,7 +967,7 @@
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>years</numerusform>
         <numerusform>years</numerusform>
       </translation>
@@ -1274,7 +1274,7 @@
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
-      <translation>Multiple %1 events have occured</translation>
+      <translation type="unfinished">Multiple %1 events have occured</translation>
     </message>
     <message>
       <source>Event: %1</source>
@@ -1365,7 +1365,7 @@
     </message>
     <message>
       <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>RTP packet loss detected, prev seq.=%1 next seq.=%2.</translation>
+      <translation type="unfinished">RTP packet loss detected, prev seq.=%1 next seq.=%2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>

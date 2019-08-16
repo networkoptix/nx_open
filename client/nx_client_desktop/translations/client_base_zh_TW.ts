@@ -99,7 +99,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Help</source>
-      <translation>求助</translation>
+      <translation>說明</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -334,7 +334,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Exit</source>
-      <translation>退出</translation>
+      <translation>離開</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
@@ -706,7 +706,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Close</source>
-      <translation>關閉</translation>
+      <translation>關閉​​​</translation>
     </message>
     <message>
       <source>Close All But This</source>
@@ -894,7 +894,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>匯出書籤...</translation>
     </message>
   </context>
   <context>
@@ -952,7 +952,7 @@ to view more bookmarks</source>
     <name>Deactivator</name>
     <message>
       <source>Unknown error.</source>
-      <translation>未知錯誤.</translation>
+      <translation>未知的錯誤.</translation>
     </message>
     <message>
       <source>License does not exist.</source>
@@ -1100,7 +1100,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Top</source>
-      <translation>最頂部</translation>
+      <translation>頂端</translation>
     </message>
     <message>
       <source>Right Edge</source>
@@ -1108,7 +1108,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>最底部</translation>
+      <translation>底端</translation>
     </message>
     <message>
       <source>Page Left</source>
@@ -1128,7 +1128,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>向左滾動</translation>
+      <translation>往左捲軸</translation>
     </message>
     <message>
       <source>Scroll Up</source>
@@ -1136,7 +1136,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>向右滾動</translation>
+      <translation>往右捲軸</translation>
     </message>
     <message>
       <source>Scroll Down</source>
@@ -1395,7 +1395,7 @@ to view more bookmarks</source>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation>載入...</translation>
+      <translation>讀取中...</translation>
     </message>
     <message>
       <source>Saving...</source>
@@ -1506,7 +1506,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>選擇全部</translation>
+      <translation>全部選擇</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -1603,7 +1603,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <source>User updated</source>
@@ -1701,7 +1701,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>描述</translation>
+      <translation>&amp;敘述</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -2028,7 +2028,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>&amp;刪除</translation>
+      <translation>刪除(&amp;D)</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
@@ -2159,7 +2159,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n devices found</source>
       <translation>
-        <numerusform>找到 %n 個裝置</numerusform>
+        <numerusform>已找到 %n 個裝置</numerusform>
       </translation>
     </message>
     <message>
@@ -2235,7 +2235,7 @@ to view more bookmarks</source>
     <name>QnCameraAdvancedSettingsWidget</name>
     <message>
       <source>Loading...</source>
-      <translation>載入...</translation>
+      <translation>讀取中...</translation>
     </message>
     <message>
       <source>This I/O module has no advanced settings</source>
@@ -2251,7 +2251,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Web</source>
-      <translation type="unfinished">Web</translation>
+      <translation>Web</translation>
     </message>
     <message>
       <source>No settings</source>
@@ -2286,7 +2286,7 @@ to view more bookmarks</source>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation>確認</translation>
+      <translation>確定</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
@@ -2406,15 +2406,15 @@ to view more bookmarks</source>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>將選擇複製至剪貼簿</translation>
+      <translation>複製所選至剪貼簿</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>將所選區塊匯出至檔案...</translation>
+      <translation>匯出所選至檔案...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>選擇全部</translation>
+      <translation>全部選擇</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
@@ -3241,11 +3241,11 @@ to %1</source>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>無法初始化聲音編碼器.</translation>
+      <translation>無法初始化聲音編碼器。</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
-      <translation>輸入裝置的格式 %1 未支援.</translation>
+      <translation>輸入裝置的範例格式 %1 未支援.</translation>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
@@ -3264,7 +3264,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>無法初始化影像編碼器。</translation>
+      <translation>無法初始化編碼器.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
@@ -3307,7 +3307,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3373,15 +3373,15 @@ to %1</source>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>複製選擇至剪貼簿</translation>
+      <translation>複製所選至剪貼簿</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>匯出選擇到檔案...</translation>
+      <translation>匯出所選至檔案...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>選擇全部</translation>
+      <translation>全部選擇</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3440,7 +3440,7 @@ to %1</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>描述</translation>
+      <translation>&amp;敘述</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3535,7 +3535,7 @@ to %1</source>
     <message>
       <source>Low</source>
       <comment>Failover priority</comment>
-      <translation>低</translation>
+      <translation>低 (L)</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -3545,7 +3545,7 @@ to %1</source>
     <message>
       <source>High</source>
       <comment>Failover priority</comment>
-      <translation>高</translation>
+      <translation>高 (H)</translation>
     </message>
   </context>
   <context>
@@ -3863,7 +3863,7 @@ to %1</source>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <source>Email</source>
@@ -3948,7 +3948,7 @@ to %1</source>
     <name>QnLicenseListModel</name>
     <message>
       <source>Type</source>
-      <translation>類別</translation>
+      <translation>類型</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -3964,7 +3964,7 @@ to %1</source>
     </message>
     <message>
       <source>Never</source>
-      <translation>永久</translation>
+      <translation>不做</translation>
     </message>
     <message>
       <source>Expired</source>
@@ -4238,7 +4238,7 @@ to %1</source>
     </message>
     <message>
       <source>All files</source>
-      <translation>所有檔案</translation>
+      <translation>全部檔案</translation>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
@@ -4363,7 +4363,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation>刪除連線</translation>
+      <translation>刪除連線?</translation>
     </message>
     <message>
       <source>There is another connection with the same name.</source>
@@ -4498,7 +4498,7 @@ to %1</source>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>即時</translation>
+      <translation>即時影像</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
@@ -4657,7 +4657,7 @@ to %1</source>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation>前一圖框</translation>
+      <translation>上一圖框</translation>
     </message>
     <message>
       <source>Speed Up</source>
@@ -4910,7 +4910,7 @@ to %1</source>
     </message>
     <message>
       <source>Home</source>
-      <translation>家</translation>
+      <translation>首頁</translation>
     </message>
     <message>
       <source>Details</source>
@@ -5009,7 +5009,7 @@ to %1</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>低</translation>
+      <translation>低 (L)</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -5017,7 +5017,7 @@ to %1</source>
     </message>
     <message>
       <source>High</source>
-      <translation>高</translation>
+      <translation>高 (H)</translation>
     </message>
     <message>
       <source>Highest</source>
@@ -5056,7 +5056,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>選擇資料夾...</translation>
+      <translation>伺服器時間...</translation>
     </message>
     <message>
       <source>Best</source>
@@ -5139,7 +5139,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 Tb</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
@@ -5199,7 +5199,7 @@ to %1</source>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>位移 + 低畫質</translation>
+      <translation>位移主串流 + 全時次串流</translation>
     </message>
   </context>
   <context>
@@ -5346,7 +5346,7 @@ to %1</source>
     <name>QnResourceWidget</name>
     <message>
       <source>Close</source>
-      <translation>關閉</translation>
+      <translation>關閉​​​</translation>
     </message>
     <message>
       <source>Information</source>
@@ -5365,7 +5365,7 @@ to %1</source>
     </message>
     <message>
       <source>URL</source>
-      <translation>網址</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Server</source>
@@ -5403,7 +5403,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>匯出書籤...</translation>
     </message>
   </context>
   <context>
@@ -5509,7 +5509,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n 使用者</numerusform>
+        <numerusform>%n 個使用者</numerusform>
       </translation>
     </message>
   </context>
@@ -6189,11 +6189,11 @@ to %1</source>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation>選擇全部</translation>
+      <translation>全部選擇</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>匯出所選到檔案...</translation>
+      <translation>匯出所選至檔案...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
@@ -6332,7 +6332,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation>將 USB 外接儲存裝置作為錄影使用。</translation>
+      <translation>已啟用錄影於USB儲存裝置上</translation>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
@@ -6724,12 +6724,12 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd日 MMMM yyyy hh: mm</translation>
+      <translation>dd日 MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd日 MMMM yyyy hh: mm</translation>
+      <translation>dd日 MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
@@ -6869,7 +6869,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <source>Role</source>
@@ -6935,7 +6935,7 @@ to %1</source>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7077,7 +7077,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>登入</translation>
+      <translation>登入帳號</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -7256,7 +7256,7 @@ to %1</source>
     </message>
     <message>
       <source>URL</source>
-      <translation>網址</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>URL cannot be empty.</source>
@@ -7282,7 +7282,7 @@ to %1</source>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation>書籤</translation>
+      <translation>寫入書籤</translation>
     </message>
     <message>
       <source>Bookmarks can only be added to an online server.</source>
@@ -7354,7 +7354,7 @@ to %1</source>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation>很快地系統會被合併起來</translation>
+      <translation>系統很快可合併成功</translation>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
@@ -7362,7 +7362,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to merge Systems</source>
-      <translation>合併系統失敗</translation>
+      <translation>無法合併系統</translation>
     </message>
     <message>
       <source>Failed to update Server</source>
@@ -7528,7 +7528,7 @@ to %1</source>
     <name>QnWorkbenchUpdateWatcher</name>
     <message>
       <source>Release Notes</source>
-      <translation>更新說明</translation>
+      <translation>版本更新說明</translation>
     </message>
     <message>
       <source>%1 version available</source>
@@ -7559,7 +7559,7 @@ to %1</source>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>新電視牆...</translation>
+      <translation>新增電視牆...</translation>
     </message>
     <message>
       <source>New Matrix %1</source>
@@ -7958,7 +7958,7 @@ to %1</source>
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation>是否停止上傳?</translation>
+      <translation>停止上傳?</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -8295,11 +8295,11 @@ to %1</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>低</translation>
+      <translation>低 (L)</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>高</translation>
+      <translation>高 (H)</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -8409,7 +8409,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>數個書籤只能以佈局模式匯出。</translation>
     </message>
   </context>
   <context>
@@ -8752,7 +8752,7 @@ to %1</source>
     </message>
     <message>
       <source>All files (*.*)</source>
-      <translation>全部檔案(*.*)</translation>
+      <translation>全部檔案 (*.*)</translation>
     </message>
     <message>
       <source>Open File</source>

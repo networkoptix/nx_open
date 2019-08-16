@@ -79,7 +79,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 システムはクラウドに接続されていない-%1 システムとのみ結合できます　システム名とパスワードは %1 システムから取得されます</translation>
+      <translation>%1 システムはクラウドに接続されていない-%1 システムとのみ結合できます　システム名とパスワードは %1 システムから取得されます。</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation>サーバー%1から不正な応答を受信：&quot;%2&quot;。</translation>
+      <translation>サーバー%1から不正な応答を受信：&quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -156,7 +156,7 @@
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation>入出力エラーが発生しました　 OSメッセージ：&quot;%1&quot;</translation>
+      <translation>入出力エラーが発生しました。 OSメッセージ：&quot;%1&quot;</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -180,11 +180,11 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>デバイス要求&quot;%1&quot; は、エラー&quot;%2&quot; で失敗しました</translation>
+      <translation>デバイス要求&quot;%1&quot; は、エラー&quot;%2&quot; により失敗しました.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>カメラ要求&quot;%1&quot; は、エラー&quot;%2&quot; で失敗しました</translation>
+      <translation>カメラ要求&quot;%1&quot; は、エラー&quot;%2&quot; により失敗しました。</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -224,7 +224,7 @@
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>I/Oモジュール要求&quot;%1&quot; がエラー&quot;%2&quot; で失敗しました</translation>
+      <translation>I/Oモジュール要求&quot;%1&quot; はエラー&quot;%2&quot; により失敗しました。</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
@@ -300,7 +300,7 @@
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation>カメラはアーカイブから復元されました　カメラを削除して再度登録すると、ライブビデオが表示されます</translation>
+      <translation>カメラはアーカイブから復元されました。カメラを削除して再度登録すると、ライブビデオが表示されます。</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
@@ -316,7 +316,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation>ファームウェアを更新してください。最小サポートバージョンは %1です。現在のバージョンは %2です</translation>
+      <translation>ファームウェアを更新してください。最小サポートバージョンは %1です。現在のバージョンは %2です。</translation>
     </message>
   </context>
   <context>
@@ -554,7 +554,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>不明なエラー</translation>
+      <translation>未知のエラー</translation>
     </message>
     <message>
       <source>Server with matching Hardware ID not found</source>
@@ -629,7 +629,7 @@
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n IOモジュール</numerusform>
+        <numerusform>%n Ioモジュール</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -659,7 +659,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>未知の値</translation>
+      <translation>不明</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -694,7 +694,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation>標準</translation>
+      <translation>中</translation>
     </message>
     <message>
       <source>High</source>
@@ -740,7 +740,7 @@
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>PS</translation>
+      <translation>Ps</translation>
     </message>
   </context>
   <context>
@@ -779,7 +779,7 @@
     </message>
     <message>
       <source>No data exported.</source>
-      <translation>データはエクスポートされませんでした</translation>
+      <translation>データはエクスポートされませんでした.</translation>
     </message>
   </context>
   <context>
@@ -1061,11 +1061,11 @@
     </message>
     <message>
       <source>Speak</source>
-      <translation>スピーク</translation>
+      <translation>話す</translation>
     </message>
     <message>
       <source>Execute PTZ preset</source>
-      <translation>PTZプリセット</translation>
+      <translation>PTZプリセットを実行</translation>
     </message>
     <message>
       <source>Show text overlay</source>
@@ -1111,15 +1111,15 @@
     </message>
     <message>
       <source>Server Failure</source>
-      <translation>サーバー不良</translation>
+      <translation>サーバー障害</translation>
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation>サーバの競合</translation>
+      <translation>サーバーの競合</translation>
     </message>
     <message>
       <source>Server Started</source>
-      <translation>サーバー開始</translation>
+      <translation>サーバーが起動しました</translation>
     </message>
     <message>
       <source>License Issue</source>
@@ -1127,7 +1127,7 @@
     </message>
     <message>
       <source>Archive backup finished</source>
-      <translation>アーカイブバックアップ終了</translation>
+      <translation>アーカイブのバックアップが終了しました</translation>
     </message>
     <message>
       <source>Any Server Issue</source>
@@ -1152,13 +1152,13 @@
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation>
-        <numerusform>デバイス切断</numerusform>
+        <numerusform>デバイスの接続が切断されました</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
       <translation>
-        <numerusform>カメラ切断</numerusform>
+        <numerusform>カメラの接続が切断されました</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1170,7 +1170,7 @@
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
       <translation>
-        <numerusform>カメラのIPの競合</numerusform>
+        <numerusform>カメラIPの競合</numerusform>
       </translation>
     </message>
     <message>
@@ -1183,15 +1183,15 @@
     </message>
     <message>
       <source>Undefined event has occurred on %1</source>
-      <translation>%1で定義していないイベント発生</translation>
+      <translation>%1で定義していないイベントが発生がしました</translation>
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation>デバイス %1 切断</translation>
+      <translation>デバイス %1 の接続が切断されました</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation>カメラ %1 切断</translation>
+      <translation>カメラ %1 の接続が切断されました</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
@@ -1203,11 +1203,11 @@
     </message>
     <message>
       <source>Motion on %1</source>
-      <translation>動体検知ON %1</translation>
+      <translation>%1で動体検知</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
-      <translation>ネットワーク問題発生 %1</translation>
+      <translation>%1でネットワーク問題発生</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
@@ -1229,7 +1229,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation>サーバー&quot;%1&quot; 開始</translation>
+      <translation>サーバー &quot;%1&quot; 起動しました</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
@@ -1245,7 +1245,7 @@
     </message>
     <message>
       <source>An unknown event has occurred</source>
-      <translation>不明なイベント</translation>
+      <translation>不明なイベントが発生しました</translation>
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
@@ -1302,7 +1302,7 @@
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>%n, %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n 回、最初に： %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1314,7 +1314,7 @@
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>最初の発生: %1 時分 %2 月日(%n 時間トータル)</numerusform>
+        <numerusform>最初の発生: %1 時分 %2 月日(合計%n 回)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1341,79 +1341,79 @@
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation>RTPパケットロス検知.</translation>
+      <translation>RTPパケットロスが検知されました.</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation>デバイスがネットワーク要求に応答しません</translation>
+      <translation>デバイスがネットワーク要求に応答しません.</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation>サーバーとの接続ロスト.</translation>
+      <translation>サーバーへの接続が失われました。</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation>サーバーが予期せず停止しました</translation>
+      <translation>サーバーが予期せず停止しました。</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation>I/O エラーが発生しました %1.</translation>
+      <translation>%1でI/Oエラーが発生しました。</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>HDD/SSD・%1.・への書き込み速度が不十分です</translation>
+      <translation>%1へのHDD/SSD書き込み速度が不十分です。</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>HDD / SSDディスク&quot;%1&quot; がいっぱいです　ディスクにVMSによって管理されていないデータが多すぎます</translation>
+      <translation>HDD / SSDディスク &quot;%1&quot; がいっぱいです。ディスクに含まれているデータが多すぎてVMSで管理できません。</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation>システムディスク&quot;%1&quot; がいっぱいです</translation>
+      <translation>システムディスク&quot;%1&quot; がほぼいっぱいです。</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation>アーカイブバックアップ失敗　空き容量が足りません</translation>
+      <translation>アーカイブのバックアップに失敗しました：バックアップストレージの空き容量が足りません</translation>
     </message>
     <message>
       <source>Archive backup failed: Target storage failure</source>
-      <translation>アーカイブバックアップ失敗　ターゲットストレージエラー</translation>
+      <translation>アーカイブのバックアップに失敗しました：ターゲットストレージエラー</translation>
     </message>
     <message>
       <source>Archive backup failed: Source file open/read error</source>
-      <translation>アーカイブバックアップ失敗　ソースファイルの読込みエラー</translation>
+      <translation>アーカイブのバックアップに失敗しました：ソースファイルのオープン/読込みエラー</translation>
     </message>
     <message>
       <source>Archive backup failed: Target file create/write error</source>
-      <translation>アーカイブバックアップ失敗　ターゲットファイル書き込みエラー</translation>
+      <translation>アーカイブのバックアップに失敗しました：ターゲットファイルの作成/書き込みエラー</translation>
     </message>
     <message>
       <source>Archive backup failed: File catalog error</source>
-      <translation>アーカイブバックアップ失敗　ファイルカタログエラー</translation>
+      <translation>アーカイブのバックアップに失敗しました：ファイルカタログエラー</translation>
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation>アーカイブのバックアップは完了しましたがバックアップ時間を超過したので完全ではありません　%1 にデータをバックアップします</translation>
+      <translation>アーカイブのバックアップは終了しましたが、バックアップ時間を超過したため、完全には完了していません　%1 にデータをバックアップします</translation>
     </message>
     <message>
       <source>Archive backup is successfully completed</source>
-      <translation>アーカイブバックアップは正常に終了しました</translation>
+      <translation>アーカイブのバックアップは正常に完了しました</translation>
     </message>
     <message>
       <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation>アーカイブバックアップはユーザーによってキャンセルされました　データは %1 にバックアップされます</translation>
+      <translation>アーカイブバックアップはユーザーによってキャンセルされました。データは %1 にバックアップされます。</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>ライセンスが不足しています　記録は次のデバイスで無効になっています:</translation>
+      <translation>ライセンスが不足しています。記録は次のデバイスで無効になっています:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>ライセンスが不足しています　記録は次のカメラで無効になっています:</translation>
+      <translation>ライセンスが不足しています。記録は次のカメラで無効になっています:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>ライセンスが不足しています　記録は次のI/Oモジュールで無効になっています:</translation>
+      <translation>ライセンスが不足しています。記録は次のI/Oモジュールで無効になっています:</translation>
     </message>
     <message>
       <source>start</source>
@@ -1469,7 +1469,7 @@
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
-      <translation>ソフトトリガー%2の%1</translation>
+      <translation>%2のソフトトリガー%1</translation>
     </message>
     <message>
       <source>Soft Trigger %1 has been activated multiple times</source>
@@ -1485,7 +1485,7 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation>解析イベント</translation>
+      <translation>分析イベント</translation>
     </message>
     <message>
       <source>%1 at %2</source>
@@ -1498,7 +1498,7 @@
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation>ストレージエラー %1</translation>
+      <translation>%1のストレージエラー</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>

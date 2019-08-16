@@ -62,7 +62,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>אוטו'</translation>
+      <translation>אוטומטי</translation>
     </message>
     <message>
       <location/>
@@ -202,7 +202,7 @@
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation>ארכיון צפיה</translation>
+      <translation>צופה בארכיון</translation>
     </message>
     <message>
       <location/>
@@ -212,7 +212,7 @@
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>צפיה חיה</translation>
+      <translation>צופה בשידור חי</translation>
     </message>
     <message>
       <location/>
@@ -384,7 +384,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation>מחק</translation>
+      <translation>מחיקה</translation>
     </message>
     <message>
       <location/>
@@ -501,7 +501,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation>מחק</translation>
+      <translation>מחיקה</translation>
     </message>
     <message>
       <location/>
@@ -511,12 +511,12 @@
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation>יומן אירועים...</translation>
+      <translation>רשימת אירועים...</translation>
     </message>
     <message>
       <location/>
       <source>Test</source>
-      <translation>בדיקה</translation>
+      <translation>בדוק</translation>
     </message>
   </context>
   <context>
@@ -554,7 +554,7 @@
     <message>
       <location/>
       <source>Brand</source>
-      <translation>חברה</translation>
+      <translation>מותג</translation>
     </message>
     <message>
       <location/>
@@ -655,7 +655,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>אוטומטית</translation>
+      <translation>אוטומטי</translation>
     </message>
     <message>
       <location/>
@@ -670,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>שחזר לברירת המחדל</translation>
+      <translation>שחזר ברירות מחדל</translation>
     </message>
     <message>
       <location/>
@@ -827,7 +827,7 @@
     <message>
       <location/>
       <source>FPS</source>
-      <translation>FPS</translation>
+      <translation>פריימים לשניה</translation>
     </message>
     <message>
       <location/>
@@ -928,7 +928,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>שינוי סיסמה</translation>
+      <translation>שינוי סיסמא</translation>
     </message>
   </context>
   <context>
@@ -1019,7 +1019,7 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>רשימת אירועים</translation>
+      <translation>יומן אירועים</translation>
     </message>
     <message>
       <location/>
@@ -1330,7 +1330,7 @@
     <message>
       <location/>
       <source>Aspect Ratio</source>
-      <translation>יחס רוחב גובה</translation>
+      <translation>יחס גובה-רוחב</translation>
     </message>
     <message>
       <location/>
@@ -1348,7 +1348,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation>מחק</translation>
+      <translation>מחיקה</translation>
     </message>
     <message>
       <location/>
@@ -1528,7 +1528,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <location/>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>זמן המתנה מקסימלי בחיפוש (בשניות)</translation>
     </message>
   </context>
   <context>
@@ -1696,7 +1696,7 @@
     <message>
       <location/>
       <source>License Key</source>
-      <translation>מפתח רשיון</translation>
+      <translation>מפתח רשיון:</translation>
     </message>
     <message>
       <location/>
@@ -1745,7 +1745,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation>מחק</translation>
+      <translation>מחיקה</translation>
     </message>
     <message>
       <location/>
@@ -1775,7 +1775,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation>בדיקה</translation>
+      <translation>בדוק</translation>
     </message>
     <message>
       <location/>
@@ -1869,7 +1869,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation>סיסמא:</translation>
+      <translation>סיסמה:</translation>
     </message>
     <message>
       <location/>
@@ -1994,7 +1994,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation>מחק</translation>
+      <translation>מחיקה</translation>
     </message>
     <message>
       <location/>
@@ -2113,7 +2113,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
       <source>Log in</source>
-      <translation>התחבר</translation>
+      <translation>התחברות</translation>
     </message>
     <message>
       <location/>
@@ -2172,7 +2172,7 @@
     <message>
       <location/>
       <source>Play</source>
-      <translation>נגן</translation>
+      <translation>הפעל</translation>
     </message>
     <message>
       <location/>
@@ -2282,7 +2282,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>רענן נתוני LDAP...</translation>
+      <translation>יבא משתמשים מLDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2399,7 +2399,7 @@
     <message>
       <location/>
       <source>s</source>
-      <translation>ש</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
@@ -2513,7 +2513,7 @@
     <message>
       <location/>
       <source>Test...</source>
-      <translation>בדיקה...</translation>
+      <translation>בדוק...</translation>
     </message>
     <message>
       <location/>
@@ -2544,7 +2544,7 @@
     <message>
       <location/>
       <source>Failover</source>
-      <translation>מעבר בזמן כשל</translation>
+      <translation>גיבוי חם</translation>
     </message>
     <message>
       <location/>
@@ -2711,12 +2711,12 @@
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>קושחה</translation>
+      <translation>קושחה:</translation>
     </message>
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>ספק</translation>
+      <translation>ספק:</translation>
     </message>
     <message>
       <location/>
@@ -2802,7 +2802,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation>בדיקה</translation>
+      <translation>בדוק</translation>
     </message>
   </context>
   <context>
@@ -3034,7 +3034,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation>מחק</translation>
+      <translation>מחיקה</translation>
     </message>
     <message>
       <location/>
@@ -3049,7 +3049,7 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>רוחב שטח</translation>
+      <translation>רוחב אזור</translation>
     </message>
   </context>
   <context>
@@ -3085,7 +3085,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation>מחק</translation>
+      <translation>מחיקה</translation>
     </message>
   </context>
   <context>
@@ -3212,12 +3212,12 @@
     <message>
       <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
       <source>Schedule Settings</source>
-      <translation>הגדרות לוח הזמנים</translation>
+      <translation>הגדרות לוח זמנים</translation>
     </message>
     <message>
       <location/>
       <source>On</source>
-      <translation>פעיל</translation>
+      <translation>פועל</translation>
     </message>
     <message>
       <location/>

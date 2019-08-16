@@ -6,32 +6,32 @@
     <message>
       <location filename="../src/ui/dialogs/about_dialog.ui"/>
       <source>About</source>
-      <translation type="unfinished">About</translation>
+      <translation>Om</translation>
     </message>
     <message>
       <location/>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Information</translation>
     </message>
     <message>
       <location/>
       <source>Credits</source>
-      <translation type="unfinished">Credits</translation>
+      <translation>Tack till</translation>
     </message>
     <message>
       <location/>
       <source>GPU Information</source>
-      <translation type="unfinished">GPU Information</translation>
+      <translation>GPU Information</translation>
     </message>
     <message>
       <location/>
       <source>Support</source>
-      <translation type="unfinished">Support</translation>
+      <translation>Support</translation>
     </message>
     <message>
       <location/>
       <source>System Servers</source>
-      <translation type="unfinished">System Servers</translation>
+      <translation>System server</translation>
     </message>
   </context>
   <context>
@@ -39,7 +39,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/accessible_resources_widget.ui"/>
       <source>Filter</source>
-      <translation type="unfinished">Filter</translation>
+      <translation>Filter</translation>
     </message>
   </context>
   <context>
@@ -47,32 +47,32 @@
     <message>
       <location filename="../src/ui/dialogs/adjust_video_dialog.ui"/>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Bildförbättring</translation>
     </message>
     <message>
       <location/>
       <source>Enable image enhancement</source>
-      <translation type="unfinished">Enable image enhancement</translation>
+      <translation>Aktivera bildförbättring</translation>
     </message>
     <message>
       <location/>
       <source>Gamma</source>
-      <translation type="unfinished">Gamma</translation>
+      <translation>Gamma</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
       <source>Black level</source>
-      <translation type="unfinished">Black level</translation>
+      <translation>Svart nivå</translation>
     </message>
     <message>
       <location/>
       <source>White level</source>
-      <translation type="unfinished">White level</translation>
+      <translation>Vit nivå</translation>
     </message>
   </context>
   <context>
@@ -80,42 +80,42 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/advanced_settings_widget.ui"/>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation type="unfinished">Downmix Audio from 5.1 to 2.1</translation>
+      <translation>Nermixa Audio från 5.1 till 2.1</translation>
     </message>
     <message>
       <location/>
       <source>Double Buffering</source>
-      <translation type="unfinished">Double Buffering</translation>
+      <translation>Dubbelbuffert</translation>
     </message>
     <message>
       <location/>
       <source>Maximum Live Buffer Length</source>
-      <translation type="unfinished">Maximum Live Buffer Length</translation>
+      <translation>Maximal realtids buffertlängd</translation>
     </message>
     <message>
       <location/>
       <source>Browse Logs</source>
-      <translation type="unfinished">Browse Logs</translation>
+      <translation>Bläddra i loggar</translation>
     </message>
     <message>
       <location/>
       <source>Clear Local Cache</source>
-      <translation type="unfinished">Clear Local Cache</translation>
+      <translation>Rensa lokal cache</translation>
     </message>
     <message>
       <location/>
       <source>Reset All Warnings</source>
-      <translation type="unfinished">Reset All Warnings</translation>
+      <translation>Återställ alla varningar</translation>
     </message>
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>Intel HD Graphics-skärmen kan möta problem om oskärpa är aktiverat. Vi rekommenderar starkt att lämna alternativet som det är.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>Inaktivera oskärpa</translation>
     </message>
   </context>
   <context>
@@ -123,22 +123,22 @@
     <message>
       <location filename="../src/ui/widgets/business/aggregation_widget.ui"/>
       <source>Check to set aggregation period</source>
-      <translation type="unfinished">Check to set aggregation period</translation>
+      <translation>Kontrollera för att ställa in aggregeringsperioden</translation>
     </message>
     <message>
       <location/>
       <source>Interval of action :</source>
-      <translation type="unfinished">Interval of action :</translation>
+      <translation>Åtgärdsintervall :</translation>
     </message>
     <message>
       <location/>
       <source>No more than once per</source>
-      <translation type="unfinished">No more than once per</translation>
+      <translation>Inte mer än en gång per</translation>
     </message>
     <message>
       <location/>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Omedelbart</translation>
     </message>
   </context>
   <context>
@@ -146,22 +146,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Nyckelord åtskilda med blanksteg</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>Bildtexten innehåller:</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>Beskrivningen innehåller:</translation>
     </message>
     <message>
       <location/>
       <source>Event Type:</source>
-      <translation type="unfinished">Event Type:</translation>
+      <translation>Typ av händelse:</translation>
     </message>
   </context>
   <context>
@@ -169,22 +169,22 @@
     <message>
       <location filename="../src/ui/widgets/properties/archive_length_widget.ui"/>
       <source>Fixed Archive Length</source>
-      <translation type="unfinished">Fixed Archive Length</translation>
+      <translation>Fast arkivlängd</translation>
     </message>
     <message>
       <location/>
       <source>Min. Days</source>
-      <translation type="unfinished">Min. Days</translation>
+      <translation>Min. dagar</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
       <source>Max. Days</source>
-      <translation type="unfinished">Max. Days</translation>
+      <translation>Max. dagar</translation>
     </message>
   </context>
   <context>
@@ -192,82 +192,82 @@
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Uppdatera</translation>
     </message>
     <message>
       <location/>
       <source>User actions</source>
-      <translation type="unfinished">User actions</translation>
+      <translation>Användaråtgärder</translation>
     </message>
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation type="unfinished">Watching archive</translation>
+      <translation>Titta på arkiv</translation>
     </message>
     <message>
       <location/>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>Exportera video</translation>
     </message>
     <message>
       <location/>
       <source>Watching live</source>
-      <translation type="unfinished">Watching live</translation>
+      <translation>Titta på live</translation>
     </message>
     <message>
       <location/>
       <source>Login/logout</source>
-      <translation type="unfinished">Login/logout</translation>
+      <translation>Inloggning/utloggning</translation>
     </message>
     <message>
       <location/>
       <source>Event rules</source>
-      <translation type="unfinished">Event rules</translation>
+      <translation>Händelsesregler</translation>
     </message>
     <message>
       <location/>
       <source>Server actions</source>
-      <translation type="unfinished">Server actions</translation>
+      <translation>Serveråtgärder</translation>
     </message>
     <message>
       <location/>
       <source>System actions</source>
-      <translation type="unfinished">System actions</translation>
+      <translation>Systemåtgärder</translation>
     </message>
     <message>
       <location/>
       <source>Select all</source>
-      <translation type="unfinished">Select all</translation>
+      <translation>Markera allt</translation>
     </message>
     <message>
       <location/>
       <source>Sessions</source>
-      <translation type="unfinished">Sessions</translation>
+      <translation>Sessioner</translation>
     </message>
     <message>
       <location/>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detaljer</translation>
     </message>
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Auditlista</translation>
     </message>
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Rensa filter</translation>
     </message>
     <message>
       <location/>
       <source>Email settings</source>
-      <translation type="unfinished">Email settings</translation>
+      <translation>E-postinställningar</translation>
     </message>
     <message>
       <location/>
       <source>All servers are offline. Audit data is not available.</source>
-      <translation type="unfinished">All servers are offline. Audit data is not available.</translation>
+      <translation>Alla servrar är offline. Auditdata är inte tillgängligt.</translation>
     </message>
   </context>
   <context>
@@ -275,37 +275,37 @@
     <message>
       <location filename="../src/ui/dialogs/backup_schedule_dialog.ui"/>
       <source>Backup Schedule...</source>
-      <translation type="unfinished">Backup Schedule...</translation>
+      <translation>Schema för säkerhetskopiering...</translation>
     </message>
     <message>
       <location/>
       <source>Execute backup on the following days:</source>
-      <translation type="unfinished">Execute backup on the following days:</translation>
+      <translation>Utför säkerhetskopiering på följande dagar:</translation>
     </message>
     <message>
       <location/>
       <source>Limit Bandwidth to:</source>
-      <translation type="unfinished">Limit Bandwidth to:</translation>
+      <translation>Begränsa bandbredd till:</translation>
     </message>
     <message>
       <location/>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit / s</translation>
     </message>
     <message>
       <location/>
       <source>Bitrate limitation could lead to backup failure.</source>
-      <translation type="unfinished">Bitrate limitation could lead to backup failure.</translation>
+      <translation>Bithastighetsbegränsning kan leda till backupfel.</translation>
     </message>
     <message>
       <location/>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Slutför</translation>
     </message>
     <message>
       <location/>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Starta</translation>
     </message>
   </context>
   <context>
@@ -313,37 +313,37 @@
     <message>
       <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
       <source>Backup Settings</source>
-      <translation type="unfinished">Backup Settings</translation>
+      <translation>Inställningar för säkerhetskopiering</translation>
     </message>
     <message>
       <location/>
       <source>Server Settings</source>
-      <translation type="unfinished">Server Settings</translation>
+      <translation>Serverinställningar</translation>
     </message>
     <message>
       <location/>
       <source>Set Schedule...</source>
-      <translation type="unfinished">Set Schedule...</translation>
+      <translation>Ange schema...</translation>
     </message>
     <message>
       <location/>
       <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
-      <translation type="unfinished">Only further recording will be backed up. Backup process will ignore existing footage.</translation>
+      <translation>Endast ytterligare inspelning kommer att säkerhetskopieras. Backup-processen ignorerar befintlig video.</translation>
     </message>
     <message>
       <location/>
       <source>Execute Backup</source>
-      <translation type="unfinished">Execute Backup</translation>
+      <translation>Utför säkerhetskopiering</translation>
     </message>
     <message>
       <location/>
       <source>Backup Archive From</source>
-      <translation type="unfinished">Backup Archive From</translation>
+      <translation>Säkerhetskopiera arkiv från</translation>
     </message>
     <message>
       <location/>
       <source>Backup Quality</source>
-      <translation type="unfinished">Backup Quality</translation>
+      <translation>Säkerhetskopieringskvalitet</translation>
     </message>
   </context>
   <context>
@@ -351,27 +351,27 @@
     <message>
       <location filename="../src/ui/widgets/business/bookmark_business_action_widget.ui"/>
       <source>Fixed duration:</source>
-      <translation type="unfinished">Fixed duration:</translation>
+      <translation>Fast varaktighet:</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>sekunder</translation>
     </message>
     <message>
       <location/>
       <source>Tags:</source>
-      <translation type="unfinished">Tags:</translation>
+      <translation>Taggar:</translation>
     </message>
     <message>
       <location/>
       <source>Pre-recording:</source>
-      <translation type="unfinished">Pre-recording:</translation>
+      <translation>Förinspelning:</translation>
     </message>
     <message>
       <location/>
       <source>Post-recording:</source>
-      <translation type="unfinished">Post-recording:</translation>
+      <translation>Efterinspelning:</translation>
     </message>
   </context>
   <context>
@@ -379,27 +379,27 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>Bokmärkesinformation</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Radera</translation>
     </message>
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Bredd på område</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Teckenstorlek</translation>
     </message>
     <message>
       <location/>
       <source>Include description</source>
-      <translation type="unfinished">Include description</translation>
+      <translation>Inkludera beskrivning</translation>
     </message>
   </context>
   <context>
@@ -407,32 +407,32 @@
     <message>
       <location filename="../src/ui/widgets/bookmark_widget.ui"/>
       <source>Popular tags</source>
-      <translation type="unfinished">Popular tags</translation>
+      <translation>Populära taggar</translation>
     </message>
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Namn</translation>
     </message>
     <message>
       <location/>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Beskrivning</translation>
     </message>
     <message>
       <location/>
       <source>Timeout</source>
-      <translation type="unfinished">Timeout</translation>
+      <translation>Överskriden tidsgräns</translation>
     </message>
     <message>
       <location/>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Taggar</translation>
     </message>
     <message>
       <location/>
       <source>List of tags divided by commas</source>
-      <translation type="unfinished">List of tags divided by commas</translation>
+      <translation>Lista med etiketter dividerat med kommatecken</translation>
     </message>
   </context>
   <context>
@@ -440,17 +440,17 @@
     <message>
       <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Uppdatera</translation>
     </message>
     <message>
       <location/>
       <source>Bookmark Log</source>
-      <translation type="unfinished">Bookmark Log</translation>
+      <translation>Bokmärkeslogg</translation>
     </message>
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Rensa filter</translation>
     </message>
   </context>
   <context>
@@ -458,37 +458,37 @@
     <message>
       <location filename="../src/ui/widgets/business/business_rule_widget.ui"/>
       <source>Event</source>
-      <translation type="unfinished">Event</translation>
+      <translation>Händelse</translation>
     </message>
     <message>
       <location/>
       <source>Schedule...</source>
-      <translation type="unfinished">Schedule...</translation>
+      <translation>Schema...</translation>
     </message>
     <message>
       <location/>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Åtgärd</translation>
     </message>
     <message>
       <location/>
       <source>Comments:</source>
-      <translation type="unfinished">Comments:</translation>
+      <translation>Kommentarer:</translation>
     </message>
     <message>
       <location/>
       <source>When</source>
-      <translation type="unfinished">When</translation>
+      <translation>När</translation>
     </message>
     <message>
       <location/>
       <source>Do</source>
-      <translation type="unfinished">Do</translation>
+      <translation>Gör</translation>
     </message>
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>Vid</translation>
     </message>
   </context>
   <context>
@@ -496,27 +496,27 @@
     <message>
       <location filename="../src/ui/dialogs/business_rules_dialog.ui"/>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Lägg till</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Radera</translation>
     </message>
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Händelsesregler</translation>
     </message>
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation type="unfinished">Event Log...</translation>
+      <translation>Händelselogg...</translation>
     </message>
     <message>
       <location/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Test</translation>
     </message>
   </context>
   <context>
@@ -524,102 +524,102 @@
     <message>
       <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>Servern är offline</translation>
     </message>
     <message>
       <location/>
       <source>IP, hostname, RTSP link...</source>
-      <translation type="unfinished">IP, hostname, RTSP link...</translation>
+      <translation>IP, värdnamn, RTSP-länk...</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Adress</translation>
     </message>
     <message>
       <location/>
       <source>Scanning...</source>
-      <translation type="unfinished">Scanning...</translation>
+      <translation>Skannar...</translation>
     </message>
     <message>
       <location/>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Stoppa</translation>
     </message>
     <message>
       <location/>
       <source>Brand</source>
-      <translation type="unfinished">Brand</translation>
+      <translation>Varumärke</translation>
     </message>
     <message>
       <location/>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Modell</translation>
     </message>
     <message>
       <location/>
       <source>New Scan...</source>
-      <translation type="unfinished">New Scan...</translation>
+      <translation>Ny sökning...</translation>
     </message>
     <message>
       <location/>
       <source>Add device(s)...</source>
-      <translation type="unfinished">Add device(s)...</translation>
+      <translation>Lägg till enhet(er)...</translation>
     </message>
     <message>
       <location/>
       <source>Discovered Devices:</source>
-      <translation type="unfinished">Discovered Devices:</translation>
+      <translation>Upptäckta enheter:</translation>
     </message>
     <message>
       <location/>
       <source>Device Address</source>
-      <translation type="unfinished">Device Address</translation>
+      <translation>Enhetens address</translation>
     </message>
     <message>
       <location/>
       <source>Start IP</source>
-      <translation type="unfinished">Start IP</translation>
+      <translation>Start IP</translation>
     </message>
     <message>
       <location/>
       <source>End IP</source>
-      <translation type="unfinished">End IP</translation>
+      <translation>Slut IP</translation>
     </message>
     <message>
       <location/>
       <source>Subnet Scan</source>
-      <translation type="unfinished">Subnet Scan</translation>
+      <translation>Subnät Sök</translation>
     </message>
     <message>
       <location/>
       <source>Discovery Port</source>
-      <translation type="unfinished">Discovery Port</translation>
+      <translation>Port för upptäckt</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Lösenord</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Logga in</translation>
     </message>
     <message>
       <location/>
       <source>Scan</source>
-      <translation type="unfinished">Scan</translation>
+      <translation>Sök</translation>
     </message>
     <message>
       <location/>
       <source>Add selected</source>
-      <translation type="unfinished">Add selected</translation>
+      <translation>Lägg till valda</translation>
     </message>
   </context>
   <context>
@@ -627,12 +627,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
       <source>Category</source>
-      <translation type="unfinished">Category</translation>
+      <translation>Kategori</translation>
     </message>
     <message>
       <location/>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Uppdatera</translation>
     </message>
   </context>
   <context>
@@ -640,147 +640,147 @@
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
       <source>Do not archive primary stream</source>
-      <translation type="unfinished">Do not archive primary stream</translation>
+      <translation>Arkivera inte primärströmmen</translation>
     </message>
     <message>
       <location/>
       <source>Do not archive secondary stream</source>
-      <translation type="unfinished">Do not archive secondary stream</translation>
+      <translation>Arkivera inte sekundära strömmen</translation>
     </message>
     <message>
       <location/>
       <source>RTP transport:</source>
-      <translation type="unfinished">RTP transport:</translation>
+      <translation>RTP transport:</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
       <source>TCP</source>
-      <translation type="unfinished">TCP</translation>
+      <translation>TCP</translation>
     </message>
     <message>
       <location/>
       <source>UDP</source>
-      <translation type="unfinished">UDP</translation>
+      <translation>UDP</translation>
     </message>
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation type="unfinished">Restore Defaults</translation>
+      <translation>Återgå till grundinställningarna</translation>
     </message>
     <message>
       <location/>
       <source>Force motion detection for stream:</source>
-      <translation type="unfinished">Force motion detection for stream:</translation>
+      <translation>Kör rörelsedetektering för ström:</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Warning! Native camera presets will not be avaliable.</translation>
+      <translation>Varning! Ursprungliga förinställningar i kameran kommer inte vara tillgängliga.</translation>
     </message>
     <message>
       <location/>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
+      <translation>Ändra inte dessa inställningar om du inte är helt säker på deras eventuella inverkan på systemets prestanda.</translation>
     </message>
     <message>
       <location/>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Kamerainställningar</translation>
     </message>
     <message>
       <location/>
       <source>Keep camera stream and profile settings</source>
-      <translation type="unfinished">Keep camera stream and profile settings</translation>
+      <translation>Behåll kameraström och profilinställningar</translation>
     </message>
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
+      <translation>Inställningar för kvalitet och bildfrekvens (FPS) i inspelningsplanen blir irrelevanta.</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
+      <translation>Beräkna bithastighet per GOP istället för bithastighet per sekund</translation>
     </message>
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation type="unfinished">It will increase bitrate for camera.</translation>
+      <translation>Det ökar bithastigheten för kameran.</translation>
     </message>
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Sekundär ström</translation>
     </message>
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation type="unfinished">Disable secondary stream</translation>
+      <translation>Inaktivera sekundär strömmen</translation>
     </message>
     <message>
       <location/>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Rörelsedetektering</translation>
     </message>
     <message>
       <location/>
       <source>Archive</source>
-      <translation type="unfinished">Archive</translation>
+      <translation>Arkiv</translation>
     </message>
     <message>
       <location/>
       <source>Media Streaming</source>
-      <translation type="unfinished">Media Streaming</translation>
+      <translation>Mediaströmning</translation>
     </message>
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Generera</translation>
     </message>
     <message>
       <location/>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Återställ</translation>
     </message>
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Logiskt ID</translation>
     </message>
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Rekommenderad PTZ förinställd typ:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>System</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Ursprungliga</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Denna kamera stöder pan och tilt</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Denna kamera stöder zoomning</translation>
     </message>
   </context>
   <context>
@@ -788,7 +788,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
+      <translation>Ingångs-ID</translation>
     </message>
   </context>
   <context>
@@ -796,7 +796,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
       <source>Add Device...</source>
-      <translation type="unfinished">Add Device...</translation>
+      <translation>Lägg till enhet...</translation>
     </message>
   </context>
   <context>
@@ -804,17 +804,17 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
       <source>Fixed duration:</source>
-      <translation type="unfinished">Fixed duration:</translation>
+      <translation>Fast varaktighet:</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>sekunder</translation>
     </message>
     <message>
       <location/>
       <source>Output ID:</source>
-      <translation type="unfinished">Output ID:</translation>
+      <translation>Utgångs-ID:</translation>
     </message>
   </context>
   <context>
@@ -822,97 +822,97 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
       <source>Schedule Settings</source>
-      <translation type="unfinished">Schedule Settings</translation>
+      <translation>Schemainställningarna</translation>
     </message>
     <message>
       <location/>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <location/>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Kvalitet</translation>
     </message>
     <message>
       <location/>
       <source>Record Always</source>
-      <translation type="unfinished">Record Always</translation>
+      <translation>Spela alltid in</translation>
     </message>
     <message>
       <location/>
       <source>Motion Only</source>
-      <translation type="unfinished">Motion Only</translation>
+      <translation>Endast rörelse</translation>
     </message>
     <message>
       <location/>
       <source>Do Not Record</source>
-      <translation type="unfinished">Do Not Record</translation>
+      <translation>Spela inte in</translation>
     </message>
     <message>
       <location/>
       <source>Motion Recording</source>
-      <translation type="unfinished">Motion Recording</translation>
+      <translation>Rörelseinspelning</translation>
     </message>
     <message>
       <location/>
       <source>Pre-Recording</source>
-      <translation type="unfinished">Pre-Recording</translation>
+      <translation>Förinspelning</translation>
     </message>
     <message>
       <location/>
       <source>Post-Recording</source>
-      <translation type="unfinished">Post-Recording</translation>
+      <translation>Efterinspelning</translation>
     </message>
     <message>
       <location/>
       <source>Copy Schedule...</source>
-      <translation type="unfinished">Copy Schedule...</translation>
+      <translation>Kopiera schema...</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Inspelning</translation>
     </message>
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktivera licens...</translation>
     </message>
     <message>
       <location/>
       <source>Show Quality</source>
-      <translation type="unfinished">Show Quality</translation>
+      <translation>Visa kvalitet</translation>
     </message>
     <message>
       <location/>
       <source>Show FPS</source>
-      <translation type="unfinished">Show FPS</translation>
+      <translation>Visa FPS</translation>
     </message>
     <message>
       <location/>
       <source>Copying Schedule</source>
-      <translation type="unfinished">Copying Schedule</translation>
+      <translation>Kopiera schema</translation>
     </message>
     <message>
       <location/>
       <source>Apply changes before copying schedule.</source>
-      <translation type="unfinished">Apply changes before copying schedule.</translation>
+      <translation>Tillämpa ändringar innan du kopierar schema.</translation>
     </message>
     <message>
       <location/>
       <source>Panic Mode:</source>
-      <translation type="unfinished">Panic Mode:</translation>
+      <translation>Panikläge:</translation>
     </message>
     <message>
       <location/>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Rörelse + Låg uppl</translation>
     </message>
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation type="unfinished">Bitrate</translation>
+      <translation>Bithastighet</translation>
     </message>
   </context>
   <context>
@@ -920,7 +920,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
       <source>Streams Addresses</source>
-      <translation type="unfinished">Streams Addresses</translation>
+      <translation>Strömmarnas adresser</translation>
     </message>
   </context>
   <context>
@@ -928,7 +928,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation type="unfinished">Change password</translation>
+      <translation>Ändra lösenord</translation>
     </message>
   </context>
   <context>
@@ -936,7 +936,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
+      <translation>Fortsätt att vara inloggad</translation>
     </message>
   </context>
   <context>
@@ -944,17 +944,17 @@
     <message>
       <location filename="../src/ui/dialogs/connection_name_dialog.ui"/>
       <source>Save connection as...</source>
-      <translation type="unfinished">Save connection as...</translation>
+      <translation>Spara anslutning som...</translation>
     </message>
     <message>
       <location/>
       <source>Enter name:</source>
-      <translation type="unfinished">Enter name:</translation>
+      <translation>Ange namn:</translation>
     </message>
     <message>
       <location/>
       <source>Save password</source>
-      <translation type="unfinished">Save password</translation>
+      <translation>Spara lösenord</translation>
     </message>
   </context>
   <context>
@@ -962,12 +962,12 @@
     <message>
       <location filename="../src/ui/dialogs/connection_testing_dialog.ui"/>
       <source>Connection Test</source>
-      <translation type="unfinished">Connection Test</translation>
+      <translation>Anslutningstest</translation>
     </message>
     <message>
       <location/>
       <source>Testing connection...</source>
-      <translation type="unfinished">Testing connection...</translation>
+      <translation>Testa anslutning...</translation>
     </message>
   </context>
   <context>
@@ -975,22 +975,22 @@
     <message>
       <location filename="../src/ui/widgets/business/custom_business_event_widget.ui"/>
       <source>Source contains:</source>
-      <translation type="unfinished">Source contains:</translation>
+      <translation>Källan innehåller:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Nyckelord åtskilda med blanksteg</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>Bildtexten innehåller:</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>Beskrivningen innehåller:</translation>
     </message>
   </context>
   <context>
@@ -998,7 +998,7 @@
     <message>
       <location filename="../src/nx/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
       <source>Category</source>
-      <translation type="unfinished">Category</translation>
+      <translation>Kategori</translation>
     </message>
   </context>
   <context>
@@ -1006,12 +1006,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
       <source>Create Backup...</source>
-      <translation type="unfinished">Create Backup...</translation>
+      <translation>Skapa säkerhetskopia...</translation>
     </message>
     <message>
       <location/>
       <source>Restore from Backup...</source>
-      <translation type="unfinished">Restore from Backup...</translation>
+      <translation>Återställ från säkerhetskopia...</translation>
     </message>
   </context>
   <context>
@@ -1019,27 +1019,27 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Händelselogg</translation>
     </message>
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Rensa filter</translation>
     </message>
     <message>
       <location/>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Uppdatera</translation>
     </message>
     <message>
       <location/>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Alla servrar är offline. Loggarna är inte tillgängliga.</translation>
     </message>
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>Händelsesregler...</translation>
     </message>
   </context>
   <context>
@@ -1047,47 +1047,47 @@
     <message>
       <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
       <source>HTTP content</source>
-      <translation type="unfinished">HTTP content</translation>
+      <translation>HTTP-innehåll</translation>
     </message>
     <message>
       <location/>
       <source>Login to authenticate (optional)</source>
-      <translation type="unfinished">Login to authenticate (optional)</translation>
+      <translation>Logga in för att autentisera (valfritt)</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Logga in</translation>
     </message>
     <message>
       <location/>
       <source>Password to authenticate (optional)</source>
-      <translation type="unfinished">Password to authenticate (optional)</translation>
+      <translation>Lösenord för att autentisera (valfritt)</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Lösenord</translation>
     </message>
     <message>
       <location/>
       <source>Content type</source>
-      <translation type="unfinished">Content type</translation>
+      <translation>Innehållstyp</translation>
     </message>
     <message>
       <location/>
       <source>HTTP URL</source>
-      <translation type="unfinished">HTTP URL</translation>
+      <translation>HTTP-URL</translation>
     </message>
     <message>
       <location/>
       <source>Authentication type</source>
-      <translation type="unfinished">Authentication type</translation>
+      <translation>Autentiseringstyp</translation>
     </message>
     <message>
       <location/>
       <source>Request type</source>
-      <translation type="unfinished">Request type</translation>
+      <translation>Typ av begäran</translation>
     </message>
   </context>
   <context>
@@ -1095,7 +1095,7 @@
     <message>
       <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
       <source>PTZ preset:</source>
-      <translation type="unfinished">PTZ preset:</translation>
+      <translation>PTZ förinställning:</translation>
     </message>
   </context>
   <context>
@@ -1103,7 +1103,7 @@
     <message>
       <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>På vy</translation>
     </message>
   </context>
   <context>
@@ -1111,12 +1111,12 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Exportinställningar</translation>
     </message>
     <message>
       <location/>
       <source>Make read-only</source>
-      <translation type="unfinished">Make read-only</translation>
+      <translation>Gör skrivskyddad</translation>
     </message>
   </context>
   <context>
@@ -1124,22 +1124,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Exportinställningar</translation>
     </message>
     <message>
       <location/>
       <source>Apply Filters</source>
-      <translation type="unfinished">Apply Filters</translation>
+      <translation>Tillämpa filter</translation>
     </message>
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
+      <translation>Rotation, Dewarping, Bildförbättring etc.</translation>
     </message>
     <message>
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
+      <translation>Att använda filter och lägga till överlagringar kräver kodning som ökar CPU-användningen och kan ta betydande tid.</translation>
     </message>
   </context>
   <context>
@@ -1147,22 +1147,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
-      <translation type="unfinished">Export Video</translation>
+      <translation>Exportera Video</translation>
     </message>
     <message>
       <location/>
       <source>Single Camera</source>
-      <translation type="unfinished">Single Camera</translation>
+      <translation>Ensam kamera</translation>
     </message>
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Exportinställningar</translation>
     </message>
     <message>
       <location/>
       <source>Multi Video</source>
-      <translation type="unfinished">Multi Video</translation>
+      <translation>Multivideo</translation>
     </message>
   </context>
   <context>
@@ -1170,7 +1170,7 @@
     <message>
       <location filename="../src/nx/client/desktop/common/widgets/filename_panel.ui"/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Bläddra...</translation>
     </message>
   </context>
   <context>
@@ -1178,52 +1178,52 @@
     <message>
       <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui"/>
       <source>Ceiling Mount</source>
-      <translation type="unfinished">Ceiling Mount</translation>
+      <translation>Takmonterad</translation>
     </message>
     <message>
       <location/>
       <source>Wall Mount</source>
-      <translation type="unfinished">Wall Mount</translation>
+      <translation>Väggmonterad</translation>
     </message>
     <message>
       <location/>
       <source>Floor/Table Mount</source>
-      <translation type="unfinished">Floor/Table Mount</translation>
+      <translation>Golv/bord monterad</translation>
     </message>
     <message>
       <location/>
       <source>Fisheye Dewarping</source>
-      <translation type="unfinished">Fisheye Dewarping</translation>
+      <translation>Fiskögedewarping</translation>
     </message>
     <message>
       <location/>
       <source>Auto Calibration</source>
-      <translation type="unfinished">Auto Calibration</translation>
+      <translation>Automatisk kalibrering</translation>
     </message>
     <message>
       <location/>
       <source>Mount Angle Correction:</source>
-      <translation type="unfinished">Mount Angle Correction:</translation>
+      <translation>Korrigering as monteringsvinkel:</translation>
     </message>
     <message>
       <location/>
       <source>Y Offset</source>
-      <translation type="unfinished">Y Offset</translation>
+      <translation>Y Förskjutning</translation>
     </message>
     <message>
       <location/>
       <source>X Offset</source>
-      <translation type="unfinished">X Offset</translation>
+      <translation>X Förskjutning</translation>
     </message>
     <message>
       <location/>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Storlek</translation>
     </message>
     <message>
       <location/>
       <source>Ellipticity</source>
-      <translation type="unfinished">Ellipticity</translation>
+      <translation>Ellipticitet</translation>
     </message>
   </context>
   <context>
@@ -1231,17 +1231,17 @@
     <message>
       <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>På vy</translation>
     </message>
     <message>
       <location/>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <location/>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Källkamera</translation>
     </message>
   </context>
   <context>
@@ -1249,62 +1249,62 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
       <source>Misc</source>
-      <translation type="unfinished">Misc</translation>
+      <translation>Övrigt</translation>
     </message>
     <message>
       <location/>
       <source>Auto Pause Video</source>
-      <translation type="unfinished">Auto Pause Video</translation>
+      <translation>Pausa video automatiskt</translation>
     </message>
     <message>
       <location/>
       <source>after</source>
-      <translation type="unfinished">after</translation>
+      <translation>efter</translation>
     </message>
     <message>
       <location/>
       <source>Minutes of Inactivity</source>
-      <translation type="unfinished">Minutes of Inactivity</translation>
+      <translation>Minuter av inaktivitet</translation>
     </message>
     <message>
       <location/>
       <source>Add...</source>
-      <translation type="unfinished">Add...</translation>
+      <translation>Lägg till...</translation>
     </message>
     <message>
       <location/>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Ta bort</translation>
     </message>
     <message>
       <location/>
       <source>Local Media Folders</source>
-      <translation type="unfinished">Local Media Folders</translation>
+      <translation>Lokala mediamappar</translation>
     </message>
     <message>
       <location/>
       <source>Audio Input</source>
-      <translation type="unfinished">Audio Input</translation>
+      <translation>Ljudingång</translation>
     </message>
     <message>
       <location/>
       <source>First Source</source>
-      <translation type="unfinished">First Source</translation>
+      <translation>Första källan</translation>
     </message>
     <message>
       <location/>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Inget</translation>
     </message>
     <message>
       <location/>
       <source>Second Source</source>
-      <translation type="unfinished">Second Source</translation>
+      <translation>Andra källa</translation>
     </message>
     <message>
       <location/>
       <source>Run Application when PC Boots up</source>
-      <translation type="unfinished">Run Application when PC Boots up</translation>
+      <translation>Kör applikation när datorn startar upp</translation>
     </message>
   </context>
   <context>
@@ -1312,12 +1312,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/general_system_administration_widget.ui"/>
       <source>System Settings</source>
-      <translation type="unfinished">System Settings</translation>
+      <translation>Systeminställningar</translation>
     </message>
     <message>
       <location/>
       <source>Backup and Restore</source>
-      <translation type="unfinished">Backup and Restore</translation>
+      <translation>Säkerhetskopiering och återställning</translation>
     </message>
   </context>
   <context>
@@ -1325,17 +1325,17 @@
     <message>
       <location filename="../src/ui/widgets/properties/image_control_widget.ui"/>
       <source>Image Control</source>
-      <translation type="unfinished">Image Control</translation>
+      <translation>Bildkontroll</translation>
     </message>
     <message>
       <location/>
       <source>Aspect Ratio</source>
-      <translation type="unfinished">Aspect Ratio</translation>
+      <translation>Bildförhållande</translation>
     </message>
     <message>
       <location/>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Rotation</translation>
     </message>
   </context>
   <context>
@@ -1343,32 +1343,32 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Bild</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Radera</translation>
     </message>
     <message>
       <location/>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Storlek</translation>
     </message>
     <message>
       <location/>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>Genomskinlighet</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>Standard</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Bläddra...</translation>
     </message>
   </context>
   <context>
@@ -1376,17 +1376,17 @@
     <message>
       <location filename="../src/ui/dialogs/image_preview_dialog.ui"/>
       <source>Image View</source>
-      <translation type="unfinished">Image View</translation>
+      <translation>Bildvisning</translation>
     </message>
     <message>
       <location/>
       <source>Loading Image...Please Wait.</source>
-      <translation type="unfinished">Loading Image...Please Wait.</translation>
+      <translation>Laddar bild... Vänligen vänta.</translation>
     </message>
     <message>
       <location/>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Ingen bild</translation>
     </message>
   </context>
   <context>
@@ -1394,47 +1394,47 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_background_settings_widget.ui"/>
       <source>Processing Image...Please Wait.</source>
-      <translation type="unfinished">Processing Image...Please Wait.</translation>
+      <translation>Bearbetar bild... Vänligen vänta.</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Bläddra...</translation>
     </message>
     <message>
       <location/>
       <source>Clear</source>
-      <translation type="unfinished">Clear</translation>
+      <translation>Rensa</translation>
     </message>
     <message>
       <location/>
       <source>View...</source>
-      <translation type="unfinished">View...</translation>
+      <translation>Visa...</translation>
     </message>
     <message>
       <location/>
       <source>Width:</source>
-      <translation type="unfinished">Width:</translation>
+      <translation>Bredd:</translation>
     </message>
     <message>
       <location/>
       <source>Keep Aspect Ratio</source>
-      <translation type="unfinished">Keep Aspect Ratio</translation>
+      <translation>Behåll bildförhållande</translation>
     </message>
     <message>
       <location/>
       <source>Opacity:</source>
-      <translation type="unfinished">Opacity:</translation>
+      <translation>Genomskinlighet:</translation>
     </message>
     <message>
       <location/>
       <source>Height:</source>
-      <translation type="unfinished">Height:</translation>
+      <translation>Höjd:</translation>
     </message>
     <message>
       <location/>
       <source>Crop to monitor aspect ratio</source>
-      <translation type="unfinished">Crop to monitor aspect ratio</translation>
+      <translation>Beskär för att övervaka bildförhållande</translation>
     </message>
   </context>
   <context>
@@ -1442,37 +1442,37 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>Låst</translation>
     </message>
     <message>
       <location/>
       <source>Width</source>
-      <translation type="unfinished">Width</translation>
+      <translation>Bredd</translation>
     </message>
     <message>
       <location/>
       <source>Height</source>
-      <translation type="unfinished">Height</translation>
+      <translation>Höjd</translation>
     </message>
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>Logiskt ID</translation>
     </message>
     <message>
       <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Generera</translation>
     </message>
     <message>
       <location/>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Återställ</translation>
     </message>
     <message>
       <location/>
       <source>Minimal Size</source>
-      <translation type="unfinished">Minimal Size</translation>
+      <translation>Minimal storlek</translation>
     </message>
   </context>
   <context>
@@ -1480,17 +1480,17 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Välj vy</translation>
     </message>
     <message>
       <location/>
       <source>Shared layouts</source>
-      <translation type="unfinished">Shared layouts</translation>
+      <translation>Delade vyer</translation>
     </message>
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
+      <translation>Välj en enskild användare i &quot;Visa till&quot; rad för att visa sina lokala vyer i den här listan</translation>
     </message>
   </context>
   <context>
@@ -1498,52 +1498,52 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
       <source>ldap(s)://host:port</source>
-      <translation type="unfinished">ldap(s)://host:port</translation>
+      <translation>ldap(er)://värd:port</translation>
     </message>
     <message>
       <location/>
       <source>Optional</source>
-      <translation type="unfinished">Optional</translation>
+      <translation>Valfritt</translation>
     </message>
     <message>
       <location/>
       <source>Testing...</source>
-      <translation type="unfinished">Testing...</translation>
+      <translation>Testar...</translation>
     </message>
     <message>
       <location/>
       <source>LDAP Settings</source>
-      <translation type="unfinished">LDAP Settings</translation>
+      <translation>LDAP inställningar</translation>
     </message>
     <message>
       <location/>
       <source>Server URL</source>
-      <translation type="unfinished">Server URL</translation>
+      <translation>Server URL</translation>
     </message>
     <message>
       <location/>
       <source>Admin DN</source>
-      <translation type="unfinished">Admin DN</translation>
+      <translation>Admin DN</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Lösenord</translation>
     </message>
     <message>
       <location/>
       <source>Search Base</source>
-      <translation type="unfinished">Search Base</translation>
+      <translation>Sökbas</translation>
     </message>
     <message>
       <location/>
       <source>Search Filter</source>
-      <translation type="unfinished">Search Filter</translation>
+      <translation>Sökfilter</translation>
     </message>
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Sök Timeout (s)</translation>
     </message>
   </context>
   <context>
@@ -1551,27 +1551,27 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation type="unfinished">Fetch Users from LDAP...</translation>
+      <translation>Hämta användare från LDAP...</translation>
     </message>
     <message>
       <location/>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Laddar ...</translation>
     </message>
     <message>
       <location/>
       <source>Connection error</source>
-      <translation type="unfinished">Connection error</translation>
+      <translation>Anslutningsfel</translation>
     </message>
     <message>
       <location/>
       <source>Role to assign to imported users</source>
-      <translation type="unfinished">Role to assign to imported users</translation>
+      <translation>Roll att tilldela importerade användare</translation>
     </message>
     <message>
       <location/>
       <source>Disable imported users</source>
-      <translation type="unfinished">Disable imported users</translation>
+      <translation>Inaktivera importerade användare</translation>
     </message>
   </context>
   <context>
@@ -1579,7 +1579,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
       <source>Edit Streams...</source>
-      <translation type="unfinished">Edit Streams...</translation>
+      <translation>Redigera strömmar...</translation>
     </message>
   </context>
   <context>
@@ -1587,32 +1587,32 @@
     <message>
       <location filename="../src/ui/dialogs/license_details_dialog.ui"/>
       <source>License Details</source>
-      <translation type="unfinished">License Details</translation>
+      <translation>Licensinformation</translation>
     </message>
     <message>
       <location/>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Allmänt</translation>
     </message>
     <message>
       <location/>
       <source>License Type:</source>
-      <translation type="unfinished">License Type:</translation>
+      <translation>Licenstyp:</translation>
     </message>
     <message>
       <location/>
       <source>License Key:</source>
-      <translation type="unfinished">License Key:</translation>
+      <translation>Licensnyckel:</translation>
     </message>
     <message>
       <location/>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Egenskaper</translation>
     </message>
     <message>
       <location/>
       <source>Locked to Hardware ID:</source>
-      <translation type="unfinished">Locked to Hardware ID:</translation>
+      <translation>Låst till maskinvaru-ID:</translation>
     </message>
   </context>
   <context>
@@ -1620,27 +1620,27 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/license_manager_widget.ui"/>
       <source>Active Licenses</source>
-      <translation type="unfinished">Active Licenses</translation>
+      <translation>Aktiva licenser</translation>
     </message>
     <message>
       <location/>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Ta bort</translation>
     </message>
     <message>
       <location/>
       <source>New License</source>
-      <translation type="unfinished">New License</translation>
+      <translation>Ny licens</translation>
     </message>
     <message>
       <location/>
       <source>Details...</source>
-      <translation type="unfinished">Details...</translation>
+      <translation>Detaljer...</translation>
     </message>
     <message>
       <location/>
       <source>The software is licensed to</source>
-      <translation type="unfinished">The software is licensed to</translation>
+      <translation>Programvaran är licensierad till</translation>
     </message>
   </context>
   <context>
@@ -1648,12 +1648,12 @@
     <message>
       <location filename="../src/ui/dialogs/license_notification_dialog.ui"/>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Varning</translation>
     </message>
     <message>
       <location/>
       <source>License issues:</source>
-      <translation type="unfinished">License issues:</translation>
+      <translation>Licensproblem:</translation>
     </message>
   </context>
   <context>
@@ -1661,57 +1661,57 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/license_widget.ui"/>
       <source>Manual Activation</source>
-      <translation type="unfinished">Manual Activation</translation>
+      <translation>Manuell aktivering</translation>
     </message>
     <message>
       <location/>
       <source>Select License File...</source>
-      <translation type="unfinished">Select License File...</translation>
+      <translation>Välj licensfil...</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Bläddra...</translation>
     </message>
     <message>
       <location/>
       <source>License will be bound to the current server</source>
-      <translation type="unfinished">License will be bound to the current server</translation>
+      <translation>Licensen kommer att vara bunden till den aktuella servern</translation>
     </message>
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation type="unfinished">Activate Free License</translation>
+      <translation>Aktivera fri licens</translation>
     </message>
     <message>
       <location/>
       <source>Activate License</source>
-      <translation type="unfinished">Activate License</translation>
+      <translation>Aktivera licens</translation>
     </message>
     <message>
       <location/>
       <source>Internet Activation</source>
-      <translation type="unfinished">Internet Activation</translation>
+      <translation>Internetaktivering</translation>
     </message>
     <message>
       <location/>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Licensnyckel</translation>
     </message>
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation type="unfinished">Invalid License Key</translation>
+      <translation>Ogiltig licensnyckel</translation>
     </message>
     <message>
       <location/>
       <source>Activation Key File</source>
-      <translation type="unfinished">Activation Key File</translation>
+      <translation>Aktiveringsfil</translation>
     </message>
     <message>
       <location/>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>Hårdvaruid</translation>
     </message>
   </context>
   <context>
@@ -1719,12 +1719,12 @@
     <message>
       <location filename="../src/ui/widgets/licensing/licenses_propose_widget.ui"/>
       <source>Licensing</source>
-      <translation type="unfinished">Licensing</translation>
+      <translation>Licensiering</translation>
     </message>
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Aktivera licens...</translation>
     </message>
   </context>
   <context>
@@ -1732,7 +1732,7 @@
     <message>
       <location filename="../src/ui/dialogs/local_settings_dialog.ui"/>
       <source>Local Settings</source>
-      <translation type="unfinished">Local Settings</translation>
+      <translation>Lokala inställningar</translation>
     </message>
   </context>
   <context>
@@ -1740,47 +1740,47 @@
     <message>
       <location filename="../src/ui/dialogs/login_dialog.ui"/>
       <source>Save...</source>
-      <translation type="unfinished">Save...</translation>
+      <translation>Spara...</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Radera</translation>
     </message>
     <message>
       <location/>
       <source>Connection Options:</source>
-      <translation type="unfinished">Connection Options:</translation>
+      <translation>Anslutningsalternativ:</translation>
     </message>
     <message>
       <location/>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>Värd</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Port</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Logga in</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Lösenord</translation>
     </message>
     <message>
       <location/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Test</translation>
     </message>
     <message>
       <location/>
       <source>Auto-Login</source>
-      <translation type="unfinished">Auto-Login</translation>
+      <translation>Autoinloggning</translation>
     </message>
   </context>
   <context>
@@ -1788,62 +1788,62 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation type="unfinished">Look and Feel</translation>
+      <translation>Utseende och känsla</translation>
     </message>
     <message>
       <location/>
       <source>Background Image</source>
-      <translation type="unfinished">Background Image</translation>
+      <translation>Bakgrundsbild</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Bläddra...</translation>
     </message>
     <message>
       <location/>
       <source>Language</source>
-      <translation type="unfinished">Language</translation>
+      <translation>Språk</translation>
     </message>
     <message>
       <location/>
       <source>Time Mode</source>
-      <translation type="unfinished">Time Mode</translation>
+      <translation>Tidsläge</translation>
     </message>
     <message>
       <location/>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Bild</translation>
     </message>
     <message>
       <location/>
       <source>Mode</source>
-      <translation type="unfinished">Mode</translation>
+      <translation>Läge</translation>
     </message>
     <message>
       <location/>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Intensitet</translation>
     </message>
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation type="unfinished">Show additional info in tree</translation>
+      <translation>Visa ytterligare information i trädet</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>sekunder</translation>
     </message>
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>Turcykel</translation>
     </message>
     <message>
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
+      <translation>IP-adresser för kameror och servrar, grupper för användare etc.</translation>
     </message>
   </context>
   <context>
@@ -1851,7 +1851,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/message_box.ui"/>
       <source>Do not show this message again</source>
-      <translation type="unfinished">Do not show this message again</translation>
+      <translation>Visa inte detta meddelande igen</translation>
     </message>
   </context>
   <context>
@@ -1859,37 +1859,37 @@
     <message>
       <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui"/>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Allmänt</translation>
     </message>
     <message>
       <location/>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Autentisering</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Lösenord:</translation>
     </message>
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Logga in:</translation>
     </message>
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation type="unfinished">Enable Audio</translation>
+      <translation>Aktivera ljud</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Inspelning</translation>
     </message>
     <message>
       <location/>
       <source>Expert</source>
-      <translation type="unfinished">Expert</translation>
+      <translation>Expert</translation>
     </message>
   </context>
   <context>
@@ -1897,17 +1897,17 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation type="unfinished">New Wearable Camera...</translation>
+      <translation>Ny kroppsburen kamera...</translation>
     </message>
     <message>
       <location/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>Till server</translation>
     </message>
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Kroppsburen kamera&quot; är ett virtuellt lagringsutrymme för videofiler, som kan laddas upp till vilken server som helst på ditt system och nås av någon användare.</translation>
     </message>
   </context>
   <context>
@@ -1915,22 +1915,22 @@
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
       <source>Manage...</source>
-      <translation type="unfinished">Manage...</translation>
+      <translation>Hantera...</translation>
     </message>
     <message>
       <location/>
       <source>Volume:</source>
-      <translation type="unfinished">Volume:</translation>
+      <translation>Volym:</translation>
     </message>
     <message>
       <location/>
       <source>Test...</source>
-      <translation type="unfinished">Test...</translation>
+      <translation>Test...</translation>
     </message>
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>Spela till användare</translation>
     </message>
   </context>
   <context>
@@ -1938,17 +1938,17 @@
     <message>
       <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
       <source>Global Notification Settings...</source>
-      <translation type="unfinished">Global Notification Settings...</translation>
+      <translation>Globala meddelandeinställningar...</translation>
     </message>
     <message>
       <location/>
       <source>for</source>
-      <translation type="unfinished">for</translation>
+      <translation>för</translation>
     </message>
     <message>
       <location/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>Tvinga bekräftelse</translation>
     </message>
   </context>
   <context>
@@ -1956,17 +1956,17 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/popup_settings_widget.ui"/>
       <source>Show all notifications</source>
-      <translation type="unfinished">Show all notifications</translation>
+      <translation>Visa alla notifieringar</translation>
     </message>
     <message>
       <location/>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>Systemnotiser</translation>
     </message>
     <message>
       <location/>
       <source>Events</source>
-      <translation type="unfinished">Events</translation>
+      <translation>Händelser</translation>
     </message>
   </context>
   <context>
@@ -1974,52 +1974,52 @@
     <message>
       <location filename="../src/ui/dialogs/ptz_manage_dialog.ui"/>
       <source>Save Current Position</source>
-      <translation type="unfinished">Save Current Position</translation>
+      <translation>Spara aktuell position</translation>
     </message>
     <message>
       <location/>
       <source>Go To Position</source>
-      <translation type="unfinished">Go To Position</translation>
+      <translation>Gå till position</translation>
     </message>
     <message>
       <location/>
       <source>Create Tour</source>
-      <translation type="unfinished">Create Tour</translation>
+      <translation>Skapa tur</translation>
     </message>
     <message>
       <location/>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Starta tur</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Radera</translation>
     </message>
     <message>
       <location/>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detaljer</translation>
     </message>
     <message>
       <location/>
       <source>No Tour Selected</source>
-      <translation type="unfinished">No Tour Selected</translation>
+      <translation>Ingen tur vald</translation>
     </message>
     <message>
       <location/>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Förhandsgranska</translation>
     </message>
     <message>
       <location/>
       <source>No preview available</source>
-      <translation type="unfinished">No preview available</translation>
+      <translation>Ingen förhandsgranskning tillgänglig</translation>
     </message>
     <message>
       <location/>
       <source>Get Preview</source>
-      <translation type="unfinished">Get Preview</translation>
+      <translation>Få förhandsvisning</translation>
     </message>
   </context>
   <context>
@@ -2027,17 +2027,17 @@
     <message>
       <location filename="../src/ui/dialogs/ptz_preset_dialog.ui"/>
       <source>Save Position</source>
-      <translation type="unfinished">Save Position</translation>
+      <translation>Spara position</translation>
     </message>
     <message>
       <location/>
       <source>Name:</source>
-      <translation type="unfinished">Name:</translation>
+      <translation>Namn:</translation>
     </message>
     <message>
       <location/>
       <source>Hotkey:</source>
-      <translation type="unfinished">Hotkey:</translation>
+      <translation>Snabbtangent:</translation>
     </message>
   </context>
   <context>
@@ -2045,12 +2045,12 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation type="unfinished">Attach to Video Wall...</translation>
+      <translation>Anslut till Videovägg...</translation>
     </message>
     <message>
       <location/>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Förhandsgranska</translation>
     </message>
   </context>
   <context>
@@ -2058,7 +2058,7 @@
     <message>
       <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
       <source>Choose a specific build</source>
-      <translation type="unfinished">Choose a specific build</translation>
+      <translation>Välj en specifik version</translation>
     </message>
   </context>
   <context>
@@ -2066,7 +2066,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Bokmärke</translation>
     </message>
   </context>
   <context>
@@ -2074,7 +2074,7 @@
     <message>
       <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.ui"/>
       <source>Installing Compatibility Version...</source>
-      <translation type="unfinished">Installing Compatibility Version...</translation>
+      <translation>Installera kompatibilitetsversion...</translation>
     </message>
   </context>
   <context>
@@ -2082,17 +2082,17 @@
     <message>
       <location filename="../src/ui/dialogs/credentials_dialog.ui"/>
       <source>User:</source>
-      <translation type="unfinished">User:</translation>
+      <translation>Användare:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Lösenord:</translation>
     </message>
     <message>
       <location/>
       <source>Enter a valid username and password...</source>
-      <translation type="unfinished">Enter a valid username and password...</translation>
+      <translation>Ange ett giltigt användarnamn och lösenord...</translation>
     </message>
   </context>
   <context>
@@ -2100,12 +2100,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>
       <source>Form</source>
-      <translation type="unfinished">Form</translation>
+      <translation>Formulär</translation>
     </message>
     <message>
       <location/>
       <source>Enable tile interface</source>
-      <translation type="unfinished">Enable tile interface</translation>
+      <translation>Aktivera skalgränssnittet</translation>
     </message>
   </context>
   <context>
@@ -2113,12 +2113,12 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>Logga in</translation>
     </message>
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
+      <translation>Fortsätt att vara inloggad</translation>
     </message>
   </context>
   <context>
@@ -2126,7 +2126,7 @@
     <message>
       <location filename="../src/ui/dialogs/media_file_settings_dialog.ui"/>
       <source>File Settings</source>
-      <translation type="unfinished">File Settings</translation>
+      <translation>Filinställningar</translation>
     </message>
   </context>
   <context>
@@ -2134,32 +2134,32 @@
     <message>
       <location filename="../src/ui/dialogs/merge_systems_dialog.ui"/>
       <source>Merge Systems...</source>
-      <translation type="unfinished">Merge Systems...</translation>
+      <translation>Sammanfoga system...</translation>
     </message>
     <message>
       <location/>
       <source>Server URL:</source>
-      <translation type="unfinished">Server URL:</translation>
+      <translation>Server URL:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Lösenord:</translation>
     </message>
     <message>
       <location/>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Kontrollera</translation>
     </message>
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Logga in:</translation>
     </message>
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation type="unfinished">The new System will have password and name from System:</translation>
+      <translation>Det nya systemet kommer att ha lösenord och namn från System:</translation>
     </message>
   </context>
   <context>
@@ -2167,27 +2167,27 @@
     <message>
       <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui"/>
       <source>Notification Sounds</source>
-      <translation type="unfinished">Notification Sounds</translation>
+      <translation>Aviseringsljud</translation>
     </message>
     <message>
       <location/>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Spela</translation>
     </message>
     <message>
       <location/>
       <source>Add...</source>
-      <translation type="unfinished">Add...</translation>
+      <translation>Lägg till...</translation>
     </message>
     <message>
       <location/>
       <source>Rename...</source>
-      <translation type="unfinished">Rename...</translation>
+      <translation>Döp om...</translation>
     </message>
     <message>
       <location/>
       <source>Delete...</source>
-      <translation type="unfinished">Delete...</translation>
+      <translation>Radera...</translation>
     </message>
   </context>
   <context>
@@ -2195,7 +2195,7 @@
     <message>
       <location filename="../src/ui/widgets/resource_tree_widget.ui"/>
       <source>Filter</source>
-      <translation type="unfinished">Filter</translation>
+      <translation>Filter</translation>
     </message>
   </context>
   <context>
@@ -2203,22 +2203,22 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/routing_management_widget.ui"/>
       <source>Add URL</source>
-      <translation type="unfinished">Add URL</translation>
+      <translation>Lägg till URL</translation>
     </message>
     <message>
       <location/>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Ta bort</translation>
     </message>
     <message>
       <location/>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Lägg till</translation>
     </message>
     <message>
       <location/>
       <source>Removing this connection option could lead to System malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to System malfunction.</translation>
+      <translation>Om du tar bort det här anslutningsalternativet kan det leda till systemfel.</translation>
     </message>
   </context>
   <context>
@@ -2226,37 +2226,37 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Avbryt</translation>
     </message>
     <message>
       <location/>
       <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation type="unfinished">It looks like the update process is taking more time than usual. Please keep waiting.</translation>
+      <translation>Det verkar som om uppdateringsprocessen tar längre tid än vanligt. Vänligen vänta.</translation>
     </message>
     <message>
       <location/>
       <source>Check for updates automatically</source>
-      <translation type="unfinished">Check for updates automatically</translation>
+      <translation>Leta efter uppdateringar automatiskt</translation>
     </message>
     <message>
       <location/>
       <source>Updating to...</source>
-      <translation type="unfinished">Updating to...</translation>
+      <translation>Uppdaterar till...</translation>
     </message>
     <message>
       <location/>
       <source>Link copied</source>
-      <translation type="unfinished">Link copied</translation>
+      <translation>Länk kopierad</translation>
     </message>
     <message>
       <location/>
       <source>You have the latest version installed</source>
-      <translation type="unfinished">You have the latest version installed</translation>
+      <translation>Du har den senaste versionen installerad</translation>
     </message>
     <message>
       <location/>
       <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation type="unfinished">Applying System updates at the end of the week is not recommended.</translation>
+      <translation>Det rekommenderas inte att uppdatera i slutet av veckan.</translation>
     </message>
   </context>
   <context>
@@ -2264,7 +2264,7 @@
     <message>
       <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Systemadministration</translation>
     </message>
   </context>
   <context>
@@ -2272,47 +2272,47 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
       <source>LDAP Settings...</source>
-      <translation type="unfinished">LDAP Settings...</translation>
+      <translation>LDAP inställningar...</translation>
     </message>
     <message>
       <location/>
       <source>New User...</source>
-      <translation type="unfinished">New User...</translation>
+      <translation>Ny användare...</translation>
     </message>
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation type="unfinished">Fetch Users from LDAP...</translation>
+      <translation>Hämta användare från LDAP...</translation>
     </message>
     <message>
       <location/>
       <source>Clear Selection</source>
-      <translation type="unfinished">Clear Selection</translation>
+      <translation>Rensa markering</translation>
     </message>
     <message>
       <location/>
       <source>Search users</source>
-      <translation type="unfinished">Search users</translation>
+      <translation>Sök användare</translation>
     </message>
     <message>
       <location/>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Aktivera</translation>
     </message>
     <message>
       <location/>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Avaktivera</translation>
     </message>
     <message>
       <location/>
       <source>Delete...</source>
-      <translation type="unfinished">Delete...</translation>
+      <translation>Radera...</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
+      <translation>Redigera roller...</translation>
     </message>
   </context>
   <context>
@@ -2320,22 +2320,22 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/videowall_settings_dialog.ui"/>
       <source>Video Wall Settings</source>
-      <translation type="unfinished">Video Wall Settings</translation>
+      <translation>Videoväggsinställningar</translation>
     </message>
     <message>
       <location/>
       <source>Launch video wall when Windows starts.</source>
-      <translation type="unfinished">Launch video wall when Windows starts.</translation>
+      <translation>Starta videovägg när Windows startar.</translation>
     </message>
     <message>
       <location/>
       <source>Place shortcut on desktop.</source>
-      <translation type="unfinished">Place shortcut on desktop.</translation>
+      <translation>Placera genväg på skrivbordet.</translation>
     </message>
     <message>
       <location/>
       <source>Enable timeline on video wall</source>
-      <translation type="unfinished">Enable timeline on video wall</translation>
+      <translation>Aktivera tidslinje på videovägg</translation>
     </message>
   </context>
   <context>
@@ -2343,32 +2343,32 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Snabbgranskning</translation>
     </message>
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation type="unfinished">Initial video length</translation>
+      <translation>Inledande videolängd</translation>
     </message>
     <message>
       <location/>
       <source>Exported video length</source>
-      <translation type="unfinished">Exported video length</translation>
+      <translation>Exporterad videolängd</translation>
     </message>
     <message>
       <location/>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>Hastighet</translation>
     </message>
     <message>
       <location/>
       <source>Frames interval</source>
-      <translation type="unfinished">Frames interval</translation>
+      <translation>Ramintervall</translation>
     </message>
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>Återställ hastighet</translation>
     </message>
   </context>
   <context>
@@ -2376,12 +2376,12 @@
     <message>
       <location filename="../src/ui/dialogs/reconnect_info_dialog.ui"/>
       <source>Reconnecting...</source>
-      <translation type="unfinished">Reconnecting...</translation>
+      <translation>Ansluter igen...</translation>
     </message>
     <message>
       <location/>
       <source>Please wait while the connection is being restored...</source>
-      <translation type="unfinished">Please wait while the connection is being restored...</translation>
+      <translation>Vänta medans anslutningen återställs...</translation>
     </message>
   </context>
   <context>
@@ -2389,42 +2389,42 @@
     <message>
       <location filename="../src/ui/widgets/business/recording_business_action_widget.ui"/>
       <source>Quality:</source>
-      <translation type="unfinished">Quality:</translation>
+      <translation>Kvalitet:</translation>
     </message>
     <message>
       <location/>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <location/>
       <source>s</source>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
       <source>max</source>
-      <translation type="unfinished">max</translation>
+      <translation>max</translation>
     </message>
     <message>
       <location/>
       <source>Pre-Recording:</source>
-      <translation type="unfinished">Pre-Recording:</translation>
+      <translation>Förinspelning:</translation>
     </message>
     <message>
       <location/>
       <source>Post-Recording:</source>
-      <translation type="unfinished">Post-Recording:</translation>
+      <translation>Efterinspelning:</translation>
     </message>
     <message>
       <location/>
       <source>Fixed duration:</source>
-      <translation type="unfinished">Fixed duration:</translation>
+      <translation>Fast varaktighet:</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>sekunder</translation>
     </message>
   </context>
   <context>
@@ -2432,52 +2432,52 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
       <source>Temporary Folder</source>
-      <translation type="unfinished">Temporary Folder</translation>
+      <translation>Tillfällig mapp</translation>
     </message>
     <message>
       <location/>
       <source>Additional Options</source>
-      <translation type="unfinished">Additional Options</translation>
+      <translation>Fler inställningar</translation>
     </message>
     <message>
       <location/>
       <source>Disable Aero</source>
-      <translation type="unfinished">Disable Aero</translation>
+      <translation>Inaktivera Aero</translation>
     </message>
     <message>
       <location/>
       <source>Capture Cursor</source>
-      <translation type="unfinished">Capture Cursor</translation>
+      <translation>Fånga muspekare</translation>
     </message>
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>En kraftfull dator rekommenderas för &quot;Bästa&quot; kvalitet och upplösning.</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Bläddra...</translation>
     </message>
     <message>
       <location/>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Upplösning</translation>
     </message>
     <message>
       <location/>
       <source>Recording Quality</source>
-      <translation type="unfinished">Recording Quality</translation>
+      <translation>Inspelningskvalitet</translation>
     </message>
     <message>
       <location/>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Källa</translation>
     </message>
     <message>
       <location/>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>Skärm</translation>
     </message>
   </context>
   <context>
@@ -2485,12 +2485,12 @@
     <message>
       <location filename="../src/ui/widgets/resource_browser_widget.ui"/>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Resurser</translation>
     </message>
     <message>
       <location/>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Sök</translation>
     </message>
   </context>
   <context>
@@ -2498,27 +2498,27 @@
     <message>
       <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui"/>
       <source>Speak the following:</source>
-      <translation type="unfinished">Speak the following:</translation>
+      <translation>Säg följande:</translation>
     </message>
     <message>
       <location/>
       <source>Type any text here</source>
-      <translation type="unfinished">Type any text here</translation>
+      <translation>Skriv någon text här</translation>
     </message>
     <message>
       <location/>
       <source>Volume:</source>
-      <translation type="unfinished">Volume:</translation>
+      <translation>Volym:</translation>
     </message>
     <message>
       <location/>
       <source>Test...</source>
-      <translation type="unfinished">Test...</translation>
+      <translation>Test...</translation>
     </message>
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>Tala med användare</translation>
     </message>
   </context>
   <context>
@@ -2526,12 +2526,12 @@
     <message>
       <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
       <source>Additional Recipients:</source>
-      <translation type="unfinished">Additional Recipients:</translation>
+      <translation>Ytterligare mottagare:</translation>
     </message>
     <message>
       <location/>
       <source>Global Email Settings...</source>
-      <translation type="unfinished">Global Email Settings...</translation>
+      <translation>Globala e-postinställningar...</translation>
     </message>
   </context>
   <context>
@@ -2539,32 +2539,32 @@
     <message>
       <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <location/>
       <source>Failover</source>
-      <translation type="unfinished">Failover</translation>
+      <translation>Failover</translation>
     </message>
     <message>
       <location/>
       <source>Failover Priority...</source>
-      <translation type="unfinished">Failover Priority...</translation>
+      <translation>Failover Prioritet...</translation>
     </message>
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Namn</translation>
     </message>
     <message>
       <location/>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>IP-adress</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Port</translation>
     </message>
   </context>
   <context>
@@ -2572,17 +2572,17 @@
     <message>
       <location filename="../src/ui/widgets/business/show_on_alarm_layout_action_widget.ui"/>
       <source>for</source>
-      <translation type="unfinished">for</translation>
+      <translation>för</translation>
     </message>
     <message>
       <location/>
       <source>Force Alarm Layout opening</source>
-      <translation type="unfinished">Force Alarm Layout opening</translation>
+      <translation>Tvinga larmvyn att visas</translation>
     </message>
     <message>
       <location/>
       <source>Also show source camera</source>
-      <translation type="unfinished">Also show source camera</translation>
+      <translation>Visa också källkamera</translation>
     </message>
   </context>
   <context>
@@ -2590,27 +2590,27 @@
     <message>
       <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>sekunder</translation>
     </message>
     <message>
       <location/>
       <source>Display text for:</source>
-      <translation type="unfinished">Display text for:</translation>
+      <translation>Visa text för:</translation>
     </message>
     <message>
       <location/>
       <source>Use custom text:</source>
-      <translation type="unfinished">Use custom text:</translation>
+      <translation>Använd anpassad text:</translation>
     </message>
     <message>
       <location/>
       <source>Rule will work only for prolonged events</source>
-      <translation type="unfinished">Rule will work only for prolonged events</translation>
+      <translation>Regel kommer endast att fungera för långvariga händelser</translation>
     </message>
     <message>
       <location/>
       <source>Also show on source camera</source>
-      <translation type="unfinished">Also show on source camera</translation>
+      <translation>Visa också på källkamera</translation>
     </message>
   </context>
   <context>
@@ -2618,17 +2618,17 @@
     <message>
       <location filename="../src/ui/dialogs/sign_dialog.ui"/>
       <source>Watermark Check</source>
-      <translation type="unfinished">Watermark Check</translation>
+      <translation>Kontrollera vattenstämpel</translation>
     </message>
     <message>
       <location/>
       <source>Checked File:</source>
-      <translation type="unfinished">Checked File:</translation>
+      <translation>Kontrollerad fil:</translation>
     </message>
     <message>
       <location/>
       <source>Check Result:</source>
-      <translation type="unfinished">Check Result:</translation>
+      <translation>Kontrollera resultat:</translation>
     </message>
   </context>
   <context>
@@ -2636,127 +2636,127 @@
     <message>
       <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui"/>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>Allmänt</translation>
     </message>
     <message>
       <location/>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Adress</translation>
     </message>
     <message>
       <location/>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <location/>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Autentisering</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Inspelning</translation>
     </message>
     <message>
       <location/>
       <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <translation>Rörelse</translation>
     </message>
     <message>
       <location/>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>Avancerad</translation>
     </message>
     <message>
       <location/>
       <source>Expert</source>
-      <translation type="unfinished">Expert</translation>
+      <translation>Expert</translation>
     </message>
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation type="unfinished">Enable Audio</translation>
+      <translation>Aktivera ljud</translation>
     </message>
     <message>
       <location/>
       <source>Motion is not available for this camera.</source>
-      <translation type="unfinished">Motion is not available for this camera.</translation>
+      <translation>Rörelse är inte tillgänglig för den här kameran.</translation>
     </message>
     <message>
       <location/>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Rörelsedetektering</translation>
     </message>
     <message>
       <location/>
       <source>Fisheye</source>
-      <translation type="unfinished">Fisheye</translation>
+      <translation>Fisköga</translation>
     </message>
     <message>
       <location/>
       <source>I/O ports</source>
-      <translation type="unfinished">I/O ports</translation>
+      <translation>I/O-portar</translation>
     </message>
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Namn</translation>
     </message>
     <message>
       <location/>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Modell</translation>
     </message>
     <message>
       <location/>
       <source>Firmware</source>
-      <translation type="unfinished">Firmware</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <location/>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Leverantör</translation>
     </message>
     <message>
       <location/>
       <source>Audio</source>
-      <translation type="unfinished">Audio</translation>
+      <translation>Ljud</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Logga in</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Lösenord</translation>
     </message>
     <message>
       <location/>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>IP-adress</translation>
     </message>
     <message>
       <location/>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Webbsida</translation>
     </message>
     <message>
       <location/>
       <source>MAC Address</source>
-      <translation type="unfinished">MAC Address</translation>
+      <translation>MAC-adress</translation>
     </message>
     <message>
       <location/>
       <source>Sensitivity</source>
-      <translation type="unfinished">Sensitivity</translation>
+      <translation>Känslighet</translation>
     </message>
     <message>
       <location/>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Återställ</translation>
     </message>
   </context>
   <context>
@@ -2764,27 +2764,27 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_advanced_settings_widget.ui"/>
       <source>Unsecure Connection</source>
-      <translation type="unfinished">Unsecure Connection</translation>
+      <translation>Osäker anslutning</translation>
     </message>
     <message>
       <location/>
       <source>(recommended)</source>
-      <translation type="unfinished">(recommended)</translation>
+      <translation>(rekommenderad)</translation>
     </message>
     <message>
       <location/>
       <source>Secure connection using TLS.</source>
-      <translation type="unfinished">Secure connection using TLS.</translation>
+      <translation>Säker anslutning med TLS.</translation>
     </message>
     <message>
       <location/>
       <source>Secure connection using SSL.</source>
-      <translation type="unfinished">Secure connection using SSL.</translation>
+      <translation>Säker anslutning med SSL.</translation>
     </message>
     <message>
       <location/>
       <source>Port:</source>
-      <translation type="unfinished">Port:</translation>
+      <translation>Port:</translation>
     </message>
   </context>
   <context>
@@ -2792,17 +2792,17 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_settings_widget.ui"/>
       <source>Outgoing Email Settings</source>
-      <translation type="unfinished">Outgoing Email Settings</translation>
+      <translation>Inställningar för utgående e-postserver</translation>
     </message>
     <message>
       <location/>
       <source>Advanced settings...</source>
-      <translation type="unfinished">Advanced settings...</translation>
+      <translation>Avancerade inställningar...</translation>
     </message>
     <message>
       <location/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Test</translation>
     </message>
   </context>
   <context>
@@ -2810,42 +2810,42 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_test_connection_widget.ui"/>
       <source>Server:</source>
-      <translation type="unfinished">Server:</translation>
+      <translation>Server:</translation>
     </message>
     <message>
       <location/>
       <source>Port:</source>
-      <translation type="unfinished">Port:</translation>
+      <translation>Port:</translation>
     </message>
     <message>
       <location/>
       <source>User:</source>
-      <translation type="unfinished">User:</translation>
+      <translation>Användare:</translation>
     </message>
     <message>
       <location/>
       <source>Security:</source>
-      <translation type="unfinished">Security:</translation>
+      <translation>Säkerhet:</translation>
     </message>
     <message>
       <location/>
       <source>Progress:</source>
-      <translation type="unfinished">Progress:</translation>
+      <translation>Förlopp:</translation>
     </message>
     <message>
       <location/>
       <source>Result:</source>
-      <translation type="unfinished">Result:</translation>
+      <translation>Resultat:</translation>
     </message>
     <message>
       <location/>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <location/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Avbryt</translation>
     </message>
   </context>
   <context>
@@ -2853,17 +2853,17 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>Tillgänglig till</translation>
     </message>
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Namn</translation>
     </message>
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Ikon</translation>
     </message>
   </context>
   <context>
@@ -2871,22 +2871,22 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
       <source>Current Statistics</source>
-      <translation type="unfinished">Current Statistics</translation>
+      <translation>Aktuell statistik</translation>
     </message>
     <message>
       <location/>
       <source>Forecast for Full Storage Usage</source>
-      <translation type="unfinished">Forecast for Full Storage Usage</translation>
+      <translation>Prognos för full lagring</translation>
     </message>
     <message>
       <location/>
       <source>Additional storage:</source>
-      <translation type="unfinished">Additional storage:</translation>
+      <translation>Ytterligare lagring:</translation>
     </message>
     <message>
       <location/>
       <source>Server is offline. Statistics are not available.</source>
-      <translation type="unfinished">Server is offline. Statistics are not available.</translation>
+      <translation>Servern är offline. Statistik är inte tillgänglig.</translation>
     </message>
   </context>
   <context>
@@ -2894,42 +2894,42 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Avbryt</translation>
     </message>
     <message>
       <location/>
       <source>Start Backup Now</source>
-      <translation type="unfinished">Start Backup Now</translation>
+      <translation>Starta säkerhetskopiering nu</translation>
     </message>
     <message>
       <location/>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Lägg till extern lagring...</translation>
     </message>
     <message>
       <location/>
       <source>Storage Locations</source>
-      <translation type="unfinished">Storage Locations</translation>
+      <translation>Lagringsplatser</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Archive</source>
-      <translation type="unfinished">Reindex Archive</translation>
+      <translation>Återskapa Arkiv</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Backup</source>
-      <translation type="unfinished">Reindex Backup</translation>
+      <translation>Återskapa Backup</translation>
     </message>
     <message>
       <location/>
       <source>Backup Archive</source>
-      <translation type="unfinished">Backup Archive</translation>
+      <translation>Backup Arkiv</translation>
     </message>
     <message>
       <location/>
       <source>Backup Settings...</source>
-      <translation type="unfinished">Backup Settings...</translation>
+      <translation>Inställningar för säkerhetskopiering...</translation>
     </message>
   </context>
   <context>
@@ -2937,7 +2937,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Avbryt</translation>
     </message>
   </context>
   <context>
@@ -2945,27 +2945,27 @@
     <message>
       <location filename="../src/ui/dialogs/storage_url_dialog.ui"/>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Lägg till extern lagring...</translation>
     </message>
     <message>
       <location/>
       <source>Protocol:</source>
-      <translation type="unfinished">Protocol:</translation>
+      <translation>Protokoll:</translation>
     </message>
     <message>
       <location/>
       <source>URL:</source>
-      <translation type="unfinished">URL:</translation>
+      <translation>URL:</translation>
     </message>
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Logga in:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Lösenord:</translation>
     </message>
   </context>
   <context>
@@ -2973,22 +2973,22 @@
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>Roller</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>Visa alla användare</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Välj användare</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>Inget matchar din sökning.</translation>
     </message>
   </context>
   <context>
@@ -2996,32 +2996,32 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/system_settings_widget.ui"/>
       <source>(recommended)</source>
-      <translation type="unfinished">(recommended)</translation>
+      <translation>(rekommenderad)</translation>
     </message>
     <message>
       <location/>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Aktivera audit trail</translation>
     </message>
     <message>
       <location/>
       <source>Send anonymous usage and crash statistics to software developers</source>
-      <translation type="unfinished">Send anonymous usage and crash statistics to software developers</translation>
+      <translation>Skicka anonym användning och kraschstatistik till programutvecklare</translation>
     </message>
     <message>
       <location/>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation type="unfinished">Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</translation>
+      <translation>Varning! Detta gör att inställningarna för kvalitet och bildfrekvens (FPS) i inspelningsschemat är irrelevanta.</translation>
     </message>
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
+      <translation>Visa vattenstämpel med användarnamn över video</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
+      <translation>Förhandsgranskning av vattenstämpel</translation>
     </message>
   </context>
   <context>
@@ -3029,27 +3029,27 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Text</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Radera</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Teckenstorlek</translation>
     </message>
     <message>
       <location/>
       <source>Enter plain text or HTML</source>
-      <translation type="unfinished">Enter plain text or HTML</translation>
+      <translation>Ange vanlig text eller HTML</translation>
     </message>
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Bredd på område</translation>
     </message>
   </context>
   <context>
@@ -3057,12 +3057,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
       <source>System Time</source>
-      <translation type="unfinished">System Time</translation>
+      <translation>Systemtid</translation>
     </message>
     <message>
       <location/>
       <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
+      <translation>Synkronisera tiden med Internet</translation>
     </message>
   </context>
   <context>
@@ -3070,22 +3070,22 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>Tidstämpel</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Teckenstorlek</translation>
     </message>
     <message>
       <location/>
       <source>Format</source>
-      <translation type="unfinished">Format</translation>
+      <translation>Formatera</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Radera</translation>
     </message>
   </context>
   <context>
@@ -3093,7 +3093,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
       <source>Change Password...</source>
-      <translation type="unfinished">Change Password...</translation>
+      <translation>Ändra lösenord...</translation>
     </message>
   </context>
   <context>
@@ -3101,17 +3101,17 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Namn</translation>
     </message>
     <message>
       <location/>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Användare</translation>
     </message>
     <message>
       <location/>
       <source>Delete Role</source>
-      <translation type="unfinished">Delete Role</translation>
+      <translation>Ta bort roll</translation>
     </message>
   </context>
   <context>
@@ -3119,22 +3119,22 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
       <source>User Roles</source>
-      <translation type="unfinished">User Roles</translation>
+      <translation>Användarroller</translation>
     </message>
     <message>
       <location/>
       <source>New role</source>
-      <translation type="unfinished">New role</translation>
+      <translation>Ny roll</translation>
     </message>
     <message>
       <location/>
       <source>There are no custom user roles yet.</source>
-      <translation type="unfinished">There are no custom user roles yet.</translation>
+      <translation>Det finns inga anpassade användarroller ännu.</translation>
     </message>
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
+      <translation>Klicka på &quot;Ny roll&quot; knappen för att skapa en.</translation>
     </message>
   </context>
   <context>
@@ -3142,17 +3142,17 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation type="unfinished">User Type</translation>
+      <translation>Typ av användare</translation>
     </message>
     <message>
       <location/>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Roll</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
+      <translation>Redigera roller...</translation>
     </message>
   </context>
   <context>
@@ -3160,17 +3160,17 @@
     <message>
       <location filename="../src/ui/widgets/properties/wearable_motion_widget.ui"/>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Rörelsedetektering</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion in uploaded video</source>
-      <translation type="unfinished">Detect motion in uploaded video</translation>
+      <translation>Upptäck rörelse i uppladdad video</translation>
     </message>
     <message>
       <location/>
       <source>Sensitivity</source>
-      <translation type="unfinished">Sensitivity</translation>
+      <translation>Känslighet</translation>
     </message>
   </context>
   <context>
@@ -3178,7 +3178,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/wearable_progress_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Avbryt</translation>
     </message>
   </context>
   <context>
@@ -3186,17 +3186,17 @@
     <message>
       <location filename="../src/ui/widgets/properties/wearable_upload_widget.ui"/>
       <source>Upload Video</source>
-      <translation type="unfinished">Upload Video</translation>
+      <translation>Ladda upp video</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Ladda upp fil...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Ladda upp mapp...</translation>
     </message>
   </context>
   <context>
@@ -3204,7 +3204,7 @@
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>This web page is for C2P integration</source>
-      <translation type="unfinished">This web page is for C2P integration</translation>
+      <translation>Den här webbsidan är för C2P-integration</translation>
     </message>
   </context>
   <context>
@@ -3212,27 +3212,27 @@
     <message>
       <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
       <source>Schedule Settings</source>
-      <translation type="unfinished">Schedule Settings</translation>
+      <translation>Schemainställningarna</translation>
     </message>
     <message>
       <location/>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>På</translation>
     </message>
     <message>
       <location/>
       <source>Off</source>
-      <translation type="unfinished">Off</translation>
+      <translation>Av</translation>
     </message>
     <message>
       <location/>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Schema</translation>
     </message>
     <message>
       <location/>
       <source>Note: Schedule is based on server time.</source>
-      <translation type="unfinished">Note: Schedule is based on server time.</translation>
+      <translation>Obs! Schemat är baserat på servertid.</translation>
     </message>
   </context>
   <context>
@@ -3240,17 +3240,17 @@
     <message>
       <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation type="unfinished">Watermark preview</translation>
+      <translation>Förhandsgranskning av vattenstämpel</translation>
     </message>
     <message>
       <location/>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>Genomskinlighet</translation>
     </message>
     <message>
       <location/>
       <source>Frequency</source>
-      <translation type="unfinished">Frequency</translation>
+      <translation>Frekvens</translation>
     </message>
   </context>
 </TS>

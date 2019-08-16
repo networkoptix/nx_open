@@ -894,7 +894,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Exporter Signet...</translation>
     </message>
   </context>
   <context>
@@ -1130,19 +1130,19 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Défilement Gauche</translation>
+      <translation>Défiler vers la gauche</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation>Défilement Haut</translation>
+      <translation>Défiler vers le haut</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Défilement Droite</translation>
+      <translation>Défiler vers la droite</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation>Défilement Bas</translation>
+      <translation>Défiler vers le bas</translation>
     </message>
   </context>
   <context>
@@ -1515,7 +1515,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Sélectionner tous</translation>
+      <translation>Tout sélectionner</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -1609,7 +1609,7 @@ pour afficher plus de signets</translation>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation>Inconnue</translation>
+      <translation>Inconnu</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -1678,7 +1678,7 @@ pour afficher plus de signets</translation>
     <message numerus="yes">
       <source>%n action(s)</source>
       <translation>
-        <numerusform>%n action</numerusform>
+        <numerusform>%n actions</numerusform>
         <numerusform>%n actions</numerusform>
       </translation>
     </message>
@@ -1936,7 +1936,7 @@ pour afficher plus de signets</translation>
     <message numerus="yes">
       <source>%n Server(s)</source>
       <translation>
-        <numerusform>%n Serveur</numerusform>
+        <numerusform>%n Serveurs</numerusform>
         <numerusform>%n Serveurs</numerusform>
       </translation>
     </message>
@@ -2049,7 +2049,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>&amp;Supprimer</translation>
+      <translation>Suppri&amp;mer</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
@@ -2216,7 +2216,7 @@ pour afficher plus de signets</translation>
     <message numerus="yes">
       <source>%n devices added.</source>
       <translation>
-        <numerusform>%n périphérique ajouté.</numerusform>
+        <numerusform>%n périphériques ajoutés.</numerusform>
         <numerusform>%n périphériques ajoutés.</numerusform>
       </translation>
     </message>
@@ -2275,7 +2275,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Web</source>
-      <translation type="unfinished">Web</translation>
+      <translation>Web</translation>
     </message>
     <message>
       <source>No settings</source>
@@ -2441,7 +2441,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Sélectionner tous</translation>
+      <translation>Tout sélectionner</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
@@ -2627,7 +2627,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>On</source>
-      <translation>Activé</translation>
+      <translation>Sur</translation>
     </message>
     <message>
       <source>Recording Schedule</source>
@@ -3075,7 +3075,7 @@ to %1</source>
     </message>
     <message>
       <source>Download</source>
-      <translation>Télécharger</translation>
+      <translation>Téléchargement</translation>
     </message>
     <message>
       <source>Restart</source>
@@ -3415,7 +3415,7 @@ to %1</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Sélectionner tous</translation>
+      <translation>Tout sélectionner</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3424,14 +3424,14 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
       <translation>
-        <numerusform>Le journal d'événement pour la période de %1 à %2 - %n événement trouvé</numerusform>
+        <numerusform>Le journal d'événement pour la période de %1 à %2 - %n événements trouvés</numerusform>
         <numerusform>Le journal d'événement pour la période de %1 à %2 - %n événements trouvés</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
-        <numerusform>Journal d'événement pour %1 - %n événement trouvé</numerusform>
+        <numerusform>Journal d'événement pour %1 - %n événements trouvés</numerusform>
         <numerusform>Journal d'événement pour %1 - %n événements trouvés</numerusform>
       </translation>
     </message>
@@ -3575,7 +3575,7 @@ to %1</source>
     <message>
       <source>Low</source>
       <comment>Failover priority</comment>
-      <translation>Bas</translation>
+      <translation>Basse</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -3585,7 +3585,7 @@ to %1</source>
     <message>
       <source>High</source>
       <comment>Failover priority</comment>
-      <translation>Haut</translation>
+      <translation>Élevée</translation>
     </message>
   </context>
   <context>
@@ -3778,7 +3778,7 @@ to %1</source>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation>Inconnue</translation>
+      <translation>Inconnu</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -3994,7 +3994,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Clé de licence</translation>
+      <translation>Clé Licence</translation>
     </message>
     <message>
       <source>Status</source>
@@ -4145,14 +4145,14 @@ to %1</source>
     <message numerus="yes">
       <source>At least %n %1 are required</source>
       <translation>
-        <numerusform>Au moins %n %1 est nécessaire</numerusform>
+        <numerusform>Au moins %n %1 sont nécessaires</numerusform>
         <numerusform>Au moins %n %1 sont nécessaires</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
       <translation>
-        <numerusform>%n %1 est actuellement en cours d’utilisation</numerusform>
+        <numerusform>%n %1 sont actuellement en cours d’utilisation</numerusform>
         <numerusform>%n %1 sont actuellement en cours d’utilisation</numerusform>
       </translation>
     </message>
@@ -4306,21 +4306,21 @@ to %1</source>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation>
-        <numerusform>Utiliser licence pour %n périphérique sélectionné</numerusform>
+        <numerusform>Utiliser licences pour %n périphériques sélectionnés</numerusform>
         <numerusform>Utiliser licences pour %n périphériques sélectionnés</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
       <translation>
-        <numerusform>Utiliser licence pour %n caméra sélectionnée</numerusform>
+        <numerusform>Utiliser licences pour %n caméras sélectionnées</numerusform>
         <numerusform>Utiliser licences pour %n caméras sélectionnées</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
       <translation>
-        <numerusform>Utiliser licence pour %n module I/O sélectionné</numerusform>
+        <numerusform>Utiliser licences pour %n modules I/O sélectionnés</numerusform>
         <numerusform>Utiliser licences pour %n modules I/O sélectionnés</numerusform>
       </translation>
     </message>
@@ -4328,7 +4328,7 @@ to %1</source>
       <source>Use licenses to view these %n cameras</source>
       <translation>
         <numerusform>Utiliser une licence pour voir %n camera</numerusform>
-        <numerusform>Utiliser une licence pour voir %n cameras</numerusform>
+        <numerusform>Utiliser une licence pour voir %n camera</numerusform>
       </translation>
     </message>
   </context>
@@ -4419,7 +4419,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation>Effacer Connexion?</translation>
+      <translation>Supprimer connexion?</translation>
     </message>
     <message>
       <source>There is another connection with the same name.</source>
@@ -4672,7 +4672,7 @@ to %1</source>
     </message>
     <message>
       <source>Skip</source>
-      <translation>Passer</translation>
+      <translation>Suivant</translation>
     </message>
     <message>
       <source>Close</source>
@@ -4784,7 +4784,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n more notifications</source>
       <translation>
-        <numerusform>%n notification de plus</numerusform>
+        <numerusform>%n notifications de plus</numerusform>
         <numerusform>%n notifications de plus</numerusform>
       </translation>
     </message>
@@ -4968,7 +4968,7 @@ to %1</source>
     </message>
     <message>
       <source>Home</source>
-      <translation>Accueil</translation>
+      <translation>Début</translation>
     </message>
     <message>
       <source>Details</source>
@@ -5003,7 +5003,7 @@ to %1</source>
     <message numerus="yes">
       <source>about %n minute(s)</source>
       <translation>
-        <numerusform>Environ %n minute</numerusform>
+        <numerusform>Environ %n minutes</numerusform>
         <numerusform>Environ %n minutes</numerusform>
       </translation>
     </message>
@@ -5036,7 +5036,7 @@ to %1</source>
     <name>QnPtzPresetDialog</name>
     <message>
       <source>Saved Position %1</source>
-      <translation>Enregistrer la position %1</translation>
+      <translation>Enregistrer Position %1</translation>
     </message>
     <message>
       <source>None</source>
@@ -5070,7 +5070,7 @@ to %1</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>Bas</translation>
+      <translation>Basse</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -5078,7 +5078,7 @@ to %1</source>
     </message>
     <message>
       <source>High</source>
-      <translation>Haut</translation>
+      <translation>Élevée</translation>
     </message>
     <message>
       <source>Highest</source>
@@ -5200,11 +5200,11 @@ to %1</source>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 TB</translation>
+      <translation>%1 To</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GB</translation>
+      <translation>%1 Go</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -5263,7 +5263,7 @@ to %1</source>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>Mouvement et Basse réso</translation>
+      <translation>Mouv. et Basse réso</translation>
     </message>
   </context>
   <context>
@@ -5416,7 +5416,7 @@ to %1</source>
     </message>
     <message>
       <source>Information</source>
-      <translation>Informations</translation>
+      <translation>Information</translation>
     </message>
     <message>
       <source>Rotate</source>
@@ -5450,7 +5450,7 @@ to %1</source>
     <name>QnScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation>Tout</translation>
+      <translation>Tous</translation>
     </message>
   </context>
   <context>
@@ -5469,7 +5469,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Exporter Signet...</translation>
     </message>
   </context>
   <context>
@@ -5577,7 +5577,7 @@ to %1</source>
       <source>%n Users</source>
       <translation>
         <numerusform>%n usager</numerusform>
-        <numerusform>%n usagers</numerusform>
+        <numerusform>%n usager</numerusform>
       </translation>
     </message>
   </context>
@@ -5659,7 +5659,7 @@ to %1</source>
     </message>
     <message>
       <source>Server Settings</source>
-      <translation>Paramètres Serveur</translation>
+      <translation>Paramètres du serveur</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -5853,7 +5853,7 @@ to %1</source>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
       <translation>
-        <numerusform>Pas assez d’espace libre sur %n serveur:</numerusform>
+        <numerusform>Pas assez d’espace libre sur %n serveurs:</numerusform>
         <numerusform>Pas assez d’espace libre sur %n serveurs:</numerusform>
       </translation>
     </message>
@@ -6261,7 +6261,7 @@ to %1</source>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation>Sélectionner tous</translation>
+      <translation>Tout sélectionner</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -6452,7 +6452,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 GB</translation>
+      <translation>%1 Go</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -6620,7 +6620,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Connexion</translation>
+      <translation>Connecter</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -6817,7 +6817,7 @@ to %1</source>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM yyyy</translation>
+      <translation>MMMM aaaa</translation>
     </message>
     <message>
       <source>yyyy</source>
@@ -6883,13 +6883,13 @@ to %1</source>
       <source>The problem is caused by %n servers:</source>
       <translation>
         <numerusform>Le problème est causé par%n serveur:</numerusform>
-        <numerusform>Le problème est causé par%n serveurs:</numerusform>
+        <numerusform>Le problème est causé par%n serveur:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
       <translation>
-        <numerusform>Aucun espace libre sur %n serveur:</numerusform>
+        <numerusform>Aucun espace libre sur %n serveurs:</numerusform>
         <numerusform>Aucun espace libre sur %n serveurs:</numerusform>
       </translation>
     </message>
@@ -6897,20 +6897,20 @@ to %1</source>
       <source>%n servers are not responding:</source>
       <translation>
         <numerusform>%n serveur ne répond pas:</numerusform>
-        <numerusform>%n serveurs ne répondent pas:</numerusform>
+        <numerusform>%n serveur ne répond pas:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
       <translation>
-        <numerusform>%n serveur est hors-ligne:</numerusform>
+        <numerusform>%n serveurs sont hors-ligne:</numerusform>
         <numerusform>%n serveurs sont hors-ligne:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
       <translation>
-        <numerusform>Échec d'authentification pour %n serveur:</numerusform>
+        <numerusform>Échec d'authentification pour %n serveurs:</numerusform>
         <numerusform>Échec d'authentification pour %n serveurs:</numerusform>
       </translation>
     </message>
@@ -7152,7 +7152,7 @@ to %1</source>
     <name>QnUserSettingsWidget</name>
     <message>
       <source>Local</source>
-      <translation>Locale</translation>
+      <translation>Local</translation>
     </message>
     <message>
       <source>Login</source>
@@ -7984,7 +7984,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Enlever</translation>
+      <translation>Supprimer</translation>
     </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
@@ -8026,7 +8026,7 @@ to %1</source>
       <source>Delete %n items?</source>
       <translation>
         <numerusform>Supprimer %n objet?</numerusform>
-        <numerusform>Supprimer %n objet?</numerusform>
+        <numerusform>Supprimer %n objets?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8410,11 +8410,11 @@ to %1</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>Bas</translation>
+      <translation>Basse</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Haut</translation>
+      <translation>Élevée</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -8526,7 +8526,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Plusieurs signets peuvent être exportés en tant que mise en page uniquement.</translation>
     </message>
   </context>
   <context>
@@ -8966,7 +8966,7 @@ to %1</source>
     </message>
     <message>
       <source>Skip</source>
-      <translation>Passer</translation>
+      <translation>Suivant</translation>
     </message>
     <message>
       <source>Beta version %1</source>

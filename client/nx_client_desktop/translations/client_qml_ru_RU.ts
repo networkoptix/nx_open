@@ -27,7 +27,7 @@
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation>Имя пользователя</translation>
     </message>
     <message>
       <source>Password</source>
@@ -74,6 +74,14 @@
     <message>
       <source>New Server</source>
       <translation>Новый сервер</translation>
+    </message>
+    <message>
+      <source>Edit</source>
+      <translation>Правка</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Скрыть</translation>
     </message>
   </context>
   <context>

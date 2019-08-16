@@ -75,6 +75,14 @@
       <source>New Server</source>
       <translation>新服务器</translation>
     </message>
+    <message>
+      <source>Edit</source>
+      <translation>编辑</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>隐藏</translation>
+    </message>
   </context>
   <context>
     <name>WelcomeScreen</name>

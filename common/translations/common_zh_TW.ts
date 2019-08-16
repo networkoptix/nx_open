@@ -686,7 +686,7 @@
     <name>QnStreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation>最低 (Ls)</translation>
+      <translation>最低</translation>
     </message>
     <message>
       <source>Low</source>
@@ -694,7 +694,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation>中 (M)</translation>
+      <translation>中</translation>
     </message>
     <message>
       <source>High</source>
@@ -702,7 +702,7 @@
     </message>
     <message>
       <source>Best</source>
-      <translation>最高 (Hs)</translation>
+      <translation>最佳</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -715,32 +715,32 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Ls</translation>
+      <translation>最低</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>L</translation>
+      <translation>低</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>M</translation>
+      <translation>中</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>H</translation>
+      <translation>高</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Hs</translation>
+      <translation>最佳</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>預</translation>
+      <translation>預設</translation>
     </message>
   </context>
   <context>
@@ -851,7 +851,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>分</translation>
+      <translation>月</translation>
     </message>
     <message>
       <source>y</source>
@@ -876,7 +876,7 @@
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation>時</translation>
+      <translation>小時</translation>
     </message>
     <message>
       <source>days</source>
@@ -923,7 +923,7 @@
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>時</numerusform>
+        <numerusform>小時</numerusform>
       </translation>
     </message>
     <message numerus="yes">

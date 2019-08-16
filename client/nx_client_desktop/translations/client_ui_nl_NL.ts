@@ -26,7 +26,7 @@
     <message>
       <location/>
       <source>Support</source>
-      <translation>Support</translation>
+      <translation>Ondersteuning</translation>
     </message>
     <message>
       <location/>
@@ -506,7 +506,7 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation>Gebeurtnisregels</translation>
+      <translation>Event regels</translation>
     </message>
     <message>
       <location/>
@@ -609,7 +609,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
@@ -715,7 +715,7 @@
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation>Secundaire stream</translation>
+      <translation>Secundair stream</translation>
     </message>
     <message>
       <location/>
@@ -760,27 +760,27 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Gewenst PTZ-preset type:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Systeem</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Oorspronkelijke resolutie</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Deze camera ondersteunt draaien en kantelen</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Deze camera ondersteunt zoomen</translation>
     </message>
   </context>
   <context>
@@ -1039,7 +1039,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Gebeurtenisregels...</translation>
+      <translation>Event regels...</translation>
     </message>
   </context>
   <context>
@@ -1057,7 +1057,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
@@ -1274,7 +1274,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Verwijderen</translation>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <location/>
@@ -1490,7 +1490,7 @@
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Selecteer een gebruiker in de regel &quot;tot&quot; om zijn lokale schermindeling in deze lijst weer te geven</translation>
+      <translation>Selecteer een gebruiker in &quot;Toon aan&quot; om de toegewezen lokale schermindelingen weer te geven</translation>
     </message>
   </context>
   <context>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Zoek time-out(s)</translation>
     </message>
   </context>
   <context>
@@ -1686,7 +1686,7 @@
     <message>
       <location/>
       <source>Activate License</source>
-      <translation>Activeer licentie</translation>
+      <translation>Licentie activeren</translation>
     </message>
     <message>
       <location/>
@@ -1765,7 +1765,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
@@ -1874,7 +1874,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Login:</translation>
+      <translation>Aanmelden:</translation>
     </message>
     <message>
       <location/>
@@ -1989,7 +1989,7 @@
     <message>
       <location/>
       <source>Start Tour</source>
-      <translation>Start tour</translation>
+      <translation>Start Tour</translation>
     </message>
     <message>
       <location/>
@@ -2113,7 +2113,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
       <source>Log in</source>
-      <translation>Log in</translation>
+      <translation>Inloggen</translation>
     </message>
     <message>
       <location/>
@@ -2177,7 +2177,7 @@
     <message>
       <location/>
       <source>Add...</source>
-      <translation>Voeg toe...</translation>
+      <translation>Toevoegen...</translation>
     </message>
     <message>
       <location/>
@@ -2282,7 +2282,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Gebruikers ophalen via LDAP...</translation>
+      <translation>Gebruikers ophalen van LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2368,7 +2368,7 @@
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation>Herstel de snelheid</translation>
+      <translation>Reset snelheid</translation>
     </message>
   </context>
   <context>
@@ -2726,7 +2726,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <location/>
@@ -2960,7 +2960,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Login:</translation>
+      <translation>Aanmelden:</translation>
     </message>
     <message>
       <location/>

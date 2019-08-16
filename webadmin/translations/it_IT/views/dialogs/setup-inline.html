@@ -40,8 +40,8 @@
             <span class="text"> o </span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">Aggiungi al sistema esistente</button><br>
-        <small>(Se {{Config.productName}} è già stato impostato)</small><br>
+        <button class="btn btn-default" ng-click="skip()">Add to Existing System</button><br>
+        <small>(if {{Config.productName}} has been already setup)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -267,7 +267,7 @@
              ng-if= "forms.localForm.$valid &&
                      (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
-                Le passwords non corrispondono
+                Le password non corrispondono
             </div>
         </div>
     </form>
@@ -424,7 +424,7 @@
         Controlla la connessione Internet.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()"> Riprovare </button> <button class="btn btn-default" ng-click="skip()"> Imposta il sistema locale </button>
+        <button class="btn btn-default" ng-click="retry()"> Riprova </button> <button class="btn btn-default" ng-click="skip()"> Imposta il sistema locale </button>
     </p>
 </div>
 
@@ -445,7 +445,7 @@
     <p class="master-description">Qualcosa è andato completamente storto. <br> Descrizione errore: {{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Riprovare</button>
+        <button class="btn btn-default" ng-click="retry()">Riprova</button>
     </p>
 </div>
 

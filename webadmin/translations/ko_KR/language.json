@@ -1,7 +1,7 @@
 {
     "language_name": "한국어",
     "dialogs": {
-        "okButton": "Ok",
+        "okButton": "승인",
         "openLink": "이 링크를 방문",
         "openLinkWithTitle": "{{title}} 링크를 방문"
     },
@@ -76,7 +76,7 @@
         "emailSupportEmail": "지원 이메일",
         "enableEdgeRecording": "오디오 녹음을 사용",
         "eventLogPeriodDays": "이벤트 로그 기간(일)",
-        "hanwhaDeleteProfilesOnInitIfNeeded": "필요에 따라 init값에서 카메라정보 삭제",
+        "hanwhaDeleteProfilesOnInitIfNeeded": "필요에 따라 init에서 카메라정보 삭제",
         "ldapAdminDn": "LDAP 관리자 DN",
         "ldapSearchBase": "LDAP 검색 기준",
         "ldapSearchFilter": "LDAP 검색 필터",
@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "업데이트 알림 활성화",
         "upnpPortMappingEnabled": "UPNP 포트 매핑 사용",
         "useTextEmailFormat": "일반 텍스트로 이메일 보내기",
-        "useWindowsEmailLineFeed": "이메일에 Windows 줄넘김 사용"
+        "useWindowsEmailLineFeed": "이메일에 Windows 줄넘김 사용",
+        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value."
     },
     "info": {
         "tabs": {
@@ -178,17 +179,17 @@
     },
     "common": {
         "voiceCommands": {
-            "search": "find + [text for searchbar]",
+            "search": "찾기 + [text for searchbar]",
             "pause": "일시정지",
-            "help": "help | show commands",
+            "help": "도움말 | 명령 표시",
             "collapse all servers": "모든 서버 축소",
-            "collapse server": "collapse server + [server name]",
+            "collapse server": "서버축소 + [server name]",
             "play": "재생",
             "clear search": "검색창 지우기",
             "live": "go to live | show me live",
             "expand all servers": "모든 서버 확장",
             "stop listening": "듣기 중지",
-            "expand server": "expand server + [server name]",
+            "expand server": "서버확장 + [server name]",
             "view": "view + [camera name]"
         },
         "systemOffline": "시스템 오프라인",
@@ -218,9 +219,9 @@
         },
         "chromeCastWarning": "크롬캐스트는 많은 리소스가 요구되어 서버에 문제가 발생할 수 있습니다.",
         "resolution": {
-            "high": "높은",
+            "high": "고해상도",
             "auto": "자동",
-            "low": "낮은"
+            "low": "저해상도"
         }
     }
 }

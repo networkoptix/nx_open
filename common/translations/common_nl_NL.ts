@@ -393,7 +393,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Kan de encoder voor codec %1 niet vinden.</translation>
+      <translation>Kon geen encoder vinden voor codec %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -592,7 +592,7 @@
       <source>%n Device(s)</source>
       <translation>
         <numerusform>%n Apparaat</numerusform>
-        <numerusform>%n Apparaten</numerusform>
+        <numerusform>%n Apparaat</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -638,13 +638,13 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n I/O Module</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Module</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n I/O Module</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
         <numerusform>%n I/O Modules</numerusform>
       </translation>
     </message>
@@ -669,7 +669,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Onbekend</translation>
+      <translation>Unknown</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -700,7 +700,7 @@
     </message>
     <message>
       <source>Low</source>
-      <translation>Lage</translation>
+      <translation>Laag</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -725,32 +725,32 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Laagst</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>Laag</translation>
+      <translation>L</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>Medium</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Hoog</translation>
+      <translation>H</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Beste</translation>
+      <translation>B</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Preset</translation>
+      <translation>Ps</translation>
     </message>
   </context>
   <context>
@@ -765,7 +765,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Kan de uitvoer stream niet voor opname toewijzen.</translation>
+      <translation>Kan de output stream niet toewijzen voor opname.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
@@ -912,15 +912,15 @@
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>milliseconde</numerusform>
-        <numerusform>millisecondes</numerusform>
+        <numerusform>milliseconden</numerusform>
+        <numerusform>milliseconden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>seconden</numerusform>
+        <numerusform>seconde</numerusform>
         <numerusform>seconden</numerusform>
       </translation>
     </message>
@@ -944,14 +944,14 @@
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>dagen</numerusform>
+        <numerusform>dag</numerusform>
         <numerusform>dagen</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>week</numerusform>
         <numerusform>weken</numerusform>
       </translation>

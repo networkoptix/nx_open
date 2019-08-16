@@ -75,6 +75,14 @@
       <source>New Server</source>
       <translation>Yeni Sunucu</translation>
     </message>
+    <message>
+      <source>Edit</source>
+      <translation>Düzenle</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Gizle</translation>
+    </message>
   </context>
   <context>
     <name>WelcomeScreen</name>

@@ -393,7 +393,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Nem található enkóder %1 kodekhez.</translation>
+      <translation>Nem található enkóder a %1 codec-hez.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -725,27 +725,27 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>La</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>A</translation>
+      <translation>Lo</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>Közepes</translation>
+      <translation>Me</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>M</translation>
+      <translation>Hi</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Legjobb</translation>
+      <translation>Bst</translation>
     </message>
     <message>
       <source>Ps</source>
@@ -765,7 +765,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>Nem lehet lefoglalni a kimeneti streamet a rögzítéshez.</translation>
+      <translation>Nem lehet lefoglalni a kimeneti stream-et a rogzítéshez.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
@@ -836,7 +836,7 @@
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation>mp</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>m</source>
@@ -912,8 +912,8 @@
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>milimásodperc</numerusform>
-        <numerusform>milimásodperc</numerusform>
+        <numerusform>milliszekundum</numerusform>
+        <numerusform>milliszekundum</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -936,8 +936,8 @@
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>óra</numerusform>
-        <numerusform>óra</numerusform>
+        <numerusform>órák</numerusform>
+        <numerusform>órák</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -952,24 +952,24 @@
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
       <translation>
-        <numerusform>hét</numerusform>
-        <numerusform>hét</numerusform>
+        <numerusform>hetek</numerusform>
+        <numerusform>hetek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
       <translation>
-        <numerusform>hónap</numerusform>
-        <numerusform>hónap</numerusform>
+        <numerusform>hónapok</numerusform>
+        <numerusform>hónapok</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
       <translation>
-        <numerusform>év</numerusform>
-        <numerusform>év</numerusform>
+        <numerusform>évek</numerusform>
+        <numerusform>évek</numerusform>
       </translation>
     </message>
   </context>

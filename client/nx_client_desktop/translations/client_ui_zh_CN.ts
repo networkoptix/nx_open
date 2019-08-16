@@ -202,7 +202,7 @@
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation>查看录像</translation>
+      <translation>录像预览</translation>
     </message>
     <message>
       <location/>
@@ -212,7 +212,7 @@
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>实时浏览</translation>
+      <translation>实时预览</translation>
     </message>
     <message>
       <location/>
@@ -247,7 +247,7 @@
     <message>
       <location/>
       <source>Details</source>
-      <translation>内容</translation>
+      <translation>详细内容</translation>
     </message>
     <message>
       <location/>
@@ -524,7 +524,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
       <source>Server is offline</source>
-      <translation>服务器离线</translation>
+      <translation>服务器已离线</translation>
     </message>
     <message>
       <location/>
@@ -670,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>还原为默认值</translation>
+      <translation>恢复默认</translation>
     </message>
     <message>
       <location/>
@@ -760,27 +760,27 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>首选PTZ预设类型：</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>系统</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>原生</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>此摄相机支援水平和垂直摇摄</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>此摄相机支援變焦</translation>
     </message>
   </context>
   <context>
@@ -832,7 +832,7 @@
     <message>
       <location/>
       <source>Quality</source>
-      <translation>画质</translation>
+      <translation>质量</translation>
     </message>
     <message>
       <location/>
@@ -1039,7 +1039,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>事件规则...</translation>
+      <translation>事件规则</translation>
     </message>
   </context>
   <context>
@@ -1241,7 +1241,7 @@
     <message>
       <location/>
       <source>Source camera</source>
-      <translation>来源摄像机</translation>
+      <translation>摄像机资源</translation>
     </message>
   </context>
   <context>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>允许搜寻连线时间 (秒)</translation>
     </message>
   </context>
   <context>
@@ -1681,12 +1681,12 @@
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation>激活免费许可密钥</translation>
+      <translation>激活免费许可</translation>
     </message>
     <message>
       <location/>
       <source>Activate License</source>
-      <translation>激活许可</translation>
+      <translation>激活授权</translation>
     </message>
     <message>
       <location/>
@@ -1696,7 +1696,7 @@
     <message>
       <location/>
       <source>License Key</source>
-      <translation>许可密钥:</translation>
+      <translation>授权密钥</translation>
     </message>
     <message>
       <location/>
@@ -1788,7 +1788,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation>常规设置</translation>
+      <translation>界面外观</translation>
     </message>
     <message>
       <location/>
@@ -1859,7 +1859,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui"/>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>通用</translation>
     </message>
     <message>
       <location/>
@@ -1999,7 +1999,7 @@
     <message>
       <location/>
       <source>Details</source>
-      <translation>配置信息</translation>
+      <translation>详细内容</translation>
     </message>
     <message>
       <location/>
@@ -2045,7 +2045,7 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation>关联电视墙...</translation>
+      <translation>连接到电视墙...</translation>
     </message>
     <message>
       <location/>
@@ -2066,7 +2066,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>标签</translation>
+      <translation>标记</translation>
     </message>
   </context>
   <context>
@@ -2226,7 +2226,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
       <source>Cancel</source>
-      <translation>取消</translation>
+      <translation>撤消</translation>
     </message>
     <message>
       <location/>
@@ -2282,7 +2282,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>从LDAP获取用户...</translation>
+      <translation>获取用户的LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2462,7 +2462,7 @@
     <message>
       <location/>
       <source>Resolution</source>
-      <translation>分辨率:</translation>
+      <translation>分辨率</translation>
     </message>
     <message>
       <location/>
@@ -2636,7 +2636,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui"/>
       <source>General</source>
-      <translation>一般</translation>
+      <translation>通用</translation>
     </message>
     <message>
       <location/>
@@ -2661,7 +2661,7 @@
     <message>
       <location/>
       <source>Motion</source>
-      <translation>移动侦测</translation>
+      <translation>监控</translation>
     </message>
     <message>
       <location/>
@@ -2711,12 +2711,12 @@
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>版本:</translation>
+      <translation>版本</translation>
     </message>
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>厂商:</translation>
+      <translation>厂商</translation>
     </message>
     <message>
       <location/>
@@ -2840,12 +2840,12 @@
     <message>
       <location/>
       <source>OK</source>
-      <translation>确认</translation>
+      <translation>确定</translation>
     </message>
     <message>
       <location/>
       <source>Cancel</source>
-      <translation>取消</translation>
+      <translation>撤消</translation>
     </message>
   </context>
   <context>
@@ -2894,7 +2894,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
       <source>Cancel</source>
-      <translation>取消</translation>
+      <translation>撤消</translation>
     </message>
     <message>
       <location/>
@@ -2937,7 +2937,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
       <source>Cancel</source>
-      <translation>取消</translation>
+      <translation>撤消</translation>
     </message>
   </context>
   <context>
@@ -3212,12 +3212,12 @@
     <message>
       <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
       <source>Schedule Settings</source>
-      <translation>录像计划设置</translation>
+      <translation>计划设定</translation>
     </message>
     <message>
       <location/>
       <source>On</source>
-      <translation>开</translation>
+      <translation>启用</translation>
     </message>
     <message>
       <location/>

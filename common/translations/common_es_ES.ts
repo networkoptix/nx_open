@@ -577,29 +577,29 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n Camara</numerusform>
+        <numerusform>%n Camaras</numerusform>
         <numerusform>%n Camaras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
       <translation>
-        <numerusform>%n camara</numerusform>
-        <numerusform>%n camaras</numerusform>
+        <numerusform>%n camara(s)</numerusform>
+        <numerusform>%n camara(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n Dispositivo</numerusform>
+        <numerusform>%n Dispositivos</numerusform>
         <numerusform>%n Dispositivos</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n device(s)</source>
       <translation>
-        <numerusform>%n Dispositivo</numerusform>
-        <numerusform>%n Dispositivos</numerusform>
+        <numerusform>%n dispositivo(s)</numerusform>
+        <numerusform>%n dispositivo(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -637,15 +637,15 @@
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n I/O Modulos</numerusform>
-        <numerusform>%n I/O Modulos</numerusform>
+        <numerusform>%n E/S Módulo(s)</numerusform>
+        <numerusform>%n E/S Módulo(s)</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n I/O Modulos</numerusform>
-        <numerusform>%n I/O Modulos</numerusform>
+        <numerusform>%n E/S módulo(s)</numerusform>
+        <numerusform>%n E/S módulo(s)</numerusform>
       </translation>
     </message>
     <message>
@@ -658,7 +658,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>Módulo E/S</translation>
+      <translation>Modulos E/S</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -696,7 +696,7 @@
     <name>QnStreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation>Más bajo</translation>
+      <translation>Menor</translation>
     </message>
     <message>
       <source>Low</source>
@@ -716,7 +716,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation>Predeterminado</translation>
+      <translation>Predefinido</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -725,7 +725,7 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Mba</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
@@ -740,7 +740,7 @@
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Al</translation>
+      <translation>Hi</translation>
     </message>
     <message>
       <source>Bst</source>
@@ -750,7 +750,7 @@
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>Pd</translation>
+      <translation>Ps</translation>
     </message>
   </context>
   <context>
@@ -765,7 +765,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>No se pudo asignar el flujo de salida para la grabación.</translation>
+      <translation>No se pudo asignar secuencia de salida para la grabación.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
@@ -856,7 +856,7 @@
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation>s</translation>
+      <translation>w</translation>
     </message>
     <message>
       <source>M</source>
@@ -866,7 +866,7 @@
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation>a</translation>
+      <translation>y</translation>
     </message>
     <message>
       <source>msec</source>
@@ -876,7 +876,7 @@
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation>seg</translation>
+      <translation>sec</translation>
     </message>
     <message>
       <source>min</source>
@@ -886,7 +886,7 @@
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation>hrs</translation>
+      <translation>horas</translation>
     </message>
     <message>
       <source>days</source>

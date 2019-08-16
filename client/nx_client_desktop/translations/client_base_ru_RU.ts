@@ -99,7 +99,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Help</source>
-      <translation>Помощь</translation>
+      <translation>Справка</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -1082,7 +1082,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n layouts</source>
       <translation>
-        <numerusform>%n раскладка</numerusform>
+        <numerusform>%n раскладкa</numerusform>
         <numerusform>%n раскладки</numerusform>
         <numerusform>%n раскладкок</numerusform>
         <numerusform>%n раскладкок</numerusform>
@@ -1106,7 +1106,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Top</source>
-      <translation>Верх</translation>
+      <translation>Вверх</translation>
     </message>
     <message>
       <source>Right Edge</source>
@@ -1114,7 +1114,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>НИз</translation>
+      <translation>Вниз</translation>
     </message>
     <message>
       <source>Page Left</source>
@@ -1134,19 +1134,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Листать влево</translation>
+      <translation>Прокрутить влево</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation>Листать вверх</translation>
+      <translation>Прокрутить вверх</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Листать вправо</translation>
+      <translation>Прокрутить вправо</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation>Листать вниз</translation>
+      <translation>Прокрутить вниз</translation>
     </message>
   </context>
   <context>
@@ -1373,7 +1373,7 @@ to view more bookmarks</source>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
@@ -1533,7 +1533,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Выбрать всё</translation>
+      <translation>Выделить всё</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -1637,7 +1637,7 @@ to view more bookmarks</source>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation>Неизвестно</translation>
+      <translation>Неизвестный</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -1645,7 +1645,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation>Имя пользователя</translation>
     </message>
     <message>
       <source>User updated</source>
@@ -1706,8 +1706,8 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n action(s)</source>
       <translation>
-        <numerusform>%n действие</numerusform>
-        <numerusform>%n действия</numerusform>
+        <numerusform>%n действий</numerusform>
+        <numerusform>%n действий</numerusform>
         <numerusform>%n действий</numerusform>
         <numerusform>%n действий</numerusform>
       </translation>
@@ -1746,7 +1746,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>Описание</translation>
+      <translation>&amp;Описание</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -1974,8 +1974,8 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n Server(s)</source>
       <translation>
-        <numerusform>%n Сервер</numerusform>
-        <numerusform>%n Сервера</numerusform>
+        <numerusform>%n Серверов</numerusform>
+        <numerusform>%n Серверов</numerusform>
         <numerusform>%n Серверов</numerusform>
         <numerusform>%n Серверов</numerusform>
       </translation>
@@ -2260,10 +2260,10 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n devices added.</source>
       <translation>
-        <numerusform>%n device added.</numerusform>
-        <numerusform>Добавлено %n устройства.</numerusform>
         <numerusform>Добавлено %n устройств.</numerusform>
-        <numerusform>%n device added.</numerusform>
+        <numerusform>Добавлено %n устройств.</numerusform>
+        <numerusform>Добавлено %n устройств.</numerusform>
+        <numerusform>Добавлено %n устройств.</numerusform>
       </translation>
     </message>
     <message>
@@ -2323,7 +2323,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Web</source>
-      <translation type="unfinished">Web</translation>
+      <translation>Web</translation>
     </message>
     <message>
       <source>No settings</source>
@@ -2345,7 +2345,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select camera</source>
-      <translation>Выберите камеру</translation>
+      <translation>Выбрать камеру</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
@@ -2361,7 +2361,7 @@ to view more bookmarks</source>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
@@ -2445,7 +2445,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
-        <numerusform>Этот идентификатор уже используется для следующей %n камере: %1</numerusform>
+        <numerusform>Этот идентификатор уже используется для следующих %n камер: %1</numerusform>
         <numerusform>Этот идентификатор уже используется для следующих %n камер: %1</numerusform>
         <numerusform>Этот идентификатор уже используется для следующих %n камер: %1</numerusform>
         <numerusform>Этот идентификатор уже используется для следующих %n камер: %1</numerusform>
@@ -2487,7 +2487,7 @@ to view more bookmarks</source>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Скопировать в буфер обмена</translation>
+      <translation>Скопировать выделение в буфер обмена</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -2495,7 +2495,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Выбрать все</translation>
+      <translation>Выделить всё</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
@@ -3143,11 +3143,11 @@ to %1</source>
     </message>
     <message>
       <source>Download</source>
-      <translation>Скачать</translation>
+      <translation>Загрузить</translation>
     </message>
     <message>
       <source>Restart</source>
-      <translation>Перезагрузить</translation>
+      <translation>Перезапуск</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
@@ -3343,7 +3343,7 @@ to %1</source>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Невозможно инициализировать звуковой кодек.</translation>
+      <translation>Ошибка инициализации кодировщика видео.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -3366,11 +3366,11 @@ to %1</source>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>Невозможно инициализировать видео кодек.</translation>
+      <translation>Ошибка инициализации кодировщика видео.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Невозможно инициализировать звуковой кодек.</translation>
+      <translation>Ошибка инициализации кодировщика видео.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
@@ -3409,7 +3409,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation>Имя пользователя</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3475,15 +3475,15 @@ to %1</source>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Скопировать в буфер обмена</translation>
+      <translation>Скопировать выделение в буфер обмена</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Экспорт выделенного в файл...</translation>
+      <translation>Экспорт выделения в файл...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Выделить все</translation>
+      <translation>Выделить всё</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3492,19 +3492,19 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
       <translation>
-        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событие</numerusform>
-        <numerusform>Журнал событий за период с %1 по %2 - найдено %n события</numerusform>
         <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
-        <numerusform>Журнал событий за период с %1 по %2 - найдено %n события</numerusform>
+        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
+        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
+        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
-        <numerusform>Журнал событий за %1 - найдено %n событие</numerusform>
-        <numerusform>Журнал событий за %1 - найдено %n события</numerusform>
         <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
-        <numerusform>Журнал событий за %1 - найдено %n события</numerusform>
+        <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
+        <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
+        <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
       </translation>
     </message>
     <message>
@@ -3548,7 +3548,7 @@ to %1</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>Описание</translation>
+      <translation>&amp;Описание</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3655,17 +3655,17 @@ to %1</source>
     <message>
       <source>Low</source>
       <comment>Failover priority</comment>
-      <translation>Низкий</translation>
+      <translation>Низ</translation>
     </message>
     <message>
       <source>Medium</source>
       <comment>Failover priority</comment>
-      <translation>Средний</translation>
+      <translation>Среднее</translation>
     </message>
     <message>
       <source>High</source>
       <comment>Failover priority</comment>
-      <translation>Высокий</translation>
+      <translation>Выс</translation>
     </message>
   </context>
   <context>
@@ -3733,7 +3733,7 @@ to %1</source>
     <message numerus="yes">
       <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
       <translation>
-        <numerusform>Эта камера не добавлена на выбранную раскладку. Действие будет работать, если камера будет добавлена ​​до срабатывания события.</numerusform>
+        <numerusform>Эта камера не добавлена на некоторые выбранные раскладки. Действие будет работать, если камера будет добавлена ​​до срабатывания события.</numerusform>
         <numerusform>Эта камера не добавлена на некоторые выбранные раскладки. Действие будет работать, если камера будет добавлена ​​до срабатывания события.</numerusform>
         <numerusform>Эта камера не добавлена на некоторые выбранные раскладки. Действие будет работать, если камера будет добавлена ​​до срабатывания события.</numerusform>
         <numerusform>Эта камера не добавлена на некоторые выбранные раскладки. Действие будет работать, если камера будет добавлена ​​до срабатывания события.</numerusform>
@@ -3860,12 +3860,12 @@ to %1</source>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation>Неизвестно</translation>
+      <translation>Неизвестный</translation>
     </message>
     <message>
       <source>Disabled</source>
       <comment>IO Port Type</comment>
-      <translation>Отключено</translation>
+      <translation>Отключен</translation>
     </message>
     <message>
       <source>Input</source>
@@ -3880,7 +3880,7 @@ to %1</source>
     <message>
       <source>Invalid</source>
       <comment>IO Port Type</comment>
-      <translation>Некорректный</translation>
+      <translation>Неверный</translation>
     </message>
     <message>
       <source>Grounded circuit</source>
@@ -3989,7 +3989,7 @@ to %1</source>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation>Имя пользователя</translation>
     </message>
     <message>
       <source>Email</source>
@@ -4082,7 +4082,7 @@ to %1</source>
     </message>
     <message>
       <source>Status</source>
-      <translation>Статус</translation>
+      <translation>Состояние</translation>
     </message>
     <message>
       <source>Server</source>
@@ -4098,7 +4098,7 @@ to %1</source>
     </message>
     <message>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Error</source>
@@ -4410,7 +4410,7 @@ to %1</source>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation>
-        <numerusform>Использовать лицензии для %n выбранного устройства</numerusform>
+        <numerusform>Использовать лицензии для %n выбранных устройств</numerusform>
         <numerusform>Использовать лицензии для %n выбранных устройств</numerusform>
         <numerusform>Использовать лицензии для %n выбранных устройств</numerusform>
         <numerusform>Использовать лицензии для %n выбранных устройств</numerusform>
@@ -4419,16 +4419,16 @@ to %1</source>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
       <translation>
-        <numerusform>Использовать лицензии для %n выбранной камеры</numerusform>
         <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
         <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
-        <numerusform>Использовать лицензии для %n выбранной камеры</numerusform>
+        <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
+        <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
       <translation>
-        <numerusform>Использовать лицензии для %n выбранного модуля ввода-вывода</numerusform>
+        <numerusform>Использовать лицензии для %n выбранный модулей ввода-вывода</numerusform>
         <numerusform>Использовать лицензии для %n выбранный модулей ввода-вывода</numerusform>
         <numerusform>Использовать лицензии для %n выбранный модулей ввода-вывода</numerusform>
         <numerusform>Использовать лицензии для %n выбранный модулей ввода-вывода</numerusform>
@@ -4438,9 +4438,9 @@ to %1</source>
       <source>Use licenses to view these %n cameras</source>
       <translation>
         <numerusform>Использовать лицензию для %n выбранной камеры</numerusform>
-        <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
-        <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
-        <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
+        <numerusform>Использовать лицензию для %n выбранной камеры</numerusform>
+        <numerusform>Использовать лицензию для %n выбранной камеры</numerusform>
+        <numerusform>Использовать лицензию для %n выбранной камеры</numerusform>
       </translation>
     </message>
   </context>
@@ -4678,7 +4678,7 @@ to %1</source>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>Модуль ввода-вывода</translation>
+      <translation>Модуль ввода/вывода</translation>
     </message>
     <message>
       <source>Lo-Res</source>
@@ -4782,7 +4782,7 @@ to %1</source>
     </message>
     <message>
       <source>Reset</source>
-      <translation>Сбросить</translation>
+      <translation>Сброс</translation>
     </message>
     <message>
       <source>Skip</source>
@@ -4898,10 +4898,10 @@ to %1</source>
     <message numerus="yes">
       <source>%n more notifications</source>
       <translation>
-        <numerusform>%n more notification</numerusform>
-        <numerusform>Ещё %n уведомления</numerusform>
         <numerusform>Ещё %n уведомлений</numerusform>
-        <numerusform>%n more notification</numerusform>
+        <numerusform>Ещё %n уведомлений</numerusform>
+        <numerusform>Ещё %n уведомлений</numerusform>
+        <numerusform>Ещё %n уведомлений</numerusform>
       </translation>
     </message>
   </context>
@@ -5058,7 +5058,7 @@ to %1</source>
     <name>QnProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Отмена</translation>
+      <translation>Отменить</translation>
     </message>
   </context>
   <context>
@@ -5084,7 +5084,7 @@ to %1</source>
     </message>
     <message>
       <source>Home</source>
-      <translation>Дом</translation>
+      <translation>Домашний каталог</translation>
     </message>
     <message>
       <source>Details</source>
@@ -5123,7 +5123,7 @@ to %1</source>
     <message numerus="yes">
       <source>about %n minute(s)</source>
       <translation>
-        <numerusform>Около %n минуты</numerusform>
+        <numerusform>Около %n минут</numerusform>
         <numerusform>Около %n минут</numerusform>
         <numerusform>Около %n минут</numerusform>
         <numerusform>Около %n минут</numerusform>
@@ -5192,7 +5192,7 @@ to %1</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>Низкая</translation>
+      <translation>Низ</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -5200,7 +5200,7 @@ to %1</source>
     </message>
     <message>
       <source>High</source>
-      <translation>Высокая</translation>
+      <translation>Выс</translation>
     </message>
     <message>
       <source>Highest</source>
@@ -5208,7 +5208,7 @@ to %1</source>
     </message>
     <message>
       <source>Instant</source>
-      <translation>Немедленно</translation>
+      <translation>Мгновенно</translation>
     </message>
     <message>
       <source>Position</source>
@@ -5270,7 +5270,7 @@ to %1</source>
     </message>
     <message>
       <source>Space</source>
-      <translation>Доступно</translation>
+      <translation>Емкость</translation>
     </message>
     <message>
       <source>Calendar Days</source>
@@ -5322,7 +5322,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 ТБ</translation>
+      <translation>%1 Тб</translation>
     </message>
     <message>
       <source>%1 GB</source>
@@ -5391,7 +5391,7 @@ to %1</source>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>ДД + низк. кач-во</translation>
+      <translation>Дд + Низ</translation>
     </message>
   </context>
   <context>
@@ -5701,7 +5701,7 @@ to %1</source>
     </message>
     <message>
       <source>All Users</source>
-      <translation>Все пользователи</translation>
+      <translation>Всем пользователям</translation>
     </message>
     <message>
       <source>Select Users...</source>
@@ -5710,10 +5710,10 @@ to %1</source>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n User</numerusform>
+        <numerusform>%n пользователь</numerusform>
         <numerusform>%n пользователя</numerusform>
         <numerusform>%n пользователей</numerusform>
-        <numerusform>%n пользователь</numerusform>
+        <numerusform>%n пользователей</numerusform>
       </translation>
     </message>
   </context>
@@ -5863,7 +5863,7 @@ to %1</source>
     </message>
     <message>
       <source>Status</source>
-      <translation>Статус</translation>
+      <translation>Состояние</translation>
     </message>
   </context>
   <context>
@@ -5995,10 +5995,10 @@ to %1</source>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
       <translation>
-        <numerusform>Not enough free space at %n Server:</numerusform>
         <numerusform>Недостаточно свободного места на %n серверах:</numerusform>
         <numerusform>Недостаточно свободного места на %n серверах:</numerusform>
-        <numerusform>Not enough free space at %n Server:</numerusform>
+        <numerusform>Недостаточно свободного места на %n серверах:</numerusform>
+        <numerusform>Недостаточно свободного места на %n серверах:</numerusform>
       </translation>
     </message>
     <message>
@@ -6273,7 +6273,7 @@ to %1</source>
     </message>
     <message>
       <source>Success</source>
-      <translation>Успешно</translation>
+      <translation>Соединение установлено</translation>
     </message>
     <message>
       <source>Connection timed out</source>
@@ -6405,15 +6405,15 @@ to %1</source>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation>Выделить все</translation>
+      <translation>Выделить всё</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Экспорт выделенного в файл...</translation>
+      <translation>Экспорт выделения в файл...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Скопировать в буфер обмена</translation>
+      <translation>Скопировать выделение в буфер обмена</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -6570,7 +6570,7 @@ to %1</source>
     </message>
     <message>
       <source>Inaccessible</source>
-      <translation>Недоступен</translation>
+      <translation>Недоступно</translation>
     </message>
     <message>
       <source>%1 (Checking...)</source>
@@ -6706,7 +6706,7 @@ to %1</source>
     </message>
     <message>
       <source>System is in safe mode</source>
-      <translation>Система запущена в безопасном режиме</translation>
+      <translation>Система находится в безопасном режиме</translation>
     </message>
     <message>
       <source>Storage is not configured</source>
@@ -6766,7 +6766,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Соединение</translation>
+      <translation>Соединиться</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -6973,7 +6973,7 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h:mm ap</translation>
+      <translation>MMMM dd yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -7027,47 +7027,47 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>The problem is caused by %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>The problem is caused by %n server:</numerusform>
+      <translation>
         <numerusform>Проблема вызвана %n серверами:</numerusform>
         <numerusform>Проблема вызвана %n серверами:</numerusform>
-        <numerusform>The problem is caused by %n server:</numerusform>
+        <numerusform>Проблема вызвана %n серверами:</numerusform>
+        <numerusform>Проблема вызвана %n серверами:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>No free space left on %n server:</numerusform>
+      <translation>
         <numerusform>Не осталось места на жестких дисках %n серверов:</numerusform>
         <numerusform>Не осталось места на жестких дисках %n серверов:</numerusform>
-        <numerusform>No free space left on %n server:</numerusform>
+        <numerusform>Не осталось места на жестких дисках %n серверов:</numerusform>
+        <numerusform>Не осталось места на жестких дисках %n серверов:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
-      <translation type="unfinished">
-        <numerusform>%n server is not responding:</numerusform>
-        <numerusform>%n сервера не отвечает:</numerusform>
+      <translation>
         <numerusform>%n серверов не отвечает:</numerusform>
-        <numerusform>%n server is not responding:</numerusform>
+        <numerusform>%n серверов не отвечает:</numerusform>
+        <numerusform>%n серверов не отвечает:</numerusform>
+        <numerusform>%n серверов не отвечает:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
-      <translation type="unfinished">
-        <numerusform>%n server has gone offline:</numerusform>
-        <numerusform>%n сервера вышло из сети:</numerusform>
+      <translation>
         <numerusform>%n серверов вышло из сети:</numerusform>
-        <numerusform>%n server has gone offline:</numerusform>
+        <numerusform>%n серверов вышло из сети:</numerusform>
+        <numerusform>%n серверов вышло из сети:</numerusform>
+        <numerusform>%n серверов вышло из сети:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
-      <translation type="unfinished">
-        <numerusform>Authentication failed for %n server:</numerusform>
+      <translation>
         <numerusform>Ошибка аутентификации на %n серверах:</numerusform>
         <numerusform>Ошибка аутентификации на %n серверах:</numerusform>
-        <numerusform>Authentication failed for %n server:</numerusform>
+        <numerusform>Ошибка аутентификации на %n серверах:</numerusform>
+        <numerusform>Ошибка аутентификации на %n серверах:</numerusform>
       </translation>
     </message>
     <message>
@@ -7091,7 +7091,7 @@ to %1</source>
     </message>
     <message>
       <source>Disabled</source>
-      <translation>Деактивирован</translation>
+      <translation>Отключен</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7103,7 +7103,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation>Имя пользователя</translation>
     </message>
     <message>
       <source>Role</source>
@@ -7169,7 +7169,7 @@ to %1</source>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation>Имя пользователя</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7314,7 +7314,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Логин</translation>
+      <translation>Имя пользователя</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -7960,7 +7960,7 @@ to %1</source>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
       <translation>
-        <numerusform>Вы можете загрузить этот файл в другой экземпляр портативной камеры.</numerusform>
+        <numerusform>Вы можете загрузить эти файлы в другой экземпляр портативной камеры.</numerusform>
         <numerusform>Вы можете загрузить эти файлы в другой экземпляр портативной камеры.</numerusform>
         <numerusform>Вы можете загрузить эти файлы в другой экземпляр портативной камеры.</numerusform>
         <numerusform>Вы можете загрузить эти файлы в другой экземпляр портативной камеры.</numerusform>
@@ -8240,11 +8240,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation type="unfinished">
-        <numerusform>Удалить %n элемент?</numerusform>
-        <numerusform>Удалить %n элемент?</numerusform>
+      <translation>
         <numerusform>Удалить %n элемент?</numerusform>
         <numerusform>Удалить %n элемента?</numerusform>
+        <numerusform>Удалить %n элементов?</numerusform>
+        <numerusform>Удалить %n элементов?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8306,8 +8306,8 @@ to %1</source>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
       <translation>
-        <numerusform>Этот видео файл до сих пор загружается в %n портативную камеру:</numerusform>
-        <numerusform>Эти видео файлы до сих пор загружаются в %n портативные камеры:</numerusform>
+        <numerusform>Эти видео файлы до сих пор загружаются в %n портативных камер:</numerusform>
+        <numerusform>Эти видео файлы до сих пор загружаются в %n портативных камер:</numerusform>
         <numerusform>Эти видео файлы до сих пор загружаются в %n портативных камер:</numerusform>
         <numerusform>Эти видео файлы до сих пор загружаются в %n портативных камер:</numerusform>
       </translation>
@@ -8640,11 +8640,11 @@ to %1</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>Низкое</translation>
+      <translation>Низ</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Высокое</translation>
+      <translation>Выс</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -8751,11 +8751,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
-      <translation type="unfinished">
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
-        <numerusform>%n bookmarks</numerusform>
+      <translation>
+        <numerusform>%n закладка</numerusform>
+        <numerusform>%n закладки</numerusform>
+        <numerusform>%n закладок</numerusform>
+        <numerusform>%n закладок</numerusform>
       </translation>
     </message>
     <message>
@@ -8939,7 +8939,7 @@ to %1</source>
     </message>
     <message>
       <source>All Users</source>
-      <translation>Все пользователи</translation>
+      <translation>Всем пользователям</translation>
     </message>
   </context>
   <context>

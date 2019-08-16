@@ -577,7 +577,7 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n Caméra</numerusform>
+        <numerusform>%n Caméras</numerusform>
         <numerusform>%n Caméras</numerusform>
       </translation>
     </message>
@@ -591,7 +591,7 @@
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n Périphérique</numerusform>
+        <numerusform>%n Périphériques</numerusform>
         <numerusform>%n Périphériques</numerusform>
       </translation>
     </message>
@@ -669,7 +669,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Inconnue</translation>
+      <translation>Inconnu</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -696,7 +696,7 @@
     <name>QnStreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation>Trés basse</translation>
+      <translation>Plus Bas</translation>
     </message>
     <message>
       <source>Low</source>
@@ -704,7 +704,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation>Moyenne</translation>
+      <translation>Moyen</translation>
     </message>
     <message>
       <source>High</source>
@@ -725,7 +725,7 @@
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>TB</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
@@ -856,7 +856,7 @@
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation>S</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>M</source>
@@ -866,7 +866,7 @@
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation>A</translation>
+      <translation>a</translation>
     </message>
     <message>
       <source>msec</source>
@@ -891,7 +891,7 @@
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation>jours</translation>
+      <translation>jour</translation>
     </message>
     <message>
       <source>wks</source>
@@ -913,23 +913,23 @@
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
         <numerusform>milliseconde</numerusform>
-        <numerusform>millisecondes</numerusform>
+        <numerusform>milliseconde</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>seconde</numerusform>
+        <numerusform>secondes</numerusform>
         <numerusform>secondes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
-      <translation>
+      <translation type="unfinished">
         <numerusform>minute</numerusform>
-        <numerusform>minutes</numerusform>
+        <numerusform>minute</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -937,14 +937,14 @@
       <comment>Full suffix for displaying hours</comment>
       <translation>
         <numerusform>heure</numerusform>
-        <numerusform>heures</numerusform>
+        <numerusform>heure</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>jour</numerusform>
+        <numerusform>jours</numerusform>
         <numerusform>jours</numerusform>
       </translation>
     </message>
@@ -953,7 +953,7 @@
       <comment>Full suffix for displaying weeks</comment>
       <translation>
         <numerusform>semaine</numerusform>
-        <numerusform>semaines</numerusform>
+        <numerusform>semaine</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -969,7 +969,7 @@
       <comment>Full suffix for displaying years</comment>
       <translation>
         <numerusform>année</numerusform>
-        <numerusform>années</numerusform>
+        <numerusform>année</numerusform>
       </translation>
     </message>
   </context>

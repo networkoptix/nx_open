@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "Повідомлення про оновлення включені",
         "upnpPortMappingEnabled": "Зіставлення портів UPNP включено",
         "useTextEmailFormat": "Відправка листів простим текстом",
-        "useWindowsEmailLineFeed": "Використовуйте лінію каналу Windows у електронних листах"
+        "useWindowsEmailLineFeed": "Використовуйте лінію каналу Windows у електронних листах",
+        "maxEventLogRecords": "Максимум запису журналу подій для зберігання в базі даних. Реальний обсяг відновлених записів може становити до 20% вище вказаного значення."
     },
     "info": {
         "tabs": {
@@ -183,7 +184,7 @@
             "help": "help | show commands",
             "collapse all servers": "згорнути всі сервери",
             "collapse server": "collapse server + [server name]",
-            "play": "відтворити",
+            "play": "відтворення",
             "clear search": "очистити вікно пошуку",
             "live": "go to live | show me live",
             "expand all servers": "розгорнути всі сервери",
@@ -206,7 +207,7 @@
             "noFormat": "Цей веб-переглядач не підтримує відтворення відео з цієї камери.",
             "ieWin10": "Будь ласка, використовуйте веб-перегляд Microsoft Edge або Google Chrome.",
             "iosVideoTooLarge": "iOS не підтримує відео з розшиненням більшим за fullHD (2MP: 1920x1080).",
-            "unauthorized": "Потрібна авторизація",
+            "unauthorized": "Потрібна аутентифікація",
             "ubuntuNX": "Цей веб-переглядач не підтримує відео з серверів на базі ARM. Замість цього скористайтеся браузером Chromium.",
             "ieNoWebm": "Відео не може бути відтворено. Можливо, потрібно <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для Internet Explorer.",
             "flashOrWebmRequired": "Відео не може бути відтворено. Можливо, потрібно <a href='https://get.adobe.com/flashplayer/' target='_blank'>встановитиAdobe Flash</a> або<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>кодек WebM</a> для відтворення відео в Internet Explorer.",
@@ -219,7 +220,7 @@
         "chromeCastWarning": "Chromecast ресурсоємний і може спричинити проблеми на вашому сервері.",
         "resolution": {
             "high": "Високий",
-            "auto": "Автоматично",
+            "auto": "Авто",
             "low": "Низький"
         }
     }

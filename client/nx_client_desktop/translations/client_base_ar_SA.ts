@@ -878,7 +878,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Resolution...</source>
-      <translation type="unfinished">Resolution...</translation>
+      <translation>Resolution...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
@@ -1071,11 +1071,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>Select device...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>Select camera...</translation>
     </message>
     <message>
       <source>Select layout...</source>
@@ -3088,7 +3088,7 @@ to %1</translation>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation>Forgot password?</translation>
+      <translation type="unfinished">Forgot password?</translation>
     </message>
     <message>
       <source>Connect to %1</source>
@@ -4643,7 +4643,7 @@ to %1</translation>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation>Delete connection?</translation>
+      <translation type="unfinished">Delete connection?</translation>
     </message>
     <message>
       <source>There is another connection with the same name.</source>
@@ -4670,7 +4670,7 @@ to %1</translation>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation>Forgot password?</translation>
+      <translation type="unfinished">Forgot password?</translation>
     </message>
     <message>
       <source>Learn more about</source>
@@ -5098,7 +5098,7 @@ to %1</translation>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Rotation</translation>
     </message>
   </context>
   <context>
@@ -8809,7 +8809,7 @@ to %1</translation>
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>Background</translation>
     </message>
   </context>
   <context>

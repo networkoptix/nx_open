@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "Notificaciones de actualización habilitadas",
         "upnpPortMappingEnabled": "Mapeo de puerto UPNP habilitado",
         "useTextEmailFormat": "Enviar correos electrónicos de texto plano",
-        "useWindowsEmailLineFeed": "Usa el salto de línea de Windows en los correos"
+        "useWindowsEmailLineFeed": "Usa el salto de línea de Windows en los correos",
+        "maxEventLogRecords": "Máximo registro de eventos para mantener en la base de datos. La cantidad real de registros no eliminados puede ser hasta un 20% mayor que el valor especificado."
     },
     "info": {
         "tabs": {
@@ -189,14 +190,14 @@
             "expand all servers": "expandir todos los servidores",
             "stop listening": "detener escucha",
             "expand server": "expand server + [server name]",
-            "view": "vista + [nombre de la cámara]"
+            "view": "view + [camera name]"
         },
         "systemOffline": "Sistema está desconectado",
         "cameraLinks": {
-            "copyToClipboard": "copiar a portapapeles",
+            "copyToClipboard": "copiar al portapapeles",
             "highStream": "Corriente de alta",
             "copyDefaultText": "copiar",
-            "unknown": "Uesconocido",
+            "unknown": "Desconocido",
             "lowStream": "Corriente de baja",
             "transcoding": "Transcodificación",
             "copyActiveText": "copiado al portapapeles"
@@ -218,7 +219,7 @@
         },
         "chromeCastWarning": "Chromecast consume muchos recursos y puede causar problemas en tu servidor.",
         "resolution": {
-            "high": "Elevado",
+            "high": "Alto",
             "auto": "Auto",
             "low": "Bajo"
         }

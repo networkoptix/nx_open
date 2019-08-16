@@ -11,7 +11,7 @@
     <message>
       <location/>
       <source>Information</source>
-      <translation>Информация о продукте</translation>
+      <translation>Информация</translation>
     </message>
     <message>
       <location/>
@@ -138,7 +138,7 @@
     <message>
       <location/>
       <source>Instant</source>
-      <translation>Немедленно</translation>
+      <translation>Мгновенно</translation>
     </message>
   </context>
   <context>
@@ -305,7 +305,7 @@
     <message>
       <location/>
       <source>Start</source>
-      <translation>Начать</translation>
+      <translation>Начинается</translation>
     </message>
   </context>
   <context>
@@ -670,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>По умолчанию</translation>
+      <translation>Сбросить настройки</translation>
     </message>
     <message>
       <location/>
@@ -770,7 +770,7 @@
     <message>
       <location/>
       <source>Native</source>
-      <translation>Оригинальный</translation>
+      <translation>Оригинальное</translation>
     </message>
     <message>
       <location/>
@@ -1335,7 +1335,7 @@
     <message>
       <location/>
       <source>Rotation</source>
-      <translation>Вращение</translation>
+      <translation>Поворот</translation>
     </message>
   </context>
   <context>
@@ -1490,7 +1490,7 @@
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
+      <translation>Выберите одного пользователя в строке &quot;Показать&quot; чтобы отобразить его локальные раскладки в этом списке</translation>
     </message>
   </context>
   <context>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Время ожидания поиска (сек)</translation>
     </message>
   </context>
   <context>
@@ -1579,7 +1579,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
       <source>Edit Streams...</source>
-      <translation type="unfinished">Edit Streams...</translation>
+      <translation>Редактировать потоки...</translation>
     </message>
   </context>
   <context>
@@ -1696,7 +1696,7 @@
     <message>
       <location/>
       <source>License Key</source>
-      <translation>Лицензионный ключ</translation>
+      <translation>Ключ</translation>
     </message>
     <message>
       <location/>
@@ -1833,7 +1833,7 @@
     <message>
       <location/>
       <source>seconds</source>
-      <translation>сек</translation>
+      <translation>секунд</translation>
     </message>
     <message>
       <location/>
@@ -2134,7 +2134,7 @@
     <message>
       <location filename="../src/ui/dialogs/merge_systems_dialog.ui"/>
       <source>Merge Systems...</source>
-      <translation>Объединение систем...</translation>
+      <translation>Объединить системы...</translation>
     </message>
     <message>
       <location/>
@@ -2172,7 +2172,7 @@
     <message>
       <location/>
       <source>Play</source>
-      <translation>Воспроизвести</translation>
+      <translation>Воспроизведение</translation>
     </message>
     <message>
       <location/>
@@ -2226,7 +2226,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
       <source>Cancel</source>
-      <translation>Отмена</translation>
+      <translation>Отменить</translation>
     </message>
     <message>
       <location/>
@@ -2307,7 +2307,7 @@
     <message>
       <location/>
       <source>Delete...</source>
-      <translation>&amp;Удалить...</translation>
+      <translation>Удалить...</translation>
     </message>
     <message>
       <location/>
@@ -2590,7 +2590,7 @@
     <message>
       <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
       <source>seconds</source>
-      <translation>сек</translation>
+      <translation>секунд</translation>
     </message>
     <message>
       <location/>
@@ -2661,12 +2661,12 @@
     <message>
       <location/>
       <source>Motion</source>
-      <translation>Детекция движения</translation>
+      <translation>Движение</translation>
     </message>
     <message>
       <location/>
       <source>Advanced</source>
-      <translation>Дополнительные</translation>
+      <translation>Расширенные</translation>
     </message>
     <message>
       <location/>
@@ -2711,7 +2711,7 @@
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>Версия прошивки</translation>
+      <translation>Прошивка</translation>
     </message>
     <message>
       <location/>
@@ -2741,7 +2741,7 @@
     <message>
       <location/>
       <source>Web Page</source>
-      <translation>Web-интерфейс</translation>
+      <translation>Web-страница</translation>
     </message>
     <message>
       <location/>
@@ -2840,12 +2840,12 @@
     <message>
       <location/>
       <source>OK</source>
-      <translation>ОК</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <location/>
       <source>Cancel</source>
-      <translation>Отмена</translation>
+      <translation>Отменить</translation>
     </message>
   </context>
   <context>
@@ -2894,7 +2894,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
       <source>Cancel</source>
-      <translation>Отмена</translation>
+      <translation>Отменить</translation>
     </message>
     <message>
       <location/>
@@ -2937,7 +2937,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
       <source>Cancel</source>
-      <translation>Отмена</translation>
+      <translation>Отменить</translation>
     </message>
   </context>
   <context>
@@ -3204,7 +3204,7 @@
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>This web page is for C2P integration</source>
-      <translation type="unfinished">This web page is for C2P integration</translation>
+      <translation>Эта веб-страница предназначена для интеграции C2P</translation>
     </message>
   </context>
   <context>

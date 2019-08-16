@@ -75,6 +75,14 @@
       <source>New Server</source>
       <translation>Nový server</translation>
     </message>
+    <message>
+      <source>Edit</source>
+      <translation>Upravit</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>Skrýt</translation>
+    </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
@@ -92,11 +100,11 @@
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation>Připojit k jinému serveru...</translation>
+      <translation>Připojování k jinému serveru...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>Připojit k serveru...</translation>
+      <translation>Připojování k serveru...</translation>
     </message>
   </context>
 </TS>

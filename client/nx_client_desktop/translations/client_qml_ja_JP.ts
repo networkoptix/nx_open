@@ -75,6 +75,14 @@
       <source>New Server</source>
       <translation>新しいサーバー</translation>
     </message>
+    <message>
+      <source>Edit</source>
+      <translation>編集</translation>
+    </message>
+    <message>
+      <source>Hide</source>
+      <translation>非表示</translation>
+    </message>
   </context>
   <context>
     <name>WelcomeScreen</name>

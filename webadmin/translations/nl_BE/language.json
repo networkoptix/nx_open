@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "Update meldingen ingeschakeld",
         "upnpPortMappingEnabled": "UPNP-poorttoewijzing ingeschakeld",
         "useTextEmailFormat": "Verstuur e-mails met platte tekst",
-        "useWindowsEmailLineFeed": "Gebruik Windows line feed in e-mails"
+        "useWindowsEmailLineFeed": "Gebruik Windows line feed in e-mails",
+        "maxEventLogRecords": "Maximum logboek evenementen om in de database te bewaren. Het werkelijke aantal niet-verwijderde records kan tot 20% hoger zijn dan de opgegeven waarde."
     },
     "info": {
         "tabs": {
@@ -178,17 +179,17 @@
     },
     "common": {
         "voiceCommands": {
-            "search": "find + [text for searchbar]",
+            "search": "vind + [tekst voor zoekbalk]",
             "pause": "pauze",
-            "help": "help | show commands",
+            "help": "help | toon commando's",
             "collapse all servers": "vouw alle servers samen",
-            "collapse server": "collapse server + [server name]",
+            "collapse server": "vouw server + [servernaam] samen",
             "play": "afspelen",
-            "clear search": "wis zoekopdracht",
-            "live": "go to live | show me live",
+            "clear search": "zoekopdracht wissen",
+            "live": "ga naar Live | live weergeven",
             "expand all servers": "vouw alle servers uit",
             "stop listening": "stop met luisteren",
-            "expand server": "expand server + [server name]",
+            "expand server": "vouw server + [servernaam] uit",
             "view": "bekijk + [camera naam]"
         },
         "systemOffline": "Systeem Offline",
@@ -211,16 +212,16 @@
             "ieNoWebm": "Installeer alstublieft <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> voor Internet Explorer.",
             "flashOrWebmRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> of <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> te installeren voor het afspelen van video's in Internet Explorer.",
             "noArmSupport": "Deze browser of dit apparaat ondersteunt geen videoweergave van ARM-gebaseerde servers.",
-            "error": "Error",
+            "error": "Fout",
             "offline": "Offline",
             "noData": "Geen data",
             "flashRequired": "Gelieve <a href='https://get.adobe.com/flashplayer/' target='_blank'> Adobe Flash</a> te installeren voor het afspelen van video's."
         },
-        "chromeCastWarning": "Een Chromecast vraagt veel resources en kan tot prestatieproblemen lijden op uw server.",
+        "chromeCastWarning": "Chromecast vraagt veel systeem resources en kan problemen veroorzaken op uw server.",
         "resolution": {
             "high": "Hoog",
             "auto": "Automatisch",
-            "low": "Lage"
+            "low": "Laag"
         }
     }
 }

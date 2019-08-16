@@ -47,7 +47,7 @@
     <message>
       <location filename="../src/ui/dialogs/adjust_video_dialog.ui"/>
       <source>Image Enhancement</source>
-      <translation>Melhoria de Imagem</translation>
+      <translation>Melhoramento de imagem</translation>
     </message>
     <message>
       <location/>
@@ -138,7 +138,7 @@
     <message>
       <location/>
       <source>Instant</source>
-      <translation>Instantâneo</translation>
+      <translation>Instante</translation>
     </message>
   </context>
   <context>
@@ -202,17 +202,17 @@
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation>A visualizar arquivos</translation>
+      <translation>A ver arquivos</translation>
     </message>
     <message>
       <location/>
       <source>Exporting video</source>
-      <translation>A exportar vídeo</translation>
+      <translation>A Exportar vídeo</translation>
     </message>
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>A visualizar em directo</translation>
+      <translation>A ver Live</translation>
     </message>
     <message>
       <location/>
@@ -379,7 +379,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation>Informação do marcador</translation>
+      <translation>Informação do Marcador</translation>
     </message>
     <message>
       <location/>
@@ -506,7 +506,7 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation>Regras de Evento</translation>
+      <translation>Regras do evento</translation>
     </message>
     <message>
       <location/>
@@ -516,7 +516,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation>Testar</translation>
+      <translation>Teste</translation>
     </message>
   </context>
   <context>
@@ -604,17 +604,17 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Senha</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <location/>
       <source>Scan</source>
-      <translation>Varredura</translation>
+      <translation>Pesquisar</translation>
     </message>
     <message>
       <location/>
@@ -670,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Restaurar Padrões</translation>
+      <translation>Restaurar Predefinições</translation>
     </message>
     <message>
       <location/>
@@ -715,7 +715,7 @@
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation>Fluxo Secundário</translation>
+      <translation>Secondary Stream</translation>
     </message>
     <message>
       <location/>
@@ -872,7 +872,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Gravação</translation>
+      <translation>Gravando</translation>
     </message>
     <message>
       <location/>
@@ -928,7 +928,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>Mudar senha</translation>
+      <translation>Alterar senha</translation>
     </message>
   </context>
   <context>
@@ -1039,7 +1039,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>Regras do Evento...</translation>
+      <translation>Regras de Evento...</translation>
     </message>
   </context>
   <context>
@@ -1057,7 +1057,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <location/>
@@ -1067,7 +1067,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Senha</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -1490,7 +1490,7 @@
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Selecione um único utilizador na linha &quot;Mostrar a&quot; para mostrar os seus layouts locais nesta lista</translation>
+      <translation>Seleccione um único utilizador na linha &quot;Mostrar a&quot; para exibir os seus layouts locais nesta lista</translation>
     </message>
   </context>
   <context>
@@ -1528,7 +1528,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Senha</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -1681,7 +1681,7 @@
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation>Activar Licença Gratuita</translation>
+      <translation>Activar licença gratuita</translation>
     </message>
     <message>
       <location/>
@@ -1696,7 +1696,7 @@
     <message>
       <location/>
       <source>License Key</source>
-      <translation>Chave da Licença</translation>
+      <translation>Chave da Licença:</translation>
     </message>
     <message>
       <location/>
@@ -1765,17 +1765,17 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>Senha</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
       <source>Test</source>
-      <translation>Testar</translation>
+      <translation>Teste</translation>
     </message>
     <message>
       <location/>
@@ -1879,12 +1879,12 @@
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>Habilitar áudio</translation>
+      <translation>Activar Áudio</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Em gravação</translation>
+      <translation>Gravando</translation>
     </message>
     <message>
       <location/>
@@ -2045,7 +2045,7 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation>Assignar a Video Wall...</translation>
+      <translation>Associar a Video Wall...</translation>
     </message>
     <message>
       <location/>
@@ -2066,7 +2066,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>Marcador</translation>
+      <translation>Bookmark</translation>
     </message>
   </context>
   <context>
@@ -2134,7 +2134,7 @@
     <message>
       <location filename="../src/ui/dialogs/merge_systems_dialog.ui"/>
       <source>Merge Systems...</source>
-      <translation>"Fundir" Sistemas... (Merge)</translation>
+      <translation>Fundir Sistemas...</translation>
     </message>
     <message>
       <location/>
@@ -2282,7 +2282,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Obter utilizador a partir do LDAP...</translation>
+      <translation>Obter Utilizador através do LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2368,7 +2368,7 @@
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation>Reset Velocidade</translation>
+      <translation>Reset da Velocidade</translation>
     </message>
   </context>
   <context>
@@ -2452,7 +2452,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>Um computador poderoso é recomendado para &quot;Melhor&quot; qualidade e resolução.</translation>
+      <translation>Um computador potente é recomendado para a "Melhor" qualidade e resolução.</translation>
     </message>
     <message>
       <location/>
@@ -2656,7 +2656,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Gravação</translation>
+      <translation>Gravando</translation>
     </message>
     <message>
       <location/>
@@ -2711,12 +2711,12 @@
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>Firmware:</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>Fabricante</translation>
+      <translation>Fabricante:</translation>
     </message>
     <message>
       <location/>
@@ -2731,7 +2731,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation>Senha</translation>
+      <translation>Password</translation>
     </message>
     <message>
       <location/>
@@ -2802,7 +2802,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation>Testar</translation>
+      <translation>Teste</translation>
     </message>
   </context>
   <context>
@@ -2960,7 +2960,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Entrar:</translation>
+      <translation>Login:</translation>
     </message>
     <message>
       <location/>
@@ -3016,12 +3016,12 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation>Exibir marca d&apos;água com nome do utilizador sobre o vídeo</translation>
+      <translation>Exibir marca d'água com nome do utilizador sobre o vídeo</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation>Visualização de marca d&apos;água</translation>
+      <translation>Visualização de marca d'água</translation>
     </message>
   </context>
   <context>
@@ -3191,12 +3191,12 @@
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation>Upload de Ficheiro...</translation>
+      <translation>Enviar Ficheiro...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation>Upload de Pasta...</translation>
+      <translation>Enviar Pasta...</translation>
     </message>
   </context>
   <context>
@@ -3212,7 +3212,7 @@
     <message>
       <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
       <source>Schedule Settings</source>
-      <translation>Definições da Agenda</translation>
+      <translation>Definições de Agenda</translation>
     </message>
     <message>
       <location/>
@@ -3240,7 +3240,7 @@
     <message>
       <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation>Pré-visualização da marca d&apos;água</translation>
+      <translation>Pré-visualização da marca d'água</translation>
     </message>
     <message>
       <location/>

@@ -670,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>初期設定に戻す</translation>
+      <translation>デフォルトに戻す</translation>
     </message>
     <message>
       <location/>
@@ -685,7 +685,7 @@
     <message>
       <location/>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>システムパフォーマンスに対する影響を理解せずに変更は行わないでください</translation>
+      <translation>システムパフォーマンスに対する影響を理解せずに変更は行わないでください。</translation>
     </message>
     <message>
       <location/>
@@ -700,17 +700,17 @@
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>録画スケジュールの品質とフレームレート (FPS) 設定は無関係になります</translation>
+      <translation>録画スケジュールの品質とフレームレート (FPS) 設定は無関係になります。</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation>毎秒のビットレートの代わりにGOPあたりのビットレートを計算する</translation>
+      <translation>1秒あたりのビットレートではなくGOPあたりのビットレートを計算する</translation>
     </message>
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation>それはカメラのビットレートを増加させます</translation>
+      <translation>カメラのビットレートが上がります。</translation>
     </message>
     <message>
       <location/>
@@ -720,7 +720,7 @@
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation>セカンダリ ストリームを無効にする</translation>
+      <translation>セカンダリストリームを無効にする</translation>
     </message>
     <message>
       <location/>
@@ -735,7 +735,7 @@
     <message>
       <location/>
       <source>Media Streaming</source>
-      <translation>メディア ストリーム</translation>
+      <translation>メディアストリーム</translation>
     </message>
     <message>
       <location/>
@@ -745,7 +745,7 @@
     <message>
       <location/>
       <source>Generate</source>
-      <translation>生成</translation>
+      <translation>一般</translation>
     </message>
     <message>
       <location/>
@@ -760,7 +760,7 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation>PTZプリセットタイプ：</translation>
+      <translation>優先されるPTZプリセットタイプ：</translation>
     </message>
     <message>
       <location/>
@@ -770,7 +770,7 @@
     <message>
       <location/>
       <source>Native</source>
-      <translation>ネイティブ</translation>
+      <translation>Native</translation>
     </message>
     <message>
       <location/>
@@ -867,7 +867,7 @@
     <message>
       <location/>
       <source>Copy Schedule...</source>
-      <translation>スケジュールコピー...</translation>
+      <translation>スケジュールをコピー...</translation>
     </message>
     <message>
       <location/>
@@ -928,7 +928,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>パスワードを変更</translation>
+      <translation>パスワードの変更</translation>
     </message>
   </context>
   <context>
@@ -1134,12 +1134,12 @@
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>回転、歪補正、イメージ拡張など</translation>
+      <translation>回転、歪み補正、イメージ強調など</translation>
     </message>
     <message>
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation>フィルタを適用してオーバーレイを追加するにはトランスコードが必要となり、CPU使用率が高くなり、時間がかかることがあります</translation>
+      <translation>フィルタを適用してオーバーレイを追加するにはトランスコードが必要です。これにより、CPU使用率が高くなり、時間がかかることがあります。</translation>
     </message>
   </context>
   <context>
@@ -1147,7 +1147,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
-      <translation>ビデオエクスポート</translation>
+      <translation>ビデオをエクスポート</translation>
     </message>
     <message>
       <location/>
@@ -1241,7 +1241,7 @@
     <message>
       <location/>
       <source>Source camera</source>
-      <translation>ソースカメラをフルスクリーン表示する</translation>
+      <translation>ソースカメラ</translation>
     </message>
   </context>
   <context>
@@ -1462,7 +1462,7 @@
     <message>
       <location/>
       <source>Generate</source>
-      <translation>生成</translation>
+      <translation>一般</translation>
     </message>
     <message>
       <location/>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>検索タイムアウト (秒)</translation>
     </message>
   </context>
   <context>
@@ -1579,7 +1579,7 @@
     <message>
       <location filename="../src/nx/client/desktop/resource_properties/camera/widgets/legacy_camera_settings_streams_panel.ui"/>
       <source>Edit Streams...</source>
-      <translation>ストリームの編集...</translation>
+      <translation>ストリームを編集...</translation>
     </message>
   </context>
   <context>
@@ -1612,7 +1612,7 @@
     <message>
       <location/>
       <source>Locked to Hardware ID:</source>
-      <translation>ハードウェアID:</translation>
+      <translation>ハードウェアIDのロック:</translation>
     </message>
   </context>
   <context>
@@ -1681,12 +1681,12 @@
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation>アクティベートフリーライセンス</translation>
+      <translation>フリーライセンスのアクティベート</translation>
     </message>
     <message>
       <location/>
       <source>Activate License</source>
-      <translation>アクティベートライセンス</translation>
+      <translation>ライセンスのアクティベート</translation>
     </message>
     <message>
       <location/>
@@ -1696,7 +1696,7 @@
     <message>
       <location/>
       <source>License Key</source>
-      <translation>ライセンスキー:</translation>
+      <translation>ライセンスキー</translation>
     </message>
     <message>
       <location/>
@@ -2045,7 +2045,7 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation>ビデオウォールレイアウト設定...</translation>
+      <translation>ビデオウォールモニター設定...</translation>
     </message>
     <message>
       <location/>
@@ -2348,12 +2348,12 @@
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation>イニシャルビデオ長</translation>
+      <translation>イニシャルビデオの長さ</translation>
     </message>
     <message>
       <location/>
       <source>Exported video length</source>
-      <translation>エクスポートビデオ長</translation>
+      <translation>エクスポートされたビデオの長さ</translation>
     </message>
     <message>
       <location/>
@@ -2399,7 +2399,7 @@
     <message>
       <location/>
       <source>s</source>
-      <translation>s</translation>
+      <translation>秒</translation>
     </message>
     <message>
       <location/>
@@ -2462,7 +2462,7 @@
     <message>
       <location/>
       <source>Resolution</source>
-      <translation>解像度</translation>
+      <translation>解像度:</translation>
     </message>
     <message>
       <location/>
@@ -2711,12 +2711,12 @@
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>ファームウェア:</translation>
+      <translation>ファームウェア</translation>
     </message>
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>ベンダー:</translation>
+      <translation>ベンダー</translation>
     </message>
     <message>
       <location/>
@@ -3016,12 +3016,12 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation>ユーザー名のウォーターマーク表示</translation>
+      <translation>ビデオの上にユーザー名で透かしを表示する</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation>ウォーターマーク表示</translation>
+      <translation>透かし表示</translation>
     </message>
   </context>
   <context>
@@ -3134,7 +3134,7 @@
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>&quot;新しい役割&quot; ボタンをクリックして作成します</translation>
+      <translation>作成するには、 &quot;役割&quot; ボタンをクリックしてください。</translation>
     </message>
   </context>
   <context>
@@ -3191,7 +3191,7 @@
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation>ファイルをアップロード...</translation>
+      <translation>ファイルをアップロード</translation>
     </message>
     <message>
       <location/>
@@ -3217,7 +3217,7 @@
     <message>
       <location/>
       <source>On</source>
-      <translation>On</translation>
+      <translation>使用</translation>
     </message>
     <message>
       <location/>
@@ -3240,7 +3240,7 @@
     <message>
       <location filename="../src/nx/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation>ウォーターマーク表示</translation>
+      <translation>透かし表示</translation>
     </message>
     <message>
       <location/>

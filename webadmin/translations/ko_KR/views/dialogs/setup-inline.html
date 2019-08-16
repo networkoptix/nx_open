@@ -40,8 +40,8 @@
             <span class="text"> 또는</span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">기존 시스템에 추가</button><br>
-        <small>({{Config.productName}}가 이미 설정된 경우)</small><br>
+        <button class="btn btn-default" ng-click="skip()">Add to Existing System</button><br>
+        <small>(if {{Config.productName}} has been already setup)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -59,7 +59,7 @@
 
         <div class="form-group has-error" ng-if="forms.systemNameForm.systemName.$touched && forms.systemNameForm.systemName.$error.required">
             <div class="help-block">
-                시스템명을 입력하세요.
+                시스템 이름이 필요합니다.
             </div>
         </div>
 
@@ -401,7 +401,7 @@
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
-        <button class="btn btn-primary" ng-click="retry()">설정 저장후 장치 재 부 팅</button>
+        <button class="btn btn-primary" ng-click="retry()">설정을 저장하고 장치 재 부 팅</button>
     </p>
 </div>
 

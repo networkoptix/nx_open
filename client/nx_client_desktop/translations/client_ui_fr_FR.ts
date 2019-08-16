@@ -6,12 +6,12 @@
     <message>
       <location filename="../src/ui/dialogs/about_dialog.ui"/>
       <source>About</source>
-      <translation>À Propos</translation>
+      <translation>À propos</translation>
     </message>
     <message>
       <location/>
       <source>Information</source>
-      <translation>Informations</translation>
+      <translation>Information</translation>
     </message>
     <message>
       <location/>
@@ -252,7 +252,7 @@
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation>Piste de vérification</translation>
+      <translation>Piste d’audit</translation>
     </message>
     <message>
       <location/>
@@ -417,7 +417,7 @@
     <message>
       <location/>
       <source>Description</source>
-      <translation>&amp;Description</translation>
+      <translation>Description</translation>
     </message>
     <message>
       <location/>
@@ -524,7 +524,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
       <source>Server is offline</source>
-      <translation>Le serveur est hors ligne</translation>
+      <translation>Serveur Hors ligne</translation>
     </message>
     <message>
       <location/>
@@ -670,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Restaurer par défauts</translation>
+      <translation>Restaurer les valeurs par défaut</translation>
     </message>
     <message>
       <location/>
@@ -750,7 +750,7 @@
     <message>
       <location/>
       <source>Reset</source>
-      <translation>Restaurer</translation>
+      <translation>Réinitialiser</translation>
     </message>
     <message>
       <location/>
@@ -760,27 +760,27 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Type de préréglage PTZ préféré:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Système</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Native</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Cette caméra prend en charge le panoramique et l'inclinaison</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Cette caméra prend en charge le zoom</translation>
     </message>
   </context>
   <context>
@@ -1019,7 +1019,7 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>Journal d'événements</translation>
+      <translation>Journal d'événement</translation>
     </message>
     <message>
       <location/>
@@ -1241,7 +1241,7 @@
     <message>
       <location/>
       <source>Source camera</source>
-      <translation>Caméra source</translation>
+      <translation>Source Caméra</translation>
     </message>
   </context>
   <context>
@@ -1274,7 +1274,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>&amp;Supprimer</translation>
+      <translation>Supprimer</translation>
     </message>
     <message>
       <location/>
@@ -1467,7 +1467,7 @@
     <message>
       <location/>
       <source>Reset</source>
-      <translation>Restaurer</translation>
+      <translation>Réinitialiser</translation>
     </message>
     <message>
       <location/>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Délai de recherche (s)</translation>
     </message>
   </context>
   <context>
@@ -1561,7 +1561,7 @@
     <message>
       <location/>
       <source>Connection error</source>
-      <translation>Erreur de Connexion</translation>
+      <translation>Erreur de connexion</translation>
     </message>
     <message>
       <location/>
@@ -1625,7 +1625,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Effacer</translation>
+      <translation>Supprimer</translation>
     </message>
     <message>
       <location/>
@@ -1681,7 +1681,7 @@
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation>Activer licence gratuite</translation>
+      <translation>Activer une licence gratuite</translation>
     </message>
     <message>
       <location/>
@@ -1696,7 +1696,7 @@
     <message>
       <location/>
       <source>License Key</source>
-      <translation>Clé de licence</translation>
+      <translation>Clé Licence</translation>
     </message>
     <message>
       <location/>
@@ -1879,7 +1879,7 @@
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>Activer l'audio</translation>
+      <translation>Activer Audio</translation>
     </message>
     <message>
       <location/>
@@ -2208,7 +2208,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Enlever</translation>
+      <translation>Supprimer</translation>
     </message>
     <message>
       <location/>
@@ -2368,7 +2368,7 @@
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation>Réinitialiser la vitesse</translation>
+      <translation>Réinitialiser vitesse</translation>
     </message>
   </context>
   <context>
@@ -2544,7 +2544,7 @@
     <message>
       <location/>
       <source>Failover</source>
-      <translation>Basculement de secours</translation>
+      <translation>Basculement</translation>
     </message>
     <message>
       <location/>
@@ -2756,7 +2756,7 @@
     <message>
       <location/>
       <source>Reset</source>
-      <translation>Restaurer</translation>
+      <translation>Réinitialiser</translation>
     </message>
   </context>
   <context>
@@ -3217,7 +3217,7 @@
     <message>
       <location/>
       <source>On</source>
-      <translation>Activé</translation>
+      <translation>Sur</translation>
     </message>
     <message>
       <location/>

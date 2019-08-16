@@ -585,8 +585,8 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n камера</numerusform>
-        <numerusform>%n камеры</numerusform>
+        <numerusform>%n камер</numerusform>
+        <numerusform>%n камер</numerusform>
         <numerusform>%n камер</numerusform>
         <numerusform>%n камер</numerusform>
       </translation>
@@ -603,8 +603,8 @@
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n устройство</numerusform>
-        <numerusform>%n устройства</numerusform>
+        <numerusform>%n устройств</numerusform>
+        <numerusform>%n устройств</numerusform>
         <numerusform>%n устройств</numerusform>
         <numerusform>%n устройств</numerusform>
       </translation>
@@ -716,23 +716,23 @@
     <name>QnStreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation>Наихудшее</translation>
+      <translation>Самая низкая</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Низкая</translation>
+      <translation>Низ</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Средний</translation>
+      <translation>Среднее</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Высокая</translation>
+      <translation>Выс</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation>Лучшее</translation>
+      <translation>Наилучшее</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -881,7 +881,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>M</translation>
+      <translation>М</translation>
     </message>
     <message>
       <source>y</source>
@@ -911,7 +911,7 @@
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation>дн</translation>
+      <translation>дней</translation>
     </message>
     <message>
       <source>wks</source>
@@ -932,8 +932,8 @@
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>миллисекунда</numerusform>
-        <numerusform>миллисекунды</numerusform>
+        <numerusform>миллисекунд</numerusform>
+        <numerusform>миллисекунд</numerusform>
         <numerusform>миллисекунд</numerusform>
         <numerusform>миллисекунд</numerusform>
       </translation>
@@ -952,20 +952,20 @@
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>минута</numerusform>
         <numerusform>минуты</numerusform>
-        <numerusform>минут</numerusform>
-        <numerusform>минут</numerusform>
+        <numerusform>минуты</numerusform>
+        <numerusform>минуты</numerusform>
+        <numerusform>минуты</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>час</numerusform>
         <numerusform>часа</numerusform>
-        <numerusform>часов</numerusform>
-        <numerusform>часов</numerusform>
+        <numerusform>часа</numerusform>
+        <numerusform>часа</numerusform>
+        <numerusform>часа</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -973,39 +973,39 @@
       <comment>Full suffix for displaying days</comment>
       <translation>
         <numerusform>день</numerusform>
-        <numerusform>дня</numerusform>
-        <numerusform>дней</numerusform>
-        <numerusform>дней</numerusform>
+        <numerusform>день</numerusform>
+        <numerusform>день</numerusform>
+        <numerusform>день</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
       <translation>
-        <numerusform>неделя</numerusform>
         <numerusform>недели</numerusform>
-        <numerusform>недель</numerusform>
-        <numerusform>недель</numerusform>
+        <numerusform>недели</numerusform>
+        <numerusform>недели</numerusform>
+        <numerusform>недели</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
       <translation>
-        <numerusform>месяц</numerusform>
         <numerusform>месяца</numerusform>
-        <numerusform>месяцев</numerusform>
-        <numerusform>месяцев</numerusform>
+        <numerusform>месяца</numerusform>
+        <numerusform>месяца</numerusform>
+        <numerusform>месяца</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
       <translation>
-        <numerusform>год</numerusform>
         <numerusform>года</numerusform>
-        <numerusform>лет</numerusform>
-        <numerusform>лет</numerusform>
+        <numerusform>года</numerusform>
+        <numerusform>года</numerusform>
+        <numerusform>года</numerusform>
       </translation>
     </message>
   </context>

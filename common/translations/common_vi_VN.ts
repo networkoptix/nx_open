@@ -596,11 +596,11 @@
     </message>
     <message>
       <source>Cameras</source>
-      <translation>Máy ảnh</translation>
+      <translation>Camera</translation>
     </message>
     <message>
       <source>cameras</source>
-      <translation>máy ảnh</translation>
+      <translation>camera</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -686,7 +686,7 @@
     <name>QnStreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation>Thấp nhất (Ls)</translation>
+      <translation>Thấp nhất</translation>
     </message>
     <message>
       <source>Low</source>
@@ -694,7 +694,7 @@
     </message>
     <message>
       <source>Medium</source>
-      <translation>Trong (M)</translation>
+      <translation>Trong</translation>
     </message>
     <message>
       <source>High</source>
@@ -1494,19 +1494,19 @@
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation type="unfinished">Storage Issue</translation>
+      <translation>Vấn đề lưu trữ</translation>
     </message>
     <message>
       <source>Storage Issue at %1</source>
-      <translation type="unfinished">Storage Issue at %1</translation>
+      <translation>Vấn đề lưu trữ ở %1</translation>
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation type="unfinished">Set to fullscreen</translation>
+      <translation>Chuyển sang màn hình đầy đủ</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
-      <translation type="unfinished">Exit fullscreen</translation>
+      <translation>Để lại toàn màn hình</translation>
     </message>
   </context>
   <context>

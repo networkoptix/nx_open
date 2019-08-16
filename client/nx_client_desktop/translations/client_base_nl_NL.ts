@@ -705,7 +705,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Close</source>
-      <translation>Sluiten</translation>
+      <translation>Afsluiten</translation>
     </message>
     <message>
       <source>Close All But This</source>
@@ -893,7 +893,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Exporteer bladwijzers...</translation>
     </message>
   </context>
   <context>
@@ -1608,7 +1608,7 @@ to view more bookmarks</source>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation>Onbekend</translation>
+      <translation>Unknown</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -1616,7 +1616,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>User updated</source>
@@ -1677,7 +1677,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n action(s)</source>
       <translation>
-        <numerusform>%n actie</numerusform>
+        <numerusform>%n acties</numerusform>
         <numerusform>%n acties</numerusform>
       </translation>
     </message>
@@ -1935,7 +1935,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n Server(s)</source>
       <translation>
-        <numerusform>%n server</numerusform>
+        <numerusform>%n servers</numerusform>
         <numerusform>%n servers</numerusform>
       </translation>
     </message>
@@ -2048,7 +2048,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>&amp;Verwijderen</translation>
+      <translation>&amp;Verwijder</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
@@ -2575,7 +2575,7 @@ to view more bookmarks</source>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
       <source>automatic</source>
-      <translation>automatisch</translation>
+      <translation>Automatisch</translation>
     </message>
   </context>
   <context>
@@ -3154,7 +3154,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Verbind</translation>
+      <translation>Verbinden</translation>
     </message>
   </context>
   <context>
@@ -3274,7 +3274,7 @@ to %1</source>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
-      <translation>Voorbeeldformaat van invoerapparaat %1 wordt niet ondersteund.</translation>
+      <translation>Voorbeeldformaat van het invoerapparaat %1 wordt niet ondersteund.</translation>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
@@ -3336,7 +3336,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3455,7 +3455,7 @@ to %1</source>
     </message>
     <message>
       <source>Event</source>
-      <translation>Gebeurtenis</translation>
+      <translation>Event</translation>
     </message>
     <message>
       <source>Source</source>
@@ -3570,7 +3570,7 @@ to %1</source>
     <message>
       <source>Low</source>
       <comment>Failover priority</comment>
-      <translation>Lage</translation>
+      <translation>Laag</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -3773,7 +3773,7 @@ to %1</source>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation>Onbekend</translation>
+      <translation>Unknown</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -3900,7 +3900,7 @@ to %1</source>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Email</source>
@@ -4212,7 +4212,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Verwijderen</translation>
+      <translation>Verwijder</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4620,7 +4620,7 @@ to %1</source>
     </message>
     <message>
       <source>New Server</source>
-      <translation>Nieuwe Server</translation>
+      <translation>Nieuwe server</translation>
     </message>
     <message>
       <source>Failed to merge Systems</source>
@@ -4671,7 +4671,7 @@ to %1</source>
     </message>
     <message>
       <source>Close</source>
-      <translation>Sluiten</translation>
+      <translation>Afsluiten</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -4686,11 +4686,11 @@ to %1</source>
     </message>
     <message>
       <source>Set Recording to &quot;Always&quot;</source>
-      <translation>Stel opnemen op &quot;Always&quot;</translation>
+      <translation>Stel opnemen in op &quot;Always&quot;</translation>
     </message>
     <message>
       <source>Enable Secondary Stream</source>
-      <translation>Secondary Stream inschakelen</translation>
+      <translation>Secondaire stream inschakelen</translation>
     </message>
     <message>
       <source>multiple values</source>
@@ -4804,7 +4804,7 @@ to %1</source>
     </message>
     <message>
       <source>Select File...</source>
-      <translation>Selecteer bestand...</translation>
+      <translation>Bestand selecteren...</translation>
     </message>
     <message>
       <source>Enter New Title:</source>
@@ -5065,7 +5065,7 @@ to %1</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>Lage</translation>
+      <translation>Laag</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -5407,7 +5407,7 @@ to %1</source>
     <name>QnResourceWidget</name>
     <message>
       <source>Close</source>
-      <translation>Sluiten</translation>
+      <translation>Afsluiten</translation>
     </message>
     <message>
       <source>Information</source>
@@ -5464,7 +5464,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Exporteer bladwijzers...</translation>
     </message>
   </context>
   <context>
@@ -5521,7 +5521,7 @@ to %1</source>
     </message>
     <message>
       <source>All Cameras</source>
-      <translation>Alle camera 's</translation>
+      <translation>Alle camera's</translation>
     </message>
     <message>
       <source>Select devices...</source>
@@ -5536,7 +5536,7 @@ to %1</source>
     <name>QnSelectServersButton</name>
     <message>
       <source>Any Server</source>
-      <translation>Een willekeurige server</translation>
+      <translation>Een willekeurige Server</translation>
     </message>
     <message>
       <source>All Servers</source>
@@ -5571,7 +5571,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n gebruikers</numerusform>
+        <numerusform>%n Gebruikers</numerusform>
         <numerusform>%n gebruikers</numerusform>
       </translation>
     </message>
@@ -6097,14 +6097,14 @@ to %1</source>
     </message>
     <message>
       <source>Enter a short System description here.</source>
-      <translation>Vul hier een korte systeembeschrijving in.</translation>
+      <translation>Vul hier een korte systeemomschrijving in.</translation>
     </message>
   </context>
   <context>
     <name>QnSmtpTestConnectionWidget</name>
     <message>
       <source>Timed Out</source>
-      <translation>Time-out</translation>
+      <translation>Uitgesteld</translation>
     </message>
     <message>
       <source>TLS</source>
@@ -6124,7 +6124,7 @@ to %1</source>
     </message>
     <message>
       <source>Success</source>
-      <translation>Succes</translation>
+      <translation>Gelukt</translation>
     </message>
     <message>
       <source>Connection timed out</source>
@@ -6615,7 +6615,7 @@ to %1</source>
     </message>
     <message>
       <source>Connect</source>
-      <translation>Verbind</translation>
+      <translation>Verbinden</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -6942,7 +6942,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Role</source>
@@ -7008,7 +7008,7 @@ to %1</source>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7151,7 +7151,7 @@ to %1</source>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Gebruikersnaam</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -7218,7 +7218,7 @@ to %1</source>
     <name>QnValidatorStrings</name>
     <message>
       <source>Email cannot be empty.</source>
-      <translation>Email mag niet leeg zijn.</translation>
+      <translation>Email kan niet leeg zijn.</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -7776,7 +7776,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>U kunt deze bestanden uploaden naar een ander exemplaar van een draagbare camera.</numerusform>
         <numerusform>U kunt deze bestanden uploaden naar een ander exemplaar van een draagbare camera.</numerusform>
       </translation>
@@ -7809,7 +7809,7 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Selected file was recorded on %1, but only files that were recorded in the last %n days can be uploaded. You can change this in camera archive settings.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Het geselecteerde bestand is opgenomen op %1, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
         <numerusform>De geselecteerde bestanden zijn opgenomen op %1, maar alleen bestanden die in de afgelopen %n dagen zijn opgenomen, kunnen worden geüpload. U kunt dit wijzigen in de instellingen van het camera-archief.</numerusform>
       </translation>
@@ -7823,14 +7823,14 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Sommige beelden kunnen zijn verwijderd na het uploaden van deze bestanden</numerusform>
         <numerusform>Sommige beelden kunnen zijn verwijderd na het uploaden van deze bestanden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Er is niet veel vrije ruimte over op serveropslag. Sommige oude beelden kunnen worden verwijderd om ruimte vrij te maken. Let op, als de geselecteerde bestanden toevallig de oudste op de server zijn, deze meteen na het uploaden worden verwijderd.</numerusform>
         <numerusform>Er is niet veel vrije ruimte over op serveropslag. Sommige oude beelden kunnen worden verwijderd om ruimte vrij te maken. Let op, als de geselecteerde bestanden toevallig de oudste op de server zijn, deze meteen na het uploaden worden verwijderd.</numerusform>
       </translation>
@@ -8102,7 +8102,7 @@ to %1</source>
     </message>
     <message>
       <source>Close</source>
-      <translation>Sluiten</translation>
+      <translation>Afsluiten</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -8405,7 +8405,7 @@ to %1</source>
     </message>
     <message>
       <source>Low</source>
-      <translation>Lage</translation>
+      <translation>Laag</translation>
     </message>
     <message>
       <source>High</source>
@@ -8521,7 +8521,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Verschillende bladwijzers kunnen alleen als schermindeling worden geëxporteerd.</translation>
     </message>
   </context>
   <context>
@@ -8635,7 +8635,7 @@ to %1</source>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>Als het veld leeg is, wordt de gebeurtenis altijd geactiveerd.</translation>
+      <translation>Als het veld leeg is, wordt het event altijd geactiveerd.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>

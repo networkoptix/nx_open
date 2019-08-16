@@ -417,7 +417,7 @@
     <message>
       <location/>
       <source>Description</source>
-      <translation>Beschreibung</translation>
+      <translation>&amp;Beschreibung</translation>
     </message>
     <message>
       <location/>
@@ -549,7 +549,7 @@
     <message>
       <location/>
       <source>Stop</source>
-      <translation>Stoppen</translation>
+      <translation>Anhalten</translation>
     </message>
     <message>
       <location/>
@@ -1019,7 +1019,7 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>Ereignisprotokoll</translation>
+      <translation>Ereignislog</translation>
     </message>
     <message>
       <location/>
@@ -1241,7 +1241,7 @@
     <message>
       <location/>
       <source>Source camera</source>
-      <translation>Quellkamera</translation>
+      <translation>Quell-Kamera</translation>
     </message>
   </context>
   <context>
@@ -1274,7 +1274,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Entfernen</translation>
+      <translation>Löschen</translation>
     </message>
     <message>
       <location/>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Such-Timeout (s)</translation>
     </message>
   </context>
   <context>
@@ -1625,7 +1625,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Entfernen</translation>
+      <translation>Löschen</translation>
     </message>
     <message>
       <location/>
@@ -1696,7 +1696,7 @@
     <message>
       <location/>
       <source>License Key</source>
-      <translation>Lizenzschlüssel:</translation>
+      <translation>Lizenzschlüssel</translation>
     </message>
     <message>
       <location/>
@@ -1966,7 +1966,7 @@
     <message>
       <location/>
       <source>Events</source>
-      <translation>Ereignisse</translation>
+      <translation>Ereignis</translation>
     </message>
   </context>
   <context>
@@ -2045,7 +2045,7 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation>Der Videowand hinzufügen...</translation>
+      <translation>Zu Videowand hinzufügen...</translation>
     </message>
     <message>
       <location/>
@@ -2208,7 +2208,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Entfernen</translation>
+      <translation>Löschen</translation>
     </message>
     <message>
       <location/>
@@ -2691,7 +2691,7 @@
     <message>
       <location/>
       <source>Fisheye</source>
-      <translation>Fischauge</translation>
+      <translation>Fischaugenobjektiv</translation>
     </message>
     <message>
       <location/>
@@ -2711,12 +2711,12 @@
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>Firmware:</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>Hersteller:</translation>
+      <translation>Hersteller</translation>
     </message>
     <message>
       <location/>
@@ -3070,7 +3070,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation>Zeitmarke</translation>
+      <translation>Zeitstempel</translation>
     </message>
     <message>
       <location/>

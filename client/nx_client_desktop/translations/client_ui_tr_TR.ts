@@ -62,7 +62,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Otomatik</translation>
+      <translation>Oto</translation>
     </message>
     <message>
       <location/>
@@ -179,7 +179,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Otomatik</translation>
+      <translation>Oto</translation>
     </message>
     <message>
       <location/>
@@ -207,7 +207,7 @@
     <message>
       <location/>
       <source>Exporting video</source>
-      <translation>Video Aktarma</translation>
+      <translation>Videoyu Dışa Aktar</translation>
     </message>
     <message>
       <location/>
@@ -257,7 +257,7 @@
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation>Filtreleri temizle</translation>
+      <translation>Filtreyi Temizle</translation>
     </message>
     <message>
       <location/>
@@ -379,7 +379,7 @@
     <message>
       <location filename="../src/nx/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation>Yer işareti bilgi</translation>
+      <translation>Bookmark Bilgisi</translation>
     </message>
     <message>
       <location/>
@@ -516,7 +516,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation>Test</translation>
+      <translation>Test Et</translation>
     </message>
   </context>
   <context>
@@ -534,7 +534,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Otomatik</translation>
+      <translation>Oto</translation>
     </message>
     <message>
       <location/>
@@ -549,7 +549,7 @@
     <message>
       <location/>
       <source>Stop</source>
-      <translation>Bitir</translation>
+      <translation>Durdur</translation>
     </message>
     <message>
       <location/>
@@ -655,7 +655,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Otomatik</translation>
+      <translation>Oto</translation>
     </message>
     <message>
       <location/>
@@ -760,27 +760,27 @@
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Tercih edilen PTZ ön ayar tipi:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Sistem</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Doğal</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Bu kamera pan ve tilt destekler</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Bu kamera zoom destekler</translation>
     </message>
   </context>
   <context>
@@ -954,7 +954,7 @@
     <message>
       <location/>
       <source>Save password</source>
-      <translation>Şifreyi Kaydet</translation>
+      <translation>Parolayı kaydet</translation>
     </message>
   </context>
   <context>
@@ -1294,7 +1294,7 @@
     <message>
       <location/>
       <source>None</source>
-      <translation>Hiç</translation>
+      <translation>Yok</translation>
     </message>
     <message>
       <location/>
@@ -1335,7 +1335,7 @@
     <message>
       <location/>
       <source>Rotation</source>
-      <translation>Döndürme</translation>
+      <translation>Döndür</translation>
     </message>
   </context>
   <context>
@@ -1508,7 +1508,7 @@
     <message>
       <location/>
       <source>Testing...</source>
-      <translation>Test Ediliyor...</translation>
+      <translation>Test Yapılıyor...</translation>
     </message>
     <message>
       <location/>
@@ -1543,7 +1543,7 @@
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Arama zaman aşımı (sn)</translation>
     </message>
   </context>
   <context>
@@ -1561,7 +1561,7 @@
     <message>
       <location/>
       <source>Connection error</source>
-      <translation>Bağlantı Hatası</translation>
+      <translation>Bağlantı hatası</translation>
     </message>
     <message>
       <location/>
@@ -1681,7 +1681,7 @@
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation>Deneme Lisansını Etkinleştir</translation>
+      <translation>Ücretsiz Lisansı Etkinleştir</translation>
     </message>
     <message>
       <location/>
@@ -1775,7 +1775,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation>Test</translation>
+      <translation>Test Et</translation>
     </message>
     <message>
       <location/>
@@ -2287,7 +2287,7 @@
     <message>
       <location/>
       <source>Clear Selection</source>
-      <translation>Seçilenleri Temizle</translation>
+      <translation>Seçileni Temizle</translation>
     </message>
     <message>
       <location/>
@@ -2691,7 +2691,7 @@
     <message>
       <location/>
       <source>Fisheye</source>
-      <translation>Fish-Eye</translation>
+      <translation>Balıkgözü</translation>
     </message>
     <message>
       <location/>
@@ -2711,12 +2711,12 @@
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>Firmware</translation>
+      <translation>Aygıt Yazılımı</translation>
     </message>
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>Üretici</translation>
+      <translation>Sağlayıcı</translation>
     </message>
     <message>
       <location/>
@@ -2820,7 +2820,7 @@
     <message>
       <location/>
       <source>User:</source>
-      <translation>Kullanıcı:</translation>
+      <translation>Kullanıcı Adı:</translation>
     </message>
     <message>
       <location/>
@@ -2945,7 +2945,7 @@
     <message>
       <location filename="../src/ui/dialogs/storage_url_dialog.ui"/>
       <source>Add External Storage...</source>
-      <translation>Harici Depolama Ekle...</translation>
+      <translation>Ek Depolama Alanı Ekle...</translation>
     </message>
     <message>
       <location/>
@@ -2996,7 +2996,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/system_settings_widget.ui"/>
       <source>(recommended)</source>
-      <translation>(Önerilen)</translation>
+      <translation>(önerilen)</translation>
     </message>
     <message>
       <location/>

@@ -577,7 +577,7 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n Kamera</numerusform>
+        <numerusform>%n Kameras</numerusform>
         <numerusform>%n Kameras</numerusform>
       </translation>
     </message>
@@ -585,13 +585,13 @@
       <source>%n camera(s)</source>
       <translation>
         <numerusform>%n Kamera</numerusform>
-        <numerusform>%n Kameras</numerusform>
+        <numerusform>%n Kamera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n Gerät</numerusform>
+        <numerusform>%n Geräte</numerusform>
         <numerusform>%n Geräte</numerusform>
       </translation>
     </message>
@@ -599,7 +599,7 @@
       <source>%n device(s)</source>
       <translation>
         <numerusform>%n Gerät</numerusform>
-        <numerusform>%n Geräte</numerusform>
+        <numerusform>%n Gerät</numerusform>
       </translation>
     </message>
     <message>
@@ -638,14 +638,14 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n I/O-Modul</numerusform>
-        <numerusform>%n I/O-Module</numerusform>
+        <numerusform>%n I/O-Modul</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n I/O-Modul</numerusform>
-        <numerusform>%n I/O-Module</numerusform>
+        <numerusform>%n I/O-Modul</numerusform>
       </translation>
     </message>
     <message>
@@ -716,7 +716,7 @@
     </message>
     <message>
       <source>Preset</source>
-      <translation>Voreinstellung</translation>
+      <translation>Preset</translation>
     </message>
     <message>
       <source>Undefined</source>
@@ -861,7 +861,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>m</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>y</source>
@@ -871,7 +871,7 @@
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation>Msek</translation>
+      <translation>msek</translation>
     </message>
     <message>
       <source>sec</source>
@@ -881,95 +881,95 @@
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation>Min</translation>
+      <translation>min</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation>Std</translation>
+      <translation>std</translation>
     </message>
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation>Tage</translation>
+      <translation>tage</translation>
     </message>
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation>Wochen</translation>
+      <translation>wochen</translation>
     </message>
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation>Monate</translation>
+      <translation>monate</translation>
     </message>
     <message>
       <source>yrs</source>
       <comment>Long suffix for displaying years</comment>
-      <translation>Jahre</translation>
+      <translation>jahre</translation>
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>Millisekunde</numerusform>
-        <numerusform>Millisekunden</numerusform>
+        <numerusform>millisekunde</numerusform>
+        <numerusform>millisekunden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>Sekunde</numerusform>
-        <numerusform>Sekunden</numerusform>
+        <numerusform>sekunde</numerusform>
+        <numerusform>sekunden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>Minute</numerusform>
-        <numerusform>Minuten</numerusform>
+        <numerusform>minute</numerusform>
+        <numerusform>minuten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>Stunde</numerusform>
-        <numerusform>Stunden</numerusform>
+        <numerusform>stunde</numerusform>
+        <numerusform>stunden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>Tag</numerusform>
-        <numerusform>Tage</numerusform>
+        <numerusform>tag</numerusform>
+        <numerusform>tage</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
       <translation>
-        <numerusform>Woche</numerusform>
-        <numerusform>Wochen</numerusform>
+        <numerusform>woche</numerusform>
+        <numerusform>wochen</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
       <translation>
-        <numerusform>Monat</numerusform>
-        <numerusform>Monate</numerusform>
+        <numerusform>monat</numerusform>
+        <numerusform>monate</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
       <translation>
-        <numerusform>Jahr</numerusform>
-        <numerusform>Jahre</numerusform>
+        <numerusform>jahr</numerusform>
+        <numerusform>jahre</numerusform>
       </translation>
     </message>
   </context>

@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "Frissítések értesítései engedélyezve",
         "upnpPortMappingEnabled": "Az UPNP port hozzárendelés engedélyezve",
         "useTextEmailFormat": "Egyszerű szöveges e-mailek küldése",
-        "useWindowsEmailLineFeed": "Használja a Windows feed-et e-mailben"
+        "useWindowsEmailLineFeed": "Használja a Windows feed-et e-mailben",
+        "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value."
     },
     "info": {
         "tabs": {
@@ -178,17 +179,17 @@
     },
     "common": {
         "voiceCommands": {
-            "search": "find + [text for searchbar]",
+            "search": "keresés + [szöveg a keresősávhoz]",
             "pause": "szünet",
-            "help": "help | show commands",
+            "help": "súgó | parancsok megjelenítése",
             "collapse all servers": "összes szerver összecsukása",
-            "collapse server": "collapse server + [server name]",
+            "collapse server": "szerver összecsukása + [szerver neve]",
             "play": "letjátszás",
             "clear search": "keresés törlése",
             "live": "go to live | show me live",
             "expand all servers": "összes szerver kibontása",
             "stop listening": "figyelés leállítása",
-            "expand server": "expand server + [server name]",
+            "expand server": "szerver kibontása + [szerver neve]",
             "view": "nézet + [kamera neve]"
         },
         "systemOffline": "A rendszer offline",
@@ -218,8 +219,8 @@
         },
         "chromeCastWarning": "A Chromecast erőforrás-igényes, és problémákat okozhat a kiszolgálón.",
         "resolution": {
-            "high": "Elsődleges",
-            "auto": "Auto",
+            "high": "Magas",
+            "auto": "Autómatikus",
             "low": "Alacsony"
         }
     }

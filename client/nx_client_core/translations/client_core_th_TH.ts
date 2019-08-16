@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>This account is blocked.</source>
-      <translation>บัญชีนี้ถูกปิดแล้ว.</translation>
+      <translation>บัญชีนี้ถูกปิดแล้ว</translation>
     </message>
     <message>
       <source>Requested feature is not implemented.</source>

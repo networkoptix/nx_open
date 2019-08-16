@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "Aktualizace oznámení byla povolena",
         "upnpPortMappingEnabled": "Mapování portů UPNP bylo povoleno",
         "useTextEmailFormat": "Odeslat prostý text emailem",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
+        "useWindowsEmailLineFeed": "V e-mailech použijte linkový zdroj Windows",
+        "maxEventLogRecords": "Maximální záznamy protokolu událostí, které lze uložit do databáze. Skutečné množství nevymazaných záznamů může být až o 20% vyšší než zadaná hodnota."
     },
     "info": {
         "tabs": {
@@ -168,7 +169,7 @@
         "selectFiles": "Vybrat soubory"
     },
     "advanced": {
-        "free": "Volný",
+        "free": "Zdarma",
         "total": "Celkem",
         "occupied": "Obsazený",
         "reserved": "Vyhrazený"
@@ -206,7 +207,7 @@
             "noFormat": "Tento prohlížeč nepodporuje přehrávání videa z této kamery.",
             "ieWin10": "Prosím použijte prohlížeč Microsoft Edge nebo Google Chrome.",
             "iosVideoTooLarge": "iOS nepodporuje video větší než fullHD (2MP: 1920 × 1080).",
-            "unauthorized": "Ověření je vyžadováno",
+            "unauthorized": "Autentifikace je vyžadována",
             "ubuntuNX": "Tento prohlížeč nepodporuje video ze serverů se systémem ARM. Použijte místo toho prohlížeč Chromium.",
             "ieNoWebm": "Pro aplikaci Internet Explorer si prosím nainstalujte <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>kodeku WebM</a>.",
             "flashOrWebmRequired": "Pro přehrávání videa v aplikaci Internet Explorer si prosím <a href='https://get.adobe.com/flashplayer/' target='_blank'>nainstalujte Adobe Flash</a> nebo<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM kodek</a>.",
@@ -218,9 +219,9 @@
         },
         "chromeCastWarning": "Chromecast je náročný na systémové zdroje a může způsobit problémy na vašem serveru.",
         "resolution": {
-            "high": "Hlavní",
+            "high": "Vysoká",
             "auto": "Auto",
-            "low": "Vedlejší"
+            "low": "Nízký"
         }
     }
 }

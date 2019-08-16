@@ -846,7 +846,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Wearable Camera...</source>
-      <translation>Câmara Wearable...</translation>
+      <translation>Câmara wearable...</translation>
     </message>
     <message>
       <source>New Wearable Camera...</source>
@@ -995,7 +995,7 @@ para ver mais favoritos</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n layout</numerusform>
         <numerusform>%n layouts</numerusform>
       </translation>
@@ -1040,11 +1040,11 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Parte 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
@@ -1079,7 +1079,7 @@ para ver mais favoritos</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n layout</numerusform>
         <numerusform>%n layouts</numerusform>
       </translation>
@@ -1515,7 +1515,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar Todos</translation>
+      <translation>Selecionar todos</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -1527,7 +1527,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation>Câmaras</translation>
+      <translation>Câmeras</translation>
     </message>
     <message>
       <source>Device actions</source>
@@ -1678,7 +1678,7 @@ para ver mais favoritos</translation>
     <message numerus="yes">
       <source>%n action(s)</source>
       <translation>
-        <numerusform>%n acção</numerusform>
+        <numerusform>%n acções</numerusform>
         <numerusform>%n acções</numerusform>
       </translation>
     </message>
@@ -1716,7 +1716,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Descrição</translation>
+      <translation>&amp;Descrição</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -1936,7 +1936,7 @@ para ver mais favoritos</translation>
     <message numerus="yes">
       <source>%n Server(s)</source>
       <translation>
-        <numerusform>%n Servidor</numerusform>
+        <numerusform>%n Servidores</numerusform>
         <numerusform>%n Servidores</numerusform>
       </translation>
     </message>
@@ -2030,7 +2030,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation>Câmaras</translation>
+      <translation>Câmeras</translation>
     </message>
     <message>
       <source>Any Device</source>
@@ -2390,12 +2390,12 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
-        <numerusform>Este ID já é usado na seguinte %n câmara: %1</numerusform>
+        <numerusform>Este ID já é usado nas seguintes %n câmaras: %1</numerusform>
         <numerusform>Este ID já é usado nas seguintes %n câmaras: %1</numerusform>
       </translation>
     </message>
@@ -2433,15 +2433,15 @@ para ver mais favoritos</translation>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Copiar Selecção para ClipBoard</translation>
+      <translation>Copiar Selecção para o Clipboard</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Exportar Selecção para Ficheiro...</translation>
+      <translation>Exportar Selecção para o Ficheiro...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar Todos</translation>
+      <translation>Selecionar todos</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
@@ -2455,11 +2455,11 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation>Listagem de Dispositivos</translation>
+      <translation>Lista de dispositivos</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation>Listagem de Câmaras</translation>
+      <translation>Lista de Câmaras</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
@@ -2531,7 +2531,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -2940,7 +2940,7 @@ a %1</translation>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation>E-mail</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2948,7 +2948,7 @@ a %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation>Criar conta</translation>
+      <translation>Criar Conta</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -3275,7 +3275,7 @@ a %1</translation>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Não foi possível iniciar o encoder de áudio.</translation>
+      <translation>Não foi possível inicializar o encoder de áudio.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -3283,11 +3283,11 @@ a %1</translation>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation>Não foi possível encontrar o encoder de áudio &quot;%1&quot;.</translation>
+      <translation>Não foi possível encontrar o codificador de áudio &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Primary audio device is not selected.</source>
-      <translation>O dispositivo de áudio principal não está seleccionado.</translation>
+      <translation>O dispositivo de áudio principal não está selecionado.</translation>
     </message>
   </context>
   <context>
@@ -3357,7 +3357,7 @@ a %1</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>Confirmar senha</translation>
+      <translation>Confirme a Senha</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -3407,15 +3407,15 @@ a %1</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Copiar selecção para ClipBoard</translation>
+      <translation>Copiar Selecção para o Clipboard</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Exportar a selecção para ficheiro...</translation>
+      <translation>Exportar Selecção para o Ficheiro...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar todos</translation>
+      <translation>Selecionar todos</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3424,14 +3424,14 @@ a %1</translation>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
       <translation>
-        <numerusform>Log de Eventos para período de %1 a %2 - %n evento encontrado</numerusform>
+        <numerusform>Log de Eventos para período de %1 a %2 - %n eventos encontrados</numerusform>
         <numerusform>Log de Eventos para período de %1 a %2 - %n eventos encontrados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
-        <numerusform>Log de Eventos para %1 - %n evento encontrado</numerusform>
+        <numerusform>Log de Eventos para %1 - %n eventos encontrados</numerusform>
         <numerusform>Log de Eventos para %1 - %n eventos encontrados</numerusform>
       </translation>
     </message>
@@ -3476,7 +3476,7 @@ a %1</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation>Descrição</translation>
+      <translation>&amp;Descrição</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3580,7 +3580,7 @@ a %1</translation>
     <message>
       <source>Medium</source>
       <comment>Failover priority</comment>
-      <translation>Média</translation>
+      <translation>Médio</translation>
     </message>
     <message>
       <source>High</source>
@@ -3653,7 +3653,7 @@ a %1</translation>
     <message numerus="yes">
       <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
       <translation>
-        <numerusform>Esta câmara não está actualmente em alguns dos layouts seleccionados. A acção funcionará se a câmara estiver adicionada antes que a acção seja accionada.</numerusform>
+        <numerusform>Estas câmaras não estão actualmente em alguns dos layouts seleccionados. A acção funcionará se as câmaras estiverem adicionadas antes que a acção seja accionada.</numerusform>
         <numerusform>Estas câmaras não estão actualmente em alguns dos layouts seleccionados. A acção funcionará se as câmaras estiverem adicionadas antes que a acção seja accionada.</numerusform>
       </translation>
     </message>
@@ -3835,7 +3835,7 @@ a %1</translation>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
@@ -3905,7 +3905,7 @@ a %1</translation>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <source>Email</source>
@@ -3994,7 +3994,7 @@ a %1</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Chave da Licença</translation>
+      <translation>Chave da Licença:</translation>
     </message>
     <message>
       <source>Status</source>
@@ -4290,7 +4290,7 @@ a %1</translation>
     </message>
     <message>
       <source>All files</source>
-      <translation>Todos ficheiros</translation>
+      <translation>Todos</translation>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
@@ -4306,21 +4306,21 @@ a %1</translation>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation>
-        <numerusform>Utilizar licenças para o %n dispositivo seleccionado</numerusform>
+        <numerusform>Utilizar licenças para os %n dispositivos seleccionados</numerusform>
         <numerusform>Utilizar licenças para os %n dispositivos seleccionados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
       <translation>
-        <numerusform>Utilizar licenças para a %n câmara seleccionada</numerusform>
+        <numerusform>Utilizar licenças para as %n câmaras seleccionadas</numerusform>
         <numerusform>Utilizar licenças para as %n câmaras seleccionadas</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
       <translation>
-        <numerusform>Utilizar licenças para o %n módulo I/O seleccionado</numerusform>
+        <numerusform>Utilizar licenças para os %n módulos I/O seleccionados</numerusform>
         <numerusform>Utilizar licenças para os %n módulos I/O seleccionados</numerusform>
       </translation>
     </message>
@@ -4328,7 +4328,7 @@ a %1</translation>
       <source>Use licenses to view these %n cameras</source>
       <translation>
         <numerusform>Use licenças para ver esta %n câmera</numerusform>
-        <numerusform>Use licenças para ver estas %n câmaras</numerusform>
+        <numerusform>Use licenças para ver esta %n câmera</numerusform>
       </translation>
     </message>
   </context>
@@ -4434,7 +4434,7 @@ a %1</translation>
     <name>QnLoginToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation>E-mail</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Password</source>
@@ -4442,7 +4442,7 @@ a %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation>Criar conta</translation>
+      <translation>Criar Conta</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -4507,7 +4507,7 @@ a %1</translation>
     </message>
     <message>
       <source>No image</source>
-      <translation>Sem imagem</translation>
+      <translation>Nenhuma imagem</translation>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
@@ -4546,7 +4546,7 @@ a %1</translation>
     </message>
     <message>
       <source>Image Enhancement</source>
-      <translation>Melhoria de Imagem</translation>
+      <translation>Melhoramento de imagem</translation>
     </message>
     <message>
       <source>Hi-Res</source>
@@ -4699,7 +4699,7 @@ a %1</translation>
     </message>
     <message>
       <source>multiple values</source>
-      <translation>múltiplos valores</translation>
+      <translation>vários valores</translation>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
@@ -4714,7 +4714,7 @@ a %1</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation>Fame Anterior</translation>
+      <translation>Frame Anterior</translation>
     </message>
     <message>
       <source>Speed Up</source>
@@ -4726,7 +4726,7 @@ a %1</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation>P/ Início</translation>
+      <translation>Para Início</translation>
     </message>
     <message>
       <source>Next Chunk</source>
@@ -4734,7 +4734,7 @@ a %1</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation>P/ Final</translation>
+      <translation>Para Final</translation>
     </message>
     <message>
       <source>Previous Chunk</source>
@@ -4764,7 +4764,7 @@ a %1</translation>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation>Câmara wearable</translation>
+      <translation>Câmara Wearable</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
@@ -4809,7 +4809,7 @@ a %1</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation>Seleccionar ficheiro...</translation>
+      <translation>Seleccionar Ficheiro...</translation>
     </message>
     <message>
       <source>Enter New Title:</source>
@@ -5003,7 +5003,7 @@ a %1</translation>
     <message numerus="yes">
       <source>about %n minute(s)</source>
       <translation>
-        <numerusform>cerca de %n minuto</numerusform>
+        <numerusform>cerca de %n minutos</numerusform>
         <numerusform>cerca de %n minutos</numerusform>
       </translation>
     </message>
@@ -5070,7 +5070,7 @@ a %1</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Baixo</translation>
+      <translation>Baixa</translation>
     </message>
     <message>
       <source>Normal</source>
@@ -5078,7 +5078,7 @@ a %1</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Alto</translation>
+      <translation>Alta</translation>
     </message>
     <message>
       <source>Highest</source>
@@ -5370,7 +5370,7 @@ a %1</translation>
     </message>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation>Câmaras e recursos</translation>
+      <translation>Câmeras e Recursos</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -5378,7 +5378,7 @@ a %1</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation>Todas as Câmaras e Recursos</translation>
+      <translation>Todas as câmeras e recursos</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
@@ -5465,7 +5465,7 @@ a %1</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation>Pesquisa</translation>
+      <translation>Pesquisar</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
@@ -5507,7 +5507,7 @@ a %1</translation>
     <name>QnSearchLineEdit</name>
     <message>
       <source>Search</source>
-      <translation>Pesquisa</translation>
+      <translation>Pesquisar</translation>
     </message>
   </context>
   <context>
@@ -5526,7 +5526,7 @@ a %1</translation>
     </message>
     <message>
       <source>All Cameras</source>
-      <translation>Todas as Câmaras</translation>
+      <translation>Todas as Câmeras</translation>
     </message>
     <message>
       <source>Select devices...</source>
@@ -5671,7 +5671,7 @@ a %1</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation>Página da Web do servidor</translation>
+      <translation>Página Web do Servidor</translation>
     </message>
   </context>
   <context>
@@ -6024,7 +6024,7 @@ a %1</translation>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation>&quot;Motion + Baixo - Res&quot; opção de gravação não pode ser definida.</translation>
+      <translation>&quot;Motion + Low - A opção de gravação Res&quot; não pode ser definida.</translation>
     </message>
     <message>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
@@ -6039,7 +6039,7 @@ a %1</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mail</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>SMTP Server</source>
@@ -6074,7 +6074,7 @@ a %1</translation>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
       <source>Email</source>
-      <translation>E-mail</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -6261,15 +6261,15 @@ a %1</translation>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar Tudo</translation>
+      <translation>Selecionar todos</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Exportar a selecção para ficheiro...</translation>
+      <translation>Exportar Selecção para o Ficheiro...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Copiar selecção para ClipBoard</translation>
+      <translation>Copiar Selecção para o Clipboard</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -6525,7 +6525,7 @@ a %1</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mail</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -6560,7 +6560,7 @@ a %1</translation>
     </message>
     <message>
       <source>System is in safe mode</source>
-      <translation>O sistema está em modo Safe</translation>
+      <translation>O Sistema está em modo Safe</translation>
     </message>
     <message>
       <source>Storage is not configured</source>
@@ -6782,7 +6782,7 @@ a %1</translation>
     <message>
       <source>dd</source>
       <comment>Format for displaying days on timeline.</comment>
-      <translation type="unfinished">dd</translation>
+      <translation>dd</translation>
     </message>
     <message>
       <source>MMMM</source>
@@ -6792,42 +6792,42 @@ a %1</translation>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation type="unfinished">yyyy</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy h ap</translation>
+      <translation>dd MMMM yyyy h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation type="unfinished">dd MMMM yyyy</translation>
+      <translation>dd MMMM yyyy</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation type="unfinished">MMMM yyyy</translation>
+      <translation>MMMM yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation type="unfinished">yyyy</translation>
+      <translation>yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation type="unfinished">dd MMMM yyyy h:mm ap</translation>
+      <translation>dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6882,7 +6882,7 @@ a %1</translation>
     <message numerus="yes">
       <source>The problem is caused by %n servers:</source>
       <translation>
-        <numerusform>O problema está a ser causado por %n servidor:</numerusform>
+        <numerusform>O problema está a ser causado por %n servidores:</numerusform>
         <numerusform>O problema está a ser causado por %n servidores:</numerusform>
       </translation>
     </message>
@@ -6890,20 +6890,20 @@ a %1</translation>
       <source>No free space left on %n servers:</source>
       <translation>
         <numerusform>Sem espaço livre em %n servidor:</numerusform>
-        <numerusform>Sem espaço livre em %n servidores:</numerusform>
+        <numerusform>Sem espaço livre em %n servidor:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
       <translation>
         <numerusform>%n Servidor não está a responder:</numerusform>
-        <numerusform>%n Servidores não estão a responder:</numerusform>
+        <numerusform>%n Servidor não está a responder:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
       <translation>
-        <numerusform>%n Servidor ficaram offline:</numerusform>
+        <numerusform>%n Servidores ficaram offline:</numerusform>
         <numerusform>%n Servidores ficaram offline:</numerusform>
       </translation>
     </message>
@@ -6911,7 +6911,7 @@ a %1</translation>
       <source>Authentication failed for %n servers:</source>
       <translation>
         <numerusform>A autenticação falhou para %n servidor:</numerusform>
-        <numerusform>A autenticação falhou para %n servidores:</numerusform>
+        <numerusform>A autenticação falhou para %n servidor:</numerusform>
       </translation>
     </message>
     <message>
@@ -6947,7 +6947,7 @@ a %1</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <source>Role</source>
@@ -7013,7 +7013,7 @@ a %1</translation>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <source>Name</source>
@@ -7025,7 +7025,7 @@ a %1</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mail</translation>
+      <translation>Email</translation>
     </message>
   </context>
   <context>
@@ -7156,7 +7156,7 @@ a %1</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Entrar</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -7176,7 +7176,7 @@ a %1</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mail</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
@@ -7188,7 +7188,7 @@ a %1</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation>Confirmar senha</translation>
+      <translation>Confirme a Senha</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -7362,7 +7362,7 @@ a %1</translation>
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation>Marcador</translation>
+      <translation>Bookmark</translation>
     </message>
     <message>
       <source>Bookmarks can only be added to an online server.</source>
@@ -7612,7 +7612,7 @@ a %1</translation>
     <name>QnWorkbenchUpdateWatcher</name>
     <message>
       <source>Release Notes</source>
-      <translation>Release notes</translation>
+      <translation>Notas de lançamento</translation>
     </message>
     <message>
       <source>%1 version available</source>
@@ -7782,7 +7782,7 @@ a %1</translation>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
       <translation>
-        <numerusform>Pode fazer upload desse ficheiro para uma instância diferente de uma câmara wearable.</numerusform>
+        <numerusform>Pode fazer upload desses ficheiros para uma instância diferente de uma câmara wearable.</numerusform>
         <numerusform>Pode fazer upload desses ficheiros para uma instância diferente de uma câmara wearable.</numerusform>
       </translation>
     </message>
@@ -8080,7 +8080,7 @@ a %1</translation>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
       <translation>
-        <numerusform>O ficheiro de vídeo ainda está a ser enviado para %n câmara wearable:</numerusform>
+        <numerusform>Os ficheiros de vídeo ainda estão a ser enviados para %n câmaras wearable:</numerusform>
         <numerusform>Os ficheiros de vídeo ainda estão a ser enviados para %n câmaras wearable:</numerusform>
       </translation>
     </message>
@@ -8258,7 +8258,7 @@ a %1</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation>Nome não pode estar vazio.</translation>
+      <translation>O nome não pode estar vazio.</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -8375,7 +8375,7 @@ a %1</translation>
     </message>
     <message>
       <source>Camera ID</source>
-      <translation>ID da câmara</translation>
+      <translation>ID da câmera</translation>
     </message>
     <message>
       <source>Audio Stream</source>
@@ -8410,11 +8410,11 @@ a %1</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>Baixo</translation>
+      <translation>Baixa</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>Alto</translation>
+      <translation>Alta</translation>
     </message>
     <message>
       <source>Custom</source>
@@ -8442,7 +8442,7 @@ a %1</translation>
     <name>nx::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation>Longa</translation>
+      <translation>Longo</translation>
     </message>
     <message>
       <source>Short</source>
@@ -8640,7 +8640,7 @@ a %1</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>Se o campo estiver vazio, o evento será sempre accionado.</translation>
+      <translation>Se o campo estiver vazio, o evento será sempre acionado.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
@@ -8775,7 +8775,7 @@ a %1</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation>E-mail</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
@@ -8875,7 +8875,7 @@ a %1</translation>
     </message>
     <message>
       <source>All files (*.*)</source>
-      <translation>Todos (*.*)</translation>
+      <translation>Todos ficheiros (*.*)</translation>
     </message>
     <message>
       <source>Open File</source>
@@ -9039,7 +9039,7 @@ a %1</translation>
     <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
       <source>Showreel</source>
-      <translation>Showreel</translation>
+      <translation>Mostrar</translation>
     </message>
     <message>
       <source>Showreel %1</source>

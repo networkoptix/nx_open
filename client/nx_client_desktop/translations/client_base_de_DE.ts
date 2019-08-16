@@ -333,7 +333,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Exit</source>
-      <translation>Beenden</translation>
+      <translation>Verlassen</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
@@ -705,7 +705,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Close</source>
-      <translation>Schliessen</translation>
+      <translation>Schließen</translation>
     </message>
     <message>
       <source>Close All But This</source>
@@ -1101,7 +1101,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Top</source>
-      <translation>Oben</translation>
+      <translation>Anfang</translation>
     </message>
     <message>
       <source>Right Edge</source>
@@ -1109,7 +1109,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>Unten</translation>
+      <translation>Ende</translation>
     </message>
     <message>
       <source>Page Left</source>
@@ -1391,7 +1391,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Customer Support</source>
-      <translation>Kunden-Support</translation>
+      <translation>Kundensupport</translation>
     </message>
     <message>
       <source>Client is not connected to any System</source>
@@ -1678,7 +1678,7 @@ to view more bookmarks</source>
       <source>%n action(s)</source>
       <translation>
         <numerusform>%n Aktion</numerusform>
-        <numerusform>%n Aktionen</numerusform>
+        <numerusform>%n Aktion</numerusform>
       </translation>
     </message>
     <message>
@@ -1715,7 +1715,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>Beschreibung</translation>
+      <translation>&amp;Beschreibung</translation>
     </message>
     <message>
       <source>Click to expand</source>
@@ -2216,7 +2216,7 @@ to view more bookmarks</source>
       <source>%n devices added.</source>
       <translation>
         <numerusform>%n Gerät hinzugefügt.</numerusform>
-        <numerusform>%n Geräte hinzugefügt.</numerusform>
+        <numerusform>%n Gerät hinzugefügt.</numerusform>
       </translation>
     </message>
     <message>
@@ -2394,7 +2394,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
-        <numerusform>Diese ID wird bereits für die folgende %n Kamera verwendet: %1</numerusform>
+        <numerusform>Diese ID wird bereits für folgende %n Kameras verwendet: %1</numerusform>
         <numerusform>Diese ID wird bereits für folgende %n Kameras verwendet: %1</numerusform>
       </translation>
     </message>
@@ -2440,7 +2440,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Alle auswählen</translation>
+      <translation>Alles auswählen</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
@@ -2454,11 +2454,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Devices List</source>
-      <translation>Geräteliste</translation>
+      <translation>Geräte-Liste</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation>Kameraliste</translation>
+      <translation>Kamera-Liste</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
@@ -3420,14 +3420,14 @@ to %1</source>
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
       <translation>
         <numerusform>Ereignisprotokoll für den Zeitraum vom %1 bis %2 - %n Ereignis gefunden</numerusform>
-        <numerusform>Ereignisprotokoll für den Zeitraum vom %1 bis %2 - %n Ereignisse gefunden</numerusform>
+        <numerusform>Ereignisprotokoll für den Zeitraum vom %1 bis %2 - %n Ereignis gefunden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
         <numerusform>Ereignisprotokoll für den %1 - %n Ereignis gefunden</numerusform>
-        <numerusform>Ereignisprotokoll für den %1 - %n Ereignisse gefunden</numerusform>
+        <numerusform>Ereignisprotokoll für den %1 - %n Ereignis gefunden</numerusform>
       </translation>
     </message>
     <message>
@@ -3471,7 +3471,7 @@ to %1</source>
     </message>
     <message>
       <source>Description</source>
-      <translation>Beschreibung</translation>
+      <translation>&amp;Beschreibung</translation>
     </message>
     <message>
       <source>All users</source>
@@ -4141,14 +4141,14 @@ to %1</source>
       <source>At least %n %1 are required</source>
       <translation>
         <numerusform>Mindestens %n %1 ist erforderlich</numerusform>
-        <numerusform>Mindestens %n %1 sind erforderlich</numerusform>
+        <numerusform>Mindestens %n %1 ist erforderlich</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
       <translation>
         <numerusform>%n %1 ist derzeit im Einsatz</numerusform>
-        <numerusform>%n %1 sind derzeit im Einsatz</numerusform>
+        <numerusform>%n %1 ist derzeit im Einsatz</numerusform>
       </translation>
     </message>
     <message>
@@ -4212,7 +4212,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Entfernen</translation>
+      <translation>Löschen</translation>
     </message>
     <message>
       <source>Deactivate</source>
@@ -4281,7 +4281,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation>Datei konnte nicht geöffnet</translation>
+      <translation>Datei konnte nicht geöffnet werden</translation>
     </message>
     <message>
       <source>All files</source>
@@ -4302,28 +4302,28 @@ to %1</source>
       <source>Use licenses for selected %n devices</source>
       <translation>
         <numerusform>Verwende Lizenzen für %n Gerät</numerusform>
-        <numerusform>Verwende Lizenzen für %n Geräte</numerusform>
+        <numerusform>Verwende Lizenzen für %n Gerät</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n cameras</source>
       <translation>
         <numerusform>Verwende Lizenzen für %n Kamera</numerusform>
-        <numerusform>Verwende Lizenzen für %n Kameras</numerusform>
+        <numerusform>Verwende Lizenzen für %n Kamera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
       <translation>
         <numerusform>Verwende Lizenzen für %n I/O-Modul</numerusform>
-        <numerusform>Verwende Lizenzen für %n I/O-Module</numerusform>
+        <numerusform>Verwende Lizenzen für %n I/O-Modul</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
       <translation>
         <numerusform>Verwenden Sie Lizenzen zum Anzeigen dieser %n Kamera</numerusform>
-        <numerusform>Verwenden Sie Lizenzen zum Anzeigen dieser %n Kameras</numerusform>
+        <numerusform>Verwenden Sie Lizenzen zum Anzeigen dieser %n Kamera</numerusform>
       </translation>
     </message>
   </context>
@@ -4414,7 +4414,7 @@ to %1</source>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation>Verbindungen löschen?</translation>
+      <translation>Verbindung löschen?</translation>
     </message>
     <message>
       <source>There is another connection with the same name.</source>
@@ -4780,7 +4780,7 @@ to %1</source>
       <source>%n more notifications</source>
       <translation>
         <numerusform>%n weitere Benachrichtigung</numerusform>
-        <numerusform>%n weitere Benachrichtigungen</numerusform>
+        <numerusform>%n weitere Benachrichtigung</numerusform>
       </translation>
     </message>
   </context>
@@ -4804,7 +4804,7 @@ to %1</source>
     </message>
     <message>
       <source>Select File...</source>
-      <translation>Datei auswählen...</translation>
+      <translation>Datei wählen...</translation>
     </message>
     <message>
       <source>Enter New Title:</source>
@@ -4963,7 +4963,7 @@ to %1</source>
     </message>
     <message>
       <source>Home</source>
-      <translation>Ausgangsposition</translation>
+      <translation>Benutzerverzeichnis</translation>
     </message>
     <message>
       <source>Details</source>
@@ -4999,7 +4999,7 @@ to %1</source>
       <source>about %n minute(s)</source>
       <translation>
         <numerusform>circa %n Minute</numerusform>
-        <numerusform>circa %n Minuten</numerusform>
+        <numerusform>circa %n Minute</numerusform>
       </translation>
     </message>
     <message>
@@ -5112,7 +5112,7 @@ to %1</source>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation>Ordner auswählen...</translation>
+      <translation>Ordner wählen...</translation>
     </message>
     <message>
       <source>Best</source>
@@ -5143,7 +5143,7 @@ to %1</source>
     </message>
     <message>
       <source>Space</source>
-      <translation>Leerzeichen</translation>
+      <translation>Speicherplatz</translation>
     </message>
     <message>
       <source>Calendar Days</source>
@@ -5258,7 +5258,7 @@ to %1</source>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
-      <translation>Bei Bewegung + Lo-Res</translation>
+      <translation>Bewegung + Lo-Res</translation>
     </message>
   </context>
   <context>
@@ -5666,7 +5666,7 @@ to %1</source>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation>Serverwebseite</translation>
+      <translation>Server-Webseite</translation>
     </message>
   </context>
   <context>
@@ -5849,7 +5849,7 @@ to %1</source>
       <source>Not enough free space at %n Servers:</source>
       <translation>
         <numerusform>Nicht genügend Speicherplatz auf %n Server:</numerusform>
-        <numerusform>Nicht genügend Speicherplatz auf %n Servern:</numerusform>
+        <numerusform>Nicht genügend Speicherplatz auf %n Server:</numerusform>
       </translation>
     </message>
     <message>
@@ -6140,7 +6140,7 @@ to %1</source>
     </message>
     <message>
       <source>Network error</source>
-      <translation>Netzwerkfehler</translation>
+      <translation>Netzwerkfehler.</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
@@ -6256,7 +6256,7 @@ to %1</source>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation>Alle auswählen</translation>
+      <translation>Alles auswählen</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -6415,7 +6415,7 @@ to %1</source>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Entfernen</translation>
+      <translation>Löschen</translation>
     </message>
     <message>
       <source>Inaccessible</source>
@@ -6822,7 +6822,7 @@ to %1</source>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h:mm ap</translation>
+      <translation>dd MMMM yyyy hh:mm</translation>
     </message>
   </context>
   <context>
@@ -6841,7 +6841,7 @@ to %1</source>
     </message>
     <message>
       <source>Network error</source>
-      <translation>Netzwerkfehler</translation>
+      <translation>Netzwerkfehler.</translation>
     </message>
   </context>
   <context>
@@ -6878,35 +6878,35 @@ to %1</source>
       <source>The problem is caused by %n servers:</source>
       <translation>
         <numerusform>Das Problem wurde von %n Server verursacht:</numerusform>
-        <numerusform>Das Problem wurde von %n Servern verursacht:</numerusform>
+        <numerusform>Das Problem wurde von %n Server verursacht:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
       <translation>
         <numerusform>Kein freier Speicher mehr auf %n Server:</numerusform>
-        <numerusform>Kein freier Speicher mehr auf %n Servern:</numerusform>
+        <numerusform>Kein freier Speicher mehr auf %n Server:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
       <translation>
         <numerusform>%n Server antwortet nicht:</numerusform>
-        <numerusform>%n Server antworten nicht:</numerusform>
+        <numerusform>%n Server antwortet nicht:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
       <translation>
         <numerusform>%n Server ist Offline gegangen:</numerusform>
-        <numerusform>%n Server sind Offline gegangen:</numerusform>
+        <numerusform>%n Server ist Offline gegangen:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
       <translation>
         <numerusform>Authentifizierung fehlgeschlagen bei %n Server:</numerusform>
-        <numerusform>Authentifizierung fehlgeschlagen bei %n Servern:</numerusform>
+        <numerusform>Authentifizierung fehlgeschlagen bei %n Server:</numerusform>
       </translation>
     </message>
     <message>
@@ -7777,7 +7777,7 @@ to %1</source>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
       <translation>
-        <numerusform>Sie können diese Datei auf eine andere Instanz einer tragbaren Kamera hochladen.</numerusform>
+        <numerusform>Sie können diese Dateien auf eine andere Instanz einer tragbaren Kamera hochladen.</numerusform>
         <numerusform>Sie können diese Dateien auf eine andere Instanz einer tragbaren Kamera hochladen.</numerusform>
       </translation>
     </message>
@@ -8075,7 +8075,7 @@ to %1</source>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
       <translation>
-        <numerusform>Eine Videodatei wird noch auf %n tragbaren Kamera hochgeladen:</numerusform>
+        <numerusform>Einige Videodateien werden noch auf %n tragbare Kameras hochgeladen:</numerusform>
         <numerusform>Einige Videodateien werden noch auf %n tragbare Kameras hochgeladen:</numerusform>
       </translation>
     </message>

@@ -846,11 +846,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Wearable Camera...</source>
-      <translation>Wearable Camera...</translation>
+      <translation type="unfinished">Wearable Camera...</translation>
     </message>
     <message>
       <source>New Wearable Camera...</source>
-      <translation>New Wearable Camera...</translation>
+      <translation type="unfinished">New Wearable Camera...</translation>
     </message>
     <message>
       <source>Upload File...</source>
@@ -862,7 +862,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Start Analytics...</source>
-      <translation>Start Analytics...</translation>
+      <translation type="unfinished">Start Analytics...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
@@ -1017,7 +1017,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
+      <translation type="unfinished">You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
@@ -1067,11 +1067,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>Select device...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>Select camera...</translation>
     </message>
     <message>
       <source>Select layout...</source>
@@ -2279,7 +2279,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>No settings</source>
-      <translation>No settings</translation>
+      <translation type="unfinished">No settings</translation>
     </message>
   </context>
   <context>
@@ -2798,11 +2798,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
-      <translation>Cannot edit properties for several wearable and non-wearable cameras.</translation>
+      <translation type="unfinished">Cannot edit properties for several wearable and non-wearable cameras.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable cameras.</source>
-      <translation>Cannot edit properties for several wearable cameras.</translation>
+      <translation type="unfinished">Cannot edit properties for several wearable cameras.</translation>
     </message>
   </context>
   <context>
@@ -3260,7 +3260,7 @@ to %1</translation>
     </message>
     <message>
       <source>Some of selected cameras requires password to be set up.</source>
-      <translation>Some of selected cameras requires password to be set up.</translation>
+      <translation type="unfinished">Some of selected cameras requires password to be set up.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -3275,7 +3275,7 @@ to %1</translation>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Could not initialize audio encoder.</translation>
+      <translation>Could not initialise audio encoder.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -4326,7 +4326,7 @@ to %1</translation>
     </message>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Use licenses to view these %n cameras</numerusform>
         <numerusform>Use licenses to view these %n cameras</numerusform>
       </translation>
@@ -4764,11 +4764,11 @@ to %1</translation>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Wearable Camera</source>
-      <translation>Wearable Camera</translation>
+      <translation type="unfinished">Wearable Camera</translation>
     </message>
     <message>
       <source>Wearable Camera %1</source>
-      <translation>Wearable Camera %1</translation>
+      <translation type="unfinished">Wearable Camera %1</translation>
     </message>
     <message>
       <source>Name</source>
@@ -4866,7 +4866,7 @@ to %1</translation>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Rotation</translation>
     </message>
   </context>
   <context>
@@ -6028,7 +6028,7 @@ to %1</translation>
     </message>
     <message>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
+      <translation type="unfinished">Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</translation>
     </message>
   </context>
   <context>
@@ -6401,11 +6401,11 @@ to %1</translation>
     </message>
     <message>
       <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
     </message>
     <message>
       <source>Recording was enabled on the USB storage</source>
-      <translation>Recording was enabled on the USB storage</translation>
+      <translation type="unfinished">Recording was enabled on the USB storage</translation>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
@@ -6762,11 +6762,11 @@ to %1</translation>
     </message>
     <message>
       <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>System time is synchronized with the Internet and does not depend on local time on servers.</translation>
+      <translation type="unfinished">System time is synchronized with the Internet and does not depend on local time on servers.</translation>
     </message>
     <message>
       <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation type="unfinished">System time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
     </message>
   </context>
   <context>
@@ -7314,7 +7314,7 @@ to %1</translation>
     <name>QnWearableUploadWidget</name>
     <message>
       <source>User &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>User &quot;%1&quot; is currently uploading footage to this camera.</translation>
+      <translation type="unfinished">User &quot;%1&quot; is currently uploading footage to this camera.</translation>
     </message>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
@@ -7728,11 +7728,11 @@ to %1</translation>
     </message>
     <message>
       <source>Video (%1)</source>
-      <translation>Video (%1)</translation>
+      <translation type="unfinished">Video (%1)</translation>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation>Open Wearable Camera Recordings...</translation>
+      <translation type="unfinished">Open Wearable Camera Recordings...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
@@ -7748,7 +7748,7 @@ to %1</translation>
     </message>
     <message>
       <source>Failed to add wearable camera</source>
-      <translation>Failed to add wearable camera</translation>
+      <translation type="unfinished">Failed to add wearable camera</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
@@ -7781,7 +7781,7 @@ to %1</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
         <numerusform>You can upload these files to a different instance of a Wearable Camera.</numerusform>
       </translation>
@@ -8079,7 +8079,7 @@ to %1</translation>
     </message>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
-      <translation>
+      <translation type="unfinished">
         <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
         <numerusform>Some video file(s) are still being uploaded to %n wearable cameras:</numerusform>
       </translation>
@@ -8126,7 +8126,7 @@ to %1</translation>
     <name>nx::client::desktop::AnalyticsActionFactory</name>
     <message>
       <source>Dynamic</source>
-      <translation>Dynamic</translation>
+      <translation type="unfinished">Dynamic</translation>
     </message>
   </context>
   <context>
@@ -8280,7 +8280,7 @@ to %1</translation>
     </message>
     <message>
       <source>Pictures (%1)</source>
-      <translation>Pictures (%1)</translation>
+      <translation type="unfinished">Pictures (%1)</translation>
     </message>
     <message>
       <source>Error</source>
@@ -8349,7 +8349,7 @@ to %1</translation>
     </message>
     <message>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>Background</translation>
     </message>
   </context>
   <context>
@@ -8375,7 +8375,7 @@ to %1</translation>
     </message>
     <message>
       <source>Camera ID</source>
-      <translation type="unfinished">Camera ID</translation>
+      <translation>Camera ID</translation>
     </message>
     <message>
       <source>Audio Stream</source>
@@ -8461,7 +8461,7 @@ to %1</translation>
     </message>
     <message>
       <source>Could not create upload on the server side</source>
-      <translation>Could not create upload on the server side</translation>
+      <translation type="unfinished">Could not create upload on the server side</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -8487,7 +8487,7 @@ to %1</translation>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation>%1 Analytics</translation>
+      <translation type="unfinished">%1 Analytics</translation>
     </message>
   </context>
   <context>
@@ -8990,7 +8990,7 @@ to %1</translation>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation>Wearable Cameras cannot be moved between servers</translation>
+      <translation type="unfinished">Wearable Cameras cannot be moved between servers</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -8998,7 +8998,7 @@ to %1</translation>
     </message>
     <message>
       <source>Failed to change password on %1 of %2 cameras</source>
-      <translation>Failed to change password on %1 of %2 cameras</translation>
+      <translation type="unfinished">Failed to change password on %1 of %2 cameras</translation>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>

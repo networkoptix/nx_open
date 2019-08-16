@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "Уведомления об обновлениях включены",
         "upnpPortMappingEnabled": "Сопоставление портов UPNP включено",
         "useTextEmailFormat": "Отправка писем простым текстом",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
+        "useWindowsEmailLineFeed": "Использовать перевод строки Windows в Email",
+        "maxEventLogRecords": "Максимальное количество записей журнала событий в базе данных. Реальное количество восстановленных записей может быть на 20% выше указанного значения."
     },
     "info": {
         "tabs": {
@@ -193,7 +194,7 @@
         },
         "systemOffline": "Система не в сети",
         "cameraLinks": {
-            "copyToClipboard": "копировать в буфер",
+            "copyToClipboard": "скопировать в буфер обмена",
             "highStream": "Выс. кач-во",
             "copyDefaultText": "копировать",
             "unknown": "Неизвестный",
@@ -218,9 +219,9 @@
         },
         "chromeCastWarning": "Chromecast является ресурсоемким и может вызывать проблемы на вашем сервере.",
         "resolution": {
-            "high": "Высокая",
+            "high": "Выс",
             "auto": "Авто",
-            "low": "Низкая"
+            "low": "Низ"
         }
     }
 }

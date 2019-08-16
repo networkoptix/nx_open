@@ -1,5 +1,5 @@
 {
-    "language_name": "Português (Brazil)",
+    "language_name": "Português (PT)",
     "dialogs": {
         "okButton": "Ok",
         "openLink": "Visite este link",
@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "Notificações de actualização habilitadas",
         "upnpPortMappingEnabled": "Mapeamento de portas UPNP activado",
         "useTextEmailFormat": "Enviar e-mails de texto simples",
-        "useWindowsEmailLineFeed": "Use o feed de linha do Windows em emails"
+        "useWindowsEmailLineFeed": "Use o feed de linha do Windows em emails",
+        "maxEventLogRecords": "Registro máximo de registros de eventos para manter no banco de dados. A quantidade real de registros não gravados pode ser até 20% superior ao valor especificado."
     },
     "info": {
         "tabs": {
@@ -168,7 +169,7 @@
         "selectFiles": "Selecione os ficheiros"
     },
     "advanced": {
-        "free": "Gratuito",
+        "free": "Livre",
         "total": "Total",
         "occupied": "Ocupado",
         "reserved": "Reservado"

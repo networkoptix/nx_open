@@ -377,7 +377,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open</source>
-      <translation>Aperto</translation>
+      <translation>Apri</translation>
     </message>
     <message>
       <source>Monitor</source>
@@ -893,7 +893,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Esporta segnalibro...</translation>
     </message>
   </context>
   <context>
@@ -1074,7 +1074,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation>Selezionare layout...</translation>
+      <translation>Seleziona il layout...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
@@ -1356,7 +1356,7 @@ to view more bookmarks</source>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation>Ok</translation>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
@@ -2310,7 +2310,7 @@ to view more bookmarks</source>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation>Ok</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
@@ -2436,7 +2436,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Esporta la selezione su file...</translation>
+      <translation>Esportare la selezione di File...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -2454,7 +2454,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Devices List</source>
-      <translation>Elenco dei dispositivi per</translation>
+      <translation>Elenco dei dispositivi</translation>
     </message>
     <message>
       <source>Cameras List</source>
@@ -2622,7 +2622,7 @@ to view more bookmarks</source>
     <name>QnCameraScheduleWidget</name>
     <message>
       <source>Off</source>
-      <translation>Disattivato</translation>
+      <translation>Disattivo</translation>
     </message>
     <message>
       <source>On</source>
@@ -2929,14 +2929,14 @@ to %1</source>
     <name>QnCloudUserPanelWidget</name>
     <message>
       <source>Account Settings</source>
-      <translation>Impostazioni dell'account</translation>
+      <translation>Impostazioni dell 'account</translation>
     </message>
   </context>
   <context>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3325,7 +3325,7 @@ to %1</source>
     <name>QnDisconnectFromCloudDialogPrivate</name>
     <message>
       <source>Next</source>
-      <translation>Successivo</translation>
+      <translation>Avanti</translation>
     </message>
     <message>
       <source>Enter password to continue.</source>
@@ -3407,7 +3407,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Esporta la selezione su file...</translation>
+      <translation>Esportare la selezione di File...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -3905,7 +3905,7 @@ to %1</source>
     </message>
     <message>
       <source>Email</source>
-      <translation>Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>DN</source>
@@ -4010,7 +4010,7 @@ to %1</source>
     </message>
     <message>
       <source>OK</source>
-      <translation>Ok</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Error</source>
@@ -5465,7 +5465,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Esporta segnalibro...</translation>
     </message>
   </context>
   <context>
@@ -6261,7 +6261,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Esporta selezione su file...</translation>
+      <translation>Esportare la selezione di File...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
@@ -6269,7 +6269,7 @@ to %1</source>
     </message>
     <message>
       <source>Refresh</source>
-      <translation>Aggiornare</translation>
+      <translation>Ricaricare</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
@@ -6420,7 +6420,7 @@ to %1</source>
     </message>
     <message>
       <source>Inaccessible</source>
-      <translation>Inaccessibile</translation>
+      <translation>Inacessibile</translation>
     </message>
     <message>
       <source>%1 (Checking...)</source>
@@ -6813,7 +6813,7 @@ to %1</source>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM yyyy</translation>
+      <translation type="unfinished">MMMM yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
@@ -6885,7 +6885,7 @@ to %1</source>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
       <translation>
-        <numerusform>Nessuno spazio libero lasciato %n server:</numerusform>
+        <numerusform>Nessuno spazio libero lasciato sul %n server:</numerusform>
         <numerusform>Nessuno spazio libero lasciato sul %n server:</numerusform>
       </translation>
     </message>
@@ -8021,8 +8021,8 @@ to %1</source>
     <message numerus="yes">
       <source>Delete %n items?</source>
       <translation>
-        <numerusform>Eliminare %n elementi?</numerusform>
-        <numerusform>Eliminare %n elementi?</numerusform>
+        <numerusform>Elimina %n elementi?</numerusform>
+        <numerusform>Elimina %n elementi?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8414,7 +8414,7 @@ to %1</source>
     </message>
     <message>
       <source>Custom</source>
-      <translation>Costum</translation>
+      <translation>Personalizzato</translation>
     </message>
   </context>
   <context>
@@ -8522,7 +8522,7 @@ to %1</source>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation type="unfinished">Several bookmarks can be exported as layout only.</translation>
+      <translation>Diversi segnalibri possono essere esportati solo come layout.</translation>
     </message>
   </context>
   <context>
@@ -8755,7 +8755,7 @@ to %1</source>
     </message>
     <message>
       <source>Next</source>
-      <translation>Successivo</translation>
+      <translation>Avanti</translation>
     </message>
     <message>
       <source>Name is necessary</source>

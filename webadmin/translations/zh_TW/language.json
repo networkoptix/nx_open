@@ -113,7 +113,8 @@
         "updateNotificationsEnabled": "更新通知啟動",
         "upnpPortMappingEnabled": "啟用 UPNP 埠映射",
         "useTextEmailFormat": "發送純文字電子郵件",
-        "useWindowsEmailLineFeed": "在電子郵件中使用Windows換行字元"
+        "useWindowsEmailLineFeed": "在電子郵件中使用Windows換行字元",
+        "maxEventLogRecords": "要保留最多筆在資料庫中的事件日誌記錄。實際未刪除記錄的數量可能比預定高出20％。"
     },
     "info": {
         "tabs": {
@@ -189,7 +190,7 @@
             "expand all servers": "展開所有伺服器",
             "stop listening": "停止聽取",
             "expand server": "expand server + [server name]",
-            "view": "瀏覽 + [攝影機名稱]"
+            "view": "view + [camera name]"
         },
         "systemOffline": "系統處於離線狀態",
         "cameraLinks": {

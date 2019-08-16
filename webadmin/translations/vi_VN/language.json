@@ -58,7 +58,7 @@
         "auditTrailPeriodDays": "Phiên bản thử nghiệm hết hạn",
         "autoDiscoveryEnabled": "Sử thiết bị tự động phát hiện",
         "autoUpdateThumbnails": "Tự động cập nhật hình thu nhỏ",
-        "backupNewCamerasByDefault": "Sao lưu máy ảnh mới theo mặc định",
+        "backupNewCamerasByDefault": "Sao lưu camera mới theo mặc định",
         "backupQualities": "Chất lượng sao lưu",
         "cameraSettingsOptimization": "Cho phép tối ưu hóa cài đặt thiết bị",
         "clientStatisticsSettingsUrl": "Số liệu thống kê của khách hàng",
@@ -108,12 +108,13 @@
         "statisticsReportUpdateDelay": "Báo cáo thống kê - cập nhật trễ",
         "synchronizeTimeWithInternet": "Đồng bộ hóa thời gian với Internet",
         "systemName": "Tên hệ thống",
-        "takeCameraOwnershipWithoutLock": "Mất quyền sở hữu máy ảnh mà không có khóa",
+        "takeCameraOwnershipWithoutLock": "Mất quyền sở hữu camera mà không có khóa",
         "timeSynchronizationEnabled": "Đồng bộ hóa thời gian kích hoạt",
         "updateNotificationsEnabled": "Đã bật thông báo cập nhật",
         "upnpPortMappingEnabled": "Ánh xạ cổng UPNP được kích hoạt",
         "useTextEmailFormat": "Gửi email văn bản thuần túy",
-        "useWindowsEmailLineFeed": "Use Windows line feed in emails"
+        "useWindowsEmailLineFeed": "Sử dụng nguồn cấp dữ liệu Windows trong email",
+        "maxEventLogRecords": "Bản ghi nhật ký sự kiện tối đa để giữ vào cơ sở dữ liệu. Số lượng thực của các bản ghi chưa được xóa có thể cao hơn tới 20% so với giá trị được chỉ định."
     },
     "info": {
         "tabs": {
@@ -168,7 +169,7 @@
         "selectFiles": "Chọn tập tin"
     },
     "advanced": {
-        "free": "Còn trống",
+        "free": "Trống",
         "total": "Tổng cộng",
         "occupied": "Sử dụng",
         "reserved": "Dự trữ"
@@ -187,19 +188,19 @@
             "clear search": "xóa tìm kiếm",
             "live": "go to live | show me live",
             "expand all servers": "mở rộng tất cả các máy chủ",
-            "stop listening": "ngừng lắng nghe",
+            "stop listening": "dừng nghe",
             "expand server": "expand server + [server name]",
             "view": "view + [camera name]"
         },
         "systemOffline": "Hệ thống offline",
         "cameraLinks": {
-            "copyToClipboard": "sao chép vào clipboard",
+            "copyToClipboard": "chép vào bảng nháp",
             "highStream": "Luồng tốc độ cao",
-            "copyDefaultText": "bản sao",
-            "unknown": "Không xác định",
+            "copyDefaultText": "sao chép",
+            "unknown": "Không biết",
             "lowStream": "Luồng tốc độ thấp",
             "transcoding": "Đang chuyển mã",
-            "copyActiveText": "đã sao chép vào clipboard"
+            "copyActiveText": "sao chép vào clipboard"
         },
         "searchCamPlaceholder": "Tìm kiếm",
         "cameraStates": {
@@ -218,7 +219,7 @@
         },
         "chromeCastWarning": "Chromecast tốn nhiều tài nguyên và có thể gây ra sự cố trên máy chủ của bạn.",
         "resolution": {
-            "high": "cao (H)",
+            "high": "Cao (H)",
             "auto": "Tự động",
             "low": "Thấp (L)"
         }

@@ -40,8 +40,8 @@
             <span class="text"> หรือ </span>
             <span class="line"></span>
         </div>
-        <button class="btn btn-default" ng-click="skip()">เพิ่มระบบที่มีอยู่</button><br>
-        <small>(หากมีการตั้งค่า {{Config.productName}})</small><br>
+        <button class="btn btn-default" ng-click="skip()">Add to Existing System</button><br>
+        <small>(if {{Config.productName}} has been already setup)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -71,7 +71,7 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('advanced')">
-    <h2>การตั้งค่าขั้นสูง</h2>
+    <h2>การตั้งค่าระบบขั้นสูง</h2>
     <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
@@ -258,7 +258,7 @@
                     forms.localForm.passwordInput.$dirty && forms.localForm.passwordInput.$error.required ||
                     forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
             <div class="help-block">
-                ต้องระบุทุกช่อง
+                ต้องกรอกทุกช่อง
             </div>
         </div>
 
