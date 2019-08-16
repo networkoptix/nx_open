@@ -21,6 +21,7 @@ namespace nx::vms::client::desktop {
 
 class SimpleMotionSearchWidget::Private: public QObject
 {
+    Q_DECLARE_TR_FUNCTIONS(SimpleMotionSearchWidget::Private)
     SimpleMotionSearchWidget* const q;
 
 public:
