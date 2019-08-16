@@ -7169,6 +7169,34 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Selecteer gebied op de video om resultaten te filteren</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>In geselecteerd gebied</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Geselecteerde camera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Geselecteerd apparaat</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Geselecteerde media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>geen</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9194,14 +9222,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Selecteer gebied op de video om resultaten te filteren</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>In geselecteerd gebied</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Geen beweging</translation>
     </message>
@@ -9215,23 +9235,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
         <numerusform>%n bewegingsevenementen</numerusform>
         <numerusform>%n bewegingsevenementen</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Geselecteerde camera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Geselecteerd apparaat</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Geselecteerde media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>geen</translation>
     </message>
   </context>
   <context>

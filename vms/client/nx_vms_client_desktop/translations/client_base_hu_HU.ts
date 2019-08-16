@@ -7172,6 +7172,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation type="unfinished">Select area on the video to filter results</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>A kijelölt területen</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Kiválasztott kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Kiválasztott eszköz</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation type="unfinished">Selected media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>semmi</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9197,14 +9225,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>A kijelölt területen</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Nincs mozgás</translation>
     </message>
@@ -9218,23 +9238,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n mozgás események</numerusform>
         <numerusform>%n mozgás események</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Kiválasztott kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Kiválasztott eszköz</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>semmi</translation>
     </message>
   </context>
   <context>

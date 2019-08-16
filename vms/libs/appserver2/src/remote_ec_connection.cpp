@@ -53,6 +53,7 @@ namespace ec2
         base_type::startReceivingNotifications();
 
         nx::utils::Url url(m_queryProcessor->getUrl());
+        NX_VERBOSE(this, "startReceivingNotifications() to %1", url);
         url.setScheme(nx::network::http::urlSheme(m_connectionInfo.allowSslConnections));
         url = nx::utils::Url( url.toString( QUrl::RemovePath | QUrl::RemoveQuery));
         QUrlQuery q;
@@ -63,6 +64,7 @@ namespace ec2
 
     void RemoteEC2Connection::stopReceivingNotifications()
     {
+        NX_VERBOSE(this, "stopReceivingNotifications()");
         base_type::stopReceivingNotifications();
         if (m_connectionFactory->messageBus())
         {

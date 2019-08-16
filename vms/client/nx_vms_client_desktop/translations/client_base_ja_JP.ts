@@ -7071,6 +7071,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>結果をフィルター処理するためにビデオのエリアを選択します</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>選択されたエリア</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>選択したカメラ</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>選択したデバイス</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>選択したメディア</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>なし</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9075,14 +9103,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>結果をフィルター処理するためにビデオのエリアを選択します</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>選択されたエリア</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>モーションなし</translation>
     </message>
@@ -9095,23 +9115,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>
         <numerusform>%n モーションイベント</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>選択したカメラ</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>選択したデバイス</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>選択したメディア</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>なし</translation>
     </message>
   </context>
   <context>

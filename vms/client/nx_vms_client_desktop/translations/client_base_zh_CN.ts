@@ -7072,6 +7072,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>选择视频上的区域来筛选结果</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>在选定区域</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>选择摄像机</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>选择设备</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>选择媒体</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>无</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9076,14 +9104,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>选择视频上的区域来筛选结果</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>在选定区域</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>无移动</translation>
     </message>
@@ -9096,23 +9116,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>
         <numerusform>%n 移动事件</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>选择摄像机</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>选择设备</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>选择媒体</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>无</translation>
     </message>
   </context>
   <context>

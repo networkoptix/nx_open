@@ -7171,6 +7171,34 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Valitse videosta alue suodattamaan tuloksia</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Valitulla alueella</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Valittu kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Valitut laitteet</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Valittu media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ei mitään</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9196,14 +9224,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Valitse videosta alue suodattamaan tuloksia</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Valitulla alueella</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Ei liikettä</translation>
     </message>
@@ -9217,23 +9237,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
         <numerusform>%n liiketapahtumaa</numerusform>
         <numerusform>%n liiketapahtumaa</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Valittu kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Valittu laite</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Valittu media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ei mitään</translation>
     </message>
   </context>
   <context>
