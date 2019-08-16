@@ -49,7 +49,7 @@ void AnalyticsSdkEventModel::loadFromCameras(
     auto addItemRecursive = nx::utils::y_combinator(
         [addItem](auto addItemRecursive, QStandardItem* parent, auto root) -> void
         {
-            for (auto node : root->children)
+            for (auto node: root->children)
             {
                 const auto menuItem = addItem(parent, node);
                 addItemRecursive(menuItem, node);
