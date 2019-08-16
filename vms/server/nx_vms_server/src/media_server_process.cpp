@@ -4219,6 +4219,12 @@ bool MediaServerProcess::initializeAnalyticsEvents()
                 NX_WARNING(this, "Can't remove analytics database [%1]", m_oldAnalyticsStoragePath);
             else
                 NX_INFO(this, "Analytics database [%1] removed", m_oldAnalyticsStoragePath);
+            QString dirName = QFileInfo(m_oldAnalyticsStoragePath).absolutePath() + "/archive/metadata";
+            QDir dir(dirName);
+            if (!dir.removeRecursively())
+                NX_WARNING(this, "Can't remove analytics binary database [%1]", dirName);
+            else
+                NX_INFO(this, "Analytics binary database [%1] removed", dirName);
         }
     }
 

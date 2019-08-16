@@ -7366,6 +7366,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>בחר אזור בסרטון כדי לסנן את התוצאות</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>באזור שנבחר</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>מצלמה שנבחרה</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>התקן נבחר</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>מדיה נבחרת</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ללא</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9433,14 +9461,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>בחר אזור בסרטון כדי לסנן את התוצאות</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>באזור שנבחר</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>אין תנועה</translation>
     </message>
@@ -9456,23 +9476,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n אירועי תנועה</numerusform>
         <numerusform>%n אירועי תנועה</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>מצלמה שנבחרה</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>התקן נבחר</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>מדיה נבחרת</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ללא</translation>
     </message>
   </context>
   <context>

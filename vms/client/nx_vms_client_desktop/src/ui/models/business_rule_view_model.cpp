@@ -1256,6 +1256,7 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
                 detailed,
                 m_actionParams.emailAddress);
         }
+        case ActionType::openLayoutAction:
         case ActionType::showPopupAction:
         {
             if (m_actionParams.allUsers)

@@ -7170,6 +7170,34 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Seleziona l'area sul video per filtrare i risultati</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Nell'area selezionata</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Telecamera selezionata</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Dispositivi selezionati</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Media selezionato</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>nessuno</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9195,14 +9223,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Seleziona l'area sul video per filtrare i risultati</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Nell'area selezionata</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Nessun movimento</translation>
     </message>
@@ -9216,23 +9236,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
         <numerusform>%n eventi di movimento</numerusform>
         <numerusform>%n eventi di movimento</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Telecamera selezionata</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Dispositivi selezionati</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Media selezionato</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>nessuno</translation>
     </message>
   </context>
   <context>
