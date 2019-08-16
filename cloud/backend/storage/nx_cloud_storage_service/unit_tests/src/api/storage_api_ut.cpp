@@ -188,7 +188,6 @@ protected:
             thenAddStorageResponseIs(ResultCode::ok);
     }
 
-
     void thenReadStorageSucceeds()
     {
         auto [result, storage] = m_readStorageResponse.pop();
@@ -287,10 +286,12 @@ private:
     nx::utils::SyncQueue<std::pair<Result, Storage>> m_addStorageResponse;
     nx::utils::SyncQueue<std::pair<Result, Storage>> m_readStorageResponse;
     nx::utils::SyncQueue<Result> m_removeStorageResponse;
+    nx::utils::SyncQueue<std::pair<Result, StorageCredentials>>m_getCredentialsResponse;
     Storage m_lastStorageAdded;
     std::vector<Storage> m_addedStorages;
     Storage m_lastStorageRead;
     Storage m_lastStorageRemoved;
+    StorageCredentials m_lastCredentialsGotten;
     service::test::S3Bucket* m_expectedBucket = nullptr;
 
     nx::utils::SyncQueue<bool> m_cloudDbAuthenticationEvent;
@@ -384,6 +385,17 @@ TEST_F(StorageApi, remove_storage)
     thenRemoveStorageSucceeds();
 
     andStorageIsNotInService();
+}
+
+TEST_F(StorageApi, DISABLED_get_credentials)
+{
+    givenCloudDbAccount();
+    givenAddedBucket();
+    givenAddedStorage();
+
+    whenGetCredentials();
+
+    thenGetCredentialsSucceeds();
 }
 
 } // namespace nx::cloud::storage::service::api::test
