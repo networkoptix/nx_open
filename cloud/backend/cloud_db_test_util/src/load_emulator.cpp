@@ -9,16 +9,26 @@
 namespace nx::cloud::db::test {
 
 LoadEmulator::LoadEmulator(
-    const std::string& cdbUrl,
+    const std::string& cdbUrlStr,
     const std::string& accountEmail,
     const std::string& accountPassword)
     :
-    m_cdbUrl(cdbUrl),
-    m_transactionConnectionCount(100)
+    m_cdbUrl(cdbUrlStr)
 {
     m_cdbClient.setCloudUrl(m_cdbUrl);
     m_cdbClient.setCredentials(accountEmail, accountPassword);
     m_connectionHelper.setRemoveConnectionAfterClosure(true);
+
+    nx::utils::Url cdbUrl(QString::fromStdString(m_cdbUrl));
+    m_syncUrl = network::url::Builder().setScheme(cdbUrl.scheme())
+        .setEndpoint(network::url::getEndpoint(cdbUrl));
+
+    m_connectionHelper.onConnectionFailureSubscription().subscribe(
+        [this](auto&&... args)
+        {
+            handleConnectionFailure(std::forward<decltype(args)>(args)...);
+        },
+        &m_connectionFailureSubscriptionId);
 }
 
 void LoadEmulator::setMaxDelayBeforeConnect(std::chrono::milliseconds delay)
@@ -29,6 +39,11 @@ void LoadEmulator::setMaxDelayBeforeConnect(std::chrono::milliseconds delay)
 void LoadEmulator::setTransactionConnectionCount(int connectionCount)
 {
     m_transactionConnectionCount = connectionCount;
+}
+
+void LoadEmulator::setReplaceFailedConnection(bool value)
+{
+    m_replaceFailedConnection = value;
 }
 
 void LoadEmulator::start()
@@ -68,27 +83,52 @@ void LoadEmulator::onSystemListReceived(
 
 void LoadEmulator::openConnections()
 {
-    nx::utils::Url cdbUrl(QString::fromStdString(m_cdbUrl));
-    const network::SocketAddress cdbEndpoint = network::url::getEndpoint(cdbUrl);
-
     std::size_t systemIndex = 0;
     for (int i = 0; i < m_transactionConnectionCount; ++i)
     {
         const auto& system = m_systems.systems[systemIndex];
 
-        m_connectionHelper.establishTransactionConnection(
-            network::url::Builder().setScheme(cdbUrl.scheme())
-                .setHost(cdbEndpoint.address.toString())
-                .setPort(cdbEndpoint.port),
-            system.id,
-            system.authKey,
-            KeepAlivePolicy::enableKeepAlive,
-            nx::vms::api::protocolVersion());
+        QnMutexLocker lock(&m_mutex);
+        openConnection(lock, system);
 
         ++systemIndex;
         if (systemIndex == m_systems.systems.size())
             systemIndex = 0;
     }
+}
+
+void LoadEmulator::openConnection(
+    const QnMutexLockerBase&,
+    const api::SystemDataEx& system)
+{
+    const int connectionId = m_connectionHelper.establishTransactionConnection(
+        m_syncUrl,
+        system.id,
+        system.authKey,
+        KeepAlivePolicy::enableKeepAlive,
+        nx::vms::api::protocolVersion());
+
+    m_connections[connectionId] = system;
+}
+
+void LoadEmulator::handleConnectionFailure(
+    int connectionId,
+    ::ec2::QnTransactionTransportBase::State state)
+{
+    if (!m_replaceFailedConnection)
+        return;
+
+    QnMutexLocker lock(&m_mutex);
+
+    auto it = m_connections.find(connectionId);
+    if (it == m_connections.end())
+        return;
+
+    NX_INFO(this, "Reopening connection %1:%2", it->second.id, it->second.authKey);
+
+    openConnection(lock, it->second);
+
+    m_connections.erase(it);
 }
 
 } // namespace nx::cloud::db::test

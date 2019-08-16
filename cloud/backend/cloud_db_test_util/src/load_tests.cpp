@@ -3,17 +3,24 @@
 #include <chrono>
 #include <thread>
 
+#include <nx/utils/timer_manager.h>
+
 #include "load_emulator.h"
 
 namespace nx::cloud::db::client {
 
-int establishManyConnections(
+int LoadTest::establishManyConnections(
     const std::string& cdbUrl,
     const std::string& login,
     const std::string& password,
-    int connectionCount,
-    std::chrono::milliseconds maxDelayBeforeConnect)
+    const nx::utils::ArgumentParser& args)
 {
+    const auto maxDelayBeforeConnect =
+        nx::utils::parseTimerDuration(args.get("max-delay").value_or(QString()));
+    const int connectionCount = args.get<int>("connections").value_or(100);
+    const bool replaceFailedConnection =
+        !static_cast<bool>(args.get("--no-reopen-connection"));
+
     auto loadEmulator = std::make_unique<test::LoadEmulator>(
         cdbUrl, //"https://cloud-dev.hdw.mx",
         login,
@@ -21,6 +28,7 @@ int establishManyConnections(
 
     loadEmulator->setMaxDelayBeforeConnect(maxDelayBeforeConnect);
     loadEmulator->setTransactionConnectionCount(connectionCount);
+    loadEmulator->setReplaceFailedConnection(replaceFailedConnection);
     loadEmulator->start();
 
     for (;;)
@@ -36,12 +44,11 @@ int establishManyConnections(
     return 0;
 }
 
-int makeApiRequests(
+int LoadTest::makeApiRequests(
     const std::string& cdbUrl,
     const std::string& login,
     const std::string& password,
-    const int connectionCount,
-    std::chrono::milliseconds /*maxDelayBeforeConnect*/)
+    const int connectionCount)
 {
     using namespace std::chrono;
 
@@ -97,6 +104,21 @@ int makeApiRequests(
         std::endl;
 
     return 0;
+}
+
+void LoadTest::printHelp(std::ostream& os)
+{
+    os << R"(
+Load mode:
+Opens connections to random systems with names load_test_system_{something}
+-l, --load              Enable load mode. Opens multiple synchronization connections
+--connections=ddd       Test connection count (100 by default)
+--max-delay=ddd         Maximum delay before starting connection (milliseconds). By default, no delay
+--no-reopen-connection
+
+TODO
+--api-requests          Make api requests
+    )";
 }
 
 } // namespace nx::cloud::db::client

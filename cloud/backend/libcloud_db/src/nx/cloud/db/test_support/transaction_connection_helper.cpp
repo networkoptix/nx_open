@@ -15,11 +15,7 @@ namespace test {
 
 TransactionConnectionHelper::TransactionConnectionHelper():
     m_moduleGuid(QnUuid::createUuid()),
-    m_runningInstanceGuid(QnUuid::createUuid()),
-    m_totalConnectionsFailed(0),
-    m_transactionConnectionIdSequence(0),
-    m_removeConnectionAfterClosure(false),
-    m_maxDelayBeforeConnect(std::chrono::milliseconds::zero())
+    m_runningInstanceGuid(QnUuid::createUuid())
 {
     m_syncPath = api::kEc2EventsPath;
 }

@@ -21,6 +21,7 @@ public:
 
     void setMaxDelayBeforeConnect(std::chrono::milliseconds delay);
     void setTransactionConnectionCount(int connectionCount);
+    void setReplaceFailedConnection(bool value);
 
     void start();
 
@@ -30,15 +31,28 @@ public:
 
 private:
     const std::string m_cdbUrl;
+    nx::utils::Url m_syncUrl;
     api::CdbClient m_cdbClient;
     api::SystemDataExList m_systems;
-    int m_transactionConnectionCount;
+    int m_transactionConnectionCount = 100;
     TransactionConnectionHelper m_connectionHelper;
     QnMutex m_mutex;
     QnWaitCondition m_cond;
+    bool m_replaceFailedConnection = true;
+    std::map<int /*connectionId*/, api::SystemDataEx> m_connections;
+    nx::utils::SubscriptionId m_connectionFailureSubscriptionId;
 
     void onSystemListReceived(api::ResultCode resultCode, api::SystemDataExList systems);
+
     void openConnections();
+
+    void openConnection(
+        const QnMutexLockerBase&,
+        const api::SystemDataEx& system);
+
+    void handleConnectionFailure(
+        int connectionId,
+        ::ec2::QnTransactionTransportBase::State state);
 };
 
 } // namespace nx::cloud::db::test
