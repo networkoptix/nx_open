@@ -169,6 +169,18 @@ protected:
             });
     }
 
+    void whenAddSystem()
+    {
+        m_expectedSystem = "system-1";
+        m_cloudStorageClient->addSystem(
+            m_lastStorageAdded.id,
+            {m_expectedSystem},
+            [this](auto result, auto system)
+            {
+                m_addSystemResponse.push({std::move(result), std::move(system)});
+            });
+    }
+
     void thenRequestIsForwardedToCloudDb()
     {
         ASSERT_TRUE(m_cloudDbAuthenticationEvent.pop());
@@ -206,6 +218,13 @@ protected:
         auto [result, credentials] = m_getCredentialsResponse.pop();
         ASSERT_EQ(api::ResultCode::ok, result.resultCode);
         m_lastCredentialsGotten = std::move(credentials);
+    }
+
+    void thenAddSystemResponseIs(ResultCode resultCode)
+    {
+        auto [result, system] = m_addSystemResponse.pop();
+        ASSERT_EQ(resultCode, result.resultCode);
+        m_lastSystemAdded = std::move(system);
     }
 
     void andBucketHasCloudStorageCountUpdated(int cloudStorageCount)
@@ -259,6 +278,12 @@ protected:
             network::url::Builder(m_lastStorageAdded.ioDevices.back().dataUrl).setPath({}));
     }
 
+    void andAddedSystemHasExpectedData()
+    {
+        ASSERT_EQ(m_lastSystemAdded.id, m_expectedSystem);
+        ASSERT_EQ(m_lastSystemAdded.storageId, m_lastStorageAdded.id);
+    }
+
 private:
     void readStorage(const std::string& storageId)
     {
@@ -287,11 +312,14 @@ private:
     nx::utils::SyncQueue<std::pair<Result, Storage>> m_readStorageResponse;
     nx::utils::SyncQueue<Result> m_removeStorageResponse;
     nx::utils::SyncQueue<std::pair<Result, StorageCredentials>>m_getCredentialsResponse;
+    nx::utils::SyncQueue<std::pair<Result, System>>m_addSystemResponse;
     Storage m_lastStorageAdded;
     std::vector<Storage> m_addedStorages;
     Storage m_lastStorageRead;
     Storage m_lastStorageRemoved;
     StorageCredentials m_lastCredentialsGotten;
+    std::string m_expectedSystem;
+    System m_lastSystemAdded;
     service::test::S3Bucket* m_expectedBucket = nullptr;
 
     nx::utils::SyncQueue<bool> m_cloudDbAuthenticationEvent;
@@ -396,6 +424,18 @@ TEST_F(StorageApi, DISABLED_get_credentials)
     whenGetCredentials();
 
     thenGetCredentialsSucceeds();
+}
+
+TEST_F(StorageApi, add_system_storage_relation)
+{
+    givenCloudDbAccount();
+    givenAddedBucket();
+    givenAddedStorage();
+
+    whenAddSystem();
+
+    thenAddSystemResponseIs(ResultCode::ok);
+    andAddedSystemHasExpectedData();
 }
 
 } // namespace nx::cloud::storage::service::api::test
