@@ -12,9 +12,10 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource_tree_sort_proxy_model.h>
-#include <ui/models/item_model_state_snapshot_helper.h>
 
 #include <core/resource/resource_fwd.h>
+
+#include "resource_tree_model_index_condition.h"
 
 namespace nx::vms::client::desktop {
 
@@ -46,15 +47,17 @@ protected:
     QnUserResourcePtr loginAsAdmin(const QString& name) const;
     QnUserResourcePtr loginAsLiveViewer(const QString& name) const;
 
-    using KeyValue = std::pair<int, QVariant>;
-    using KeyValueVector = std::vector<KeyValue>;
     QAbstractItemModel* model() const;
     QModelIndexList getAllIndexes() const;
-    QModelIndexList getIndexByData(const KeyValueVector& lookupData) const;
 
-    QJsonDocument testSnapshot(ItemModelStateSnapshotHelper::SnapshotParams& params) const;
-    std::string snapshotsOutputString(const QJsonDocument& actual,
-        const QJsonDocument& reference) const;
+    QModelIndex uniqueMatchingIndex(index_condition::Condition condition) const;
+    QModelIndexList allMatchingIndexes(index_condition::Condition condition) const;
+
+    bool noneMatches(index_condition::Condition condition) const;
+    bool onlyOneMatches(index_condition::Condition condition) const;
+    int matchCount(index_condition::Condition condition) const;
+
+    std::vector<QString> transformToDisplayStrings(const QModelIndexList& indexes) const;
 
 protected:
     QSharedPointer<QnClientModule> m_clientModule;

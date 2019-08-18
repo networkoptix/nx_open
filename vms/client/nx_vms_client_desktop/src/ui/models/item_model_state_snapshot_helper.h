@@ -12,7 +12,7 @@ class QAbstractItemModel;
 
 namespace nx::vms::client::desktop {
 
-class NX_VMS_CLIENT_DESKTOP_API ItemModelStateSnapshotHelper
+class ItemModelStateSnapshotHelper
 {
 public:
     struct SnapshotParams

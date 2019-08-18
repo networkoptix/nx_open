@@ -14,6 +14,7 @@
 using namespace nx;
 using namespace nx::vms::api;
 using namespace nx::vms::client::desktop;
+using namespace nx::vms::client::desktop::index_condition;
 
 void ResourceTreeModelTest::SetUp()
 {
@@ -193,38 +194,42 @@ QModelIndexList ResourceTreeModelTest::getAllIndexes() const
     return getChildren(QModelIndex());
 }
 
-QModelIndexList ResourceTreeModelTest::getIndexByData(const KeyValueVector& lookupData) const
+QModelIndex ResourceTreeModelTest::uniqueMatchingIndex(Condition condition) const
 {
-    const auto dataMatch =
-        [lookupData](const QModelIndex& index) -> bool
-        {
-            for (const auto& keyValue: lookupData)
-            {
-                const auto indexData = index.data(keyValue.first);
-                if (indexData.isNull() || indexData != keyValue.second)
-                    return false;
-            }
-            return true;
-        };
+    const auto matchingIndexes = allMatchingIndexes(condition);
+    if (!NX_ASSERT(matchingIndexes.size() == 1))
+        return QModelIndex();
+    return matchingIndexes.first();
+}
 
+QModelIndexList ResourceTreeModelTest::allMatchingIndexes(Condition condition) const
+{
     QModelIndexList result;
     const auto allIndexes = getAllIndexes();
-    std::copy_if(allIndexes.cbegin(), allIndexes.cend(), std::back_inserter(result), dataMatch);
-
+    std::copy_if(allIndexes.cbegin(), allIndexes.cend(), std::back_inserter(result), condition);
     return result;
 }
 
-QJsonDocument ResourceTreeModelTest::testSnapshot(
-    ItemModelStateSnapshotHelper::SnapshotParams& params) const
+bool ResourceTreeModelTest::noneMatches(Condition condition) const
 {
-    return ItemModelStateSnapshotHelper::makeSnapshot(model(), params);
+    return allMatchingIndexes(condition).isEmpty();
 }
 
-std::string ResourceTreeModelTest::snapshotsOutputString(const QJsonDocument& actual,
-    const QJsonDocument& reference) const
+bool ResourceTreeModelTest::onlyOneMatches(Condition condition) const
 {
-    return QString("Actual snapshot:\n%1Reference snapshot:\n%2")
-        .arg(QString(actual.toJson()))
-        .arg(QString(reference.toJson()))
-        .toStdString();
+    return allMatchingIndexes(condition).size() == 1;
+}
+
+int ResourceTreeModelTest::matchCount(Condition condition) const
+{
+    return allMatchingIndexes(condition).size();
+}
+
+std::vector<QString> ResourceTreeModelTest::transformToDisplayStrings(
+    const QModelIndexList& indexes) const
+{
+    std::vector<QString> result;
+    std::transform(indexes.begin(), indexes.end(), std::back_inserter(result),
+        [](const QModelIndex& index) { return index.data(Qt::DisplayRole).toString(); });
+    return result;
 }
