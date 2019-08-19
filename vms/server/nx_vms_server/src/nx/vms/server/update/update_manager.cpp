@@ -110,13 +110,8 @@ void UpdateManager::retry(bool forceRedownload)
 
     if (status.code == update::Status::Code::readyToInstall)
     {
-        m_installer.recheckFreeSpaceForInstallation();
-
-        if (m_installer.state() == UpdateInstaller::State::ok
-            && (m_targetUpdateInfo.lastInstallationRequestTime > 0 || m_installationDetected))
-        {
+        if (m_targetUpdateInfo.lastInstallationRequestTime > 0 || m_installationDetected)
             m_installer.installDelayed();
-        }
 
         return;
     }
