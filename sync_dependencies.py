@@ -69,7 +69,6 @@ def determine_package_versions(
         v["ffmpeg"] = "3.1.9"
 
     if platform == "ios":
-        v["libjpeg-turbo"] = "1.4.1"
         v["ffmpeg"] = "3.1.1"
 
     if box == "bpi":
