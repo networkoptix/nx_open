@@ -42,6 +42,7 @@ public:
         const auto now = monotonicTime();
         closeExpiredPeriods(now);
         m_sumPerSubperiod.front() += value;
+        m_currentSum += value;
     }
 
     /**
@@ -66,12 +67,14 @@ public:
             if (currentPeriodLength >= valuePeriod)
             {
                 m_sumPerSubperiod[periodIndex] += value;
+                m_currentSum += value;
                 return;
             }
 
             const auto valuePerCurrentPeriod =
                 (Value) (value * ((double) currentPeriodLength.count() / valuePeriod.count()));
             m_sumPerSubperiod[periodIndex] += valuePerCurrentPeriod;
+            m_currentSum += valuePerCurrentPeriod;
             value -= valuePerCurrentPeriod;
             valuePeriod -= currentPeriodLength;
         }
@@ -81,9 +84,8 @@ public:
 
     Value getSumPerLastPeriod() const
     {
-        const auto now = monotonicTime();
-        const_cast<SumPerPeriod*>(this)->closeExpiredPeriods(now);
-        return std::accumulate(m_sumPerSubperiod.begin(), m_sumPerSubperiod.end(), Value());
+        const_cast<SumPerPeriod*>(this)->closeExpiredPeriods(monotonicTime());
+        return m_currentSum;
     }
 
     float maxError() const
@@ -94,13 +96,16 @@ public:
     void reset()
     {
         m_sumPerSubperiod = std::deque<Value>(m_subPeriodCount);
+        m_currentSum = Value();
         m_currentPeriodStart = std::nullopt;
     }
 
 private:
     const int m_subPeriodCount;
     const std::chrono::microseconds m_subperiod;
+    // TODO: #ak Use cyclic array here.
     std::deque<Value> m_sumPerSubperiod;
+    Value m_currentSum = Value();
     std::optional<std::chrono::steady_clock::time_point> m_currentPeriodStart;
 
     void closeExpiredPeriods(
@@ -111,6 +116,9 @@ private:
             m_currentPeriodStart = now;
             return;
         }
+
+        // TODO: #ak The following loop can be greatly simplified
+        // if add expiration time to m_sumPerSubperiod.
 
         const auto deadline = now - m_subperiod * m_subPeriodCount;
         for (int i = 0; i < m_subPeriodCount; ++i)
@@ -124,6 +132,7 @@ private:
             }
             else
             {
+                m_currentSum -= m_sumPerSubperiod.back();
                 m_sumPerSubperiod.pop_back();
                 m_sumPerSubperiod.push_front(Value());
                 *m_currentPeriodStart += m_subperiod;
