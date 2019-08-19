@@ -185,7 +185,7 @@ const Hikvision::EngineManifest& Engine::engineManifest() const
     return m_engineManifest;
 }
 
-void Engine::doExecuteAction(Result<void>* /*outResult*/, IAction* /*action*/)
+void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
 {
 }
 

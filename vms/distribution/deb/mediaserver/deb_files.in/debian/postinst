@@ -249,7 +249,11 @@ case "$1" in
         then
             chown "root:${SYSTEM_USER}" "${BIN_DIR}/root-tool-bin"
             chmod u+s "${BIN_DIR}/root-tool-bin"
+
             setcap CAP_NET_BIND_SERVICE=+eip "$BIN_DIR/mediaserver-bin"
+
+            mkdir -p "${BASE_DIR}/var/log"
+            chown -R "${SYSTEM_USER}:${SYSTEM_USER}" "${BASE_DIR}/var/log"
         fi
 
         touch "$RUNTIME_CONFIG_FILE"

@@ -563,13 +563,23 @@ std::vector<ObjectTrack> ObjectTrackSearcher::loadTracks(
     nx::sql::AbstractSqlQuery* query, int limit)
 {
     std::vector<ObjectTrack> tracks;
-
+    const size_t maxObjectTrackSize = m_filter.maxObjectTrackSize;
+    m_filter.maxObjectTrackSize = 0;
     while (query->next())
     {
         auto track = loadTrack(query);
 
         if (satisfiesFilter(m_filter, track))
+        {
+            if (maxObjectTrackSize > 0 && track.objectPositionSequence.size() > maxObjectTrackSize)
+            {
+                track.objectPositionSequence.erase(
+                    track.objectPositionSequence.begin() + maxObjectTrackSize,
+                    track.objectPositionSequence.end());
+            }
+
             tracks.push_back(std::move(track));
+        }
         if (limit > 0 && tracks.size() >= limit)
             break;
     }

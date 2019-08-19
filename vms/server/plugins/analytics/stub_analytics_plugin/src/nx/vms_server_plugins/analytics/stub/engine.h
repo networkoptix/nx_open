@@ -41,15 +41,13 @@ protected:
         nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*>* outResult,
         const nx::sdk::IDeviceInfo* deviceInfo) override;
 
-    virtual nx::sdk::Result<void> executeAction(
+    virtual nx::sdk::Result<sdk::analytics::IAction::Result> executeAction(
         const std::string& actionId,
         nx::sdk::Uuid trackId,
         nx::sdk::Uuid deviceId,
         int64_t timestampUs,
         nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> objectTrackInfo,
-        const std::map<std::string, std::string>& params,
-        std::string* outActionUrl,
-        std::string* outMessageToUser) override;
+        const std::map<std::string, std::string>& params) override;
 
 private:
     void obtainPluginHomeDir();

@@ -47,15 +47,14 @@ public:
     protected: virtual const IStringMap* getParams() const = 0;
     public: Ptr<const IStringMap> params() const { return toPtr(getParams()); }
 
-    /**
-     * Report action result back to Server. If the action is decided not to have any result, this
-     * method can be either called with nulls or not called at all.
-     * @param actionUrl If not null, Client will open this URL in an embedded browser.
-     * @param messageToUser If not null, Client will show this text to the user.
-     */
-    virtual void handleResult(
-        const char* actionUrl,
-        const char* messageToUser) = 0;
+    struct Result
+    {
+        /** If neither null nor empty, Client will open this URL in an embedded browser. */
+        Ptr<IString> actionUrl;
+
+        /** If neither null nor empty, Client will show this text to the user. */
+        Ptr<IString> messageToUser;
+    };
 };
 
 } // namespace analytics

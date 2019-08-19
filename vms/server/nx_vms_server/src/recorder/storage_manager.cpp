@@ -767,7 +767,7 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
         if (!stillHaveThisStorage)
             return;
     }
-    fileCatalog->addChunks(newChunks);
+    fileCatalog->addChunks(std::move(newChunks));
 }
 
 void QnStorageManager::initDone()
@@ -913,7 +913,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
         {
             if (fileCatalog)
             {
-                fileCatalog->addChunks(chunks);
+                fileCatalog->addChunks(std::move(chunks));
                 oldCatalogs << fileCatalog;
                 chunks.clear();
             }
@@ -944,7 +944,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     }
     if (fileCatalog)
     {
-        fileCatalog->addChunks(chunks);
+        fileCatalog->addChunks(std::move(chunks));
         oldCatalogs << fileCatalog;
     }
 
@@ -1034,8 +1034,7 @@ void QnStorageManager::addDataFromDatabase(const QnStorageResourcePtr &storage)
     for(const DeviceFileCatalogPtr& c: sdb->loadFullFileCatalog())
     {
         DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->cameraUniqueId(), c->getCatalog());
-        fileCatalog->addChunks(c->m_chunks);
-        //fileCatalog->addChunks(correctChunksFromMediaData(fileCatalog, storage, c->m_chunks));
+        fileCatalog->addChunks(std::move(c->m_chunks));
     }
 }
 

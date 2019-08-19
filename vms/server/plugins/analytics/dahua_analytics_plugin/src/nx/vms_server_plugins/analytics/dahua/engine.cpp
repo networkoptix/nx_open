@@ -207,7 +207,7 @@ const EngineManifest& Engine::parsedManifest() const
     return m_parsedManifest;
 }
 
-void Engine::doExecuteAction(Result<void>* /*outResult*/, IAction* /*action*/)
+void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
 {
 }
 

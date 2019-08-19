@@ -116,8 +116,15 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
 
     QnSecurityCamResourcePtr camRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
     if (camRes)
-        connect(this,       &QnMulticodecRtpReader::networkIssue, camRes.data(), &QnSecurityCamResource::networkIssue,              Qt::DirectConnection);
-    Qn::directConnect(res.data(), &QnResource::propertyChanged, this, &QnMulticodecRtpReader::at_propertyChanged);
+    {
+        connect(this, &QnMulticodecRtpReader::networkIssue, camRes.data(),
+            &QnSecurityCamResource::networkIssue, Qt::DirectConnection);
+
+        m_ignoreRtcpReports = camRes->resourceData().value<bool>(
+            ResourceDataKey::kIgnoreRtcpReports, m_ignoreRtcpReports);
+    }
+    Qn::directConnect(res.data(), &QnResource::propertyChanged,
+        this, &QnMulticodecRtpReader::at_propertyChanged);
 
     m_timeHelper.setTimePolicy(getTimePolicy(m_resource));
 }
@@ -272,15 +279,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataInternal()
         if (!result)
             continue;
 
-        auto secResource = getResource().dynamicCast<QnSecurityCamResource>();
-        bool ignoreRtcpReports = false;
-        if (secResource)
-        {
-            ignoreRtcpReports = secResource->resourceData().value<bool>(
-                ResourceDataKey::kIgnoreRtcpReports, false);
-        }
         nx::streaming::rtp::RtcpSenderReport rtcpReport;
-        if (!ignoreRtcpReports && track.ioDevice)
+        if (!m_ignoreRtcpReports && track.ioDevice)
             rtcpReport = track.ioDevice->getSenderReport();
 
         result->timestamp = m_timeHelper.getTime(

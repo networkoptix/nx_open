@@ -7,6 +7,64 @@ namespace nx::vms::api::analytics {
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(DeviceAgentManifest, (json), DeviceAgentManifest_Fields,
     (brief, true))
 
+class ListProcessor
+{
+public:
+    ListProcessor(EntryFieldManifestErrorTypes manifestErrorTypes):
+        m_manifestErrorTypes(std::move(manifestErrorTypes))
+    {
+    }
+
+    template<typename Entity, typename FieldValueGetter, typename ErrorMaker>
+    void process(
+        std::vector<ManifestError>* inOutErrorList,
+        const QList<Entity>& entityList,
+        FieldValueGetter fieldValueGetter,
+        ErrorMaker errorMaker)
+    {
+        if (!NX_ASSERT(inOutErrorList))
+            return;
+
+        for (const auto& entity: entityList)
+        {
+            const auto fieldValue = fieldValueGetter(entity);
+            if (fieldValue.isEmpty() && !m_isEmptyFieldDetected)
+            {
+                inOutErrorList->emplace_back(m_manifestErrorTypes.emptyField, QString());
+                m_isEmptyFieldDetected = true;
+            }
+            else
+            {
+                const bool isDuplicate =
+                    m_processedFields.find(fieldValue) != m_processedFields.cend();
+
+                const bool isDuplicateAlreadyProcessed =
+                    m_processedFieldDuplicates.find(fieldValue)
+                    != m_processedFieldDuplicates.cend();
+
+                if (isDuplicate && !isDuplicateAlreadyProcessed)
+                {
+                    inOutErrorList->emplace_back(
+                        errorMaker(
+                            m_manifestErrorTypes.duplicatedField,
+                            m_manifestErrorTypes.listEntryTypeName,
+                            entity));
+
+                    m_processedFieldDuplicates.insert(fieldValue);
+                }
+
+                m_processedFields.insert(fieldValue);
+            }
+        }
+    }
+
+private:
+    bool m_isEmptyFieldDetected = false;
+    std::set<QString> m_processedFields;
+    std::set<QString> m_processedFieldDuplicates;
+    EntryFieldManifestErrorTypes m_manifestErrorTypes;
+};
+
 template<typename ListOfTypes, typename FieldValueGetter>
 void validateSupportedTypesByField(
     std::vector<ManifestError>* outErrorList,
@@ -15,61 +73,15 @@ void validateSupportedTypesByField(
     const EntryFieldManifestErrorTypes& entryFieldManifestErrorTypes,
     FieldValueGetter fieldValueGetter)
 {
-    bool isEmptyFieldDetected = false;
-    std::set<QString> processedFields;
-    std::set<QString> processedFieldDuplicates;
-
     if (!NX_ASSERT(outErrorList))
         return;
 
     const auto identitiyGetter = [](const auto& entry) { return entry; };
 
-    const auto processList =
-        [
-            &isEmptyFieldDetected,
-            &processedFields,
-            &processedFieldDuplicates,
-            &entryFieldManifestErrorTypes,
-            outErrorList
-        ](
-            const auto& entryList,
-            const auto& fieldValueGetter,
-            const auto& errorMaker)
-        {
-            for (const auto entry: entryList)
-            {
-                const auto fieldValue = fieldValueGetter(entry);
-                if (fieldValue.isEmpty() && !isEmptyFieldDetected)
-                {
-                    outErrorList->emplace_back(entryFieldManifestErrorTypes.emptyField, QString());
-                    isEmptyFieldDetected = true;
-                }
-                else
-                {
-                    const bool isDuplicate =
-                        processedFields.find(fieldValue) != processedFields.cend();
+    ListProcessor listProcessor(entryFieldManifestErrorTypes);
 
-                    const bool isDuplicateAlreadyProcessed =
-                        processedFieldDuplicates.find(fieldValue)
-                            != processedFieldDuplicates.cend();
-
-                    if (isDuplicate && !isDuplicateAlreadyProcessed)
-                    {
-                        outErrorList->emplace_back(
-                            errorMaker(
-                                entryFieldManifestErrorTypes.duplicatedField,
-                                entryFieldManifestErrorTypes.listEntryTypeName,
-                                entry));
-
-                        processedFieldDuplicates.insert(fieldValue);
-                    }
-
-                    processedFields.insert(fieldValue);
-                }
-            }
-        };
-
-    processList(
+    listProcessor.process(
+        outErrorList,
         supportedTypeList,
         identitiyGetter,
         [](ManifestErrorType errorType, const QString& entryTypeName, const QString& entryId)
@@ -77,7 +89,8 @@ void validateSupportedTypesByField(
             return ManifestError(errorType, lm("%1 id: %2").args(entryTypeName, entryId));
         });
 
-    processList(
+    listProcessor.process(
+        outErrorList,
         declaredTypeList,
         fieldValueGetter,
         [](ManifestErrorType errorType, const QString& entryTypeName, const auto& entry)

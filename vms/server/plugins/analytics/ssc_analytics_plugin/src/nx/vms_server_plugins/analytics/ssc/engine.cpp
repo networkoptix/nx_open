@@ -367,7 +367,7 @@ void Engine::getManifest(Result<const IString*>* outResult) const
     *outResult = new nx::sdk::String(m_manifest);
 }
 
-void Engine::doExecuteAction(Result<void>* /*outResult*/, IAction* /*action*/)
+void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
 {
 }
 

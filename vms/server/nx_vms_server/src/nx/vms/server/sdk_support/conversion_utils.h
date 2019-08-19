@@ -21,7 +21,7 @@
 
 extern "C" {
 #include <libavformat/avformat.h>
-}
+} // extern "C"
 
 namespace nx::vms::server::sdk_support {
 

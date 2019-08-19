@@ -20,6 +20,7 @@
 
 #include <nx/vms/event/events/events_fwd.h>
 #include <nx/vms/event/events/plugin_diagnostic_event.h>
+#include <api/model/analytics_actions.h>
 
 namespace nx::vms::server::analytics::wrappers {
 
@@ -41,20 +42,34 @@ public:
 
     std::shared_ptr<DeviceAgent> obtainDeviceAgent(QnVirtualCameraResourcePtr deviceInfo);
 
-    bool executeAction(sdk::Ptr<sdk::analytics::IAction> action);
+    struct ExecuteActionResult
+    {
+        QString errorMessage; /**< Empty if no error. */
+        AnalyticsActionResult actionResult;
+
+        ExecuteActionResult(QString errorMessage): errorMessage(std::move(errorMessage)) {}
+        ExecuteActionResult(AnalyticsActionResult value): actionResult(std::move(value)) {}
+    };
+
+    ExecuteActionResult executeAction(sdk::Ptr<const sdk::analytics::IAction> action);
 
     void setHandler(sdk::Ptr<sdk::analytics::IEngine::IHandler> handler);
 
 protected:
     virtual DebugSettings makeManifestProcessorSettings() const override;
-
     virtual DebugSettings makeSettingsProcessorSettings() const override;
-
     virtual SdkObjectDescription sdkObjectDescription() const override;
 
 private:
     resource::AnalyticsEngineResourcePtr engineResource() const;
     resource::AnalyticsPluginResourcePtr pluginResource() const;
+
+    template<typename Error>
+    QString makeErrorString(SdkMethod sdkMethod, Error error)  const
+    {
+        return StringBuilder(sdkMethod, sdkObjectDescription(), std::move(error))
+            .buildPluginDiagnosticEventDescription();
+    }
 
 private:
     QWeakPointer<resource::AnalyticsEngineResource> m_engineResource;

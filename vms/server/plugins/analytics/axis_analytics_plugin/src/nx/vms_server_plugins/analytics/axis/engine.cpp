@@ -115,7 +115,7 @@ EngineManifest Engine::fetchSupportedEvents(const IDeviceInfo* deviceInfo)
     return result;
 }
 
-void Engine::doExecuteAction(Result<void>* /*outResult*/, IAction* /*action*/)
+void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
 {
 }
 

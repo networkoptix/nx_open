@@ -42,6 +42,7 @@ NX_VMS_API QString toHumanReadableString(ManifestErrorType errorType);
 struct ManifestError
 {
     ManifestError() = default;
+
     ManifestError(ManifestErrorType errorType, QString additionalInfo = QString()):
         errorType(errorType),
         additionalInfo(additionalInfo)

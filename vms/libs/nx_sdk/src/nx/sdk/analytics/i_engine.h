@@ -85,7 +85,7 @@ public:
      * merges the received values with the ones in its database.
      *
      * @return Result containing (in case of success) information about settings that are stored on
-     *     the plugin side. Errors corresponding to particular settings should be placed in the
+     *     the plugin side. Errors corresponding to the particular settings should be placed in the
      *     ISettingsResponse object. A faulty result must be returned only in case of a general
      *     failure that affects the settings retrieval procedure. The result should contain null if
      *     the Engine has no plugin-side settings.
@@ -145,10 +145,11 @@ public:
      *     been triggered, and a means for reporting back action results to Server. This object
      *     should not be used after returning from this function.
      */
-    protected: virtual void doExecuteAction(Result<void>* outResult, IAction* action) = 0;
-    public: Result<void> executeAction(IAction* action)
+    protected: virtual void doExecuteAction(
+        Result<IAction::Result>* outResult, const IAction* action) = 0;
+    public: Result<IAction::Result> executeAction(const IAction* action)
     {
-        Result<void> result;
+        Result<IAction::Result> result;
         doExecuteAction(&result, action);
         return result;
     }
