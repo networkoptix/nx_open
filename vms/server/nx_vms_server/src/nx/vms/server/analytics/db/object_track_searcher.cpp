@@ -74,7 +74,7 @@ void ObjectTrackSearcher::loadCurrentRecord(
     nx::sql::SqlQuery* query,
     ObjectTrack* object)
 {
-    *object = loadTrack(query);
+    *object = *loadTrack(query, [](auto&&...) { return true; });
 }
 
 void ObjectTrackSearcher::addTrackFilterConditions(
@@ -292,10 +292,11 @@ std::optional<ObjectTrack> ObjectTrackSearcher::fetchTrackById(
 
     query->exec();
 
-    if (query->next())
-        return loadTrack(query.get());
+    auto tracks = loadTracks(query.get(), 1);
+    if (tracks.empty())
+        return std::nullopt;
 
-    return std::nullopt;
+    return std::move(tracks.front());
 }
 
 std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
@@ -562,23 +563,17 @@ std::vector<ObjectTrack> ObjectTrackSearcher::loadTracks(
     nx::sql::AbstractSqlQuery* query, int limit)
 {
     std::vector<ObjectTrack> tracks;
-    const size_t maxObjectTrackSize = m_filter.maxObjectTrackSize;
-    m_filter.maxObjectTrackSize = 0;
     while (query->next())
     {
-        auto track = loadTrack(query);
+        auto track = loadTrack(
+            query,
+            [this](const auto& track) { return satisfiesFilter(m_filter, track); });
 
-        if (satisfiesFilter(m_filter, track))
-        {
-            if (maxObjectTrackSize > 0 && track.objectPositionSequence.size() > maxObjectTrackSize)
-            {
-                track.objectPositionSequence.erase(
-                    track.objectPositionSequence.begin() + maxObjectTrackSize,
-                    track.objectPositionSequence.end());
-            }
+        if (!track)
+            continue;
 
-            tracks.push_back(std::move(track));
-        }
+        tracks.push_back(std::move(*track));
+
         if (limit > 0 && tracks.size() >= limit)
             break;
     }
@@ -586,7 +581,10 @@ std::vector<ObjectTrack> ObjectTrackSearcher::loadTracks(
     return tracks;
 }
 
-ObjectTrack ObjectTrackSearcher::loadTrack(nx::sql::AbstractSqlQuery* query)
+template<typename FilterFunc>
+std::optional<ObjectTrack> ObjectTrackSearcher::loadTrack(
+    nx::sql::AbstractSqlQuery* query,
+    FilterFunc filter)
 {
     ObjectTrack track;
 
@@ -614,6 +612,10 @@ ObjectTrack ObjectTrackSearcher::loadTrack(nx::sql::AbstractSqlQuery* query)
         query->value("track_detail").toByteArray());
 
     filterTrack(&track.objectPositionSequence);
+    if (!filter(track))
+        return std::nullopt;
+
+    truncateTrack(&track.objectPositionSequence, m_filter.maxObjectTrackSize);
     if (!track.objectPositionSequence.empty())
     {
         for (auto& position: track.objectPositionSequence)
@@ -637,8 +639,6 @@ void ObjectTrackSearcher::filterTrack(std::vector<ObjectPosition>* const track)
                     return true;
             }
 
-            // TODO: Filter box
-
             return false;
         };
 
@@ -649,9 +649,14 @@ void ObjectTrackSearcher::filterTrack(std::vector<ObjectPosition>* const track)
     std::sort(
         track->begin(), track->end(),
         [](const auto& left, const auto& right) { return left.timestampUs < right.timestampUs; });
+}
 
-    if (m_filter.maxObjectTrackSize > 0 && (int) track->size() > m_filter.maxObjectTrackSize)
-        track->erase(track->begin() + m_filter.maxObjectTrackSize, track->end());
+void ObjectTrackSearcher::truncateTrack(
+    std::vector<ObjectPosition>* const track,
+    int maxSize)
+{
+    if (maxSize > 0 && (int)track->size() > maxSize)
+        track->erase(track->begin() + maxSize, track->end());
 }
 
 void ObjectTrackSearcher::addObjectTypeIdToFilter(
