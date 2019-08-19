@@ -35,6 +35,8 @@ public:
             return;
     }
 
+    virtual ~SdkObjectWithManifest() = default;
+
     std::optional<ManifestType> manifest(
         std::unique_ptr<StringBuilder>* outStringBuilder = nullptr) const
     {
