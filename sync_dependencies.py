@@ -70,7 +70,7 @@ def determine_package_versions(
         v["ffmpeg"] = "3.1.9"
 
     if platform == "ios":
-        v["libjpeg-turbo"] = "1.4.1"
+        v["ffmpeg"] = "3.1.1"
 
     if box in ("bpi", "bananapi"):
         v["festival"] = "2.4-1"
