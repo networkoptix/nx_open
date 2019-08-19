@@ -230,7 +230,8 @@ QRectF AreaTooltipItem::boundingRect() const
     if (d->textPixmap.isNull())
         return QRectF();
 
-    return QRectF(QPoint(), Geometry::dilated(d->textPixmap.size(), textMargins()));
+    const auto pixmapSize = d->textPixmap.size() / d->textPixmap.devicePixelRatio();
+    return QRectF(QPoint(), Geometry::dilated(pixmapSize, textMargins()));
 }
 
 void AreaTooltipItem::paint(

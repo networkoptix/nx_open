@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #include "abstract_object.h"
 
 #include <functional>
@@ -5,7 +7,7 @@
 #include <string>
 
 #include <nx/sdk/helpers/attribute.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 
 #include "random_state_changer.h"

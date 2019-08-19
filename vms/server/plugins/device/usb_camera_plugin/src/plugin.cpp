@@ -3,6 +3,8 @@ extern "C" {
 #include <libavdevice/avdevice.h>
 } // extern "C"
 
+#include <nx/sdk/ptr.h>
+
 #include "discovery_manager.h"
 #include "device/audio/utils.h"
 
@@ -95,8 +97,8 @@ void Plugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 
 void Plugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
-    m_timeProvider.reset(
-        static_cast<nxpl::TimeProvider*>(pluginContainer->queryInterface(nxpl::IID_TimeProvider)));
+    m_timeProvider = nx::sdk::queryInterfaceOfOldSdk<nxpl::TimeProvider>(
+        pluginContainer, nxpl::IID_TimeProvider);
 }
 
 nxpt::CommonRefManager* Plugin::refManager()

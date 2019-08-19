@@ -3,7 +3,7 @@
 #include <type_traits>
 
 #include <nx/sdk/result.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 namespace nx::vms::server::sdk_support {
 
@@ -68,14 +68,12 @@ class ResultHolder<Value, typename detail::EnableForPointerToRefCountable<Value>
 {
 public:
     ResultHolder(nx::sdk::Result<Value>&& result):
-        detail::ResultHolderBase<Value>(result.error.errorCode, result.error.errorMessage),
-        m_value(nx::sdk::toPtr(result.value))
+        detail::ResultHolderBase<Value>(result.error().errorCode(), result.error().errorMessage()),
+        m_value(nx::sdk::toPtr(result.value()))
     {
     }
 
-    const nx::sdk::Ptr<typename detail::RemovedPointer<Value>> value() const { return m_value; }
-
-    void isRefCountable() {};
+    nx::sdk::Ptr<typename detail::RemovedPointer<Value>> value() const { return m_value; }
 
 private:
     const nx::sdk::Ptr<typename detail::RemovedPointer<Value>> m_value;
@@ -87,14 +85,12 @@ class ResultHolder<Value, typename detail::DisableForPointerToRefCountable<Value
 {
 public:
     ResultHolder(nx::sdk::Result<Value>&& result):
-        detail::ResultHolderBase<Value>(result.error.errorCode, result.error.errorMessage),
-        m_value(std::move(result.value))
+        detail::ResultHolderBase<Value>(result.error().errorCode(), result.error().errorMessage()),
+        m_value(std::move(result.value()))
     {
     }
 
-    nx::sdk::Ptr<Value> value() const { return m_value; }
-
-    void isNonRefCountable() {};
+    Value value() const { return m_value; }
 
 private:
     const Value m_value;
@@ -105,11 +101,9 @@ class ResultHolder<void>: public detail::ResultHolderBase<void>
 {
 public:
     ResultHolder(nx::sdk::Result<void>&& result):
-        detail::ResultHolderBase<void>(result.error.errorCode, result.error.errorMessage)
+        detail::ResultHolderBase<void>(result.error().errorCode(), result.error().errorMessage())
     {
     }
-
-    void isVoid() {};
 };
 
 } // namespace nx::vms::server::sdk_support

@@ -91,7 +91,7 @@ cmake_dependent_option(withDistributions "Enable distributions build"
     ON
 )
 
-cmake_dependent_option(withAnalyticsSdk "Enable nx_analytics_sdk build"
+cmake_dependent_option(withSdk "Enable nx_*_sdk build"
     OFF "NOT withDistributions"
     ON
 )

@@ -32,6 +32,8 @@ namespace {
 // Delay after which preview is requested again in case of receiving "NO DATA".
 static const milliseconds kPreviewReloadDelay = seconds(ini().rightPanelPreviewReloadDelay);
 
+static const milliseconds kPreviewLoadDelay(qMax(ini().tilePreviewLoadDelayOverrideMs, 0));
+
 static constexpr auto kRoundingRadius = 2;
 
 static constexpr int kTitleFontPixelSize = 13;
@@ -80,13 +82,6 @@ void setWidgetHolder(QWidget* widget, QWidget* newHolder)
     widget->setParent(newHolder);
     newHolder->layout()->addWidget(widget);
     widget->setHidden(wasHidden);
-}
-
-milliseconds previewLoadDelay()
-{
-    return ini().tilePreviewLoadDelayOverrideMs < 1
-        ? 1ms
-        : milliseconds(ini().tilePreviewLoadDelayOverrideMs);
 }
 
 } // namespace
@@ -230,10 +225,18 @@ struct EventTile::Private
 
     void updatePreview(milliseconds delay)
     {
-        if (isPreviewUpdateRequired())
-            loadPreviewTimer->start(delay);
+        if (kPreviewLoadDelay > 0ms)
+        {
+            if (isPreviewUpdateRequired())
+                requestPreview();
+        }
         else
-            loadPreviewTimer->stop();
+        {
+            if (isPreviewUpdateRequired())
+                loadPreviewTimer->start(delay);
+            else
+                loadPreviewTimer->stop();
+        }
     }
 
     void showDebugPreviewTimestamp()
@@ -536,7 +539,7 @@ void EventTile::setPreview(ImageProvider* value, bool forceUpdate)
 
     d->isPreviewLoadNeeded = false;
     d->forceNextPreviewUpdate = forceUpdate;
-    d->updatePreview(previewLoadDelay());
+    d->updatePreview(kPreviewLoadDelay);
 
     if (ini().showDebugTimeInformationInRibbon)
         d->showDebugPreviewTimestamp();
@@ -580,7 +583,7 @@ void EventTile::setAutomaticPreviewLoad(bool value)
 
     d->automaticPreviewLoad = value;
     d->isPreviewLoadNeeded = d->isPreviewLoadNeeded && !d->automaticPreviewLoad;
-    d->updatePreview(previewLoadDelay());
+    d->updatePreview(kPreviewLoadDelay);
 }
 
 bool EventTile::isPreviewLoadNeeded() const
@@ -763,7 +766,7 @@ void EventTile::setPreviewEnabled(bool value)
     ui->previewWidget->setHidden(!value);
     ui->previewWidget->parentWidget()->setHidden(!value || !ui->previewWidget->imageProvider());
 
-    d->updatePreview(previewLoadDelay());
+    d->updatePreview(kPreviewLoadDelay);
 }
 
 bool EventTile::footerEnabled() const

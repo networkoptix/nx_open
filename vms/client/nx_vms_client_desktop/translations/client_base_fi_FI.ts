@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fi" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Minkä tahansa tyyppinen</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Valitse alue</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Valitse jokin alue videosta...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Valitulla alueella</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Plugin-toiminnon suorittaminen epäonnistui</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Anna parametrit</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Toimenpide vaatii joitakin parametreja.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1016,6 +1047,45 @@ nähdäksesi lisää kirjanmerkkejä</translation>
     </message>
   </context>
   <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Palvelimen tapahtumat</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Analytiikka-tapahtumat</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Mikä tahansa tapahtuma</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Kaikki laitteen ongelmat</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Kaikki kameran ongelmat</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Mikä tahansa palvelintapahtuma</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Laitteen ongelmat</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Kameran ongelmat</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Kaikki analyytiikan tapahtumat</translation>
+    </message>
+  </context>
+  <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
@@ -1270,7 +1340,7 @@ nähdäksesi lisää kirjanmerkkejä</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>Vain latinalaiset kirjaimet, numerot ja näppäimistösymbolit ovat sallittuja.</translation>
+      <translation>Vain latinalaiset kirjaimet, numerot ja näppäimistösymbolit %1 ovat sallittuja.</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
@@ -2711,7 +2781,7 @@ to %1</source>
     </message>
     <message>
       <source>Client version: %1.</source>
-      <translation>Client-sovelluksen versio.</translation>
+      <translation>Client-sovelluksen versio: %1.</translation>
     </message>
     <message>
       <source>Server version: %1.</source>
@@ -5934,10 +6004,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <translation>Ei sisällä henkilökohtaisia tietoja ja on täysin nimetöntä.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Failover-palvelimen toimenpiteet saattavat silti pyytää kameran tilapäivityksiä tästä asetuksesta riippumatta.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Ota käyttöön laitteiden ja palvelinten automaattinen havaitseminen ja automaattinen laitteen tilan tarkistus</translation>
     </message>
@@ -5948,6 +6014,10 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Kun se on käytössä, järjestelmä havaitsee jatkuvasti uusia kameroita ja palvelimia ja lähettää etsintäpyynnöt kameroille tilapäivitykseen.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
     </message>
   </context>
   <context>
@@ -5967,44 +6037,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Taulukon (CSV) tiedosto</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Palvelin</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Siirtymä</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Päivämäärä</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Aikavyöhyke</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Aika</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Palvelimella ei ole Internet-yhteyttä. Aikaa ei synkronoida.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>Järjestelmäaika synkronoidaan Internetin kanssa, eikä se riipu palvelimien paikallisesta ajasta.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>Järjestelmäaika synkronoidaan paikallisen ajan kanssa valitulta palvelimelta eikä se ole riippuvainen paikallisesta ajasta muissa palvelimissa.</translation>
     </message>
   </context>
   <context>
@@ -7139,6 +7171,34 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Valitse videosta alue suodattamaan tuloksia</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Valitulla alueella</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Valittu kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Valitut laitteet</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Valittu media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ei mitään</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7379,38 +7439,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
         <numerusform>%n kohdetta</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Minkä tahansa tyyppinen</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Valitse alue</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Valitse jokin alue videosta...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Valitulla alueella</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>nimettömän analytiikan alusta</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Plugin-toiminnon suorittaminen epäonnistui</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Anna parametrit</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Toimenpide vaatii joitakin parametreja.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7453,17 +7481,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>Applying changes...</source>
       <translation>Toteutaan muutoksia...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Tässä I/O-moduulissa ei ole lisäasetuksia</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Tässä kamerassa ei ole lisäasetuksia</translation>
     </message>
   </context>
   <context>
@@ -8021,42 +8038,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation>Palvelimen tapahtumat</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Analytiikka-tapahtumat</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Kaikki laitteen ongelmat</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Kaikki kameran ongelmat</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Mikä tahansa palvelintapahtuma</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Laitteen ongelmat</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Kameran ongelmat</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Mikä tahansa tapahtuma</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Kaikki analyytiikan tapahtumat</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Ei tapahtumia</translation>
     </message>
@@ -8611,11 +8592,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>Joidenkin palvelintent päivitykset eivät ole valmiit. Viimeistele ne joka tapauksessa?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 käynnistetään uudelleen päivitettyyn versioon.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -9248,14 +9224,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Valitse videosta alue suodattamaan tuloksia</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Valitulla alueella</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Ei liikettä</translation>
     </message>
@@ -9270,23 +9238,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
         <numerusform>%n liiketapahtumaa</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Valittu kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Valittu laite</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Valittu media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ei mitään</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
@@ -9300,8 +9251,8 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
       <translation>
-        <numerusform>Sähköpostiosoitetta ei ole asetettu käyttäjälle %1</numerusform>
-        <numerusform>Sähköpostiosoitetta ei ole asetettu käyttäjälle %1</numerusform>
+        <numerusform>Sähköpostiosoitetta ei ole asetettu %n käyttäjälle</numerusform>
+        <numerusform>Sähköpostiosoitetta ei ole asetettu %n käyttäjälle</numerusform>
       </translation>
     </message>
     <message>

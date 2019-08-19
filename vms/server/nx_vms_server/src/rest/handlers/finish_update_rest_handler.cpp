@@ -3,6 +3,7 @@
 #include <nx/vms/server/update/update_manager.h>
 #include "private/multiserver_update_request_helpers.h"
 #include <rest/server/rest_connection_processor.h>
+#include <rest/helpers/permissions_helper.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
@@ -25,7 +26,7 @@ bool QnFinishUpdateRestHandler::allPeersUpdatedSuccessfully() const
     try
     {
         const auto updateInfo = serverModule()->updateManager()->updateInformation(
-            UpdateManager::InformationCategory::target);
+            UpdateManager::InformationCategory::target).value();
 
         return ifParticipantPredicate
             && std::all_of(
@@ -64,6 +65,10 @@ int QnFinishUpdateRestHandler::executePost(
 {
     const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
         processor->resourcePool(), params);
+
+    const auto accessRights = processor->accessRights();
+    if (!QnPermissionsHelper::hasOwnerPermissions(serverModule()->resourcePool(), accessRights))
+        return nx::network::http::StatusCode::forbidden;
 
     if (params.contains("ignorePendingPeers") || allPeersUpdatedSuccessfully())
     {

@@ -26,6 +26,8 @@ void Timer::start(
     std::chrono::milliseconds timeout,
     TimerEventHandler timerFunc)
 {
+    NX_CRITICAL(timerFunc);
+
     // TODO: #ak m_aioService.registerTimer currently does not support zero timeouts,
     // so using following hack
     if (timeout == std::chrono::milliseconds::zero())

@@ -1008,13 +1008,17 @@ QSet<QnUuid> PeerStateTracker::peersFailed() const
     return m_peersFailed;
 }
 
-void PeerStateTracker::setTask(const QSet<QnUuid> &targets)
+void PeerStateTracker::setTask(const QSet<QnUuid> &targets, bool reset)
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
     m_peersActive = targets;
     m_peersIssued = targets;
-    m_peersComplete = {};
-    m_peersFailed = {};
+
+    if (reset)
+    {
+        m_peersComplete = {};
+        m_peersFailed = {};
+    }
 }
 
 void PeerStateTracker::setTaskError(const QSet<QnUuid>& targets, const QString& /*error*/)

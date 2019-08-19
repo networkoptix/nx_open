@@ -6,6 +6,7 @@
 #include <client/client_color_types.h>
 #include <utils/common/connective.h>
 #include <core/resource/camera_bookmark_fwd.h>
+#include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/customization/customized.h>
 
@@ -30,6 +31,9 @@ public:
 
     void setBookmarkColors(const QnBookmarkColors &colors);
 
+    void setDisplayFilter(const QnVirtualCameraResourceSet& cameraFilter,
+        const QString& textFilter);
+
 private:
     class WidgetData;
     typedef QSharedPointer<WidgetData> WidgetDataPtr;
@@ -38,5 +42,7 @@ private:
 private:
     QnBookmarkColors m_colors;
     WidgetDataHash m_widgetDataHash;
+    QnVirtualCameraResourceSet m_cameraFilter; //< If empty, any is allowed.
+    QString m_textFilter;
 };
 

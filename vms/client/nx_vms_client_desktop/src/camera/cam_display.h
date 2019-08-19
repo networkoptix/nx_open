@@ -295,7 +295,7 @@ protected:
 
     std::chrono::microseconds m_forcedVideoBufferLength = std::chrono::microseconds::zero();
     qint64 m_lastQueuedVideoTime;
-    int m_liveBufferSize;
+    int m_liveBufferSizeMkSec;
     bool m_liveMaxLenReached;
     bool m_hasVideo;
     Qn::MediaStreamEvent m_lastMediaEvent = Qn::MediaStreamEvent::NoEvent;

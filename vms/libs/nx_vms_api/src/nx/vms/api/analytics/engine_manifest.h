@@ -4,6 +4,7 @@
 #include <QtCore/QStringList>
 #include <QtCore/QJsonObject>
 
+#include <nx/vms/api/analytics/manifest_error.h>
 #include <nx/vms/api/analytics/manifest_items.h>
 #include <nx/vms/api/analytics/pixel_format.h>
 #include <nx/fusion/model_functions_fwd.h>
@@ -44,6 +45,8 @@ struct NX_VMS_API EngineManifest
 
         QString id; /**< Id of the action type, like "vendor.pluginName.actionName". */
         QString name; /**< Action name to be shown to the user. */
+
+        // Empty list means that the Action supports any type of objects.
         QList<QString> supportedObjectTypeIds;
         QJsonObject parametersModel;
         Requirements requirements;
@@ -90,6 +93,8 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EngineManifest::Capability)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EngineManifest::ObjectAction::Capability)
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest::ObjectAction, (json), NX_VMS_API)
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest::ObjectAction::Requirements, (json)(eq), NX_VMS_API)
+
+NX_VMS_API std::vector<ManifestError> validate(const EngineManifest& manifest);
 
 } // namespace nx::vms::api::analytics
 

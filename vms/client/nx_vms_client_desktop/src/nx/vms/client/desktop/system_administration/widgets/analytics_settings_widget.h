@@ -21,6 +21,11 @@ public:
     virtual bool hasChanges() const override;
     virtual bool activate(const QUrl& url) override;
 
+    bool shouldBeVisible() const;
+
+signals:
+    void visibilityUpdateRequested();
+
 private:
     class Private;
     const QScopedPointer<Private> d;

@@ -23,7 +23,7 @@ enum class MultiThreadDecodePolicy
 
 struct DecoderConfig
 {
-    MultiThreadDecodePolicy mtDecodePolicy = MultiThreadDecodePolicy::disabled;
+    MultiThreadDecodePolicy mtDecodePolicy = MultiThreadDecodePolicy::autoDetect;
 };
 
 //!Abstract interface. Every video decoder MUST implement this interface.

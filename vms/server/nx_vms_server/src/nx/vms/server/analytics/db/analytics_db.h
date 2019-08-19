@@ -75,28 +75,13 @@ private:
     ObjectTrackCache m_objectTrackCache;
     ObjectTrackAggregator m_trackAggregator;
     ObjectTrackGroupDao m_trackGroupDao;
+    bool m_stopped = false;
 
     bool ensureDbDirIsWritable(const QString& path);
 
     bool readMaximumEventTimestamp();
 
     bool loadDictionaries();
-
-    /**
-     * @return Inserted event id.
-     * Throws on error.
-     */
-    void insertEvent(
-        nx::sql::QueryContext* queryContext,
-        const common::metadata::ObjectMetadataPacket& packet,
-        const common::metadata::ObjectMetadata& objectMetadata,
-        int64_t attributesId,
-        int64_t timePeriodId);
-
-    void updateDictionariesIfNeeded(
-        nx::sql::QueryContext* queryContext,
-        const common::metadata::ObjectMetadataPacket& packet,
-        const common::metadata::ObjectMetadata& objectMetadata);
 
     void savePacketDataToCache(
         const QnMutexLockerBase& /*lock*/,
@@ -110,6 +95,7 @@ private:
         CreateCursorCompletionHandler completionHandler);
 
     void scheduleDataCleanup(
+        const QnMutexLockerBase&,
         QnUuid deviceId,
         std::chrono::milliseconds oldestDataToKeepTimestamp);
 

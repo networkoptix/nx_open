@@ -7,6 +7,8 @@
 #include <mutex>
 #include <chrono>
 #include <ctime>
+#include <thread>
+#include <type_traits>
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
@@ -19,6 +21,7 @@
 #include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/settings_response.h>
+#include <nx/sdk/helpers/error.h>
 
 #include "utils.h"
 #include "stub_analytics_plugin_ini.h"
@@ -97,7 +100,8 @@ static const std::vector<EventDescriptor> kEventsToFire = {
 } // namespace
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
-    VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
+    VideoFrameProcessingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT),
+    m_engine(engine)
 {
     m_pluginDiagnosticEventThread =
         std::make_unique<std::thread>([this]() { processPluginDiagnosticEvents(); });
@@ -174,7 +178,7 @@ std::string DeviceAgent::manifestString() const
 )json";
 }
 
-StringMapResult DeviceAgent::settingsReceived()
+Result<const IStringMap*> DeviceAgent::settingsReceived()
 {
     parseSettings();
     updateObjectGenerationParameters();
@@ -186,12 +190,18 @@ StringMapResult DeviceAgent::settingsReceived()
 /** @param func Name of the caller for logging; supply __func__. */
 void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* func)
 {
+    if (m_deviceAgentSettings.additionalFrameProcessingDelay.load()
+        > std::chrono::milliseconds::zero())
+    {
+        std::this_thread::sleep_for(m_deviceAgentSettings.additionalFrameProcessingDelay.load());
+    }
+
     NX_OUTPUT << func << "(): timestamp " << videoFrame->timestampUs() << " us;"
         << " frame #" << m_frameCounter;
 
     if (m_deviceAgentSettings.leakFrames)
     {
-        NX_PRINT << "Intentionally creating a memomry leak with IDataPacket @"
+        NX_PRINT << "Intentionally creating a memory leak with IDataPacket @"
             << nx::kit::utils::toString(videoFrame);
         videoFrame->addRef();
     }
@@ -210,7 +220,7 @@ void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* f
 
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
 {
-    if (engine()->needUncompressedVideoFrames())
+    if (m_engine->needUncompressedVideoFrames())
     {
         NX_PRINT << "ERROR: Received compressed video frame, contrary to manifest.";
         return false;
@@ -222,7 +232,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
 
 bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* videoFrame)
 {
-    if (!engine()->needUncompressedVideoFrames())
+    if (!m_engine->needUncompressedVideoFrames())
     {
         NX_PRINT << "ERROR: Received uncompressed video frame, contrary to manifest.";
         return false;
@@ -257,13 +267,13 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
     return true;
 }
 
-Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* /*outResult*/, const IMetadataTypes* neededMetadataTypes)
 {
-    if (metadataTypes->isEmpty())
+    if (neededMetadataTypes->isEmpty())
         stopFetchingMetadata();
 
-    startFetchingMetadata(metadataTypes);
-    return {};
+    startFetchingMetadata(neededMetadataTypes);
 }
 
 void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
@@ -337,12 +347,13 @@ void DeviceAgent::processPluginDiagnosticEvents()
     }
 }
 
-SettingsResponseResult DeviceAgent::pluginSideSettings() const
+void DeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* outResult) const
 {
-    auto response = new SettingsResponse();
+    const auto response = new SettingsResponse();
     response->setValue("pluginSideTestSpinBox", "100");
 
-    return response;
+    *outResult = response;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -510,12 +521,12 @@ int64_t DeviceAgent::usSinceEpoch() const
 
 bool DeviceAgent::checkVideoFrame(const IUncompressedVideoFrame* frame) const
 {
-    if (frame->pixelFormat() != engine()->pixelFormat())
+    if (frame->pixelFormat() != m_engine->pixelFormat())
     {
         NX_PRINT << __func__ << "() ERROR: Video frame has pixel format "
             << pixelFormatToStdString(frame->pixelFormat())
             << " instead of "
-            << pixelFormatToStdString(engine()->pixelFormat());
+            << pixelFormatToStdString(m_engine->pixelFormat());
         return false;
     }
 
@@ -627,14 +638,15 @@ void DeviceAgent::dumpSomeFrameBytes(
 void DeviceAgent::parseSettings()
 {
     auto assignIntegerSetting =
-        [this](const std::string& parameterName, std::atomic<int>* target)
+        [this](const std::string& parameterName, auto target)
         {
             using namespace nx::kit::utils;
             int result = 0;
             const auto parameterValueString = settingValue(parameterName);
             if (fromString(parameterValueString, &result))
             {
-                *target = result;
+                using AtomicValueType = decltype(target->load());
+                target->store(AtomicValueType{result});
             }
             else
             {
@@ -663,6 +675,10 @@ void DeviceAgent::parseSettings()
     assignIntegerSetting(
         kNumberOfObjectsToGenerateSetting,
         &m_deviceAgentSettings.numberOfObjectsToGenerate);
+
+    assignIntegerSetting(
+        kAdditionalFrameProcessingDelayMs,
+        &m_deviceAgentSettings.additionalFrameProcessingDelay);
 }
 
 void DeviceAgent::updateObjectGenerationParameters()

@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh-CN" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>任何类型</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>选择区域</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>选择视频中的某区域...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>在选定区域</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>无法执行插件操作</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>输入参数。</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>操作需要填入参数。</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1013,6 +1044,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>请重新输入布局 %1密码：</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>服务器事件</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>分析事件</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>任一事件</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>任一设备问题</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>任一摄像机问题</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>任一服务器事件</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>设备问题</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>摄像机问题</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>任一分析事件</translation>
     </message>
   </context>
   <context>
@@ -5871,10 +5941,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>不包含任何个人信息，并且完全匿名</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>无论此设定为何，备援服务器仍可请求摄像机更新状态。</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>启用设备和服务器的自动搜寻以及自动确认设备状态</translation>
     </message>
@@ -5885,6 +5951,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>启用后，系统会持续搜寻新的摄像机和服务器，并向摄像机传送请求以进行状态更新。</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>如果备援移转已启用，无论设定为何，服务器仍可请求摄像机更新状态。</translation>
     </message>
   </context>
   <context>
@@ -5904,44 +5974,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>电子表格（CSV）文件</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>服务器</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>偏移</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>日期</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>时区</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>时间</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>没有服务器具有互联网访问权限。时间不会被同步。</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>VMS时间与網路同步，不依赖于服务器上的本地时间。</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>VMS时间与所选服务器上的本地时间同步，并且不取决于其他服务器上的本地时间。</translation>
     </message>
   </context>
   <context>
@@ -7040,6 +7072,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>选择视频上的区域来筛选结果</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>在选定区域</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>选择摄像机</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>选择设备</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>选择媒体</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>无</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7278,38 +7338,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n 物件</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>任何类型</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>选择区域</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>选择视频中的某区域...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>在选定区域</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>未命名的分析引擎</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>无法执行插件操作</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>输入参数。</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>操作需要填入参数。</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7351,17 +7379,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>保存更改...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>此 I/O 模块有没有高级的设置</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>摄像机没有高级的设置</translation>
     </message>
   </context>
   <context>
@@ -7907,42 +7924,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>服务器事件</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>分析事件</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>任一设备问题</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>任一摄像机问题</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>任一服务器事件</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>设备问题</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>摄像机问题</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>任一事件</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>任一分析事件</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>无事件</translation>
@@ -8493,11 +8474,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>有些服务器未完成更新。继续完成？</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 将重新启动到更新的版本。</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -9128,14 +9104,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>选择视频上的区域来筛选结果</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>在选定区域</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>无移动</translation>
     </message>
@@ -9148,23 +9116,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>
         <numerusform>%n 移动事件</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>选择摄像机</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>选择设备</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>选择媒体</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>无</translation>
     </message>
   </context>
   <context>

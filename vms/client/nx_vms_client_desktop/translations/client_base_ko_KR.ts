@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ko" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>아무 유형</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>영역 선택</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>비디오에서 일부 영역을 선택하십시오...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation type="unfinished">In selected area</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>플러그인 작업을 실행하는데 실패했습니다</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>매개 변수 입력</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>작업을 수행하려면 일부 매개 변수를 채워야합니다.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1011,7 +1042,46 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>레이아웃 %1비밀번호를 다시 입력하십시오:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>서버 이벤트</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>분석 이벤트</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>모든 이벤트</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>모든 장치 문제</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>모든 카메라 문제</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>모든 서버 이벤트</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>장치 문제</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>카메라 문제</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>모든 분석 이벤트</translation>
     </message>
   </context>
   <context>
@@ -1322,7 +1392,7 @@ to view more bookmarks</source>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>레이아웃이 잠겨 있습니다</translation>
     </message>
   </context>
   <context>
@@ -1576,15 +1646,15 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>%1의 %n 세션에 대 한 세부 정보</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>%1의 %n 카메라들에 대 한 세부 정보</numerusform>
       </translation>
     </message>
   </context>
@@ -1740,12 +1810,12 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>설치된 것을 업데이트</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n 작업들</numerusform>
       </translation>
     </message>
   </context>
@@ -5870,10 +5940,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>개인 정보는 포함되지 않으며 완전히 익명입니다.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
     </message>
@@ -5884,6 +5950,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>장애 조치가 활성화 된 경우 서버는이 설정에 관계없이 카메라 상태 업데이트를 계속 요청할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -5903,44 +5973,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation type="unfinished">Spread Sheet (CSV) File</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>서버</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>오프셋</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>날짜</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>시간대</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>시간</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>인터넷에 액세스 할 수있는 서버가 없습니다. 시간이 동기화되지 않습니다.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
     </message>
   </context>
   <context>
@@ -7039,6 +7071,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation type="unfinished">Select area on the video to filter results</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation type="unfinished">In selected area</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>선택된 카메라</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation type="unfinished">Selected device</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation type="unfinished">Selected media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>없음</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7277,38 +7337,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n objects</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation type="unfinished">Failed to execute plugin action</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7350,17 +7378,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>변경 적용</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>이 장치는고급 설정 없음</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>이 카메라는고급 설정 없음</translation>
     </message>
   </context>
   <context>
@@ -7626,11 +7643,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>모션 감지가 비활성화되어, 모든 &quot;동작&quot; 및 &quot;동작 + Lo-Res&quot; 스케줄 녹화가 &quot;항상&amp;quot 으로 변경됩니다;</translation>
+      <translation>모션 감지가 비활성화되어, 모든 &quot;동작&quot; 및 &quot;동작 + Lo-Res&quot; 스케줄 녹화가 &quot;항상&quot; 으로 변경됩니다;</translation>
     </message>
     <message>
       <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>듀얼 스트리밍이 비활성화 되어있어, 모든 &quot;Motion + Lo-Res&quot; 스케줄 녹화가 &quot;항상&amp;quot 으로 변경됩니다;</translation>
+      <translation>듀얼 스트리밍이 비활성화 되어있어, 모든 &quot;Motion + Lo-Res&quot; 스케줄 녹화가 &quot;항상&quot; 으로 변경됩니다;</translation>
     </message>
   </context>
   <context>
@@ -7906,42 +7923,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>이벤트 없음</translation>
@@ -8492,11 +8473,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>일부 서버에서는 업데이트 프로세스가 완료되지 않았습니다. 그래도 종료하시겠습니까?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 업데이트 버전을 다시 시작 됩니다.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -9127,14 +9103,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation type="unfinished">No motion</translation>
     </message>
@@ -9147,23 +9115,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">
         <numerusform>%n motion events</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>선택된 카메라</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>없음</translation>
     </message>
   </context>
   <context>

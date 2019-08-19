@@ -16,6 +16,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 
+#include <business/business_resource_validation.h>
 #include <common/common_module.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_access/resource_access_manager.h>
@@ -26,6 +27,61 @@
 #include <nx/vms/event/strings_helper.h>
 
 namespace nx::vms::client::desktop {
+
+class AccessValidator: public QnSubjectValidationPolicy
+{
+public:
+    AccessValidator(QnCommonModule* common):
+        m_accessManager(common->resourceAccessManager()),
+        m_rolesManager(common->userRolesManager())
+    {
+    }
+
+    virtual QValidator::State roleValidity(const QnUuid& roleId) const override
+    {
+        if (m_layout)
+        {
+            // Admins have access to all layouts.
+            if (QnUserRolesManager::adminRoleIds().contains(roleId))
+                return QValidator::Acceptable;
+
+            // For other users access permissions depend on the layout kind.
+            if (m_layout->isShared())
+            {
+                // Shared layout. Ask AccessManager for details.
+                return m_accessManager->hasPermission(
+                    m_rolesManager->userRole(roleId), m_layout, Qn::ReadPermission)
+                    ? QValidator::Acceptable
+                    : QValidator::Invalid;
+            }
+            else
+            {
+                // Local layout. Non-admin groups have no access.
+                return QValidator::Invalid;
+            }
+        }
+
+        // No layout has been selected. All users are acceptable.
+        return QValidator::Acceptable;
+    }
+
+    virtual bool userValidity(const QnUserResourcePtr& user) const override
+    {
+        return m_layout
+            ? m_accessManager->hasPermission(user, m_layout, Qn::ReadPermission)
+            : false;
+    }
+
+    void setLayout(const QnLayoutResourcePtr& layout)
+    {
+        m_layout = layout;
+    }
+
+private:
+    QnResourceAccessManager* m_accessManager;
+    QnUserRolesManager* m_rolesManager;
+    QnLayoutResourcePtr m_layout;
+};
 
 OpenLayoutActionWidget::OpenLayoutActionWidget(QWidget* parent):
     base_type(parent),
@@ -43,6 +99,9 @@ OpenLayoutActionWidget::OpenLayoutActionWidget(QWidget* parent):
     ui->warningForUsers->setHidden(true);
 
     setSubjectsButton(ui->selectUsersButton);
+
+    m_validator = new AccessValidator(commonModule());
+    setValidationPolicy(m_validator); //< Takes ownership, so we use raw pointer here.
 }
 
 OpenLayoutActionWidget::~OpenLayoutActionWidget()
@@ -61,14 +120,20 @@ void OpenLayoutActionWidget::at_model_dataChanged(Fields fields)
     if (!model())
         return;
 
+    if (fields.testFlag(Field::actionParams))
+    {
+        // Validator should be updated before the call to base_type.
+        auto params = model()->actionParams();
+        m_selectedLayout = resourcePool()->getResourceById<QnLayoutResource>(params.actionResourceId);
+        m_validator->setLayout(m_selectedLayout);
+    }
+
     base_type::at_model_dataChanged(fields);
 
     QScopedValueRollback<bool> updatingRollback(m_updating, true);
 
     if (fields.testFlag(Field::actionParams))
     {
-        auto params = model()->actionParams();
-        m_selectedLayout = resourcePool()->getResourceById<QnLayoutResource>(params.actionResourceId);
         checkWarnings();
         updateLayoutsButton();
     }
@@ -81,17 +146,9 @@ void OpenLayoutActionWidget::displayWarning(LayoutWarning warning)
 
     switch (warning)
     {
-        case LayoutWarning::MissingAccess:
-            setWarningStyle(ui->warningForUsers);
-            ui->warningForLayouts->setText(
-                tr("Some users do not have access to the selected layout. "
-                    "Action will not work for them."));
-            break;
-        case LayoutWarning::NobodyHasAccess:
-            setWarningStyle(ui->warningForUsers);
-            ui->warningForLayouts->setText(
-                tr("None of selected users have access to the selected layout. "
-                    "Action will not work."));
+        case LayoutWarning::LocalResource:
+            setWarningStyle(ui->warningForLayouts);
+            ui->warningForLayouts->setText(tr("Local layouts can only be shown to their owners."));
             break;
         case LayoutWarning::NoWarning:
             break;
@@ -107,13 +164,23 @@ void OpenLayoutActionWidget::displayWarning(UserWarning warning)
 
     switch (warning)
     {
-        case UserWarning::LocalResource:
-            setWarningStyle(ui->warningForUsers);
-            ui->warningForUsers->setText(tr("Local layouts can only be shown to their owners."));
-            break;
         case UserWarning::EmptyRoles:
             setWarningStyle(ui->warningForUsers);
-            ui->warningForUsers->setText(tr("None of selected user roles contain users. Action will not work."));
+            ui->warningForUsers->setText(
+                tr("None of selected user roles contain users. Action will not work."));
+            break;
+        case UserWarning::MissingAccess:
+            setWarningStyle(ui->warningForUsers);
+            ui->warningForUsers->setText(
+                tr("Some users do not have access to the selected layout. "
+                    "Action will not work for them."));
+            break;
+        case UserWarning::NobodyHasAccess:
+            setWarningStyle(ui->warningForUsers);
+            ui->warningForUsers->setText(
+                tr("None of selected users have access to the selected layout. "
+                    "Action will not work."));
+            break;
         case UserWarning::NoWarning:
             break;
     }
@@ -125,9 +192,10 @@ void OpenLayoutActionWidget::checkWarnings()
 {
     QString warnings;
 
-    bool rolesSelected;
     QnResourcePtr layout = getSelectedLayout();
-    QnUserResourceList users = getSelectedUsers(rolesSelected);
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+    std::tie(users, roles) = getSelectedUsersAndRoles();
 
     bool foundUserWarning = false;
     bool foundLayoutWarning = false;
@@ -146,27 +214,38 @@ void OpenLayoutActionWidget::checkWarnings()
             if (!accessManager->hasPermission(user, layout, Qn::ReadPermission))
                 ++noAccess;
 
-            if (parentResource && parentResource->getParentId() != user->getId())
+            if (parentResource && parentResource->getId() != user->getId())
                 othersLocal = true;
         }
-    }
 
-    if (noAccess > 0)
-    {
-        displayWarning(noAccess == users.size() ? LayoutWarning::NobodyHasAccess : LayoutWarning::MissingAccess);
-        foundLayoutWarning = true;
-    }
-
-    if (rolesSelected && !users.size())
-    {
-        displayWarning(UserWarning::EmptyRoles);
-        foundUserWarning = true;
+        for (auto role: roles)
+        {
+            if (m_validator->roleValidity(role) != QValidator::Acceptable)
+                ++noAccess;
+        }
     }
 
     if (othersLocal)
     {
-        displayWarning(UserWarning::LocalResource);
-        foundUserWarning = true;
+        displayWarning(LayoutWarning::LocalResource);
+        foundLayoutWarning = true;
+    }
+
+    // Right now we show layout warning only if a local layout is selected.
+    // According to the spec, we shouldn't show additional user warnings in this case.
+    if (!foundLayoutWarning)
+    {
+        if (noAccess > 0)
+        {
+            displayWarning(noAccess == users.size() + roles.size() ? UserWarning::NobodyHasAccess : UserWarning::MissingAccess);
+            foundUserWarning = true;
+        }
+
+        if (roles.size() && !users.size())
+        {
+            displayWarning(UserWarning::EmptyRoles);
+            foundUserWarning = true;
+        }
     }
 
     if (!foundUserWarning)
@@ -180,21 +259,22 @@ QnLayoutResourcePtr OpenLayoutActionWidget::getSelectedLayout()
     return m_selectedLayout;
 }
 
-QnUserResourceList OpenLayoutActionWidget::getSelectedUsers(bool& rolesSelected)
+std::pair<QnUserResourceList, QList<QnUuid>> OpenLayoutActionWidget::getSelectedUsersAndRoles()
 {
     QnUserResourceList users;
+    QList<QnUuid> roles;
     if (model())
     {
         const auto params = model()->actionParams();
-        QList<QnUuid> roles;
         userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
-        rolesSelected = roles.size();
+
         for (const auto& roleId: roles)
             for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(roleId))
                 users.append(subject.user()); //< TODO: skip duplicates?
+
         users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
     }
-    return users;
+    return std::pair(users, roles);
 }
 
 void OpenLayoutActionWidget::updateLayoutsButton()
@@ -256,8 +336,9 @@ void OpenLayoutActionWidget::openLayoutSelectionDialog()
     const bool singlePick = true;
     LayoutSelectionDialog dialog(singlePick, this);
 
-    bool rolesSelected; //< #TODO: check specification for the case when selection includes roles
-    const auto& users = getSelectedUsers(rolesSelected);
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+    std::tie(users, roles) = getSelectedUsersAndRoles();
 
     LayoutSelectionDialog::LocalLayoutSelection selectionMode =
         LayoutSelectionDialog::ModeFull;

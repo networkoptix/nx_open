@@ -139,7 +139,7 @@ void ObjectTrackDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
         m_trackGuidToId[track.id] = trackDbId;
         m_objectTrackCache->setTrackIdInDb(track.id, trackDbId);
 
-        m_objectTrackCache->saveTrackGuidToAttributesId(
+        m_objectTrackCache->saveTrackIdToAttributesId(
             track.id, attributesId);
     }
 }
@@ -191,7 +191,7 @@ void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
             : (long long) m_objectTrackCache->dbIdFromTrackId(trackUpdate.trackId));
         updateObjectQuery->exec();
 
-        m_objectTrackCache->saveTrackGuidToAttributesId(trackUpdate.trackId, newAttributesId);
+        m_objectTrackCache->saveTrackIdToAttributesId(trackUpdate.trackId, newAttributesId);
     }
 }
 
@@ -304,7 +304,7 @@ ObjectTrackDataSaver::ObjectTrackDbAttributes
     ObjectTrackDataSaver::getTrackDbDataById(const QnUuid& trackId)
 {
     ObjectTrackDbAttributes result;
-    result.attributesDbId = m_objectTrackCache->getAttributesIdByTrackGuid(trackId);
+    result.attributesDbId = m_objectTrackCache->getAttributesIdByTrackId(trackId);
     if (auto track = m_objectTrackCache->getTrackById(trackId); track)
     {
         result.objectTypeId = m_objectTypeDao->objectTypeIdFromName(track->objectTypeId);

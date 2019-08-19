@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pl" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Dowolny typ</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Wybierz obszar</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Wybierz obszar na wideo...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>W zaznaczonym obszarze</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Nie udało się uruchomić akcji wtyczki</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Wprowadź parametry</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Akcja wymaga wypełnienia niektórych parametrów.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1012,6 +1043,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Wprowadź ponownie hasło dla układu %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Zdarzenia serwera</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Zdarzenia analityczne</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Dowolne zdarzenie</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Dowolny problem z urządzeniem</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Dowolny problem z kamerą</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Dowolne zdarzenie na serwerze</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Problemy z urządzeniem</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Problemy z kamerą</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Dowolne zdarzenie analityczne</translation>
     </message>
   </context>
   <context>
@@ -6055,10 +6125,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Nie zawiera informacji osobistych i jest całkowicie anonimowe.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Funkcja failover może nadal powodować wysyłanie zapytań o stany kamer niezależnie od tego ustawienia.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Włącz automatyczne wykrywanie urządzeń i serwerów oraz automatyczne sprawdzanie stanów urządzeń</translation>
     </message>
@@ -6069,6 +6135,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Po włączeniu tej funkcji system stale wykrywa nowe kamery i serwery oraz wysyła zapytania do kamer w celu aktualizacji ich stanów.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Funkcja failover może nadal powodować wysyłanie zapytań o stany kamer niezależnie od tego ustawienia.</translation>
     </message>
   </context>
   <context>
@@ -6088,44 +6158,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Plik arkusza kalkulacyjnego (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Serwer</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Przesunięcie</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Data</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Strefa czasowa</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Czas</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Serwery nie mają dostępu do Internetu. Czas nie jest synchronizowany.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>Czas VMS jest zsynchronizowany z Internetem i nie zależy od lokalnych serwerów.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>Czas VMS jest zsynchronizowany z wybranym serwerem lokalnym i nie zależy od innych serwerów.</translation>
     </message>
   </context>
   <context>
@@ -7332,6 +7364,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Wybierz obszar wideo, aby filtrować wyniki</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>W zaznaczonym obszarze</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Wybrana kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Wybrane urządzenie</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Wybrane media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>brak</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7576,38 +7636,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n obiektów</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Dowolny typ</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Wybierz obszar</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Wybierz obszar na wideo...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>W zaznaczonym obszarze</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>nieznany silnik analityczny</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Nie udało się uruchomić akcji wtyczki</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Wprowadź parametry</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Akcja wymaga wypełnienia niektórych parametrów.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7652,17 +7680,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>Zapisywanie zmian...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Ten moduł I/O nie ma ustawień zaawansowanych</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Ta kamera nie ma ustawień zaawansowanych</translation>
     </message>
   </context>
   <context>
@@ -8242,42 +8259,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation>Zdarzenia serwera</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Zdarzenia analityczne</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Dowolny problem z urządzeniem</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Dowolny problem z kamerą</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Dowolne zdarzenie na serwerze</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Problemy z urządzeniem</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Problemy z kamerą</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Dowolne zdarzenie</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Dowolne zdarzenie analityczne</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Brak zdarzeń</translation>
     </message>
@@ -8842,11 +8823,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>Niektóre serwery nie zakończyły jeszcze procesu aktualizacji, czy na pewno zamknąć?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 zostanie uruchomiony ponownie w zaktualizowanej wersji.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -9483,14 +9459,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Wybierz obszar wideo, aby filtrować wyniki</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>W zaznaczonym obszarze</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Brak ruchu</translation>
     </message>
@@ -9506,23 +9474,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n zdarzeń ruchu</numerusform>
         <numerusform>%n zdarzeń ruchu</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Wybrana kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Wybrane urządzenie</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Wybrane media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>brak</translation>
     </message>
   </context>
   <context>

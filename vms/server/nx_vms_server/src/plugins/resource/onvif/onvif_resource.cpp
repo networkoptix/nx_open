@@ -3802,7 +3802,15 @@ void QnPlOnvifResource::stopInputPortStatesMonitoring()
     }
 
     if (serverModule()->isStopping())
+    {
+        /*
+            This of course does not solve the problem completely, but dramatically lowers the crash
+            probability. As we can't fix the core crash reason before release, let's use this crutch.
+            The crash is possible, if server begins to stop after "if (serverModule()->isStopping())"
+            check is finished and stops really quickly (that is nearly impossible).
+        */
         return;
+    }
 
     if (QnSoapServer::instance() && QnSoapServer::instance()->getService())
         QnSoapServer::instance()->getService()->removeResourceRegistration(toSharedPointer(this));
@@ -4626,11 +4634,6 @@ void QnPlOnvifResource::setOutputPortStateNonSafe(
     NX_DEBUG(this, "Successfully set relay %1 output state to %2. endpoint %3",
         relayOutputInfo.token, onvifActive, soapWrapper.endpoint());
     return /*true*/;
-}
-
-QnMutex* QnPlOnvifResource::getStreamConfMutex()
-{
-    return &m_streamConfMutex;
 }
 
 void QnPlOnvifResource::beforeConfigureStream(Qn::ConnectionRole /*role*/)

@@ -187,6 +187,9 @@ void AbstractSearchWidget::Private::setupModels()
     connect(m_mainModel.data(), &QAbstractItemModel::rowsInserted,
         this, &Private::handleItemCountChanged);
 
+    connect(m_mainModel.data(), &AbstractSearchListModel::liveAboutToBeCommitted,
+        this, &Private::updateFetchDirection);
+
     using FetchDirection = AbstractSearchListModel::FetchDirection;
     using UpdateMode = EventRibbon::UpdateMode;
 
@@ -382,7 +385,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
                     setSelectedPeriod(period);
 
                     if (ini().automaticFilterByTimelineSelection && period != Period::selection)
-                        navigator()->clearTimeSelection();
+                        navigator()->clearTimelineSelection();
                 });
 
             m_timeSelectionActions[period] = action;
@@ -454,10 +457,14 @@ void AbstractSearchWidget::Private::setupTimeSelection()
 
     // Setup day change watcher.
 
-    m_dayChangeTimer->setInterval(1s);
+    m_dayChangeTimer->start(1s);
 
-    connect(m_dayChangeTimer.data(), &QTimer::timeout,
-        this, &Private::updateCurrentTimePeriod);
+    connect(m_dayChangeTimer.data(), &QTimer::timeout, this,
+        [this]()
+        {
+            updateCurrentTimePeriod();
+            setCurrentDate(qnSyncTime->currentDateTime().date());
+        });
 }
 
 void AbstractSearchWidget::Private::setupCameraSelection()
@@ -622,7 +629,7 @@ void AbstractSearchWidget::Private::setAllowed(bool value)
 
 void AbstractSearchWidget::Private::goToLive()
 {
-    if (m_mainModel->liveSupported())
+    if (m_mainModel->effectiveLiveSupported())
         m_mainModel->setLive(true);
 
     ui->ribbon->scrollBar()->setValue(0);
@@ -661,11 +668,6 @@ void AbstractSearchWidget::Private::setSelectedPeriod(Period value)
     m_previousPeriod = m_period;
     m_period = value;
     updateCurrentTimePeriod();
-
-    if (m_period == Period::day || m_period == Period::week || m_period == Period::month)
-        m_dayChangeTimer->start();
-    else
-        m_dayChangeTimer->stop();
 }
 
 QnTimePeriod AbstractSearchWidget::Private::currentTimePeriod() const
@@ -814,10 +816,10 @@ void AbstractSearchWidget::Private::updateCurrentCameras()
     }
 }
 
-void AbstractSearchWidget::Private::requestFetchIfNeeded()
+bool AbstractSearchWidget::Private::updateFetchDirection()
 {
-    if (!ui->ribbon->isVisible() || !model())
-        return;
+    if (!m_mainModel)
+        return false;
 
     const auto scrollBar = ui->ribbon->scrollBar();
 
@@ -826,9 +828,18 @@ void AbstractSearchWidget::Private::requestFetchIfNeeded()
     else if (scrollBar->value() == scrollBar->minimum())
         setFetchDirection(AbstractSearchListModel::FetchDirection::later);
     else
-        return; //< Scroll bar is not at the beginning nor the end.
+    {
+        setFetchDirection(AbstractSearchListModel::FetchDirection::earlier);
+        return false; //< Scroll bar is not at the beginning nor the end.
+    }
 
-    m_fetchMoreOperation->requestOperation();
+    return true;
+}
+
+void AbstractSearchWidget::Private::requestFetchIfNeeded()
+{
+    if (ui->ribbon->isVisible() && updateFetchDirection())
+        m_fetchMoreOperation->requestOperation();
 }
 
 void AbstractSearchWidget::Private::resetFilters()
@@ -944,6 +955,23 @@ void AbstractSearchWidget::Private::updatePlaceholderVisibility()
     m_placeholderOpacityAnimation->setEasingCurve(kPlaceholderFadeEasing);
     m_placeholderOpacityAnimation->setDuration(kPlaceholderFadeDuration.count() * delta);
     m_placeholderOpacityAnimation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void AbstractSearchWidget::Private::setCurrentDate(const QDate& value)
+{
+    if (m_currentDate == value)
+        return;
+
+    m_currentDate = value;
+
+    const auto model = ui->ribbon->model();
+    const auto range = ui->ribbon->visibleRange();
+
+    if (range.isEmpty() || !NX_ASSERT(model))
+        return;
+
+    emit model->dataChanged(
+        model->index(range.lower()), model->index(range.upper()), {Qn::TimestampTextRole});
 }
 
 } // namespace nx::vms::client::desktop

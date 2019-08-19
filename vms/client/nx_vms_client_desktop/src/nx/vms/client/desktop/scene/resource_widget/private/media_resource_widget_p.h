@@ -9,10 +9,15 @@
 #include <nx/client/core/media/abstract_metadata_consumer_owner.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
 
+#include <nx/vms/api/types/resource_types.h>
+
 #include <utils/common/connective.h>
 
 class QnSingleCamLicenseStatusHelper;
 class QnWorkbenchAccessController;
+
+namespace nx::analytics { class MetadataLogParser; }
+namespace nx::analytics::db { struct Filter; }
 
 namespace nx::vms::client::desktop {
 
@@ -45,6 +50,7 @@ public:
     nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider;
 
     QScopedPointer<WidgetAnalyticsController> analyticsController;
+    std::unique_ptr<nx::analytics::MetadataLogParser> analyticsMetadataLogParser;
 
 public:
     explicit MediaResourceWidgetPrivate(
@@ -66,6 +72,13 @@ public:
     QSharedPointer<nx::media::AbstractMetadataConsumer> motionMetadataConsumer() const;
     QSharedPointer<nx::media::AbstractMetadataConsumer> analyticsMetadataConsumer() const;
 
+    void setMotionEnabled(bool enabled);
+
+    bool isAnalyticsEnabled() const;
+    void setAnalyticsEnabled(bool enabled);
+
+    void setAnalyticsFilter(const nx::analytics::db::Filter& value);
+
 signals:
     void stateChanged();
     void licenseStatusChanged();
@@ -84,6 +97,12 @@ private:
     bool calculateIsAnalyticsSupported() const;
     void updateIsAnalyticsSupported();
 
+    /** Request analytics objects once to check if they exist in the archive. */
+    void requestAnalyticsObjectsExistence();
+
+    void setStreamDataFilter(nx::vms::api::StreamDataFilter filter, bool on);
+    void setStreamDataFilters(nx::vms::api::StreamDataFilters filters);
+
 private:
     QnResourceDisplayPtr m_display;
     QScopedPointer<QnSingleCamLicenseStatusHelper> m_licenseStatusHelper;
@@ -92,6 +111,8 @@ private:
     bool m_isPlayingLive = false;
     bool m_isOffline = false;
     bool m_isUnauthorized = false;
+    bool m_analyticsObjectsFound = false;
+    bool m_forceDisabledAnalytics = false;
 };
 
 } // namespace nx::vms::client::desktop

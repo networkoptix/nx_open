@@ -40,6 +40,11 @@ EventsStorage::~EventsStorage()
     if (!m_dbController)
         return;
 
+    {
+        QnMutexLocker lock(&m_dbControllerMutex);
+        m_stopped = true;
+    }
+
     // Flushing all cached data.
     // Since update queries are queued all scheduled requests will be completed before flush.
     std::promise<ResultCode> done;
@@ -61,8 +66,10 @@ bool EventsStorage::initialize(const Settings& settings)
             cursor->close();
         m_openedCursors.clear();
     }
-    m_analyticsArchiveDirectory.reset();
+    // Unprocessed tasks in dbController could reference to m_analyticsArchiveDirectory
+    // via detectionDataSaver. Destroy dbController first.
     m_dbController.reset();
+    m_analyticsArchiveDirectory.reset();
 
     m_closingDbController = false;
 
@@ -88,34 +95,36 @@ void EventsStorage::save(common::metadata::ConstObjectMetadataPacketPtr packet)
 {
     using namespace std::chrono;
 
+    NX_VERBOSE(this, "Saving packet %1", *packet);
+
     QElapsedTimer t;
     t.restart();
 
-    NX_VERBOSE(this, "Saving packet %1", *packet);
-
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_maxRecordedTimestamp = std::max<milliseconds>(
-            m_maxRecordedTimestamp,
-            duration_cast<milliseconds>(microseconds(packet->timestampUs)));
-    }
-
     QnMutexLocker lock(&m_mutex);
+
+    NX_VERBOSE(this, "Saving packet (1). %1ms", t.elapsed());
+
+    m_maxRecordedTimestamp = std::max<milliseconds>(
+        m_maxRecordedTimestamp,
+        duration_cast<milliseconds>(microseconds(packet->timestampUs)));
+
     savePacketDataToCache(lock, packet);
     ObjectTrackDataSaver detectionDataSaver = takeDataToSave(lock, /*flush*/ false);
     lock.unlock();
 
+    if (detectionDataSaver.empty())
+    {
+        NX_VERBOSE(this, "Saving packet (2) took %1ms", t.elapsed());
+        return;
+    }
+
     QnMutexLocker dbLock(&m_dbControllerMutex);
+
+    NX_VERBOSE(this, "Saving packet (3). %1ms", t.elapsed());
 
     if (!m_dbController)
     {
         NX_DEBUG(this, "Attempt to write to non-initialized analytics DB");
-        return;
-    }
-
-    if (detectionDataSaver.empty())
-    {
-        NX_VERBOSE(this, "Saving packet (1) took %1ms", t.elapsed());
         return;
     }
 
@@ -129,7 +138,7 @@ void EventsStorage::save(common::metadata::ConstObjectMetadataPacketPtr packet)
         [this](sql::DBResult resultCode) { logDataSaveResult(resultCode); },
         kSaveEventQueryAggregationKey);
 
-    NX_VERBOSE(this, "Saving packet (2) took %1ms", t.elapsed());
+    NX_VERBOSE(this, "Saving packet (4) took %1ms", t.elapsed());
 }
 
 void EventsStorage::createLookupCursor(
@@ -271,7 +280,7 @@ void EventsStorage::markDataAsDeprecated(
     NX_VERBOSE(this, "Cleaning data of device %1 up to timestamp %2",
         deviceId, oldestDataToKeepTimestamp.count());
 
-    scheduleDataCleanup(deviceId, oldestDataToKeepTimestamp);
+    scheduleDataCleanup(lock, deviceId, oldestDataToKeepTimestamp);
 }
 
 void EventsStorage::flush(StoreCompletionHandler completionHandler)
@@ -358,6 +367,9 @@ bool EventsStorage::readMaximumEventTimestamp()
 
 bool EventsStorage::readMinimumEventTimestamp(std::chrono::milliseconds* outResult)
 {
+    // TODO: The mutex is locked here for the duration of DB query which is a long lock.
+    // Long locks should not happen.
+
     QnMutexLocker dbLock(&m_dbControllerMutex);
 
     if (!m_dbController)
@@ -370,14 +382,14 @@ bool EventsStorage::readMinimumEventTimestamp(std::chrono::milliseconds* outResu
     {
         *outResult = m_dbController->queryExecutor().executeSelectQuerySync(
             [](nx::sql::QueryContext* queryContext)
-        {
-            auto query = queryContext->connection()->createQuery();
-            query->prepare("SELECT min(track_start_ms) FROM track");
-            query->exec();
-            if (query->next())
-                return std::chrono::milliseconds(query->value(0).toLongLong());
-            return std::chrono::milliseconds::zero();
-        });
+            {
+                auto query = queryContext->connection()->createQuery();
+                query->prepare("SELECT min(track_start_ms) FROM track");
+                query->exec();
+                if (query->next())
+                    return std::chrono::milliseconds(query->value(0).toLongLong());
+                return std::chrono::milliseconds::zero();
+            });
     }
     catch (const std::exception& e)
     {
@@ -407,53 +419,6 @@ bool EventsStorage::loadDictionaries()
     }
 
     return true;
-}
-
-void EventsStorage::updateDictionariesIfNeeded(
-    nx::sql::QueryContext* queryContext,
-    const common::metadata::ObjectMetadataPacket& packet,
-    const common::metadata::ObjectMetadata& objectMetadata)
-{
-    m_deviceDao.insertOrFetch(queryContext, packet.deviceId);
-    m_objectTypeDao.insertOrFetch(queryContext, objectMetadata.objectTypeId);
-}
-
-void EventsStorage::insertEvent(
-    sql::QueryContext* queryContext,
-    const common::metadata::ObjectMetadataPacket& packet,
-    const common::metadata::ObjectMetadata& objectMetadata,
-    int64_t attributesId,
-    int64_t /*timePeriodId*/)
-{
-    sql::SqlQuery insertEventQuery(queryContext->connection());
-    insertEventQuery.prepare(QString::fromLatin1(R"sql(
-        INSERT INTO event(timestamp_usec_utc, duration_usec,
-            device_id, object_type_id, object_id, attributes_id,
-            box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y)
-        VALUES(:timestampMs, :durationMs, :deviceId,
-            :objectTypeId, :trackId, :attributesId,
-            :boxTopLeftX, :boxTopLeftY, :boxBottomRightX, :boxBottomRightY)
-    )sql"));
-    insertEventQuery.bindValue(":timestampMs", packet.timestampUs / kUsecInMs);
-    insertEventQuery.bindValue(":durationMs", packet.durationUs / kUsecInMs);
-    insertEventQuery.bindValue(":deviceId", m_deviceDao.deviceIdFromGuid(packet.deviceId));
-    insertEventQuery.bindValue(
-        ":objectTypeId",
-        (long long) m_objectTypeDao.objectTypeIdFromName(objectMetadata.objectTypeId));
-    insertEventQuery.bindValue(
-        ":trackId",
-        QnSql::serialized_field(objectMetadata.trackId));
-
-    insertEventQuery.bindValue(":attributesId", (long long) attributesId);
-
-    const auto packedBoundingBox = packRect(objectMetadata.boundingBox);
-
-    insertEventQuery.bindValue(":boxTopLeftX", packedBoundingBox.topLeft().x());
-    insertEventQuery.bindValue(":boxTopLeftY", packedBoundingBox.topLeft().y());
-    insertEventQuery.bindValue(":boxBottomRightX", packedBoundingBox.bottomRight().x());
-    insertEventQuery.bindValue(":boxBottomRightY", packedBoundingBox.bottomRight().y());
-
-    insertEventQuery.exec();
 }
 
 void EventsStorage::savePacketDataToCache(
@@ -524,6 +489,7 @@ void EventsStorage::reportCreateCursorCompletion(
 }
 
 void EventsStorage::scheduleDataCleanup(
+    const QnMutexLockerBase&,
     QnUuid deviceId,
     std::chrono::milliseconds oldestDataToKeepTimestamp)
 {
@@ -543,7 +509,9 @@ void EventsStorage::scheduleDataCleanup(
             if (cleaner.clean(queryContext) == Cleaner::Result::incomplete)
             {
                 NX_VERBOSE(this, "Could not clean all data in one run. Scheduling another one");
-                scheduleDataCleanup(deviceId, oldestDataToKeepTimestamp);
+                QnMutexLocker lock(&m_dbControllerMutex);
+                if (!m_stopped)
+                    scheduleDataCleanup(lock, deviceId, oldestDataToKeepTimestamp);
             }
 
             return nx::sql::DBResult::ok;

@@ -576,7 +576,7 @@ private:
             {
                 hasProperType |= std::find(
                     filter.objectTypeId.begin(), filter.objectTypeId.end(),
-                    objectMetadata.objectTypeId) != filter.objectTypeId.end();
+                    objectMetadata.typeId) != filter.objectTypeId.end();
             }
             if (!hasProperType)
                 return false;
@@ -620,7 +620,7 @@ private:
             {
                 ObjectTrack track;
                 track.id = objectMetadata.trackId;
-                track.objectTypeId = objectMetadata.objectTypeId;
+                track.objectTypeId = objectMetadata.typeId;
                 track.attributes = objectMetadata.attributes;
                 track.deviceId = packet->deviceId;
                 track.objectPositionSequence.push_back(ObjectPosition());
@@ -797,7 +797,7 @@ protected:
     {
         const auto& randomPacket = nx::utils::random::choice(analyticsDataPackets());
         const auto& randomObject = nx::utils::random::choice(randomPacket->objectMetadataList);
-        m_filter.objectTypeId.push_back(randomObject.objectTypeId);
+        m_filter.objectTypeId.push_back(randomObject.typeId);
     }
 
     void addMaxObjectTracksLimitToFilter()
@@ -821,6 +821,17 @@ protected:
     void addRandomTextFoundInDataToFilter()
     {
         m_filter.freeText = attributeDictionary().getRandomText();
+    }
+
+    void invertTextFilterCase()
+    {
+        if (!m_effectiveLookupFilter)
+            m_effectiveLookupFilter = m_filter;
+
+        if (m_effectiveLookupFilter->freeText.front().isLower())
+            m_effectiveLookupFilter->freeText = m_effectiveLookupFilter->freeText.toUpper();
+        else
+            m_effectiveLookupFilter->freeText = m_effectiveLookupFilter->freeText.toLower();
     }
 
     void addRandomBoundingBoxToFilter()
@@ -867,8 +878,11 @@ protected:
         if (nx::utils::random::number<bool>())
         {
             addRandomObjectTypeIdToFilter();
-            if (!nx::utils::contains(m_filter.objectTypeId, randomPacket->objectMetadataList.front().objectTypeId))
-                m_filter.objectTypeId.push_back(randomPacket->objectMetadataList.front().objectTypeId);
+            if (!nx::utils::contains(
+                m_filter.objectTypeId, randomPacket->objectMetadataList.front().typeId))
+            {
+                m_filter.objectTypeId.push_back(randomPacket->objectMetadataList.front().typeId);
+            }
         }
 
         if (nx::utils::random::number<bool>())
@@ -926,7 +940,7 @@ protected:
             for (auto& objectMetadata: packet->objectMetadataList)
             {
                 objectMetadata.trackId = m_specificObjectTrackId;
-                objectMetadata.objectTypeId = m_specificObjectTrackId.toString();
+                objectMetadata.typeId = m_specificObjectTrackId.toString();
             }
         }
 
@@ -945,7 +959,10 @@ protected:
 
     void whenLookupObjectTracks()
     {
-        base_type::whenLookupObjectTracks(m_filter);
+        if (!m_effectiveLookupFilter)
+            m_effectiveLookupFilter = m_filter;
+
+        base_type::whenLookupObjectTracks(*m_effectiveLookupFilter);
     }
 
     void whenLookupByEmptyFilter()
@@ -1039,6 +1056,7 @@ protected:
 
 private:
     Filter m_filter;
+    std::optional<Filter> m_effectiveLookupFilter;
     QnUuid m_specificObjectTrackId;
     QnTimePeriod m_specificObjectTrackTimePeriod;
 
@@ -1124,6 +1142,15 @@ TEST_F(AnalyticsDbLookup, sort_lookup_result_by_timestamp_descending)
 TEST_F(AnalyticsDbLookup, full_text_search)
 {
     whenLookupByRandomTextFoundInData();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbLookup, full_text_search_case_insensitive)
+{
+    addRandomTextFoundInDataToFilter();
+    invertTextFilterCase();
+    whenLookupObjectTracks();
+
     thenResultMatchesExpectations();
 }
 
@@ -1231,7 +1258,7 @@ protected:
             for (std::size_t i = 0; i < packet->objectMetadataList.size(); ++i)
             {
                 packet->objectMetadataList[i].trackId = trackIds[i];
-                packet->objectMetadataList[i].objectTypeId = trackIds[i].toSimpleString();
+                packet->objectMetadataList[i].typeId = trackIds[i].toSimpleString();
             }
         }
 

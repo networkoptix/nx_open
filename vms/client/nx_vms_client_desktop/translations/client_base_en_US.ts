@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+        <source>Any type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select some area on the video...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In selected area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to execute plugin action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter parameters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Action requires some parameters to be filled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
         <source>Backup newly added devices</source>
@@ -1012,6 +1043,45 @@ to view more bookmarks</source>
     <message>
         <source>Please re-enter password for layout %1:</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+        <source>Server events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analytics events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any device issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any camera issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any server event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device issues</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera issues</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any analytics event</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5930,10 +6000,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Enable devices and servers autodiscovery and automated device status check</source>
         <translation></translation>
     </message>
@@ -5944,6 +6010,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5962,44 +6032,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Spread Sheet (CSV) File</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-        <source>Server</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Offset</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Date</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Timezone</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-        <source>No server has Internet access. Time is not being synchronized.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
         <translation></translation>
     </message>
 </context>
@@ -7135,6 +7167,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
 </context>
 <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+        <source>Select area on the video to filter results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In selected area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>none</source>
+        <comment>No currently selected camera</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>StreamQualityStrings</name>
     <message>
         <source>Lowest</source>
@@ -7375,38 +7435,6 @@ If you intended to move analytics data to another storage location, please conta
             <numerusform>%n objects</numerusform>
         </translation>
     </message>
-    <message>
-        <source>Any type</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select area</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select some area on the video...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>In selected area</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>unnamed analytics engine</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failed to execute plugin action</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enter parameters</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Action requires some parameters to be filled.</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7448,17 +7476,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Applying changes...</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-        <source>This I/O module has no advanced settings</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>This camera has no advanced settings</source>
         <translation></translation>
     </message>
 </context>
@@ -8017,42 +8034,6 @@ If you intended to move analytics data to another storage location, please conta
 <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-        <source>Server events</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Analytics events</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any device issue</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any camera issue</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any server event</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Device issues</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Camera issues</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any event</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Any analytics event</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>No events</source>
         <translation></translation>
     </message>
@@ -8606,11 +8587,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Some servers have not completed the update process. Finish it anyway?</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 will be restarted to the updated version.</source>
-        <comment>Application name will be substituted</comment>
         <translation></translation>
     </message>
     <message>
@@ -9244,14 +9220,6 @@ If you intended to move analytics data to another storage location, please conta
 <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-        <source>Select area on the video to filter results</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>In selected area</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>No motion</source>
         <translation></translation>
     </message>
@@ -9265,23 +9233,6 @@ If you intended to move analytics data to another storage location, please conta
             <numerusform>%n motion event</numerusform>
             <numerusform>%n motion events</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Selected camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Selected device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Selected media</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>none</source>
-        <comment>No currently selected camera</comment>
-        <translation></translation>
     </message>
 </context>
 <context>

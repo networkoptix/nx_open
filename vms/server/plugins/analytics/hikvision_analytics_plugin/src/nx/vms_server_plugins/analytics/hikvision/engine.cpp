@@ -67,40 +67,42 @@ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/
 {
 }
 
-StringMapResult Engine::setSettings(const IStringMap* /*settings*/)
+void Engine::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
-    return nullptr;
 }
 
-SettingsResponseResult Engine::pluginSideSettings() const
+void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
-MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
     if (!isCompatible(deviceInfo))
-        return nullptr;
+        return;
 
     auto supportedEventTypeIds = fetchSupportedEventTypeIds(deviceInfo);
     if (!supportedEventTypeIds)
-        return error(ErrorCode::internalError, "No supported event types");
+    {
+        *outResult = error(ErrorCode::internalError, "No supported event types");
+        return;
+    }
 
     nx::vms::api::analytics::DeviceAgentManifest deviceAgentManifest;
     deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
 
-    auto deviceAgent = new DeviceAgent(this);
+    const auto deviceAgent = new DeviceAgent(this);
     deviceAgent->setDeviceInfo(deviceInfo);
     deviceAgent->setDeviceAgentManifest(QJson::serialized(deviceAgentManifest));
     deviceAgent->setEngineManifest(engineManifest());
 
-    return deviceAgent;
+    *outResult = deviceAgent;
 }
 
-StringResult Engine::manifest() const
+void Engine::getManifest(Result<const IString*>* outResult) const
 {
-    return new nx::sdk::String(m_manifest);
+    *outResult = new nx::sdk::String(m_manifest);
 }
 
 QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
@@ -183,9 +185,8 @@ const Hikvision::EngineManifest& Engine::engineManifest() const
     return m_engineManifest;
 }
 
-Result<void> Engine::executeAction(IAction* /*action*/)
+void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
 {
-    return {};
 }
 
 void Engine::setHandler(IHandler* /*handler*/)

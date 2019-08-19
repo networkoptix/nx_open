@@ -12,7 +12,7 @@ namespace analytics {
 class IEngineInfo: public Interface<IEngineInfo>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::IEngineInfo"); }
+    static auto interfaceId() { return makeId("nx::sdk::IEngineInfo"); }
 
     /** @return Id assigned to this Engine by the Server. */
     virtual const char* id() const = 0;

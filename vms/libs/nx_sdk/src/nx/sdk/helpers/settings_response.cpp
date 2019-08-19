@@ -11,7 +11,7 @@ SettingsResponse::SettingsResponse(Ptr<StringMap> values, Ptr<StringMap> errors)
 {
 }
 
-IStringMap* SettingsResponse::values() const
+IStringMap* SettingsResponse::getValues() const
 {
     if (m_values)
         m_values->addRef();
@@ -19,7 +19,7 @@ IStringMap* SettingsResponse::values() const
     return m_values.get();
 }
 
-IStringMap* SettingsResponse::errors() const
+IStringMap* SettingsResponse::getErrors() const
 {
     if (m_errors)
         m_errors->addRef();

@@ -1,8 +1,6 @@
 #pragma once
 
-#include <memory>
-
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_api.h>
 #include <plugins/plugin_container_api.h>
@@ -33,7 +31,7 @@ public:
 
 private:
     nxpt::CommonRefManager m_refManager;
-    std::unique_ptr<DiscoveryManager> m_discoveryManager;
+    nx::sdk::Ptr<DiscoveryManager> m_discoveryManager;
     nx::sdk::Ptr<nxpl::TimeProvider> m_timeProvider;
 };
 

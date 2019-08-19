@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="nl-BE" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Elk type</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Selecteer gebied</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Selecteer een gebied op de video...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>In geselecteerd gebied</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Kan plugin actie niet uitvoeren</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Voer parameters in</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Actie vereist dat sommige parameters worden ingevuld.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1012,6 +1043,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Voer wachtwoord opnieuw in voor lay-out %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Server evenementen</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Analytics evenementen</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Elke gebeurtenis</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Elk apparaatprobleem</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Elk camera probleem</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Elke servergebeurtenis</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Apparaatproblemen</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Camera problemen</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Elke analytics gebeurtenis</translation>
     </message>
   </context>
   <context>
@@ -3009,16 +3079,16 @@ to %1</source>
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
       <translation>
-        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
-        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis(sen) gevonden</numerusform>
+        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenis gevonden</numerusform>
+        <numerusform>Gebeurtenislogboek voor periode van %1 tot %2 - %n gebeurtenisen gevonden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
       <translation>
-        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
-        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis(sen) gevonden</numerusform>
+        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenis gevonden</numerusform>
+        <numerusform>Gebeurtenislogboek voor %1 - %n gebeurtenisen gevonden</numerusform>
       </translation>
     </message>
   </context>
@@ -5932,10 +6002,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Bevat geen persoonlijke informatie en is volledig anoniem.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Failover-servermaatregelen vragen mogelijk nog steeds om statusupdates van de camera, ongeacht deze instelling.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Schakel autodiscovery van apparaten en servers en geautomatiseerde apparaatstatuscontrole in</translation>
     </message>
@@ -5946,6 +6012,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Indien ingeschakeld, ontdekt het systeem continu nieuwe camera's en servers en verzendt het detectieverzoeken naar camera's voor statusupdate.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Als Failover is ingeschakeld, kan de server nog steeds camera-statusupdates vragen, ongeacht deze instelling.</translation>
     </message>
   </context>
   <context>
@@ -5965,44 +6035,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Spread Sheet (CSV) -bestand</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Verschil</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Datum</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Tijdzone</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Tijd</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Geen server heeft internettoegang. De tijd wordt niet gesynchroniseerd.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>VMS-tijd wordt gesynchroniseerd met internet en is niet afhankelijk van de lokale tijd op servers.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>VMS tijd wordt gesynchroniseerd met lokale tijd op de geselecteerde server en is niet afhankelijk van lokale tijd op andere servers.</translation>
     </message>
   </context>
   <context>
@@ -7137,6 +7169,34 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Selecteer gebied op de video om resultaten te filteren</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>In geselecteerd gebied</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Geselecteerde camera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Geselecteerd apparaat</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Geselecteerde media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>geen</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7377,38 +7437,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
         <numerusform>%n objecten</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Elk type</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Selecteer gebied</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Selecteer een gebied op de video...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>In geselecteerd gebied</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>naamloze analytics engine</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Kan plugin actie niet uitvoeren</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Voer parameters in</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Actie vereist dat sommige parameters worden ingevuld.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7451,17 +7479,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Applying changes...</source>
       <translation>Wijzigingen toepassen...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Deze I/O module heeft geen geavanceerde instellingen</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Deze camera heeft geen geavanceerde instellingen</translation>
     </message>
   </context>
   <context>
@@ -8019,42 +8036,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation>Server evenementen</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Analytics evenementen</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Elk apparaatprobleem</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Elk camera probleem</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Elke servergebeurtenis</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Apparaatproblemen</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Camera problemen</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Elke gebeurtenis</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Elke analytics gebeurtenis</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Geen gebeurtenissen</translation>
     </message>
@@ -8609,11 +8590,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>Sommige servers hebben het update proces niet voltooid. Toch afronden?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 wordt opnieuw gestart naar de bijgewerkte versie.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -9246,14 +9222,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Selecteer gebied op de video om resultaten te filteren</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>In geselecteerd gebied</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Geen beweging</translation>
     </message>
@@ -9267,23 +9235,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
         <numerusform>%n bewegingsevenementen</numerusform>
         <numerusform>%n bewegingsevenementen</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Geselecteerde camera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Geselecteerd apparaat</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Geselecteerde media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>geen</translation>
     </message>
   </context>
   <context>

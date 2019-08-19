@@ -29,7 +29,6 @@
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
-#include <nx/vms/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/vms/client/desktop/ini.h>
 
 #include <client_core/client_core_module.h>
@@ -122,7 +121,11 @@
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
 #include <nx/vms/client/desktop/ini.h>
 
+#include <nx/analytics/metadata_log_parser.h>
+
 #include <nx/network/cloud/protocol_type.h>
+
+#include <nx/utils/guarded_callback.h>
 
 using namespace std::chrono;
 
@@ -132,8 +135,6 @@ using namespace ui;
 
 using nx::vms::client::core::Geometry;
 using nx::vms::client::core::MotionGrid;
-using nx::vms::api::StreamDataFilter;
-using nx::vms::api::StreamDataFilters;
 
 namespace {
 
@@ -1564,13 +1565,17 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(
 void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channel, const QRectF &rect)
 {
     const auto timestamp = m_renderer->lastDisplayedTimestamp(channel);
+    const bool currentCamera = navigator()->currentResource() == resource()->toResource();
 
     if (options().testFlag(DisplayMotion))
     {
         ensureMotionSelectionCache();
 
-        paintMotionGrid(painter, channel, rect,
-            d->motionMetadataProvider->metadata(timestamp, channel));
+        const auto metadata = !ini().applyCameraFilterToSceneItems || currentCamera
+            ? d->motionMetadataProvider->metadata(timestamp, channel)
+            : nx::vms::client::core::MetaDataV1Ptr();
+
+        paintMotionGrid(painter, channel, rect, metadata);
 
         // Motion search region.
         const bool isActiveWidget = navigator()->currentMediaWidget() == this;
@@ -1582,14 +1587,9 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     }
 
     if (isAnalyticsEnabled())
-        d->analyticsController->updateAreas(timestamp, channel);
-
-    if (ini().enableOldAnalyticsController && d->analyticsMetadataProvider)
     {
-        // TODO: Rewrite old-style analytics visualization (via zoom windows) with metadata
-        // providers.
-        if (const auto metadata = d->analyticsMetadataProvider->metadata(timestamp, channel))
-            qnMetadataAnalyticsController->gotMetadata(d->resource, metadata);
+        d->analyticsController->updateAreas(timestamp, channel);
+        paintAnalyticsObjectsDebugOverlay(duration_cast<milliseconds>(timestamp), painter, rect);
     }
 
     if (m_entropixProgress >= 0)
@@ -1719,6 +1719,45 @@ void QnMediaResourceWidget::paintProgress(QPainter* painter, const QRectF& rect,
     painter->fillRect(
         Geometry::subRect(progressBarRect, QRectF(0, 0, progress / 100.0, 1)),
         palette().highlight());
+}
+
+void QnMediaResourceWidget::paintAnalyticsObjectsDebugOverlay(
+    std::chrono::milliseconds timestamp,
+    QPainter* painter,
+    const QRectF& rect)
+{
+    if (!d->analyticsMetadataLogParser)
+        return;
+
+    static milliseconds prevRenderedFrameTimestamp = milliseconds::zero();
+    static milliseconds currentRenderedFrameTimestamp = milliseconds::zero();
+
+    if (currentRenderedFrameTimestamp != timestamp)
+    {
+        prevRenderedFrameTimestamp = currentRenderedFrameTimestamp;
+        currentRenderedFrameTimestamp = timestamp;
+    }
+
+    if (prevRenderedFrameTimestamp != milliseconds::zero()
+        && prevRenderedFrameTimestamp < currentRenderedFrameTimestamp)
+    {
+        const auto packets = d->analyticsMetadataLogParser->packetsBetweenTimestamps(
+            prevRenderedFrameTimestamp.count(),
+            currentRenderedFrameTimestamp.count());
+
+        const PainterTransformScaleStripper scaleStripper(painter);
+        const auto widgetRect = scaleStripper.mapRect(rect);
+
+        for (const auto& packet: packets)
+        {
+            for (const auto& rect: packet->rects)
+            {
+                const auto absoluteObjectRect = Geometry::subRect(widgetRect, rect);
+                QColor overlayColor = toTransparent(Qt::green, 0.3);
+                painter->fillRect(absoluteObjectRect, overlayColor);
+            }
+        }
+    }
 }
 
 void QnMediaResourceWidget::paintWatermark(QPainter* painter, const QRectF& rect)
@@ -1856,14 +1895,7 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
     if (changedFlags.testFlag(DisplayMotion))
     {
         const bool motionSearchEnabled = options().testFlag(DisplayMotion);
-
-        if (auto reader = d->display()->archiveReader())
-        {
-            StreamDataFilters filter = reader->streamDataFilter();
-            filter.setFlag(StreamDataFilter::motion, motionSearchEnabled);
-            filter.setFlag(StreamDataFilter::media);
-            reader->setStreamDataFilter(filter);
-        }
+        d->setMotionEnabled(motionSearchEnabled);
 
         titleBar()->rightButtonsBar()->setButtonsChecked(
             Qn::MotionSearchButton, motionSearchEnabled);
@@ -2728,13 +2760,7 @@ bool QnMediaResourceWidget::isAnalyticsSupported() const
 
 bool QnMediaResourceWidget::isAnalyticsEnabled() const
 {
-    if (!isAnalyticsSupported())
-        return false;
-
-    if (const auto reader = display()->archiveReader())
-        return reader->streamDataFilter().testFlag(StreamDataFilter::objectDetection);
-
-    return false;
+    return d->isAnalyticsEnabled();
 }
 
 void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
@@ -2747,34 +2773,18 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
         analyticsEnabled ? "enabled" : "disabled",
         this);
 
-    if (auto reader = display()->archiveReader())
-    {
-        StreamDataFilters filter = reader->streamDataFilter();
-        filter.setFlag(StreamDataFilter::objectDetection, analyticsEnabled);
-        filter.setFlag(StreamDataFilter::media);
-        reader->setStreamDataFilter(filter);
-    }
-
-    if (!analyticsEnabled)
-    {
-        d->analyticsController->clearAreas();
-
-        // Earlier we didn't unset forced video buffer length to avoid micro-freezes required to
-        // fill in the video buffer on succeeding analytics mode activations. But it looks like this
-        // mode causes a lot of glitches when enabled, so we'd prefer to leave on a safe side.
-        display()->camDisplay()->setForcedVideoBufferLength(milliseconds::zero());
-    }
-    else
-    {
-        display()->camDisplay()->setForcedVideoBufferLength(
-            milliseconds(ini().analyticsVideoBufferLengthMs));
-    }
+    d->setAnalyticsEnabled(analyticsEnabled);
 }
 
 nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr
     QnMediaResourceWidget::analyticsMetadataProvider() const
 {
     return d->analyticsMetadataProvider;
+}
+
+void QnMediaResourceWidget::setAnalyticsFilter(const nx::analytics::db::Filter& value)
+{
+    d->setAnalyticsFilter(value);
 }
 
 void QnMediaResourceWidget::updateWatermark()
@@ -3131,7 +3141,6 @@ rest::Handle QnMediaResourceWidget::invokeTrigger(
     const auto responseHandler =
         [this, resultHandler, id](bool success, rest::Handle handle, const QnJsonRestResult& result)
         {
-            Q_UNUSED(handle);
             success = success && result.error == QnRestResult::NoError;
 
             if (!success)
@@ -3145,8 +3154,11 @@ rest::Handle QnMediaResourceWidget::invokeTrigger(
         };
 
     return commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
-        d->resource->getId(), id, toggleState,
-        responseHandler, QThread::currentThread());
+        /*cameraId*/ d->resource->getId(),
+        /*triggerId*/ id,
+        toggleState,
+        nx::utils::guarded(this, responseHandler),
+        thread());
 }
 
 void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)

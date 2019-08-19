@@ -19,51 +19,15 @@ class Camera;
 class DiscoveryManager: public nxcip::CameraDiscoveryManager
 {
 private:
-    struct DeviceDataWithNxId
+    struct CameraAndDeviceData
     {
         device::DeviceData device;
-        std::string nxId;
-
-        DeviceDataWithNxId(const device::DeviceData& device, const std::string& nxId):
-        device(device),
-        nxId(nxId)
-        {
-        }
-
-        bool operator==(const DeviceDataWithNxId& rhs) const
-        {
-            return
-                nxId == rhs.nxId
-                && device.name == rhs.device.name
-                && device.path == rhs.device.path
-                && device.uniqueId == rhs.device.uniqueId;
-        }
-
-        bool operator!=(const DeviceDataWithNxId& rhs) const
-        {
-            return !operator==(rhs);
-        }
-
-        std::string toString() const
-        {
-            return
-                std::string("nxId: ") + nxId +
-                ", device: { name: " + device.name +
-                ", path: " + device.path +
-                ", uid: " + device.uniqueId + " }";
-        }
-    };
-
-    struct CameraAndDeviceDataWithNxId
-    {
-        DeviceDataWithNxId deviceData;
         std::shared_ptr<Camera> camera;
 
-        CameraAndDeviceDataWithNxId(const DeviceDataWithNxId& deviceData):
-            deviceData(deviceData)
+        CameraAndDeviceData(const device::DeviceData& deviceData):
+            device(deviceData)
         {
         }
-        ~CameraAndDeviceDataWithNxId() = default;
     };
 
 public:
@@ -94,17 +58,17 @@ public:
         nxcip::CameraInfo* cameraInfo) override;
     virtual nxcip::BaseCameraManager* createCameraManager( const nxcip::CameraInfo& info ) override;
     virtual int getReservedModelList( char** modelList, int* count ) override;
-    void addOrUpdateCamera(const DeviceDataWithNxId& nxDevice);
+    void addOrUpdateCamera(const device::DeviceData& device);
 
 private:
     nxpt::CommonRefManager m_refManager;
     nxpl::TimeProvider *const m_timeProvider;
     mutable std::mutex m_mutex;
-    std::map<std::string/*nxId*/, CameraAndDeviceDataWithNxId> m_cameras;
+    std::map<std::string/*nxId*/, CameraAndDeviceData> m_cameras;
 
 private:
-    std::vector<DeviceDataWithNxId> findCamerasInternal();
-    CameraAndDeviceDataWithNxId* getCameraAndDeviceData(const std::string& nxId);
+    //std::vector<DeviceDataWithNxId> findCamerasInternal();
+    CameraAndDeviceData* getCameraAndDeviceData(const std::string& nxId);
 };
 
 } // namespace nx

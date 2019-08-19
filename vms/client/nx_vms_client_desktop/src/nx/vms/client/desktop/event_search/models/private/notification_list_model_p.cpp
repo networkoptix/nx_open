@@ -334,6 +334,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
     if (!actionHasId)
         m_uuidHashes[action->getRuleId()][resource].insert(eventData.id);
+
+    truncateToMaximumCount();
 }
 
 void NotificationListModel::Private::removeNotification(const vms::event::AbstractActionPtr& action)
@@ -556,6 +558,29 @@ QPixmap NotificationListModel::Private::pixmapForAction(
         default:
             return QPixmap();
     }
+}
+
+int NotificationListModel::Private::maximumCount() const
+{
+    return m_maximumCount;
+}
+
+void NotificationListModel::Private::setMaximumCount(int value)
+{
+    if (m_maximumCount == value)
+        return;
+
+    m_maximumCount = value;
+    truncateToMaximumCount();
+}
+
+void NotificationListModel::Private::truncateToMaximumCount()
+{
+    const int rowCount = q->rowCount();
+    const int countToRemove = rowCount - m_maximumCount;
+
+    if (countToRemove > 0)
+        q->removeRows(rowCount - countToRemove, countToRemove);
 }
 
 } // namespace nx::vms::client::desktop

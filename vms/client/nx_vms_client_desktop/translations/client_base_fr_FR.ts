@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Tous Types</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Sélectionner zone</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Sélectionner une zone sur la vidéo...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Dans la zone sélectionnée</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Échec d’exécution d'action plugin</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Entrer paramètres</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Action nécessite que certains paramètres soient remplis.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1013,6 +1044,45 @@ pour afficher plus de signets</translation>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Veuillez saisir le mot de passe pour la mise en page %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Événements serveur</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Événements analytiques</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Tout événement</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Tout problème périphérique</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Tout problème caméra</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Tout événement serveur</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Problèmes périphérique</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Problèmes caméra</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Tout événement d'analyse</translation>
     </message>
   </context>
   <context>
@@ -2046,7 +2116,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
+      <translation>Reconnaissance forcé ne fonctionnera que pour les événements génériques si les identifiants de caméra sont utilisés dans l'URL de l'événement générique</translation>
     </message>
   </context>
   <context>
@@ -5937,10 +6007,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>N'inclut aucune information personnelle et est complètement anonyme.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Les mesures du serveur de basculement peuvent toujours demander des mises à jour de l'état de la caméra, indépendamment de ce paramètre.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Activer la découverte automatique des périphériques, serveurs et la vérification automatisée de l'état des périphériques</translation>
     </message>
@@ -5951,6 +6017,10 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Lorsqu'il est activé, le système découvre en permanence de nouvelles caméras et serveurs, et envoie des demandes de découverte aux caméras pour la mise à jour du statut.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Si le basculement est activé, le serveur peut toujours demander des mises à jour de l'état de la caméra, indépendamment de ce paramètre.</translation>
     </message>
   </context>
   <context>
@@ -5970,44 +6040,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Fichier Tableur (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Serveur</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Décalage</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Date</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Fuseau horaire</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Temps</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Aucun serveur n'a accès à Internet. Le temps n'est pas synchronisé.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>Heure VMS est synchronisée avec Internet et ne dépend pas de l'heure locale sur les serveurs.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>Heure VMS est synchronisée avec l'heure locale sur le serveur sélectionné et ne dépend pas de l'heure locale sur les autres serveurs.</translation>
     </message>
   </context>
   <context>
@@ -7142,6 +7174,34 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Sélectionnez une zone sur la vidéo pour filtrer les résultats</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Dans la zone sélectionnée</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Caméra sélectionnée</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Périphérique sélectionné</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Média sélectionné</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>aucun</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7382,38 +7442,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
         <numerusform>%n objets</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Tous Types</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Sélectionner zone</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Sélectionner une zone sur la vidéo...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Dans la zone sélectionnée</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>moteur d'analyse sans nom</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Échec d’exécution d'action plugin</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Entrer paramètres</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Action nécessite que certains paramètres soient remplis.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7456,17 +7484,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Applying changes...</source>
       <translation>Application des modifications...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Ce module I/O n’a aucun paramètres avancés</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Cette caméra n’a aucun paramètres avancés</translation>
     </message>
   </context>
   <context>
@@ -8024,42 +8041,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation>Événements serveur</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Événements analytiques</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Tout problème périphérique</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Tout problème caméra</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Tout événement serveur</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Problèmes périphérique</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Problèmes caméra</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Tout événement</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Tout événement d'analyse</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Aucun événement</translation>
     </message>
@@ -8614,11 +8595,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>Certains serveurs n'ont pas terminé le processus de mise à jour. Terminer quand même?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 sera redémarré à la version mise à jour.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -9251,14 +9227,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Sélectionnez une zone sur la vidéo pour filtrer les résultats</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Dans la zone sélectionnée</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Auncun mouvement</translation>
     </message>
@@ -9272,23 +9240,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
         <numerusform>%n Événement mouvement</numerusform>
         <numerusform>%n Événements mouvement</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Caméra sélectionnée</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Périphérique sélectionné</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Média sélectionné</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>aucun</translation>
     </message>
   </context>
   <context>

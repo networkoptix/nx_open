@@ -2,11 +2,18 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/vms/discovery/manager.h>
 #include <nx/vms/server/root_fs.h>
 #include <nx/vms/server/update/update_installer.h>
 #include <media_server/media_server_module.h>
 #include <api/global_settings.h>
+#include <api/server_rest_connection.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
+#include <utils/common/synctime.h>
+
+using namespace std::chrono;
 
 namespace nx::vms::server {
 
@@ -16,7 +23,7 @@ namespace downloader = vms::common::p2p::downloader;
 
 namespace  {
 
-std::string toString(UpdateManager::InformationCategory category)
+QString toString(UpdateManager::InformationCategory category)
 {
     switch (category)
     {
@@ -31,8 +38,16 @@ std::string toString(UpdateManager::InformationCategory category)
 
 UpdateManager::UpdateManager(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
-    m_installer(serverModule)
+    m_installer(serverModule),
+    m_autoRetryTimer(new QTimer(this))
 {
+    connect(m_autoRetryTimer, &QTimer::timeout, this,
+        [this]()
+        {
+            NX_VERBOSE(this, "Auto-retry triggered.");
+            retry();
+        });
+    m_autoRetryTimer->start(1min);
 }
 
 UpdateManager::~UpdateManager()
@@ -57,6 +72,13 @@ void UpdateManager::connectToSignals()
     connect(
         downloader(), &Downloader::fileStatusChanged,
         this, &UpdateManager::onDownloaderFileStatusChanged, Qt::QueuedConnection);
+
+    const discovery::Manager* discoveryManager =
+        serverModule()->commonModule()->moduleDiscoveryManager();
+    connect(discoveryManager, &discovery::Manager::found,
+        this, &UpdateManager::processFoundEndpoint);
+    connect(discoveryManager, &discovery::Manager::changed,
+        this, &UpdateManager::processFoundEndpoint);
 }
 
 update::Status UpdateManager::status()
@@ -69,7 +91,7 @@ update::Status UpdateManager::status()
 
 void UpdateManager::cancel()
 {
-    startUpdate("");
+    setTargetUpdateInformation({});
 }
 
 void UpdateManager::retry(bool forceRedownload)
@@ -85,6 +107,15 @@ void UpdateManager::retry(bool forceRedownload)
     }
 
     const update::Status status = this->status();
+
+    if (status.code == update::Status::Code::readyToInstall)
+    {
+        if (m_targetUpdateInfo.lastInstallationRequestTime > 0 || m_installationDetected)
+            m_installer.installDelayed();
+
+        return;
+    }
+
     if (!status.suitableForRetrying())
         return;
 
@@ -97,7 +128,6 @@ void UpdateManager::retry(bool forceRedownload)
         case ErrorCode::unknownError:
         case ErrorCode::applauncherError:
         case ErrorCode::invalidUpdateContents:
-        case ErrorCode::noFreeSpaceToInstall:
             // We can do nothing with these cases.
             break;
 
@@ -113,131 +143,85 @@ void UpdateManager::retry(bool forceRedownload)
         case ErrorCode::extractionError:
             extract();
             break;
+
+        case ErrorCode::noFreeSpaceToInstall:
+            m_installer.recheckFreeSpaceForInstallation();
+            break;
     }
 }
 
 void UpdateManager::startUpdate(const QByteArray& content)
 {
-    globalSettings()->setTargetUpdateInformation(content);
-    globalSettings()->synchronizeNowSync();
+    const auto& info = QJson::deserialized<update::Information>(content);
+    setTargetUpdateInformation(info);
+}
+
+bool UpdateManager::startUpdateInstallation(const QList<QnUuid>& participants)
+{
+    if (!m_targetUpdateInfo.isValid())
+        return false;
+
+    update::Information info = m_targetUpdateInfo;
+    info.participants = participants;
+    info.lastInstallationRequestTime = qnSyncTime->currentMSecsSinceEpoch();
+    setTargetUpdateInformation(info);
+    return true;
 }
 
 void UpdateManager::install(const QnAuthSession& authInfo)
 {
-    if (m_installer.state() != UpdateInstaller::State::ok)
-        return;
-
     m_installer.install(authInfo);
 }
 
-update::Information UpdateManager::updateInformation(
+std::optional<update::Information> UpdateManager::updateInformation(
     UpdateManager::InformationCategory category) const
 {
     update::Information information;
-    std::optional<nx::update::FindPackageResult> result;
+    nx::update::FindPackageResult result;
 
-    switch (category)
+    if (category == InformationCategory::installed)
     {
-        case InformationCategory::target:
-            result = nx::update::fromByteArray(
-                globalSettings()->targetUpdateInformation(),
-                &information,
-                nullptr);
-            break;
-        case InformationCategory::installed:
-            result = nx::update::fromByteArray(
-                globalSettings()->installedUpdateInformation(),
-                &information,
-                nullptr);
-            break;
+        result = nx::update::fromByteArray(
+            globalSettings()->installedUpdateInformation(),
+            &information,
+            nullptr);
+    }
+    else
+    {
+        result = nx::update::fromByteArray(
+            globalSettings()->targetUpdateInformation(),
+            &information,
+            nullptr);
     }
 
-    NX_ASSERT(result);
-    if (*result != nx::update::FindPackageResult::ok)
+    if (result != nx::update::FindPackageResult::ok)
     {
-        throw std::runtime_error(
-            "Failed to deserialize \"" + toString(category) + "\" update information");
+        NX_DEBUG(this, "Failed to deserialize \"%1\" update information", toString(category));
+        return {};
     }
 
-    return information;
-}
-
-update::Information UpdateManager::updateInformation(
-    UpdateManager::InformationCategory category, bool* ok) const
-{
-    update::Information result;
-    try
-    {
-        result = updateInformation(category);
-        if (ok)
-            *ok = true;
-    }
-    catch (const std::exception& e)
-    {
-        NX_DEBUG(this, e.what());
-        if (ok)
-            *ok = false;
-    }
-
-    return result;
-}
-
-void UpdateManager::setUpdateInformation(
-    UpdateManager::InformationCategory category, const update::Information& information)
-{
-    QByteArray serializedUpdateInformation;
-    QJson::serialize(information, &serializedUpdateInformation);
-
-    switch (category)
-    {
-        case InformationCategory::target:
-            globalSettings()->setTargetUpdateInformation(serializedUpdateInformation);
-            break;
-        case InformationCategory::installed:
-            globalSettings()->setInstalledUpdateInformation(serializedUpdateInformation);
-            break;
-    }
-
-    if (!globalSettings()->synchronizeNowSync())
-    {
-        throw std::runtime_error(
-            "Failed to synchronize \"" + toString(category) + "\" update information");
-    }
-}
-
-void UpdateManager::setUpdateInformation(
-    UpdateManager::InformationCategory category,
-    const update::Information& information,
-    bool* ok)
-{
-    try
-    {
-        setUpdateInformation(category, information);
-        if (ok)
-            *ok = true;
-    }
-    catch (const std::exception& e)
-    {
-        NX_DEBUG(this, e.what());
-        if (ok)
-            *ok = false;
-    }
+    return {information};
 }
 
 void UpdateManager::finish()
 {
     globalSettings()->setInstalledUpdateInformation(globalSettings()->targetUpdateInformation());
-    globalSettings()->synchronizeNowSync();
-    startUpdate("");
+    globalSettings()->setTargetUpdateInformation({});
+    globalSettings()->synchronizeNow();
 }
 
 void UpdateManager::onGlobalUpdateSettingChanged()
 {
+    m_targetUpdateInfo = updateInformation(InformationCategory::target).value_or(
+        update::Information{});
     start();
 }
 
 void UpdateManager::onDownloaderFailed(const QString& fileName)
 {
+    if (!m_targetUpdateInfo.isValid())
+        return;
+
     nx::update::Package package;
     if (findPackage(&package) != update::FindPackageResult::ok || package.file != fileName)
         return;
@@ -248,6 +232,9 @@ void UpdateManager::onDownloaderFailed(const QString& fileName)
 
 void UpdateManager::onDownloaderFinished(const QString& fileName)
 {
+    if (!m_targetUpdateInfo.isValid())
+        return;
+
     nx::update::Package package;
     if (findPackage(&package) != update::FindPackageResult::ok || package.file != fileName)
         return;
@@ -262,6 +249,22 @@ void UpdateManager::onDownloaderFileStatusChanged(
         onDownloaderFinished(fileInformation.name);
 }
 
+void UpdateManager::processFoundEndpoint(const discovery::ModuleEndpoint& endpoint)
+{
+    if (!helpers::serverBelongsToCurrentSystem(endpoint, serverModule()->commonModule()))
+        return;
+
+    if (endpoint.version != nx::utils::SoftwareVersion(m_targetUpdateInfo.version))
+        return;
+
+    const auto& server = resourcePool()->getResourceById<QnMediaServerResource>(endpoint.id);
+    if (!server)
+        return;
+
+    checkUpdateInfo(server, InformationCategory::target);
+    checkUpdateInfo(server, InformationCategory::installed);
+}
+
 update::FindPackageResult UpdateManager::findPackage(
     update::Package* outPackage, QString* outMessage) const
 {
@@ -272,6 +275,40 @@ update::FindPackageResult UpdateManager::findPackage(
     return result;
 }
 
+void UpdateManager::detectStartedInstallation()
+{
+    if (m_installationDetected)
+        return;
+
+    NX_VERBOSE(this, "Started installation detection requested.");
+
+    if (m_targetUpdateInfo.isValid() && m_targetUpdateInfo.lastInstallationRequestTime > 0)
+    {
+        setInstallationDetected();
+        return;
+    }
+
+    const discovery::Manager* discoveryManager =
+        serverModule()->commonModule()->moduleDiscoveryManager();
+
+    for (const auto& server: resourcePool()->getResources<QnMediaServerResource>())
+    {
+        const auto& endpoint = discoveryManager->getModule(server->getId());
+        if (endpoint.has_value())
+            processFoundEndpoint(*endpoint);
+    }
+}
+
+void UpdateManager::setInstallationDetected(bool detected)
+{
+    if (m_installationDetected == detected)
+        return;
+
+    m_installationDetected = detected;
+    NX_DEBUG(this, "Started installation detected: %1", detected);
+    m_installer.installDelayed();
+}
+
 void UpdateManager::extract()
 {
     nx::update::Package package;
@@ -279,6 +316,7 @@ void UpdateManager::extract()
         return;
 
     m_installer.prepareAsync(downloader()->filePath(package.file));
+    detectStartedInstallation();
 }
 
 void UpdateManager::clearDownloader(bool force)
@@ -349,21 +387,9 @@ bool UpdateManager::canDownloadFile(const update::Package& package, update::Stat
                 return false;
             case FileInformation::Status::downloaded:
             {
-                const bool result = installerState(outUpdateStatus, peerId);
-
-                if (outUpdateStatus->code == update::Status::Code::readyToInstall)
-                {
-                    if (!m_installer.checkFreeSpaceForInstallation())
-                    {
-                        *outUpdateStatus = update::Status(
-                            peerId,
-                            update::Status::Code::error,
-                            update::Status::ErrorCode::noFreeSpaceToInstall);
-                        return false;
-                    }
-                }
-
-                return result;
+                if (m_installer.state() == UpdateInstaller::State::noFreeSpaceToInstall)
+                    m_installer.recheckFreeSpaceForInstallation();
+                return installerState(outUpdateStatus, peerId);
             }
             case FileInformation::Status::notFound:
                 NX_ASSERT(false, "Unexpected state");
@@ -445,6 +471,7 @@ bool UpdateManager::installerState(update::Status* outUpdateStatus, const QnUuid
     switch (m_installer.state())
     {
     case UpdateInstaller::State::ok:
+    case UpdateInstaller::State::installing:
         *outUpdateStatus = update::Status(
             peerId,
             update::Status::Code::readyToInstall);
@@ -466,6 +493,12 @@ bool UpdateManager::installerState(update::Status* outUpdateStatus, const QnUuid
             peerId,
             update::Status::Code::error,
             update::Status::ErrorCode::noFreeSpaceToExtract);
+        return true;
+    case UpdateInstaller::State::noFreeSpaceToInstall:
+        *outUpdateStatus = update::Status(
+            peerId,
+            update::Status::Code::error,
+            update::Status::ErrorCode::noFreeSpaceToInstall);
         return true;
     case UpdateInstaller::State::brokenZip:
         *outUpdateStatus = update::Status(
@@ -537,6 +570,7 @@ update::Status UpdateManager::start()
     NX_DEBUG(this, "Start update: Should download from scratch: %1, package valid: %2",
         shouldDownloadFromScratch, package.isValid());
 
+    setInstallationDetected(false);
     const bool shouldClearFiles = !package.isValid() || shouldDownloadFromScratch;
     m_installer.stopSync(shouldClearFiles);
     clearDownloader(shouldClearFiles);
@@ -546,10 +580,20 @@ update::Status UpdateManager::start()
     if (!shouldDownloadFromScratch)
     {
         if (downloader()->fileInformation(package.file).status
-                == FileInformation::Status::downloaded
-            && m_installer.state() == UpdateInstaller::State::idle)
+                == FileInformation::Status::downloaded)
         {
-            m_installer.prepareAsync(downloader()->filePath(package.file));
+            switch (m_installer.state())
+            {
+                case UpdateInstaller::State::idle:
+                    extract();
+                    break;
+                case UpdateInstaller::State::ok:
+                    if (m_targetUpdateInfo.lastInstallationRequestTime > 0)
+                        m_installer.installDelayed();
+                    break;
+                default:
+                    break;
+            }
         }
 
         return updateStatus;
@@ -620,6 +664,73 @@ vms::common::p2p::downloader::Downloader* UpdateManager::downloader()
 int64_t UpdateManager::freeSpace(const QString& path) const
 {
     return serverModule()->rootFileSystem()->freeSpace(path);
+}
+
+void UpdateManager::setTargetUpdateInformation(const update::Information& information)
+{
+    QByteArray data;
+    if (information.isValid())
+        data = QJson::serialized(information);
+
+    globalSettings()->setTargetUpdateInformation(data);
+    globalSettings()->synchronizeNow();
+}
+
+void UpdateManager::checkUpdateInfo(
+    const QnMediaServerResourcePtr& server, InformationCategory infoCategory)
+{
+    if (m_installationDetected)
+        return;
+
+    const auto& processReply =
+        [this, infoCategory, serverId = server->getId()](
+            bool success,
+            rest::Handle handle,
+            rest::UpdateInformationData response)
+        {
+            if (!m_pendingUpdateInformationRequests.removeOne(handle))
+                return;
+
+            if (m_installationDetected)
+                return;
+
+            if (!success || response.error != QnRestResult::NoError)
+                return;
+
+            const nx::update::Information& info = response.data;
+            if (!info.isValid())
+                return;
+
+            if (!m_targetUpdateInfo.isValid())
+                return;
+
+            if (m_targetUpdateInfo.version != info.version)
+                return;
+
+            if (infoCategory == InformationCategory::installed
+                || info.lastInstallationRequestTime > 0)
+            {
+                if (infoCategory == InformationCategory::target)
+                {
+                    NX_INFO(this, "Detected update (%1) installation on server %2",
+                        m_targetUpdateInfo.version, serverId);
+                }
+                else
+                {
+                    NX_INFO(this, "Detected finished update (%1) on server %2",
+                        m_targetUpdateInfo.version, serverId);
+                }
+
+                setInstallationDetected();
+            }
+        };
+
+    NX_VERBOSE(this, "Checking server %1 for started installation...", server->getId());
+
+    const rest::Handle handle = server->restConnection()->getUpdateInfo(
+        toString(infoCategory), processReply, thread());
+    if (handle > 0)
+        m_pendingUpdateInformationRequests.append(handle);
 }
 
 } // namespace nx::vms::server

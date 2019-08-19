@@ -4,24 +4,22 @@
 
 #include <nx/sdk/interface.h>
 #include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 namespace nx {
 namespace sdk {
-namespace test {
-
-namespace {
+namespace ptr_ut {
 
 class IBase: public Interface<IBase, IRefCountable>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::test::*::IBase"); }
+    static auto interfaceId() { return makeId("nx::sdk::test::IBase"); }
 };
 
 class IData: public Interface<IData, IBase>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::test::*::IData"); }
+    static auto interfaceId() { return makeId("nx::sdk::test::IData"); }
 
     virtual int number() const = 0;
 };
@@ -78,8 +76,6 @@ void assertEq(
     ASSERT_EQ(expectedRefCount, actualRefCount);
 }
 
-} // namespace
-
 //-------------------------------------------------------------------------------------------------
 
 TEST(Ptr, null)
@@ -102,7 +98,10 @@ TEST(Ptr, basic)
     Data::s_destructorCalled = false;
     {
         const Ptr<Data> data = makePtr<Data>(42);
-        ASSERT_EQ(sizeof(Data*), sizeof(data)); //< Ptr layout should be the same as a raw pointer.
+
+        // Ptr layout should be the same as of a raw pointer.
+        ASSERT_EQ(sizeof(Data*), sizeof(data));
+
         ASSERT_EQ(data->number(), 42);
         ASSERT_EQ(1, data->refCount());
         ASSERT_TRUE(static_cast<bool>(data)); //< operator bool()
@@ -204,46 +203,6 @@ TEST(Ptr, releasePtrAndReset)
     ASSERT_EQ(nullptr, data2.get());
 }
 
-TEST(Ptr, queryInterfacePtrNonConst)
-{
-    Data::s_destructorCalled = false;
-    {
-        Data* const nullDataPtr = nullptr;
-        ASSERT_FALSE(queryInterfacePtr<IData>(nullDataPtr));
-
-        // NOTE: `auto` is not used to ensure proper return types of the tested functions.
-
-        const Ptr<Data> dataPtr = makePtr<Data>(42);
-
-        const Ptr<IData> iDataPtrFromData{queryInterfacePtr<IData>(dataPtr.get())};
-        ASSERT_EQ(dataPtr, iDataPtrFromData);
-
-        const Ptr<IData> iDataPtrFromIData{queryInterfacePtr<IData>(dataPtr)};
-        ASSERT_EQ(dataPtr, iDataPtrFromIData);
-    }
-    ASSERT_TRUE(Data::s_destructorCalled);
-}
-
-TEST(Ptr, queryInterfacePtrConst)
-{
-    Data::s_destructorCalled = false;
-    {
-        const Data* const nullDataPtr = nullptr;
-        ASSERT_FALSE(queryInterfacePtr<const IData>(nullDataPtr));
-
-        // NOTE: `auto` is not used to ensure proper return types of the tested functions.
-
-        const Ptr<const Data> dataPtr = makePtr<const Data>(42);
-
-        const Ptr<const IData> iDataPtrFromData{queryInterfacePtr<const IData>(dataPtr.get())};
-        ASSERT_EQ(dataPtr, iDataPtrFromData);
-
-        const Ptr<const IData> iDataPtrFromIData{queryInterfacePtr<const IData>(dataPtr)};
-        ASSERT_EQ(dataPtr, iDataPtrFromIData);
-    }
-    ASSERT_TRUE(Data::s_destructorCalled);
-}
-
-} // namespace test
+} // namespace ptr_ut
 } // namespace sdk
 } // namespace nx

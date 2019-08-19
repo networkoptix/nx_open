@@ -253,8 +253,8 @@ bool ObjectTrackSearcher::matchAttributes(
         bool found = false;
         for (const auto& attribute : attributes)
         {
-            if (attribute.name.indexOf(filterWord) != -1 ||
-                attribute.value.indexOf(filterWord) != -1)
+            if (attribute.name.indexOf(filterWord, 0, Qt::CaseInsensitive) != -1 ||
+                attribute.value.indexOf(filterWord, 0, Qt::CaseInsensitive) != -1)
             {
                 found = true;
                 break;
@@ -324,7 +324,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
         auto matchResult = m_analyticsArchive->matchObjects(
             m_filter.deviceIds,
             archiveFilter);
-        const auto fetchedObjectGroupsCount = matchResult.trackGroups.size();
+        const int fetchedObjectGroupsCount = matchResult.trackGroups.size();
 
         matchResult.trackGroups.erase(
             std::remove_if(
@@ -337,10 +337,10 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
 
         fetchTracksFromDb(queryContext, matchResult.trackGroups, &result);
 
-        if (result.size() >= m_filter.maxObjectTracksToSelect ||
+        if ((int) result.size() >= m_filter.maxObjectTracksToSelect ||
             fetchedObjectGroupsCount < archiveFilter.limit)
         {
-            if (result.size() > m_filter.maxObjectTracksToSelect)
+            if ((int) result.size() > m_filter.maxObjectTracksToSelect)
                 result.erase(result.begin() + m_filter.maxObjectTracksToSelect, result.end());
             return result;
         }
@@ -377,22 +377,19 @@ void ObjectTrackSearcher::fetchTracksFromDb(
     query->setForwardOnly(true);
     query->prepare(lm(R"sql(
         SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
-            content, best_shot_timestamp_ms, best_shot_rect
-        FROM
-            (SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
-                ua.content AS content, best_shot_timestamp_ms, best_shot_rect
-            FROM track t, unique_attributes ua, track_group tg
-            WHERE t.attributes_id=ua.id AND t.id=tg.track_id AND %1
-            ORDER BY track_start_ms DESC
-            %2)
-        ORDER BY track_start_ms %3
-    )sql").args(objectGroupFilter.toString(), limitExpr,
-        m_filter.sortOrder == Qt::AscendingOrder ? "ASC" : "DESC"));
+            ua.content AS content, best_shot_timestamp_ms, best_shot_rect
+        FROM track t, unique_attributes ua, track_group tg
+        WHERE t.attributes_id=ua.id AND t.id=tg.track_id AND %1
+        ORDER BY track_start_ms DESC
+    )sql").args(objectGroupFilter.toString()));
     objectGroupFilter.bindFields(&query->impl());
 
     query->exec();
 
-    auto tracks = loadTracks(query.get());
+    auto tracks = loadTracks(query.get(), m_filter.maxObjectTracksToSelect);
+    if (m_filter.sortOrder == Qt::AscendingOrder)
+        std::reverse(tracks.begin(), tracks.end());
+
     std::move(tracks.begin(), tracks.end(), std::back_inserter(*result));
 }
 
@@ -562,7 +559,8 @@ nx::sql::Filter ObjectTrackSearcher::prepareTrackFilterSqlExpression()
     return sqlFilter;
 }
 
-std::vector<ObjectTrack> ObjectTrackSearcher::loadTracks(nx::sql::AbstractSqlQuery* query)
+std::vector<ObjectTrack> ObjectTrackSearcher::loadTracks(
+    nx::sql::AbstractSqlQuery* query, int limit)
 {
     std::vector<ObjectTrack> tracks;
 
@@ -572,6 +570,8 @@ std::vector<ObjectTrack> ObjectTrackSearcher::loadTracks(nx::sql::AbstractSqlQue
 
         if (satisfiesFilter(m_filter, track))
             tracks.push_back(std::move(track));
+        if (limit > 0 && tracks.size() >= limit)
+            break;
     }
 
     return tracks;

@@ -137,15 +137,6 @@
             "flags": "stateDependent"
         },
         {
-            "id": "nx.hikvision.AttendedBaggage",
-            "name": "Object removal",
-            "internalName": "AttendedBaggage",
-            "description": "Object removal %1",
-            "positiveState": "has been detected",
-            "negativeState": "has ended",
-            "flags": "stateDependent"
-        },
-        {
             "id": "nx.hikvision.SceneChange",
             "name": "Scene changed",
             "internalName": "SceneChange",

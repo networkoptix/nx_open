@@ -1,7 +1,4 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "discovery_manager.h"
 
@@ -15,7 +12,6 @@
 #include "camera_manager.h"
 #include "dir_iterator.h"
 #include "plugin.h"
-
 
 DiscoveryManager::DiscoveryManager()
 :

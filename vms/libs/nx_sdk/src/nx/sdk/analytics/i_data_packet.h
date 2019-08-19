@@ -16,7 +16,7 @@ namespace analytics {
 class IDataPacket: public Interface<IDataPacket>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IDataPacket"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IDataPacket"); }
 
     /**
      * @return Timestamp of the media data in microseconds since epoch, or 0 if not relevant.

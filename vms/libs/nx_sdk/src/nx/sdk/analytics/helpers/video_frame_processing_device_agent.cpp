@@ -7,7 +7,7 @@
 #include <nx/kit/debug.h>
 
 #include <nx/sdk/helpers/log_utils.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/to_string.h>
 #include <nx/sdk/helpers/error.h>
@@ -22,39 +22,18 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-class PrintPrefixMaker
+static std::string makePrintPrefix(const IDeviceInfo* deviceInfo)
 {
-public:
-    std::string makePrintPrefix(
-        const std::string& overridingPrintPrefix,
-        const IDeviceInfo* deviceInfo)
-    {
-        NX_KIT_ASSERT(deviceInfo);
-
-        if (!overridingPrintPrefix.empty())
-            return overridingPrintPrefix;
-
-        return std::string("[") + libContext().name() + "_device_" + deviceInfo->id() + "] ";
-    }
-
-private:
-    /** Used by the above NX_KIT_ASSERT (via NX_PRINT). */
-    struct
-    {
-        const std::string printPrefix =
-            "nx::sdk::analytics::VideoFrameProcessingDeviceAgent(): ";
-    } logUtils;
-};
+    return "[" + libContext().name() + "_device" +
+        (!deviceInfo ? "" : (std::string("_") + deviceInfo->id())) + "] ";
+}
 
 VideoFrameProcessingDeviceAgent::VideoFrameProcessingDeviceAgent(
-    IEngine* engine,
-    const IDeviceInfo* deviceInfo,
-    bool enableOutput,
-    const std::string& printPrefix)
+    const IDeviceInfo* deviceInfo, bool enableOutput)
     :
-    logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix, deviceInfo)),
-    m_engine(engine)
+    logUtils(enableOutput, makePrintPrefix(deviceInfo))
 {
+    NX_KIT_ASSERT(deviceInfo);
     NX_PRINT << "Created " << this;
 }
 
@@ -73,14 +52,16 @@ void VideoFrameProcessingDeviceAgent::setHandler(IDeviceAgent::IHandler* handler
     m_handler.reset(handler);
 }
 
-Result<void> VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPacket)
+void VideoFrameProcessingDeviceAgent::doPushDataPacket(
+    Result<void>* outResult, IDataPacket* dataPacket)
 {
     const auto logError =
-        [this, func = __func__](ErrorCode errorCode, const std::string& message)
+        [this, outResult, func = __func__](ErrorCode errorCode, const std::string& message)
         {
             NX_PRINT << func << "() " << ((NX_DEBUG_ENABLE_OUTPUT) ? "END " : "") << "-> "
                 << errorCode << ": " << message;
-            return error(errorCode, message);
+            *outResult = error(errorCode, message);
+            return;
         };
 
     NX_OUTPUT << __func__ << "() BEGIN";
@@ -94,12 +75,12 @@ Result<void> VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPa
             + nx::kit::utils::toString(dataPacket->timestampUs()) + "; discarding the packet.");
     }
 
-    if (const auto compressedFrame = queryInterfacePtr<ICompressedVideoPacket>(dataPacket))
+    if (const auto compressedFrame = dataPacket->queryInterface<ICompressedVideoPacket>())
     {
         if (!pushCompressedVideoFrame(compressedFrame.get()))
             return logError(ErrorCode::otherError, "pushCompressedVideoFrame() failed.");
     }
-    else if (const auto uncompressedFrame = queryInterfacePtr<IUncompressedVideoFrame>(dataPacket))
+    else if (const auto uncompressedFrame = dataPacket->queryInterface<IUncompressedVideoFrame>())
     {
         if (!pushUncompressedVideoFrame(uncompressedFrame.get()))
             return logError(ErrorCode::otherError, "pushUncompressedVideoFrame() failed.");
@@ -119,7 +100,6 @@ Result<void> VideoFrameProcessingDeviceAgent::pushDataPacket(IDataPacket* dataPa
     processMetadataPackets(metadataPackets);
 
     NX_OUTPUT << __func__ << "() END";
-    return {};
 }
 
 void VideoFrameProcessingDeviceAgent::processMetadataPackets(
@@ -161,23 +141,23 @@ void VideoFrameProcessingDeviceAgent::processMetadataPacket(
     m_handler->handleMetadata(metadataPacket);
 }
 
-StringResult VideoFrameProcessingDeviceAgent::manifest() const
+void VideoFrameProcessingDeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
-    return new String(manifestString());
+    *outResult = new String(manifestString());
 }
 
-StringMapResult VideoFrameProcessingDeviceAgent::setSettings(
-    const IStringMap* settings)
+void VideoFrameProcessingDeviceAgent::doSetSettings(
+    Result<const IStringMap*>* outResult, const IStringMap* settings)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
-        return error(ErrorCode::invalidParams, "Settings are invalid");
-
-    return settingsReceived();
+        *outResult = error(ErrorCode::invalidParams, "Settings are invalid");
+    else
+        *outResult = settingsReceived();
 }
 
-SettingsResponseResult VideoFrameProcessingDeviceAgent::pluginSideSettings() const
+void VideoFrameProcessingDeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -215,28 +195,19 @@ std::string VideoFrameProcessingDeviceAgent::settingValue(const std::string& par
     return m_settings[paramName];
 }
 
-void VideoFrameProcessingDeviceAgent::assertEngineCasted(void* engine) const
-{
-    // This method is placed in .cpp to allow NX_KIT_ASSERT() use the correct NX_PRINT() prefix.
-    NX_KIT_ASSERT(engine,
-        "nx::sdk::analytics::VideoFrameProcessingDeviceAgent "
-        + nx::kit::utils::toString(this)
-        + " has m_engine of incorrect runtime type " + typeid(*m_engine).name());
-}
-
 void VideoFrameProcessingDeviceAgent::logMetadataPacketIfNeeded(
     const IMetadataPacket* metadataPacket,
     const std::string& packetIndexName) const
 {
-    if (!NX_DEBUG_ENABLE_OUTPUT)
+    if (!NX_DEBUG_ENABLE_OUTPUT || !NX_KIT_ASSERT(metadataPacket))
         return;
 
     std::string packetName;
-    if (queryInterfacePtr<const IObjectMetadataPacket>(metadataPacket))
+    if (metadataPacket->queryInterface<const IObjectMetadataPacket>())
     {
         packetName = "Object";
     }
-    else if (queryInterfacePtr<const IEventMetadataPacket>(metadataPacket))
+    else if (metadataPacket->queryInterface<const IEventMetadataPacket>())
     {
         packetName = "Event";
     }
@@ -248,8 +219,8 @@ void VideoFrameProcessingDeviceAgent::logMetadataPacketIfNeeded(
     }
     packetName += " metadata packet" + packetIndexName;
 
-    auto compoundMetadataPacket = queryInterfacePtr<const ICompoundMetadataPacket>(metadataPacket);
-    if (compoundMetadataPacket)
+    if (const auto compoundMetadataPacket =
+        metadataPacket->queryInterface<const ICompoundMetadataPacket>())
     {
         if (compoundMetadataPacket->count() == 0)
         {
@@ -258,7 +229,7 @@ void VideoFrameProcessingDeviceAgent::logMetadataPacketIfNeeded(
         }
 
         const std::string itemsName = (compoundMetadataPacket->count() == 1)
-            ? (std::string("item of type ") + toPtr(compoundMetadataPacket->at(0))->typeId())
+            ? (std::string("item of type ") + compoundMetadataPacket->at(0)->typeId())
             : "item(s)";
 
         NX_OUTPUT << __func__ << "(): " << packetName << " contains "

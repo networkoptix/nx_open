@@ -5,20 +5,16 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/scope_guard.h>
-#include <nx/utils/software_version.h>
-#include <nx/fusion/model_functions.h>
 #include <nx/update/update_information.h>
 #include <utils/common/process.h>
-#include <utils/common/util.h>
 #include <nx/update/update_check.h>
 #include <audit/audit_manager.h>
 #include <api/model/audit/auth_session.h>
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
 #include <media_server/settings.h>
-#include <media_server/serverutil.h>
-#include <common/static_common_module.h>
 #include <nx/vms/server/root_fs.h>
+#include <nx_vms_server_ini.h>
 
 namespace nx::vms::server {
 
@@ -48,7 +44,15 @@ update::PackageInformation updateInformation(const QString& path)
 } // namespace
 
 UpdateInstaller::UpdateInstaller(QnMediaServerModule* serverModule):
-    ServerModuleAware(serverModule)
+    ServerModuleAware(serverModule),
+    m_installationTimer(new QTimer())
+{
+    m_installationTimer->setInterval(ini().autoUpdateInstallationDelayMs);
+    QObject::connect(m_installationTimer.get(), &QTimer::timeout,
+        [this]() { install(QnAuthSession()); });
+}
+
+UpdateInstaller::~UpdateInstaller()
 {
 }
 
@@ -115,8 +119,18 @@ void UpdateInstaller::prepareAsync(const QString& path)
     });
 }
 
-bool UpdateInstaller::install(const QnAuthSession& authInfo)
+void UpdateInstaller::install(const QnAuthSession& authInfo)
 {
+    stopInstallationTimerAsync();
+
+    if (const auto currentState = state(); currentState != UpdateInstaller::State::ok)
+    {
+        NX_ERROR(this, "Ignoring installation request. Current state: %1.", (int) currentState);
+        return;
+    }
+
+    NX_INFO(this, "Starting installation...");
+
     QString installerDir = workDir();
 
     QStringList arguments;
@@ -127,27 +141,45 @@ bool UpdateInstaller::install(const QnAuthSession& authInfo)
     else
         NX_WARNING(this, "Failed to create or open update log file.");
 
-    auto authRecord = auditManager()->prepareRecord(authInfo, Qn::AR_UpdateInstall);
-    authRecord.addParam("version", m_version.toLatin1());
-    auditManager()->addAuditRecord(authRecord);
+    if (!authInfo.id.isNull())
+    {
+        auto authRecord = auditManager()->prepareRecord(authInfo, Qn::AR_UpdateInstall);
+        authRecord.addParam("version", m_version.toLatin1());
+        auditManager()->addAuditRecord(authRecord);
+    }
 
     QString installerPath = QDir(workDir()).absoluteFilePath(m_executable);
     SystemError::ErrorCode error = startProcessDetached(installerPath, arguments, installerDir);
-    if (error == SystemError::noError)
-    {
-        NX_INFO(this, "Update has been started. file=\"%1\", args=[%2]",
-            installerPath, arguments.join(", "));
-    }
-    else
+    if (error != SystemError::noError)
     {
         NX_ERROR(this, "Failed to launch the update script. %1", SystemError::toString(error));
+        return;
     }
 
-    return true;
+    setStateLocked(State::installing);
+
+    NX_INFO(this, "Update has been started. file=\"%1\", args=[%2]",
+        installerPath, arguments.join(", "));
+}
+
+void UpdateInstaller::installDelayed()
+{
+    if (m_installationTimer->isActive())
+        return;
+
+    if (state() != State::ok)
+        return;
+
+    NX_INFO(this, "Delayed installation requested. Starting in %1ms",
+        m_installationTimer->interval());
+
+    QTimer::singleShot(0, m_installationTimer.get(), qOverload<>(&QTimer::start));
 }
 
 void UpdateInstaller::stopSync(bool clearAndReset)
 {
+    stopInstallationTimerAsync();
+
     NX_MUTEX_LOCKER lock(&m_mutex);
     while (m_state == State::inProgress)
         m_condition.wait(lock.mutex());
@@ -156,6 +188,15 @@ void UpdateInstaller::stopSync(bool clearAndReset)
         m_state = State::idle;
         cleanInstallerDirectory();
     }
+}
+
+void UpdateInstaller::recheckFreeSpaceForInstallation()
+{
+    const auto state = this->state();
+    if (state != State::noFreeSpaceToInstall && state != State::ok)
+        return;
+
+    setStateLocked(checkFreeSpaceForInstallation() ? State:: ok : State::noFreeSpaceToInstall);
 }
 
 UpdateInstaller::State UpdateInstaller::state() const
@@ -252,15 +293,23 @@ bool UpdateInstaller::initializeUpdateLog(
     return true;
 }
 
-void UpdateInstaller::setState(UpdateInstaller::State result)
+void UpdateInstaller::setState(UpdateInstaller::State state)
 {
-    m_state = result;
+    m_state = state;
 }
 
-void UpdateInstaller::setStateLocked(UpdateInstaller::State result)
+void UpdateInstaller::setStateLocked(UpdateInstaller::State state)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    m_state = result;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        if (m_state == state)
+            return;
+
+        m_state = state;
+    }
+
+    if (state != State::ok)
+        stopInstallationTimerAsync();
 }
 
 bool UpdateInstaller::cleanInstallerDirectory()
@@ -332,6 +381,12 @@ UpdateInstaller::State UpdateInstaller::checkContents(const QString& outputPath)
     m_version = info.version;
     m_freeSpaceRequiredToUpdate = info.freeSpaceRequired;
 
+    if (!checkFreeSpaceForInstallation())
+    {
+        NX_ERROR(this, "Not enough free space for installation");
+        return State::noFreeSpaceToInstall;
+    }
+
     return State::ok;
 }
 
@@ -341,6 +396,11 @@ QString UpdateInstaller::workDir() const
     // This path will look like /tmp/nx_isntaller-server_guid/
     // We add server_guid to allow to run multiple servers on a single machine.
     return closeDirPath(dataDirectoryPath()) + "nx_installer-" + selfPath;
+}
+
+void UpdateInstaller::stopInstallationTimerAsync()
+{
+    QTimer::singleShot(0, m_installationTimer.get(), &QTimer::stop);
 }
 
 } // namespace nxvms::server

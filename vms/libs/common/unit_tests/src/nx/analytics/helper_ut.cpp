@@ -596,8 +596,7 @@ TEST_F(HelperTest, eventTypes)
     givenServerWithEventDescriptors(m_servers[1], kEngineId0, "group", 1, 3, &expectedResult);
     givenServerWithEventDescriptors(m_servers[2], kEngineId1, "group", 3, 4, &expectedResult);
 
-    EventTypeDescriptorManager eventTypeDescriptorManager(m_commonModule.get());
-    ASSERT_EQ(expectedResult, eventTypeDescriptorManager.descriptors());
+    ASSERT_EQ(expectedResult, m_commonModule->analyticsEventTypeDescriptorManager()->descriptors());
 }
 
 // TODO: #dmishin fix tests below.
@@ -615,9 +614,8 @@ TEST_F(HelperTest, DISABLED_supportedEventTypes)
     static const auto eventTypeIds = makeEventIds({2, 4});
     const auto device = givenDeviceWhichSupportsEventTypes(eventTypeIds);
 
-    const EventTypeDescriptorManager eventTypeDescriptorManager(m_commonModule.get());
     ASSERT_EQ(
-        eventTypeDescriptorManager.supportedEventTypeDescriptors(device),
+        m_commonModule->analyticsEventTypeDescriptorManager()->supportedEventTypeDescriptors(device),
         pickDescriptors(allEventDescriptors, eventTypeIds));
 }
 
@@ -636,9 +634,8 @@ TEST_F(HelperTest, DISABLED_supportedEventTypesUnion)
     const auto device0 = givenDeviceWhichSupportsEventTypes(eventTypeIds0);
     const auto device1 = givenDeviceWhichSupportsEventTypes(eventTypeIds1);
 
-    const EventTypeDescriptorManager eventTypeDescriptorManager(m_commonModule.get());
-    const auto scopedEventTypeIds = eventTypeDescriptorManager.supportedEventTypeIdsUnion(
-        {device0, device1});
+    const auto scopedEventTypeIds = m_commonModule->analyticsEventTypeDescriptorManager()
+        ->supportedEventTypeIdsUnion({device0, device1});
 
     const auto actualEventTypeIds = extractEventTypeIds(scopedEventTypeIds);
     ASSERT_EQ(
@@ -661,9 +658,8 @@ TEST_F(HelperTest, DISABLED_supportedEventTypesIntersection)
     const auto device0 = givenDeviceWhichSupportsEventTypes(eventTypeIds0);
     const auto device1 = givenDeviceWhichSupportsEventTypes(eventTypeIds1);
 
-    const EventTypeDescriptorManager eventTypeDescriptorManager(m_commonModule.get());
-    const auto scopedEventTypeIds = eventTypeDescriptorManager.supportedEventTypeIdsIntersection(
-        { device0, device1 });
+    const auto scopedEventTypeIds = m_commonModule->analyticsEventTypeDescriptorManager()
+        ->supportedEventTypeIdsIntersection({ device0, device1 });
 
     const auto actualEventTypeIds = extractEventTypeIds(scopedEventTypeIds);
     ASSERT_EQ(

@@ -1,0 +1,3 @@
+add_subdirectory(ftp_storage_plugin)
+
+add_subdirectory(test_storage_plugin)

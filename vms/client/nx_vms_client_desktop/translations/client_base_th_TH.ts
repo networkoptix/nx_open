@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="th" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>ทุกชนิด</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>เลือกพื้นที่</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>เลือกบางพื้นที่ในวิดีโอ</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>ในพื้นที่ที่เลือก</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>ไม่สามารถดำเนินการกับปลั๊กอินได้</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>ป้อนพารามิเตอร์</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>การดำเนินการต้องเติมพารามิเตอร์บางอย่าง</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -873,7 +904,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation>การตั้งค่าเครื่องมือวิเคราะห์ ...</translation>
+      <translation>การตั้งค่าเครื่องมือวิเคราะห์...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -893,11 +924,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation>กล้องเสมือน ...</translation>
+      <translation>กล้องเสมือน...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation>ใหม่กล้องเสมือนจริง ...</translation>
+      <translation>ใหม่กล้องเสมือนจริง...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -917,7 +948,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Files...</source>
-      <translation>ไฟล์ ...</translation>
+      <translation>ไฟล์...</translation>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
@@ -1012,6 +1043,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>กรุณาใส่รหัสผ่านใหม่สำหรับเลย์เอาต์ %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>เหตุการณ์เซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>วิเคราะห์เหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>ทุกเหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>ปัญหาเกี่ยวกับกล้อง</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>เหตุการณ์ของเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>ปัญหาของกล้อง</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>วิเคราะห์เหตุการณ์</translation>
     </message>
   </context>
   <context>
@@ -2022,7 +2092,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
+      <translation>การรับทราบแรงจะทำงานเฉพาะกับเหตุการณ์ทั่วไปหากมีการใช้ตัวดัดแปลงกล้องใน URL เหตุการณ์ทั่วไป</translation>
     </message>
   </context>
   <context>
@@ -3062,7 +3132,7 @@ to %1</source>
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
       <translation>
-        <numerusform>%1 ของ%n กล้อง)</numerusform>
+        <numerusform>%1 (ของ%n กล้อง)</numerusform>
       </translation>
     </message>
   </context>
@@ -3744,7 +3814,7 @@ to %1</source>
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>%1  มีใช้อยู่ในปัจจุบัน</numerusform>
+        <numerusform>%1 มีใช้อยู่ในปัจจุบัน</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4194,7 +4264,7 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation>กล้องเสมือน ...</translation>
+      <translation>กล้องเสมือน...</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
@@ -4791,7 +4861,7 @@ to %1</source>
     </message>
     <message>
       <source>Videowalls</source>
-      <translation>videowalls</translation>
+      <translation>Videowalls</translation>
     </message>
     <message>
       <source>Analytics Engines</source>
@@ -5545,8 +5615,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>ข้อมูลการวิเคราะห์ปัจจุบันจะไม่ถูกย้ายไปที่อื่นโดยอัตโนมัติและจะไม่สามารถเข้าถึงได้ คุณสามารถเก็บมันและย้ายด้วยตนเองในภายหลังหรือลบอย่างถาวร
+หากคุณต้องการย้ายข้อมูลการวิเคราะห์ไปยังที่เก็บข้อมูลอื่นโปรดติดต่อฝ่ายสนับสนุนก่อนดำเนินการต่อ</translation>
     </message>
   </context>
   <context>
@@ -5869,10 +5939,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ไม่รวมข้อมูลส่วนบุคคลใด ๆ และไม่ระบุชื่อ</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>มาตรการการเซิร์ฟเวอร์ล้มเหลวยังคงร้องขอการปรับปรุงสถานะของกล้องโดยไม่คำนึงถึงการตั้งค่านี้</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>เปิดใช้งานอุปกรณ์และเซิร์ฟเวอร์ค้นหาอัตโนมัติและตรวจสอบสถานะอุปกรณ์อัตโนมัติ</translation>
     </message>
@@ -5883,6 +5949,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>เมื่อเปิดใช้งานระบบจะค้นพบกล้องและเซิร์ฟเวอร์ใหม่อย่างต่อเนื่องและส่งคำขอการค้นพบไปยังกล้องเพื่ออัพเดทสถานะ</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>หากเปิดใช้งาน Failover เซิร์ฟเวอร์อาจยังร้องขอการอัพเดตสถานะกล้องโดยไม่คำนึงถึงการตั้งค่านี้</translation>
     </message>
   </context>
   <context>
@@ -5902,44 +5972,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>ไฟล์สเปรดชีต (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>เซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>สาขา</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>วันที่</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>เขตเวลา</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>เวลา</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>ไม่มีเซิร์ฟเวอร์ที่มีการเข้าถึงอินเทอร์เน็ต เวลาไม่ได้ซิงโครไนซ์</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>เวลา VMS ถูกซิงโครไนซ์กับอินเทอร์เน็ตและไม่ขึ้นอยู่กับเวลาท้องถิ่นบนเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>เวลา VMS ถูกซิงโครไนซ์กับเวลาท้องถิ่นบนเซิร์ฟเวอร์ที่เลือกและไม่ขึ้นอยู่กับเวลาท้องถิ่นบนเซิร์ฟเวอร์อื่น</translation>
     </message>
   </context>
   <context>
@@ -6806,7 +6838,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation>เปิดการบันทึกกล้องเสมือน ...</translation>
+      <translation>เปิดการบันทึกกล้องเสมือน...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
@@ -7038,6 +7070,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>เลือกพื้นที่บนวิดีโอเพื่อกรองผลลัพธ์</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>ในพื้นที่ที่เลือก</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>เลือกกล้อง</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>เลือกอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>เลือกสื่อ</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ไม่มี</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7070,7 +7130,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>LST</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
@@ -7080,7 +7140,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>ME</translation>
+      <translation>Me</translation>
     </message>
     <message>
       <source>Hi</source>
@@ -7276,38 +7336,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n วัตถุ</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>ทุกชนิด</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>เลือกพื้นที่</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>เลือกบางพื้นที่ในวิดีโอ</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>ในพื้นที่ที่เลือก</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>โปรแกรมวิเคราะห์ชื่อ</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>ไม่สามารถดำเนินการกับปลั๊กอินได้</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>ป้อนพารามิเตอร์</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>การดำเนินการต้องเติมพารามิเตอร์บางอย่าง</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7349,17 +7377,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>ใช้การเปลี่ยนแปลง...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>โมดูล I / O นี้ไม่มีการตั้งค่าขั้นสูง</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>กล้องนี้ไม่มีการตั้งค่าขั้นสูง</translation>
     </message>
   </context>
   <context>
@@ -7416,7 +7433,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
       <translation>
-        <numerusform>รหัสนี้ใช้กับกล้อง %n ต่อไปนี้: </numerusform>
+        <numerusform>รหัสนี้ใช้กับกล้อง %n ต่อไปนี้:</numerusform>
       </translation>
     </message>
     <message>
@@ -7856,7 +7873,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Add %n Devices</source>
       <translation>
-        <numerusform>เพิ่มอุปกรณ์</numerusform>
+        <numerusform>เพิ่ม %n อุปกรณ์</numerusform>
       </translation>
     </message>
     <message>
@@ -7905,42 +7922,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>เหตุการณ์เซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>วิเคราะห์เหตุการณ์</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>ปัญหาเกี่ยวกับกล้อง</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>เหตุการณ์ของเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>ปัญหาของกล้อง</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>ทุกเหตุการณ์</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>วิเคราะห์เหตุการณ์</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>ไม่พบเหตุการณ์</translation>
@@ -8427,7 +8408,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation>ไม่มีแพ็คเกจการอัปเดตสำหรับเซิร์ฟเวอร์ </translation>
+      <translation>ไม่มีแพ็คเกจการอัปเดตสำหรับเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
@@ -8491,11 +8472,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>เซิร์ฟเวอร์บางตัวยังไม่เสร็จสิ้นกระบวนการอัพเดต เสร็จแล้วหรือยัง?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 จะเริ่มต้นใหม่เป็นเวอร์ชันที่ได้รับการปรับปรุง</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -8579,7 +8555,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation>เรียกดูไฟล์อื่น ...</translation>
+      <translation>เรียกดูไฟล์อื่น...</translation>
     </message>
     <message>
       <source>Select Another Build</source>
@@ -8729,7 +8705,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation>เค้าโครงเฉพาะสามารถแสดงต่อเจ้าของได้เท่านั้น </translation>
+      <translation>เค้าโครงเฉพาะสามารถแสดงต่อเจ้าของได้เท่านั้น</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
@@ -9127,14 +9103,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>เลือกพื้นที่บนวิดีโอเพื่อกรองผลลัพธ์</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>ในพื้นที่ที่เลือก</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>ไม่มีการเคลื่อนไหว</translation>
     </message>
@@ -9147,23 +9115,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>
         <numerusform>กิจกรรมเคลื่อนไหว %n</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>เลือกกล้อง</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>เลือกอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>เลือกสื่อ</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ไม่มี</translation>
     </message>
   </context>
   <context>
@@ -9298,11 +9249,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>รีโมตไฟล์ &quot;%1&quot; เสียหาย</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>เซิร์ฟเวอร์แล้วมีไฟล์นี้ &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9411,7 +9362,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Starting export...</source>
-      <translation>เริ่มส่งออก ...</translation>
+      <translation>เริ่มส่งออก...</translation>
     </message>
     <message>
       <source>Saving layout</source>
@@ -9427,7 +9378,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation>เริ่มบันทึก ...</translation>
+      <translation>เริ่มบันทึก...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
@@ -9825,21 +9776,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>ยืนยันที่เก็บสินค้าเพื่อจัดเก็บข้อมูลการวิเคราะห์ใน &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>พาร์ติชันที่มีขนาดใหญ่ที่สุด</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>ฐานข้อมูลการวิเคราะห์ควรเก็บไว้ในไดรฟ์ในเครื่องเท่านั้นและอาจใช้พื้นที่จำนวนมาก
+เมื่อเลือกสถานที่จัดเก็บข้อมูลการวิเคราะห์แล้วจะไม่สามารถเปลี่ยนแปลงได้อย่างง่ายดายโดยไม่สูญเสียข้อมูลที่มีอยู่ เราแนะนำให้เลือกตำแหน่งที่ตั้งอย่างระมัดระวังและหลีกเลี่ยงการใช้พาร์ติชันระบบเนื่องจากอาจทำให้ระบบทำงานผิดปกติอย่างรุนแรง
+โดยค่าเริ่มต้นข้อมูลการวิเคราะห์จะถูกเก็บไว้ใน %1
+คุณสามารถเลือกที่เก็บข้อมูลอื่นได้ในแท็บ &quot;การจัดการที่เก็บ&quot; ของกล่องโต้ตอบการตั้งค่าเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>

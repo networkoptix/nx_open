@@ -2671,9 +2671,9 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/analyticsLookupObjectTracks
      * Search analytics DB for objects that match filter specified.
-     * %param[opt] deviceId Id of camera.
-     * %param[opt] objectTypeId Analytics object type id.
-     * %param[opt] objectTrackId Analytics object track id.
+     * %param[opt] deviceId Id of Device.
+     * %param[opt] objectTypeId Analytics Object Type id.
+     * %param[opt] objectTrackId Analytics Object Track id.
      * %param[opt] startTime Milliseconds since epoch (1970-01-01 00:00, UTC).
      * %param[opt] endTime Milliseconds since epoch (1970-01-01 00:00, UTC).
      * %param[opt] x1 Top left "x" coordinate of picture bounding box to search within. In range
@@ -2684,14 +2684,14 @@ void MediaServerProcess::registerRestHandlers(
      *     range [0.0; 1.0].
      * %param[opt] y2 Bottom right "y" coordinate of picture bounding box to search within. In
      *     range [0.0; 1.0].
-     * %param[opt] freeText Text to match within track properties.
-     * %param[opt] limit Maximum number of object tracks to return.
-     * %param[opt] maxObjectTrackSize Maximum number of elements of an object track.
-     * %param[opt] sortOrder Sort order of object tracks by a track start timestamp.
+     * %param[opt] freeText Text to match within Object Track properties.
+     * %param[opt] limit Maximum number of Object Tracks to return.
+     * %param[opt] maxObjectTrackSize Maximum number of elements of an Object Track.
+     * %param[opt] sortOrder Sort order of Object Tracks by a Track start timestamp.
      *     %value asc Ascending order.
      *     %value desc Descending order.
-     * %param[opt] isLocal If "false" then request is forwarded to every other online server and
-     *     results are merged. Otherwise, request is processed on receiving server only.
+     * %param[opt] isLocal If "false" then request is forwarded to every other online Server and
+     *     results are merged. Otherwise, request is processed on receiving Server only.
      * %return JSON data.
      */
     reg("ec2/analyticsLookupObjectTracks", new QnMultiserverAnalyticsLookupObjectTracks(
@@ -2713,24 +2713,24 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getAnalyticsActions", new QnGetAnalyticsActionsRestHandler());
 
     /**%apidoc POST /api/executeAnalyticsAction
-     * Execute analytics action from the particular analytics plugin on this server. The action is
-     * applied to the specified track.
+     * Execute analytics Action from the particular analytics Plugin on this Server. The action is
+     * applied to the specified Object Track.
      * %param engineId Id of an Analytics Engine which offers the Action.
      * %param actionId Id of an Action to execute.
-     * %param trackId Id of a track to which the Action is applied.
+     * %param trackId Id of an Object Track to which the Action is applied.
      * %param deviceId Id of a Device from which the Action was triggered.
-     * %param timestampUs Timestamp (microseconds) of the video frame from which the action was
+     * %param timestampUs Timestamp (microseconds) of the video frame from which the Action was
      *     triggered.
      * %param params JSON object with key-value pairs containing values for the Action params
      *     described in the Engine manifest.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
-     *     %param:object reply Result returned by the executed action.
-     *         %param reply.actionUrl If not empty, provides a URL composed by the plugin, to be
+     *     %param:object reply Result returned by the executed Action.
+     *         %param reply.actionUrl If not empty, provides a URL composed by the Plugin, to be
      *             opened by the Client in an embedded browser.
-     *         %param reply.messageToUser If not empty, provides a message composed by the plugin,
-     *             to be shown to the user who triggered the action.
+     *         %param reply.messageToUser If not empty, provides a message composed by the Plugin,
+     *             to be shown to the user who triggered the Action.
      */
     reg("api/executeAnalyticsAction", new QnExecuteAnalyticsActionRestHandler(serverModule()));
 
@@ -3604,7 +3604,7 @@ void MediaServerProcess::setSetupModuleCallback(std::function<void(QnMediaServer
 }
 
 bool MediaServerProcess::setUpMediaServerResource(
-    CloudIntegrationManager* cloudIntegrationManager,
+    CloudIntegrationManager* /*cloudIntegrationManager*/,
     QnMediaServerModule* serverModule,
     const ec2::AbstractECConnectionPtr& ec2Connection)
 {
@@ -3736,6 +3736,7 @@ void MediaServerProcess::stopObjects()
     serverModule()->stop();
 
     m_generalTaskTimer.reset();
+    m_serverStartedTimer.reset();
     m_udtInternetTrafficTimer.reset();
     m_createDbBackupTimer.reset();
 
@@ -4087,6 +4088,8 @@ void MediaServerProcess::connectSignals()
 
     m_generalTaskTimer = std::make_unique<QTimer>();
     connect(m_generalTaskTimer.get(), SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
+    m_serverStartedTimer = std::make_unique<QTimer>();
+    connect(m_serverStartedTimer.get(), SIGNAL(timeout()), this, SLOT(writeServerStartedEvent()), Qt::DirectConnection);
 
     m_udtInternetTrafficTimer = std::make_unique<QTimer>();
     connect(m_udtInternetTrafficTimer.get(), &QTimer::timeout,
@@ -4243,6 +4246,12 @@ bool MediaServerProcess::initializeAnalyticsEvents()
                 NX_WARNING(this, "Can't remove analytics database [%1]", m_oldAnalyticsStoragePath);
             else
                 NX_INFO(this, "Analytics database [%1] removed", m_oldAnalyticsStoragePath);
+            QString dirName = QFileInfo(m_oldAnalyticsStoragePath).absolutePath() + "/archive/metadata";
+            QDir dir(dirName);
+            if (!dir.removeRecursively())
+                NX_WARNING(this, "Can't remove analytics binary database [%1]", dirName);
+            else
+                NX_INFO(this, "Analytics binary database [%1] removed", dirName);
         }
     }
 
@@ -4368,7 +4377,10 @@ void MediaServerProcess::startObjects()
         serverModule()->licenseWatcher()->start();
 
     commonModule()->messageProcessor()->init(commonModule()->ec2Connection()); // start receiving notifications
-    writeServerStartedEvent();
+
+    // Write server started event with delay. In case of client has time to reconnect, it could display it on the right panel.
+    m_serverStartedTimer->setSingleShot(true);
+    m_serverStartedTimer->start(serverModule()->settings().serverStartedEventTimeoutMs());
 }
 
 std::map<QString, QVariant> MediaServerProcess::confParamsFromSettings() const

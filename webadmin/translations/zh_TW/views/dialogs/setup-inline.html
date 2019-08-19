@@ -29,9 +29,9 @@
 </div>
 
 <div class="panel-body text-center panel-body-big" ng-if="stepIs('start')">
-    <div ng-class="{'vertical-bottom':!settings.liteClient, 'master-description': settings.liteClient}">
+    <div>
         <h2>開始 {{Config.productName}}</h2>
-        <p>請先設定伺服器.<br>
+        <p class="master-description">請先設定伺服器.<br>
             選擇一個選項.</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
         <button class="btn btn-primary" autofocus ng-click="next()">安裝新系統</button>

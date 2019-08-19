@@ -39,6 +39,8 @@ public:
 
     std::chrono::microseconds timestamp() const; //< For cameras returns precise frame timestamp.
 
+    QnResourcePtr resource() const;
+
     virtual bool tryLoad() override;
 
 protected:

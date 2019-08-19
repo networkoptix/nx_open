@@ -1357,6 +1357,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     // AbstractVideowallManager::remove
     regUpdate<IdData>(p, ApiCommand::removeVideowall);
     regUpdate<VideowallControlMessageData>(p, ApiCommand::videowallControl);
+    regUpdate<RuntimeData>(p, ApiCommand::runtimeInfoChanged);
 
     /**%apidoc GET /ec2/getWebPages
      * Return list of web pages

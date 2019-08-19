@@ -112,6 +112,9 @@ void LocalResourcesDirectoryModel::addWatchedDirectory(const QString& path)
     for (const auto& childDirectory: childDirectories)
         addWatchedDirectory(dir.absoluteFilePath(childDirectory));
 
+    for (auto& childFile: childFiles)
+        childFile = dir.absoluteFilePath(childFile);
+
     if (!childFiles.empty())
         emit filesAdded(childFiles);
 }

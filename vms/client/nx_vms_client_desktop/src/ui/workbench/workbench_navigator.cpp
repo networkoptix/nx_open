@@ -523,12 +523,11 @@ action::Parameters QnWorkbenchNavigator::currentParameters(action::ActionScope s
 
 bool QnWorkbenchNavigator::isLiveSupported() const
 {
-    if (m_currentWidget && m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
-        for (const QnMediaResourcePtr& resource : m_syncedResources.keys())
-            if (calculateResourceWidgetFlags(resource->toResourcePtr()) & WidgetSupportsLive)
-                return true;
-
-    return m_currentWidgetFlags & WidgetSupportsLive;
+    // TODO: #GDM Just return cached value. Even better: replace m_lastLiveSupported with a direct
+    // call to m_timeSlider (and store calclated value only once).
+    const bool value = calculateIsLiveSupported();
+    NX_ASSERT(value == m_lastLiveSupported);
+    return value;
 }
 
 bool QnWorkbenchNavigator::isLive() const
@@ -550,6 +549,7 @@ bool QnWorkbenchNavigator::setLive(bool live)
     if (!m_timeSlider)
         return false;
 
+    NX_VERBOSE(this, "Set live to %1", live);
     if (live)
     {
         m_timeSlider->setValue(m_timeSlider->maximum(), true);
@@ -835,9 +835,8 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
     m_motionIgnoreWidgets.remove(widget);
     m_updateHistoryQueue.remove(widget->resource().dynamicCast<QnSecurityCamResource>());
 
-    if(auto loader = m_cameraDataManager->loader(syncedResource, false))
+    if (auto loader = m_cameraDataManager->loader(syncedResource, false))
     {
-        loader->setMotionRegions(QList<QRegion>());
         if (noMoreWidgetsOfThisResource)
             loader->setEnabled(false);
     }
@@ -1200,6 +1199,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
     initializePositionAnimations();
 
     updateCurrentWidgetFlags();
+    updatePlayingSupported();
     updateLines();
     updateCalendar();
 
@@ -1229,9 +1229,7 @@ void QnWorkbenchNavigator::updateCurrentWidget()
 
     updateLocalOffset();
     updateCurrentPeriods();
-    updateLiveSupported();
     updateLive();
-    updatePlayingSupported();
     updatePlaying();
     updateSpeedRange();
     updateSpeed();
@@ -1303,6 +1301,7 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags()
     m_currentWidgetFlags = flags;
 
     updateSliderOptions();
+    updateLiveSupported();
 }
 
 void QnWorkbenchNavigator::updateSliderOptions()
@@ -1442,6 +1441,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
     qint64 endTimeMSec, startTimeMSec;
 
     bool widgetLoaded = false;
+    bool isLiveSupportedInReader = false;
     if (isSearch)
     {
         endTimeMSec = searchState.period.endTimeMs();
@@ -1453,6 +1453,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
         const qint64 startTimeUSec = reader->startTime();
         const qint64 endTimeUSec = reader->endTime();
         widgetLoaded = startTimeUSec != AV_NOPTS_VALUE && endTimeUSec != AV_NOPTS_VALUE;
+        isLiveSupportedInReader = endTimeUSec == DATETIME_NOW;
 
         /* This can also be true if the current widget has no archive at all and all other synced widgets still have not received rtsp response. */
         bool noRecordedPeriodsFound = startTimeUSec == DATETIME_NOW;
@@ -1519,6 +1520,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
         m_timeSlider->invalidateWindow();
     }
 
+    NX_VERBOSE(this, "Updating slider from reader. IsLiveSuppored: %1", isLiveSupportedInReader);
     m_timeSlider->setTimeRange(milliseconds(startTimeMSec), milliseconds(endTimeMSec));
 
     if (m_calendar)
@@ -1596,7 +1598,21 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
         if (timeMSec >= m_timeSlider->maximum().count() && speed() <= 0.0)
             timeMSec = m_timeSlider->maximum().count() - 1;
 
-        if (!keepInWindow || m_sliderDataInvalid)
+        const bool isLive = (timeUSec == DATETIME_NOW);
+        NX_VERBOSE(this, "Updating slider from reader. Is playing live: %1", isLive);
+        NX_ASSERT(isLiveSupported() == m_timeSlider->isLiveSupported(),
+            "Navigator supports live: %1, time slider: %2",
+            isLiveSupported(),
+            m_timeSlider->isLiveSupported());
+
+        // If we are displaying live and timeslider is already in live, skip all animations.
+        if (isLive && m_timeSlider->isLive())
+        {
+            NX_ASSERT(isLiveSupported());
+            stopPositionAnimations();
+            m_animatedPosition = timeMSec;
+        }
+        else if (!keepInWindow || m_sliderDataInvalid)
         {
             /* Position was reset: */
             m_animatedPosition = timeMSec;
@@ -1615,7 +1631,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
                     && m_currentWidget->resource()->flags().testFlag(Qn::local_media)
                     && !m_currentWidget->resource()->flags().testFlag(Qn::sync);
 
-                if (qAbs(delta) < m_timeSlider->msecsPerPixel() ||
+                if (qAbs(delta) < m_timeSlider->msecsPerPixel().count() ||
                     (canOmitAnimation && delta * speed() < 0))
                 {
                     // If distance is less than 1 pixel or we catch up backwards on
@@ -1644,6 +1660,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
 
         m_previousMediaPosition = timeMSec;
 
+        NX_VERBOSE(this, "Updating slider from reader: animated position %1", m_animatedPosition);
         m_timeSlider->setValue(milliseconds(m_animatedPosition), keepInWindow);
 
         if (timeUSec >= 0)
@@ -1905,6 +1922,7 @@ void QnWorkbenchNavigator::updateLive()
     if (m_lastLive == live)
         return;
 
+    NX_VERBOSE(this, "Live changed to %1", live);
     m_lastLive = live;
 
     if (live)
@@ -1916,9 +1934,23 @@ void QnWorkbenchNavigator::updateLive()
     emit liveChanged();
 }
 
+bool QnWorkbenchNavigator::calculateIsLiveSupported() const
+{
+    if (m_currentWidget && m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
+    {
+        for (const QnMediaResourcePtr& resource: m_syncedResources.keys())
+        {
+            if (calculateResourceWidgetFlags(resource->toResourcePtr()) & WidgetSupportsLive)
+                return true;
+        }
+    }
+
+    return m_currentWidgetFlags & WidgetSupportsLive;
+}
+
 void QnWorkbenchNavigator::updateLiveSupported()
 {
-    bool liveSupported = isLiveSupported();
+    bool liveSupported = calculateIsLiveSupported();
     if (m_lastLiveSupported == liveSupported)
         return;
 
@@ -2314,7 +2346,21 @@ void QnWorkbenchNavigator::updateLoaderPeriods(const QnMediaResourcePtr& resourc
     updatePlaybackMask();
 }
 
-void QnWorkbenchNavigator::clearTimeSelection()
+QnTimePeriod QnWorkbenchNavigator::timelineWindow() const
+{
+    return m_timeSlider
+        ? QnTimePeriod::fromInterval(m_timeSlider->windowStart(), m_timeSlider->windowEnd())
+        : QnTimePeriod();
+}
+
+QnTimePeriod QnWorkbenchNavigator::timelineSelection() const
+{
+    return m_timeSlider && m_timeSlider->isSelectionValid()
+        ? QnTimePeriod::fromInterval(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd())
+        : QnTimePeriod();
+}
+
+void QnWorkbenchNavigator::clearTimelineSelection()
 {
     if (m_timeSlider)
         m_timeSlider->setSelectionValid(false);
@@ -2651,10 +2697,10 @@ void QnWorkbenchNavigator::updatePlaybackMask()
     const auto content = selectedExtraContent();
     QnTimePeriodList playbackMask;
 
-    // TODO: #dmishin setting of playback mask for analytics content makes it impossible.
-    // to play archive in some cases (if analytics periods are very small)
-    // Figure out how to properly fix it.
-    if (content != Qn::RecordingContent && content != Qn::AnalyticsContent)
+    const bool playbackMaskDisabled = content == Qn::RecordingContent
+        || (content == Qn::AnalyticsContent && !ini().enableAnalyticsPlaybackMask);
+
+    if (!playbackMaskDisabled)
     {
         if (ini().enableSyncedChunksForExtraContent)
         {

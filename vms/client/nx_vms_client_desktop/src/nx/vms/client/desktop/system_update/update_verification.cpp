@@ -163,6 +163,8 @@ bool verifyUpdateContents(
     contents.invalidVersion.clear();
     contents.missingUpdate.clear();
     contents.unsuportedSystemsReport.clear();
+    contents.peersWithUpdate.clear();
+    contents.noServerWithInternet = true;
 
     // Check if some packages from manifest do not exist.
     if (contents.sourceType == nx::update::UpdateSourceType::file && !contents.packagesGenerated)
@@ -277,6 +279,9 @@ bool verifyUpdateContents(
                 contents.info.version, id);
         }
 
+        const bool hasInternet = server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
+        contents.noServerWithInternet |= hasInternet;
+
         const nx::utils::SoftwareVersion serverVersion = server->getVersion();
         // Prohibiting updates to previous version.
         if (serverVersion > targetVersion)
@@ -322,8 +327,6 @@ bool verifyUpdateContents(
             contents.alreadyInstalled = false;
             contents.peersWithUpdate.insert(id);
             package->targets.insert(id);
-
-            auto hasInternet = server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
             if (!hasInternet || options.downloadAllPackages)
                 manualPackages.insert(package);
         }

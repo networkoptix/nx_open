@@ -12,6 +12,8 @@ class QnResourceListModel;
 
 namespace nx::vms::client::desktop {
 
+class AccessValidator;
+
 /**
  * A widget to edit parameters for openLayoutAction
  * Provides UI to:
@@ -38,8 +40,7 @@ private:
     enum class LayoutWarning
     {
         NoWarning,
-        MissingAccess,  //< Some users have no access
-        NobodyHasAccess,   //< No user has an access
+        LocalResource  //< Selected local resource and multiple users
     };
 
     // Warnings for picked users.
@@ -47,8 +48,9 @@ private:
     enum class UserWarning
     {
         NoWarning,
-        LocalResource,  //< Selected local resource and multiple users
-        EmptyRoles  //< Selected some roles, but there are no users in them
+        EmptyRoles,  //< Selected some roles, but there are no users in them
+        MissingAccess,  //< Some users have no access
+        NobodyHasAccess   //< No user has an access
     };
 
     void displayWarning(LayoutWarning warning);
@@ -61,7 +63,7 @@ private:
     // Can return nullptr.
     QnLayoutResourcePtr getSelectedLayout();
 
-    QnUserResourceList getSelectedUsers(bool& rolesSelected);
+    std::pair<QnUserResourceList, QList<QnUuid>> getSelectedUsersAndRoles();
 
     // Updates button state according to selected layouts.
     void updateLayoutsButton();
@@ -75,6 +77,8 @@ private:
     QScopedPointer<Ui::OpenLayoutActionWidget> ui;
 
     QnLayoutResourcePtr m_selectedLayout;
+
+    AccessValidator* m_validator;
 };
 
 } // namespace nx::vms::client::desktop

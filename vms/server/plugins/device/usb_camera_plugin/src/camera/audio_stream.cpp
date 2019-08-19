@@ -39,6 +39,9 @@ AudioStream::~AudioStream()
 void AudioStream::updateUrl(const std::string& url)
 {
     std::scoped_lock<std::mutex> lock(m_mutex);
+    if (url == m_url)
+        return;
+
     m_url = url;
     m_transcoder.uninitialize();
     m_inputFormat.reset(nullptr);
@@ -88,9 +91,13 @@ void AudioStream::uninitialize()
 int AudioStream::initializeInput()
 {
     auto inputFormat = std::make_unique<ffmpeg::InputFormat>();
-    int result = inputFormat->initialize(ffmpegDeviceTypePlatformDependent());
-    if (result < 0)
-        return result;
+    int status = inputFormat->initialize(ffmpegDeviceTypePlatformDependent());
+    if (status < 0)
+    {
+        NX_ERROR(this, "Failed to inititalize audio device, error: %1",
+            ffmpeg::utils::errorToString(status));
+        return status;
+    }
 
 #ifdef _WIN32
     // Decrease audio latency by reducing audio buffer size.
@@ -99,10 +106,15 @@ int AudioStream::initializeInput()
     inputFormat->setEntry(kAudioBufferSizeKey, kAudioBufferSizeValue);
 #endif // _WIN32
 
-    NX_DEBUG(this, "open audio device: [%1]", ffmpegUrlPlatformDependent());
-    result = inputFormat->open(ffmpegUrlPlatformDependent().c_str());
-    if (result < 0)
-        return result;
+    std::string url = ffmpegUrlPlatformDependent();
+    NX_DEBUG(this, "open audio device: [%1]", url);
+    status = inputFormat->open(url.c_str());
+    if (status < 0)
+    {
+        NX_ERROR(this, "Failed to open audio device: [%1], error: %2",
+            url, ffmpeg::utils::errorToString(status));
+        return status;
+    }
 
     m_inputFormat = std::move(inputFormat);
 

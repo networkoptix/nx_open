@@ -233,6 +233,14 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
 
             emit stateChanged(m_state);
         }, Qt::DirectConnection);
+
+    m_recorder->setEndOfRecordingHandler(
+        [this]
+        {
+            if (m_archiveReader)
+                m_archiveReader->pleaseStop();
+            m_recorder->pleaseStop();
+        });
 }
 
 } // namespace recorder

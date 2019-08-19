@@ -84,7 +84,6 @@
 #include <core/storage/file_storage/qtfile_storage_resource.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 
-#include <nx/vms/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 
 #include <server/server_storage_manager.h>
@@ -218,8 +217,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     QObject(parent),
     m_startupParameters(startupParams)
 {
-    ini().reload();
-
 #if defined(Q_OS_WIN)
     // Enable full crash dumps if needed. Do not disable here as it can be enabled elsewhere.
     if (ini().profilerMode)
@@ -446,7 +443,6 @@ void QnClientModule::initSingletons()
     commonModule->store(new QnGlobals());
 
     m_radassController = commonModule->store(new RadassController());
-    commonModule->store(new MetadataAnalyticsController());
 
     commonModule->store(new QnPlatformAbstraction());
 

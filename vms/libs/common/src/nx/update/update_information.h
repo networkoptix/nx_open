@@ -273,6 +273,8 @@ struct UpdateContents
 
     bool needClientUpdate = false;
 
+    bool noServerWithInternet = true;
+
     /** Resets data from verification. */
     void resetVerification();
 

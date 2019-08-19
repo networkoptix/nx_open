@@ -9,12 +9,14 @@
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/sdk_support/utils.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/uuid.h>
 #include <nx/vms_server_plugins/utils/uuid.h>
 #include <nx/vms/server/sdk_support/utils.h>
+#include <nx/vms/server/sdk_support/conversion_utils.h>
 #include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/vms/server/sdk_support/result_holder.h>
+#include <nx/vms/server/analytics/wrappers/engine.h>
 #include <nx/sdk/i_string_map.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/helpers/object_track_info.h>
@@ -27,8 +29,12 @@
 
 #include <plugins/settings.h>
 
-using namespace nx::vms::server;
+using namespace nx::sdk;
+using namespace nx::sdk::analytics;
 using namespace nx::analytics::db;
+using namespace nx::vms::server;
+using namespace nx::vms::server::analytics;
+using namespace nx::vms_server_plugins::utils;
 
 template<typename T>
 using ResultHolder = nx::vms::server::sdk_support::ResultHolder<T>;
@@ -37,11 +43,11 @@ namespace {
 
 const QString kBestShotAttribute("nx.sys.preview.timestampUs");
 
-nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> makeObjectTrackInfo(
+Ptr<IObjectTrackInfo> makeObjectTrackInfo(
     const ExtendedAnalyticsActionData& actionData)
 {
     using namespace nx::vms::server::sdk_support;
-    auto objectTrackInfo = nx::sdk::makePtr<nx::sdk::analytics::ObjectTrackInfo>();
+    const auto objectTrackInfo = makePtr<ObjectTrackInfo>();
 
     if (actionData.objectTrack)
     {
@@ -66,10 +72,9 @@ nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> makeObjectTrackInfo(
 
     if (actionData.bestShotVideoFrame)
     {
-        nx::sdk::Ptr<nx::sdk::analytics::IUncompressedVideoFrame> bestShotVideoFrame =
-            createUncompressedVideoFrame(
-                actionData.bestShotVideoFrame,
-                actionData.actionTypeDescriptor.requirements.bestShotVideoFramePixelFormat);
+        const Ptr<IUncompressedVideoFrame> bestShotVideoFrame = createUncompressedVideoFrame(
+            actionData.bestShotVideoFrame,
+            actionData.actionTypeDescriptor.requirements.bestShotVideoFramePixelFormat);
 
         if (!bestShotVideoFrame)
             return nullptr;
@@ -80,29 +85,29 @@ nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> makeObjectTrackInfo(
     return objectTrackInfo;
 }
 
-class Action: public nx::sdk::RefCountable<nx::sdk::analytics::IAction>
+class Action: public RefCountable<IAction>
 {
 public:
-    Action(const ExtendedAnalyticsActionData& actionData, AnalyticsActionResult* actionResult):
+    Action(const ExtendedAnalyticsActionData& actionData):
         m_actionId(actionData.action.actionId.toStdString()),
-        m_objectTrackId(
-            nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(actionData.action.objectTrackId)),
-        m_deviceId(nx::vms_server_plugins::utils::fromQnUuidToSdkUuid(actionData.action.deviceId)),
+        m_objectTrackId(fromQnUuidToSdkUuid(actionData.action.objectTrackId)),
+        m_deviceId(fromQnUuidToSdkUuid(actionData.action.deviceId)),
         m_timestampUs(actionData.action.timestampUs),
         m_objectTrackInfo(makeObjectTrackInfo(actionData)),
-        m_params(nx::vms::server::sdk_support::toIStringMap(actionData.action.params)),
-        m_actionResult(actionResult)
+        m_params(sdk_support::toSdkStringMap(actionData.action.params))
     {
-        NX_ASSERT(m_actionResult);
     }
 
     virtual const char* actionId() const override { return m_actionId.c_str(); }
 
-    virtual nx::sdk::Uuid objectTrackId() const override { return m_objectTrackId; }
+    virtual int64_t timestampUs() const override { return m_timestampUs; }
 
-    virtual nx::sdk::Uuid deviceId() const override { return m_deviceId; }
+protected:
+    virtual void getObjectTrackId(Uuid* outValue) const override { *outValue = m_objectTrackId; }
 
-    virtual nx::sdk::analytics::IObjectTrackInfo* objectTrackInfo() const override
+    virtual void getDeviceId(Uuid* outValue) const override { *outValue = m_deviceId; }
+
+    virtual IObjectTrackInfo* getObjectTrackInfo() const override
     {
         if (!m_objectTrackInfo)
             return nullptr;
@@ -111,33 +116,20 @@ public:
         return m_objectTrackInfo.get();
     }
 
-    virtual int64_t timestampUs() const
-    {
-        return m_timestampUs;
-    }
-
-    virtual const nx::sdk::IStringMap* params() const override
+    virtual const IStringMap* getParams() const override
     {
         m_params->addRef();
         return m_params.get();
     }
 
-    virtual void handleResult(const char* actionUrl, const char* messageToUser) override
-    {
-        m_actionResult->actionUrl = actionUrl;
-        m_actionResult->messageToUser = messageToUser;
-    }
-
 private:
-    std::string m_actionId;
-    nx::sdk::Uuid m_objectTrackId;
-    nx::sdk::Uuid m_deviceId;
-    int64_t m_timestampUs;
+    const std::string m_actionId;
+    const Uuid m_objectTrackId;
+    const Uuid m_deviceId;
+    const int64_t m_timestampUs;
 
-    nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> m_objectTrackInfo;
-    const nx::sdk::Ptr<nx::sdk::IStringMap> m_params;
-
-    AnalyticsActionResult* m_actionResult = nullptr;
+    const Ptr<IObjectTrackInfo> m_objectTrackInfo;
+    const Ptr<const IStringMap> m_params;
 };
 
 } // namespace
@@ -207,7 +199,7 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
     if (!errorMessage.isEmpty())
     {
         result.setError(QnJsonRestResult::CantProcessRequest,
-            lm("Engine %1 failed to execute action: %2").args(engineResource, errorMessage));
+            lm("Engine %1 failed to execute Action: %2").args(engineResource, errorMessage));
     }
 
     result.setReply(actionResult);
@@ -234,7 +226,7 @@ QString QnExecuteAnalyticsActionRestHandler::checkInputParameters(
 {
     using namespace nx::vms::server;
 
-    auto makeErrorMessage =
+    const auto makeErrorMessage =
         [](const QString& missingField)
         {
             return lm("Missing required field '%1'").args(missingField);
@@ -389,19 +381,20 @@ QString QnExecuteAnalyticsActionRestHandler::executeAction(
     if (!NX_ASSERT(actionData.engine, kNoEngineToExecuteActionMessage))
         return kNoEngineToExecuteActionMessage;
 
-    auto action = nx::sdk::makePtr<Action>(actionData, outActionResult);
+    const auto action = makePtr<Action>(actionData);
     static const QString kNoSdkEngineToExecuteActionMessage(
         "No SDK engine to execute the action has been provided");
 
-    const auto sdkEngine = actionData.engine->sdkEngine();
+    const wrappers::EnginePtr sdkEngine = actionData.engine->sdkEngine();
     if (!NX_ASSERT(sdkEngine, kNoSdkEngineToExecuteActionMessage))
         return kNoSdkEngineToExecuteActionMessage;
 
-    const ResultHolder<void> result = sdkEngine->executeAction(action.get());
+    const wrappers::Engine::ExecuteActionResult executeActionResult =
+        sdkEngine->executeAction(action);
 
-    // By this time, the Engine either already called Action::handleResult(), or is not going to
-    // do it.
-    return result.isOk() ? QString() : sdk_support::toErrorString(result);
+    if (executeActionResult.errorMessage.isEmpty()) //< Successfully executed the Action.
+        *outActionResult = executeActionResult.actionResult;
+    return executeActionResult.errorMessage;
 }
 
 std::optional<nx::analytics::db::ObjectPosition>
@@ -618,18 +611,5 @@ std::optional<LookupResult> QnExecuteAnalyticsActionRestHandler::makeDatabaseReq
     }
 
     return std::get<1>(result);
-}
-
-std::unique_ptr<sdk_support::AbstractManifestLogger>
-QnExecuteAnalyticsActionRestHandler::makeLogger(
-    resource::AnalyticsEngineResourcePtr engineResource) const
-{
-    const QString messageTemplate(
-        "Error occurred while fetching Engine manifest for engine: {:engine}: {:error}");
-
-    return std::make_unique<sdk_support::ManifestLogger>(
-        typeid(*this), //< Using the same tag for all instances.
-        messageTemplate,
-        std::move(engineResource));
 }
 

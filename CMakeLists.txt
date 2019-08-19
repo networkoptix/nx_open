@@ -114,7 +114,7 @@ include(customization/default-values.cmake)
 include(${customization_dir}/customization.cmake)
 
 if(useMetaVersion)
-    set(metaVersion R12)
+    set(metaVersion R13)
 endif()
 
 include(properties)

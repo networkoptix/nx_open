@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="sv-SE" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Någon typ</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Välj område</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Välj ett område i videon...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>I markerat område</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Kunde inte köra plugin åtgärd</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Ange parametrar</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Åtgärden kräver att vissa parametrar ska fyllas i.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1013,6 +1044,45 @@ om du vill visa fler bokmärken</translation>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Vänligen skriv in lösenordet för layout %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Serverhändelser</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Analyshändelse</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Någon händelse</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Någon enhet har problem</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Någon kamera har problem</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Någon serverhändelse</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Enhetsproblem</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Kameraproblem</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>En analyshändelse</translation>
     </message>
   </context>
   <context>
@@ -5937,10 +6007,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Innehåller inte någon personlig information och är helt anonym.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Failover-serveråtgärder kan fortfarande kräva statusuppdateringar för kameror oavsett inställningen.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Aktivera autodiscovery för enheter och servrar och automatisk kontroll av enhetsstatus</translation>
     </message>
@@ -5951,6 +6017,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>När den är aktiverad upptäcker systemet kontinuerligt nya kameror och servrar och skickar funktionsförfrågningar till kameror för statusuppdatering.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Om Failover är aktiverat kan servern fortfarande begära kamerastatusuppdateringar oavsett inställning.</translation>
     </message>
   </context>
   <context>
@@ -5970,44 +6040,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Kalkylblad (CSV) -fil</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Förskjutning</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Datum</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Tidszon</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Tid</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Ingen server har tillgång till internet. Tiden synkroniseras inte.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>Systemtiden synkroniseras med Internet och beror inte på lokal tid på servrar.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>Systemtiden synkroniseras med lokal tid på den valda servern och beror inte på lokal tid på andra servrar.</translation>
     </message>
   </context>
   <context>
@@ -7142,6 +7174,34 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Välj område på videon för att filtrera resultat</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>I markerat område</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Vald kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Vald enhet</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Vald media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ingen</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7382,38 +7442,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
         <numerusform>%n objekt</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Någon typ</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Välj område</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Välj ett område i videon...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>I markerat område</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>namnlös analysmotor</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Kunde inte köra plugin åtgärd</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Ange parametrar</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Åtgärden kräver att vissa parametrar ska fyllas i.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7456,17 +7484,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Applying changes...</source>
       <translation>Tillämpa ändringar...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Denna I / O-modul har inga avancerade inställningar</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Kameran har inga avancerade inställningar</translation>
     </message>
   </context>
   <context>
@@ -8024,42 +8041,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation>Serverhändelser</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Analyshändelse</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Någon enhet har problem</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Någon kamera har problem</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Någon serverhändelse</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Enhetsproblem</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Kameraproblem</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Någon händelse</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>En analyshändelse</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Inga händelser</translation>
     </message>
@@ -8614,11 +8595,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>Vissa servrar har ej slutförda uppdateringsprocesser. Slutför det ändå?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 kommer att startas om till den uppdaterade versionen.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -9251,14 +9227,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Välj område på videon för att filtrera resultat</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>I markerat område</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Ingen rörelse</translation>
     </message>
@@ -9272,23 +9240,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
         <numerusform>%n rörelsehändelser</numerusform>
         <numerusform>%n rörelsehändelser</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Vald kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Vald enhet</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Vald media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ingen</translation>
     </message>
   </context>
   <context>

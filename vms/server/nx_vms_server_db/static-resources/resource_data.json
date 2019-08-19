@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.96",
+    "version": "1.0.1.107",
     "data": [
         {
             "keys": [
@@ -1322,10 +1322,17 @@
         },
         {
             "keys": [
-                "DW|DWC-MD421D",
-                "DW|DWC-MV421D"
+                "DW|DWC-MV421D",
+                "_comment: fixed in firmware version 4.4 (kernel version 1.0.0.0, server version 1.1.2.0)",
+                "##DW|DWC-MD421D"
             ],
             "fixWrongOutputPortToken": true
+        },
+        {
+            "keys": [
+                "DW|DWC-MD421D"
+            ],
+            "additionalNotificationTopics": [ "Device/Trigger/Relay" ]
         },
         {
             "keys": [
@@ -2304,6 +2311,12 @@
                     "password": "123456"
                 }
             ]
+        },
+        {
+            "keys": [
+                "Speco|O4VLD5"
+            ],
+            "ignoreRtcpReports": true
         },
         {
             "keys": [
@@ -3558,7 +3571,8 @@
         {
             "_comment1": "Cameras that should not use Media2 (and should not try to detect Media2 support)",
             "keys": [
-                "Geovision|GV-BX2700"
+                "Geovision|GV-BX2700",
+                "GV-BX2700|Geovision"
             ],
             "onvifIgnoreMedia2":  true
         }

@@ -8,6 +8,7 @@
 #include <api/global_settings.h>
 #include <nx/update/update_information.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/app_info.h>
 #include <nx/vms/api/data/system_information.h>
 #include <quazip/quazipfile.h>
 #include <rest/server/json_rest_handler.h>
@@ -222,6 +223,8 @@ protected:
     {
         m_peers[peerIndex]->stop();
     }
+
+    MediaServerLauncher* peer(size_t index) { return m_peers[index].get(); }
 
 private:
     struct ZipContext
@@ -835,6 +838,30 @@ TEST_F(FtUpdates, finishUpdate_success_installedUpdateInformationSetCorrectly)
     thenInstalledtUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ false);
     thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true, QString());
     thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true, "target");
+}
+
+TEST_F(FtUpdates, UpdateRequestsAreRestrictedToAdminOnly)
+{
+    givenConnectedPeers(1);
+
+    vms::api::UserDataEx userData;
+    userData.permissions = GlobalPermission::advancedViewerPermissions;
+    userData.name = "viewer";
+    userData.password = "password";
+
+    NX_TEST_API_POST(peer(0), "/ec2/saveUser", userData);
+
+    NX_TEST_API_POST(peer(0), "/ec2/startUpdate", "{}", nullptr,
+        nx::network::http::StatusCode::forbidden, userData.name, userData.password);
+
+    NX_TEST_API_POST(peer(0), "/ec2/cancelUpdate", "", nullptr,
+        nx::network::http::StatusCode::forbidden, userData.name, userData.password);
+
+    NX_TEST_API_POST(peer(0), "/ec2/finishUpdate", "", nullptr,
+        nx::network::http::StatusCode::forbidden, userData.name, userData.password);
+
+    NX_TEST_API_POST(peer(0), "/ec2/retryUpdate", "", nullptr,
+        nx::network::http::StatusCode::forbidden, userData.name, userData.password);
 }
 
 } // namespace nx::vms::server::test

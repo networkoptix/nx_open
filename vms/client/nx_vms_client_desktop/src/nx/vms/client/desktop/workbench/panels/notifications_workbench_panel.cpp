@@ -51,8 +51,8 @@ using namespace ui;
 
 namespace {
 
-static constexpr int kNarrowWidth = 280;
-static constexpr int kWideWidth = 430;
+static constexpr int kNarrowWidth = 283;
+static constexpr int kWideWidth = 433;
 
 static const QSize kToolTipMaxThumbnailSize(240, 180);
 static constexpr int kToolTipShowDelayMs = 250;
@@ -449,7 +449,10 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
 
     const auto parentWidget = m_eventPanel->graphicsProxyWidget();
     const auto imageProvider = tile->preview();
-    const auto text = tile->toolTip();
+
+    auto text = tile->toolTip();
+    if (text.isEmpty() && imageProvider)
+        text = tile->title();
     if (text.isEmpty())
         return;
 
