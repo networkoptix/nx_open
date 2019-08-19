@@ -302,21 +302,18 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
     nx::sql::QueryContext* queryContext)
 {
     auto archiveFilter =
-        AnalyticsArchiveDirectory::prepareArchiveFilter(m_filter, m_objectTypeDao);
+        AnalyticsArchiveDirectory::prepareArchiveFilter(
+            queryContext, m_filter, m_objectTypeDao, m_attributesDao);
     // NOTE: We are always searching for newest objects.
     // The sortOrder is applied to the lookup result.
-    archiveFilter.sortOrder = Qt::DescendingOrder;
 
-    if (!m_filter.freeText.isEmpty())
+    if (!archiveFilter)
     {
-        const auto attributeGroups =
-            m_attributesDao->lookupCombinedAttributes(queryContext, m_filter.freeText);
-        if (attributeGroups.empty())
-            return std::vector<ObjectTrack>(); //< No records with such text.
-        std::copy(
-            attributeGroups.begin(), attributeGroups.end(),
-            std::back_inserter(archiveFilter.allAttributesHash));
+        NX_DEBUG(this, "Object lookup canceled. The filter is %1", m_filter);
+        return std::vector<ObjectTrack>(); //< No records with such text.
     }
+
+    archiveFilter->sortOrder = Qt::DescendingOrder;
 
     std::set<std::int64_t> analyzedObjectGroups;
 
@@ -325,7 +322,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
     {
         auto matchResult = m_analyticsArchive->matchObjects(
             m_filter.deviceIds,
-            archiveFilter);
+            *archiveFilter);
         const int fetchedObjectGroupsCount = matchResult.trackGroups.size();
 
         matchResult.trackGroups.erase(
@@ -340,7 +337,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
         fetchTracksFromDb(queryContext, matchResult.trackGroups, &result);
 
         if ((int) result.size() >= m_filter.maxObjectTracksToSelect ||
-            fetchedObjectGroupsCount < archiveFilter.limit)
+            fetchedObjectGroupsCount < archiveFilter->limit)
         {
             if ((int) result.size() > m_filter.maxObjectTracksToSelect)
                 result.erase(result.begin() + m_filter.maxObjectTracksToSelect, result.end());
@@ -350,9 +347,9 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
         // Repeating match.
         // NOTE: Both time period boundaries are inclusive.
         if (m_filter.sortOrder == Qt::AscendingOrder)
-            archiveFilter.startTime = matchResult.timePeriod.endTime() + std::chrono::milliseconds(1);
+            archiveFilter->startTime = matchResult.timePeriod.endTime() + std::chrono::milliseconds(1);
         else
-            archiveFilter.endTime = matchResult.timePeriod.startTime();
+            archiveFilter->endTime = matchResult.timePeriod.startTime();
     }
 
     NX_WARNING(this, "Failed to select all required objects in %1 iterations. Filter %2",
