@@ -43,7 +43,7 @@ void makeSureParticipantsAreReadyForInstall(
     detail::checkUpdateStatusRemotely(
         ifParticipantPredicate,
         serverModule,
-        "/ec2/retryUpdate", //< This will also re-check free space available for installation.
+        "/ec2/updateStatus",
         &reply,
         &context);
 
