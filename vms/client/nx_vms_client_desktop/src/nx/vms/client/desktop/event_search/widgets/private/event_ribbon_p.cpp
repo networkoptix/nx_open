@@ -561,7 +561,7 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
     const auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>();
     if (!resourceList.empty())
     {
-        if (!menu)
+        if (!menu || !NX_ASSERT(!menu->isEmpty()))
             menu.reset(new QMenu());
         else
             menu->insertSeparator(menu->actions()[0]);
