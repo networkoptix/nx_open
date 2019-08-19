@@ -41,7 +41,7 @@ void QnVMax480ChunkReader::run()
             msleep(200);
     }
 
-    while (!needToStop())
+    while (!needToStop() && !m_res->commonModule()->isNeedToStop())
     {
         Qn::ResourceStatus status = m_res->getStatus();
 

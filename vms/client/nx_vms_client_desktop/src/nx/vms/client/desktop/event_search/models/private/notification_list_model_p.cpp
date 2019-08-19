@@ -402,7 +402,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     eventData.removable = false;
     eventData.level = QnNotificationLevel::Value::CriticalNotification;
 
-    eventData.extraAction = CommandActionPtr(new CommandAction(this));
+    eventData.extraAction = CommandActionPtr(new CommandAction());
     eventData.extraAction->setIcon(qnSkin->icon("buttons/acknowledge.png"));
     eventData.extraAction->setText(tr("Acknowledge"));
 

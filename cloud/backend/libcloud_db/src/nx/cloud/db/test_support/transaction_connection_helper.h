@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/network/aio/timer.h>
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -26,8 +26,11 @@ using OnConnectionFailureSubscription =
 /**
  * Helps to establish transaction connection to appserver2 peer and monitor its state.
  */
-class TransactionConnectionHelper
+class TransactionConnectionHelper:
+    public nx::network::aio::BasicPollable
 {
+    using base_type = nx::network::aio::BasicPollable;
+
 public:
     struct ConnectionContext
     {
@@ -45,6 +48,8 @@ public:
 
     TransactionConnectionHelper();
     ~TransactionConnectionHelper();
+
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread*) override;
 
     void setRemoveConnectionAfterClosure(bool val);
     void setMaxDelayBeforeConnect(std::chrono::milliseconds delay);
@@ -96,18 +101,20 @@ public:
     OnConnectionBecomesActiveSubscription& onConnectionBecomesActiveSubscription();
     OnConnectionFailureSubscription& onConnectionFailureSubscription();
 
+protected:
+    virtual void stopWhileInAioThread() override;
+
 private:
     QnUuid m_moduleGuid;
     QnUuid m_runningInstanceGuid;
     std::map<ConnectionId, ConnectionContext> m_connections;
     std::set<ConnectionId> m_connectedConnections;
-    std::atomic<std::size_t> m_totalConnectionsFailed;
+    std::atomic<std::size_t> m_totalConnectionsFailed{0};
     mutable QnMutex m_mutex;
     QnWaitCondition m_condition;
-    std::atomic<ConnectionId> m_transactionConnectionIdSequence;
-    nx::network::aio::Timer m_aioTimer;
-    bool m_removeConnectionAfterClosure;
-    std::chrono::milliseconds m_maxDelayBeforeConnect;
+    std::atomic<ConnectionId> m_transactionConnectionIdSequence{0};
+    bool m_removeConnectionAfterClosure = false;
+    std::chrono::milliseconds m_maxDelayBeforeConnect = std::chrono::milliseconds::zero();
     OnConnectionBecomesActiveSubscription m_onConnectionBecomesActiveSubscription;
     OnConnectionFailureSubscription m_onConnectionFailureSubscription;
     std::string m_syncPath;

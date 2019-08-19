@@ -6,6 +6,7 @@ import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
 import Nx.Layout 1.0
+import Nx.RightPanel 1.0
 import nx.client.desktop 1.0
 
 Control
@@ -122,6 +123,11 @@ Control
             width: narrowWidth
 
             anchors { top: titlePanel.bottom; bottom: timelinePanel.top }
+
+            contentItem: RightPanel
+            {
+                id: rightPanelTabs
+            }
         }
 
         // ----------------------------------------------------------------------------------------

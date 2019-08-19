@@ -46,6 +46,7 @@ Controller::Controller(
     m_vmsP2pCommandBus(&m_ec2SynchronizationEngine),
     m_systemHealthInfoProvider(
         SystemHealthInfoProviderFactory::instance().create(
+            settings,
             &m_ec2SynchronizationEngine.connectionManager(),
             &m_dbInstanceController.queryExecutor())),
     m_systemManager(

@@ -16,7 +16,9 @@ bool QnLdapSettings::isValid() const
 
 int QnLdapSettings::defaultPort(bool ssl)
 {
-    return ssl ? 389 : 636;
+    const int defaultLdapPort = 389;
+    const int defaultLdapSslPort = 636;
+    return ssl ? defaultLdapSslPort : defaultLdapPort;
 }
 
 QString QnLdapUser::toString() const

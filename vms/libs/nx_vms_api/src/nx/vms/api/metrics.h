@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <QtCore/QJsonValue>
+#include <QtCore/QJsonObject>
 
 #include <nx/fusion/model_functions_fwd.h>
 

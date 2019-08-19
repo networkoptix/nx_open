@@ -280,43 +280,21 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(m_stateTracker.get(), &PeerStateTracker::itemRemoved, this,
         [this](UpdateItemPtr item)
         {
-            if (m_widgetState != WidgetUpdateState::ready)
-                return;
-
-            NX_VERBOSE(this,
-               "peer %1 is going to be removed. We should repeat validation.", item->id);
-            repeatUpdateValidation();
+            if (m_widgetState == WidgetUpdateState::downloading)
+                m_stateTracker->removeFromTask(item->id);
+            atServerConfigurationChanged(item);
         });
 
     connect(m_stateTracker.get(), &PeerStateTracker::itemAdded, this,
         [this](UpdateItemPtr item)
         {
-            if (m_widgetState != WidgetUpdateState::ready)
-                return;
-
-            NX_VERBOSE(this,
-               "peer %1 is going to be added. We should repeat validation.", item->id);
-            repeatUpdateValidation();
+            if (m_widgetState == WidgetUpdateState::downloading)
+                m_stateTracker->addToTask(item->id);
+            atServerConfigurationChanged(item);
         });
 
     connect(m_stateTracker.get(), &PeerStateTracker::itemOnlineStatusChanged, this,
-        [this](UpdateItemPtr item)
-        {
-            if (m_widgetState != WidgetUpdateState::ready
-                && m_widgetState != WidgetUpdateState::readyInstall)
-            {
-                return;
-            }
-
-            if (!item->offline || !item->verificationMessage.isEmpty())
-            {
-                // TODO: Make more conservative check: only check if server goes online, or if
-                // server has errors and goes offline.
-                NX_VERBOSE(this,
-                   "peer %1 has changed online status. We should repeat validation.", item->id);
-                repeatUpdateValidation();
-            }
-        });
+        &MultiServerUpdatesWidget::atServerConfigurationChanged);
 
     connect(m_serverUpdateTool.get(), &ServerUpdateTool::startUpdateComplete,
         this, &MultiServerUpdatesWidget::atStartUpdateComplete);
@@ -1339,6 +1317,25 @@ void MultiServerUpdatesWidget::atServerPackageDownloadFailed(
     }
 }
 
+void MultiServerUpdatesWidget::atServerConfigurationChanged(std::shared_ptr<UpdateItem> item)
+{
+    if (m_widgetState != WidgetUpdateState::ready
+        && m_widgetState != WidgetUpdateState::readyInstall
+        && m_widgetState != WidgetUpdateState::downloading)
+    {
+        return;
+    }
+
+    if (!item->offline || !item->verificationMessage.isEmpty())
+    {
+        // TODO: Make more conservative check: only check if server goes online, or if
+        // server has errors and goes offline.
+        NX_VERBOSE(this,
+           "peer %1 has changed online status. We should repeat validation.", item->id);
+        repeatUpdateValidation();
+    }
+}
+
 ServerUpdateTool::ProgressInfo MultiServerUpdatesWidget::calculateActionProgress() const
 {
     ServerUpdateTool::ProgressInfo result;
@@ -1672,6 +1669,7 @@ void MultiServerUpdatesWidget::processDownloadingState()
             m_serverUpdateTool->requestRetryAction();
             m_clientUpdateTool->setUpdateTarget(m_updateInfo);
             setTargetState(WidgetUpdateState::downloading, serversToRetry);
+            m_stateTracker->markStatusUnknown(serversToRetry);
         }
         else if (clicked == cancelUpdate)
         {
@@ -1687,13 +1685,17 @@ void MultiServerUpdatesWidget::processReadyInstallState()
 {
     auto idle = m_stateTracker->peersInState(StatusCode::idle);
     auto all = m_stateTracker->allPeers();
-    auto downloading = m_stateTracker->peersInState(StatusCode::downloading);
+    auto downloading = m_stateTracker->peersInState(StatusCode::downloading)
+        + m_stateTracker->peersInState(StatusCode::preparing);
     downloading.subtract(m_stateTracker->offlineServers());
+
     if (!downloading.empty())
     {
         // We should go to downloading stage if we have merged
         // another system. This system will start update automatically, so we just need
         // to change UI state.
+        NX_DEBUG(this, "processReadyInstallState() - detected servers %1 in downloading state",
+            downloading);
         setTargetState(WidgetUpdateState::downloading, downloading, false);
     }
     else if (idle.size() == all.size() && m_serverUpdateTool->haveActiveUpdate())
@@ -2320,31 +2322,41 @@ void MultiServerUpdatesWidget::syncRemoteUpdateStateToUi()
 
     auto readyAndOnline = m_stateTracker->onlineAndInState(LocalStatusCode::readyToInstall);
     auto readyAndOffline = m_stateTracker->offlineAndInState(LocalStatusCode::readyToInstall);
-    bool hasErrors = m_stateTracker->hasVerificationErrors();
+    bool hasVerificationErrors = m_stateTracker->hasVerificationErrors();
+    bool hasStatusErrors = m_stateTracker->hasStatusErrors();
 
+    QStringList errorTooltips;
     if (m_widgetState == WidgetUpdateState::readyInstall)
     {
-        if (readyAndOnline.empty() || !readyAndOffline.empty())
+        if (readyAndOnline.empty() || !readyAndOffline.empty()
+            || hasStatusErrors || hasVerificationErrors)
         {
-            ui->downloadButton->setEnabled(false);
-            ui->downloadButton->setToolTip(tr("Some servers have gone offline. "
-                "Please wait until they become online to continue."));
-        }
-        else if (hasErrors)
-        {
-            ui->downloadButton->setEnabled(false);
-            ui->downloadButton->setToolTip(tr("Some servers have no package available"));
-        }
-        else
-        {
-            ui->downloadButton->setEnabled(true);
-            ui->downloadButton->setToolTip("");
+            if (hasVerificationErrors)
+            {
+                errorTooltips << tr("Some servers have no update packages available.");
+            }
+            else if (hasStatusErrors)
+            {
+                errorTooltips << tr("Some servers have encountered an internal error.");
+                errorTooltips << tr("Please please contact Customer Support.");
+            }
+            else
+            {
+                errorTooltips << tr("Some servers have gone offline. "
+                                    "Please wait until they become online to continue.");
+            }
         }
     }
-    else
+
+    if (errorTooltips.isEmpty())
     {
         ui->downloadButton->setEnabled(true);
         ui->downloadButton->setToolTip("");
+    }
+    else
+    {
+        ui->downloadButton->setEnabled(false);
+        ui->downloadButton->setToolTip(errorTooltips.join("\n"));
     }
 
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::StorageSettingsColumn, !m_showStorageSettings);

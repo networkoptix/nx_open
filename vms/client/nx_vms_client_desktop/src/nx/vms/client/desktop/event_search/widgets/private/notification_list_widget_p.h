@@ -12,7 +12,7 @@ class QToolButton;
 namespace nx::vms::client::desktop {
 
 class EventRibbon;
-class AbstractEventListModel;
+class NotificationTabModel;
 
 class NotificationListWidget::Private:
     public QObject,
@@ -28,8 +28,7 @@ private:
     NotificationListWidget* const q;
     EventRibbon* const m_eventRibbon;
     QWidget* const m_placeholder;
-    AbstractEventListModel* const m_systemHealthModel;
-    AbstractEventListModel* const m_notificationsModel;
+    NotificationTabModel* const m_model;
 };
 
 } // namespace nx::vms::client::desktop

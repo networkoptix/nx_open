@@ -5,6 +5,9 @@
 
 namespace nx::vms::server::metrics {
 
+/**
+ * Provides cameras, which are parrented by the current server.
+ */
 class CameraProvider:
     public QObject,
     public ServerModuleAware,

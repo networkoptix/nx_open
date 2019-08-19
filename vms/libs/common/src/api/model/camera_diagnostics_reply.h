@@ -26,6 +26,6 @@ struct QnCameraDiagnosticsReply
 
 #define QnCameraDiagnosticsReply_Fields (performedStep)(errorCode)(errorParams)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraDiagnosticsReply, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraDiagnosticsReply, (json)(ubjson)(metatype))
 
 #endif // QN_TIME_REPLY_H

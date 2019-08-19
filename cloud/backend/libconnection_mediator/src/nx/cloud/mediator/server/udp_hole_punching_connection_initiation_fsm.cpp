@@ -384,18 +384,8 @@ void UDPHolePunchingConnectionInitiationFsm::initiateRelayInstanceSearch()
 {
     m_state = State::resolvingServersRelayInstance;
 
-    auto completionHander =
-        [this](
-            nx::cloud::relay::api::ResultCode resultCode,
-            nx::utils::Url relayInstanceUrl)
-        {
-            onRelayInstanceSearchCompletion(
-                resultCode == nx::cloud::relay::api::ResultCode::ok
-                    ? std::make_optional(std::move(relayInstanceUrl))
-                    : std::nullopt);
-        };
-
-    findRelayInstance(std::move(completionHander));
+    findRelayInstance([this](auto&&... args) {
+        onRelayInstanceSearchCompletion(std::forward<decltype(args)>(args)...); });
 }
 
 void UDPHolePunchingConnectionInitiationFsm::findRelayInstance(
@@ -407,9 +397,7 @@ void UDPHolePunchingConnectionInitiationFsm::findRelayInstance(
     m_findRelayInstanceFunc.invokeWithTimeout(
         [sharedHandler](auto... args)
         {
-            nx::utils::swapAndCall(
-                *sharedHandler,
-                std::move(args)...);
+            nx::utils::swapAndCall(*sharedHandler, std::move(args)...);
         },
         m_settings.connectionParameters().maxRelayInstanceSearchTime,
         [sharedHandler]()
@@ -449,23 +437,24 @@ void UDPHolePunchingConnectionInitiationFsm::finishConnect()
 }
 
 void UDPHolePunchingConnectionInitiationFsm::onRelayInstanceSearchCompletion(
-    std::optional<nx::utils::Url> relayInstanceUrl)
+    nx::cloud::relay::api::ResultCode resultCode,
+    nx::utils::Url relayInstanceUrl)
 {
-    if (relayInstanceUrl)
+    if (resultCode == nx::cloud::relay::api::ResultCode::ok)
     {
-        NX_VERBOSE(this, lm("Connection %1. Found relay instance %2")
-            .args(m_connectionID, *relayInstanceUrl));
-        m_preparedConnectResponse.trafficRelayUrl = relayInstanceUrl->toString().toUtf8();
+        NX_VERBOSE(this, "Connection %1. Found relay instance %2",
+            m_connectionID, relayInstanceUrl);
+        m_preparedConnectResponse.trafficRelayUrl = relayInstanceUrl.toString().toUtf8();
     }
     else
     {
-        NX_WARNING(this, lm("Connection %1. Could not find a relay instance")
-            .args(m_connectionID));
+        NX_WARNING(this, "Connection %1. Could not find a relay instance. %2",
+            m_connectionID, nx::cloud::relay::api::toString(resultCode));
     }
 
     if (m_state > State::resolvingServersRelayInstance)
     {
-        NX_DEBUG(this, lm("Ignoring late \"find relay instance\" response"));
+        NX_DEBUG(this, "Ignoring late \"find relay instance\" response");
         return;
     }
 
@@ -477,7 +466,7 @@ void UDPHolePunchingConnectionInitiationFsm::onRelayInstanceSearchCompletion(
 api::ConnectResponse UDPHolePunchingConnectionInitiationFsm::prepareConnectResponse(
     const api::ConnectionAckRequest& connectionAckRequest,
     std::vector<network::SocketAddress> tcpEndpoints,
-    std::optional <nx::utils::Url> relayInstanceUrl)
+    std::optional<nx::utils::Url> relayInstanceUrl)
 {
     api::ConnectResponse connectResponse;
     connectResponse.params = m_settings.connectionParameters();
@@ -569,6 +558,8 @@ const char* UDPHolePunchingConnectionInitiationFsm::toString(State state)
             return "init";
         case State::waitingServerPeerUDPAddress:
             return "waitingServerPeerUDPAddress";
+        case State::resolvingServersRelayInstance:
+            return "resolvingServersRelayInstance";
         case State::waitingConnectionResult:
             return "waitingConnectionResult";
         case State::fini:

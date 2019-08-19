@@ -1,7 +1,10 @@
 #pragma once
 
+#include <nx/utils/move_only_func.h>
+
 #include <nx_ec/ec_api_fwd.h>
 #include <nx_ec/impl/ec_api_impl.h>
+#include <nx_ec/impl/regular_completion_handler.h>
 #include <nx_ec/impl/sync_handler.h>
 
 #include <nx/vms/api/data/access_rights_data.h>
@@ -47,6 +50,13 @@ public:
                 target, handler)));
     }
 
+    int getUsers(
+        nx::utils::MoveOnlyFunc<void(ErrorCode, nx::vms::api::UserDataList)> handler)
+    {
+        return getUsers(
+            impl::makeRegularCompletionHandler<impl::GetUsersHandler>(std::move(handler)));
+    }
+
     ErrorCode getUsersSync(nx::vms::api::UserDataList* const userList)
     {
         return impl::doSyncCall<impl::GetUsersHandler>(
@@ -67,6 +77,15 @@ public:
         return save(user, newPassword, std::static_pointer_cast<impl::SimpleHandler>(
             std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
                 target, handler)));
+    }
+
+    int save(
+        const nx::vms::api::UserData& user,
+        const QString& newPassword,
+        nx::utils::MoveOnlyFunc<void(ErrorCode)> handler)
+    {
+        return save(user, newPassword,
+            impl::makeRegularCompletionHandler<impl::SimpleHandler>(std::move(handler)));
     }
 
     ErrorCode saveSync(const nx::vms::api::UserData& user, const QString& newPassword = QString())

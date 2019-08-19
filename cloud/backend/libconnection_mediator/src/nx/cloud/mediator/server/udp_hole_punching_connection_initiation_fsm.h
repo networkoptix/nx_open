@@ -153,7 +153,9 @@ private:
 
     void finishConnect();
 
-    void onRelayInstanceSearchCompletion(std::optional<nx::utils::Url> relayInstanceUrl);
+    void onRelayInstanceSearchCompletion(
+        nx::cloud::relay::api::ResultCode resultCode,
+        nx::utils::Url relayInstanceUrl);
 
     api::ConnectResponse prepareConnectResponse(
         const api::ConnectionAckRequest& connectionAckRequest,

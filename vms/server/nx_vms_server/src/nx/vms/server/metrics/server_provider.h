@@ -8,6 +8,9 @@ class QnStorageManager;
 
 namespace nx::vms::server::metrics {
 
+/**
+ * Provides a single server (the current one).
+ */
 class ServerProvider:
     public ServerModuleAware,
     public utils::metrics::ResourceProvider<QnMediaServerResource*>
@@ -20,6 +23,12 @@ public:
         const Resource& resource) const override;
 
 private:
+    /** @returns true if this resource is a current server. */
+    bool isLocal(const Resource& resource) const;
+
+    /** Allows getter to work only on current server resource. */
+    utils::metrics::Getter<Resource> localGetter(utils::metrics::Getter<Resource> getter) const;
+
     ParameterProviders makeProviders();
     ParameterProviderPtr makeStorageProvider(const QString& type, QnStorageManager* storageManager);
     ParameterProviderPtr makeMiscProvider();

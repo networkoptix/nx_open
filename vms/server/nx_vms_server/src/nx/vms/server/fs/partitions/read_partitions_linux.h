@@ -33,6 +33,8 @@ struct PartitionInfo
     qint64 sizeBytes;
 
     bool isUsb = false;
+
+    QString toString() const;
 };
 
 SystemError::ErrorCode readPartitionsInformation(

@@ -4,9 +4,7 @@
 
 #include "data_generator.h"
 
-namespace nx {
-namespace cdb {
-namespace client {
+namespace nx::cloud::db::client {
 
 int generateSystems(
     const std::string& cdbUrl,
@@ -23,6 +21,4 @@ int generateSystems(
     return 0;
 }
 
-} // namespace client
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db::client

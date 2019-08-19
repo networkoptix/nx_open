@@ -11,6 +11,10 @@ struct ResourceDescription
     QString id;
     QString parent;
     QString name;
+    bool isLocal = true;
+
+    ResourceDescription(QString id, QString parent, QString name, bool isLocal = true):
+        id(std::move(id)), parent(std::move(parent)), name(std::move(name)), isLocal(isLocal) {}
 };
 
 class AbstractResourceProvider
@@ -22,10 +26,12 @@ public:
     virtual const api::metrics::ResourceManifest& manifest() const = 0;
 
     /** Starts monitoring for new resources. dataBaseAccess should be used to store their values. */
-    virtual void startMonitoring(DataBase::Access dataBaseAccess) = 0;
+    virtual void startMonitoring(DataBase::Writer dbWriter) = 0;
 
-    /** Resource descriptions for resources, which are currently discovered. */
-    virtual std::vector<ResourceDescription> resources() const = 0;
+    /** Returns current resources with parameter values. */
+    virtual api::metrics::ResourceGroupValues values(bool includeRemote) const = 0;
+    virtual api::metrics::ResourceGroupValues timeline(
+        bool includeRemote, uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const = 0;
 };
 
 /**
@@ -38,13 +44,16 @@ public:
     using Resource = ResourceType;
     ResourceProvider(ResourceParameterProviders<Resource> providers);
 
-    const api::metrics::ResourceManifest& manifest() const final;
-    void startMonitoring(DataBase::Access dataBaseAccess) final;
-    std::vector<ResourceDescription> resources() const final;
-
     using Value = api::metrics::Value;
     using ParameterProviders = ResourceParameterProviders<Resource>;
     using ParameterProviderPtr = std::unique_ptr<AbstractParameterProvider<Resource>>;
+
+    const api::metrics::ResourceManifest& manifest() const final;
+    void startMonitoring(DataBase::Writer dbWriter) final;
+
+    api::metrics::ResourceGroupValues values(bool includeRemote) const final;
+    api::metrics::ResourceGroupValues timeline(
+        bool includeRemote, uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const final;
 
 protected:
     /** Should be implemented in inheritors to begin resource discovery process. */
@@ -62,13 +71,9 @@ protected:
     /** Should be called from inheritors, when resource description is changed. */
     void changed(const Resource& resource);
 
-    static std::unique_ptr<AbstractParameterProvider<Resource>> singleParameterProvider(
+    static std::unique_ptr<AbstractParameterProvider<ResourceType>> singleParameterProvider(
         api::metrics::ParameterManifest manifest,
-        typename SingleParameterProvider<Resource>::Getter getter,
-        typename SingleParameterProvider<Resource>::Watch watch = nullptr);
-
-    template<typename Signal>
-    static typename SingleParameterProvider<Resource>::Watch qSignalWatch(Signal signal);
+        Getter<ResourceType> getter, Watch<ResourceType> watch = nullptr);
 
     template<typename... Providers>
     static ResourceParameterProviders<Resource> parameterProviders(Providers... providers);
@@ -80,8 +85,8 @@ protected:
 private:
     const ParameterGroupProvider<Resource> m_parameters;
     mutable nx::utils::Mutex m_mutex;
-    DataBase::Access m_dataBaseAccess;
-    std::map<Resource, nx::utils::SharedGuardPtr> m_resources;
+    DataBase::Writer m_dbWriter;
+    std::map<Resource, ParameterMonitorPtr> m_resources;
 };
 
 // -----------------------------------------------------------------------------------------------
@@ -99,24 +104,62 @@ const api::metrics::ResourceManifest& ResourceProvider<ResourceType>::manifest()
 }
 
 template<typename ResourceType>
-void ResourceProvider<ResourceType>::startMonitoring(DataBase::Access dataBaseAccess)
+void ResourceProvider<ResourceType>::startMonitoring(DataBase::Writer dbWriter)
 {
-    m_dataBaseAccess = dataBaseAccess;
+    m_dbWriter = dbWriter;
     startMonitoring();
 }
 
 template<typename ResourceType>
-std::vector<ResourceDescription> ResourceProvider<ResourceType>::resources() const
+api::metrics::ResourceGroupValues ResourceProvider<ResourceType>::values(bool includeRemote) const
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    std::vector<ResourceDescription> descriptions;
-    for (const auto [resource, monitorGuard]: m_resources)
+    api::metrics::ResourceGroupValues groupValues;
+    for (const auto& [resource, monitor]: m_resources)
     {
         if (auto description = describe(resource))
-            descriptions.push_back(std::move(*description));
+        {
+            if (!includeRemote && !description->isLocal)
+                continue;
+
+            auto parameterValues = monitor->current();
+            NX_ASSERT(!parameterValues.group.empty());
+
+            groupValues[description->id] = {
+                std::move(description->name),
+                std::move(description->parent),
+                std::move(parameterValues.group)
+            };
+        }
     }
 
-    return descriptions;
+    return groupValues;
+}
+
+template<typename ResourceType>
+api::metrics::ResourceGroupValues ResourceProvider<ResourceType>::timeline(
+    bool includeRemote, uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) const
+{
+    api::metrics::ResourceGroupValues groupValues;
+    for (const auto& [resource, monitor]: m_resources)
+    {
+        if (auto description = describe(resource))
+        {
+            if (!includeRemote && !description->isLocal)
+                continue;
+
+            auto parameterValues = monitor->timeline(nowSecsSinceEpoch, length);
+            if (!parameterValues)
+                continue;
+
+            NX_ASSERT(!parameterValues->group.empty());
+            groupValues[description->id] = {
+                std::move(description->name),
+                std::move(description->parent),
+                parameterValues->group};
+        }
+    }
+
+    return groupValues;
 }
 
 template<typename ResourceType>
@@ -124,7 +167,7 @@ void ResourceProvider<ResourceType>::found(const Resource& resource)
 {
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
-        const auto [it, isInserted] =  m_resources.emplace(resource, nx::utils::SharedGuardPtr());
+        const auto [it, isInserted] =  m_resources.emplace(resource, ParameterMonitorPtr{});
         if (!NX_ASSERT(isInserted, "Duplicate %1", resource))
             return;
     }
@@ -146,23 +189,21 @@ template<typename ResourceType>
 void ResourceProvider<ResourceType>::changed(const Resource& resource)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    nx::utils::SharedGuardPtr& monitoringGuard = m_resources[resource];
+    auto& monitor = m_resources[resource];
     if (const auto description = describe(resource))
     {
-        const auto& id = description->id;
-        if (!monitoringGuard)
+        if (!monitor)
         {
             NX_DEBUG(this, "Start monitoring %1", resource);
-            auto guard = m_parameters.monitor(resource, m_dataBaseAccess[id]);
-            monitoringGuard = guard;
+            monitor = m_parameters.monitor(resource, m_dbWriter[description->id]);
         }
     }
     else
     {
-        if (monitoringGuard)
+        if (monitor)
         {
             NX_DEBUG(this, "Stop monitoring %1", resource);
-            monitoringGuard.reset();
+            monitor.reset();
         }
     }
 }
@@ -171,26 +212,10 @@ template<typename ResourceType>
 std::unique_ptr<AbstractParameterProvider<ResourceType>>
     ResourceProvider<ResourceType>::singleParameterProvider(
         api::metrics::ParameterManifest manifest,
-        typename SingleParameterProvider<Resource>::Getter getter,
-        typename SingleParameterProvider<Resource>::Watch watch)
+        Getter<ResourceType> getter, Watch<ResourceType> watch)
 {
     return std::make_unique<SingleParameterProvider<Resource>>(
         std::move(manifest), std::move(getter), std::move(watch));
-}
-
-template<typename ResourceType>
-template<typename Signal>
-typename SingleParameterProvider<ResourceType>::Watch
-    ResourceProvider<ResourceType>::qSignalWatch(Signal signal)
-{
-    return [signal](const Resource& resource, nx::utils::MoveOnlyFunc<void()> change)
-    {
-        const auto connection = QObject::connect(
-            resource, signal,
-            [change = std::move(change)](const auto& /*resource*/) { change(); });
-
-        return nx::utils::makeSharedGuard([connection]() { QObject::disconnect(connection); });
-    };
 }
 
 template<typename ResourceType>

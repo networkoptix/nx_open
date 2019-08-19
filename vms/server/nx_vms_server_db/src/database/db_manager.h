@@ -823,6 +823,7 @@ namespace detail
         bool fixBusinessRules();
         bool syncLicensesBetweenDB();
         bool encryptKvPairs();
+        bool encryptBusinessRules();
         bool moveAnalyticsStorageIdToProperty();
         bool fixDefaultBusinessRuleGuids();
         bool updateBusinessRulesTransactions();

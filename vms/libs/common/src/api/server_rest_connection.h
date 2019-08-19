@@ -6,8 +6,9 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/utils/system_error.h>
-#include "utils/common/request_param.h"
-#include "nx_ec/data/api_fwd.h"
+#include <utils/camera/camera_diagnostics.h>
+#include <utils/common/request_param.h>
+#include <nx_ec/data/api_fwd.h>
 #include <api/helpers/request_helpers_fwd.h>
 #include <nx/api/mediaserver/requests_fwd.h>
 #include <nx/network/deprecated/asynchttpclient.h>
@@ -21,6 +22,7 @@
 #include <api/http_client_pool.h>
 #include <api/model/analytics_actions.h>
 #include <api/model/audit/audit_record.h>
+#include <api/model/camera_diagnostics_reply.h>
 #include <api/model/manual_camera_seach_reply.h>
 #include <api/model/test_email_settings_reply.h>
 #include <api/model/time_reply.h>
@@ -459,15 +461,15 @@ public:
         QThread* targetThread = nullptr);
 
     Handle updateActionStop(
-        std::function<void(Handle, bool)>&& callback,
+        std::function<void(bool, Handle)>&& callback,
         QThread* targetThread = nullptr);
 
     Handle updateActionFinish(bool skipActivePeers,
-        std::function<void(Handle, bool)>&& callback,
+        std::function<void(bool, Handle, const QnRestResult&)>&& callback,
         QThread* targetThread = nullptr);
 
     Handle updateActionInstall(const QSet<QnUuid>& participants,
-        std::function<void(Handle, bool)>&& callback,
+        std::function<void(bool, Handle, const QnRestResult&)>&& callback,
         QThread* targetThread = nullptr);
 
     Handle retryUpdate(
@@ -533,6 +535,16 @@ public:
         Result<QString>::type&& callback,
         QThread* targetThread = nullptr);
 
+    /**
+     * Request the server to run the camera diagnostics step following previousStep.
+     * @param slot Slot MUST have signature (int, QnCameraDiagnosticsReply, int).
+     * @return Request handle.
+     */
+    Handle doCameraDiagnosticsStep(
+        const QnUuid& cameraId, CameraDiagnostics::Step::Value previousStep,
+        Result<RestResultWithData<QnCameraDiagnosticsReply>>::type&& callback,
+        QThread* targetThread = nullptr);
+
     Handle debug(
         const QString& action,
         const QString& value,
@@ -567,6 +579,12 @@ public:
         const QString& action,
         const QnRequestParamList& params,
         std::function<void(bool, Handle, QnUbjsonRestResult response)>&& callback,
+        QThread* targetThread = nullptr);
+
+    Handle getJsonResult(
+        const QString& action,
+        const QnRequestParamList& params,
+        std::function<void(bool, Handle, QnJsonRestResult response)>&& callback,
         QThread* targetThread = nullptr);
 
     Handle getRawResult(

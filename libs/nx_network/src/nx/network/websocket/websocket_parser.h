@@ -2,19 +2,11 @@
 
 #include <nx/network/buffer.h>
 #include "websocket_common_types.h"
+#include <nx/utils/move_only_func.h>
 
 namespace nx {
 namespace network {
 namespace websocket {
-
-class ParserHandler
-{
-public:
-    virtual void gotFrame(FrameType type, const nx::Buffer& data, bool fin) = 0;
-    virtual void handleError(Error err) = 0;
-
-    virtual ~ParserHandler() {}
-};
 
 class NX_NETWORK_API Parser
 {
@@ -35,7 +27,9 @@ class NX_NETWORK_API Parser
     const int kFixedHeaderLen = 2;
 
 public:
-    Parser(Role role, ParserHandler* handler);
+    using GotFrameHandler = nx::utils::MoveOnlyFunc<void(FrameType, const nx::Buffer&, bool)>;
+
+    Parser(Role role, GotFrameHandler gotFrameHandler);
     void consume(char* data, int len);
     void consume(nx::Buffer& buf);
     void setRole(Role role);
@@ -44,7 +38,7 @@ public:
 
 private:
     Role m_role;
-    ParserHandler* m_handler;
+    GotFrameHandler m_frameHandler;
     nx::Buffer m_buf;
     nx::Buffer m_frameBuffer;
     ParseState m_state = ParseState::readingHeaderFixedPart;

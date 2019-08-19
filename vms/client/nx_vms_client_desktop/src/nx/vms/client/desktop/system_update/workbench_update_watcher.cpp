@@ -18,7 +18,6 @@
 
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/system_update/update_contents.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -37,6 +36,7 @@
 #include <nx/update/update_check.h>
 
 #include "server_update_tool.h"
+#include "update_verification.h"
 
 using namespace nx::vms::client::desktop::ui;
 using UpdateContents = nx::update::UpdateContents;

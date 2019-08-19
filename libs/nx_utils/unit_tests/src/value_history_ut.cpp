@@ -39,22 +39,31 @@ TEST(ValueHistoryTest, main)
 TEST(TreeValueHistoryTest, main)
 {
     TreeValueHistory<QString, int> history;
-    const auto baseAccess = history.access();
+    const auto baseWriter = history.writer();
 
-    auto singleAccess = baseAccess["single"];
-    singleAccess->update(10);
+    auto singleWriter = baseWriter[QString("single")];
+    singleWriter->update(10);
 
-    auto groupAccess = baseAccess["group"];
+    auto groupWriter = baseWriter[QString("group")];
 
-    auto aaaGroupAccess = groupAccess["aaa"];
-    aaaGroupAccess->update(20);
+    auto aaaGroupWriter = groupWriter[QString("aaa")];
+    aaaGroupWriter->update(20);
 
-    auto bbbGroupAccess = groupAccess["bbb"];
-    bbbGroupAccess->update(30);
+    auto bbbGroupWriter = groupWriter[QString("bbb")];
+    bbbGroupWriter->update(30);
 
-    EXPECT_EQ(10, history.access("single")->current());
-    EXPECT_EQ(20, history.access("group")["aaa"]->current());
-    EXPECT_EQ(30, history.access("group")["bbb"]->current());
+    const auto singleReader = history.reader("single");
+    ASSERT_TRUE((bool) singleReader);
+    EXPECT_EQ(10, singleReader->current());
+
+    const auto groupReader = history.reader("group");
+    ASSERT_TRUE((bool) groupReader);
+    EXPECT_EQ(20, groupReader[QString("aaa")]->current());
+    EXPECT_EQ(30, groupReader[QString("bbb")]->current());
+
+    const auto wrongReader = history.reader("wrong");
+    ASSERT_FALSE((bool) wrongReader);
+    ASSERT_EQ(wrongReader->current(), 0);
 }
 
 } // namespace nx::utils::test

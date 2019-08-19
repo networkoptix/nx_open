@@ -165,7 +165,7 @@ function main()
 
         if [ "$func" = "build" ]
         then
-            args="$1"; shift; n=$((n+1))
+            args="$1"; shift || true; n=$((n+1))
         fi
         if [ "$func" = "stage_cmake" ]
         then

@@ -75,7 +75,7 @@ public:
             std::chrono::milliseconds(3002);
 
         static constexpr std::chrono::milliseconds kDefaultMessageBodyReadTimeout =
-            std::chrono::milliseconds::zero();  //no timeout
+            std::chrono::milliseconds(10003);
 
         std::chrono::milliseconds sendTimeout = kDefaultSendTimeout;
         std::chrono::milliseconds responseReadTimeout = kDefaultResponseReadTimeout;

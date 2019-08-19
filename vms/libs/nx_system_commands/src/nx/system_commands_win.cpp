@@ -67,6 +67,8 @@ int SystemCommands::open(const std::string& /*path*/, int /*mode*/)
 
 static inline QString toLongPathW(const std::string& path)
 {
+    // Using prefix \\?\ here to support long paths handling.
+    // https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
     return QString("\\\\?\\") + QDir::toNativeSeparators(QString::fromStdString(path));
 }
 

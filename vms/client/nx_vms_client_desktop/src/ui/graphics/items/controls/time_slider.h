@@ -170,7 +170,7 @@ public:
     milliseconds windowEnd() const;
     void setWindowEnd(milliseconds windowEnd);
 
-    void setWindow(milliseconds start, milliseconds end, bool animate = false);
+    void setWindow(milliseconds start, milliseconds end, bool animate = false, bool forceResize = false);
     void shiftWindow(milliseconds delta, bool animate = false);
 
     bool windowContains(milliseconds position);

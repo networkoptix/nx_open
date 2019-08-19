@@ -19,6 +19,7 @@ if(withClouds)
     add_subdirectory(time_server)
     add_subdirectory(cloud_connect_test_util)
     add_subdirectory(storage)
+    add_subdirectory(cloud_db_test_util)
 
     if(withTests)
         add_subdirectory(tests)

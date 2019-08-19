@@ -40,7 +40,7 @@ bool QnFinishUpdateRestHandler::allPeersUpdatedSuccessfully() const
 int QnFinishUpdateRestHandler::executePost(
     const QString& /*path*/,
     const QnRequestParamList& params,
-    const QByteArray& body,
+    const QByteArray& /*body*/,
     const QByteArray& /*srcBodyContentType*/,
     QByteArray& result,
     QByteArray& resultContentType,
@@ -52,6 +52,11 @@ int QnFinishUpdateRestHandler::executePost(
     if (params.contains("ignorePendingPeers") || allPeersUpdatedSuccessfully())
     {
         serverModule()->updateManager()->finish();
+        // Client expects json object in all cases or response is considered failed.
+        QnRestResult restResult;
+        restResult.setError(QnRestResult::Error::NoError);
+        QnFusionRestHandlerDetail::serialize(
+            restResult, result, resultContentType, Qn::JsonFormat);
         return nx::network::http::StatusCode::ok;
     }
 

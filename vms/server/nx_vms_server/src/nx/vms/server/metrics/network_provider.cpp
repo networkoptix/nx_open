@@ -1,5 +1,7 @@
 #include "network_provider.h"
 
+#include "helpers.h"
+
 namespace nx::vms::server::metrics {
 
 NetworkProvider::NetworkProvider(const QnUuid& serverId):
@@ -19,9 +21,8 @@ void NetworkProvider::startMonitoring()
 std::optional<utils::metrics::ResourceDescription> NetworkProvider::describe(
     const Resource& resource) const
 {
-    return utils::metrics::ResourceDescription{
-        m_serverId + "_" + resource->name, m_serverId, resource->name
-    };
+    return utils::metrics::ResourceDescription(
+        m_serverId + "_" + resource->name, m_serverId, resource->name);
 }
 
 NetworkProvider::ParameterProviders NetworkProvider::makeProviders()
@@ -29,15 +30,18 @@ NetworkProvider::ParameterProviders NetworkProvider::makeProviders()
     return parameterProviders(
         singleParameterProvider(
             {"ip", "IP"},
-            [](const auto& resource) { return Value(resource->address.toString()); } //< TODO: Monitor.
+            [](const auto& resource) { return Value(resource->address.toString()); },
+            staticWatch<Resource>() //< TODO: Monitor.
         ),
         singleParameterProvider(
             {"inRate", "IN Rate", "bps"},
-            [](const auto& /*resource*/) { return Value(100000); } //< TODO: Implement.
+            [](const auto& /*resource*/) { return Value(100000); }, //< TODO: Implement.
+            staticWatch<Resource>()
         ),
         singleParameterProvider(
             {"outRate", "OUT Rate", "bps"},
-            [](const auto& /*resource*/) { return Value(100000); } //< TODO: Implement.
+            [](const auto& /*resource*/) { return Value(100000); }, //< TODO: Implement.
+            staticWatch<Resource>()
         )
     );
 }
