@@ -9,10 +9,6 @@ namespace test {
 
 Ec2MserverCloudSynchronizationConnection::Ec2MserverCloudSynchronizationConnection()
 {
-    NX_GTEST_ASSERT_TRUE(startAndWaitUntilStarted());
-
-    m_account = addActivatedAccount2();
-    m_system = addRandomSystemToAccount(m_account);
 }
 
 const AccountWithPassword& Ec2MserverCloudSynchronizationConnection::account() const
@@ -117,6 +113,16 @@ OnConnectionFailureSubscription&
 test::TransactionConnectionHelper& Ec2MserverCloudSynchronizationConnection::connectionHelper()
 {
     return m_connectionHelper;
+}
+
+void Ec2MserverCloudSynchronizationConnection::SetUp()
+{
+    base_type::SetUp();
+
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    m_account = addActivatedAccount2();
+    m_system = addRandomSystemToAccount(m_account);
 }
 
 void Ec2MserverCloudSynchronizationConnection::waitForAtLeastNConnectionsToMoveToACertainState(
