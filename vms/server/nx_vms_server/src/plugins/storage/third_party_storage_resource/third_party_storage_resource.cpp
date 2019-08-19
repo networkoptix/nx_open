@@ -371,7 +371,7 @@ bool QnThirdPartyStorageResource::isFileExists(const QString& url)
 
     QnMutexLocker lock(&m_mutex);
     int errorCode;
-    const int result = m_storage->fileExists(urlToPath(url).toLatin1().constData(), &errorCode);
+    m_storage->fileExists(urlToPath(url).toLatin1().constData(), &errorCode);
     return errorCode == nx_spl::error::NoError;
 }
 

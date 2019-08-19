@@ -769,7 +769,8 @@ bool QnServerStreamRecorder::isRedundantSyncOn() const
     return cameraBackupQualities.testFlag(Qn::CameraBackupQuality::CameraBackup_LowQuality);
 }
 
-void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataProvider* provider)
+void QnServerStreamRecorder::getStoragesAndFileNames(
+    QnAbstractMediaStreamDataProvider* /*provider*/)
 {
     if (!m_fixedFileName)
     {
