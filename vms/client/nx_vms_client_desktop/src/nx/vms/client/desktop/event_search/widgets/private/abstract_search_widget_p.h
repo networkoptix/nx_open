@@ -147,7 +147,7 @@ private:
 
     std::optional<bool> m_isAllowed; //< std::optional for lazy initialization.
 
-    QDate m_currentDate;
+    QDate m_currentDate; //< Local settings aware.
 };
 
 inline uint qHash(AbstractSearchWidget::Period source)

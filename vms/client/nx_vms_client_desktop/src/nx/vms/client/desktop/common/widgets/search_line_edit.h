@@ -54,7 +54,7 @@ protected:
 private:
     QAction* m_glassIcon = nullptr;
     QLineEdit* const m_lineEdit = nullptr;
-    const QScopedPointer<utils::PendingOperation> m_emitTextChanged;
+    const QScopedPointer<nx::utils::PendingOperation> m_emitTextChanged;
 };
 
 } // namespace nx::vms::client::desktop
