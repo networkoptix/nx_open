@@ -88,6 +88,12 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
         timer.restart();
         const auto attributeGroups =
             m_attributesDao->lookupCombinedAttributes(queryContext, filter.freeText);
+        if (attributeGroups.empty())
+        {
+            NX_DEBUG(this, "Time periods lookup canceled. Text is not matched.");
+            return QnTimePeriodList(); //< No records with such text.
+        }
+
         std::copy(
             attributeGroups.begin(), attributeGroups.end(),
             std::back_inserter(archiveFilter.allAttributesHash));

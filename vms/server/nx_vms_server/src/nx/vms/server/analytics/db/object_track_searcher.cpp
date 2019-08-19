@@ -311,6 +311,8 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
     {
         const auto attributeGroups =
             m_attributesDao->lookupCombinedAttributes(queryContext, m_filter.freeText);
+        if (attributeGroups.empty())
+            return std::vector<ObjectTrack>(); //< No records with such text.
         std::copy(
             attributeGroups.begin(), attributeGroups.end(),
             std::back_inserter(archiveFilter.allAttributesHash));
