@@ -273,7 +273,7 @@ void CLServerPushStreamReader::pleaseReopenStream()
         m_needReopen = true;
 }
 
-void CLServerPushStreamReader::at_audioEnabledChanged(const QnResourcePtr& res)
+void CLServerPushStreamReader::at_audioEnabledChanged(const QnResourcePtr& /*resource*/)
 {
     if (m_cameraAudioEnabled != m_camera->isAudioEnabled())
         pleaseReopenStream();

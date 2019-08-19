@@ -9,6 +9,7 @@
 
 #include <nx/vms/server/sdk_support/file_utils.h>
 #include <nx/vms/server/sdk_support/conversion_utils.h>
+#include <nx/vms/server/analytics/wrappers/sdk_object_description.h>
 #include <nx/vms/server/analytics/wrappers/types.h>
 #include <plugins/vms_server_plugins_ini.h>
 
@@ -17,6 +18,7 @@
 #include <nx/vms/event/events/events_fwd.h>
 
 #include <nx/fusion/serialization/json.h>
+
 
 namespace nx::vms::server::analytics::wrappers {
 
@@ -204,7 +206,7 @@ private:
         const std::vector<api::analytics::ManifestError>& manifestErrors)
     {
         QString result;
-        for (int i = 0; i < manifestErrors.size(); ++i)
+        for (decltype (manifestErrors.size()) i = 0; i < manifestErrors.size(); ++i)
         {
             const auto& error = manifestErrors[i];
             result += lm("error: %1").args(toHumanReadableString(error.errorType));

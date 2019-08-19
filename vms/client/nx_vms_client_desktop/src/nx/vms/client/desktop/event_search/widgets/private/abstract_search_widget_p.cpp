@@ -20,6 +20,7 @@
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -27,6 +28,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
 
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/common/models/concatenation_list_model.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
@@ -129,7 +131,7 @@ AbstractSearchWidget::Private::Private(
     m_itemCounterLabel(new QLabel(q)),
     m_textFilterEdit(createSearchLineEdit(q)),
     m_dayChangeTimer(new QTimer()),
-    m_fetchMoreOperation(new utils::PendingOperation())
+    m_fetchMoreOperation(new nx::utils::PendingOperation())
 {
     NX_CRITICAL(model, "Model must be specified.");
     m_mainModel->setParent(nullptr); //< Stored as a scoped pointer.
@@ -163,7 +165,7 @@ AbstractSearchWidget::Private::Private(
 
     q->setFocusPolicy(Qt::ClickFocus);
 
-    m_fetchMoreOperation->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
+    m_fetchMoreOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
     m_fetchMoreOperation->setInterval(kQueuedFetchMoreDelay);
     m_fetchMoreOperation->setCallback([this]() { tryFetchMore(); });
 }
@@ -414,9 +416,9 @@ void AbstractSearchWidget::Private::setupTimeSelection()
 
     // Setup timeline selection watcher.
 
-    auto applyTimePeriod = new utils::PendingOperation(this);
+    auto applyTimePeriod = new nx::utils::PendingOperation(this);
     applyTimePeriod->setInterval(kTimeSelectionDelay);
-    applyTimePeriod->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
+    applyTimePeriod->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
     applyTimePeriod->setCallback(
         [this]()
         {
@@ -462,8 +464,9 @@ void AbstractSearchWidget::Private::setupTimeSelection()
     connect(m_dayChangeTimer.data(), &QTimer::timeout, this,
         [this]()
         {
+            const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+            setCurrentDate(timeWatcher->displayTime(qnSyncTime->currentMSecsSinceEpoch()).date());
             updateCurrentTimePeriod();
-            setCurrentDate(qnSyncTime->currentDateTime().date());
         });
 }
 
@@ -715,9 +718,7 @@ QnTimePeriod AbstractSearchWidget::Private::effectiveTimePeriod() const
             break;
     }
 
-    auto current = qnSyncTime->currentDateTime();
-    current.setTime(QTime(0, 0, 0, 0));
-    return QnTimePeriod(current.addDays(1 - days).toMSecsSinceEpoch(),
+    return QnTimePeriod(QDateTime(m_currentDate.addDays(1 - days)).toMSecsSinceEpoch(),
         QnTimePeriod::kInfiniteDuration);
 }
 

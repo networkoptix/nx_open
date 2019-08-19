@@ -107,6 +107,7 @@ QnMediaServerResourcePtr previewServer(const ResourceThumbnailProvider* provider
 } // namespace
 
 EventRibbon::Private::Private(EventRibbon* q):
+    QnWorkbenchContextAware(q),
     q(q),
     m_scrollBar(new QScrollBar(Qt::Vertical, q)),
     m_viewport(new QWidget(q)),
@@ -554,11 +555,54 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
     if (!m_model)
         return;
 
-    const auto index = m_model->index(indexOf(tile));
-    const auto menu = index.data(Qn::ContextMenuRole).value<QSharedPointer<QMenu>>();
+    const QPersistentModelIndex index = m_model->index(indexOf(tile));
+    auto menu = index.data(Qn::ContextMenuRole).value<QSharedPointer<QMenu>>();
+
+    const auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>();
+    if (!resourceList.empty())
+    {
+        if (!menu || !NX_ASSERT(!menu->isEmpty()))
+            menu.reset(new QMenu());
+        else
+            menu->insertSeparator(menu->actions()[0]);
+
+        // TODO: #vkutin #gdm
+        // Add new translatable strings in 4.2 and remove workbench context awareness.
+
+        const auto openAction = new QAction(
+            action(ui::action::OpenInCurrentLayoutAction)->text(), menu.get());
+
+        connect(openAction, &QAction::triggered, this,
+            [this, index]()
+            {
+                if (index.isValid())
+                    emit q->doubleClicked(index);
+            });
+
+        const auto openInNewTabAction = new QAction(
+            action(ui::action::OpenInNewTabAction)->text(), menu.get());
+
+        connect(openInNewTabAction, &QAction::triggered, this,
+            [this, index]()
+            {
+                if (index.isValid())
+                    emit q->clicked(index, Qt::MiddleButton, Qt::NoModifier);
+            });
+
+        QList<QAction*> actions({openAction, openInNewTabAction});
+        menu->insertActions(menu->actions()[0], actions);
+    }
 
     if (!menu)
         return;
+
+    connect(m_model, &QAbstractItemModel::modelAboutToBeReset, menu.get(), &QObject::deleteLater);
+    connect(m_model, &QAbstractItemModel::rowsAboutToBeRemoved, menu.get(),
+        [menu, index](const QModelIndex& parent, int first, int last)
+        {
+            if (!parent.isValid() && index.row() >= first && index.row() <= last)
+                menu->close();
+        });
 
     menu->setWindowFlags(menu->windowFlags() | Qt::BypassGraphicsProxyWidget);
 

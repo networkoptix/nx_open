@@ -16,6 +16,7 @@ public:
 
     int maximumCount() const;
     void setMaximumCount(int value);
+    static constexpr int kDefaultMaximumCount = 100;
 
 protected:
     virtual bool defaultAction(const QModelIndex& index) override;

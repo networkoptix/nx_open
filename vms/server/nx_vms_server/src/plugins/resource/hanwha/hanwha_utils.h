@@ -109,7 +109,7 @@ boost::optional<int> extractPropertyChannel(const QString& fullPropertyName);
 nx::core::resource::DeviceType fromHanwhaToNxDeviceType(HanwhaDeviceType hanwhaDeviceType);
 
 template<typename T>
-T fromHanwhaString(const QString& str)
+T fromHanwhaString(const QString& /*str*/)
 {
     static_assert(std::is_same<T, bool>::value
         || std::is_same<T, AVCodecID>::value
@@ -125,7 +125,7 @@ T fromHanwhaString(const QString& str)
 }
 
 template<typename T>
-T fromHanwhaString(const QString& str, bool* outSuccess)
+T fromHanwhaString(const QString& /*str*/, bool* /*outSuccess*/)
 {
     static_assert(std::is_same<T, int>::value, "No specialization for type");
 }
