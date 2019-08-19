@@ -574,7 +574,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::loadTracks(
             if (maxObjectTrackSize > 0 && track.objectPositionSequence.size() > maxObjectTrackSize)
             {
                 track.objectPositionSequence.erase(
-                    track.objectPositionSequence.begin() + m_filter.maxObjectTrackSize,
+                    track.objectPositionSequence.begin() + maxObjectTrackSize,
                     track.objectPositionSequence.end());
             }
 
