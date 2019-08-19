@@ -561,9 +561,8 @@ void MessageBus::at_allDataSent(QWeakPointer<ConnectionBase> weakRef)
 bool MessageBus::selectAndSendTransactions(
     const P2pConnectionPtr& connection,
     vms::api::TranState newSubscription,
-    bool addImplicitData)
+    [[maybe_unused]] bool addImplicitData)
 {
-    nx::utils::unused(addImplicitData);
     context(connection)->sendDataInProgress = false;
     context(connection)->remoteSubscription = newSubscription;
     return true;
@@ -933,9 +932,8 @@ void MessageBus::cleanupRuntimeInfo(const PersistentIdData& peer)
 void MessageBus::gotTransaction(
     const QnTransaction<nx::vms::api::UpdateSequenceData> &tran,
     const P2pConnectionPtr& connection,
-    const TransportHeader& transportHeader)
+    [[maybe_unused]] const TransportHeader& transportHeader)
 {
-    nx::utils::unused(transportHeader);
     PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
 
     if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
@@ -1311,9 +1309,8 @@ QMap<PersistentIdData, RuntimeData> MessageBus::runtimeInfo() const
     return m_lastRuntimeInfo;
 }
 
-void MessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection)
+void MessageBus::sendInitialDataToCloud([[maybe_unused]] const P2pConnectionPtr& connection)
 {
-    nx::utils::unused(connection);
     NX_ASSERT(0, "Not implemented");
 }
 
