@@ -142,6 +142,24 @@ Condition iconStatusMatch(QnResourceIconCache::Key paramIconKey)
         };
 }
 
+Condition hasFlag(Qt::ItemFlag flag)
+{
+    return
+        [flag](const QModelIndex& index)
+        {
+            return index.flags().testFlag(flag);
+        };
+}
+
+Condition flagsMatch(Qt::ItemFlags flags)
+{
+    return
+        [flags](const QModelIndex& index)
+        {
+            return (index.flags() & flags) == flags;
+        };
+}
+
 Condition dataMatch(int role, const QVariant& paramData)
 {
     return

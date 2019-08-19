@@ -29,6 +29,10 @@ Condition iconFullMatch(QnResourceIconCache::Key paramIconKey);
 Condition iconTypeMatch(QnResourceIconCache::Key paramIconKey);
 Condition iconStatusMatch(QnResourceIconCache::Key paramIconKey);
 
+// Flags conditions.
+Condition hasFlag(Qt::ItemFlag flag);
+Condition flagsMatch(Qt::ItemFlags flags);
+
 // Generic data conditions.
 Condition dataMatch(int role, const QVariant& data);
 
