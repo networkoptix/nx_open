@@ -1,0 +1,12 @@
+# Executes at the build phase. Creates and populates the SDK directory to be zipped.
+
+# Receive variable values from the calling CMakeList.txt.
+set(stage_dir @stage_dir@)
+set(CMAKE_SOURCE_DIR @CMAKE_SOURCE_DIR@)
+set(copied_static_origin @copied_static_origin@)
+set(copied_static_files @copied_static_files@)
+
+include(${CMAKE_SOURCE_DIR}/cmake/utils.cmake)
+
+nx_copy_always(${copied_static_origin} "${copied_static_files}"
+    ${stage_dir})

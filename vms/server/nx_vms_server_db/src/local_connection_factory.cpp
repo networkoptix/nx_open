@@ -646,7 +646,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * Read additional camera attributes.
      * %param[default] format
      * %param[opt]:string id Camera id (can be obtained from "id", "physicalId" or "logicalId"
-     *     field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+     *     field via /ec2/getCamerasEx) or MAC address (not
      *     supported for certain cameras). If omitted, return data for all cameras.
      * %return List of objects with additional camera attributes for all cameras, in the requested
      *     format.
@@ -758,7 +758,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * Read camera list.
      * %param[default] format
      * %param[opt]:string id Camera id (can be obtained from "id", "physicalId" or "logicalId"
-     *     field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+     *     field via /ec2/getCamerasEx) or MAC address (not
      *     supported for certain cameras). If omitted, return data for all cameras.
      * %param[opt]:boolean showDesktopCameras Whether desktop cameras should be listed. False by
      *     default.
