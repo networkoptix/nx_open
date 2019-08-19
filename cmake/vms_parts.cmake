@@ -1,4 +1,5 @@
 set(_withMediaServer ON)
+set(_withBoxTool OFF)
 set(_withMediaDbUtil OFF)
 set(_withTrayTool OFF)
 set(_withNxTool OFF)
@@ -30,6 +31,7 @@ if("${platform}" STREQUAL "linux")
         set(_withClouds OFF)
     elseif("${arch}" STREQUAL "x64")
         set(_withClouds ON)
+        set(_withBoxTool ON)
     endif()
 endif()
 
@@ -46,6 +48,7 @@ if("${platform}" STREQUAL "macosx")
 endif()
 
 if(WINDOWS)
+    set(_withBoxTool ON)
     set(_withTrayTool ON)
     set(_withNxTool ${build_nxtool})
     if("${arch}" STREQUAL "x64")
@@ -96,6 +99,11 @@ cmake_dependent_option(withSdk "Enable nx_*_sdk build"
     ON
 )
 
+cmake_dependent_option(withBoxTool "Enable nx_box_tool build"
+    OFF "NOT withDistributions OR NOT _withBoxTool"
+    ON
+)
+
 cmake_dependent_option(withUnitTestsArchive "Enable unit tests archive generation"
     OFF "withTests"
     OFF
@@ -108,6 +116,7 @@ if(enableHanwha OR developerBuild AND NOT targetDevice STREQUAL "edge1")
     set(enable_hanwha true)
 endif()
 
+unset(_withBoxTool)
 unset(_withMediaServer)
 unset(_withMediaDbUtil)
 unset(_withNxTool)
