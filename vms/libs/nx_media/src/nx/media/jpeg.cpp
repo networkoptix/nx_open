@@ -5,7 +5,7 @@
 #endif
 
 #ifdef USE_LIBJPEG
-#include <libjpeg/jpeglib.h>
+#include <jpeglib.h>
 #include <setjmp.h>
 #include <QtCore/QDebug>
 #endif
