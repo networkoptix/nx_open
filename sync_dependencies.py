@@ -35,7 +35,7 @@ def determine_package_versions(
         "sigar": "1.7",
         "sasl2": "2.1.26",
         "openal": "1.16",
-        "libjpeg-turbo": "1.4.2",
+        "libjpeg-turbo": "2.0.2",
         "festival": "2.4",
         "directx": "JUN2010",
         "pandoc": "2.2.1",
@@ -65,7 +65,9 @@ def determine_package_versions(
         v["festival"] = "2.1"
 
     if platform == "android":
-        v["openal"] = "1.17.2"
+        v["openal"] = "1.19.1"
+        v["openssl"] = "1.0.2s"
+        v["ffmpeg"] = "3.1.9"
 
     if platform == "ios":
         v["libjpeg-turbo"] = "1.4.1"
@@ -210,7 +212,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
 
 
 def parse_target(target):
-    components = target.split("-")
+    components = target.split("-") if "-" in target else target.split("_")
 
     platform = None
     arch = None
