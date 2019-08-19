@@ -117,7 +117,7 @@ private:
     sdk::Ptr<const sdk::IStringMap> prepareSettings(const sdk_support::SettingMap& settings) const
     {
         const auto sdkSettings = sdk::makePtr<sdk::StringMap>();
-        for (const auto& [key, value]: nx::utils::constKeyValueRange(settings))
+        for (const auto [key, value]: nx::utils::constKeyValueRange(settings))
             sdkSettings->setItem(key.toStdString(), value.toString().toStdString());
 
         if (!m_debugSettings.outputPath.isEmpty())
@@ -127,7 +127,7 @@ private:
                 m_debugSettings.outputPath,
                 baseFilename + "_effective_settings.json");
 
-            const bool dumpIsSuccessful = sdk_support::dumpStringToFile(
+            sdk_support::dumpStringToFile(
                 m_debugSettings.logTag,
                 absoluteFilename,
                 QString::fromStdString(sdk::toJsonString(sdkSettings.get())));
@@ -141,7 +141,7 @@ private:
         const QString& prefix) const
     {
         QString result = prefix;
-        for (const auto& [key, value]: nx::utils::constKeyValueRange(errors))
+        for (const auto [key, value]: nx::utils::constKeyValueRange(errors))
             result += key + ": " + value + ";\n";
 
         return result;

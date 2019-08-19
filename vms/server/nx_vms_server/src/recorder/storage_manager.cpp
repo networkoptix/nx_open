@@ -444,22 +444,31 @@ public:
             {
                 fullscanProcessed = true;
 
-                auto genProgressCallback = [this, totalProgressValue, totalProgressStep, &archiveCameras](const QString &url, qreal offset)
-                  -> std::function<void(int, int)>
-                {
-                    return [this, url, totalProgressValue, totalProgressStep, offset](int current, int total) {
-                        if (total <= 0)
-                        {   /* Lets think we have already done this =) */
-                            total = 1;
-                            current = 1;
-                        }
+                auto genProgressCallback =
+                    [this, totalProgressValue, totalProgressStep](
+                        const QString &url, qreal offset) -> std::function<void(int, int)>
+                    {
+                        return
+                            [this, url, totalProgressValue, totalProgressStep, offset](
+                                int current, int total)
+                            {
+                                if (total <= 0)
+                                {   /* Lets think we have already done this =) */
+                                    total = 1;
+                                    current = 1;
+                                }
 
-                        /* Dividing storage progress by two as there are two catalogs rebuilding. */
-                        const qreal storageProgress = offset + (0.5 * current / (qreal) total);
-                        const qreal totalProgress = totalProgressValue + storageProgress * totalProgressStep;
-                        m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, url, storageProgress, totalProgress));
+                                // Dividing storage progress by two as there are two catalogs rebuilding.
+                                const qreal storageProgress = offset + (0.5 * current / (qreal) total);
+                                const qreal totalProgress = totalProgressValue
+                                    + storageProgress * totalProgressStep;
+                                m_owner->setRebuildInfo(QnStorageScanData(
+                                    Qn::RebuildState_FullScan,
+                                    url,
+                                    storageProgress,
+                                    totalProgress));
+                            };
                     };
-                };
 
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getUrl(), 0.0, totalProgressValue));
                 m_owner->loadFullFileCatalogFromMedia(scanData.storage, QnServer::LowQualityCatalog, archiveCameras, genProgressCallback(scanData.storage->getUrl(), 0.0));
@@ -516,17 +525,13 @@ public:
 class TestStorageThread: public QnLongRunnable
 {
 public:
-    TestStorageThread(
-        QnStorageManager* owner,
-        const nx::vms::server::Settings* settings,
-        const char* threadName = nullptr)
-        :
-        m_owner(owner),
-        m_settings(settings)
+    TestStorageThread(QnStorageManager* owner, const char* threadName = nullptr):
+        m_owner(owner)
     {
         if (threadName)
             setObjectName(threadName);
     }
+
     virtual void run() override
     {
         for (const auto& storage: storagesToTest())
@@ -555,7 +560,6 @@ public:
 
 private:
     QnStorageManager* m_owner = nullptr;
-    const nx::vms::server::Settings* m_settings = nullptr;
 
     QnStorageResourceList storagesToTest()
     {
@@ -563,7 +567,7 @@ private:
         std::sort(
             result.begin(),
             result.end(),
-            [this](const QnStorageResourcePtr& lhs, const QnStorageResourcePtr& rhs)
+            [](const QnStorageResourcePtr& lhs, const QnStorageResourcePtr& rhs)
             {
                 return isLocal(lhs) && !isLocal(rhs);
             });
@@ -600,7 +604,6 @@ QnStorageManager::QnStorageManager(
     m_mutexCatalog(QnMutex::Recursive),
     m_isWritableStorageAvail(false),
     m_rebuildCancelled(false),
-    m_rebuildArchiveThread(0),
     m_firstStoragesTestDone(false),
     m_isRenameDisabled(serverModule->settings().disableRename()),
     m_camInfoWriterHandler(this, serverModule->resourcePool()),
@@ -614,7 +617,6 @@ QnStorageManager::QnStorageManager(
     m_storageWarnTimer.restart();
     m_testStorageThread = new TestStorageThread(
         this,
-        &serverModule->settings(),
         threadName
         ? (std::string(threadName) + std::string("::TestStorageThread")).c_str()
         : nullptr);
@@ -723,11 +725,10 @@ void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraData
 
     for (const auto &camera : camerasToAdd)
     {
-        ec2::ErrorCode errCode =
-            QnAppserverResourceProcessor::addAndPropagateCamResource(
-                serverModule()->commonModule(),
-                camera.coreData,
-                camera.properties);
+        QnAppserverResourceProcessor::addAndPropagateCamResource(
+            serverModule()->commonModule(),
+            camera.coreData,
+            camera.properties);
     }
 
     updateCameraHistory();
@@ -1742,7 +1743,6 @@ void QnStorageManager::updateCameraHistory() const
 void QnStorageManager::checkSystemStorageSpace()
 {
     QnStorageManager::StorageMap storageRoots = getAllStorages();
-    qint64 bigStorageThreshold = 0;
     for (const auto& storage: getAllStorages())
     {
         if (storage->getStatus() == Qn::Online && storage->isSystem()
@@ -2058,7 +2058,6 @@ QMap<QnUuid, qint64> QnStorageManager::calculateOldestDataTimestampByCamera()
 bool QnStorageManager::getMinTimes(QMap<QString, qint64>& lastTime)
 {
     QnStorageManager::StorageMap storageRoots = getAllStorages();
-    qint64 bigStorageThreshold = 0;
     for (StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
     {
         QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (itr.value());

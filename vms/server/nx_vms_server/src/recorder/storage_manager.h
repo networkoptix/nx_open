@@ -324,7 +324,7 @@ private:
     friend class ScanMediaFilesTask;
     friend class AuxiliaryTask;
 
-    ScanMediaFilesTask* m_rebuildArchiveThread;
+    ScanMediaFilesTask* m_rebuildArchiveThread = nullptr;
 
     bool m_initInProgress;
     QMap<QString, QSet<int>> m_oldStorageIndexes;
