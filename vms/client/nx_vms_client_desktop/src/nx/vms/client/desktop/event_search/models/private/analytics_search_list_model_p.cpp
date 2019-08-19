@@ -766,6 +766,9 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
         }
     }
 
+    if (menu->isEmpty())
+        menu.reset();
+
     return menu;
 }
 
