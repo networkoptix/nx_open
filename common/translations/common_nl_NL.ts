@@ -592,7 +592,7 @@
       <source>%n Device(s)</source>
       <translation>
         <numerusform>%n Apparaat</numerusform>
-        <numerusform>%n Apparaat</numerusform>
+        <numerusform>%n Apparaaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -638,13 +638,13 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n I/O Module</numerusform>
-        <numerusform>%n I/O Module</numerusform>
+        <numerusform>%n I/O Modules</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n I/O Modules</numerusform>
+        <numerusform>%n I/O Module</numerusform>
         <numerusform>%n I/O Modules</numerusform>
       </translation>
     </message>

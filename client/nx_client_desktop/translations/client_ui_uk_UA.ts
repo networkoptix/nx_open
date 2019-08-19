@@ -6,7 +6,7 @@
     <message>
       <location filename="../src/ui/dialogs/about_dialog.ui"/>
       <source>About</source>
-      <translation>Про програму</translation>
+      <translation>Про програмне забезпечення</translation>
     </message>
     <message>
       <location/>
@@ -39,7 +39,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/accessible_resources_widget.ui"/>
       <source>Filter</source>
-      <translation>Пошук</translation>
+      <translation>Фільтр</translation>
     </message>
   </context>
   <context>
@@ -529,7 +529,7 @@
     <message>
       <location/>
       <source>IP, hostname, RTSP link...</source>
-      <translation>IP, ім'я хоста, посилання RTSP...</translation>
+      <translation>IP адреса, ім'я хоста, RTSP посилання...</translation>
     </message>
     <message>
       <location/>
@@ -564,22 +564,22 @@
     <message>
       <location/>
       <source>New Scan...</source>
-      <translation>Нове сканування...</translation>
+      <translation>Нове Сканування...</translation>
     </message>
     <message>
       <location/>
       <source>Add device(s)...</source>
-      <translation>Додати пристрої(й)...</translation>
+      <translation>Додати пристрiй(рої)...</translation>
     </message>
     <message>
       <location/>
       <source>Discovered Devices:</source>
-      <translation>Виявлені пристрої:</translation>
+      <translation>Виявлені Пристрої:</translation>
     </message>
     <message>
       <location/>
       <source>Device Address</source>
-      <translation>Адреса пристрою</translation>
+      <translation>Адреса Пристрою</translation>
     </message>
     <message>
       <location/>
@@ -619,7 +619,7 @@
     <message>
       <location/>
       <source>Add selected</source>
-      <translation>Додати вибрані</translation>
+      <translation>Додати обрані</translation>
     </message>
   </context>
   <context>
@@ -650,7 +650,7 @@
     <message>
       <location/>
       <source>RTP transport:</source>
-      <translation>Транспорт RTP:</translation>
+      <translation>RTP передача:</translation>
     </message>
     <message>
       <location/>
@@ -670,7 +670,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Скинути налаштування</translation>
+      <translation>Налаштування за замовчуванням</translation>
     </message>
     <message>
       <location/>
@@ -902,7 +902,7 @@
     <message>
       <location/>
       <source>Panic Mode:</source>
-      <translation>Запис по тривозі:</translation>
+      <translation>Режим Запису Панiка:</translation>
     </message>
     <message>
       <location/>
@@ -1330,7 +1330,7 @@
     <message>
       <location/>
       <source>Aspect Ratio</source>
-      <translation>Відношення сторін</translation>
+      <translation>Співвідношення Сторін</translation>
     </message>
     <message>
       <location/>
@@ -1472,7 +1472,7 @@
     <message>
       <location/>
       <source>Minimal Size</source>
-      <translation>Мінімальний розмір</translation>
+      <translation>Мінімальний Розмір</translation>
     </message>
   </context>
   <context>
@@ -1498,7 +1498,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
       <source>ldap(s)://host:port</source>
-      <translation>ldap(s)://host:port</translation>
+      <translation type="unfinished">ldap(s)://host:port</translation>
     </message>
     <message>
       <location/>
@@ -1879,7 +1879,7 @@
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>Увімкнути звук</translation>
+      <translation>Активувати Звук</translation>
     </message>
     <message>
       <location/>
@@ -1897,7 +1897,7 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>New Wearable Camera...</source>
-      <translation>Нова портативнаякамера...</translation>
+      <translation>Нова портативна камера...</translation>
     </message>
     <message>
       <location/>
@@ -1907,7 +1907,7 @@
     <message>
       <location/>
       <source>&quot;Wearable Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Портативна камера&quot; - це віртуальне сховище для відеофайлів, яке може бути завантажене на будь-який сервер вашої системи і доступно будь-якому користувачеві.</translation>
+      <translation>&quot;Портативна камера&quot; - це віртуальне сховище для відеофайлів, яке може бути завантажене на будь-який сервер вашої Системи і доступно будь-якому користувачеві.</translation>
     </message>
   </context>
   <context>
@@ -2676,12 +2676,12 @@
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>Увімкнути звук</translation>
+      <translation>Активувати Звук</translation>
     </message>
     <message>
       <location/>
       <source>Motion is not available for this camera.</source>
-      <translation>Для даної камери недоступна детекция руху.</translation>
+      <translation>Для даної камери недоступне виявлення руху.</translation>
     </message>
     <message>
       <location/>
@@ -3057,7 +3057,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
       <source>System Time</source>
-      <translation>Системний час</translation>
+      <translation>Системний Час</translation>
     </message>
     <message>
       <location/>

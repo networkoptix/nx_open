@@ -347,7 +347,7 @@
     </message>
     <message>
       <source>Could not allocate sample buffers, error code: %1</source>
-      <translation>Kon geen voorbeeldbuffers toewijzen, foutcode: %1</translation>
+      <translation>Kan voorbeeldbuffers niet toewijzen, foutcode: %1</translation>
     </message>
     <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>

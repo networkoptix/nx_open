@@ -1677,7 +1677,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n action(s)</source>
       <translation>
-        <numerusform>%n acties</numerusform>
+        <numerusform>%n actie</numerusform>
         <numerusform>%n acties</numerusform>
       </translation>
     </message>
@@ -1935,7 +1935,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n Server(s)</source>
       <translation>
-        <numerusform>%n servers</numerusform>
+        <numerusform>%n server</numerusform>
         <numerusform>%n servers</numerusform>
       </translation>
     </message>
@@ -4592,7 +4592,7 @@ to %1</source>
     <name>QnMergeSystemsDialog</name>
     <message>
       <source>http(s)://host:port</source>
-      <translation>http (s): // host: port</translation>
+      <translation type="unfinished">http(s)://host:port</translation>
     </message>
     <message>
       <source>%1 (current)</source>
@@ -4998,7 +4998,7 @@ to %1</source>
     <message numerus="yes">
       <source>about %n minute(s)</source>
       <translation>
-        <numerusform>ongeveer %n minuten</numerusform>
+        <numerusform>ongeveer %n minuut</numerusform>
         <numerusform>ongeveer %n minuten</numerusform>
       </translation>
     </message>
@@ -8075,7 +8075,7 @@ to %1</source>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
       <translation>
-        <numerusform>Sommige videobestanden worden nog steeds geüpload naar %n draagbare camera's:</numerusform>
+        <numerusform>Sommige videobestanden worden nog steeds geüpload naar %n draagbare camera:</numerusform>
         <numerusform>Sommige videobestanden worden nog steeds geüpload naar %n draagbare camera's:</numerusform>
       </translation>
     </message>

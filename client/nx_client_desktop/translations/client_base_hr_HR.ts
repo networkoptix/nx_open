@@ -4654,7 +4654,7 @@ to %1</translation>
     <name>QnMergeSystemsDialog</name>
     <message>
       <source>http(s)://host:port</source>
-      <translation>http(s)://host:port</translation>
+      <translation type="unfinished">http(s)://host:port</translation>
     </message>
     <message>
       <source>%1 (current)</source>

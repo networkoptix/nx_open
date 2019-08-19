@@ -1678,7 +1678,7 @@ to view more bookmarks</source>
       <source>%n action(s)</source>
       <translation>
         <numerusform>%n Aktion</numerusform>
-        <numerusform>%n Aktion</numerusform>
+        <numerusform>%n Aktionen</numerusform>
       </translation>
     </message>
     <message>
@@ -1936,7 +1936,7 @@ to view more bookmarks</source>
       <source>%n Server(s)</source>
       <translation>
         <numerusform>%n Server</numerusform>
-        <numerusform>%n Server</numerusform>
+        <numerusform>%n Serveren</numerusform>
       </translation>
     </message>
     <message>
@@ -3420,14 +3420,14 @@ to %1</source>
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
       <translation>
         <numerusform>Ereignisprotokoll für den Zeitraum vom %1 bis %2 - %n Ereignis gefunden</numerusform>
-        <numerusform>Ereignisprotokoll für den Zeitraum vom %1 bis %2 - %n Ereignis gefunden</numerusform>
+        <numerusform>Ereignisprotokoll für den Zeitraum vom %1 bis %2 - %n Ereignisen gefunden</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
         <numerusform>Ereignisprotokoll für den %1 - %n Ereignis gefunden</numerusform>
-        <numerusform>Ereignisprotokoll für den %1 - %n Ereignis gefunden</numerusform>
+        <numerusform>Ereignisprotokoll für den %1 - %n Ereignisen gefunden</numerusform>
       </translation>
     </message>
     <message>
@@ -4592,7 +4592,7 @@ to %1</source>
     <name>QnMergeSystemsDialog</name>
     <message>
       <source>http(s)://host:port</source>
-      <translation>http(s)://Host:Port</translation>
+      <translation type="unfinished">http(s)://host:port</translation>
     </message>
     <message>
       <source>%1 (current)</source>
@@ -4999,7 +4999,7 @@ to %1</source>
       <source>about %n minute(s)</source>
       <translation>
         <numerusform>circa %n Minute</numerusform>
-        <numerusform>circa %n Minute</numerusform>
+        <numerusform>circa %n Minuten</numerusform>
       </translation>
     </message>
     <message>
@@ -6782,12 +6782,12 @@ to %1</source>
     <message>
       <source>MMMM</source>
       <comment>Format for displaying months on timeline.</comment>
-      <translation>MMMM</translation>
+      <translation type="unfinished">MMMM</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation>yyyy</translation>
+      <translation type="unfinished">yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
@@ -6812,12 +6812,12 @@ to %1</source>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM yyyy</translation>
+      <translation type="unfinished">MMMM yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>yyyy</translation>
+      <translation type="unfinished">yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
@@ -8075,7 +8075,7 @@ to %1</source>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
       <translation>
-        <numerusform>Einige Videodateien werden noch auf %n tragbare Kameras hochgeladen:</numerusform>
+        <numerusform>Einige Videodateien werden noch auf %n tragbare Kamera hochgeladen:</numerusform>
         <numerusform>Einige Videodateien werden noch auf %n tragbare Kameras hochgeladen:</numerusform>
       </translation>
     </message>

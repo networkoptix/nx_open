@@ -577,7 +577,7 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n Camaras</numerusform>
+        <numerusform>%n Camara</numerusform>
         <numerusform>%n Camaras</numerusform>
       </translation>
     </message>
@@ -591,7 +591,7 @@
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n Dispositivos</numerusform>
+        <numerusform>%n Dispositivo</numerusform>
         <numerusform>%n Dispositivos</numerusform>
       </translation>
     </message>

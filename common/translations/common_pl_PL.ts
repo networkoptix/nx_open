@@ -585,35 +585,35 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n Kamery</numerusform>
-        <numerusform>%n Kamery</numerusform>
-        <numerusform>%n Kamery</numerusform>
-        <numerusform>%n Kamery</numerusform>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamery</numerusform>
+        <numerusform>%n kamer</numerusform>
+        <numerusform>%n kamer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
       <translation>
         <numerusform>%n kamera</numerusform>
-        <numerusform>%n kamera</numerusform>
-        <numerusform>%n kamera</numerusform>
-        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamery</numerusform>
+        <numerusform>%n kamer</numerusform>
+        <numerusform>%n kamer</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n Urządzeń</numerusform>
-        <numerusform>%n Urządzeń</numerusform>
-        <numerusform>%n Urządzeń</numerusform>
-        <numerusform>%n Urządzeń</numerusform>
+        <numerusform>%n urządzenie</numerusform>
+        <numerusform>%n urządzenia</numerusform>
+        <numerusform>%n urządzeń</numerusform>
+        <numerusform>%n urządzeń</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n device(s)</source>
       <translation>
         <numerusform>%n urządzenie</numerusform>
-        <numerusform>%n urządzenie</numerusform>
+        <numerusform>%n urządzenia</numerusform>
         <numerusform>%n urządzenie</numerusform>
         <numerusform>%n urządzenie</numerusform>
       </translation>
@@ -653,19 +653,19 @@
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n Moduł I/O</numerusform>
-        <numerusform>%n Moduł I/O</numerusform>
-        <numerusform>%n Moduł I/O</numerusform>
-        <numerusform>%n Moduł I/O</numerusform>
+        <numerusform>%n moduł I/O</numerusform>
+        <numerusform>%n moduły I/O</numerusform>
+        <numerusform>%n modułów I/O</numerusform>
+        <numerusform>%n modułów I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n moduł I/O</numerusform>
-        <numerusform>%n moduł I/O</numerusform>
-        <numerusform>%n moduł I/O</numerusform>
-        <numerusform>%n moduł I/O</numerusform>
+        <numerusform>%n moduły I/O</numerusform>
+        <numerusform>%n modułów I/O</numerusform>
+        <numerusform>%n modułów I/O</numerusform>
       </translation>
     </message>
     <message>

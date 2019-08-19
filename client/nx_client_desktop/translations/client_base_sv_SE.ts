@@ -1679,7 +1679,7 @@ om du vill visa fler bokmärken</translation>
       <source>%n action(s)</source>
       <translation>
         <numerusform>%n åtgärd</numerusform>
-        <numerusform>%n åtgärd</numerusform>
+        <numerusform>%n åtgärder</numerusform>
       </translation>
     </message>
     <message>
@@ -4597,7 +4597,7 @@ till %1</translation>
     <name>QnMergeSystemsDialog</name>
     <message>
       <source>http(s)://host:port</source>
-      <translation>http(s)://värd:port</translation>
+      <translation type="unfinished">http(s)://host:port</translation>
     </message>
     <message>
       <source>%1 (current)</source>
@@ -6787,47 +6787,47 @@ till %1</translation>
     <message>
       <source>MMMM</source>
       <comment>Format for displaying months on timeline.</comment>
-      <translation>MMMM</translation>
+      <translation type="unfinished">MMMM</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation>åååå</translation>
+      <translation type="unfinished">yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dD MMMM åååå hh: mm</translation>
+      <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dD MMMM åååå hh: mm</translation>
+      <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM åååå h ap</translation>
+      <translation type="unfinished">dd MMMM yyyy h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>dd MMMM åååå</translation>
+      <translation type="unfinished">dd MMMM yyyy</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>MMMM yyyy</translation>
+      <translation type="unfinished">MMMM yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>åååå</translation>
+      <translation type="unfinished">yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h:mm ap</translation>
+      <translation type="unfinished">dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>

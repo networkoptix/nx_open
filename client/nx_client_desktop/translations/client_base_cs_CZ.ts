@@ -3489,7 +3489,7 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
       <translation>
-        <numerusform>Deník událostí pro období od %1 do %2 - %n nalezených událostí</numerusform>
+        <numerusform>Deník událostí pro období od %1 do %2 - %n nalezených událost</numerusform>
         <numerusform>Deník událostí pro období od %1 do %2 - %n nalezených událostí</numerusform>
         <numerusform>Deník událostí pro období od %1 do %2 - %n nalezených událostí</numerusform>
         <numerusform>Deník událostí pro období od %1 do %2 - %n nalezených událostí</numerusform>
@@ -3498,7 +3498,7 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
-        <numerusform>Deník událostí na %1 - %n nalezených událostí</numerusform>
+        <numerusform>Deník událostí na %1 - %n nalezených událost</numerusform>
         <numerusform>Deník událostí na %1 - %n nalezených událostí</numerusform>
         <numerusform>Deník událostí na %1 - %n nalezených událostí</numerusform>
         <numerusform>Deník událostí na %1 - %n nalezených událostí</numerusform>
@@ -4708,7 +4708,7 @@ to %1</source>
     <name>QnMergeSystemsDialog</name>
     <message>
       <source>http(s)://host:port</source>
-      <translation>http(s)://host:port</translation>
+      <translation type="unfinished">http(s)://host:port</translation>
     </message>
     <message>
       <source>%1 (current)</source>
@@ -8303,7 +8303,7 @@ to %1</source>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
       <translation>
-        <numerusform>Některé video soubory jsou stále nahrávány do %n přenosných kamer:</numerusform>
+        <numerusform>Některé video soubory jsou stále nahrávány do %n přenosný kamera:</numerusform>
         <numerusform>Některé video soubory jsou stále nahrávány do %n přenosných kamer:</numerusform>
         <numerusform>Některé video soubory jsou stále nahrávány do %n přenosných kamer:</numerusform>
         <numerusform>Některé video soubory jsou stále nahrávány do %n přenosných kamer:</numerusform>

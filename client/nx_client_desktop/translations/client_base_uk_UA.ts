@@ -83,7 +83,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Installation has been cancelled</source>
-      <translation>Установка була скасована</translation>
+      <translation>Встановлення скасовано</translation>
     </message>
   </context>
   <context>
@@ -230,7 +230,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Drop Resources</source>
-      <translation>Покласти ресурси</translation>
+      <translation>Зменшити ресурси</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
@@ -821,7 +821,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Unpin Notifications</source>
-      <translation>Відмінити закріплення панель сповіщень</translation>
+      <translation>Відмінити закріплення панелі сповіщень</translation>
     </message>
     <message>
       <source>Bookmark Log...</source>
@@ -849,7 +849,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New Wearable Camera...</source>
-      <translation>Нова портативнаякамера...</translation>
+      <translation>Нова портативна камера...</translation>
     </message>
     <message>
       <source>Upload File...</source>
@@ -1018,7 +1018,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>You are about to export a long video. It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation>Ви збираєтеся експортувати довге відео. Для цього може знадобитися понад гігабайт вільного простору на жорсткому диску і зайняти кілька хвилин.</translation>
+      <translation>Ви збираєтеся експортувати відео за довгий період часу. Для цього може знадобитися понад гігабайт вільного місця на жорсткому диску і зайняти кілька хвилин.</translation>
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
@@ -1105,7 +1105,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Top</source>
-      <translation>Уверх</translation>
+      <translation>Вгору</translation>
     </message>
     <message>
       <source>Right Edge</source>
@@ -1113,7 +1113,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>Униз</translation>
+      <translation>Донизу</translation>
     </message>
     <message>
       <source>Page Left</source>
@@ -1133,19 +1133,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Прокрутити ліворуч</translation>
+      <translation>Прокрутити Ліворуч</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation>Прокрутка вгору</translation>
+      <translation>Прокрутити Вгору</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Прокрутити праворуч</translation>
+      <translation>Прокрутити Праворуч</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation>Прокрутити вниз</translation>
+      <translation>Прокрутити Донизу</translation>
     </message>
   </context>
   <context>
@@ -1411,7 +1411,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Client is not connected to any System</source>
-      <translation>Клієнт не підключений до жодної системи</translation>
+      <translation>Клієнт не підключений до жодної з Систем</translation>
     </message>
   </context>
   <context>
@@ -1494,11 +1494,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Min and Max settings determine the age of archive which should be kept for this camera.</source>
-      <translation>Налаштування Min і Max визначають вік архіву, який повинен зберігатися по цій камері.</translation>
+      <translation>Налаштування Min і Max визначають термін зберігання архіву, який повинен зберігатися для цієї цікамери.</translation>
     </message>
     <message>
       <source>If &quot;Auto&quot; option is enabled, the oldest footage among all cameras will be deleted first.</source>
-      <translation>Якщо включено параментр &quot;Auto&quot;, то зпочатку будуть видалені найстаріші записи серед усіх камер.</translation>
+      <translation>Якщо включено параментр &quot;Auto&quot;, то зпочатку будуть видалені записи зробленi ранiше серед усіх камер.</translation>
     </message>
   </context>
   <context>
@@ -1532,7 +1532,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Вибрати все</translation>
+      <translation>Вибрати Все</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -1705,7 +1705,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n action(s)</source>
       <translation>
-        <numerusform>%n дії</numerusform>
+        <numerusform>%n дія</numerusform>
         <numerusform>%n дії</numerusform>
         <numerusform>%n дії</numerusform>
         <numerusform>%n дії</numerusform>
@@ -1973,10 +1973,10 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n Server(s)</source>
       <translation>
-        <numerusform>%n серверів</numerusform>
-        <numerusform>%n серверів</numerusform>
-        <numerusform>%n серверів</numerusform>
-        <numerusform>%n серверів</numerusform>
+        <numerusform>%n Сервер</numerusform>
+        <numerusform>%n Сервер(iв)</numerusform>
+        <numerusform>%n Сервер(iв)</numerusform>
+        <numerusform>%n Сервер(iв)</numerusform>
       </translation>
     </message>
     <message>
@@ -2180,7 +2180,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select target server...</source>
-      <translation>Виберіть цільовий сервер...</translation>
+      <translation>Виберіть бажаний сервер...</translation>
     </message>
     <message>
       <source>Examples:</source>
@@ -2192,11 +2192,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Server went offline - search aborted.</source>
-      <translation>Сервер відключений - пошук перервано.</translation>
+      <translation>Сервер відключений - пошук скасовано.</translation>
     </message>
     <message>
       <source>Server has been removed - search aborted.</source>
-      <translation>Сервер був видалений - пошук перервано.</translation>
+      <translation>Сервер був видалений - пошук скасовано.</translation>
     </message>
     <message>
       <source>Device address field must contain a valid URL, IP address, or RTSP link.</source>
@@ -2208,11 +2208,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please select at least one device</source>
-      <translation>Виберіть принаймні один пристрій</translation>
+      <translation>Будь ласка, оберіть хоча б один пристрій</translation>
     </message>
     <message>
       <source>Server is offline, devices can only be added to an online server.</source>
-      <translation>Сервер відключений. Пристрої можна додавати тільки на включений сервер.</translation>
+      <translation>Сервер відключений. Пристрої можна додавати тільки до включеного в мережу сервера.</translation>
     </message>
     <message>
       <source>Server has been removed - cannot add devices.</source>
@@ -2241,12 +2241,12 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Scanning hosts...</source>
-      <translation>Сканування вузлів...</translation>
+      <translation>Сканування хостів...</translation>
     </message>
     <message>
       <source>Scanning host...</source>
       <extracomment>Scanning host... (0 devices found)</extracomment>
-      <translation>Сканування вузла...</translation>
+      <translation>Сканування хоста...</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -2259,15 +2259,15 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n devices added.</source>
       <translation>
-        <numerusform>%n пристрої додано.</numerusform>
-        <numerusform>%n пристрої додано.</numerusform>
-        <numerusform>%n пристрої додано.</numerusform>
-        <numerusform>%n пристрої додано.</numerusform>
+        <numerusform>%n пристрій додано.</numerusform>
+        <numerusform>%n пристроїв додано.</numerusform>
+        <numerusform>%n пристроїв додано.</numerusform>
+        <numerusform>%n пристроїв додано.</numerusform>
       </translation>
     </message>
     <message>
       <source>It might take them a few moments to appear.</source>
-      <translation>Може пройти кілька хвилин, перш ніж вони з'являться в системі.</translation>
+      <translation>Необхідно кілька хвилин, перш ніж вони з'являться в системі.</translation>
     </message>
     <message numerus="yes">
       <source>Failed to add %n devices</source>
@@ -2444,7 +2444,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras: %1</source>
       <translation>
-        <numerusform>Цей ідентифікатор вже використовується для наступних %n камер: %1</numerusform>
+        <numerusform>Цей ідентифікатор вже використовується для наступної %n камери: %1</numerusform>
         <numerusform>Цей ідентифікатор вже використовується для наступних %n камер: %1</numerusform>
         <numerusform>Цей ідентифікатор вже використовується для наступних %n камер: %1</numerusform>
         <numerusform>Цей ідентифікатор вже використовується для наступних %n камер: %1</numerusform>
@@ -2494,7 +2494,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Вибрати все</translation>
+      <translation>Вибрати Все</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
@@ -2597,11 +2597,11 @@ to view more bookmarks</source>
     <name>QnCameraMotionMaskWidget</name>
     <message>
       <source>Too many motion windows</source>
-      <translation>Занадто багато регіонів детекції руху</translation>
+      <translation>Занадто багато областей детекції руху</translation>
     </message>
     <message>
       <source>Maximum number of motion windows for the current camera is %1, and %2 motion windows are currently selected.</source>
-      <translation>Максимальна кількість вікон детекції руху для цієї камери %1, а вибрано %2.</translation>
+      <translation>Максимальна кількість областей виявлення руху для цієї камери %1, а вибрано %2.</translation>
     </message>
     <message>
       <source>Too many motion sensitivity settings</source>
@@ -2609,19 +2609,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Maximum number of motion sensitivity settings for the current camera is %1, and %2 settings are currently selected.</source>
-      <translation>Максимальна кількість налаштувань чутливості детекції руху для цієї камери %1, а вибрано %2.</translation>
+      <translation>Максимальна кількість областей виявлення руху для цієї камери %1, а вибрано %2.</translation>
     </message>
     <message>
       <source>Too many motion areas</source>
-      <translation>Занадто багато регіонів детекції руху</translation>
+      <translation>Занадто багато областей виявлення руху</translation>
     </message>
     <message>
       <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
-      <translation>Максимальна кількість регіонів детекції руху для цієї камери %1, а вибрано %2.</translation>
+      <translation>Максимальна кількість областей виявлення руху для цієї камери %1, а вибрано %2.</translation>
     </message>
     <message>
       <source>Maximum number of motion sensitivity settings for any sensor of the current camera is %1, and %2 settings are currently selected.</source>
-      <translation>Максимальна кількість налаштувань чутливості детекції руху для цієї камери %1, а вибрано %2.</translation>
+      <translation>Максимальна кількість налаштувань чутливості руху для будь-якого датчика поточної камери становить %1, і наразі вибрано %2.</translation>
     </message>
   </context>
   <context>
@@ -2700,7 +2700,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Not enough licenses to enable recording</source>
-      <translation>Недостатньо ліцензій для включення запису</translation>
+      <translation>Недостатньо ліцензій для активації запису</translation>
     </message>
     <message>
       <source>License limit exceeded, recording will not be enabled.</source>
@@ -2724,15 +2724,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Щоб переконатися, що воно підтримується і включити його, перейдіть на вкладку &quot;Рух&quot; в налаштуваннях камери.</translation>
+      <translation>Щоб переконатися в підтримці і включити її, перейдіть на вкладку &quot;Детекція Руху&quot; в Налаштуваннях Камери.</translation>
     </message>
     <message>
       <source>Dual-Streaming not supported for this camera</source>
-      <translation>Подвійний потік не підтримується для цієї камери</translation>
+      <translation>Подвійний відео потік не підтримується для цієї камери</translation>
     </message>
     <message>
       <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Подвійний потік та детектор руху не підтримуються для цієї камери</translation>
+      <translation>Подвійний відео потік та виявлення руху не підтримуються для цієї камери</translation>
     </message>
     <message>
       <source>Motion detection disabled</source>
@@ -2740,7 +2740,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Щоб увімкнути або налаштувати його, перейдіть на вкладку &quot;Рух&quot; в розділі Параметри камери.</translation>
+      <translation>Щоб переконатися в підтримці і включити її, перейдіть на вкладку &quot;Детекція Руху&quot; в Налаштуваннях Камери.</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -2791,7 +2791,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Show on Layout</source>
-      <translation>Показати на розкладці</translation>
+      <translation>Показати на Розкладці</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -2861,7 +2861,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>No device selected.</source>
-      <translation>Жодного пристрою не вибрано.</translation>
+      <translation>Не вибрано жодного пристрою.</translation>
     </message>
     <message>
       <source>Cannot edit properties for several wearable and non-wearable cameras.</source>
@@ -3482,7 +3482,7 @@ to %1</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Вибрати все</translation>
+      <translation>Вибрати Все</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3490,17 +3490,17 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
-      <translation>
-        <numerusform>Журнал подій за період від %1 до %2 - знайдено %n подій</numerusform>
-        <numerusform>Журнал подій за період від %1 до %2 - знайдено %n подій</numerusform>
-        <numerusform>Журнал подій за період від %1 до %2 - знайдено %n подій</numerusform>
-        <numerusform>Журнал подій за період від %1 до %2 - знайдено %n подій</numerusform>
+      <translation type="unfinished">
+        <numerusform>Журнал подій за період від %1 до %2 - %n подію знайдено</numerusform>
+        <numerusform>Журнал подій за період від %1 до %2 - %n знайдено подій</numerusform>
+        <numerusform>Журнал подій за період від %1 до %2 - %n знайдено подій</numerusform>
+        <numerusform>Журнал подій за період від %1 до %2 - %n знайдено подій</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
-        <numerusform>Журнал подій за %1 - знайдено %n подій</numerusform>
+        <numerusform>Журнал подій за %1 - знайдено %n подія</numerusform>
         <numerusform>Журнал подій за %1 - знайдено %n подій</numerusform>
         <numerusform>Журнал подій за %1 - знайдено %n подій</numerusform>
         <numerusform>Журнал подій за %1 - знайдено %n подій</numerusform>
@@ -3709,11 +3709,11 @@ to %1</source>
     </message>
     <message>
       <source>Image might be too dim.</source>
-      <translation>Зображення може бути занадто тьмяне.</translation>
+      <translation>Зображення може бути невиразним.</translation>
     </message>
     <message>
       <source>Invalid input image.</source>
-      <translation>Недійсний образ введення.</translation>
+      <translation>Недійсне вхідне зображення.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -3732,10 +3732,10 @@ to %1</source>
     <message numerus="yes">
       <source>This camera is not currently on some of the selected layouts. Action will work if camera will be added before action triggers.</source>
       <translation>
+        <numerusform>Ця камера наразі не використовується для деяких вибраних розкладок. Дія буде активна, якщо камера буде додана до початку тригера.</numerusform>
+        <numerusform>Ця камера наразі не використовується для деяких вибраних розкладок. Дія буде працювати, якщо камера буде додана до початку тригера.</numerusform>
         <numerusform>Ця камера наразі не використовується для деяких вибраних макетів. Дія буде працювати, якщо камера буде додана до початку тригера.</numerusform>
-        <numerusform>Ця камера наразі не використовується для деяких вибраних макетів. Дія буде працювати, якщо камера буде додана до початку тригера.</numerusform>
-        <numerusform>Ця камера наразі не використовується для деяких вибраних макетів. Дія буде працювати, якщо камера буде додана до початку тригера.</numerusform>
-        <numerusform>Ця камера наразі не використовується для деяких вибраних макетів. Дія буде працювати, якщо камера буде додана до початку тригера.</numerusform>
+        <numerusform>Ці камери наразі не використовуються для деяких з обраних розкладок. Дія активується, якщо камери будуть додані до початку тригера.</numerusform>
       </translation>
     </message>
   </context>
@@ -4233,16 +4233,16 @@ to %1</source>
         <numerusform>Потрібно принаймні %n %1</numerusform>
         <numerusform>Потрібно принаймні %n %1</numerusform>
         <numerusform>Потрібно принаймні %n %1</numerusform>
-        <numerusform>Потрібно принаймні %n %1</numerusform>
+        <numerusform>Потрібні принаймні %n %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %1 are currently in use</source>
       <translation>
         <numerusform>%n %1 використовується</numerusform>
-        <numerusform>%n %1 використовується</numerusform>
-        <numerusform>%n %1 використовується</numerusform>
-        <numerusform>%n %1 використовується</numerusform>
+        <numerusform>%n %1 використовуються</numerusform>
+        <numerusform>%n %1 використовуються</numerusform>
+        <numerusform>%n %1 використовуються</numerusform>
       </translation>
     </message>
     <message>
@@ -4409,10 +4409,10 @@ to %1</source>
     <message numerus="yes">
       <source>Use licenses for selected %n devices</source>
       <translation>
-        <numerusform>Використовувати ліцензії для %n вибраних пристроїв</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних пристроїв</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних пристроїв</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних пристроїв</numerusform>
+        <numerusform>Використати ліцензії для обраного %n пристрою</numerusform>
+        <numerusform>Використати ліцензії для обраних %n пристроїв</numerusform>
+        <numerusform>Використати ліцензії для обраних %n пристроїв</numerusform>
+        <numerusform>Використати ліцензії для обраних %n пристроїв</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4427,19 +4427,19 @@ to %1</source>
     <message numerus="yes">
       <source>Use licenses for selected %n I/O modules</source>
       <translation>
-        <numerusform>Використовувати ліцензії для %n вибраних модулів вводу/виводу</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних модулів вводу/виводу</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних модулів вводу/виводу</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних модулів вводу/виводу</numerusform>
+        <numerusform>Використати ліцензії для обраного %n модулю вводу/виводу</numerusform>
+        <numerusform>Використати ліцензії для обраних %n модулів вводу/виводу</numerusform>
+        <numerusform>Використати ліцензії для обраних %n модулів вводу/виводу</numerusform>
+        <numerusform>Використати ліцензії для обраних %n модулів вводу/виводу</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Use licenses to view these %n cameras</source>
       <translation>
-        <numerusform>Використовувати ліцензії для %n вибраних камер</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних камер</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних камер</numerusform>
-        <numerusform>Використовувати ліцензії для %n вибраних камер</numerusform>
+        <numerusform>Використати ліцензії для %n обраної камери</numerusform>
+        <numerusform>Використати ліцензії для %n обраних камер</numerusform>
+        <numerusform>Використати ліцензії для %n обраних камер</numerusform>
+        <numerusform>Використати ліцензії для %n обраних камер</numerusform>
       </translation>
     </message>
   </context>
@@ -4578,7 +4578,7 @@ to %1</source>
     <name>QnLookAndFeelPreferencesWidget</name>
     <message>
       <source>Pictures %1</source>
-      <translation>Картинки %1</translation>
+      <translation>Зображення %1</translation>
     </message>
     <message>
       <source>Preparing Image...</source>
@@ -4710,7 +4710,7 @@ to %1</source>
     <name>QnMergeSystemsDialog</name>
     <message>
       <source>http(s)://host:port</source>
-      <translation>http(s)://host:port</translation>
+      <translation type="unfinished">http(s)://host:port</translation>
     </message>
     <message>
       <source>%1 (current)</source>
@@ -4800,15 +4800,15 @@ to %1</source>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
       <source>Secondary stream disabled for these cameras</source>
-      <translation>Вторинний потік вимкнено для цих камер</translation>
+      <translation>Другий потік вимкнено для цих камер</translation>
     </message>
     <message>
       <source>Set Recording to &quot;Always&quot;</source>
-      <translation>Встановити запис до &quot;Завжди&quot;</translation>
+      <translation>Налаштувати Запис до &quot;Завжди&quot;</translation>
     </message>
     <message>
       <source>Enable Secondary Stream</source>
-      <translation>Включити вторинний потік</translation>
+      <translation>Включити Другий Потік</translation>
     </message>
     <message>
       <source>multiple values</source>
@@ -4816,7 +4816,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation>Режим запису &quot;Рух + Низьке розширення&quot; не може бути встановлений.</translation>
+      <translation>&quot;Виявлення Руху + Низька Роздільна Здатність&quot;режим запису не може бути встановлений.</translation>
     </message>
   </context>
   <context>
@@ -4897,10 +4897,10 @@ to %1</source>
     <message numerus="yes">
       <source>%n more notifications</source>
       <translation>
+        <numerusform>%n нового сповіщення</numerusform>
         <numerusform>%n сповіщень</numerusform>
-        <numerusform>%n сповіщень</numerusform>
-        <numerusform>%n сповіщень</numerusform>
-        <numerusform>%n сповіщень</numerusform>
+        <numerusform>%n нових сповіщень</numerusform>
+        <numerusform>%n нових сповіщень</numerusform>
       </translation>
     </message>
   </context>
@@ -5083,7 +5083,7 @@ to %1</source>
     </message>
     <message>
       <source>Home</source>
-      <translation>Домашній каталог</translation>
+      <translation>Головна сторінка</translation>
     </message>
     <message>
       <source>Details</source>
@@ -5289,19 +5289,19 @@ to %1</source>
     </message>
     <message>
       <source>Devices with non-empty archive</source>
-      <translation>Пристрої з непорожним архівом</translation>
+      <translation>Пристрої з не порожнiм архівом</translation>
     </message>
     <message>
       <source>Cameras with non-empty archive</source>
-      <translation>Камери з непорожним архівом</translation>
+      <translation>Камери з не порожнiм архівом</translation>
     </message>
     <message>
       <source>Storage space occupied by devices</source>
-      <translation>Сховище, зайняте пристроями</translation>
+      <translation>Місце для зберігання займають пристрої</translation>
     </message>
     <message>
       <source>Storage space occupied by cameras</source>
-      <translation>Сховище, зайняте камерами</translation>
+      <translation>Місце для зберігання займають камери</translation>
     </message>
     <message>
       <source>Device</source>
@@ -5325,7 +5325,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Гб</translation>
+      <translation>%1 ГБ</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -5440,23 +5440,23 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Any Type</source>
-      <translation>Будь-який</translation>
+      <translation>Будь-який Тип</translation>
     </message>
     <message>
       <source>Video Files</source>
-      <translation>Відеофайли</translation>
+      <translation>Відео Файли</translation>
     </message>
     <message>
       <source>Image Files</source>
-      <translation>Файли зображень</translation>
+      <translation>Файли Зображень</translation>
     </message>
     <message>
       <source>Live Devices</source>
-      <translation>Пристрої в режимі реального часу</translation>
+      <translation>Пристрої в режимі Он-лайн</translation>
     </message>
     <message>
       <source>Live Cameras</source>
-      <translation>Камери в режимі реального часу</translation>
+      <translation>Камери в режимі Он-лайн</translation>
     </message>
   </context>
   <context>
@@ -5478,7 +5478,7 @@ to %1</source>
     </message>
     <message>
       <source>Select users...</source>
-      <translation>Виберіть користувачів...</translation>
+      <translation>Оберiть користувачів...</translation>
     </message>
   </context>
   <context>
@@ -5536,7 +5536,7 @@ to %1</source>
     <name>QnResourceTreeModelOtherSystemsNode</name>
     <message>
       <source>New System</source>
-      <translation>Нова система</translation>
+      <translation>Нова Система</translation>
     </message>
   </context>
   <context>
@@ -5889,23 +5889,23 @@ to %1</source>
     </message>
     <message>
       <source>Download the Latest Version Update File</source>
-      <translation>Завантажте останню версію файлу</translation>
+      <translation>Завантажте Файл Оновлення Останньої Версії</translation>
     </message>
     <message>
       <source>Selected Version</source>
-      <translation>Обрана версія</translation>
+      <translation>Обрана Версія</translation>
     </message>
     <message>
       <source>Download Update File</source>
-      <translation>Завантажити файл оновлення</translation>
+      <translation>Завантажити Файл Оновлення</translation>
     </message>
     <message>
       <source>Browse for Update File...</source>
-      <translation>Знайти файл оновлення...</translation>
+      <translation>Знайти Файл Оновлення...</translation>
     </message>
     <message>
       <source>Selected Update File</source>
-      <translation>Вибраний файл оновлення</translation>
+      <translation>Обраний Файл Оновлення</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -5925,7 +5925,7 @@ to %1</source>
     </message>
     <message>
       <source>Downgrade to an earlier version is prohibited.</source>
-      <translation>Оновлення до більш ранньої версії не підтримується.</translation>
+      <translation>Перехід на більш ранню версію заборонено.</translation>
     </message>
     <message>
       <source>Updates for one or more servers were not found.</source>
@@ -5941,11 +5941,11 @@ to %1</source>
     </message>
     <message>
       <source>Update Finished...</source>
-      <translation>Оновлення завершено...</translation>
+      <translation>Оновлення Завершено...</translation>
     </message>
     <message>
       <source>Checking for updates...</source>
-      <translation>Перевірка оновлень...</translation>
+      <translation>Перевірити наявність оновлених версій...</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
@@ -5957,11 +5957,11 @@ to %1</source>
     </message>
     <message>
       <source>Installing updates to incompatible servers...</source>
-      <translation>Установка оновлень на несумісні сервери...</translation>
+      <translation>Встановлення оновлень на несумісні сервери...</translation>
     </message>
     <message>
       <source>Pushing updates to servers...</source>
-      <translation>Відправка оновлень на сервера...</translation>
+      <translation>Відправка оновлень на сервери...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
@@ -5969,7 +5969,7 @@ to %1</source>
     </message>
     <message>
       <source>Specific Build...</source>
-      <translation>Вказати номер збірки...</translation>
+      <translation>Вказати Номер Збірки...</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -5977,7 +5977,7 @@ to %1</source>
     </message>
     <message>
       <source>Update System</source>
-      <translation>Оновити систему</translation>
+      <translation>Оновити Систему</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -5994,23 +5994,23 @@ to %1</source>
     <message numerus="yes">
       <source>Not enough free space at %n Servers:</source>
       <translation>
-        <numerusform>Недостатньо вільного місця на %n серверах:</numerusform>
-        <numerusform>Недостатньо вільного місця на %n серверах:</numerusform>
-        <numerusform>Недостатньо вільного місця на %n серверах:</numerusform>
-        <numerusform>Недостатньо вільного місця на %n серверах:</numerusform>
+        <numerusform>Недостатньо вільного місця на %n Серверi:</numerusform>
+        <numerusform>Недостатньо вільного місця на %n Cерверах:</numerusform>
+        <numerusform>Недостатньо вільного місця на %n Cерверах:</numerusform>
+        <numerusform>Недостатньо вільного місця на %n Cерверах:</numerusform>
       </translation>
     </message>
     <message>
       <source>Attempt to update may fail or cause Server malfunction.</source>
-      <translation>Спроба оновлення може виявитися невдалою або привести до некоректної роботи сервера.</translation>
+      <translation>Спроба оновлення може не вдатися або призвести до несправності сервера.</translation>
     </message>
     <message>
       <source>Force Update</source>
-      <translation>Все одно оновити</translation>
+      <translation>Примусове Оновлення</translation>
     </message>
     <message>
       <source>Server update completed</source>
-      <translation>Оновлення сервера завершено</translation>
+      <translation>Оновлення Сервера завершено</translation>
     </message>
     <message>
       <source>Update completed</source>
@@ -6026,7 +6026,7 @@ to %1</source>
     </message>
     <message>
       <source>Update failed</source>
-      <translation>Оновлення провалено</translation>
+      <translation>Оновлення не вдалося</translation>
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
@@ -6046,11 +6046,11 @@ to %1</source>
     </message>
     <message>
       <source>All components in your System are up to date.</source>
-      <translation>Ваша система складається з компонентів нової версії.</translation>
+      <translation>Усі компоненти вашої Системи оновлені.</translation>
     </message>
     <message>
       <source>All components in your System are up to this version.</source>
-      <translation>Всі компоненти в вашій системі оновлені до цієї версії.</translation>
+      <translation>Всі компоненти в вашій Системі оновлені до цієї версії.</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
@@ -6067,7 +6067,7 @@ to %1</source>
     </message>
     <message>
       <source>Checking for free space...</source>
-      <translation>Перевірка вільного простору...</translation>
+      <translation>Перевірка вільного місця...</translation>
     </message>
   </context>
   <context>
@@ -6135,27 +6135,27 @@ to %1</source>
     </message>
     <message>
       <source>FPS in the schedule was lowered from %1 to %2, which is the maximum for this camera.</source>
-      <translation>FPS в розкладі було знижено з %1 до %2, що є максимальним для цієї камери.</translation>
+      <translation>FPS в розкладі було знижено з %1 до %2, що є максимальним для обраної камери.</translation>
     </message>
     <message>
       <source>For software motion detection, 2 FPS are reserved for the secondary stream.</source>
-      <translation>2 FPS зарезервовані для програмного виявлення руху на вторинному потоці.</translation>
+      <translation>Для виявлення руху програмним забезпеченням 2 FPS зарезервовані для другого вiдео потоку.</translation>
     </message>
     <message>
       <source>FPS in the schedule was lowered from %1 to %2.</source>
-      <translation>FPS в графіку було знижено з %1 до %2.</translation>
+      <translation>FPS у графіку було знижено з %1 до %2.</translation>
     </message>
     <message>
       <source>Secondary stream disabled for this camera</source>
-      <translation>Вторинний потік вимкнено для цієї камери</translation>
+      <translation>Другий потік вимкнено для цієї камери</translation>
     </message>
     <message>
       <source>Set Recording to &quot;Always&quot;</source>
-      <translation>Встановити запис до &quot;Завжди&quot;</translation>
+      <translation>Налаштувати Запис до &quot;Завжди&quot;</translation>
     </message>
     <message>
       <source>Enable Secondary Stream</source>
-      <translation>Включити вторинний потік</translation>
+      <translation>Включити Другий Потік</translation>
     </message>
     <message>
       <source>Reset motion regions to default?</source>
@@ -6167,11 +6167,11 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-      <translation>Режим запису &quot;Рух + Низьке розширення&quot; не може бути встановлений.</translation>
+      <translation>&quot;Виявлення Руху + Низька Роздільна Здатність&quot;режим запису не може бути встановлений.</translation>
     </message>
     <message>
       <source>Uploaded archive can be deleted automatically, if there is no free space on a server storage. The oldest footage among all cameras on the server will be deleted first.</source>
-      <translation>Завантажений архів буде видалений автоматично, як тільки вільне місце на сервері закінчиться. Спочатку будуть видалені найстаріші кадри серед всіх камер на сервері.</translation>
+      <translation>Завантажений архів можна видалити автоматично, якщо на сервері немає вільного місця. Спочатку будуть видалені найдавніші кадри серед усіх камер на сервері.</translation>
     </message>
   </context>
   <context>
@@ -6404,7 +6404,7 @@ to %1</source>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation>Вибрати все</translation>
+      <translation>Вибрати Все</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -6597,7 +6597,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Гб</translation>
+      <translation>%1 ГБ</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -6834,11 +6834,11 @@ to %1</source>
     <name>QnSystemSettingsWidget</name>
     <message>
       <source>Enable devices and servers auto discovery</source>
-      <translation>Включити автовизначення пристроїв і серверів</translation>
+      <translation>Увімкнути автоматичне виявлення пристроїв та серверів</translation>
     </message>
     <message>
       <source>Enable cameras and servers auto discovery</source>
-      <translation>Включити автовизначення камер і серверів</translation>
+      <translation>Увімкнути автоматичне виявлення камер та серверів</translation>
     </message>
     <message>
       <source>Allow System to optimize device settings</source>
@@ -6907,11 +6907,11 @@ to %1</source>
     </message>
     <message>
       <source>System time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>Системний час синхронізується з Інтернетом і не залежить від локального часу на серверах.</translation>
+      <translation>Час Системи відео керування синхронізується з Інтернетом і не залежить від локального часу на серверах.</translation>
     </message>
     <message>
       <source>System time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>Системний час синхронізується з локальним часом на вибраному сервері і не залежить від локального часу на інших серверах.</translation>
+      <translation>Час Системи відео керування синхронізується з локальним часом на обраному сервері і не залежить від локального часу на інших серверах.</translation>
     </message>
   </context>
   <context>
@@ -6932,47 +6932,47 @@ to %1</source>
     <message>
       <source>MMMM</source>
       <comment>Format for displaying months on timeline.</comment>
-      <translation>ММММ</translation>
+      <translation type="unfinished">MMMM</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation>yyyy</translation>
+      <translation type="unfinished">yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-      <translation>dd MMMM yyyy hh:mm</translation>
+      <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h ap</source>
       <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h ap</translation>
+      <translation type="unfinished">dd MMMM yyyy h ap</translation>
     </message>
     <message>
       <source>dd MMMM yyyy</source>
       <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-      <translation>dd MMMM yyyy</translation>
+      <translation type="unfinished">dd MMMM yyyy</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
       <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-      <translation>Мммм рррр</translation>
+      <translation type="unfinished">MMMM yyyy</translation>
     </message>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>yyyy</translation>
+      <translation type="unfinished">yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
       <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-      <translation>dd MMMM yyyy h:mm ap</translation>
+      <translation type="unfinished">dd MMMM yyyy h:mm ap</translation>
     </message>
   </context>
   <context>
@@ -6998,7 +6998,7 @@ to %1</source>
     <name>QnUpdateResult</name>
     <message>
       <source>Update has been successfully finished.</source>
-      <translation>Оновлення було успішно завершено.</translation>
+      <translation>Оновлення успішно завершено.</translation>
     </message>
     <message>
       <source>Update has been cancelled.</source>
@@ -7006,7 +7006,7 @@ to %1</source>
     </message>
     <message>
       <source>Another user has already started an update.</source>
-      <translation>Хтось уже запустив процес оновлення.</translation>
+      <translation>Інший користувач вже розпочав процес оновлення.</translation>
     </message>
     <message>
       <source>All servers are already updated.</source>
@@ -7018,16 +7018,16 @@ to %1</source>
     </message>
     <message>
       <source>No free space left on the disk.</source>
-      <translation>Мало вільного місця на диску.</translation>
+      <translation>На диску не залишилося вільного місця.</translation>
     </message>
     <message>
       <source>Could not push updates to servers.</source>
-      <translation>Неможливо перенести оновлення на сервера.</translation>
+      <translation>Неможливо вiдправити оновлення до серверiв.</translation>
     </message>
     <message numerus="yes">
       <source>The problem is caused by %n servers:</source>
       <translation>
-        <numerusform>Проблема викликана через %n серверів:</numerusform>
+        <numerusform>Проблема викликана через %n сервер:</numerusform>
         <numerusform>Проблема викликана через %n серверів:</numerusform>
         <numerusform>Проблема викликана через %n серверів:</numerusform>
         <numerusform>Проблема викликана через %n серверів:</numerusform>
@@ -7036,42 +7036,42 @@ to %1</source>
     <message numerus="yes">
       <source>No free space left on %n servers:</source>
       <translation>
-        <numerusform>Немає вільного місця на серверах %n:</numerusform>
-        <numerusform>Немає вільного місця на серверах %n:</numerusform>
-        <numerusform>Немає вільного місця на серверах %n:</numerusform>
-        <numerusform>Немає вільного місця на серверах %n:</numerusform>
+        <numerusform>Не має вільного місця на %n сервері:</numerusform>
+        <numerusform>Не має вільного місця на %n серверах:</numerusform>
+        <numerusform>Не має вільного місця на %n серверах:</numerusform>
+        <numerusform>Не має вільного місця на %n серверах:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers are not responding:</source>
       <translation>
-        <numerusform>%n серверів не відповідють:</numerusform>
-        <numerusform>%n серверів не відповідють:</numerusform>
-        <numerusform>%n серверів не відповідють:</numerusform>
-        <numerusform>%n серверів не відповідють:</numerusform>
+        <numerusform>%n сервер не дає зворотній зв'язок:</numerusform>
+        <numerusform>%n сервера не дають зворотній зв'язок:</numerusform>
+        <numerusform>%n сервера не дають зворотній зв'язок:</numerusform>
+        <numerusform>%n сервера не дають зворотній зв'язок:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n servers have gone offline:</source>
       <translation>
-        <numerusform>%n сервери виключені:</numerusform>
-        <numerusform>%n сервери виключені:</numerusform>
-        <numerusform>%n сервери виключені:</numerusform>
-        <numerusform>%n сервери виключені:</numerusform>
+        <numerusform>%n сервер перейшов в офлайн режим:</numerusform>
+        <numerusform>%n сервери перейшли в офлайн режим:</numerusform>
+        <numerusform>%n сервери перейшли в офлайн режим:</numerusform>
+        <numerusform>%n сервери перейшли в офлайн режим:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Authentication failed for %n servers:</source>
       <translation>
-        <numerusform>Автентифікація не виконана для серверів %n:</numerusform>
-        <numerusform>Автентифікація не виконана для серверів %n:</numerusform>
-        <numerusform>Автентифікація не виконана для серверів %n:</numerusform>
-        <numerusform>Автентифікація не виконана для серверів %n:</numerusform>
+        <numerusform>Помилка аутентифікації для %n сервера:</numerusform>
+        <numerusform>Помилка аутентифікації для %n серверів:</numerusform>
+        <numerusform>Помилка аутентифікації для %n серверів:</numerusform>
+        <numerusform>Помилка аутентифікації для %n серверів:</numerusform>
       </translation>
     </message>
     <message>
       <source>Could not install an update to the client.</source>
-      <translation>Не вдається встановити оновлення на клієнт.</translation>
+      <translation>Не вдається встановити оновлення для клієнту.</translation>
     </message>
     <message>
       <source>Could not install updates on one or more servers.</source>
@@ -7608,7 +7608,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to update Server</source>
-      <translation>Не вдалося оновити сервер</translation>
+      <translation>Помилка оновлення Сервера</translation>
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
@@ -7903,7 +7903,7 @@ to %1</source>
     </message>
     <message>
       <source>Open Wearable Camera Recordings...</source>
-      <translation>Відкрити записи портативної камери...</translation>
+      <translation>Відкрити Записи Портативної Камери...</translation>
     </message>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
@@ -7959,10 +7959,10 @@ to %1</source>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Wearable Camera.</source>
       <translation>
-        <numerusform>Ви можете завантажити ці файли в інший екземпляр портативної камери.</numerusform>
-        <numerusform>Ви можете завантажити ці файли в інший екземпляр портативної камери.</numerusform>
-        <numerusform>Ви можете завантажити ці файли в інший екземпляр портативної камери.</numerusform>
-        <numerusform>Ви можете завантажити ці файли в інший екземпляр портативної камери.</numerusform>
+        <numerusform>Ви можете завантажити цей файл в інший примiрник Портативної Камери.</numerusform>
+        <numerusform>Ви можете завантажити ці файли в інший примiрник портативної камери.</numerusform>
+        <numerusform>Ви можете завантажити ці файли в інший примiрник портативної камери.</numerusform>
+        <numerusform>Ви можете завантажити ці файли в інший примiрник портативної камери.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8509,7 +8509,7 @@ to %1</source>
     </message>
     <message>
       <source>Pictures (%1)</source>
-      <translation>Картинки (%1)</translation>
+      <translation>Зображення (%1)</translation>
     </message>
     <message>
       <source>Error</source>
@@ -8544,7 +8544,7 @@ to %1</source>
     </message>
     <message>
       <source>Pictures %1</source>
-      <translation>Картинки %1</translation>
+      <translation>Зображення %1</translation>
     </message>
     <message>
       <source>Picture cannot be read</source>
@@ -8600,7 +8600,7 @@ to %1</source>
     </message>
     <message>
       <source>I/O Module ID</source>
-      <translation>Модулі вводу-виводу</translation>
+      <translation>Ідентифікатор модуля вводу / виводу</translation>
     </message>
     <message>
       <source>Camera ID</source>
@@ -8616,11 +8616,11 @@ to %1</source>
     </message>
     <message>
       <source>URL is not available. Open stream and try again.</source>
-      <translation>URL недоступний. Відкрийте потік і повторіть спробу.</translation>
+      <translation>URL адреса не доступна. Відкрийте відео потік і спробуйте ще раз.</translation>
     </message>
     <message>
       <source>URL is not available. Open video stream and try again.</source>
-      <translation>URL-адреса недоступна. Відкрийте відео потік і спробуйте ще раз.</translation>
+      <translation>URL адреса не доступна. Відкрийте відео потік і спробуйте ще раз.</translation>
     </message>
     <message>
       <source>I/O module has no audio stream</source>
@@ -8628,7 +8628,7 @@ to %1</source>
     </message>
     <message>
       <source>Camera has no secondary stream</source>
-      <translation>Камера не має вторинного потоку</translation>
+      <translation>Камера не має другого потоку</translation>
     </message>
   </context>
   <context>
@@ -8718,7 +8718,7 @@ to %1</source>
     <name>nx::client::desktop::WorkbenchAnalyticsController</name>
     <message>
       <source>%1 Analytics</source>
-      <translation>Аналітика %1</translation>
+      <translation>%1 Аналітика</translation>
     </message>
   </context>
   <context>
@@ -8770,11 +8770,11 @@ to %1</source>
     </message>
     <message>
       <source>Could not create output file %1...</source>
-      <translation>Не вдається створити вихідний файл: %1...</translation>
+      <translation>Не вдається створити вихідний файл %1...</translation>
     </message>
     <message>
       <source>Unknown error has occurred.</source>
-      <translation>Відбулась невідома помилка.</translation>
+      <translation>Сталася невідома помилка.</translation>
     </message>
     <message>
       <source>Exporting to &quot;%1&quot;...</source>
@@ -8810,19 +8810,19 @@ to %1</source>
     </message>
     <message>
       <source>Please choose another name or wait until recording is finished.</source>
-      <translation>Будь ласка, виберіть інше ім'я або зачекайте, доки не закінчиться запис.</translation>
+      <translation>Будь ласка, виберіть інше ім'я або зачекайте, доки закінчиться запис.</translation>
     </message>
     <message>
       <source>Exporting Layout</source>
-      <translation>Експорт розкладки</translation>
+      <translation>Експорт Розкладки</translation>
     </message>
     <message>
       <source>EXE format not recommended</source>
-      <translation>EXE-формат не рекомендується</translation>
+      <translation>Формат EXE не рекомендується</translation>
     </message>
     <message>
       <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
-      <translation>Через обмеження Windows EXE-файли більше 4 ГБ не можуть бути відкриті подвійним клацанням миші.</translation>
+      <translation>Файли EXE розміром понад 4 Гб неможливо відкрити подвійним клiком через обмеження системи Windows.</translation>
     </message>
     <message>
       <source>Export to EXE anyway?</source>
@@ -8854,7 +8854,7 @@ to %1</source>
     </message>
     <message>
       <source>Make file read-only.</source>
-      <translation>Зробити доступним тільки для читання.</translation>
+      <translation>Зробити файл доступним тільки для читання.</translation>
     </message>
     <message>
       <source>Export</source>
@@ -9104,19 +9104,19 @@ to %1</source>
     </message>
     <message>
       <source>Layout is locked and cannot be changed.</source>
-      <translation>Розкладка заблокована, і її неможливо змінити.</translation>
+      <translation>Розкладка заблокована і її не можливо змінити.</translation>
     </message>
     <message>
       <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>Все підтримуються (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *. bmp *.tiff)</translation>
+      <translation>Усi формати підтримуються (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *. bmp *.tiff)</translation>
     </message>
     <message>
       <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
-      <translation>Відео (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
+      <translation>Відео формати (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
     </message>
     <message>
       <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>Зображення (*.jpg *.png *.gif *.bmp *.tiff)</translation>
+      <translation>Формати Зображення (*.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
       <source>All files (*.*)</source>
@@ -9237,7 +9237,7 @@ to %1</source>
     </message>
     <message>
       <source>Wearable Cameras cannot be moved between servers</source>
-      <translation>Портативні камери не можна переміщати між серверами</translation>
+      <translation>Портативні камери не можна переміщувати між серверами</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -9249,7 +9249,7 @@ to %1</source>
     </message>
     <message>
       <source>Warning! This build is for testing purposes only!</source>
-      <translation>Попередження! Ця збірка призначена для тестування!</translation>
+      <translation>Попередження! Ця версiя програмного забезпечення призначена для тестування!</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>

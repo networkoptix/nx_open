@@ -5,7 +5,7 @@
     <name>CloseButton</name>
     <message>
       <source>Close Tab</source>
-      <translation>Закрити вкладку</translation>
+      <translation>Закрити Вкладку</translation>
     </message>
   </context>
   <context>
@@ -20,11 +20,11 @@
     </message>
     <message>
       <source>Hide Others</source>
-      <translation>Сховати решту</translation>
+      <translation>Сховати Решту</translation>
     </message>
     <message>
       <source>Show All</source>
-      <translation>Показати всі</translation>
+      <translation>Показати Всі</translation>
     </message>
     <message>
       <source>Preferences...</source>
@@ -32,33 +32,33 @@
     </message>
     <message>
       <source>Quit %1</source>
-      <translation>Вийти з %1</translation>
+      <translation>Вихід %1</translation>
     </message>
     <message>
       <source>About %1</source>
-      <translation>Про програму %1</translation>
+      <translation>Про програмне забезпечення %1</translation>
     </message>
   </context>
   <context>
     <name>QAbstractSpinBox</name>
     <message>
       <source>&amp;Select All</source>
-      <translation>&amp;Вибрати все</translation>
+      <translation>&amp;Вибрати Всi</translation>
     </message>
     <message>
       <source>&amp;Step up</source>
-      <translation>Крок впе&amp;ред</translation>
+      <translation>&amp;Активізувати</translation>
     </message>
     <message>
       <source>Step &amp;down</source>
-      <translation>Крок на&amp;зад</translation>
+      <translation>Крок &amp;попереднiй</translation>
     </message>
   </context>
   <context>
     <name>QAccessibleActionInterface</name>
     <message>
       <source>Press</source>
-      <translation>Натиснути</translation>
+      <translation>Натисніть</translation>
     </message>
     <message>
       <source>Increase</source>
@@ -70,31 +70,31 @@
     </message>
     <message>
       <source>ShowMenu</source>
-      <translation>ПоказатиМеню</translation>
+      <translation>Показати Меню</translation>
     </message>
     <message>
       <source>SetFocus</source>
-      <translation>ВстановитиФокус</translation>
+      <translation>Встановити Фокус</translation>
     </message>
     <message>
       <source>Toggle</source>
-      <translation>Змінити</translation>
+      <translation>Перемкнути</translation>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Прокрутити ліворуч</translation>
+      <translation>Прокрутити Ліворуч</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Прокрутити праворуч</translation>
+      <translation>Прокрутити Праворуч</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation>Прокрутка вгору</translation>
+      <translation>Прокрутити Вгору</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation>Прокрутити вниз</translation>
+      <translation>Прокрутити Донизу</translation>
     </message>
     <message>
       <source>Previous Page</source>
@@ -102,7 +102,7 @@
     </message>
     <message>
       <source>Next Page</source>
-      <translation>Наступна сторінка</translation>
+      <translation>Наступна Сторінка</translation>
     </message>
     <message>
       <source>Triggers the action</source>
@@ -130,11 +130,11 @@
     </message>
     <message>
       <source>Scrolls to the left</source>
-      <translation>Прокручування вліво</translation>
+      <translation>Прокрутка вліво</translation>
     </message>
     <message>
       <source>Scrolls to the right</source>
-      <translation>Прокручування вправо</translation>
+      <translation>Прокрутка вправо</translation>
     </message>
     <message>
       <source>Scrolls up</source>
@@ -142,11 +142,11 @@
     </message>
     <message>
       <source>Scrolls down</source>
-      <translation>Прокрутка вниз</translation>
+      <translation>Прокрутка донизу</translation>
     </message>
     <message>
       <source>Goes back a page</source>
-      <translation>Перехід на попередню сторінку</translation>
+      <translation>Повертає попередню сторінку</translation>
     </message>
     <message>
       <source>Goes to the next page</source>
@@ -161,7 +161,7 @@
     </message>
     <message>
       <source>Yes to All</source>
-      <translation>Так, для всіх</translation>
+      <translation>Так, для Всіх</translation>
     </message>
     <message>
       <source>No</source>
@@ -169,7 +169,7 @@
     </message>
     <message>
       <source>No to All</source>
-      <translation>Ні для всіх</translation>
+      <translation>Ні для Всіх</translation>
     </message>
   </context>
   <context>
@@ -180,7 +180,7 @@
     </message>
     <message>
       <source>About</source>
-      <translation>Про програму</translation>
+      <translation>Про програмне забезпечення</translation>
     </message>
     <message>
       <source>Config</source>
@@ -200,11 +200,11 @@
     </message>
     <message>
       <source>Setup</source>
-      <translation>Налаштування</translation>
+      <translation>Інсталяція</translation>
     </message>
     <message>
       <source>Quit</source>
-      <translation>Вийти</translation>
+      <translation>Вихід</translation>
     </message>
     <message>
       <source>Exit</source>
@@ -224,7 +224,7 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation>Вибрати все</translation>
+      <translation>Вибрати Все</translation>
     </message>
   </context>
   <context>
@@ -262,7 +262,7 @@
     </message>
     <message>
       <source>A&amp;lpha channel:</source>
-      <translation>&amp;Альфа-канал:</translation>
+      <translation>А&amp;льфа канал:</translation>
     </message>
     <message>
       <source>&amp;HTML:</source>
@@ -299,7 +299,7 @@ Press ESC to cancel</source>
     <name>QComboBox</name>
     <message>
       <source>False</source>
-      <translation>Ні</translation>
+      <translation>Хибне значення</translation>
     </message>
     <message>
       <source>True</source>
@@ -372,7 +372,7 @@ Press ESC to cancel</source>
     <name>QFile</name>
     <message>
       <source>Destination file is the same file.</source>
-      <translation>Файл призначення такий самий, що і вихідний.</translation>
+      <translation>Файл призначення такий самий.</translation>
     </message>
     <message>
       <source>Source file does not exist.</source>
@@ -427,11 +427,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Go back</source>
-      <translation>Назад</translation>
+      <translation>Повернутися назад</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation>Вперед</translation>
+      <translation>Переслати</translation>
     </message>
     <message>
       <source>Go forward</source>
@@ -447,23 +447,23 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Create New Folder</source>
-      <translation>Створити нову папку</translation>
+      <translation>Створити Нову Папку</translation>
     </message>
     <message>
       <source>Create a New Folder</source>
-      <translation>Створити нову Папку</translation>
+      <translation>Створити Нову Папку</translation>
     </message>
     <message>
       <source>List View</source>
-      <translation>Список</translation>
+      <translation>Перегляд Списку</translation>
     </message>
     <message>
       <source>Change to list view mode</source>
-      <translation>Переключити в режим списку</translation>
+      <translation>Змінити режим перегляду списку</translation>
     </message>
     <message>
       <source>Detail View</source>
-      <translation>Докладний вид</translation>
+      <translation>Докладний Вид</translation>
     </message>
     <message>
       <source>Change to detail view mode</source>
@@ -475,7 +475,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Find Directory</source>
-      <translation>Знайти каталог</translation>
+      <translation>Знайти Директорiю</translation>
     </message>
     <message>
       <source>Open</source>
@@ -483,11 +483,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Save As</source>
-      <translation>Зберегти як</translation>
+      <translation>Зберегти Як</translation>
     </message>
     <message>
       <source>Directory:</source>
-      <translation>Каталог:</translation>
+      <translation>Директорiя:</translation>
     </message>
     <message>
       <source>File &amp;name:</source>
@@ -507,7 +507,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>All Files (*)</source>
-      <translation>Всі файли (*)</translation>
+      <translation>Всі Файли (*)</translation>
     </message>
     <message>
       <source>Show </source>
@@ -523,11 +523,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
-      <translation>Показати при&amp;ховані файли</translation>
+      <translation>Показати &amp;приховані файли</translation>
     </message>
     <message>
       <source>&amp;New Folder</source>
-      <translation>&amp;Нова папка</translation>
+      <translation>&amp;Нова Папка</translation>
     </message>
     <message>
       <source>All files (*)</source>
@@ -535,30 +535,33 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Directories</source>
-      <translation>Каталоги</translation>
+      <translation>Директорії</translation>
     </message>
     <message>
       <source>%1
 Directory not found.
 Please verify the correct directory name was given.</source>
       <translation>%1
-Каталог не знайдено. Будь ласка, перевірте правильність імені каталогу.</translation>
+Директорiю не знайдено.
+Будь ласка, перевірте правильність імені директорії.</translation>
     </message>
     <message>
       <source>%1 already exists.
 Do you want to replace it?</source>
-      <translation>%1 вже існує. Ви хочете його замінити?</translation>
+      <translation>%1 вже існує.
+Ви хочете його замінити?</translation>
     </message>
     <message>
       <source>%1
 File not found.
 Please verify the correct file name was given.</source>
       <translation>%1
-Файл не знайдено. Будь ласка, перевірте правильність імені файлу.</translation>
+Файл не знайдено.
+Будь ласка, перевірте, чи правильно вказано ім'я файлу.</translation>
     </message>
     <message>
       <source>New Folder</source>
-      <translation>Нова папка</translation>
+      <translation>Нова Папка</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -567,7 +570,8 @@ Please verify the correct file name was given.</source>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation>&apos;%1&apos; захищений від запису. Ви хочете видалити його в будь-якому випадку?</translation>
+      <translation>&apos;%1&apos; захищений від запису.
+Ви хочете видалити його в будь-якому випадку?</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
@@ -575,11 +579,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Could not delete directory.</source>
-      <translation>Не вдалося видалити каталог.</translation>
+      <translation>Не вдалося видалити директорiю.</translation>
     </message>
     <message>
       <source>Recent Places</source>
-      <translation>Недавні документи</translation>
+      <translation>Останні пошукові запити</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -596,7 +600,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
-      <translation>Файл %1</translation>
+      <translation>%1 Файл</translation>
     </message>
     <message>
       <source>File</source>
@@ -615,7 +619,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Alias</source>
       <comment>OS X Finder</comment>
-      <translation>Псевдонім</translation>
+      <translation>Аліас</translation>
     </message>
     <message>
       <source>Shortcut</source>
@@ -628,7 +632,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Sidebar</source>
-      <translation>Бічна панель</translation>
+      <translation>Панель iнструментiв з боку</translation>
     </message>
     <message>
       <source>List of places and bookmarks</source>
@@ -640,15 +644,15 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Alt+Left</source>
-      <translation>Alt + стрілка вліво</translation>
+      <translation>Alt+клавiша переходу влiво</translation>
     </message>
     <message>
       <source>Alt+Right</source>
-      <translation>Alt + стрілка вправо</translation>
+      <translation>Alt+клавiша переходу вправо</translation>
     </message>
     <message>
       <source>Alt+Up</source>
-      <translation>Alt + стрілка вгору</translation>
+      <translation>Alt+клавiша переходу вгору</translation>
     </message>
   </context>
   <context>
@@ -659,7 +663,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Гб</translation>
+      <translation>%1 ГБ</translation>
     </message>
     <message>
       <source>%1 MB</source>
@@ -759,7 +763,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>No such file or directory</source>
-      <translation>Немає такого файлу чи каталогу</translation>
+      <translation>Немає такого файлу чи директорії</translation>
     </message>
     <message>
       <source>No space left on device</source>
@@ -771,7 +775,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>file to open is a directory</source>
-      <translation>файл, що відкривається є каталогом</translation>
+      <translation>файл, що відкривається є директорією</translation>
     </message>
   </context>
   <context>
@@ -827,7 +831,7 @@ Do you want to delete it anyway?</source>
     <name>QKeySequenceEdit</name>
     <message>
       <source>Press shortcut</source>
-      <translation>Натисніть клавіші</translation>
+      <translation>Натисніть комбінацію клавіш</translation>
     </message>
     <message>
       <source>%1, ...</source>
@@ -863,18 +867,18 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Вибрати все</translation>
+      <translation>Вибрати Все</translation>
     </message>
   </context>
   <context>
     <name>QMessageBox</name>
     <message>
       <source>Show Details...</source>
-      <translation>Показати подробиці...</translation>
+      <translation>Детальніше...</translation>
     </message>
     <message>
       <source>Hide Details...</source>
-      <translation>Приховати подробиці...</translation>
+      <translation>Сховати детальну інформацію...</translation>
     </message>
     <message>
       <source>OK</source>
@@ -897,7 +901,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Save All</source>
-      <translation>Зберегти все</translation>
+      <translation>Зберегти Все</translation>
     </message>
     <message>
       <source>Open</source>
@@ -909,7 +913,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Yes to &amp;All</source>
-      <translation>Так для &amp;всіх</translation>
+      <translation>Так для &amp;Всіх</translation>
     </message>
     <message>
       <source>&amp;No</source>
@@ -917,7 +921,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>N&amp;o to All</source>
-      <translation>Н&amp;і для всіх</translation>
+      <translation>Н&amp;і для Всіх</translation>
     </message>
     <message>
       <source>Abort</source>
@@ -929,7 +933,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Ignore</source>
-      <translation>Пропустити</translation>
+      <translation>Ігнорувати</translation>
     </message>
     <message>
       <source>Close</source>
@@ -957,7 +961,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation>Скинути налаштування</translation>
+      <translation>Налаштування за замовчуванням</translation>
     </message>
   </context>
   <context>
@@ -982,7 +986,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation>Файл посилається на каталог</translation>
+      <translation>Файл посилається на директорію</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>
@@ -1001,15 +1005,15 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Top</source>
-      <translation>Уверх</translation>
+      <translation>Вгору</translation>
     </message>
     <message>
       <source>Right edge</source>
-      <translation>Правий край</translation>
+      <translation>До правого краю</translation>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>Униз</translation>
+      <translation>Донизу</translation>
     </message>
     <message>
       <source>Page left</source>
@@ -1025,23 +1029,23 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Page down</source>
-      <translation>На сторінку вниз</translation>
+      <translation>На сторінку донизу</translation>
     </message>
     <message>
       <source>Scroll left</source>
-      <translation>Прокрутити ліворуч</translation>
+      <translation>Прокрутка ліворуч</translation>
     </message>
     <message>
       <source>Scroll up</source>
-      <translation>Прокрутити догори</translation>
+      <translation>Прокрутка вгору</translation>
     </message>
     <message>
       <source>Scroll right</source>
-      <translation>Прокрутити праворуч</translation>
+      <translation>Прокрутка праворуч</translation>
     </message>
     <message>
       <source>Scroll down</source>
-      <translation>Прокрутка вниз</translation>
+      <translation>Прокрутка донизу</translation>
     </message>
   </context>
   <context>
@@ -1076,11 +1080,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Temporary Directory</source>
-      <translation>Тимчасовий каталог</translation>
+      <translation>Тимчасова директорія</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation>Домашній каталог</translation>
+      <translation>Головна сторінка</translation>
     </message>
     <message>
       <source>Application Data</source>
@@ -1092,15 +1096,15 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Cache</source>
-      <translation>Кеш-пам'ять</translation>
+      <translation>Кеш пам'ять</translation>
     </message>
     <message>
       <source>Shared Data</source>
-      <translation>Загальні дані</translation>
+      <translation>Загальні Дані</translation>
     </message>
     <message>
       <source>Runtime</source>
-      <translation>Виконувані файли</translation>
+      <translation>Тривалість</translation>
     </message>
     <message>
       <source>Configuration</source>
@@ -1108,11 +1112,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Shared Configuration</source>
-      <translation>Загальна конфігурація</translation>
+      <translation>Спільна конфігурація</translation>
     </message>
     <message>
       <source>Shared Cache</source>
-      <translation>Загальна кеш-пам'ять</translation>
+      <translation>Загальна кеш пам'ять</translation>
     </message>
     <message>
       <source>Download</source>
@@ -1123,11 +1127,11 @@ Do you want to delete it anyway?</source>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation>Прокрутити ліворуч</translation>
+      <translation>Прокрутити Ліворуч</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Прокрутити праворуч</translation>
+      <translation>Прокрутити Праворуч</translation>
     </message>
   </context>
   <context>
@@ -1169,7 +1173,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Вибрати все</translation>
+      <translation>Вибрати Все</translation>
     </message>
   </context>
 </TS>

@@ -585,8 +585,8 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n камер</numerusform>
-        <numerusform>%n камер</numerusform>
+        <numerusform>%n камерa</numerusform>
+        <numerusform>%n камеры</numerusform>
         <numerusform>%n камер</numerusform>
         <numerusform>%n камер</numerusform>
       </translation>
@@ -595,16 +595,16 @@
       <source>%n camera(s)</source>
       <translation>
         <numerusform>%n камера</numerusform>
-        <numerusform>%n камера</numerusform>
-        <numerusform>%n камера</numerusform>
-        <numerusform>%n камера</numerusform>
+        <numerusform>%n камеры</numerusform>
+        <numerusform>%n камер</numerusform>
+        <numerusform>%n камер</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n устройств</numerusform>
-        <numerusform>%n устройств</numerusform>
+        <numerusform>%n устройство</numerusform>
+        <numerusform>%n устройства</numerusform>
         <numerusform>%n устройств</numerusform>
         <numerusform>%n устройств</numerusform>
       </translation>
@@ -613,9 +613,9 @@
       <source>%n device(s)</source>
       <translation>
         <numerusform>%n устройство</numerusform>
-        <numerusform>%n устройство</numerusform>
-        <numerusform>%n устройство</numerusform>
-        <numerusform>%n устройство</numerusform>
+        <numerusform>%n устройства</numerusform>
+        <numerusform>%n устройств</numerusform>
+        <numerusform>%n устройств</numerusform>
       </translation>
     </message>
     <message>
@@ -654,18 +654,18 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n модуль ввода/вывода</numerusform>
-        <numerusform>%n модуль ввода/вывода</numerusform>
-        <numerusform>%n модуль ввода/вывода</numerusform>
-        <numerusform>%n модуль ввода/вывода</numerusform>
+        <numerusform>%n модуля ввода/вывода</numerusform>
+        <numerusform>%n модулей ввода/вывода</numerusform>
+        <numerusform>%n модулей ввода/вывода</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n модуль ввода/вывода</numerusform>
-        <numerusform>%n модуль ввода/вывода</numerusform>
-        <numerusform>%n модуль ввода/вывода</numerusform>
-        <numerusform>%n модуль ввода/вывода</numerusform>
+        <numerusform>%n модуля ввода/вывода</numerusform>
+        <numerusform>%n модулей ввода/вывода</numerusform>
+        <numerusform>%n модулей ввода/вывода</numerusform>
       </translation>
     </message>
     <message>

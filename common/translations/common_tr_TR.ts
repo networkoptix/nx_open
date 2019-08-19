@@ -577,7 +577,7 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n Kameralar</numerusform>
+        <numerusform>%n Kamera</numerusform>
         <numerusform>%n Kameralar</numerusform>
       </translation>
     </message>
@@ -585,13 +585,13 @@
       <source>%n camera(s)</source>
       <translation>
         <numerusform>%n kamera</numerusform>
-        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kameralar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n Aygıtlar</numerusform>
+        <numerusform>%n Aygıt</numerusform>
         <numerusform>%n Aygıtlar</numerusform>
       </translation>
     </message>
@@ -599,7 +599,7 @@
       <source>%n device(s)</source>
       <translation>
         <numerusform>%n aygıt</numerusform>
-        <numerusform>%n aygıt</numerusform>
+        <numerusform>%n aygıtlar</numerusform>
       </translation>
     </message>
     <message>
@@ -638,14 +638,14 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n I/O Modül</numerusform>
-        <numerusform>%n I/O Modül</numerusform>
+        <numerusform>%n I/O Modülleri</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n I/O modül</numerusform>
-        <numerusform>%n I/O modül</numerusform>
+        <numerusform>%n I/O Modülleri</numerusform>
       </translation>
     </message>
     <message>

@@ -1706,8 +1706,8 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n action(s)</source>
       <translation>
-        <numerusform>%n действий</numerusform>
-        <numerusform>%n действий</numerusform>
+        <numerusform>%n действие</numerusform>
+        <numerusform>%n действия</numerusform>
         <numerusform>%n действий</numerusform>
         <numerusform>%n действий</numerusform>
       </translation>
@@ -1974,8 +1974,8 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n Server(s)</source>
       <translation>
-        <numerusform>%n Серверов</numerusform>
-        <numerusform>%n Серверов</numerusform>
+        <numerusform>%n Сервер</numerusform>
+        <numerusform>%n Сервера</numerusform>
         <numerusform>%n Серверов</numerusform>
         <numerusform>%n Серверов</numerusform>
       </translation>
@@ -3492,8 +3492,8 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
       <translation>
-        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
-        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
+        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событие</numerusform>
+        <numerusform>Журнал событий за период с %1 по %2 - найдено %n события</numerusform>
         <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
         <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
       </translation>
@@ -3501,8 +3501,8 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
-        <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
-        <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
+        <numerusform>Журнал событий за %1 - найдено %n событие</numerusform>
+        <numerusform>Журнал событий за %1 - найдено %n события</numerusform>
         <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
         <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
       </translation>
@@ -4711,7 +4711,7 @@ to %1</source>
     <name>QnMergeSystemsDialog</name>
     <message>
       <source>http(s)://host:port</source>
-      <translation>http(s)://host:port</translation>
+      <translation type="unfinished">http(s)://host:port</translation>
     </message>
     <message>
       <source>%1 (current)</source>
@@ -5123,10 +5123,10 @@ to %1</source>
     <message numerus="yes">
       <source>about %n minute(s)</source>
       <translation>
-        <numerusform>Около %n минут</numerusform>
-        <numerusform>Около %n минут</numerusform>
-        <numerusform>Около %n минут</numerusform>
-        <numerusform>Около %n минут</numerusform>
+        <numerusform>около %n минуты</numerusform>
+        <numerusform>около %n минут</numerusform>
+        <numerusform>около %n минут</numerusform>
+        <numerusform>около %n минут</numerusform>
       </translation>
     </message>
     <message>
@@ -8306,8 +8306,8 @@ to %1</source>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
       <translation>
-        <numerusform>Эти видео файлы до сих пор загружаются в %n портативных камер:</numerusform>
-        <numerusform>Эти видео файлы до сих пор загружаются в %n портативных камер:</numerusform>
+        <numerusform>Эти видео файлы до сих пор загружаются в %n портативную камеру:</numerusform>
+        <numerusform>Эти видео файлы до сих пор загружаются в %n портативные камеры:</numerusform>
         <numerusform>Эти видео файлы до сих пор загружаются в %n портативных камер:</numerusform>
         <numerusform>Эти видео файлы до сих пор загружаются в %n портативных камер:</numerusform>
       </translation>

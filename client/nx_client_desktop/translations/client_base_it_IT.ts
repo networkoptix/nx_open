@@ -1677,7 +1677,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n action(s)</source>
       <translation>
-        <numerusform>%n Azioni</numerusform>
+        <numerusform>%n Azione</numerusform>
         <numerusform>%n Azioni</numerusform>
       </translation>
     </message>
@@ -3420,15 +3420,15 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
       <translation>
-        <numerusform>Registro degli eventi per periodo da %1 a %2 - %n evento (i) trovato (i)</numerusform>
-        <numerusform>Registro degli eventi per periodo da %1 a %2 - %n evento (i) trovato (i)</numerusform>
+        <numerusform>Registro degli eventi per periodo da %1 a %2 - %n eventi trovati</numerusform>
+        <numerusform>Registro degli eventi per periodo da %1 a %2 - %n evento trovato</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
-        <numerusform>Registro degli eventi per %1 - %n evento (i) trovato (i)</numerusform>
-        <numerusform>Registro degli eventi per %1 - %n evento (i) trovato (i)</numerusform>
+        <numerusform>Registro degli eventi per %1 - %n evento trovato</numerusform>
+        <numerusform>Registro degli eventi per %1 - %n eventi trovati</numerusform>
       </translation>
     </message>
     <message>
@@ -4593,7 +4593,7 @@ to %1</source>
     <name>QnMergeSystemsDialog</name>
     <message>
       <source>http(s)://host:port</source>
-      <translation>http(s)://host:port</translation>
+      <translation type="unfinished">http(s)://host:port</translation>
     </message>
     <message>
       <source>%1 (current)</source>
@@ -4999,7 +4999,7 @@ to %1</source>
     <message numerus="yes">
       <source>about %n minute(s)</source>
       <translation>
-        <numerusform>circa %n minuti</numerusform>
+        <numerusform>circa %n minuto</numerusform>
         <numerusform>circa %n minuti</numerusform>
       </translation>
     </message>
@@ -6788,7 +6788,7 @@ to %1</source>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation>yyyy</translation>
+      <translation type="unfinished">yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
@@ -6818,7 +6818,7 @@ to %1</source>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>yyyy</translation>
+      <translation type="unfinished">yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
@@ -8076,7 +8076,7 @@ to %1</source>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
       <translation>
-        <numerusform>Alcuni file video sono ancora in fase di caricamento %n telecamere indossabili:</numerusform>
+        <numerusform>Alcuni file video sono ancora in fase di caricamento %n telecamera indossabile:</numerusform>
         <numerusform>Alcuni file video sono ancora in fase di caricamento %n telecamere indossabili:</numerusform>
       </translation>
     </message>

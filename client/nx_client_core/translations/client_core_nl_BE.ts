@@ -29,15 +29,15 @@
     </message>
     <message>
       <source>Unknown realm.</source>
-      <translation>Unknown realm.</translation>
+      <translation>Onbekende realm.</translation>
     </message>
     <message>
       <source>Bad request.</source>
-      <translation>Onjuist verzoek.</translation>
+      <translation>Foutief verzoek.</translation>
     </message>
     <message>
       <source>Invalid nonce.</source>
-      <translation>Invalid nonce.</translation>
+      <translation>Ongeldige nonce.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
@@ -45,7 +45,7 @@
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation>Er is ongeldige data ontvangen.</translation>
+      <translation>Ongeldige gegevens ontvangen.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -75,7 +75,7 @@
     <message>
       <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Sorry, de %1 dienst is tijdelijk niet beschikbaar. We doen ons best om het te herstellen. Probeer het later nogmaals.</translation>
+      <translation>Sorry, %1 Service is tijdelijk niet beschikbaar. We doen ons best om het te herstellen. Probeer het later opnieuw.</translation>
     </message>
     <message>
       <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>

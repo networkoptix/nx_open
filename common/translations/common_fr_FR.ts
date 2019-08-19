@@ -577,7 +577,7 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n Caméras</numerusform>
+        <numerusform>%n Caméra</numerusform>
         <numerusform>%n Caméras</numerusform>
       </translation>
     </message>
@@ -585,13 +585,13 @@
       <source>%n camera(s)</source>
       <translation>
         <numerusform>%n caméra</numerusform>
-        <numerusform>%n caméra</numerusform>
+        <numerusform>%n caméras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n Périphériques</numerusform>
+        <numerusform>%n Périphérique</numerusform>
         <numerusform>%n Périphériques</numerusform>
       </translation>
     </message>
@@ -599,7 +599,7 @@
       <source>%n device(s)</source>
       <translation>
         <numerusform>%n périphérique</numerusform>
-        <numerusform>%n périphérique</numerusform>
+        <numerusform>%n périphériques</numerusform>
       </translation>
     </message>
     <message>
@@ -638,14 +638,14 @@
       <source>%n I/O Module(s)</source>
       <translation>
         <numerusform>%n Module I/O</numerusform>
-        <numerusform>%n Module I/O</numerusform>
+        <numerusform>%n Modules I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
         <numerusform>%n module I/O</numerusform>
-        <numerusform>%n module I/O</numerusform>
+        <numerusform>%n modules I/O</numerusform>
       </translation>
     </message>
     <message>

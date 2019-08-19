@@ -579,7 +579,7 @@
     <message>
       <location/>
       <source>Device Address</source>
-      <translation>Adresse des Geräts:</translation>
+      <translation>Adresse des Geräts</translation>
     </message>
     <message>
       <location/>
@@ -1498,7 +1498,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
       <source>ldap(s)://host:port</source>
-      <translation>LDAP(s)://Host:Port</translation>
+      <translation type="unfinished">ldap(s)://host:port</translation>
     </message>
     <message>
       <location/>

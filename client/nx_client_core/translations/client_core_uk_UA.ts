@@ -25,7 +25,7 @@
     </message>
     <message>
       <source>Requested feature is not implemented.</source>
-      <translation>Запитана функція не реалізована.</translation>
+      <translation>Функція за вашим запитом не реалізована.</translation>
     </message>
     <message>
       <source>Unknown realm.</source>
@@ -37,7 +37,7 @@
     </message>
     <message>
       <source>Invalid nonce.</source>
-      <translation>Невірний ідентифікатор.</translation>
+      <translation>Некоректний ідентифікатор.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>
@@ -45,7 +45,7 @@
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation>Отримані дані - недійсні.</translation>
+      <translation>Отримано недійсні дані.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -53,7 +53,7 @@
     </message>
     <message>
       <source>Unexpected network error. Please check your Internet connection and try again.</source>
-      <translation>Несподівана мережева помилка. Перевірте з'єднання з Інтернетом і спробуйте ще раз.</translation>
+      <translation>Мережева помилка. Будь ласка, перевірте з'єднання з Інтернетом і спробуйте ще раз.</translation>
     </message>
     <message>
       <source>Invalid login.</source>
@@ -61,11 +61,11 @@
     </message>
     <message>
       <source>Requested object is not found.</source>
-      <translation>Запитаний об'єкт не знайдено.</translation>
+      <translation>Об'єкт за вашим запитом не знайдено.</translation>
     </message>
     <message>
       <source>Object already exists.</source>
-      <translation>Такий користувач вже існує.</translation>
+      <translation>Об'єкт вже існує.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>

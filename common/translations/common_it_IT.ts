@@ -577,29 +577,29 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n Telecamera / e</numerusform>
-        <numerusform>%n Telecamera / e</numerusform>
+        <numerusform>%n Telecamera</numerusform>
+        <numerusform>%n Telecamera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
       <translation>
-        <numerusform>%n telecamera / e</numerusform>
-        <numerusform>%n telecamera / e</numerusform>
+        <numerusform>%n telecamera</numerusform>
+        <numerusform>%n telecamere</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n Dispositivo / i</numerusform>
-        <numerusform>%n Dispositivo / i</numerusform>
+        <numerusform>%n Dispositivo</numerusform>
+        <numerusform>%n Dispositivi</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n device(s)</source>
       <translation>
-        <numerusform>%n dispositivo / i</numerusform>
-        <numerusform>%n dispositivo / i</numerusform>
+        <numerusform>%n dispositivo</numerusform>
+        <numerusform>%n dispositivi</numerusform>
       </translation>
     </message>
     <message>
@@ -637,14 +637,14 @@
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n Moduli I/O</numerusform>
+        <numerusform>%n Modulo I/O</numerusform>
         <numerusform>%n Moduli I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n Moduli I/O</numerusform>
+        <numerusform>%n Modulo I/O</numerusform>
         <numerusform>%n Moduli I/O</numerusform>
       </translation>
     </message>

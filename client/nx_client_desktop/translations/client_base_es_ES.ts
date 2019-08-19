@@ -1677,7 +1677,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n action(s)</source>
       <translation>
-        <numerusform>%n acciones</numerusform>
+        <numerusform>%n accion</numerusform>
         <numerusform>%n acciones</numerusform>
       </translation>
     </message>
@@ -1935,7 +1935,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n Server(s)</source>
       <translation>
-        <numerusform>%n Servidores</numerusform>
+        <numerusform>%n Servidor</numerusform>
         <numerusform>%n Servidores</numerusform>
       </translation>
     </message>
@@ -3422,14 +3422,14 @@ a %1</translation>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n event(s) found</source>
       <translation>
-        <numerusform>Registro de eventos para el período de %1 a %2: %n eventos encontrados</numerusform>
+        <numerusform>Registro de eventos para el período de %1 a %2: %n evento encontrado</numerusform>
         <numerusform>Registro de eventos para el período de %1 a %2: %n eventos encontrados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n event(s) found</source>
       <translation>
-        <numerusform>Registro de eventos para %1 - %n eventos encontrados</numerusform>
+        <numerusform>Registro de eventos para %1 - %n evento encontrado</numerusform>
         <numerusform>Registro de eventos para %1 - %n eventos encontrados</numerusform>
       </translation>
     </message>
@@ -4595,7 +4595,7 @@ a %1</translation>
     <name>QnMergeSystemsDialog</name>
     <message>
       <source>http(s)://host:port</source>
-      <translation>http(s)://anfitrión:puerto</translation>
+      <translation type="unfinished">http(s)://host:port</translation>
     </message>
     <message>
       <source>%1 (current)</source>
@@ -5001,7 +5001,7 @@ a %1</translation>
     <message numerus="yes">
       <source>about %n minute(s)</source>
       <translation>
-        <numerusform>acerca %n minutos</numerusform>
+        <numerusform>acerca %n minuto</numerusform>
         <numerusform>acerca %n minutos</numerusform>
       </translation>
     </message>
@@ -8077,7 +8077,7 @@ a %1</translation>
     <message numerus="yes">
       <source>Some video file(s) are still being uploaded to %n wearable cameras:</source>
       <translation>
-        <numerusform>Algunos archivos de video todavía se están cargando en %n cámaras portátiles:</numerusform>
+        <numerusform>Algunos archivos de video todavía se están cargando en %n cámara portátil:</numerusform>
         <numerusform>Algunos archivos de video todavía se están cargando en %n cámaras portátiles:</numerusform>
       </translation>
     </message>

@@ -7084,7 +7084,7 @@ to %1</translation>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying years on timeline</comment>
-      <translation>yyyy</translation>
+      <translation type="unfinished">yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy hh:mm</source>
@@ -7114,7 +7114,7 @@ to %1</translation>
     <message>
       <source>yyyy</source>
       <comment>Format for displaying year caption in timeline&apos;s header</comment>
-      <translation>yyyy</translation>
+      <translation type="unfinished">yyyy</translation>
     </message>
     <message>
       <source>dd MMMM yyyy h:mm ap</source>
@@ -9061,7 +9061,7 @@ to %1</translation>
     </message>
     <message>
       <source>Export to EXE anyway?</source>
-      <translation>Export to EXE anyway?</translation>
+      <translation type="unfinished">Export to EXE anyway?</translation>
     </message>
     <message>
       <source>Failed to export Multi-Video</source>
@@ -9391,7 +9391,7 @@ to %1</translation>
     </message>
     <message>
       <source>Cancel device adding?</source>
-      <translation>Cancel device adding?</translation>
+      <translation type="unfinished">Cancel device adding?</translation>
     </message>
     <message>
       <source>Confirm files deleting</source>
