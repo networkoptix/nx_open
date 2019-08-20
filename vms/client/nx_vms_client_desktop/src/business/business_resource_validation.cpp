@@ -17,6 +17,7 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
@@ -786,4 +787,53 @@ QString QnRequiredPermissionSubjectPolicy::calculateAlert(bool allUsers,
     }
 
     return alert.isEmpty() ? alert : kForceHtml.arg(alert);
+}
+
+//-------------------------------------------------------------------------------------------------
+// QnLayoutAccessValidationPolicy
+
+QnLayoutAccessValidationPolicy::QnLayoutAccessValidationPolicy(QnCommonModule* common):
+    m_accessManager(common->resourceAccessManager()),
+    m_rolesManager(common->userRolesManager())
+{
+}
+
+QValidator::State QnLayoutAccessValidationPolicy::roleValidity(const QnUuid& roleId) const
+{
+    if (m_layout)
+    {
+        // Admins have access to all layouts.
+        if (QnUserRolesManager::adminRoleIds().contains(roleId))
+            return QValidator::Acceptable;
+
+        // For other users access permissions depend on the layout kind.
+        if (m_layout->isShared())
+        {
+            // Shared layout. Ask AccessManager for details.
+            return m_accessManager->hasPermission(
+                m_rolesManager->userRole(roleId), m_layout, Qn::ReadPermission)
+                    ? QValidator::Acceptable
+                    : QValidator::Invalid;
+        }
+        else
+        {
+            // Local layout. Non-admin groups have no access.
+            return QValidator::Invalid;
+        }
+    }
+
+    // No layout has been selected. All users are acceptable.
+    return QValidator::Acceptable;
+}
+
+bool QnLayoutAccessValidationPolicy::userValidity(const QnUserResourcePtr& user) const
+{
+    return m_layout
+        ? m_accessManager->hasPermission(user, m_layout, Qn::ReadPermission)
+        : false;
+}
+
+void QnLayoutAccessValidationPolicy::setLayout(const QnLayoutResourcePtr& layout)
+{
+    m_layout = layout;
 }

@@ -165,7 +165,7 @@ public:
 
     bool isAnalyticsSupported() const;
     bool isAnalyticsEnabled() const;
-    void setAnalyticsEnabled(bool analyticsEnabled);
+    void setAnalyticsEnabled(bool enabled);
 
     enum class AreaType
     {
