@@ -14,6 +14,10 @@ if(withNxTool)
     add_subdirectory(nxtool)
 endif()
 
+if(withBoxTool)
+    add_subdirectory(nx_box_tool)
+endif()
+
 if(withDistributions)
     add_subdirectory(distribution)
 endif()

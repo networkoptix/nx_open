@@ -1,0 +1,63 @@
+#!/usr/bin/python3 -b
+
+import platform
+import signal
+import sys
+from io import StringIO
+
+# This block ensures that ^C interrupts are handled quietly.
+try:
+    def exithandler(signum, _frame):
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
+        signal.signal(signal.SIGTERM, signal.SIG_IGN)
+        sys.exit(128 + signum)
+
+    signal.signal(signal.SIGINT, exithandler)
+    signal.signal(signal.SIGTERM, exithandler)
+    # Prevent "[Errno 32] Broken pipe" exceptions when
+    # writing to a pipe.
+    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+
+except KeyboardInterrupt:
+    sys.exit(128 + signal.SIGINT)
+
+def debug_signal(_signum, _frame):
+    import pdb
+    pdb.set_trace()
+
+if platform.python_implementation() == 'Jython':
+    debug_signum = signal.SIGUSR2 # bug #424259
+else:
+    debug_signum = signal.SIGUSR1
+
+signal.signal(debug_signum, debug_signal)
+
+from os import path as osp
+
+project_root = osp.dirname(osp.dirname(osp.realpath(__file__)))
+if osp.isfile(osp.join(project_root, ".not_installed")):
+    sys.path.insert(0, osp.join(project_root, "lib"))
+
+from nx_box_tool.server_connection import ServerConnection
+
+server = ServerConnection(
+    #ip='10.0.1.26',
+    ip='192.168.0.143', login="nvidia", password="nvidia",
+    port=22
+)
+
+stdout = StringIO("")
+stderr = StringIO("")
+res = server.sh('ifconfig; echo fffff>&2', stdout=stdout, stderr=stderr)
+
+if not res:
+    print(f'Failed to execute command on Server: {res.message}', file=sys.stderr)
+    exit(1)
+
+print(
+    f"Command successfuly executed, return code={res.return_code}\n" +
+    "stdout:\n" +
+    stdout.getvalue() +
+    "stderr:\n" +
+    stderr.getvalue()
+)
