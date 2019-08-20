@@ -103,8 +103,6 @@ private:
 
     void prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* query);
 
-    void prepareLookupQuery(nx::sql::AbstractSqlQuery* query);
-
     std::tuple<QString /*query text*/, nx::sql::Filter> prepareBoxFilterSubQuery();
 
     nx::sql::Filter prepareTrackFilterSqlExpression();

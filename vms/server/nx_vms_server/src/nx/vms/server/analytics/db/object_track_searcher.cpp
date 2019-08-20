@@ -37,37 +37,22 @@ ObjectTrackSearcher::ObjectTrackSearcher(
 
 std::vector<ObjectTrack> ObjectTrackSearcher::lookup(nx::sql::QueryContext* queryContext)
 {
-    if (kLookupObjectsInAnalyticsArchive)
+    if (!m_filter.objectTrackId.isNull())
     {
-        if (!m_filter.objectTrackId.isNull())
-        {
-            auto track = fetchTrackById(queryContext, m_filter.objectTrackId);
-            if (!track)
-                return {};
-            return {std::move(*track)};
-        }
-        else
-        {
-            return lookupTracksUsingArchive(queryContext);
-        }
+        auto track = fetchTrackById(queryContext, m_filter.objectTrackId);
+        if (!track)
+            return {};
+        return {std::move(*track)};
     }
     else
     {
-        auto selectEventsQuery = queryContext->connection()->createQuery();
-        selectEventsQuery->setForwardOnly(true);
-        prepareLookupQuery(selectEventsQuery.get());
-        selectEventsQuery->exec();
-
-        return loadTracks(selectEventsQuery.get());
+        return lookupTracksUsingArchive(queryContext);
     }
 }
 
 void ObjectTrackSearcher::prepareCursorQuery(nx::sql::SqlQuery* query)
 {
-    if (kLookupObjectsInAnalyticsArchive)
-        prepareCursorQueryImpl(query);
-    else
-        prepareLookupQuery(query);
+    prepareCursorQueryImpl(query);
 }
 
 void ObjectTrackSearcher::loadCurrentRecord(
@@ -430,80 +415,6 @@ void ObjectTrackSearcher::prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* quer
         limitExpr));
 
     sqlFilter.bindFields(&query->impl());
-}
-
-void ObjectTrackSearcher::prepareLookupQuery(nx::sql::AbstractSqlQuery* query)
-{
-    QString queryText = R"sql(
-        WITH
-          %boxFilteredTable%
-          filtered_object AS
-            (SELECT t.*
-            FROM
-               %fromBoxFilteredTable%
-               %objectFilteredByText%
-            WHERE
-              %joinBoxFilteredTable%
-              %objectExpr%
-              1 = 1
-            ORDER BY track_start_ms DESC
-            %limitObjectCount%)
-        SELECT t.id, device_id, object_type_id, guid, track_start_ms, track_end_ms,
-            track_detail, attrs.content AS content, best_shot_timestamp_ms, best_shot_rect
-        FROM filtered_object t, unique_attributes attrs
-        WHERE t.attributes_id = attrs.id
-        ORDER BY track_start_ms %objectOrderByTrackStart%
-    )sql";
-
-    std::map<QString, QString> queryTextParams({
-        {kBoxFilteredTable, ""},
-        {kFromBoxFilteredTable, ""},
-        {kJoinBoxFilteredTable, ""},
-        {kObjectFilteredByTextExpr, "track t"},
-        {kObjectExpr, ""},
-        {kLimitObjectCount, ""},
-        {kObjectOrderByTrackStart, "DESC"}});
-
-    nx::sql::Filter boxSubqueryFilter;
-    if (m_filter.boundingBox)
-    {
-        QString queryText;
-        std::tie(queryText, boxSubqueryFilter) = prepareBoxFilterSubQuery();
-        queryTextParams[kBoxFilteredTable] = "box_filtered_ids AS (" + queryText + "),";
-        queryTextParams[kFromBoxFilteredTable] = "box_filtered_ids,";
-        queryTextParams[kJoinBoxFilteredTable] = "t.id = box_filtered_ids.object_id AND ";
-    }
-
-    const auto sqlQueryFilter = prepareTrackFilterSqlExpression();
-    auto objectFilterSqlText = sqlQueryFilter.toString();
-    if (!objectFilterSqlText.empty())
-        queryTextParams[kObjectExpr] = (objectFilterSqlText + " AND ").c_str();
-
-    if (m_filter.maxObjectTracksToSelect > 0)
-    {
-        queryTextParams[kLimitObjectCount] =
-            lm("LIMIT %1").args(m_filter.maxObjectTracksToSelect).toQString();
-    }
-
-    if (!m_filter.freeText.isEmpty())
-    {
-        queryTextParams[kObjectFilteredByTextExpr] =
-            "(SELECT * FROM track WHERE attributes_id IN "
-                "(SELECT docid FROM attributes_text_index WHERE content MATCH :textQuery)) o";
-    }
-
-    queryTextParams[kObjectOrderByTrackStart] =
-        m_filter.sortOrder == Qt::SortOrder::AscendingOrder ? "ASC" : "DESC";
-
-    for (const auto& [name, value]: queryTextParams)
-        queryText.replace(name, value);
-
-    query->prepare(queryText);
-
-    sqlQueryFilter.bindFields(query);
-    boxSubqueryFilter.bindFields(query);
-    if (!m_filter.freeText.isEmpty())
-        query->bindValue(":textQuery", m_filter.freeText + "*");
 }
 
 std::tuple<QString /*query text*/, nx::sql::Filter> ObjectTrackSearcher::prepareBoxFilterSubQuery()
