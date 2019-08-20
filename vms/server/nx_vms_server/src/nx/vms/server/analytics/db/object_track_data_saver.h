@@ -88,8 +88,6 @@ private:
 
     void updateObjects(nx::sql::QueryContext* queryContext);
 
-    void saveObjectSearchData(nx::sql::QueryContext* queryContext);
-
     void saveToAnalyticsArchive(nx::sql::QueryContext* queryContext);
     std::vector<AnalyticsArchiveItem> prepareArchiveData(nx::sql::QueryContext* queryContext);
     ObjectTrackDbAttributes getTrackDbDataById(const QnUuid& trackId);

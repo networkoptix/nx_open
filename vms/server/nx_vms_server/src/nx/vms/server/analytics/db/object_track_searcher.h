@@ -103,16 +103,27 @@ private:
 
     void prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* query);
 
-    void prepareLookupQuery(nx::sql::AbstractSqlQuery* query);
-
     std::tuple<QString /*query text*/, nx::sql::Filter> prepareBoxFilterSubQuery();
 
     nx::sql::Filter prepareTrackFilterSqlExpression();
 
     std::vector<ObjectTrack> loadTracks(nx::sql::AbstractSqlQuery* query, int limit = 0);
-    ObjectTrack loadTrack(nx::sql::AbstractSqlQuery* query);
+
+    /**
+     * Loads current record from query as an ObjectTrack.
+     * @return std::nullopt if the record is not matched by the filter.
+     */
+    template<typename FilterFunc>
+    // requires std::is_same_v<std::invoke_result_t<FilterFunc, const ObjectTrack&>, bool>
+    std::optional<ObjectTrack> loadTrack(
+        nx::sql::AbstractSqlQuery* query,
+        FilterFunc filter);
 
     void filterTrack(std::vector<ObjectPosition>* const track);
+
+    void truncateTrack(
+        std::vector<ObjectPosition>* const track,
+        int maxSize);
 
     static void addObjectTypeIdToFilter(
         const std::vector<QString>& objectTypes,
