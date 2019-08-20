@@ -104,7 +104,7 @@ void AuthenticationProvider::getAuthenticationResponse(
     std::string systemId;
     if (!authzInfo.get(attr::authSystemId, &systemId))
         return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
-    if (authRequest.realm != AuthenticationManager::realm())
+    if (authRequest.realm != AuthenticationManager::realm().toStdString())
         return completionHandler(api::ResultCode::unknownRealm, api::AuthResponse());
 
     auto isNonceValid = std::make_shared<bool>(false);

@@ -18,7 +18,7 @@ namespace {
 static std::string toLowerReversed(std::string domainName)
 {
     nx::utils::to_lower(&domainName);
-    return nx::utils::reverseWords(domainName, ".");
+    return nx::utils::reverseWords(domainName, '.');
 }
 
 } //namespace

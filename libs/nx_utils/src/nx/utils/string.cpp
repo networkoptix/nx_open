@@ -525,8 +525,8 @@ std::vector<QnByteArrayConstRef> splitQuotedString(
 
         if (((groupTokens & GroupToken::doubleQuotes) && ch == '"') ||
             ((groupTokens & GroupToken::singleQuotes) && ch == '\'') ||
-            ((groupTokens & GroupToken::squareBraces) && ch == '[') ||
-            ((groupTokens & GroupToken::roundBraces) && ch == '('))
+            ((groupTokens & GroupToken::squareBrackets) && ch == '[') ||
+            ((groupTokens & GroupToken::roundBrackets) && ch == '('))
         {
             currentGroupClosingToken =
                 ch == '"' ? '"' :
@@ -665,18 +665,6 @@ QByteArray formatJsonString(const QByteArray& data)
     result.resize(doFormatJsonString(data.data(), data.data() + data.size(), 0));
     doFormatJsonString(data.data(), data.data() + data.size(), result.data());
     return result;
-}
-
-int stricmp(const std::string_view& left, const std::string_view& right)
-{
-    if (left.size() == right.size())
-        return qstrnicmp(left.data(), right.data(), left.size());
-
-    const auto result = qstrnicmp(left.data(), right.data(), std::min(left.size(), right.size()));
-    if (result != 0)
-        return result;
-
-    return left.size() < right.size() ? -1 : 1;
 }
 
 int stricmp(const QByteArray& left, const QByteArray& right)
