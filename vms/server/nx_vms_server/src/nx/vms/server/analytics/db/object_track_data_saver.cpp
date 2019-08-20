@@ -53,9 +53,6 @@ void ObjectTrackDataSaver::save(nx::sql::QueryContext* queryContext)
     insertObjects(queryContext);
     updateObjects(queryContext);
 
-    if (!kLookupObjectsInAnalyticsArchive)
-        saveObjectSearchData(queryContext);
-
     if (m_analyticsArchive)
         saveToAnalyticsArchive(queryContext);
 }
@@ -192,41 +189,6 @@ void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
         updateObjectQuery->exec();
 
         m_objectTrackCache->saveTrackIdToAttributesId(trackUpdate.trackId, newAttributesId);
-    }
-}
-
-void ObjectTrackDataSaver::saveObjectSearchData(nx::sql::QueryContext* queryContext)
-{
-    using namespace std::chrono;
-
-    auto insertObjectSearchCell = queryContext->connection()->createQuery();
-    insertObjectSearchCell->prepare(R"sql(
-        INSERT INTO object_search(timestamp_seconds_utc,
-            box_top_left_x, box_top_left_y, box_bottom_right_x, box_bottom_right_y,
-            object_group_id)
-        VALUES (?, ?, ?, ?, ?, ?)
-    )sql");
-
-    for (const auto& trackSearchGridCell: m_trackSearchData)
-    {
-        std::set<int64_t> trackDbIds;
-        std::transform(
-            trackSearchGridCell.trackIds.begin(), trackSearchGridCell.trackIds.end(),
-            std::inserter(trackDbIds, trackDbIds.end()),
-            [this](const QnUuid& trackId) { return m_objectTrackCache->dbIdFromTrackId(trackId); });
-
-        const auto trackGroupId = m_trackGroupDao->insertOrFetchGroup(queryContext, trackDbIds);
-
-        insertObjectSearchCell->bindValue(0,
-            (long long) duration_cast<seconds>(trackSearchGridCell.timestamp).count());
-
-        insertObjectSearchCell->bindValue(1, trackSearchGridCell.boundingBox.topLeft().x());
-        insertObjectSearchCell->bindValue(2, trackSearchGridCell.boundingBox.topLeft().y());
-        insertObjectSearchCell->bindValue(3, trackSearchGridCell.boundingBox.bottomRight().x());
-        insertObjectSearchCell->bindValue(4, trackSearchGridCell.boundingBox.bottomRight().y());
-        insertObjectSearchCell->bindValue(5, (long long) trackGroupId);
-
-        insertObjectSearchCell->exec();
     }
 }
 

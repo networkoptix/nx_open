@@ -823,6 +823,11 @@ protected:
         m_filter.freeText = attributeDictionary().getRandomText();
     }
 
+    void addRandomUnknownText()
+    {
+        m_filter.freeText = QnUuid::createUuid().toSimpleString();
+    }
+
     void invertTextFilterCase()
     {
         if (!m_effectiveLookupFilter)
@@ -1142,6 +1147,13 @@ TEST_F(AnalyticsDbLookup, sort_lookup_result_by_timestamp_descending)
 TEST_F(AnalyticsDbLookup, full_text_search)
 {
     whenLookupByRandomTextFoundInData();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbLookup, lookup_by_unknown_text_produces_no_objects)
+{
+    addRandomUnknownText();
+    whenLookupObjectTracks();
     thenResultMatchesExpectations();
 }
 
@@ -1685,6 +1697,13 @@ TEST_F(AnalyticsDbTimePeriodsLookup, with_region)
 TEST_F(AnalyticsDbTimePeriodsLookup, with_random_filter)
 {
     givenRandomFilter();
+    whenLookupTimePeriods();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbTimePeriodsLookup, lookup_by_unknown_text_produces_no_objects)
+{
+    addRandomUnknownText();
     whenLookupTimePeriods();
     thenResultMatchesExpectations();
 }
