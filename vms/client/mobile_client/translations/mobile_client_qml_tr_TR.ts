@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="tr" sourcelanguage="en">
   <context>
+    <name>ActionButtonsHint</name>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Takvim dışı</translation>
+    </message>
+  </context>
+  <context>
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
@@ -29,6 +36,10 @@
     <message>
       <source>Offline</source>
       <translation>Çevrimdışı</translation>
+    </message>
+    <message>
+      <source>I/O module</source>
+      <translation>I/O modül</translation>
     </message>
   </context>
   <context>
@@ -325,13 +336,6 @@
     </message>
   </context>
   <context>
-    <name>LiveVideoNavigation</name>
-    <message>
-      <source>LIVE</source>
-      <translation>CANLI</translation>
-    </message>
-  </context>
-  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -359,6 +363,14 @@
     <message>
       <source>Incompatible server version %1</source>
       <translation>Uyumsuz Sunucu versiyonu %1</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Çok fazla deneme yapıldı. Daha sonra tekrar deneyin.</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation>Kurmak için web tarayıcısından veya masaüstü istemcisinden bu sunucuya bağlanın</translation>
     </message>
   </context>
   <context>
@@ -479,7 +491,7 @@
     </message>
   </context>
   <context>
-    <name>SearchToolBar</name>
+    <name>SearchEdit</name>
     <message>
       <source>Search</source>
       <translation>Arama</translation>
@@ -586,6 +598,10 @@
       <comment>%1 is a system name</comment>
       <translation>Sisteme bağlanılamıyor &quot;%1&quot;</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Hiçbir şey bulunamadı</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -608,6 +624,10 @@
     <message>
       <source>Delete</source>
       <translation>Sil</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Tut</translation>
     </message>
   </context>
   <context>
@@ -769,6 +789,10 @@
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>Bu uygulamada I / O modülü sadece bir ses girişi aygıtı olarak kullanılabilir. Bir kontrol modülü olarak kullanmak için lütfen %1masaüstü sürümünü kullanın</translation>
     </message>
+    <message>
+      <source>No live stream</source>
+      <translation type="unfinished">No live stream</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -818,6 +842,10 @@
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
       <translation>Geçersiz özel alan. Lütfen doğru bir tane çizin.</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Ses</translation>
     </message>
   </context>
   <context>

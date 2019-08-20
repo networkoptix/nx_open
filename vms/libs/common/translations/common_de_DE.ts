@@ -1028,7 +1028,7 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation>ZIP-Datei ist beschädigt.</translation>
+      <translation>Zip-datei ist beschädigt.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>

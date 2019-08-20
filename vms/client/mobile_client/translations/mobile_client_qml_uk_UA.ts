@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="uk" sourcelanguage="en">
   <context>
+    <name>ActionButtonsHint</name>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Відключено за розкладом</translation>
+    </message>
+  </context>
+  <context>
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
@@ -29,6 +36,10 @@
     <message>
       <source>Offline</source>
       <translation>Поза мережею</translation>
+    </message>
+    <message>
+      <source>I/O module</source>
+      <translation>Модуль вводу-виводу</translation>
     </message>
   </context>
   <context>
@@ -325,13 +336,6 @@
     </message>
   </context>
   <context>
-    <name>LiveVideoNavigation</name>
-    <message>
-      <source>LIVE</source>
-      <translation>НАЖИВО</translation>
-    </message>
-  </context>
-  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -359,6 +363,14 @@
     <message>
       <source>Incompatible server version %1</source>
       <translation>Версія сервера %1 не підтримується</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Забагато спроб. Спробуйте пізніше.</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation>Підключіться до цього сервера через веб-браузер або через настільний клієнт, щоб налаштувати його</translation>
     </message>
   </context>
   <context>
@@ -479,7 +491,7 @@
     </message>
   </context>
   <context>
-    <name>SearchToolBar</name>
+    <name>SearchEdit</name>
     <message>
       <source>Search</source>
       <translation>Пошук</translation>
@@ -586,6 +598,10 @@
       <comment>%1 is a system name</comment>
       <translation>Не вдається підключитися до системи &quot;%1&quot;</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Нічого не знайдено</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -608,6 +624,10 @@
     <message>
       <source>Delete</source>
       <translation>Видалити</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Залишити</translation>
     </message>
   </context>
   <context>
@@ -769,6 +789,10 @@
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>У цьому додатку модуль вводу / виводу може використовуватися лише як пристрій звукозапису. Щоб використовувати його як контрольний модуль, будь ласка, використовуйте додаток клієнта на рівні %1</translation>
     </message>
+    <message>
+      <source>No live stream</source>
+      <translation type="unfinished">No live stream</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -818,6 +842,10 @@
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
       <translation>Неприпустима обрана область. Будь ласка, намалюйте правильну.</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Аудіо</translation>
     </message>
   </context>
   <context>

@@ -49,6 +49,8 @@ public:
 
     void setMinimalVersion(const QString& minimalVersion);
 
+    static Q_INVOKABLE int searchRoleId();
+
 signals:
     void minimalVersionChanged();
 

@@ -7,7 +7,7 @@ Button
     id: control
 
     implicitWidth: parent ? parent.width : 200
-    implicitHeight: 48
+    implicitHeight: 32
 
     text: applicationInfo.version()
     background: null

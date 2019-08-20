@@ -25,7 +25,7 @@ public:
 
     Q_INVOKABLE nx::vms::api::SoftwareVersion softwareVersion(const QString& version) const;
 
-    Q_INVOKABLE void ensureFlickableChildVisible(QQuickItem* item);
+    Q_INVOKABLE bool ensureFlickableChildVisible(QQuickItem* item);
 
     Q_INVOKABLE QnUuid uuid(const QString& uuid) const;
 };

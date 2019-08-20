@@ -144,26 +144,6 @@ Page
         model: authenticationDataModel
     }
 
-    Connections
-    {
-        target: d.connecting ? connectionManager : null
-
-        onConnectionStateChanged:
-        {
-            if (connectionManager.connectionState != QnConnectionManager.Connected)
-                return;
-
-            Workflow.openResourcesScreen(connectionManager.systemName || systemName)
-            finishOperation(true)
-        }
-
-        onConnectionFailed:
-        {
-            d.connecting = false
-            showWarning(status, infoParameter)
-        }
-    }
-
     function checkConnectionFields()
     {
         hideWarning()
@@ -194,28 +174,38 @@ Page
         if (!checkConnectionFields())
             return
 
+        d.connecting = true;
         connectButton.forceActiveFocus()
-        d.connecting = true
-        connectionManager.connectByUserInput(address, login, password)
+
+        ConnectionController.connectByUserInput(
+            address, login, password, systemName,
+            handleConnectionFailed,
+            handleConnected)
     }
 
-    function showWarning(status, info)
+    function handleConnected()
     {
-        if (status === QnConnectionManager.UnauthorizedConnectionResult)
+        finishOperation(true)
+    }
+
+    function handleConnectionFailed(result, extraInfo)
+    {
+        d.connecting = false
+
+        var lockedOut = result == QnConnectionManager.UserTemporaryLockedOut
+        if (lockedOut || result === QnConnectionManager.UnauthorizedConnectionResult)
         {
-            credentialsEditor.loginErrorText = ""
-            credentialsEditor.passwordErrorText =
-                LoginUtils.connectionErrorText(QnConnectionManager.UnauthorizedConnectionResult)
-            credentialsEditor.displayLoginError = true
-            credentialsEditor.displayPasswordError = true
+            credentialsEditor.passwordErrorText = LoginUtils.connectionErrorText(result)
+            credentialsEditor.displayLoginError = !lockedOut
+            credentialsEditor.displayPasswordError = !lockedOut
         }
         else
         {
-            credentialsEditor.addressErrorText = LoginUtils.connectionErrorText(status, info)
+            credentialsEditor.addressErrorText = LoginUtils.connectionErrorText(result, extraInfo)
             credentialsEditor.displayAddressError = true
         }
 
-        if (status === QnConnectionManager.IncompatibleVersionConnectionResult)
+        if (result === QnConnectionManager.IncompatibleVersionConnectionResult)
             Workflow.openOldClientDownloadSuggestion()
     }
 
@@ -224,6 +214,9 @@ Page
         credentialsEditor.displayLoginError = false
         credentialsEditor.displayPasswordError = false
         credentialsEditor.displayAddressError = false
+        credentialsEditor.addressErrorText = ""
+        credentialsEditor.loginErrorText = ""
+        credentialsEditor.passwordErrorText = ""
     }
 
     function focusHostField()

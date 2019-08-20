@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="th" sourcelanguage="en">
   <context>
+    <name>ActionButtonsHint</name>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>ปิดใช้งานตามกำหนดเวลา</translation>
+    </message>
+  </context>
+  <context>
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
@@ -29,6 +36,10 @@
     <message>
       <source>Offline</source>
       <translation>ออฟไลน์</translation>
+    </message>
+    <message>
+      <source>I/O module</source>
+      <translation>I/O โมดูล</translation>
     </message>
   </context>
   <context>
@@ -325,13 +336,6 @@
     </message>
   </context>
   <context>
-    <name>LiveVideoNavigation</name>
-    <message>
-      <source>LIVE</source>
-      <translation>สด</translation>
-    </message>
-  </context>
-  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -359,6 +363,14 @@
     <message>
       <source>Incompatible server version %1</source>
       <translation>เซิร์ฟเวอร์ที่เข้ากันไม่ได้กับเวอร์ชัน %1</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>คุณพยายามเข้าระบบมากเกินไป กรุณารออีกสักพักแล้วเข้าใหม่</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation>เชื่อมต่อกับเซิร์ฟเวอร์นี้จากเว็บเบราเซอร์หรือผ่านทางไคลเอ็นต์เดสก์ท็อปเพื่อตั้งค่า</translation>
     </message>
   </context>
   <context>
@@ -479,7 +491,7 @@
     </message>
   </context>
   <context>
-    <name>SearchToolBar</name>
+    <name>SearchEdit</name>
     <message>
       <source>Search</source>
       <translation>ค้นหา</translation>
@@ -586,6 +598,10 @@
       <comment>%1 is a system name</comment>
       <translation>ไม่สามารถเชื่อมต่อกับระบบ &quot;%1&quot;</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>ไม่พบสิ่งใด</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -608,6 +624,10 @@
     <message>
       <source>Delete</source>
       <translation>ลบ</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>เก็บไว้</translation>
     </message>
   </context>
   <context>
@@ -769,6 +789,10 @@
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>ใน app นี้ สามารถใช้โมดูล I/O เป็นอุปกรณ์อินพุตเสียงเท่านั้น เพื่อใช้เป็นควบคุมโมดูล โปรดใช้เดสก์ท็อปรุ่นของ %1</translation>
     </message>
+    <message>
+      <source>No live stream</source>
+      <translation type="unfinished">No live stream</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -818,6 +842,10 @@
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
       <translation>พื้นที่ที่กำหนดไม่ถูกต้อง โปรดวาดที่ถูกต้อง</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>เสียง</translation>
     </message>
   </context>
   <context>

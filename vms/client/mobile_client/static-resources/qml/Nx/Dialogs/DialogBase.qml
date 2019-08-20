@@ -9,6 +9,7 @@ Popup
     parent: mainWindow.contentItem
 
     property bool deleteOnClose: false
+    property bool disableAutoClose: false
     default property alias data: content.data
 
     width: Math.min(328, parent.width - 32)
@@ -17,7 +18,9 @@ Popup
     y: 0
     padding: 0
     modal: true
-    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside | Popup.CloseOnReleaseOutside
+    closePolicy: disableAutoClose
+            ? Popup.NoAutoClose
+            : Popup.CloseOnEscape | Popup.CloseOnPressOutside | Popup.CloseOnReleaseOutside
 
     background: null
 
@@ -67,7 +70,11 @@ Popup
             onHeightChanged: ensureActiveItemVisible()
         }
 
-        onClicked: close()
+        onClicked:
+        {
+            if (!disableAutoClose)
+                close()
+        }
     }
 
     readonly property int _animationDuration: 200

@@ -142,6 +142,11 @@ public:
 
     bool checkSuppressed();
 
+    bool setCredentialsInternal(
+        const nx::vms::common::Credentials& credentials,
+        bool initial,
+        bool forced);
+
 private:
     void setStatus(QnCloudStatusWatcher::Status newStatus,
         QnCloudStatusWatcher::ErrorCode error);
@@ -214,7 +219,7 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
     using namespace nx::vms::client::core;
 
     // TODO: #GDM store temporary credentials
-    setCredentials(settings()->cloudCredentials(), true);
+    setInitialCredentials(settings()->cloudCredentials());
 
     connect(&settings()->cloudCredentials, &Settings::BaseProperty::changed, this,
         [this]()
@@ -299,34 +304,24 @@ void QnCloudStatusWatcher::resetCredentials(bool keepUser)
     setCredentials({keepUser ? qnCloudStatusWatcher->effectiveUserName() : QString(), QString()});
 }
 
-bool QnCloudStatusWatcher::setCredentials(
-    const nx::vms::common::Credentials& credentials,
-    bool initial)
+bool QnCloudStatusWatcher::setInitialCredentials(const nx::vms::common::Credentials& credentials)
 {
     Q_D(QnCloudStatusWatcher);
-
-    const auto loweredCredentials =
-        nx::vms::common::Credentials(credentials.user.toLower(), credentials.password);
-
-    if (d->credentials == loweredCredentials)
-        return false;
-
-    const bool userChanged = (d->credentials.user != loweredCredentials.user);
-    const bool passwordChanged = (d->credentials.password != loweredCredentials.password);
-
-    d->credentials = loweredCredentials;
-
-    d->updateConnection(initial);
-
-    emit credentialsChanged();
-
-    if (userChanged)
-        emit this->loginChanged();
-    if (passwordChanged)
-        emit this->passwordChanged();
-
-    return true;
+    return d->setCredentialsInternal(credentials, true, false);
 }
+
+bool QnCloudStatusWatcher::setCredentials(const nx::vms::common::Credentials& credentials)
+{
+    Q_D(QnCloudStatusWatcher);
+    return d->setCredentialsInternal(credentials, false, false);
+}
+
+bool QnCloudStatusWatcher::forcedSetCredentials(const nx::vms::common::Credentials& credentials)
+{
+    Q_D(QnCloudStatusWatcher);
+    return d->setCredentialsInternal(credentials, false, true);
+}
+
 
 nx::vms::common::Credentials QnCloudStatusWatcher::createTemporaryCredentials()
 {
@@ -834,5 +829,35 @@ bool QnCloudStatusWatcherPrivate::checkSuppressed()
         }
         return false;
     }
+    return true;
+}
+
+bool QnCloudStatusWatcherPrivate::setCredentialsInternal(
+    const nx::vms::common::Credentials& value,
+    bool initial,
+    bool forced)
+{
+    Q_Q(QnCloudStatusWatcher);
+
+    const auto loweredCredentials =
+        nx::vms::common::Credentials(value.user.toLower(), value.password);
+
+    if (!forced && credentials == loweredCredentials)
+        return false;
+
+    const bool userChanged = (credentials.user != loweredCredentials.user);
+    const bool passwordChanged = (credentials.password != loweredCredentials.password);
+
+    credentials = loweredCredentials;
+
+    updateConnection(initial);
+
+    emit q->credentialsChanged();
+
+    if (userChanged)
+        emit q->loginChanged();
+    if (passwordChanged)
+        emit q->passwordChanged();
+
     return true;
 }

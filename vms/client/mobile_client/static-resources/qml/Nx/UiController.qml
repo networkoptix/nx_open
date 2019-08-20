@@ -10,8 +10,7 @@ Object
         onConnectRequested:
         {
             sideNavigation.close()
-            Workflow.openResourcesScreen()
-            connectionManager.connectToServer(url)
+            ConnectionController.connectToServerByUrl(url)
         }
 
         onDisconnectRequested:
@@ -30,13 +29,11 @@ Object
         }
 
         onConnectToServerScreenRequested:
-            Workflow.openConnectToServerScreen(host, user, password)
+            Workflow.openConnectToServerScreen(host, user, password, operationId)
         onResourcesScreenRequested:
             Workflow.openResourcesScreen(connectionManager.systemName, filterIds)
         onVideoScreenRequested:
-        {
             Workflow.openVideoScreen(cameraId, undefined, undefined, undefined, timestamp)
-        }
         onLoginToCloudScreenRequested:
             Workflow.openCloudScreen(user, password, connectOperationId)
     }
