@@ -485,7 +485,7 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
                             nx::vms::client::core::helpers::saveCloudCredentials(cloudCredentials);
                         }
 
-                        qnCloudStatusWatcher->setCredentials(cloudCredentials, true);
+                        qnCloudStatusWatcher->setInitialCredentials(cloudCredentials);
                         connectToSystemInternal(QString(), url, cloudCredentials,
                             dialog->savePassword(), kNoAutoLogin, controlsGuard);
                     }

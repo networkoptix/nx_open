@@ -358,7 +358,7 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
     const bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
     if (systemIsCloud)
     {
-        qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
+        qnClientModule->cloudStatusWatcher()->setInitialCredentials(credentials);
         NX_DEBUG(this, "Custom URI: System is cloud, connecting to the cloud first");
     }
 
@@ -451,7 +451,7 @@ bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& st
     const nx::vms::common::Credentials credentials(auth.user, auth.password);
 
     NX_DEBUG(this, "Custom URI: Connecting to cloud as %1", auth.user);
-    qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
+    qnClientModule->cloudStatusWatcher()->setInitialCredentials(credentials);
     return true;
 }
 
