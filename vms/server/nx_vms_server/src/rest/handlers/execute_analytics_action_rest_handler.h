@@ -68,7 +68,9 @@ private:
         const QnUuid& objectTrackId,
         int64_t timestampUs);
 
-    int64_t tryToFindBestShotTimestampUsByAttrubute(const QnUuid& objectTrackId);
+    std::optional<nx::analytics::db::ObjectPosition> fetchObjectPositionByTimestampFromTrack(
+        const nx::analytics::db::ObjectTrack& track,
+        int64_t timestampUs);
 
     CLVideoDecoderOutputPtr imageByTimestamp(const QnUuid& deviceId, const int64_t timestampUs);
 
