@@ -74,8 +74,11 @@ public:
 
     void setMotionEnabled(bool enabled);
 
-    bool isAnalyticsEnabled() const;
-    void setAnalyticsEnabled(bool enabled);
+    /** Check is current video stream contains analytics objects metadata. */
+    bool isAnalyticsEnabledInStream() const;
+
+    /** Setup current video stream to contain analytics objects metadata. */
+    void setAnalyticsEnabledInStream(bool enabled);
 
     void setAnalyticsFilter(const nx::analytics::db::Filter& value);
 

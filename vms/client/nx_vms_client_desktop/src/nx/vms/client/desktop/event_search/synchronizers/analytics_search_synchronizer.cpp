@@ -130,15 +130,26 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
         this,
         [this](const QnLayoutItemIndex& index, AnalyticsObjectsVisualizationMode value)
         {
-            if (index.layout() != workbench()->currentLayout()->resource())
+            const auto currentLayout = workbench()->currentLayout();
+            if (index.layout() != currentLayout->resource())
                 return;
 
-            const auto item = workbench()->currentLayout()->item(index.uuid());
+            const auto item = currentLayout->item(index.uuid());
             if (!item)
                 return;
 
             if (const auto widget = asMediaWidget(display()->widget(item)))
                 updateMediaResourceWidgetAnalyticsMode(widget);
+
+            // Cleanup analytics areas on all target widget zoom windows.
+            for (const auto zoomItem: currentLayout->zoomItems(item))
+            {
+                if (const auto widget = asMediaWidget(display()->widget(zoomItem)))
+                {
+                    NX_ASSERT(widget->isZoomWindow());
+                    updateMediaResourceWidgetAnalyticsMode(widget);
+                }
+            }
         });
 }
 
