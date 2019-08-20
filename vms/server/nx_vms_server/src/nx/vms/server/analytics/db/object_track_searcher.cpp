@@ -42,7 +42,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookup(nx::sql::QueryContext* quer
         if (!m_filter.objectTrackId.isNull())
         {
             auto track = fetchTrackById(queryContext, m_filter.objectTrackId);
-            if (!track || !satisfiesFilter(m_filter, *track))
+            if (!track)
                 return {};
             return {std::move(*track)};
         }
