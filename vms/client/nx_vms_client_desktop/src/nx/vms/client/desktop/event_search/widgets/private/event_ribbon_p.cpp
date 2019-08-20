@@ -385,7 +385,8 @@ ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
     auto provider = new ResourceThumbnailProvider(request);
 
     connect(provider, &QObject::destroyed, this,
-        [this, provider]() { handleLoadingEnded(provider); });
+        [this, provider]() { handleLoadingEnded(provider); },
+        Qt::QueuedConnection);
 
     connect(provider, &ImageProvider::statusChanged, this,
         [this, provider](Qn::ThumbnailStatus status)
