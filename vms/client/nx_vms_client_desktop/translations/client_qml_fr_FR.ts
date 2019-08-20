@@ -58,7 +58,7 @@
     </message>
     <message>
       <source>Connect</source>
-      <translation>Connexion</translation>
+      <translation>Connecter</translation>
     </message>
   </context>
   <context>
