@@ -112,6 +112,7 @@ public:
     }
 
     virtual void getSystemAccessLevel(
+        const std::string& systemId,
         const nx::cloud::db::api::UserAuthorization& authorization,
         std::function<void(nx::cloud::db::api::ResultCode, nx::cloud::db::api::SystemAccess)> completionHandler) override
     {
