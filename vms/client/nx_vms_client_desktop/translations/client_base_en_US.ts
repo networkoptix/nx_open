@@ -1721,23 +1721,11 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Business rule updated</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Server removed</source>
         <translation></translation>
     </message>
     <message>
-        <source>Business rule removed</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>User removed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Business rule reseted</source>
         <translation></translation>
     </message>
     <message>
@@ -1834,6 +1822,18 @@ to view more bookmarks</source>
             <numerusform>%n action</numerusform>
             <numerusform>%n actions</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Event rule changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event rule removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event rules reset to default</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
