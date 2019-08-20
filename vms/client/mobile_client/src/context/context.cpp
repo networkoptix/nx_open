@@ -345,7 +345,7 @@ bool QnContext::setCloudCredentials(const QString& login, const QString& passwor
 {
     const nx::vms::common::Credentials credentials{login, password};
     nx::vms::client::core::settings()->cloudCredentials = credentials;
-    const bool result = cloudStatusWatcher()->setCredentials(credentials);
+    const bool result = cloudStatusWatcher()->forcedSetCredentials(credentials);
     return result;
 }
 
