@@ -46,6 +46,7 @@ public:
         storage->setStorageType("local");
         storage->setUsedForWriting(
             storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
+        storage->setIdUnsafe(QnUuid::createUuid());
 
         NX_ASSERT(storage->isUsedForWriting());
 
