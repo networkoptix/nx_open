@@ -307,8 +307,6 @@ std::optional<ExtendedAnalyticsActionData>
     const bool needBestShotObjectPosition = capabilities.testFlag(
         EngineManifest::ObjectAction::Capability::needBestShotObjectMetadata);
 
-    const bool needBestShotTimestamp = needBestShotObjectPosition || needBestShotObjectPosition;
-
     const auto objectTrack = fetchObjectTrack(trackId, needFullTrack);
     if (!objectTrack)
     {
@@ -325,17 +323,18 @@ std::optional<ExtendedAnalyticsActionData>
     if (needFullTrack)
         extendedAnalyticsActionData.objectTrack = objectTrack;
 
-    int64_t bestShotTimestampUs = AV_NOPTS_VALUE;
-    if (needBestShotTimestamp)
-    {
-        bestShotTimestampUs = objectTrack->bestShot.initialized()
-            ? objectTrack->bestShot.timestampUs
-            : objectTrack->objectPositionSequence[0].timestampUs;
-    }
+    if (!needBestShotObjectPosition && !needBestShotVideoFrame)
+        return extendedAnalyticsActionData;
+
+    // Either an Object position or the best shot video frame is needed.
+    const int64_t bestShotTimestampUs = objectTrack->bestShot.initialized()
+        ? objectTrack->bestShot.timestampUs
+        : objectTrack->objectPositionSequence[0].timestampUs;
 
     if (!NX_ASSERT(bestShotTimestampUs != AV_NOPTS_VALUE))
     {
-        NX_DEBUG(this, "Failed to fetch the best shot timestamp for the Object Track %1", trackId);
+        NX_DEBUG(this,
+            "Failed to fetch the best shot timestamp for the Object track %1", trackId);
         return std::nullopt;
     }
 
@@ -347,10 +346,11 @@ std::optional<ExtendedAnalyticsActionData>
 
         if (!objectPosition)
         {
-            if (needFullTrack)
+            if (needFullTrack) //< The Track is already fetched.
             {
                 objectPosition = fetchObjectPositionByTimestampFromTrack(
-                    *objectTrack, bestShotTimestampUs);
+                    *objectTrack,
+                    bestShotTimestampUs);
             }
             else
             {
