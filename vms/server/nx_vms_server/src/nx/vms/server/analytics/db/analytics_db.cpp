@@ -535,7 +535,7 @@ bool MovableAnalyticsDb::initialize(const Settings& settings)
     // Waiting for the old DB to become unused.
     // NOTE: Using loop with a delay to make things simpler here.
     // Anyway, closing / opening a DB is a time-consuming operation.
-    // Extra millisecond sleep does not make it worth.
+    // Extra millisecond sleep does not make it worse.
     while (otherDb.use_count() > 1)
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
