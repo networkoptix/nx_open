@@ -351,7 +351,7 @@ protected:
         flushData();
     }
 
-    EventsStorage& eventsStorage()
+    AbstractEventsStorage& eventsStorage()
     {
         return *m_eventsStorage;
     }
@@ -430,6 +430,11 @@ protected:
         return Filter();
     }
 
+    Settings settings() const
+    {
+        return m_settings;
+    }
+
 private:
     struct LookupResult
     {
@@ -437,7 +442,7 @@ private:
         std::vector<ObjectTrack> tracksFound;
     };
 
-    std::unique_ptr<EventsStorage> m_eventsStorage;
+    std::unique_ptr<AbstractEventsStorage> m_eventsStorage;
     Settings m_settings;
     std::vector<common::metadata::ObjectMetadataPacketPtr> m_analyticsDataPackets;
     nx::utils::SyncQueue<LookupResult> m_lookupResultQueue;
@@ -451,7 +456,7 @@ private:
 
     bool initializeStorage()
     {
-        m_eventsStorage = std::make_unique<EventsStorage>(nullptr);
+        m_eventsStorage = EventsStorageFactory::instance().create(nullptr);
         return m_eventsStorage->initialize(m_settings);
     }
 
@@ -732,6 +737,85 @@ TEST_F(AnalyticsDb, tracks_best_shot_is_saved_and_reported)
     whenSaveObjectTrackContainingBestShot();
 
     thenAllEventsCanBeRead();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class AnalyticsDbMovingToNewPath:
+    public AnalyticsDb
+{
+public:
+    ~AnalyticsDbMovingToNewPath()
+    {
+        m_terminated = true;
+
+        if (m_dbLoadThread.joinable())
+            m_dbLoadThread.join();
+    }
+
+protected:
+    void startFillingDbConcurrently()
+    {
+        m_dbLoadThread = std::thread(
+            [this]()
+            {
+                while (!m_terminated)
+                    eventsStorage().save(generateRandomPacket());
+            });
+    }
+
+    void startConcurrentLookups()
+    {
+        static constexpr int kRequestBatchSize = 100;
+
+        m_dbLoadThread = std::thread(
+            [this]()
+            {
+                nx::utils::SyncQueue<int /*dummy*/> done;
+
+                while (!m_terminated)
+                {
+                    for (int i = 0; i < kRequestBatchSize; ++i)
+                        eventsStorage().lookup(Filter(), [&done](auto&&...) { done.push(0); });
+                    for (int i = 0; i < kRequestBatchSize; ++i)
+                        done.pop();
+                }
+            });
+    }
+
+    void whenChangeDbPath()
+    {
+        auto newSettings = settings();
+        const auto newPath = nx::utils::test::TestWithTemporaryDirectory::testDataDir() + "/2/";
+        ASSERT_TRUE(QDir().mkdir(newPath));
+        newSettings.path = newPath;
+
+        eventsStorage().initialize(newSettings);
+    }
+
+    void thenDbIsOperational()
+    {
+        whenLookupObjectTracks(buildEmptyFilter());
+        thenLookupSucceded();
+    }
+
+private:
+    std::thread m_dbLoadThread;
+    bool m_terminated = false;
+};
+
+TEST_F(AnalyticsDbMovingToNewPath, moving_during_concurrent_load)
+{
+    startFillingDbConcurrently();
+    whenChangeDbPath();
+    thenDbIsOperational();
+}
+
+TEST_F(AnalyticsDbMovingToNewPath, moving_during_concurrent_lookups)
+{
+    startConcurrentLookups();
+    whenChangeDbPath();
+    thenDbIsOperational();
 }
 
 //-------------------------------------------------------------------------------------------------
