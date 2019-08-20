@@ -4,7 +4,7 @@
 
 #include <analytics/db/analytics_db_types.h>
 
-#include "analytics_storage_types.h"
+#include "attribute_dictionary.h"
 
 namespace nx::analytics::db::test {
 

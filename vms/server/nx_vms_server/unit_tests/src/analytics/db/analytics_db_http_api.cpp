@@ -9,7 +9,7 @@
 #include <api/mediaserver_client.h>
 #include <test_support/mediaserver_launcher.h>
 
-#include "analytics_storage_types.h"
+#include "attribute_dictionary.h"
 
 namespace nx::analytics::db::test {
 
