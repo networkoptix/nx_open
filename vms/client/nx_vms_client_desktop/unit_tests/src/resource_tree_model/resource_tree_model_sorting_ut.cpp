@@ -20,13 +20,13 @@ TEST_P(ResourceTreeModelSortingTest, sorting)
     const auto userId = user->getId();
     for (const QString& string: sortingSignificantStrings)
     {
-        addLayoutResource(string, userId);
-        addFileLayoutResource(string + ".nov");
-        addMediaResource(string + ".png");
-        addMediaResource(string + ".mkv");
+        addLayout(string, userId);
+        addFileLayout(string + ".nov");
+        addLocalMedia(string + ".png");
+        addLocalMedia(string + ".mkv");
         addLayoutTour(string, userId);
-        addVideoWallResource(string);
-        addWebPageResource(string);
+        addVideoWall(string);
+        addWebPage(string);
     }
 
     // Check tree.

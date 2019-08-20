@@ -27,25 +27,35 @@ protected:
 
     QnCommonModule* commonModule() const;
     QnResourcePool* resourcePool() const;
+    QnWorkbenchAccessController* workbenchAccessController() const;
+    QnResourceAccessManager* resourceAccessManager() const;
+    QnWorkbenchLayoutSnapshotManager* layoutSnapshotManager() const;
+    QnRuntimeInfoManager* runtimeInfoManager() const;
 
     void setSystemName(const QString& name) const;
 
     QnUserResourcePtr addUser(const QString& name, GlobalPermissions globalPermissions,
         QnUserType userType = QnUserType::Local) const;
     QnMediaServerResourcePtr addServer(const QString& name) const;
-    QnAviResourcePtr addMediaResource(const QString& path) const;
-    QnFileLayoutResourcePtr addFileLayoutResource(const QString& path,
+    QnAviResourcePtr addLocalMedia(const QString& path) const;
+    QnFileLayoutResourcePtr addFileLayout(const QString& path,
         bool isEncrypted = false) const;
-    QnLayoutResourcePtr addLayoutResource(const QString& name,
+    QnLayoutResourcePtr addLayout(const QString& name,
         const QnUuid& parentId = QnUuid()) const;
-    QnWebPageResourcePtr addWebPageResource(const QString& name) const;
-    QnVideoWallResourcePtr addVideoWallResource(const QString& name) const;
+    QnWebPageResourcePtr addWebPage(const QString& name) const;
+    QnVideoWallResourcePtr addVideoWall(const QString& name) const;
+    void addVideoWallItem(const QString& name, QnVideoWallResourcePtr videowall) const;
+    void addVideoWallMatrix(const QString& name, QnVideoWallResourcePtr videowall) const;
     nx::vms::api::LayoutTourData addLayoutTour(const QString& name,
         const QnUuid& parentId = QnUuid()) const;
+    QnVirtualCameraResourcePtr addCamera(const QString& name,
+        const QnUuid& parentId = QnUuid()) const;
 
-    void logout() const;
+    QnUserResourcePtr loginAsUserWithPermissions(const QString& name,
+        nx::vms::api::GlobalPermissions permissions) const;
     QnUserResourcePtr loginAsAdmin(const QString& name) const;
     QnUserResourcePtr loginAsLiveViewer(const QString& name) const;
+    void logout() const;
 
     QAbstractItemModel* model() const;
     QModelIndexList getAllIndexes() const;
@@ -55,6 +65,7 @@ protected:
 
     bool noneMatches(index_condition::Condition condition) const;
     bool onlyOneMatches(index_condition::Condition condition) const;
+    bool atLeastOneMatches(index_condition::Condition condition) const;
     int matchCount(index_condition::Condition condition) const;
 
     std::vector<QString> transformToDisplayStrings(const QModelIndexList& indexes) const;

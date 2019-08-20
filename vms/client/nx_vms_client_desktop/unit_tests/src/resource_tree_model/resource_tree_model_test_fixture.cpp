@@ -4,12 +4,17 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_item.h>
+#include <core/resource/camera_resource.h>
+#include <client/client_settings.h>
+#include <test_support/resource/camera_resource_stub.h>
 
 using namespace nx;
 using namespace nx::vms::api;
@@ -55,6 +60,26 @@ QnResourcePool* ResourceTreeModelTest::resourcePool() const
     return commonModule()->resourcePool();
 }
 
+QnWorkbenchAccessController* ResourceTreeModelTest::workbenchAccessController() const
+{
+    return m_accessController.get();
+}
+
+QnResourceAccessManager* ResourceTreeModelTest::resourceAccessManager() const
+{
+    return commonModule()->resourceAccessManager();
+}
+
+QnWorkbenchLayoutSnapshotManager* ResourceTreeModelTest::layoutSnapshotManager() const
+ {
+    return m_layoutSnapshotManager.get();
+}
+
+QnRuntimeInfoManager* ResourceTreeModelTest::runtimeInfoManager() const
+{
+    return commonModule()->runtimeInfoManager();
+}
+
 void ResourceTreeModelTest::setSystemName(const QString& name) const
 {
     commonModule()->globalSettings()->setSystemName(name);
@@ -84,54 +109,83 @@ QnMediaServerResourcePtr ResourceTreeModelTest::addServer(const QString& name) c
     return server;
 }
 
-QnAviResourcePtr ResourceTreeModelTest::addMediaResource(const QString& path) const
+QnAviResourcePtr ResourceTreeModelTest::addLocalMedia(const QString& path) const
 {
-    QnAviResourcePtr mediaResource(new QnAviResource(path, commonModule()));
-    resourcePool()->addResource(mediaResource);
-    return mediaResource;
+    QnAviResourcePtr localMedia(new QnAviResource(path, commonModule()));
+    resourcePool()->addResource(localMedia);
+    return localMedia;
 }
 
-QnFileLayoutResourcePtr ResourceTreeModelTest::addFileLayoutResource(
+QnFileLayoutResourcePtr ResourceTreeModelTest::addFileLayout(
     const QString& path,
     bool isEncrypted) const
 {
-    QnFileLayoutResourcePtr fileLayoutResource(new QnFileLayoutResource(commonModule()));
-    fileLayoutResource->setIdUnsafe(guidFromArbitraryData(path));
-    fileLayoutResource->setUrl(path);
-    fileLayoutResource->setName(QFileInfo(path).fileName());
-    fileLayoutResource->setIsEncrypted(isEncrypted);
-    resourcePool()->addResource(fileLayoutResource);
-    return fileLayoutResource;
+    QnFileLayoutResourcePtr fileLayout(new QnFileLayoutResource(commonModule()));
+    fileLayout->setIdUnsafe(guidFromArbitraryData(path));
+    fileLayout->setUrl(path);
+    fileLayout->setName(QFileInfo(path).fileName());
+    fileLayout->setIsEncrypted(isEncrypted);
+    resourcePool()->addResource(fileLayout);
+    return fileLayout;
 }
 
-QnLayoutResourcePtr ResourceTreeModelTest::addLayoutResource(
+QnLayoutResourcePtr ResourceTreeModelTest::addLayout(
     const QString& name,
     const QnUuid& parentId) const
 {
-    QnLayoutResourcePtr layoutResource(new QnLayoutResource(commonModule()));
-    layoutResource->setName(name);
-    layoutResource->setIdUnsafe(QnUuid::createUuid());
-    layoutResource->setParentId(parentId);
-    resourcePool()->addResource(layoutResource);
-    return layoutResource;
+    QnLayoutResourcePtr layout(new QnLayoutResource(commonModule()));
+    layout->setName(name);
+    layout->setIdUnsafe(QnUuid::createUuid());
+    layout->setParentId(parentId);
+    resourcePool()->addResource(layout);
+    return layout;
 }
 
-QnWebPageResourcePtr ResourceTreeModelTest::addWebPageResource(const QString& name) const
+QnWebPageResourcePtr ResourceTreeModelTest::addWebPage(const QString& name) const
 {
-    QnWebPageResourcePtr webPageResource(new QnWebPageResource());
-    webPageResource->setName(name);
-    webPageResource->setIdUnsafe(QnUuid::createUuid());
-    resourcePool()->addResource(webPageResource);
-    return webPageResource;
+    QnWebPageResourcePtr webPage(new QnWebPageResource());
+    webPage->setName(name);
+    webPage->setIdUnsafe(QnUuid::createUuid());
+    resourcePool()->addResource(webPage);
+    return webPage;
 }
 
-QnVideoWallResourcePtr ResourceTreeModelTest::addVideoWallResource(const QString& name) const
+QnVideoWallResourcePtr ResourceTreeModelTest::addVideoWall(const QString& name) const
 {
-    QnVideoWallResourcePtr videoWallResource(new QnVideoWallResource(commonModule()));
-    videoWallResource->setName(name);
-    videoWallResource->setIdUnsafe(QnUuid::createUuid());
-    resourcePool()->addResource(videoWallResource);
-    return videoWallResource;
+    QnVideoWallResourcePtr videoWall(new QnVideoWallResource(commonModule()));
+    videoWall->setName(name);
+    videoWall->setIdUnsafe(QnUuid::createUuid());
+    resourcePool()->addResource(videoWall);
+    return videoWall;
+}
+
+void ResourceTreeModelTest::addVideoWallItem(
+    const QString& name,
+    QnVideoWallResourcePtr videowall) const
+{
+    auto layout = addLayout("layout", videowall->getId());
+    layout->setData(Qn::VideoWallResourceRole, qVariantFromValue(videowall));
+    QnVideoWallItem item;
+    item.name = name;
+    item.uuid = QnUuid::createUuid();
+    item.layout = layout->getId();
+    videowall->items()->addOrUpdateItem(item);
+}
+
+void ResourceTreeModelTest::addVideoWallMatrix(
+    const QString& name,
+    QnVideoWallResourcePtr videowall) const
+{
+    QnVideoWallMatrix matrix;
+    matrix.name = name;
+    matrix.uuid = QnUuid::createUuid();
+    for (const QnVideoWallItem& item: videowall->items()->getItems())
+    {
+        if (item.layout.isNull() || !resourcePool()->getResourceById(item.layout))
+            continue;
+        matrix.layoutByItem[item.uuid] = item.layout;
+    }
+    videowall->matrices()->addItem(matrix);
 }
 
 LayoutTourData ResourceTreeModelTest::addLayoutTour(
@@ -146,26 +200,54 @@ LayoutTourData ResourceTreeModelTest::addLayoutTour(
     return tourData;
 }
 
-void ResourceTreeModelTest::logout() const
+QnVirtualCameraResourcePtr ResourceTreeModelTest::addCamera(
+    const QString& name,
+    const QnUuid& parentId /*= QnUuid()*/) const
 {
-    m_accessController->setUser(QnUserResourcePtr());
-    resourcePool()->removeResources(resourcePool()->getResourcesWithFlag(Qn::remote));
+    QnVirtualCameraResourcePtr camera(new CameraResourceStub());
+    camera->setName(name);
+    camera->setIdUnsafe(QnUuid::createUuid());
+    camera->setParentId(parentId);
+    resourcePool()->addResource(camera);
+    return camera;
+}
+
+QnUserResourcePtr ResourceTreeModelTest::loginAsUserWithPermissions(
+    const QString& name,
+    GlobalPermissions permissions) const
+{
+    logout();
+    const auto users = resourcePool()->getResources<QnUserResource>();
+    const auto itr = std::find_if(users.cbegin(), users.cend(),
+        [this, name](const QnUserResourcePtr& user)
+        {
+            const auto permissions = resourceAccessManager()->globalPermissions(user);
+            return (user->getName() == name) && permissions.testFlag(GlobalPermission::admin);
+        });
+
+    QnUserResourcePtr user;
+    if (itr != users.cend())
+        user = *itr;
+    else
+        user = addUser(name, GlobalPermission::adminPermissions);
+
+    m_accessController->setUser(user);
+    return user;
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAsAdmin(const QString& name) const
 {
-    logout();
-    auto user = addUser(name, GlobalPermission::adminPermissions);
-    m_accessController->setUser(user);
-    return user;
+    return loginAsUserWithPermissions(name, GlobalPermission::admin);
 }
 
 QnUserResourcePtr ResourceTreeModelTest::loginAsLiveViewer(const QString& name) const
 {
-    logout();
-    auto user = addUser(name, GlobalPermission::liveViewerPermissions);
-    m_accessController->setUser(user);
-    return user;
+    return loginAsUserWithPermissions(name, GlobalPermission::liveViewerPermissions);
+}
+
+void ResourceTreeModelTest::logout() const
+{
+    m_accessController->setUser(QnUserResourcePtr());
 }
 
 QAbstractItemModel* ResourceTreeModelTest::model() const
@@ -218,6 +300,11 @@ bool ResourceTreeModelTest::noneMatches(Condition condition) const
 bool ResourceTreeModelTest::onlyOneMatches(Condition condition) const
 {
     return allMatchingIndexes(condition).size() == 1;
+}
+
+bool ResourceTreeModelTest::atLeastOneMatches(Condition condition) const
+{
+    return allMatchingIndexes(condition).size() > 0;
 }
 
 int ResourceTreeModelTest::matchCount(Condition condition) const
