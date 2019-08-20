@@ -149,6 +149,7 @@ public:
         std::function<void(api::ResultCode, api::CredentialsDescriptor)> completionHandler) = 0;
 
     virtual void getSystemAccessLevel(
+        const std::string& systemId,
         const api::UserAuthorization& authorization,
         std::function<void(api::ResultCode, api::SystemAccess)> completionHandler) = 0;
 };

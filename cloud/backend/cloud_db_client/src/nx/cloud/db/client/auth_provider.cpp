@@ -1,5 +1,7 @@
 #include "auth_provider.h"
 
+#include <nx/network/http/rest/http_rest_client.h>
+
 #include "cdb_request_path.h"
 #include "data/auth_data.h"
 #include "data/system_data.h"
@@ -54,11 +56,12 @@ void AuthProvider::resolveUserCredentials(
 }
 
 void AuthProvider::getSystemAccessLevel(
+    const std::string& systemId,
     const api::UserAuthorization& authorization,
     std::function<void(api::ResultCode, api::SystemAccess)> completionHandler)
 {
     executeRequest(
-        kAuthSystemAccessLevel,
+        network::http::rest::substituteParameters(kAuthSystemAccessLevel, {systemId}).c_str(),
         authorization,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemAccess()));
