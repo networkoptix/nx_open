@@ -485,7 +485,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::loadTracks(
 
         tracks.push_back(std::move(*track));
 
-        if (limit > 0 && tracks.size() >= limit)
+        if (limit > 0 && (int) tracks.size() >= limit)
             break;
     }
 
