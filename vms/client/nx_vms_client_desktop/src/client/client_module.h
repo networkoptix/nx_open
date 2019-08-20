@@ -23,6 +23,7 @@ class AnalyticsMetadataProviderFactory;
 class UploadManager;
 class WearableManager;
 class VideoCache;
+class ResourceDirectoryBrowser;
 
 } // namespace nx::vms::client::desktop
 
@@ -48,6 +49,8 @@ public:
     nx::vms::client::desktop::UploadManager* uploadManager() const;
     nx::vms::client::desktop::WearableManager* wearableManager() const;
     nx::vms::client::desktop::VideoCache* videoCache() const;
+    nx::vms::client::desktop::ResourceDirectoryBrowser* resourceDirectoryBrowser() const;
+
 private:
     void initApplication();
     void initThread();
@@ -69,6 +72,7 @@ private:
     QScopedPointer<QnClientCoreModule> m_clientCoreModule;
     QScopedPointer<nx::vms::client::desktop::AnalyticsMetadataProviderFactory>
         m_analyticsMetadataProviderFactory;
+    QScopedPointer<nx::vms::client::desktop::ResourceDirectoryBrowser> m_resourceDirectoryBrowser;
     QnNetworkProxyFactory* m_networkProxyFactory = nullptr;
     QnCloudStatusWatcher* m_cloudStatusWatcher = nullptr;
     QnCameraDataManager* m_cameraDataManager = nullptr;

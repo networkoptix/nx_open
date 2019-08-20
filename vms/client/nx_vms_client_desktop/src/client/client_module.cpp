@@ -697,11 +697,12 @@ void QnClientModule::initLocalResources()
     commonModule->store(new QnLocalResourceStatusWatcher());
     if (!m_startupParameters.skipMediaFolderScan && !m_startupParameters.acsMode)
     {
-        auto localFilesSearcher = commonModule->store(new ResourceDirectoryBrowser());
         QStringList paths;
         paths.append(qnSettings->mediaFolder());
         paths.append(qnSettings->extraMediaFolders());
-        localFilesSearcher->setLocalResourcesDirectories(paths);
+
+        m_resourceDirectoryBrowser.reset(new ResourceDirectoryBrowser());
+        m_resourceDirectoryBrowser->setLocalResourcesDirectories(paths);
     }
 }
 
@@ -743,6 +744,12 @@ WearableManager* QnClientModule::wearableManager() const
 VideoCache* QnClientModule::videoCache() const
 {
     return m_videoCache;
+}
+
+nx::vms::client::desktop::ResourceDirectoryBrowser*
+    QnClientModule::resourceDirectoryBrowser() const
+{
+    return m_resourceDirectoryBrowser.data();
 }
 
 void QnClientModule::initLocalInfo()
