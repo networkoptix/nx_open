@@ -70,9 +70,7 @@ def determine_package_versions(
         v["ffmpeg"] = "3.1.9"
 
     if platform == "ios":
-<<<<<<< working copy
         v["ffmpeg"] = "3.1.1"
-        v["libjpeg-turbo"] = "1.4.1"
 
     if target == "linux_arm32":
         v["festival"] = "2.4-1"
@@ -87,7 +85,6 @@ def determine_package_versions(
         v["ffmpeg"] = "3.1.9-6"
         v["openssl"] = "1.0.2q-2"
         v["sysroot"] = "xenial"
-        v["ffmpeg"] = "3.1.1"
 
     if box == "bpi":
         v["festival"] = "2.4-1"
