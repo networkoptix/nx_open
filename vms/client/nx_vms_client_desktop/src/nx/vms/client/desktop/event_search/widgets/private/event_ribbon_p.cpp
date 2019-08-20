@@ -91,9 +91,14 @@ bool shouldAnimateTile(const QModelIndex& index)
 
 int maxSimultaneousPreviewLoads(const QnMediaServerResourcePtr& server)
 {
-    return QnMediaServerResource::isArmServer(server)
-        ? std::clamp(ini().maxSimultaneousTilePreviewLoadsArm, 1, 5)
-        : std::clamp(ini().maxSimultaneousTilePreviewLoads, 1, 15);
+    if (QnMediaServerResource::isArmServer(server))
+    {
+        return std::clamp(ini().maxSimultaneousTilePreviewLoadsArm,
+            1, EventRibbon::kSimultaneousPreviewLoadsLimitArm);
+    }
+
+    return std::clamp(ini().maxSimultaneousTilePreviewLoads,
+        1, EventRibbon::kSimultaneousPreviewLoadsLimit);
 }
 
 QnMediaServerResourcePtr previewServer(const ResourceThumbnailProvider* provider)
