@@ -21,12 +21,6 @@ Cleaner::Cleaner(
 
 Cleaner::Result Cleaner::clean(nx::sql::QueryContext* queryContext)
 {
-    if (!kLookupObjectsInAnalyticsArchive)
-    {
-        if (cleanObjectSearch(queryContext) >= kRecordsToRemoveAtATime)
-            return Result::incomplete;
-    }
-
     if (cleanTrackGroupToTrack(queryContext) >= kRecordsToRemoveAtATime)
         return Result::incomplete;
 
@@ -38,32 +32,6 @@ Cleaner::Result Cleaner::clean(nx::sql::QueryContext* queryContext)
         return Result::incomplete;
 
     return Result::done;
-}
-
-int Cleaner::cleanObjectSearch(nx::sql::QueryContext* queryContext)
-{
-    if (m_deviceId == -1)
-    {
-        return executeObjectDataCleanUpQuery(
-            queryContext,
-            R"sql(
-            DELETE FROM object_search WHERE id IN
-                (SELECT id FROM object_search WHERE object_group_id IN
-	                (SELECT DISTINCT group_id FROM object_group WHERE object_id IN
-		                (SELECT id FROM object WHERE track_start_ms<?))
-                LIMIT ?)
-        )sql");
-    }
-
-    return executeObjectDataCleanUpQuery(
-        queryContext,
-        R"sql(
-            DELETE FROM object_search WHERE id IN
-                (SELECT id FROM object_search WHERE object_group_id IN
-	                (SELECT DISTINCT group_id FROM object_group WHERE object_id IN
-		                (SELECT id FROM object WHERE device_id=? AND track_start_ms<?))
-                LIMIT ?)
-        )sql");
 }
 
 int Cleaner::cleanTrackGroupToTrack(nx::sql::QueryContext* queryContext)

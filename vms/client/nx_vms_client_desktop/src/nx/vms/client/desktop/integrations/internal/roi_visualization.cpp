@@ -241,7 +241,7 @@ void RoiVisualizationIntegration::registerWidget(QnMediaResourceWidget* widget)
         return;
 
     const auto server = camera->getParentServer();
-    if (!NX_ASSERT(server))
+    if (!server)
         return;
 
     const auto engines = camera->enabledAnalyticsEngineResources();

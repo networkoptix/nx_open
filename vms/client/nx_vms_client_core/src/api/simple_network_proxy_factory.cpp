@@ -17,8 +17,8 @@ QNetworkProxy QnSimpleNetworkProxyFactory::proxyToResource(const QnResourcePtr &
 
     QnMediaServerResourcePtr server;
 
-    if (resource.dynamicCast<QnSecurityCamResource>())
-        server = resource->getParentResource().dynamicCast<QnMediaServerResource>();
+    if (const auto camera = resource.dynamicCast<QnSecurityCamResource>())
+        server = camera->getParentServer();
     else
         server = resource.dynamicCast<QnMediaServerResource>();
 
