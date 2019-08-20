@@ -334,7 +334,7 @@ void MediaResourceWidgetPrivate::requestAnalyticsObjectsExistence()
 {
     NX_ASSERT(camera);
     const auto server = camera->getParentServer();
-    if (!NX_ASSERT(server))
+    if (!server)
         return;
 
     const auto connection = server->restConnection();

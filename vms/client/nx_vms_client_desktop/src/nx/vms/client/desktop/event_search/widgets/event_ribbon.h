@@ -80,6 +80,9 @@ public:
     void setInsertionMode(UpdateMode updateMode, bool scrollDown);
     void setRemovalMode(UpdateMode updateMode);
 
+    static constexpr int kSimultaneousPreviewLoadsLimit = 15;
+    static constexpr int kSimultaneousPreviewLoadsLimitArm = 5;
+
 signals:
     void countChanged(int count);
     void unreadCountChanged(int unreadCount, QnNotificationLevel::Value importance, QPrivateSignal);

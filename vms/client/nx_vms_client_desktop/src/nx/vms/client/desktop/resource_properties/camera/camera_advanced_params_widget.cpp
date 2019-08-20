@@ -386,7 +386,7 @@ QnMediaServerConnectionPtr CameraAdvancedParamsWidget::getServerConnection() con
     if (!m_camera)
         return {};
 
-    if (const auto& server = m_camera->getParentResource().dynamicCast<QnMediaServerResource>())
+    if (const auto server = m_camera->getParentServer())
         return server->apiConnection();
 
     return {};

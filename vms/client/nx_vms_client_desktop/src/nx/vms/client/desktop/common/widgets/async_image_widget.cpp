@@ -346,7 +346,7 @@ int AsyncImageWidget::heightForWidth(int width) const
     if (autoScaleUp())
         height = qMax(height, qFloor(width / hint.width() * hint.height()));
 
-    return qRound(height);
+    return qCeil(height);
 }
 
 void AsyncImageWidget::retranslateUi()

@@ -372,7 +372,7 @@ void Worker::requestFileInformationInternal()
             requestSubjectString(m_state), peer);
 
         auto context = peer.manager->requestFileInfo(peer.id, m_fileName, url);
-        if (context->isValid())
+        if (context && context->isValid())
         {
             contexts.emplace_back(peer, std::move(context));
             ++requestCount;
@@ -504,7 +504,7 @@ void Worker::requestChecksums()
                 requestSubjectString(State::requestingChecksums), peer);
 
             auto context = peer.manager->requestChecksums(peer.id, m_fileName);
-            if (context->isValid())
+            if (context && context->isValid())
                 contexts.emplace_back(peer, std::move(context));
             else
                 decreasePeerRank(peer);
@@ -629,7 +629,7 @@ void Worker::downloadChunks()
 
             auto context = peer.manager->downloadChunk(
                 peer.id, m_fileName, fileInfo.url, chunk, (int) fileInfo.chunkSize);
-            if (context->isValid())
+            if (context && context->isValid())
             {
                 chunkRequested = true;
                 contexts.emplace_back(
