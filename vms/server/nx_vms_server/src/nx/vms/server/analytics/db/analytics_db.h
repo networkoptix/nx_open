@@ -41,6 +41,8 @@ public:
      */
     virtual bool initialize(const Settings& settings) override;
 
+    virtual bool initialized() const override;
+
     virtual void save(common::metadata::ConstObjectMetadataPacketPtr packet) override;
 
     virtual void createLookupCursor(
@@ -125,6 +127,8 @@ public:
     virtual ~MovableAnalyticsDb();
 
     virtual bool initialize(const Settings& settings) override;
+
+    virtual bool initialized() const override;
 
     virtual void save(common::metadata::ConstObjectMetadataPacketPtr packet) override;
 

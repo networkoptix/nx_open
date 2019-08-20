@@ -85,6 +85,11 @@ bool EventsStorage::initialize(const Settings& settings)
     return true;
 }
 
+bool EventsStorage::initialized() const
+{
+    return m_dbController != nullptr;
+}
+
 void EventsStorage::save(common::metadata::ConstObjectMetadataPacketPtr packet)
 {
     using namespace std::chrono;
@@ -540,6 +545,11 @@ bool MovableAnalyticsDb::initialize(const Settings& settings)
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
     return result;
+}
+
+bool MovableAnalyticsDb::initialized() const
+{
+    return m_db != nullptr;
 }
 
 void MovableAnalyticsDb::save(common::metadata::ConstObjectMetadataPacketPtr packet)
