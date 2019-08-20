@@ -165,8 +165,6 @@ bool Socket<SocketInterfaceToImplement>::shutdown()
 template<typename SocketInterfaceToImplement>
 bool Socket<SocketInterfaceToImplement>::close()
 {
-    shutdown();
-
     if (m_fd == -1)
         return true;
 

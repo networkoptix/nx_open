@@ -287,6 +287,7 @@ void RemoteConnectionFactory::remoteConnectionFinished(
         case ec2::ErrorCode::ldap_temporary_unauthorized:
         case ec2::ErrorCode::cloud_temporary_unauthorized:
         case ec2::ErrorCode::disabled_user_unauthorized:
+        case ec2::ErrorCode::userLockedOut:
             break;
 
         default:

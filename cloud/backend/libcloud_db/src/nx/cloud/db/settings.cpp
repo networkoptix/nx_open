@@ -64,6 +64,9 @@ const std::chrono::seconds kDefaultDropExpiredSystemsPeriodSec = std::chrono::ho
 const QLatin1String kControlSystemStatusByDb("systemManager/controlSystemStatusByDb");
 const bool kDefaultControlSystemStatusByDb = false;
 
+const QLatin1String kSaveSystemHealthHistory("systemManager/saveSystemHealthHistory");
+const bool kDefaultSaveSystemHealthHistory = false;
+
 //-------------------------------------------------------------------------------------------------
 // Authentication settings
 const QLatin1String kModuleName("cloud_db");
@@ -378,6 +381,11 @@ void Settings::loadSettings()
         settings().value(
             kControlSystemStatusByDb,
             kDefaultControlSystemStatusByDb ? "true" : "false").toString() == "true";
+
+    m_systemManager.saveSystemHealthHistory =
+        settings().value(
+            kSaveSystemHealthHistory,
+            kDefaultSaveSystemHealthHistory ? "true" : "false").toString() == "true";
 
     loadAuth();
 

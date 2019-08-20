@@ -69,6 +69,8 @@ public:
 
     int tileHideOptions() const;
 
+    static Q_INVOKABLE int searchRoleId();
+
 signals:
     void minimalVersionChanged();
 

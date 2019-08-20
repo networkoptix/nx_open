@@ -312,6 +312,7 @@ private:
     QnJsonRestResult m_vmsResponse;
 
     std::unique_ptr<AbstractSystemHealthInfoProvider> createSystemHealthInfoProvider(
+        const conf::Settings& /*settings*/,
         clusterdb::engine::ConnectionManager*,
         nx::sql::AbstractAsyncSqlQueryExecutor*)
     {

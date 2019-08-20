@@ -9,7 +9,14 @@
 namespace nx::network::aio::detail {
 
 AioTaskQueue::AioTaskQueue(AbstractPollSet* pollSet):
-    m_pollSet(pollSet)
+    m_pollSet(pollSet),
+    m_abnormalProcessingTimeDetector(
+        1000,
+        std::chrono::seconds(20),
+        [this](auto&&... args)
+        {
+            reportAbnormalProcessingTime(std::forward<decltype(args)>(args)...);
+        })
 {
 }
 
@@ -334,7 +341,9 @@ void AioTaskQueue::processSocketEvents(const qint64 curClock)
             continue;
 
         //eventTriggered is allowed to call stopMonitoring which can remove socket from pollset
+        nx::utils::math::ElapsedTimer<std::chrono::microseconds> timer;
         handlingData->eventHandler->eventTriggered(socket, sockEventType);
+        m_abnormalProcessingTimeDetector.add(timer.elapsed(), "socket event");
 
         //updating socket's periodic task (it's garanteed that there is a periodic task for socket)
         if (handlingData->timeout > std::chrono::milliseconds::zero())
@@ -402,9 +411,12 @@ bool AioTaskQueue::processPeriodicTasks(const qint64 curClock)
         if (periodicTaskData.socket)    //periodic event, associated with socket (e.g., socket operation timeout)
         {
             //NOTE socket is allowed to be removed in eventTriggered
+            nx::utils::math::ElapsedTimer<std::chrono::microseconds> timer;
             handlingData->eventHandler->eventTriggered(
                 periodicTaskData.socket,
                 static_cast<aio::EventType>(periodicTaskData.eventType | aio::etTimedOut));
+            m_abnormalProcessingTimeDetector.add(timer.elapsed(), "timer");
+
             //adding periodic task with same timeout
             addPeriodicTaskNonSafe(
                 curClock + handlingData->timeout.count(),
@@ -428,7 +440,10 @@ void AioTaskQueue::processPostedCalls()
         NX_ASSERT(!m_postedCalls.front().socket ||
             m_postedCalls.front().socket->isInSelfAioThread());
         m_postedCalls.erase(m_postedCalls.begin());
+
+        nx::utils::math::ElapsedTimer<std::chrono::microseconds> timer;
         postHandler();
+        m_abnormalProcessingTimeDetector.add(timer.elapsed(), "post");
     }
 }
 
@@ -562,6 +577,15 @@ bool AioTaskQueue::empty() const
     return m_postedCalls.empty()
         && m_pollSetModificationQueue.empty()
         && m_periodicTasksByClock.empty();
+}
+
+void AioTaskQueue::reportAbnormalProcessingTime(
+    std::chrono::microseconds value,
+    std::chrono::microseconds average,
+    const char* where_)
+{
+    NX_DEBUG(this, "Abnormal %1 running time detected: %2 vs %3 on average",
+        where_, value, average);
 }
 
 } // namespace nx::network::aio::detail

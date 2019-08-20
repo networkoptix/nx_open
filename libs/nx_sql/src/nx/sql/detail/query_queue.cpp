@@ -1,5 +1,7 @@
 #include "query_queue.h"
 
+#include <nx/utils/elapsed_timer.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/time.h>
 
@@ -16,6 +18,10 @@ QueryQueue::QueryQueue():
 
 void QueryQueue::push(value_type value)
 {
+    nx::utils::ElapsedTimer t;
+    t.restart();
+
+    std::size_t queueSize = 0;
     {
         QnMutexLocker lock(&m_mutex);
 
@@ -23,11 +29,15 @@ void QueryQueue::push(value_type value)
         auto elementIter = m_elementsByPriority.emplace(
             priority, ElementContext{std::move(value), std::nullopt});
 
+        queueSize = m_elementsByPriority.size();
+
         if (m_itemStayTimeout)
             addElementExpirationTimer(elementIter);
     }
 
     m_cond.wakeAll();
+
+    NX_VERBOSE(this, "QueryQueue::push done in %1, queue size %2", t.elapsed(), queueSize);
 }
 
 std::size_t QueryQueue::size() const
@@ -139,7 +149,7 @@ std::optional<QueryQueue::FoundQueryContext> QueryQueue::getNextSuitableQuery(
 
         if (consumeLimits)
         {
-            // Limits check didn't pass. Making sure we are not selecting a query of the same type 
+            // Limits check didn't pass. Making sure we are not selecting a query of the same type
             // on this iteration since it will lead to query reordering.
             querySelectionContext->forbiddenQueryTypes.push_back(query->queryType());
         }

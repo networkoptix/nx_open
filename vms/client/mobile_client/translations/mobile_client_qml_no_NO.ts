@@ -2,33 +2,44 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="no" sourcelanguage="en">
   <context>
+    <name>ActionButtonsHint</name>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Deaktivert etter planen</translation>
+    </message>
+  </context>
+  <context>
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
-      <translation type="unfinished">Press and hold to</translation>
+      <translation>Trykk og hold for å</translation>
     </message>
   </context>
   <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Velg kamera</translation>
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>Krever innlogging</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Passord kreves</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Firmware på kamera er ikke støttet</translation>
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Frakoblet</translation>
+    </message>
+    <message>
+      <source>I/O module</source>
+      <translation>I / O-modul</translation>
     </message>
   </context>
   <context>
@@ -36,7 +47,7 @@
     <message>
       <source>Log in to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>Logg inn på %1</translation>
     </message>
   </context>
   <context>
@@ -44,170 +55,170 @@
     <message>
       <source>%1 Account</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">%1 Account</translation>
+      <translation>%1 Konto</translation>
     </message>
   </context>
   <context>
     <name>CloudSummary</name>
     <message>
       <source>Log out</source>
-      <translation type="unfinished">Log out</translation>
+      <translation>Logg ut</translation>
     </message>
     <message>
       <source>Go to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Go to %1</translation>
+      <translation>Gå til %1</translation>
     </message>
   </context>
   <context>
     <name>CredentialsEditor</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-post</translation>
     </message>
     <message>
       <source>Resend activation email</source>
-      <translation type="unfinished">Resend activation email</translation>
+      <translation>Send aktiverings e-post igjen</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Passord</translation>
     </message>
     <message>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>Logg Inn</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Opprett konto</translation>
     </message>
     <message>
       <source>Forgot your password?</source>
-      <translation type="unfinished">Forgot your password?</translation>
+      <translation>Glemt passordet?</translation>
     </message>
     <message>
       <source>Activation email sent</source>
-      <translation type="unfinished">Activation email sent</translation>
+      <translation>Aktiverings e-post sendt</translation>
     </message>
     <message>
       <source>Cannot send activation email</source>
-      <translation type="unfinished">Cannot send activation email</translation>
+      <translation>Kan ikke sende aktiverings-e-post</translation>
     </message>
     <message>
       <source>Check your inbox and visit provided link to activate account</source>
-      <translation type="unfinished">Check your inbox and visit provided link to activate account</translation>
+      <translation>Kontroller innboksen din og klikk på lenken for å aktivere konto</translation>
     </message>
     <message>
       <source>Check your internet connection or try again later</source>
-      <translation type="unfinished">Check your internet connection or try again later</translation>
+      <translation>Sjekk Internett-tilkoblingen din, eller prøv igjen senere</translation>
     </message>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>Konto ikke funnet</translation>
     </message>
     <message>
       <source>Wrong password</source>
-      <translation type="unfinished">Wrong password</translation>
+      <translation>Feil passord</translation>
     </message>
     <message>
       <source>Account not activated</source>
-      <translation type="unfinished">Account not activated</translation>
+      <translation>Kontoen er ikke aktivert</translation>
     </message>
     <message>
       <source>Email cannot be empty</source>
-      <translation type="unfinished">Email cannot be empty</translation>
+      <translation>E-post kan ikke være tom</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Passordet kan ikke være tomt</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Learn more about %1</translation>
+      <translation>Lær mer om %1</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Kan ikke koble til %1</translation>
     </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Koble til server</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slett</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-      <translation type="unfinished">Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</translation>
+      <translation>Serveradresser og andre pålogginger forblir lagrede. For å slette all tilkoblingsinformasjon bør du slette alle lagrede pålogginger.</translation>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation type="unfinished">Delete connection?</translation>
+      <translation>Slett tilkobling?</translation>
     </message>
     <message>
       <source>Enter server address</source>
-      <translation type="unfinished">Enter server address</translation>
+      <translation>Skriv inn serveradressen</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
+      <translation>Feltet kan ikke være tomt</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Passordet kan ikke være tomt</translation>
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
       <comment>%1 is a user name</comment>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>Slett innlogging &quot;%1&quot;?</translation>
     </message>
   </context>
   <context>
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>Utviklerinnstillinger</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>Lognivå</translation>
     </message>
   </context>
   <context>
     <name>DialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Avbryt</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Lukk</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Ja</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Nei</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation type="unfinished">Abort</translation>
+      <translation>Avbryt</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Prøv på nytt</translation>
     </message>
   </context>
   <context>
@@ -215,469 +226,478 @@
     <message>
       <source>To connect to old servers please download the legacy application from Google Play.</source>
       <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation type="unfinished">To connect to old servers please download the legacy application from Google Play.</translation>
+      <translation>For å koble til gamle servere kan du laste ned det eldre programmet fra Google Play.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the App Store.</source>
       <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation type="unfinished">To connect to old servers please download the legacy application from the App Store.</translation>
+      <translation>For å koble til gamle servere kan du laste ned det eldre programmet fra App Store.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation type="unfinished">To connect to old servers please download the legacy application from the Internet.</translation>
+      <translation>For å koble til gamle servere, last ned det eldre programmet fra Internett.</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Last ned</translation>
     </message>
   </context>
   <context>
     <name>HelpPopup</name>
     <message>
       <source>Select another cell</source>
-      <translation type="unfinished">Select another cell</translation>
+      <translation>Velg en annen celle</translation>
     </message>
     <message>
       <source>Switch camera in the cell</source>
-      <translation type="unfinished">Switch camera in the cell</translation>
+      <translation>Bytt kamera i cellen</translation>
     </message>
     <message>
       <source>Enter or exit fullscreen</source>
-      <translation type="unfinished">Enter or exit fullscreen</translation>
+      <translation>Åpne eller lukk fullskjerm</translation>
     </message>
     <message>
       <source>Press any key to go to cameras</source>
-      <translation type="unfinished">Press any key to go to cameras</translation>
+      <translation>Trykk på en hvilken som helst tast for å gå til kameraer</translation>
     </message>
     <message>
       <source>Press F1 to show this message again</source>
-      <translation type="unfinished">Press F1 to show this message again</translation>
+      <translation>Trykk F1 for å vise denne meldingen på nytt</translation>
     </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Lukk</translation>
     </message>
   </context>
   <context>
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Ukjent</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>Hi-Res</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>Lo-Res</translation>
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
-      <translation type="unfinished">Keyfr + Lo-Res</translation>
+      <translation>Keyfr + Lo-Res</translation>
     </message>
     <message>
       <source>Custom-Res</source>
-      <translation type="unfinished">Custom-Res</translation>
+      <translation>Custom-Res</translation>
     </message>
     <message>
       <source>%1 fps</source>
       <comment>%1 is a count of frames per second</comment>
-      <translation type="unfinished">%1 fps</translation>
+      <translation>%1 fps</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
       <comment>%1 is a mebgabits per second</comment>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbps</translation>
     </message>
   </context>
   <context>
     <name>LaunchButton</name>
     <message>
       <source>Turn On</source>
-      <translation type="unfinished">Turn On</translation>
+      <translation>Slå på</translation>
     </message>
   </context>
   <context>
     <name>LiteClientControlScreen</name>
     <message>
       <source>Cannot start client</source>
-      <translation type="unfinished">Cannot start client</translation>
+      <translation>Kan ikke starte klienten</translation>
     </message>
     <message>
       <source>Please make sure that display is connected to %1.</source>
-      <translation type="unfinished">Please make sure that display is connected to %1.</translation>
+      <translation>Kontroller at skjermen er koblet til %1.</translation>
     </message>
     <message>
       <source>Cannot stop client</source>
-      <translation type="unfinished">Cannot stop client</translation>
+      <translation>Kan ikke stoppe klienten</translation>
     </message>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>Programvare rotasjon er ikke støttet i fullskjermmodus</translation>
     </message>
     <message>
       <source>%1 is offline</source>
-      <translation type="unfinished">%1 is offline</translation>
-    </message>
-  </context>
-  <context>
-    <name>LiveVideoNavigation</name>
-    <message>
-      <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>%1 er offline</translation>
     </message>
   </context>
   <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Koble til</translation>
     </message>
   </context>
   <context>
     <name>LoginUtils</name>
     <message>
       <source>Invalid login or password</source>
-      <translation type="unfinished">Invalid login or password</translation>
+      <translation>Ugyldig brukernavn eller passord</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out</source>
-      <translation type="unfinished">LDAP Server connection timed out</translation>
+      <translation>LDAP-serverforbindelse utløpt</translation>
     </message>
     <message>
       <source>Server or network is not available</source>
-      <translation type="unfinished">Server or network is not available</translation>
+      <translation>Server eller nettverk er ikke tilgjengelig</translation>
     </message>
     <message>
       <source>Incompatible server</source>
-      <translation type="unfinished">Incompatible server</translation>
+      <translation>Inkompatibel server</translation>
     </message>
     <message>
       <source>Incompatible server version %1</source>
-      <translation type="unfinished">Incompatible server version %1</translation>
+      <translation>Inkompatibel serverversjon %1</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>For mange forsøk. Prøv igjen om et minutt.</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation>Koble til denne serveren fra nettleseren eller via stasjonær klient for å konfigurere den</translation>
     </message>
   </context>
   <context>
     <name>MoveOnTapOverlay</name>
     <message>
       <source>Tap on the image to position your camera</source>
-      <translation type="unfinished">Tap on the image to position your camera</translation>
+      <translation>Trykk på bildet for å plassere kameraet ditt</translation>
     </message>
     <message>
       <source>CANCEL</source>
-      <translation type="unfinished">CANCEL</translation>
+      <translation>AVBRYT</translation>
     </message>
   </context>
   <context>
     <name>NoCameraItem</name>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Ikke noe bilde</translation>
     </message>
   </context>
   <context>
     <name>NoDisplayDummy</name>
     <message>
       <source>No display connected</source>
-      <translation type="unfinished">No display connected</translation>
+      <translation>Ingen skjerm tilkoblet</translation>
     </message>
   </context>
   <context>
     <name>OfflineDummy</name>
     <message>
       <source>You are not connected to any System</source>
-      <translation type="unfinished">You are not connected to any System</translation>
+      <translation>Du er ikke koblet til noe system</translation>
     </message>
   </context>
   <context>
     <name>PresetsButton</name>
     <message>
       <source>PRESETS</source>
-      <translation type="unfinished">PRESETS</translation>
+      <translation>POSISJONER</translation>
     </message>
   </context>
   <context>
     <name>PresetsDialog</name>
     <message>
       <source>PTZ Presets</source>
-      <translation type="unfinished">PTZ Presets</translation>
+      <translation>PTZ-posisjoner</translation>
     </message>
   </context>
   <context>
     <name>QualityDialog</name>
     <message>
       <source>Video Quality</source>
-      <translation type="unfinished">Video Quality</translation>
+      <translation>Video kvalitet</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Ukjent</translation>
     </message>
     <message>
       <source>Highest speed</source>
-      <translation type="unfinished">Highest speed</translation>
+      <translation>Høyeste hastighet</translation>
     </message>
     <message>
       <source>Best quality</source>
-      <translation type="unfinished">Best quality</translation>
+      <translation>Beste kvalitet</translation>
     </message>
     <message>
       <source>Transcoding is disabled.</source>
-      <translation type="unfinished">Transcoding is disabled.</translation>
+      <translation>Transcoding er deaktivert.</translation>
     </message>
     <message>
       <source>Transcoding is not supported for this camera.</source>
-      <translation type="unfinished">Transcoding is not supported for this camera.</translation>
+      <translation>Transcoding støttes ikke for dette kameraet.</translation>
     </message>
     <message>
       <source>Transcoding is not supported for servers with version lower than 3.0.</source>
-      <translation type="unfinished">Transcoding is not supported for servers with version lower than 3.0.</translation>
+      <translation>Transcoding støttes ikke for servere med versjon lavere enn 3.0.</translation>
     </message>
     <message>
       <source>Transcoding is not supported for ARM servers.</source>
-      <translation type="unfinished">Transcoding is not supported for ARM servers.</translation>
+      <translation>Transcoding støttes ikke for ARM-servere.</translation>
     </message>
   </context>
   <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Server frakoblet</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Laster...</translation>
     </message>
     <message>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>Kobler til...</translation>
     </message>
     <message>
       <source>Cannot connect to server</source>
-      <translation type="unfinished">Cannot connect to server</translation>
+      <translation>Kan ikke koble til serveren</translation>
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation type="unfinished">No cameras available on this layout</translation>
+      <translation>Ingen kameraer tilgjengelig i denne visningen</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation type="unfinished">Show all cameras</translation>
+      <translation>Vis alle kameraer</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Ingenting funnet</translation>
     </message>
     <message>
       <source>Press %1 to exit</source>
       <comment>%1 is a key name (like Esc)</comment>
-      <translation type="unfinished">Press %1 to exit</translation>
+      <translation>Trykk %1 å avslutte</translation>
     </message>
   </context>
   <context>
-    <name>SearchToolBar</name>
+    <name>SearchEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Søk</translation>
     </message>
   </context>
   <context>
     <name>SelectCameraDummy</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Velg kamera</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Trykk Ctrl + Pil eller bruk mushjulet</translation>
     </message>
   </context>
   <context>
     <name>ServerOfflineDummy</name>
     <message>
       <source>%1 is offline</source>
-      <translation type="unfinished">%1 is offline</translation>
+      <translation>%1 er offline</translation>
     </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
     <message>
       <source>Host : Port</source>
-      <translation type="unfinished">Host : Port</translation>
+      <translation>Tjener: Port</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Logg Inn</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Passord</translation>
     </message>
     <message>
       <source>Hosts</source>
-      <translation type="unfinished">Hosts</translation>
+      <translation>Tjenere</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Brukere</translation>
     </message>
   </context>
   <context>
     <name>SessionItem</name>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>INKOMPATIBEL</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>OFFLINE</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>UTILGJENGELIG</translation>
     </message>
     <message>
       <source>This server has too old version. Please update it to the latest version.</source>
-      <translation type="unfinished">This server has too old version. Please update it to the latest version.</translation>
+      <translation>Denne serveren har for gammel versjon. Vennligst oppdatere den til den nyeste versjonen.</translation>
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>Koble til denne serveren fra nettleseren eller via stasjonær klient for å konfigurere den</translation>
     </message>
   </context>
   <context>
     <name>SessionsScreen</name>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Koble til server...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Koble til en annen server...</translation>
     </message>
     <message>
       <source>No Systems found</source>
-      <translation type="unfinished">No Systems found</translation>
+      <translation>Ingen systemer funnet</translation>
     </message>
     <message>
       <source>Cannot connect to Server</source>
-      <translation type="unfinished">Cannot connect to Server</translation>
+      <translation>Kan ikke koble til serveren</translation>
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
-      <translation type="unfinished">Check your network connection or contact a system administrator</translation>
+      <translation>Sjekk nettverksforbindelsen din eller kontakt en systemadministrator</translation>
     </message>
     <message>
       <source>Log in to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>Logg inn på %1</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
       <comment>%1 is a button name</comment>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>Kontroller nettverksforbindelsen eller trykk &quot;%1&quot; knappen for å angi en kjent serveradresse.</translation>
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
       <comment>%1 is a system name</comment>
-      <translation type="unfinished">Cannot connect to System &quot;%1&quot;</translation>
+      <translation>Kan ikke koble til System &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Ingenting funnet</translation>
     </message>
   </context>
   <context>
     <name>SettingsScreen</name>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Innstillingar</translation>
     </message>
     <message>
       <source>Live previews in the cameras list</source>
-      <translation type="unfinished">Live previews in the cameras list</translation>
+      <translation>Live forhåndsvisninger i kameraets liste</translation>
     </message>
     <message>
       <source>Save passwords for servers</source>
-      <translation type="unfinished">Save passwords for servers</translation>
+      <translation>Lagre passord for servere</translation>
     </message>
     <message>
       <source>What to do with currently saved passwords?</source>
-      <translation type="unfinished">What to do with currently saved passwords?</translation>
+      <translation>Hva skal du gjøre med lagrede passord?</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slett</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Behold</translation>
     </message>
   </context>
   <context>
     <name>SideNavigation</name>
     <message>
       <source>New connection</source>
-      <translation type="unfinished">New connection</translation>
+      <translation>Ny tilkobling</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation type="unfinished">Disconnect from Server</translation>
+      <translation>Koble fra serveren</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Innstillinger</translation>
     </message>
     <message>
       <source>Start test</source>
-      <translation type="unfinished">Start test</translation>
+      <translation>Ta testen</translation>
     </message>
     <message>
       <source>Stop test</source>
-      <translation type="unfinished">Stop test</translation>
+      <translation>Stopp testen</translation>
     </message>
   </context>
   <context>
     <name>StartingDummy</name>
     <message>
       <source>Turning on</source>
-      <translation type="unfinished">Turning on</translation>
+      <translation>Slår på</translation>
     </message>
   </context>
   <context>
     <name>StoppingDummy</name>
     <message>
       <source>Turning off</source>
-      <translation type="unfinished">Turning off</translation>
+      <translation>Slår av</translation>
     </message>
   </context>
   <context>
     <name>SystemInformationBlock</name>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Ny server</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Ukjent</translation>
     </message>
   </context>
   <context>
     <name>TestSelectionDialog</name>
     <message>
       <source>Select Test</source>
-      <translation type="unfinished">Select Test</translation>
+      <translation>Velg Test</translation>
     </message>
   </context>
   <context>
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Klipp ut</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopier</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Lim inn</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -688,155 +708,163 @@
     <name>TransformationsNotSupportedWarning</name>
     <message>
       <source>Software image rotation is not supported in fullscreen mode</source>
-      <translation type="unfinished">Software image rotation is not supported in fullscreen mode</translation>
+      <translation>Programvare rotasjon er ikke støttet i fullskjermmodus</translation>
     </message>
     <message>
       <source>Show as is</source>
-      <translation type="unfinished">Show as is</translation>
+      <translation>Vis som er</translation>
     </message>
     <message>
       <source>(Space)</source>
-      <translation type="unfinished">(Space)</translation>
+      <translation>(Mellomrom)</translation>
     </message>
   </context>
   <context>
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Lukk</translation>
     </message>
   </context>
   <context>
     <name>VideoDummy</name>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Frakoblet</translation>
     </message>
     <message>
       <source>Unauthorized</source>
-      <translation type="unfinished">Unauthorized</translation>
+      <translation>Uautorisert</translation>
     </message>
     <message>
       <source>Cannot load video</source>
-      <translation type="unfinished">Cannot load video</translation>
+      <translation>Kan ikke laste inn video</translation>
     </message>
     <message>
       <source>Cannot play any video stream</source>
-      <translation type="unfinished">Cannot play any video stream</translation>
+      <translation>Kan ikke spille noen videostrøm</translation>
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>Server frakoblet</translation>
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>Autentisering er påkrevd</translation>
     </message>
     <message>
       <source>Camera offline</source>
-      <translation type="unfinished">Camera offline</translation>
+      <translation>Kamera frakoblet</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
-      <translation type="unfinished">Not enough licenses</translation>
+      <translation>Ikke nok lisenser</translation>
     </message>
     <message>
       <source>Password required</source>
-      <translation type="unfinished">Password required</translation>
+      <translation>Passord kreves</translation>
     </message>
     <message>
       <source>Set password on this camera using Wisenet WAVE client or camera web-page to view video</source>
-      <translation type="unfinished">Set password on this camera using Wisenet WAVE client or camera web-page to view video</translation>
+      <translation>Angi passord på dette kameraet via kameraets webside for å vise video</translation>
     </message>
     <message>
       <source>Unsupported firmware version</source>
-      <translation type="unfinished">Unsupported firmware version</translation>
+      <translation>Firmware på kamera er ikke støttet</translation>
     </message>
     <message>
       <source>Please update firmware</source>
-      <translation type="unfinished">Please update firmware</translation>
+      <translation>Vennligst oppdater firmware</translation>
     </message>
     <message>
       <source>Too many connections</source>
-      <translation type="unfinished">Too many connections</translation>
+      <translation>For mange tilkoblinger</translation>
     </message>
     <message>
       <source>I/O interface not supported yet</source>
-      <translation type="unfinished">I/O interface not supported yet</translation>
+      <translation>I / O-grensesnittet støttes ikke ennå</translation>
     </message>
     <message>
       <source>In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</source>
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
-      <translation type="unfinished">In this app I/O module can be used as a sound input device only. To use it as a control module, please use desktop version of %1</translation>
+      <translation>I denne appen kan I / O-modulen kun brukes som lydinngangsenhet. For å bruke det som en kontrollmodul, bruk desktopversjonen av %1</translation>
+    </message>
+    <message>
+      <source>No live stream</source>
+      <translation type="unfinished">No live stream</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
     <message>
       <source>No motion data for this camera</source>
-      <translation type="unfinished">No motion data for this camera</translation>
+      <translation>Ingen bevegelsesdata for dette kameraet</translation>
     </message>
     <message>
       <source>No motion found in the selected area</source>
-      <translation type="unfinished">No motion found in the selected area</translation>
+      <translation>Ingen bevegelse funnet i det valgte området</translation>
     </message>
     <message>
       <source>No motion found in the visible area</source>
-      <translation type="unfinished">No motion found in the visible area</translation>
+      <translation>Ingen bevegelse funnet i det synlige området</translation>
     </message>
     <message>
       <source>No Archive</source>
-      <translation type="unfinished">No Archive</translation>
+      <translation>Ingen Opptak</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>LIVE</translation>
     </message>
   </context>
   <context>
     <name>VideoScreen</name>
     <message>
       <source>Area</source>
-      <translation type="unfinished">Area</translation>
+      <translation>Område</translation>
     </message>
     <message>
       <source>Change Quality</source>
-      <translation type="unfinished">Change Quality</translation>
+      <translation>Endre kvalitet</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Informasjon</translation>
     </message>
     <message>
       <source>Tap and hold to select an area</source>
-      <translation type="unfinished">Tap and hold to select an area</translation>
+      <translation>Trykk og hold for å velge et område</translation>
     </message>
     <message>
       <source>Enable motion search first to select an area</source>
-      <translation type="unfinished">Enable motion search first to select an area</translation>
+      <translation>Aktiver bevegelsessøk først for å velge et område</translation>
     </message>
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
-      <translation type="unfinished">Invalid custom area. Please draw a correct one.</translation>
+      <translation>Ugyldig tilpasset område. Vennligst prøv igjen.</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Lyd</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Hopp over</translation>
     </message>
   </context>
   <context>
     <name>main</name>
     <message>
       <source>Server offline. Reconnecting...</source>
-      <translation type="unfinished">Server offline. Reconnecting...</translation>
+      <translation>Server frakoblet. Gjenopptar kontakten...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the short cloud name (like &apos;Cloud&apos;)</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Kan ikke koble til %1</translation>
     </message>
   </context>
 </TS>

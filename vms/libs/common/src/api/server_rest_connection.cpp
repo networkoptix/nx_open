@@ -133,7 +133,7 @@ rest::Handle ServerConnection::softwareTriggerCommand(const QnUuid& cameraId, co
     params.insert(lit("eventResourceId"), cameraId.toString());
     if (toggleState != nx::vms::api::EventState::undefined)
         params.insert(lit("state"), QnLexical::serialized(toggleState));
-    return executePost(lit("/api/createEvent"), params, callback, targetThread);
+    return executeGet(lit("/api/createEvent"), params, callback, targetThread);
 }
 
 Handle ServerConnection::createGenericEvent(
