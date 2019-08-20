@@ -1,0 +1,340 @@
+#pragma once
+
+/**@file
+ * This file contains partial implementation of <charconv> header.
+ * Needed because of the lack of support on macosx.
+ * Limitations:
+ * - to from_chars / to_chars only are implemented
+ * - only 10 and 16 bases are supported for integers
+ * - only std::chars_format::general format is supported for floats
+ */
+
+#if defined(__APPLE__)
+#   define NX_CHARCONV_INTEGER
+#   define NX_CHARCONV_FROM_FLOAT
+#elif defined(__GNUG__)
+#   define NX_CHARCONV_FROM_FLOAT
+#endif
+
+// NOTE: msvc declares to_chars(..., float, ...) as "=delete" making it impossible
+// to implement them locally.
+// If needed, this <charconv> implementation may be moved to a new namespace.
+// #define NX_CHARCONV_TO_FLOAT
+
+#if !defined(NX_CHARCONV_INTEGER) && !defined(NX_CHARCONV_FROM_FLOAT) && !defined(NX_CHARCONV_TO_FLOAT)
+
+#include <charconv>
+
+#else
+
+#include <array>
+#include <cstdio>
+#include <cstdlib>
+#include <system_error>
+
+#if !defined(NX_CHARCONV_INTEGER)
+#include <charconv>
+#endif
+
+#include "../log/assert.h"
+
+namespace std {
+
+#if defined(NX_CHARCONV_INTEGER)
+
+struct from_chars_result {
+    const char* ptr;
+    std::errc ec;
+};
+
+struct to_chars_result {
+    char* ptr;
+    std::errc ec;
+};
+
+#endif // #if defined(NX_CHARCONV_INTEGER)
+
+#if defined(NX_CHARCONV_FROM_FLOAT) || defined(NX_CHARCONV_TO_FLOAT)
+
+enum class chars_format {
+    scientific = 1,
+    fixed = 2,
+    hex = 4,
+    general = fixed | scientific
+};
+
+#endif // #if defined(NX_CHARCONV_FROM_FLOAT) || defined(NX_CHARCONV_TO_FLOAT)
+
+} // namespace std
+
+//-------------------------------------------------------------------------------------------------
+
+namespace nx::utils::charconv::detail {
+
+template<typename T, typename Func, typename... Args>
+// requires std::is_arithmetic_v<T>
+std::from_chars_result from_chars(
+    const char* first, const char* last,
+    T& value,
+    Func func,
+    Args... args)
+{
+    const char* realFirst = first;
+    while (isspace(*realFirst) && realFirst < last)
+        ++realFirst;
+
+    //NOTE: strtoll and similar do not support string end.
+    char buf[32];
+    if ((std::size_t)(last - realFirst) > sizeof(buf) - 1)
+        return {first, std::errc::invalid_argument};
+
+    memcpy(buf, realFirst, last - realFirst);
+    buf[last - realFirst] = '\0';
+
+    char* strEnd = nullptr;
+    value = func(buf, &strEnd, args...);
+    if (strEnd == buf)
+        return {first, std::errc::invalid_argument};
+
+    return {realFirst + (strEnd - buf), std::errc()};
+}
+
+template<typename T, typename Func, typename X = std::enable_if_t<std::is_integral_v<T>>>
+// requires std::is_integral_v<T>
+std::from_chars_result int_from_chars(
+    const char* first, const char* last,
+    T& value,
+    Func func,
+    int base)
+{
+    if ((base != 0 && base < 8) || (last <= first))
+        return {first, std::errc::invalid_argument};
+
+    return from_chars(first, last, value, func, base);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+template<typename T>
+std::to_chars_result to_chars(char* first, char* last, T value, const char* format)
+{
+    char buf[32];
+    auto len = std::sprintf(buf, format, value);
+
+    if (len > last - first)
+        return {last, std::errc::value_too_large};
+
+    memcpy(first, buf, len);
+    return {first + len, std::errc()};
+}
+
+template<typename T>
+std::array<char, 5> prepareIntFormatSpecifier(int base)
+{
+    std::array<char, 5> buf;
+    char* fmt = &buf.front();
+    *(fmt++) = '%';
+    if constexpr (std::is_same_v<std::make_signed_t<T>, long>)
+    {
+        *(fmt++) = 'l';
+    }
+    else if constexpr (std::is_same_v<std::make_signed_t<T>, long long>)
+    {
+        *(fmt++) = 'l';
+        *(fmt++) = 'l';
+    }
+
+    if constexpr (std::is_signed_v<T>)
+        *(fmt++) = 'd';
+    else
+        *(fmt++) = 'u';
+
+    if (base == 16)
+        *(fmt - 1) = 'x';
+
+    *(fmt++) = '\0';
+    return buf;
+}
+
+template<typename T, typename X = std::enable_if_t<std::is_integral_v<T>>>
+// requires std::is_integral_v<T>
+std::to_chars_result int_to_chars(char* first, char* last, T value, int base)
+{
+    NX_ASSERT(base == 10 || base == 16);
+
+    if (base != 10 && base != 16)
+        return {first, std::errc::invalid_argument};
+
+    auto format = prepareIntFormatSpecifier<T>(base);
+    return to_chars(first, last, value, format.data());
+}
+
+template<typename T, typename X = std::enable_if_t<std::is_floating_point_v<T>>>
+// requires std::is_floating_point_v<T>
+std::to_chars_result float_to_chars(
+    char* first, char* last,
+    T value,
+    std::chars_format fmt, int precision)
+{
+    NX_ASSERT(fmt == std::chars_format::general);
+
+    if (fmt != std::chars_format::general)
+        return {first, std::errc::invalid_argument};
+
+    char format[16];
+    sprintf(format, "%%.%dg", precision);
+    return to_chars(first, last, value, format);
+}
+
+} // namespace nx::utils::charconv::detail
+
+//-------------------------------------------------------------------------------------------------
+// integer types support.
+
+namespace std {
+
+#if defined(NX_CHARCONV_INTEGER)
+
+inline std::from_chars_result from_chars(
+    const char* first, const char* last,
+    unsigned long long& value, int base = 10)
+{
+    return nx::utils::charconv::detail::int_from_chars(first, last, value, &strtoull, base);
+}
+
+inline std::from_chars_result from_chars(
+    const char* first, const char* last,
+    long long& value, int base = 10)
+{
+    return nx::utils::charconv::detail::int_from_chars(first, last, value, &strtoll, base);
+}
+
+inline std::from_chars_result from_chars(
+    const char* first, const char* last,
+    long& value, int base = 10)
+{
+    return nx::utils::charconv::detail::int_from_chars(first, last, value, &strtol, base);
+}
+
+inline std::from_chars_result from_chars(
+    const char* first, const char* last,
+    unsigned long& value, int base = 10)
+{
+    return nx::utils::charconv::detail::int_from_chars(first, last, value, &strtoul, base);
+}
+
+inline std::from_chars_result from_chars(
+    const char* first, const char* last,
+    int& value, int base = 10)
+{
+    long tmpValue = 0;
+    const auto result = nx::utils::charconv::detail::int_from_chars(first, last, tmpValue, &strtol, base);
+    value = tmpValue;
+    return result;
+}
+
+inline std::from_chars_result from_chars(
+    const char* first, const char* last,
+    unsigned int& value, int base = 10)
+{
+    unsigned long tmpValue = 0;
+    const auto result = nx::utils::charconv::detail::int_from_chars(first, last, tmpValue, &strtol, base);
+    value = tmpValue;
+    return result;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+inline to_chars_result to_chars(char* first, char* last, long long value, int base = 10)
+{
+    return nx::utils::charconv::detail::int_to_chars(first, last, value, base);
+}
+
+inline to_chars_result to_chars(char* first, char* last, unsigned long long value, int base = 10)
+{
+    return nx::utils::charconv::detail::int_to_chars(first, last, value, base);
+}
+
+inline to_chars_result to_chars(char* first, char* last, long value, int base = 10)
+{
+    return nx::utils::charconv::detail::int_to_chars(first, last, value, base);
+}
+
+inline to_chars_result to_chars(char* first, char* last, unsigned long value, int base = 10)
+{
+    return nx::utils::charconv::detail::int_to_chars(first, last, value, base);
+}
+
+inline to_chars_result to_chars(char* first, char* last, int value, int base = 10)
+{
+    return nx::utils::charconv::detail::int_to_chars(first, last, value, base);
+}
+
+inline to_chars_result to_chars(char* first, char* last, unsigned int value, int base = 10)
+{
+    return nx::utils::charconv::detail::int_to_chars(first, last, value, base);
+}
+
+#endif // #if defined(NX_CHARCONV_INTEGER)
+
+#if defined(NX_CHARCONV_FROM_FLOAT)
+
+//-------------------------------------------------------------------------------------------------
+// float support.
+
+inline std::from_chars_result from_chars(
+    const char* first, const char* last, float& value,
+    std::chars_format /*fmt*/ = std::chars_format::general)
+{
+    return nx::utils::charconv::detail::from_chars(first, last, value, &strtof);
+}
+
+inline std::from_chars_result from_chars(
+    const char* first, const char* last, double& value,
+    std::chars_format /*fmt*/ = std::chars_format::general)
+{
+    return nx::utils::charconv::detail::from_chars(first, last, value, &strtod);
+}
+
+inline std::from_chars_result from_chars(
+    const char* first, const char* last, long double& value,
+    std::chars_format /*fmt*/ = std::chars_format::general)
+{
+    return nx::utils::charconv::detail::from_chars(first, last, value, &strtold);
+}
+
+#endif // #if defined(NX_CHARCONV_FROM_FLOAT)
+
+//-------------------------------------------------------------------------------------------------
+
+#if defined(NX_CHARCONV_TO_FLOAT)
+
+inline to_chars_result to_chars(
+    char* first, char* last,
+    float value,
+    std::chars_format fmt, int precision)
+{
+    return nx::utils::charconv::detail::float_to_chars(first, last, value, fmt, precision);
+}
+
+inline to_chars_result to_chars(
+    char* first, char* last,
+    double value,
+    std::chars_format fmt, int precision)
+{
+    return nx::utils::charconv::detail::float_to_chars(first, last, value, fmt, precision);
+}
+
+inline to_chars_result to_chars(
+    char* first, char* last,
+    long double value,
+    std::chars_format fmt, int precision)
+{
+    return nx::utils::charconv::detail::float_to_chars(first, last, value, fmt, precision);
+}
+
+#endif // defined(NX_CHARCONV_TO_FLOAT)
+
+} // namespace std
+
+#endif
