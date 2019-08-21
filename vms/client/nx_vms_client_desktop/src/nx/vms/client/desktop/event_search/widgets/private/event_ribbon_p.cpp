@@ -597,7 +597,10 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
             });
 
         QList<QAction*> actions({openAction, openInNewTabAction});
-        menu->insertActions(menu->actions()[0], actions);
+        if (menu->isEmpty())
+            menu->addActions(actions);
+        else
+            menu->insertActions(menu->actions()[0], actions);
     }
 
     if (!menu)
