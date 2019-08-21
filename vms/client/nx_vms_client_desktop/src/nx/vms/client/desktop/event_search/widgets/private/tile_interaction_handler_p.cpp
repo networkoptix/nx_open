@@ -127,6 +127,12 @@ TileInteractionHandler::TileInteractionHandler(EventRibbon* parent):
             openSource(index, /*inNewTab*/ false, /*fromDoubleClick*/ true);
         });
 
+    connect(m_ribbon.data(), &EventRibbon::openRequested, this,
+        [this](const QModelIndex& index, bool inNewTab)
+        {
+            openSource(index, inNewTab, /*fromDoubleClick*/ false);
+        });
+
     connect(m_ribbon.data(), &EventRibbon::dragStarted,
         this, &TileInteractionHandler::performDragAndDrop);
 

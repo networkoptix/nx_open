@@ -583,7 +583,7 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
             [this, index]()
             {
                 if (index.isValid())
-                    emit q->doubleClicked(index);
+                    emit q->openRequested(index, /*inNewTab*/ false);
             });
 
         const auto openInNewTabAction = new QAction(
@@ -593,7 +593,7 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
             [this, index]()
             {
                 if (index.isValid())
-                    emit q->clicked(index, Qt::MiddleButton, Qt::NoModifier);
+                    emit q->openRequested(index, /*inNewTab*/ true);
             });
 
         QList<QAction*> actions({openAction, openInNewTabAction});
