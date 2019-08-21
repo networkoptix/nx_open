@@ -141,38 +141,13 @@ nx::Buffer SignatureCalculator::calculateSignKey(
     return md;
 }
 
-class TestOutput
-{
-public:
-    TestOutput():
-        m_hash(nx::utils::QnCryptographicHash::Algorithm::Sha256)
-    {
-    }
-
-    void addData(const QByteArray& data)
-    {
-        m_str += data;
-        m_hash.addData(data);
-    }
-
-    QByteArray result()
-    {
-        return m_hash.result();
-    }
-
-private:
-    QByteArray m_str;
-    nx::utils::QnCryptographicHash m_hash;
-};
-
 std::tuple<nx::Buffer, bool /*result*/>
     SignatureCalculator::calculateCanonicalRequestSha256Hash(
         const network::http::Request& request,
         IntermediateValues* intermediateValues)
 {
-    //nx::utils::QnCryptographicHash cryptographicHash(
-    //    nx::utils::QnCryptographicHash::Algorithm::Sha256);
-    TestOutput cryptographicHash;
+    nx::utils::QnCryptographicHash cryptographicHash(
+        nx::utils::QnCryptographicHash::Algorithm::Sha256);
 
     cryptographicHash.addData(request.requestLine.method);
     cryptographicHash.addData("\n");
