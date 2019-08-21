@@ -650,9 +650,9 @@ void DeviceAgent::parseSettings()
             else
             {
                 NX_PRINT << "Received an incorrect setting value for '"
-                    << parameterName << "' "
-                    << parameterValueString
-                    << ". Expected an integer";
+                    << parameterName << "': "
+                    << nx::kit::utils::toString(parameterValueString)
+                    << ". Expected an integer.";
             }
         };
 

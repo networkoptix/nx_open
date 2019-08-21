@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+
 #include <nx/sql/filter.h>
 #include <nx/sql/query.h>
 #include <nx/sql/query_context.h>
@@ -84,6 +86,12 @@ public:
         const QString& filter);
 
 private:
+    struct TrackQueryResult
+    {
+        std::vector<ObjectTrack> tracks;
+        std::set<QnUuid> ids;
+    };
+
     const DeviceDao& m_deviceDao;
     const ObjectTypeDao& m_objectTypeDao;
     AttributesDao* m_attributesDao = nullptr;
@@ -98,8 +106,8 @@ private:
 
     void fetchTracksFromDb(
         nx::sql::QueryContext* queryContext,
-        const std::vector<std::int64_t>& trackGroups,
-        std::vector<ObjectTrack>* result);
+        const std::set<std::int64_t>& trackGroups,
+        TrackQueryResult* result);
 
     void prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* query);
 
