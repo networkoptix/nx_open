@@ -28,7 +28,7 @@ void AuthenticationForwarder::authenticate(
     {
         auto failedAuthentication =
             failedAuthenticationResult(
-                ResultCode::badRequest,
+                ResultCode::notAuthorized,
                 "missing Authorization header");
         failedAuthentication.wwwAuthenticate = generateWwwAuthenticateHeader(generateNonce());
         return completionHandler(std::move(failedAuthentication));
