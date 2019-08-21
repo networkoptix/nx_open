@@ -14,12 +14,11 @@ file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js
 
 set(resources)
 
-if (IOS OR ANDROID)
-    set (TRANSLATION_FILES
-        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/common_translations.dat"
-        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mobile_client_translations.dat"
-        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/nx_vms_client_core_translations.dat")
-endif()
+set(translation_files
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/common_translations.dat
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mobile_client_translations.dat
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/nx_vms_client_core_translations.dat
+)
 
 if(IOS)
     if(NOT mobile_client_ios_launch_screen)
@@ -106,6 +105,7 @@ if(ANDROID)
         QML_ROOT_PATH "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
         VERSION "${mobileClientVersion.full}"
         EXTRA_LIBS ${OPENSSL_LIBS} ${FFMPEG_LIBS} ${OPENAL_LIBS}
+        TRANSLATIONS ${translation_files}
         ${code_signing_parameters}
     )
 endif()

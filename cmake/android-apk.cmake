@@ -22,7 +22,7 @@ function(add_android_apk target)
     set(options)
     set(oneValueArgs TARGET FILE_NAME QML_ROOT_PATH VERSION
         KEYSTORE_FILE KEYSTORE_ALIAS KEYSTORE_PASSWORD KEYSTORE_KEY_PASSWORD)
-    set(multiValueArgs PACKAGE_SOURCES QML_IMPORT_PATHS EXTRA_LIBS)
+    set(multiValueArgs PACKAGE_SOURCES QML_IMPORT_PATHS EXTRA_LIBS TRANSLATIONS)
 
     cmake_parse_arguments(APK "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -103,6 +103,15 @@ function(add_android_apk target)
 
     set(apk_dir "${CMAKE_CURRENT_BINARY_DIR}/${APK_TARGET}_apk")
     set(translations_dir "${PACKAGE_SOURCE}/assets/translations")
+
+    set(copy_translations_commands)
+    if(APK_TRANSLATIONS)
+        set(copy_translations_commands
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${translations_dir}"
+            COMMAND ${CMAKE_COMMAND} -E copy ${APK_TRANSLATIONS} ${translations_dir}
+        )
+    endif()
+
     add_custom_command(
         OUTPUT ${APK_FILE_NAME}
         DEPENDS ${APK_TARGET}
@@ -110,8 +119,7 @@ function(add_android_apk target)
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${PACKAGE_SOURCE}
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${APK_PACKAGE_SOURCES} ${PACKAGE_SOURCE}
         COMMAND ${CMAKE_COMMAND} -E make_directory "${apk_dir}/libs/${CMAKE_ANDROID_ARCH_ABI}"
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${translations_dir}"
-        COMMAND ${CMAKE_COMMAND} -E copy ${TRANSLATION_FILES} ${translations_dir}
+        ${copy_translations_commands}
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:${APK_TARGET}>"
             "${apk_dir}/libs/${CMAKE_ANDROID_ARCH_ABI}"
         COMMAND ${ANDROIDDEPLOYQT_EXECUTABLE} ${build_type} ${sign_parameters}
