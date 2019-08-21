@@ -465,7 +465,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
         [this]()
         {
             const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
-            setCurrentDate(timeWatcher->displayTime(qnSyncTime->currentMSecsSinceEpoch()).date());
+            setCurrentDate(timeWatcher->displayTime(qnSyncTime->currentMSecsSinceEpoch()));
             updateCurrentTimePeriod();
         });
 }
@@ -718,7 +718,7 @@ QnTimePeriod AbstractSearchWidget::Private::effectiveTimePeriod() const
             break;
     }
 
-    return QnTimePeriod(QDateTime(m_currentDate.addDays(1 - days)).toMSecsSinceEpoch(),
+    return QnTimePeriod(m_currentDate.addDays(1 - days).toMSecsSinceEpoch(),
         QnTimePeriod::kInfiniteDuration);
 }
 
@@ -958,12 +958,15 @@ void AbstractSearchWidget::Private::updatePlaceholderVisibility()
     m_placeholderOpacityAnimation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-void AbstractSearchWidget::Private::setCurrentDate(const QDate& value)
+void AbstractSearchWidget::Private::setCurrentDate(const QDateTime& value)
 {
-    if (m_currentDate == value)
+    auto startOfDay = value;
+    startOfDay.setTime(QTime(0, 0));
+
+    if (m_currentDate == startOfDay)
         return;
 
-    m_currentDate = value;
+    m_currentDate = startOfDay;
 
     const auto model = ui->ribbon->model();
     const auto range = ui->ribbon->visibleRange();

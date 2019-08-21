@@ -744,9 +744,6 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
 {
     NX_ASSERT(params.eventType == EventType::analyticsSdkEvent);
 
-    const QnUuid engineId = params.getAnalyticsEngineId();
-    NX_ASSERT(!engineId.isNull());
-
     const QString eventTypeId = params.getAnalyticsEventTypeId();
     NX_ASSERT(!eventTypeId.isEmpty());
 
