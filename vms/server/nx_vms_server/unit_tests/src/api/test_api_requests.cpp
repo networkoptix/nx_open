@@ -95,14 +95,14 @@ void doExecutePost(const MediaServerLauncher* const launcher, const QString& url
     {
         StatusCodeVisitor(int actual): m_actual(actual) {}
 
-        void operator()(const Equals& equal) const
+        void operator()(const Equals& equals) const
         {
-            ASSERT_EQ(m_actual, equal.code);
+            ASSERT_EQ(m_actual, equals.code);
         }
 
-        void operator()(const NotEquals& notEqual) const
+        void operator()(const NotEquals& notEquals) const
         {
-            ASSERT_NE(m_actual, notEqual.code);
+            ASSERT_NE(m_actual, notEquals.code);
         }
 
     private:

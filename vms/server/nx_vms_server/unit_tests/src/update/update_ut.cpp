@@ -266,7 +266,8 @@ protected:
         return result;
     }
 
-    void assertForbiddenStatus(const std::vector<QString>& requestsToCheck,
+    void assertForbiddenStatus(
+        const std::vector<QString>& requestsToCheck,
         const UserDataWithExpectedForbiddenStatus& userDataWithHttpCode)
     {
         for (const auto& request: requestsToCheck)
