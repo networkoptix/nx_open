@@ -43,7 +43,8 @@ protected:
         const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
 private:
-    void startFetchingMetadata(const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+    nx::sdk::Result<void> startFetchingMetadata(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
     void stopFetchingMetadata();
 
 private:

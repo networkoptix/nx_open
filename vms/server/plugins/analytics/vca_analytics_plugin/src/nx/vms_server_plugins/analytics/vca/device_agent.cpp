@@ -429,12 +429,22 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     m_handler.reset(handler);
 }
 
-
 void DeviceAgent::doSetNeededMetadataTypes(
     Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
-    if (neededMetadataTypes->isEmpty())
+    const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
+    if (const char* const kMessage = "Event type id list is null";
+        !NX_ASSERT(eventTypeIds, kMessage))
+    {
+        *outResult = error(ErrorCode::internalError, kMessage);
+        return;
+    }
+
+    if (eventTypeIds->count() == 0)
+    {
         stopFetchingMetadata();
+        return;
+    }
 
     *outResult = startFetchingMetadata(neededMetadataTypes);
 }
