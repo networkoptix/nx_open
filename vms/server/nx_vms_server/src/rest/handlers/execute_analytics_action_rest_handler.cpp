@@ -310,13 +310,13 @@ std::optional<ExtendedAnalyticsActionData>
     const auto objectTrack = fetchObjectTrack(trackId, needFullTrack);
     if (!objectTrack)
     {
-        NX_DEBUG(this, "Unable fetch track by id %1", trackId);
+        NX_DEBUG(this, "Unable to fetch Track by id %1", trackId);
         return std::nullopt;
     }
 
     if (objectTrack->objectPositionSequence.empty())
     {
-        NX_DEBUG(this, "Object track %1 position sequence is empty", trackId);
+        NX_DEBUG(this, "Object Track %1 position sequence is empty", trackId);
         return std::nullopt;
     }
 
@@ -334,7 +334,7 @@ std::optional<ExtendedAnalyticsActionData>
     if (!NX_ASSERT(bestShotTimestampUs != AV_NOPTS_VALUE))
     {
         NX_DEBUG(this,
-            "Failed to fetch the best shot timestamp for the Object track %1", trackId);
+            "Failed to fetch the best shot timestamp for the Object Track %1", trackId);
         return std::nullopt;
     }
 
@@ -361,7 +361,7 @@ std::optional<ExtendedAnalyticsActionData>
         if (!objectPosition)
         {
             NX_WARNING(this,
-                "Unable to find best shot position for track %1 by timestamp %2 us",
+                "Unable to find best shot position for Track %1 by timestamp %2 us",
                 trackId,
                 bestShotTimestampUs);
             return std::nullopt;
@@ -476,7 +476,7 @@ std::optional<nx::analytics::db::ObjectPosition>
     if (lowerBound == objectPositionSequence.cend() && upperBound == objectPositionSequence.cend())
     {
         NX_DEBUG(this,
-            "Unable to find position with timestamp %1 in the track %2",
+            "Unable to find position with timestamp %1 in the Track %2",
             timestampUs, objectTrack.id);
 
         return std::nullopt;
@@ -485,14 +485,14 @@ std::optional<nx::analytics::db::ObjectPosition>
     if (lowerBound == objectPositionSequence.cend())
     {
         NX_DEBUG(this,
-            "Unable to find lower bound for position with timestamp %1 in the track %2, "
+            "Unable to find lower bound for position with timestamp %1 in the Track %2, "
             "using upper bound %3",
             timestampUs, objectTrack.id, upperBound->timestampUs);
 
         return *upperBound;
     }
 
-    NX_DEBUG(this, "Got poistion for timestamp %1 for the track %2, position timestmap is %3",
+    NX_DEBUG(this, "Got poistion for timestamp %1 for the Track %2, position timestmap is %3",
         timestampUs, objectTrack.id, lowerBound->timestampUs);
 
     return *lowerBound;
@@ -509,7 +509,7 @@ std::optional<nx::analytics::db::ObjectTrack>
     filter.maxObjectTrackSize = needFullTrack ? /*unlimited length*/ 0 : 1;
 
     NX_DEBUG(this,
-        "Trying to fetch track with id %1. Full track is needed: %2",
+        "Trying to fetch Track with id %1. Full Track is needed: %2",
         objectTrackId, needFullTrack);
 
     const auto lookupResult = makeDatabaseRequest(filter);
@@ -521,12 +521,12 @@ std::optional<nx::analytics::db::ObjectTrack>
     }
 
     NX_ASSERT(lookupResult->size() <= 1,
-        lm("Only one object track has been requested but got %1").args(lookupResult->size()));
+        lm("Only one object Track has been requested but got %1").args(lookupResult->size()));
 
     if (!lookupResult->empty())
         return lookupResult->at(0);
 
-    NX_DEBUG(this, "Database lookup result is empty for object track %1", objectTrackId);
+    NX_DEBUG(this, "Database lookup result is empty for object Track %1", objectTrackId);
     return std::nullopt;
 }
 
