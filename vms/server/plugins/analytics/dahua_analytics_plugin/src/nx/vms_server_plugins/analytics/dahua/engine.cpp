@@ -109,7 +109,11 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
         fetchDeviceAgentParsedManifest(deviceInfo);
 
     if (deviceAgentParsedManifest.supportedEventTypeIds.isEmpty())
+    {
+        NX_DEBUG(this, "Supported Event Type list is empty for the Device %1 (%2)",
+            deviceInfo->name(), deviceInfo->id());
         return;
+    }
 
     *outResult = new DeviceAgent(this, deviceInfo, deviceAgentParsedManifest);
 }

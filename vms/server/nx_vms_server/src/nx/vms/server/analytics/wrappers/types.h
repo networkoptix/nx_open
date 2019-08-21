@@ -70,7 +70,6 @@ enum class ViolationType
     manifestLogicalError,
 
     nullEngine,
-    nullDeviceAgent,
 
     inconsistentActionResult,
     invalidActionResultUrl,

@@ -112,7 +112,9 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
         const auto deviceAgent = createDeviceAgent();
         if (!deviceAgent)
         {
-            NX_ERROR(this, "DeviceAgent creation failed for the Device %1 (%2)",
+            NX_ERROR(this,
+                "DeviceAgent creation failed for the Engine %1 (%2) and the Device %3 (%4)",
+                m_engine->getName(), m_engine->getId(),
                 m_device->getUserDefinedName(), m_device->getId());
             return false;
         }
