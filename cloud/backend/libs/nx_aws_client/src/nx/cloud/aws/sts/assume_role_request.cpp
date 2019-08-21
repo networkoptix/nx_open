@@ -43,14 +43,14 @@ void serialize(QXmlStreamWriter* writer, const sts::AssumeRoleResult& object)
 {
     writeElement(writer, kPackedPolicySize, object.packedPolicySize);
     {
-        NestedObject(writer, object.credentials);
+        NestedObject<decltype(object.credentials)>(writer, object.credentials);
         writeElement(writer, kAccessKeyId, object.credentials.accessKeyId);
         writeElement(writer, kSecretAccessKey, object.credentials.secretAccessKey);
         writeElement(writer, kSessionToken, object.credentials.sessionToken);
         writeElement(writer, kExpiration, object.credentials.expiration);
     }
     {
-        NestedObject(writer, object.assumedRoleUser);
+        NestedObject<decltype(object.assumedRoleUser)>(writer, object.assumedRoleUser);
         writeElement(writer, kAssumedRoleId, object.assumedRoleUser.assumedRoleId);
         writeElement(writer, kArn, object.assumedRoleUser.arn);
     }

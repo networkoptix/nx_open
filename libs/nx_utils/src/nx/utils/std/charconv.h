@@ -229,7 +229,7 @@ inline std::from_chars_result from_chars(
 {
     long tmpValue = 0;
     const auto result = nx::utils::charconv::detail::int_from_chars(first, last, tmpValue, &strtol, base);
-    value = tmpValue;
+    value = (int) tmpValue;
     return result;
 }
 
@@ -239,7 +239,7 @@ inline std::from_chars_result from_chars(
 {
     unsigned long tmpValue = 0;
     const auto result = nx::utils::charconv::detail::int_from_chars(first, last, tmpValue, &strtol, base);
-    value = tmpValue;
+    value = (unsigned int) tmpValue;
     return result;
 }
 
