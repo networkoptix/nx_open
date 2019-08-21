@@ -79,6 +79,7 @@ const std::string kGenerateBicyclesSetting{"generateBicycles"};
 const std::string kGenerateObjectsEveryNFramesSetting{"generateObjectsEveryNFrames"};
 const std::string kNumberOfObjectsToGenerateSetting{"numberOfObjectsToGenerate"};
 const std::string kGeneratePreviewPacketSetting{"generatePreviewPacket"};
+const std::string kGeneratePreviewAfterNFramesSetting("generatePreviewAfterNFrames");
 const std::string kThrowPluginDiagnosticEventsFromDeviceAgentSetting{
     "throwPluginDiagnosticEventsFromDeviceAgent"};
 

@@ -300,6 +300,14 @@ std::string Engine::manifestString() const
                                 "caption": "Generate preview packet",
                                 "defaultValue": true,
                                 "value": true
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": ")json" + kGeneratePreviewAfterNFramesSetting + R"json(",
+                                "caption": "Generate preview after N frames",
+                                "defaultValue": 30,
+                                "minValue": 1,
+                                "maxValue": 100000
                             }
                         ]
                     },
@@ -425,7 +433,14 @@ static std::string objectTrackToString(
     if (track->count() == 0)
         return "empty";
 
-    std::string result = format("%d metadata items", track->count());
+    const auto firstMetadataOfTrack = track->at(0);
+    if (!firstMetadataOfTrack)
+        return "INTERNAL ERROR: Invalid Track metadata list";
+
+    std::string result = format(
+        "%d metadata items, Track start time, us: %lld",
+        track->count(),
+        firstMetadataOfTrack->timestampUs());
 
     Uuid trackld;
     for (int i = 0; i < track->count(); ++i)
@@ -436,7 +451,7 @@ static std::string objectTrackToString(
         {
             if (!result.empty())
                 result += "; ";
-            result += format("INTERNAL ERROR: Track id #%d %s does not equal track id #0 %s",
+            result += format("INTERNAL ERROR: Track id #%d %s does not equal Track id #0 %s",
                 i,
                 UuidHelper::toStdString(trackld).c_str(),
                 UuidHelper::toStdString(track->at(0)->trackId()).c_str());
@@ -448,7 +463,7 @@ static std::string objectTrackToString(
     {
         if (!result.empty())
             result += "; ";
-        result += format("INTERNAL ERROR: Track id in the track is %s, but in the action is %s",
+        result += format("INTERNAL ERROR: Track id in the Track is %s, but in the Action is %s",
             UuidHelper::toStdString(trackld).c_str(),
             UuidHelper::toStdString(expectedTrackId).c_str());
     }

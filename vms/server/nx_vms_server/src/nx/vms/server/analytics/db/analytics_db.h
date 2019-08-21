@@ -7,6 +7,7 @@
 
 #include <nx/sql/filter.h>
 #include <nx/sql/query.h>
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/basic_factory.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
@@ -34,7 +35,13 @@ public:
     EventsStorage(QnMediaServerModule* mediaServerModule);
     virtual ~EventsStorage();
 
+    /**
+     * MUST be invoked before any usage.
+     * If this method fails then the object cannot be used.
+     */
     virtual bool initialize(const Settings& settings) override;
+
+    virtual bool initialized() const override;
 
     virtual void save(common::metadata::ConstObjectMetadataPacketPtr packet) override;
 
@@ -63,9 +70,6 @@ private:
     QnMediaServerModule* m_mediaServerModule = nullptr;
     std::unique_ptr<DbController> m_dbController;
     std::list<AbstractCursor*> m_openedCursors;
-    QnMutex m_dbControllerMutex;
-    QnMutex m_cursorsMutex;
-    std::atomic<bool> m_closingDbController {false};
     std::chrono::milliseconds m_maxRecordedTimestamp = std::chrono::milliseconds::zero();
     mutable QnMutex m_mutex;
     AttributesDao m_attributesDao;
@@ -76,12 +80,15 @@ private:
     ObjectTrackAggregator m_trackAggregator;
     ObjectTrackGroupDao m_trackGroupDao;
     bool m_stopped = false;
+    nx::utils::AsyncOperationGuard m_asyncOperationGuard;
 
     bool ensureDbDirIsWritable(const QString& path);
 
     bool readMaximumEventTimestamp();
 
     bool loadDictionaries();
+
+    void closeAllCursors(const QnMutexLockerBase&);
 
     void savePacketDataToCache(
         const QnMutexLockerBase& /*lock*/,
@@ -108,6 +115,50 @@ private:
 
     static QRect packRect(const QRectF& rectf);
     static QRectF unpackRect(const QRect& rect);
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class MovableAnalyticsDb:
+    public AbstractEventsStorage
+{
+public:
+    MovableAnalyticsDb(QnMediaServerModule* mediaServerModule);
+    virtual ~MovableAnalyticsDb();
+
+    virtual bool initialize(const Settings& settings) override;
+
+    virtual bool initialized() const override;
+
+    virtual void save(common::metadata::ConstObjectMetadataPacketPtr packet) override;
+
+    virtual void createLookupCursor(
+        Filter filter,
+        CreateCursorCompletionHandler completionHandler) override;
+
+    virtual void lookup(
+        Filter filter,
+        LookupCompletionHandler completionHandler) override;
+
+    virtual void lookupTimePeriods(
+        Filter filter,
+        TimePeriodsLookupOptions options,
+        TimePeriodsLookupCompletionHandler completionHandler) override;
+
+    virtual void markDataAsDeprecated(
+        QnUuid deviceId,
+        std::chrono::milliseconds oldestDataToKeepTimestamp) override;
+
+    virtual void flush(StoreCompletionHandler completionHandler) override;
+
+    virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override;
+
+private:
+    QnMutex m_mutex;
+    QnMediaServerModule* m_mediaServerModule = nullptr;
+    std::shared_ptr<EventsStorage> m_db;
+
+    std::shared_ptr<EventsStorage> getDb();
 };
 
 //-------------------------------------------------------------------------------------------------

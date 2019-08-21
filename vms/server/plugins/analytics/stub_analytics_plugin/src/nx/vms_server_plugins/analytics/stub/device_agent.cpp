@@ -484,9 +484,8 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 
         ++(context.frameCounter);
 
-        static const int kNumberOfFramesBeforePreviewGeneration = 60;
         bool previewIsNeeded = m_deviceAgentSettings.generatePreviews
-            && context.frameCounter > kNumberOfFramesBeforePreviewGeneration
+            && context.frameCounter > m_deviceAgentSettings.numberOfFramesBeforePreviewGeneration
             && !context.isPreviewGenerated;
 
         if (previewIsNeeded)
@@ -679,6 +678,10 @@ void DeviceAgent::parseSettings()
     assignIntegerSetting(
         kAdditionalFrameProcessingDelayMs,
         &m_deviceAgentSettings.additionalFrameProcessingDelay);
+
+    assignIntegerSetting(
+        kGeneratePreviewAfterNFramesSetting,
+        &m_deviceAgentSettings.numberOfFramesBeforePreviewGeneration);
 }
 
 void DeviceAgent::updateObjectGenerationParameters()

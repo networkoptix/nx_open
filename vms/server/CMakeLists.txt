@@ -3,17 +3,17 @@ if(withMediaServer OR withClouds)
 endif()
 
 if(withMediaServer)
-    add_subdirectory(nx_vms_server)
-    add_subdirectory(mediaserver)
-    add_subdirectory(plugins)
-    add_subdirectory(rtsp_perf)
-
-    if(withSdk)
-        # TODO: Combine all SDKs (nx_storage_sdk, nx_camera_sdk, nx_metadata_sdk) into one like this.
+    if(withSdk) #< Should come before nx_vms_server because the latter packs sdk zips to resources.
+        # TODO: Combine all SDKs (storage_sdk, camera_sdk, metadata_sdk) into one.
         add_subdirectory(nx_metadata_sdk)
         add_subdirectory(nx_camera_sdk)
         add_subdirectory(nx_storage_sdk)
     endif()
+
+    add_subdirectory(nx_vms_server)
+    add_subdirectory(mediaserver)
+    add_subdirectory(plugins)
+    add_subdirectory(rtsp_perf)
 
     if(withMediaDbUtil)
         add_subdirectory(media_db_util)
