@@ -119,18 +119,14 @@ function(setup_ios_application target)
         COMMENT "Copying QML imports for ${target}"
     )
 
-    set(copy_translations_command)
     if(APP_TRANSLATIONS)
-        set(copy_translations_command
+        add_custom_command(
+            TARGET ${target}
+            PRE_LINK
+            DEPENDS ${APP_TRANSLATIONS}
             COMMAND ${CMAKE_COMMAND} -E copy ${APP_TRANSLATIONS} ${app_dir}
             COMMENT "Copying translations for ${target}"
-            )
+        )
     endif()
 
-    add_custom_command(
-        TARGET ${target}
-        PRE_LINK
-        DEPENDS ${APP_TRANSLATIONS}
-        ${copy_translations_command}
-    )
 endfunction()
