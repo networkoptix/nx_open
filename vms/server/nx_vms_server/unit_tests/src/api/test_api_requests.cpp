@@ -72,7 +72,8 @@ nx::utils::Url createUrl(const MediaServerLauncher* const launcher, const QStrin
 
 void doExecutePost(const MediaServerLauncher* const launcher, const QString& urlStr,
     const QByteArray& request, PreprocessRequestFunc preprocessRequestFunc,
-    int httpStatus, const QString &authName, const QString &authPassword, QByteArray* responseBody)
+    StatusCodeExpectation httpStatus, const QString &authName, const QString &authPassword,
+    QByteArray* responseBody)
 {
     auto httpClient = createHttpClient(authName, authPassword);
     nx::utils::Url url = createUrl(launcher, urlStr);
@@ -89,8 +90,27 @@ void doExecutePost(const MediaServerLauncher* const launcher, const QString& url
     NX_INFO(typeid(FunctionsTag), lm("POST_STATUS: %1").arg(httpClient->response()->statusLine.statusCode));
 
     ASSERT_TRUE(httpClient->response() != nullptr);
-    ASSERT_EQ(httpStatus, httpClient->response()->statusLine.statusCode);
 
+    struct StatusCodeVisitor
+    {
+        StatusCodeVisitor(int actual): m_actual(actual) {}
+
+        void operator()(const Equals& equal) const
+        {
+            ASSERT_EQ(m_actual, equal.code);
+        }
+
+        void operator()(const NotEquals& notEqual) const
+        {
+            ASSERT_NE(m_actual, notEqual.code);
+        }
+
+    private:
+        int m_actual = -1;
+    };
+
+    boost::apply_visitor(
+        StatusCodeVisitor(httpClient->response()->statusLine.statusCode), httpStatus);
     if (responseBody)
         *responseBody = response;
 }
