@@ -165,7 +165,7 @@ void StorageManager::addStorage(
 
     m_database->synchronizationEngine().transactionLog().startDbTransaction(
         m_settings.database().synchronization.clusterId,
-        [this, addStorageContext, request, clientEndpoint, accountOwner](auto queryContext)
+        [this, addStorageContext, request, clientEndpoint, accountOwner = accountOwner](auto queryContext)
         {
             auto buckets = m_bucketManager->fetchBuckets(queryContext);
 
