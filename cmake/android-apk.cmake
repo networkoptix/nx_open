@@ -115,7 +115,7 @@ function(add_android_apk target)
     add_custom_command(
         OUTPUT ${APK_FILE_NAME}
         DEPENDS ${APK_TARGET}
-        DEPENDS ${TRANSLATIONS}
+        DEPENDS ${APK_TRANSLATIONS}
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${PACKAGE_SOURCE}
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${APK_PACKAGE_SOURCES} ${PACKAGE_SOURCE}
         COMMAND ${CMAKE_COMMAND} -E make_directory "${apk_dir}/libs/${CMAKE_ANDROID_ARCH_ABI}"
