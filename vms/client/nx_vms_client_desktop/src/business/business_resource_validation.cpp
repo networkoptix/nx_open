@@ -830,7 +830,7 @@ bool QnLayoutAccessValidationPolicy::userValidity(const QnUserResourcePtr& user)
 {
     return m_layout
         ? m_accessManager->hasPermission(user, m_layout, Qn::ReadPermission)
-        : false;
+        : true;
 }
 
 void QnLayoutAccessValidationPolicy::setLayout(const QnLayoutResourcePtr& layout)
