@@ -385,7 +385,8 @@ ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
     auto provider = new ResourceThumbnailProvider(request);
 
     connect(provider, &QObject::destroyed, this,
-        [this, provider]() { handleLoadingEnded(provider); });
+        [this, provider]() { handleLoadingEnded(provider); },
+        Qt::QueuedConnection);
 
     connect(provider, &ImageProvider::statusChanged, this,
         [this, provider](Qn::ThumbnailStatus status)
@@ -398,23 +399,24 @@ ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
                 case Qn::ThumbnailStatus::Loading:
                 case Qn::ThumbnailStatus::Refreshing:
                 {
-                    const auto timeoutTimer = executeDelayedParented(
-                        [this, provider]() { handleLoadingEnded(provider); },
-                        kPreviewLoadTimeout,
-                        provider);
+                    const QSharedPointer<QTimer> timeoutTimer(new QTimer(),
+                        [](QTimer* timer)
+                        {
+                            if (!timer)
+                                return;
+
+                            timer->stop();
+                            timer->deleteLater();
+                        });
+
+                    connect(timeoutTimer.get(), &QTimer::timeout, this,
+                        [this, provider]() { handleLoadingEnded(provider); });
+
+                    timeoutTimer->setSingleShot(true);
+                    timeoutTimer->start(kPreviewLoadTimeout);
 
                     const auto server = previewServer(provider);
-
-                    m_loadingByProvider.insert(provider, {server,
-                        QSharedPointer<QTimer>(timeoutTimer,
-                            [](QTimer* timer)
-                            {
-                                if (!timer)
-                                    return;
-
-                                timer->stop();
-                                timer->deleteLater();
-                            })});
+                    m_loadingByProvider.insert(provider, {server, timeoutTimer});
 
                     auto& serverData = m_loadingByServer[server];
                     ++serverData.loadingCounter;
@@ -581,7 +583,7 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
             [this, index]()
             {
                 if (index.isValid())
-                    emit q->doubleClicked(index);
+                    emit q->openRequested(index, /*inNewTab*/ false);
             });
 
         const auto openInNewTabAction = new QAction(
@@ -591,11 +593,14 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
             [this, index]()
             {
                 if (index.isValid())
-                    emit q->clicked(index, Qt::MiddleButton, Qt::NoModifier);
+                    emit q->openRequested(index, /*inNewTab*/ true);
             });
 
         QList<QAction*> actions({openAction, openInNewTabAction});
-        menu->insertActions(menu->actions()[0], actions);
+        if (menu->isEmpty())
+            menu->addActions(actions);
+        else
+            menu->insertActions(menu->actions()[0], actions);
     }
 
     if (!menu)

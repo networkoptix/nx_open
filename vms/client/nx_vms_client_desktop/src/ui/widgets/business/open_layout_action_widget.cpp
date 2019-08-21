@@ -28,61 +28,6 @@
 
 namespace nx::vms::client::desktop {
 
-class AccessValidator: public QnSubjectValidationPolicy
-{
-public:
-    AccessValidator(QnCommonModule* common):
-        m_accessManager(common->resourceAccessManager()),
-        m_rolesManager(common->userRolesManager())
-    {
-    }
-
-    virtual QValidator::State roleValidity(const QnUuid& roleId) const override
-    {
-        if (m_layout)
-        {
-            // Admins have access to all layouts.
-            if (QnUserRolesManager::adminRoleIds().contains(roleId))
-                return QValidator::Acceptable;
-
-            // For other users access permissions depend on the layout kind.
-            if (m_layout->isShared())
-            {
-                // Shared layout. Ask AccessManager for details.
-                return m_accessManager->hasPermission(
-                    m_rolesManager->userRole(roleId), m_layout, Qn::ReadPermission)
-                    ? QValidator::Acceptable
-                    : QValidator::Invalid;
-            }
-            else
-            {
-                // Local layout. Non-admin groups have no access.
-                return QValidator::Invalid;
-            }
-        }
-
-        // No layout has been selected. All users are acceptable.
-        return QValidator::Acceptable;
-    }
-
-    virtual bool userValidity(const QnUserResourcePtr& user) const override
-    {
-        return m_layout
-            ? m_accessManager->hasPermission(user, m_layout, Qn::ReadPermission)
-            : false;
-    }
-
-    void setLayout(const QnLayoutResourcePtr& layout)
-    {
-        m_layout = layout;
-    }
-
-private:
-    QnResourceAccessManager* m_accessManager;
-    QnUserRolesManager* m_rolesManager;
-    QnLayoutResourcePtr m_layout;
-};
-
 OpenLayoutActionWidget::OpenLayoutActionWidget(QWidget* parent):
     base_type(parent),
     ui(new Ui::OpenLayoutActionWidget)
@@ -100,7 +45,7 @@ OpenLayoutActionWidget::OpenLayoutActionWidget(QWidget* parent):
 
     setSubjectsButton(ui->selectUsersButton);
 
-    m_validator = new AccessValidator(commonModule());
+    m_validator = new QnLayoutAccessValidationPolicy(commonModule());
     setValidationPolicy(m_validator); //< Takes ownership, so we use raw pointer here.
 }
 
@@ -209,7 +154,7 @@ void OpenLayoutActionWidget::checkWarnings()
     {
         auto parentResource = layout->getParentResource();
 
-        for (auto user: users)
+        for (const auto& user: users)
         {
             if (!accessManager->hasPermission(user, layout, Qn::ReadPermission))
                 ++noAccess;
@@ -218,7 +163,7 @@ void OpenLayoutActionWidget::checkWarnings()
                 othersLocal = true;
         }
 
-        for (auto role: roles)
+        for (const auto& role: roles)
         {
             if (m_validator->roleValidity(role) != QValidator::Acceptable)
                 ++noAccess;
@@ -269,8 +214,10 @@ std::pair<QnUserResourceList, QList<QnUuid>> OpenLayoutActionWidget::getSelected
         userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
 
         for (const auto& roleId: roles)
+        {
             for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(roleId))
                 users.append(subject.user()); //< TODO: skip duplicates?
+        }
 
         users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
     }

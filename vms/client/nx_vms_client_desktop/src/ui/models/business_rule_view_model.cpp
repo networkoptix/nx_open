@@ -308,9 +308,11 @@ QVariant QnBusinessRuleViewModel::data(Column column, const int role) const
             return qVariantFromValue(m_actionType);
         case Qn::ActionResourcesRole:
         {
-            auto ids = m_actionType != ActionType::showPopupAction
-                ? filterActionResources(this, m_actionResources, m_actionType)
-                : filterSubjectIds(m_actionParams.additionalResources);
+            auto ids = (
+                m_actionType != ActionType::showPopupAction
+                && m_actionType != ActionType::openLayoutAction)
+                    ? filterActionResources(this, m_actionResources, m_actionType)
+                    : filterSubjectIds(m_actionParams.additionalResources);
 
             if (m_actionParams.allUsers)
                 ids.insert(kAllUsersId);
@@ -583,6 +585,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
             return qnResIconCache->icon(QnResourceIconCache::Users);
         }
 
+        case vms::event::ActionType::openLayoutAction:
         case vms::event::ActionType::showPopupAction:
         {
             if (m_actionParams.allUsers)

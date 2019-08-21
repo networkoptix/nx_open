@@ -3,7 +3,7 @@
 #include <nx/vms/server/update/update_manager.h>
 #include <media_server/media_server_module.h>
 #include <rest/server/rest_connection_processor.h>
-#include <rest/helpers/permissions_helper.h>
+#include <core/resource_access/resource_access_manager.h>
 
 #include "update_status_rest_handler.h"
 
@@ -40,9 +40,11 @@ int RetryUpdate::executePost(
     QByteArray& resultContentType,
     const QnRestConnectionProcessor* processor)
 {
-    const auto accessRights = processor->accessRights();
-    if (!QnPermissionsHelper::hasOwnerPermissions(serverModule()->resourcePool(), accessRights))
+    if (!serverModule()->resourceAccessManager()->hasGlobalPermission(
+            processor->accessRights(), GlobalPermission::admin))
+    {
         return nx::network::http::StatusCode::forbidden;
+    }
 
     return executeGet(path, params, result, resultContentType, processor);
 }

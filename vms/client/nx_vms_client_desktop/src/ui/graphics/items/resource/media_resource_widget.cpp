@@ -2760,20 +2760,22 @@ bool QnMediaResourceWidget::isAnalyticsSupported() const
 
 bool QnMediaResourceWidget::isAnalyticsEnabled() const
 {
-    return d->isAnalyticsEnabled();
+    return d->isAnalyticsEnabledInStream();
 }
 
-void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
+void QnMediaResourceWidget::setAnalyticsEnabled(bool enabled)
 {
-    // We should be able to disable analytics if it is not supported anymore.
-    if (analyticsEnabled && !isAnalyticsSupported())
+    // Cleanup existing object frames in any case.
+    if (!enabled)
+        d->analyticsController->clearAreas();
+
+    // Zoom window must not control the video stream.
+    if (isZoomWindow())
         return;
 
-    NX_VERBOSE(this, "Setting analytics frames %1 for %2",
-        analyticsEnabled ? "enabled" : "disabled",
-        this);
-
-    d->setAnalyticsEnabled(analyticsEnabled);
+    // We should be able to disable analytics if it is not supported anymore.
+    if (isAnalyticsSupported() || !enabled)
+        d->setAnalyticsEnabledInStream(enabled);
 }
 
 nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr

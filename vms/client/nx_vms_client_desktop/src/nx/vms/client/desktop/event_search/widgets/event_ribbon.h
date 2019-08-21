@@ -94,6 +94,7 @@ signals:
     void doubleClicked(const QModelIndex& index); //< With left mouse button.
     void dragStarted(const QModelIndex& index, const QPoint& pos, const QSize& size);
     void linkActivated(const QModelIndex& index, const QString& link);
+    void openRequested(const QModelIndex& index, bool inNewTab);
 
 protected:
     virtual bool event(QEvent* event) override;
