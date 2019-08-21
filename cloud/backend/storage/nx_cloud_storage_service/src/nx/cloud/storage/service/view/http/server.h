@@ -52,7 +52,7 @@ private:
     controller::StorageManager* m_storageManager = nullptr;
 
     std::unique_ptr<network::http::server::AbstractAuthenticationManager>
-        m_cloudDBAuthenticationForwarder;
+        m_cloudDbAuthenticationForwarder;
 
     network::http::server::rest::MessageDispatcher m_messageDispatcher;
     network::http::server::AuthenticationDispatcher m_authenticationDispatcher;

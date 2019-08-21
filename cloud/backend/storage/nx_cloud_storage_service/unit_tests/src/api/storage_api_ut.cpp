@@ -3,6 +3,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/cloud/storage/service/test_support/cloud_db_emulator.h>
 #include <nx/cloud/storage/service/settings.h>
+#include <nx/cloud/storage/service/controller/cloud_db/authentication_manager.h>
 #include <nx/cloud/db/api/cdb_client.h>
 
 namespace nx::cloud::storage::service::api::test {
@@ -12,9 +13,9 @@ namespace{
 static constexpr char kFileContents[] = "hello world";
 
 class CloudDBAuthenticationForwarderStub:
-    public service::view::http::CloudDbAuthenticationForwarder
+    public service::controller::cloud_db::AuthenticationForwarder
 {
-    using base_type = service::view::http::CloudDbAuthenticationForwarder;
+    using base_type = controller::cloud_db::AuthenticationForwarder;
 public:
     CloudDBAuthenticationForwarderStub(
         const conf::CloudDb& settings,
@@ -50,7 +51,7 @@ public:
     {
         if (m_cloudDBAuthenticationFactoryFuncBak)
         {
-            view::http::CloudDbAuthenticationFactory::instance().setCustomFunc(
+            controller::cloud_db::AuthenticationManagerFactory::instance().setCustomFunc(
                 std::move(m_cloudDBAuthenticationFactoryFuncBak));
         }
     }
@@ -59,7 +60,7 @@ protected:
     virtual void SetUp()override
     {
         m_cloudDBAuthenticationFactoryFuncBak =
-            view::http::CloudDbAuthenticationFactory::instance().setCustomFunc(
+            controller::cloud_db::AuthenticationManagerFactory::instance().setCustomFunc(
                 [this](const auto& settings)
                 {
                     return std::make_unique<CloudDBAuthenticationForwarderStub>(
@@ -395,7 +396,8 @@ private:
     service::test::S3Bucket* m_expectedBucket = nullptr;
 
     nx::utils::SyncQueue<bool> m_cloudDbAuthenticationEvent;
-    view::http::CloudDbAuthenticationFactory::Function m_cloudDBAuthenticationFactoryFuncBak;
+    controller::cloud_db::AuthenticationManagerFactory::Function
+        m_cloudDBAuthenticationFactoryFuncBak;
 };
 
 TEST_F(StorageApi, add_storage_by_region)

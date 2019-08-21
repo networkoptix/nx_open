@@ -8,7 +8,6 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/storage/service/controller/geo_ip_resolver.h>
-#include <nx/cloud/storage/service/view/http/cloud_db_authentication_manager.h>
 
 #include "../s3_bucket.h"
 

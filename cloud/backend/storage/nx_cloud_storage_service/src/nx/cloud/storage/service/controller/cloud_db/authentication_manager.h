@@ -19,13 +19,13 @@ class Settings;
 
 } // namespace conf
 
-namespace view::http {
+namespace controller::cloud_db {
 
-class CloudDbAuthenticationForwarder:
+class AuthenticationForwarder:
     public network::http::server::AbstractAuthenticationManager
 {
 public:
-    CloudDbAuthenticationForwarder(const conf::CloudDb& settings);
+    AuthenticationForwarder(const conf::CloudDb& settings);
 
     virtual void authenticate(
         const network::http::HttpServerConnection& connection,
@@ -59,26 +59,26 @@ private:
 };
 
 //-------------------------------------------------------------------------------------------------
-// CloudDbAuthenticationFactory
+// AuthenticationFactory
 
-using CloudDbAuthenticationFactoryType =
+using FactoryType =
 std::unique_ptr<network::http::server::AbstractAuthenticationManager>(const conf::Settings&);
 
-class CloudDbAuthenticationFactory:
-    public nx::utils::BasicFactory<CloudDbAuthenticationFactoryType>
+class AuthenticationManagerFactory:
+    public nx::utils::BasicFactory<FactoryType>
 {
-    using base_type = nx::utils::BasicFactory<CloudDbAuthenticationFactoryType>;
+    using base_type = nx::utils::BasicFactory<FactoryType>;
 
 public:
-    CloudDbAuthenticationFactory();
+    AuthenticationManagerFactory();
 
-    static CloudDbAuthenticationFactory& instance();
+    static AuthenticationManagerFactory& instance();
 
 private:
     std::unique_ptr<network::http::server::AbstractAuthenticationManager> defaultFactoryFunction(
         const conf::Settings& settings);
 };
 
-} // namespace view::http
+} // namespace controller::cloud_db
 } // namespace storage::service
 } // namespace nx::cloud

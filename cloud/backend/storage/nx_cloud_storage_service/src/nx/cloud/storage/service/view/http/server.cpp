@@ -7,7 +7,8 @@
 #include "nx/cloud/storage/service/controller/controller.h"
 #include "nx/cloud/storage/service/controller/bucket_manager.h"
 #include "nx/cloud/storage/service/controller/storage_manager.h"
-#include "cloud_db_authentication_manager.h"
+#include "nx/cloud/storage/service/controller/cloud_db/resource.h"
+#include "nx/cloud/storage/service/controller/cloud_db/authentication_manager.h"
 #include "request_handler.h"
 
 namespace nx::cloud::storage::service::view::http {
@@ -24,7 +25,8 @@ Server::Server(const conf::Settings& settings, controller::Controller* controlle
     m_settings(settings),
     m_bucketManager(&controller->bucketManager()),
     m_storageManager(&controller->storageManager()),
-    m_cloudDBAuthenticationForwarder(CloudDbAuthenticationFactory::instance().create(settings)),
+    m_cloudDbAuthenticationForwarder(
+        controller::cloud_db::AuthenticationManagerFactory::instance().create(settings)),
     m_multiAddressServer(
         &m_authenticationDispatcher,
         &m_messageDispatcher)
@@ -32,7 +34,7 @@ Server::Server(const conf::Settings& settings, controller::Controller* controlle
     // Adding "/storages/" and "/storage/{id}" to cloud db authentication forwarding.
     registerAuthenticationManager(
         std::string(api::kStoragePrefix) + ".*",
-        m_cloudDBAuthenticationForwarder.get());
+        m_cloudDbAuthenticationForwarder.get());
 
     registerBucketApiHandlers();
     registerStorageApiHandlers();
@@ -96,20 +98,22 @@ void Server::registerStorageApiHandlers()
                 std::bind(&controller::StorageManager::addStorage, m_storageManager, _1, _2, _3, _4),
                 network::http::Method::put);
 
-    registerRequestProcessor<RequestHandler<void, api::Storage, RestArgFetcher<kStorageId>>>(
-        api::kStorageId,
-        std::bind(&controller::StorageManager::readStorage, m_storageManager, _1, _2),
-        network::http::Method::get);
-
-    registerRequestProcessor<RequestHandler<void, void, RestArgFetcher<kStorageId>>>(
-        api::kStorageId,
-        std::bind(&controller::StorageManager::removeStorage, m_storageManager, _1, _2),
-        network::http::Method::delete_);
+    registerRequestProcessor<
+        RequestHandler<void, api::Storage, AuthInfoFetcher, RestArgFetcher<kStorageId>>>(
+            api::kStorageId,
+            std::bind(&controller::StorageManager::readStorage, m_storageManager, _1, _2, _3),
+            network::http::Method::get);
 
     registerRequestProcessor<
-        RequestHandler<void, api::StorageCredentials, RestArgFetcher<kStorageId>>>(
+        RequestHandler<void, void, AuthInfoFetcher, RestArgFetcher<kStorageId>>>(
+            api::kStorageId,
+            std::bind(&controller::StorageManager::removeStorage, m_storageManager, _1, _2, _3),
+            network::http::Method::delete_);
+
+    registerRequestProcessor<
+        RequestHandler<void, api::StorageCredentials, AuthInfoFetcher, RestArgFetcher<kStorageId>>>(
             api::kStorageCredentials,
-            std::bind(&controller::StorageManager::getCredentials, m_storageManager, _1, _2),
+            std::bind(&controller::StorageManager::getCredentials, m_storageManager, _1, _2, _3),
             network::http::Method::get);
 
     registerRequestProcessor<

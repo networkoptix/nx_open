@@ -40,6 +40,8 @@ class Model;
 
 namespace controller {
 
+class AccessManager;
+
 using GetStorageHandler = nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)>;
 
 class StorageManager:
@@ -53,16 +55,18 @@ public:
     ~StorageManager();
 
     void addStorage(
-        const nx::utils::stree::ResourceContainer& authInfo,
-        const network::SocketAddress& clientEndpoint,
-        const api::AddStorageRequest& request,
+        nx::utils::stree::ResourceContainer authInfo,
+        network::SocketAddress clientEndpoint,
+        api::AddStorageRequest request,
         GetStorageHandler handler);
 
     void readStorage(
-        const std::string& storageId,
+        nx::utils::stree::ResourceContainer authInfo,
+        std::string storageId,
         GetStorageHandler handler);
 
     void removeStorage(
+        nx::utils::stree::ResourceContainer authInfo,
         const std::string& storageId,
         nx::utils::MoveOnlyFunc<void(api::Result)> handler);
 
@@ -71,7 +75,8 @@ public:
         nx::utils::MoveOnlyFunc<void(api::Result, std::vector<std::string>)> handler);
 
     void getCredentials(
-        const std::string& storageId,
+        nx::utils::stree::ResourceContainer authInfo,
+        std::string storageId,
         nx::utils::MoveOnlyFunc<void(api::Result, api::StorageCredentials)> handler);
 
     void addSystem(
@@ -85,10 +90,40 @@ public:
         nx::utils::MoveOnlyFunc<void(api::Result)> handler);
 
 private:
+    struct AddStorageContext
+    {
+        api::Result bucketLookupResult;
+        api::Storage storage;
+
+        void initializeStorage(
+            const std::string& accountOwner,
+            const api::Bucket& bucket,
+            const api::AddStorageRequest& request);
+    };
+
+    struct ReadStorageContext
+    {
+        std::string storageId;
+        nx::utils::stree::ResourceContainer authInfo;
+        bool withDataUsage = false;
+        GetStorageHandler handler;
+
+        api::Storage storage;
+        bool found = false;
+
+        ReadStorageContext(
+            std::string storageId,
+            nx::utils::stree::ResourceContainer authInfo,
+            bool withDataUsage,
+            GetStorageHandler handler);
+    };
+
+private:
     void getStorage(
-        const std::string& storageId,
-        bool withDataUsage,
-        GetStorageHandler handler);
+        std::shared_ptr<ReadStorageContext> readStorageContext);
+
+    void readStorageIfAllowed(
+        std::shared_ptr<ReadStorageContext> readStorageContext);
 
     void getCredentialsForStorage(
         api::Storage storage,
@@ -114,22 +149,11 @@ private:
     void registerSyncEngineCommandHandlers();
 
 private:
-    struct AddStorageContext
-    {
-        api::Result bucketLookupResult;
-        api::Storage storage;
-
-        void initializeStorage(
-            const std::string& cloudDbAccountOwner,
-            const api::Bucket& bucket,
-            const api::AddStorageRequest& request);
-    };
-
-private:
     const conf::Settings& m_settings;
     model::Database* m_database = nullptr;
     model::dao::AbstractStorageDao* m_storageDao = nullptr;
     BucketManager* m_bucketManager = nullptr;
+    std::unique_ptr<AccessManager> m_accessManager;
     std::unique_ptr<nx::geo_ip::AbstractResolver> m_geoIpResolver;
     QnMutex m_mutex;
     std::set<std::shared_ptr<s3::DataUsageCalculator>> m_dataUsageCalculators;

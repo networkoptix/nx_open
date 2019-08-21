@@ -1,4 +1,4 @@
-#include "cloud_db_authentication_manager.h"
+#include "authentication_manager.h"
 
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/network/http/buffer_source.h>
@@ -6,19 +6,19 @@
 #include <nx/network/http/auth_tools.h>
 
 #include "nx/cloud/storage/service/settings.h"
-#include "cloud_db_resource.h"
+#include "resource.h"
 
-namespace nx::cloud::storage::service::view::http {
+namespace nx::cloud::storage::service::controller::cloud_db{
 
 using namespace nx::cloud::db::api;
 using namespace nx::network::http;
 
-CloudDbAuthenticationForwarder::CloudDbAuthenticationForwarder(const conf::CloudDb& settings):
+AuthenticationForwarder::AuthenticationForwarder(const conf::CloudDb& settings):
     m_settings(settings)
 {
 }
 
-void CloudDbAuthenticationForwarder::authenticate(
+void AuthenticationForwarder::authenticate(
     const HttpServerConnection& /*connection*/,
     const Request& request,
     server::AuthenticationCompletionHandler completionHandler)
@@ -41,7 +41,7 @@ void CloudDbAuthenticationForwarder::authenticate(
     authenticateWithCloudDb(std::move(userAuth), std::move(completionHandler));
 }
 
-void CloudDbAuthenticationForwarder::authenticateWithCloudDb(
+void AuthenticationForwarder::authenticateWithCloudDb(
     UserAuthorization userAuth,
     server::AuthenticationCompletionHandler completionHandler)
 {
@@ -50,7 +50,7 @@ void CloudDbAuthenticationForwarder::authenticateWithCloudDb(
     auto* cdbClient = createAuthenticationRequest(std::move(completionHandler));
     cdbClient->authProvider()->resolveUserCredentials(
         userAuth,
-        [this, cdbClient](
+        [this, cdbClient, userAuth](
             auto cdbResult,
             auto credentials) mutable
         {
@@ -71,13 +71,15 @@ void CloudDbAuthenticationForwarder::authenticateWithCloudDb(
             }
 
             server::SuccessfulAuthenticationResult success;
-            success.authInfo.put(CloudDbResource::accountOwner, credentials.objectId.c_str());
+            success.authInfo.put(Resource::accountOwner, credentials.objectId.c_str());
+            success.authInfo.put(Resource::httpMethod, userAuth.requestMethod.c_str());
+            success.authInfo.put(Resource::authorization, userAuth.requestAuthorization.c_str());
             request.handler(std::move(success));
         });
 }
 
 
-CdbClient* CloudDbAuthenticationForwarder::createAuthenticationRequest(
+CdbClient* AuthenticationForwarder::createAuthenticationRequest(
     server::AuthenticationCompletionHandler completionHandler)
 {
     AuthenticationRequest request;
@@ -93,8 +95,8 @@ CdbClient* CloudDbAuthenticationForwarder::createAuthenticationRequest(
     return cdbClientPtr;
 }
 
-CloudDbAuthenticationForwarder::AuthenticationRequest
-    CloudDbAuthenticationForwarder::authenticationComplete(
+AuthenticationForwarder::AuthenticationRequest
+    AuthenticationForwarder::authenticationComplete(
         CdbClient* cdbClient)
 {
     QnMutexLocker lock(&m_mutex);
@@ -105,7 +107,7 @@ CloudDbAuthenticationForwarder::AuthenticationRequest
     return request;
 }
 
-server::AuthenticationResult CloudDbAuthenticationForwarder::failedAuthenticationResult(
+server::AuthenticationResult AuthenticationForwarder::failedAuthenticationResult(
     ResultCode resultCode,
     QByteArray reason)
 {
@@ -122,27 +124,27 @@ server::AuthenticationResult CloudDbAuthenticationForwarder::failedAuthenticatio
 }
 
 //-------------------------------------------------------------------------------------------------
-// CloudDbAuthenticationFactory
+// AuthenticationManagerFactory
 
-CloudDbAuthenticationFactory::CloudDbAuthenticationFactory():
+AuthenticationManagerFactory::AuthenticationManagerFactory():
     base_type(std::bind(
-        &CloudDbAuthenticationFactory::defaultFactoryFunction,
+        &AuthenticationManagerFactory::defaultFactoryFunction,
         this,
         std::placeholders::_1))
 {
 }
 
-CloudDbAuthenticationFactory& CloudDbAuthenticationFactory::instance()
+AuthenticationManagerFactory& AuthenticationManagerFactory::instance()
 {
-    static CloudDbAuthenticationFactory factory;
+    static AuthenticationManagerFactory factory;
     return factory;
 }
 
 std::unique_ptr<server::AbstractAuthenticationManager>
-    CloudDbAuthenticationFactory::defaultFactoryFunction(
+    AuthenticationManagerFactory::defaultFactoryFunction(
         const conf::Settings& settings)
 {
-    return std::make_unique<CloudDbAuthenticationForwarder>(settings.cloudDb());
+    return std::make_unique<AuthenticationForwarder>(settings.cloudDb());
 }
 
 } // namespace nx::cloud::storage::service::view::http
