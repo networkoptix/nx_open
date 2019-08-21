@@ -304,6 +304,7 @@ protected:
     mutable QnMutex m_metadataConsumersHashMutex;
     QMultiMap<MetadataType, QWeakPointer<nx::media::AbstractMetadataConsumer>>
         m_metadataConsumerByType;
+    QVector<bool> m_gotKeyDataInfo;
 };
 
 #endif //QN_CAM_DISPLAY_H
