@@ -41,7 +41,7 @@ QString toString(InformationError error)
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (Variant)(Package)(Information),
+    (Variant)(Package)(Information)(UpdateDeliveryInfo),
     (ubjson)(json)(datastream)(eq),
     _Fields)
 
