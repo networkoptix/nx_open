@@ -103,7 +103,7 @@ function(add_android_apk target)
 
     set(apk_dir "${CMAKE_CURRENT_BINARY_DIR}/${APK_TARGET}_apk")
 
-    set(translations_dir "${CMAKE_CURRENT_BINARY_DIR}/mobile_client_apk_apk_template/assets/translations")
+    set(translations_dir "${PACKAGE_SOURCE}/assets/translations")
 
     add_custom_command(
         OUTPUT ${APK_FILE_NAME}
