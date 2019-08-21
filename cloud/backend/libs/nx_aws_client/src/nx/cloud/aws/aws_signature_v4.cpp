@@ -1,34 +1,34 @@
 #include "aws_signature_v4.h"
 
 #include <algorithm>
+#include <cctype>
 #include <set>
 #include <string_view>
 
 #include <openssl/sha.h>
 
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/cryptographic_hash.h>
 
 namespace nx::cloud::aws {
 
 static const std::set<std::string_view, std::greater<std::string_view>>
-    kAllowedCanonicalHeaderPrefixes =
+    kForbiddenCanonicalHeaderPrefixes =
 {
-    "content-encoding",
-    "content-type",
-    "date",
-    "host",
-    "range",
-    "user-agent",
-    "x-amz-"
+    "authorization",
+    "connection",
+    "forwarded",
+    "x-forwarded-",
+    "via",
 };
 
 static bool isAllowedCanonicalHeader(const std::string_view& name)
 {
-    auto it = kAllowedCanonicalHeaderPrefixes.lower_bound(name);
-    if (it == kAllowedCanonicalHeaderPrefixes.end())
-        return false;
+    auto it = kForbiddenCanonicalHeaderPrefixes.lower_bound(name);
+    if (it == kForbiddenCanonicalHeaderPrefixes.end())
+        return true;
 
-    return name.substr(0, it->size()) == *it; //< name.starts_with(*it)
+    return name.substr(0, it->size()) != *it; //< !name.starts_with(*it)
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -141,13 +141,38 @@ nx::Buffer SignatureCalculator::calculateSignKey(
     return md;
 }
 
+class TestOutput
+{
+public:
+    TestOutput():
+        m_hash(nx::utils::QnCryptographicHash::Algorithm::Sha256)
+    {
+    }
+
+    void addData(const QByteArray& data)
+    {
+        m_str += data;
+        m_hash.addData(data);
+    }
+
+    QByteArray result()
+    {
+        return m_hash.result();
+    }
+
+private:
+    QByteArray m_str;
+    nx::utils::QnCryptographicHash m_hash;
+};
+
 std::tuple<nx::Buffer, bool /*result*/>
     SignatureCalculator::calculateCanonicalRequestSha256Hash(
         const network::http::Request& request,
         IntermediateValues* intermediateValues)
 {
-    nx::utils::QnCryptographicHash cryptographicHash(
-        nx::utils::QnCryptographicHash::Algorithm::Sha256);
+    //nx::utils::QnCryptographicHash cryptographicHash(
+    //    nx::utils::QnCryptographicHash::Algorithm::Sha256);
+    TestOutput cryptographicHash;
 
     cryptographicHash.addData(request.requestLine.method);
     cryptographicHash.addData("\n");
@@ -169,24 +194,41 @@ std::tuple<nx::Buffer, bool /*result*/>
 
     // Payload hash.
     auto it = request.headers.find("x-amz-content-sha256");
-    if (it == request.headers.end())
-        return std::make_tuple(nx::Buffer(), false);
-    cryptographicHash.addData(it->second);
+    if (it != request.headers.end())
+    {
+        cryptographicHash.addData(it->second);
+    }
+    else
+    {
+        // Calculating payload signature.
+        const auto payloadHash = nx::utils::QnCryptographicHash::hash(
+            request.messageBody,
+            nx::utils::QnCryptographicHash::Algorithm::Sha256).toHex().toLower();
+        cryptographicHash.addData(payloadHash);
+    }
 
     return std::make_tuple(cryptographicHash.result().toHex(), true);
 }
 
-void SignatureCalculator::hashPath(
-    nx::utils::QnCryptographicHash* hash, const QString& path)
+QByteArray SignatureCalculator::encodePath(const QString& path)
 {
-    const auto encodedPath = QUrl::toPercentEncoding(QUrl::toPercentEncoding(path, "/"), "/");
+    return QUrl::toPercentEncoding(QUrl::toPercentEncoding(path, "/"), "/");
+}
+
+template<typename CryptographicHash>
+void SignatureCalculator::hashPath(
+    CryptographicHash* hash, const QString& path)
+{
+    const auto encodedPath = encodePath(nx::network::url::normalizePath(path));
+
     if (!encodedPath.startsWith('/'))
         hash->addData("/");
     hash->addData(encodedPath);
 }
 
+template<typename CryptographicHash>
 void SignatureCalculator::hashQuery(
-    nx::utils::QnCryptographicHash* hash,
+    CryptographicHash* hash,
     const nx::String& query)
 {
     if (query.isEmpty())
@@ -210,11 +252,15 @@ void SignatureCalculator::hashQuery(
     }
 }
 
+template<typename CryptographicHash>
 void SignatureCalculator::hashCanonicalHeaders(
-    nx::utils::QnCryptographicHash* hash,
+    CryptographicHash* hash,
     const nx::network::http::HttpHeaders& headers,
     std::vector<nx::String>* lowCaseHeaderNames)
 {
+    // TODO: #ak Headers that occur multiple times should be put as:
+    // my-header1:value4,value1,value3,value2
+
     lowCaseHeaderNames->reserve(headers.size());
     for (const auto& header: headers)
     {
@@ -222,17 +268,33 @@ void SignatureCalculator::hashCanonicalHeaders(
         if (!isAllowedCanonicalHeader(std::string_view(lowerName.data(), lowerName.size())))
             continue;
 
-        lowCaseHeaderNames->push_back(lowerName);
+        auto trimmedHeaderValue = trimHeaderValue(header.second);
 
-        hash->addData(lowCaseHeaderNames->back());
-        hash->addData(":");
-        hash->addData(header.second.trimmed());
-        hash->addData("\n");
+        if (!lowCaseHeaderNames->empty() && lowCaseHeaderNames->back() == lowerName)
+        {
+            hash->addData(",");
+            hash->addData(trimmedHeaderValue);
+        }
+        else
+        {
+            if (!lowCaseHeaderNames->empty())
+                hash->addData("\n"); //< Closing the previous header.
+
+            lowCaseHeaderNames->push_back(lowerName);
+
+            hash->addData(lowCaseHeaderNames->back());
+            hash->addData(":");
+            hash->addData(trimmedHeaderValue);
+        }
     }
+
+    if (!lowCaseHeaderNames->empty())
+        hash->addData("\n"); //< Closing the previous header.
 }
 
+template<typename CryptographicHash>
 void SignatureCalculator::hashSignedHeaders(
-    nx::utils::QnCryptographicHash* hash,
+    CryptographicHash* hash,
     const std::vector<nx::String>& lowCaseHeaderNames,
     IntermediateValues* intermediateValues)
 {
@@ -268,6 +330,28 @@ bool SignatureCalculator::addScope(
     HMAC_Update(hmacCtx, (const unsigned char*) kAws4Request.data(), kAws4Request.size());
 
     return true;
+}
+
+QByteArray SignatureCalculator::trimHeaderValue(const QByteArray& str)
+{
+    QByteArray result;
+    result.reserve(str.size());
+
+    bool prevChIsSpace = true; //< setting to true to remove spaces in the beginning.
+    for (int i = 0; i < str.size(); ++i)
+    {
+        const bool chIsSpace = std::isspace(str[i]);
+        if (!(prevChIsSpace && chIsSpace))
+            result.push_back(str[i]);
+        // else: skipping subsequent spaces.
+
+        prevChIsSpace = chIsSpace;
+    }
+
+    if (result.endsWith(' '))
+        result.remove(result.size() - 1, 1);
+
+    return result;
 }
 
 } // namespace nx::cloud::aws

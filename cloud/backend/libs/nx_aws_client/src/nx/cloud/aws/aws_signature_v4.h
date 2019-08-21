@@ -47,7 +47,7 @@ public:
         IntermediateValues* intermediateValues = nullptr);
 
 protected:
-    virtual void hashPath(nx::utils::QnCryptographicHash* hash, const QString& path);
+    virtual QByteArray encodePath(const QString& path);
 
 private:
      nx::Buffer calculateSignKey(
@@ -60,15 +60,25 @@ private:
         const network::http::Request& request,
         IntermediateValues* intermediateValues);
 
-     void hashQuery(nx::utils::QnCryptographicHash* hash, const nx::String& query);
+     template<typename CryptographicHash>
+     void hashPath(
+         CryptographicHash* hash,
+         const QString& path);
 
+     template<typename CryptographicHash>
+     void hashQuery(
+         CryptographicHash* hash,
+         const nx::String& query);
+
+     template<typename CryptographicHash>
      void hashCanonicalHeaders(
-        nx::utils::QnCryptographicHash* hash,
+        CryptographicHash* hash,
         const nx::network::http::HttpHeaders& headers,
         std::vector<nx::String>* lowCaseHeaderNames);
 
+     template<typename CryptographicHash>
      void hashSignedHeaders(
-        nx::utils::QnCryptographicHash* hash,
+        CryptographicHash* hash,
         const std::vector<nx::String>& lowCaseHeaderNames,
         IntermediateValues* intermediateValues);
 
@@ -77,6 +87,8 @@ private:
         const nx::String& date,
         const std::string& region,
         const std::string& service);
+
+     QByteArray trimHeaderValue(const QByteArray& str);
 };
 
 } // namespace nx::cloud::aws

@@ -15,6 +15,12 @@ TEST(Url, normalizePath)
     ASSERT_EQ("/sample/url/path", normalizePath(std::string("//sample//url/path")));
     ASSERT_EQ("/sample/url/path", normalizePath(std::string("///sample//url/path")));
     ASSERT_EQ("/sample/url/path/", normalizePath(std::string("/sample///url/path////")));
+    ASSERT_EQ("/sample/", normalizePath(std::string("//sample//")));
+
+    ASSERT_EQ("/sample/url/path/", normalizePath(std::string("/./sample/./url/path/")));
+    ASSERT_EQ("/url/path/", normalizePath(std::string("/sample/../url/path/")));
+    ASSERT_EQ("/../url/path", normalizePath(std::string("/sample/../../url/path")));
+    ASSERT_EQ("../path/", normalizePath(std::string("../url/../path/")));
 }
 
 } // namespace test

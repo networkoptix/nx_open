@@ -4,6 +4,8 @@
 
 #include <nx/cloud/aws/s3/aws_signature_v4.h>
 
+#include "aws_signature_v4_test_data.h"
+
 namespace nx::cloud::aws::test {
 
 class AwsSignatureV4:
@@ -172,6 +174,34 @@ TEST_F(AwsSignatureV4, PUT_request_authorization_header)
         "SignedHeaders=date;host;x-amz-content-sha256;x-amz-date;x-amz-storage-class,"
         "Signature=98ad721746da40c64f1a55b78f14c238d841ea1380cd77a1b5971af0ece108bd",
         header);
+}
+
+TEST_F(AwsSignatureV4, aws_test_suite)
+{
+    const nx::network::http::Credentials credentials(
+        kAwsTestUser, nx::network::http::PasswordAuthToken(kAwsTestSecretKey));
+
+    static constexpr std::string_view kDesiredTestName = "";
+
+    for (const auto& test: kAwsSignatureV4TestSuite)
+    {
+        if (!kDesiredTestName.empty() && test.testName != kDesiredTestName)
+            continue;
+
+        nx::network::http::Request request;
+        request.parse(QByteArray(test.request));
+
+        const auto [header, result] = s3::SignatureCalculator().calculateAuthorizationHeader(
+            request, credentials, kAwsTestRegion, kAwsTestService);
+
+        QByteArray actual = header;
+        actual.replace(" ", "");
+
+        QByteArray expected = test.authorizationHeader;
+        expected.replace(" ", "");
+
+        ASSERT_EQ(expected, actual) << "Test " << test.testName << "has failed";
+    }
 }
 
 } // namespace nx::cloud::aws::test

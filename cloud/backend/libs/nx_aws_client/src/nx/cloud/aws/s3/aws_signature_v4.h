@@ -8,7 +8,7 @@ class NX_AWS_CLIENT_API SignatureCalculator:
     public aws::SignatureCalculator
 {
 protected:
-    virtual void hashPath(nx::utils::QnCryptographicHash* hash, const QString& path) override;
+    virtual QByteArray encodePath(const QString& path) override;
 };
 
 } // namespace nx::cloud::aws::s3

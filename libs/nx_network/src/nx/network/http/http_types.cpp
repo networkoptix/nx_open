@@ -612,7 +612,7 @@ bool parseRequestOrResponse(
             break;  //no more data to parse
         curPos = lineSepPos;
         ++curPos;   //skipping separator
-        if (curPos < data.size() && (data[curPos] == '\r' || data[curPos] == '\n'))
+        if (curPos < data.size() && (data[lineSepPos] == '\r' && data[curPos] == '\n'))
             ++curPos;   //skipping complex separator (\r\n)
     }
 

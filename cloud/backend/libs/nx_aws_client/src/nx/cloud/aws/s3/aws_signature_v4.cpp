@@ -4,13 +4,9 @@
 
 namespace nx::cloud::aws::s3 {
 
-void SignatureCalculator::hashPath(
-    nx::utils::QnCryptographicHash* hash, const QString& path)
+QByteArray SignatureCalculator::encodePath(const QString& path)
 {
-    const auto encodedPath = QUrl::toPercentEncoding(path, "/");
-    if (!encodedPath.startsWith('/'))
-        hash->addData("/");
-    hash->addData(encodedPath);
+    return QUrl::toPercentEncoding(path, "/");
 }
 
 } // namespace nx::cloud::aws::s3
