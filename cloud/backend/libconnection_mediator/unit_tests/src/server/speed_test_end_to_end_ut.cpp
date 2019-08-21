@@ -80,7 +80,8 @@ protected:
         ASSERT_TRUE(startAndWaitUntilStarted());
 
         m_uplinkSpeedUpdatedId = moduleInstance()->impl()->listeningPeerDb().
-            subscribeToUplinkSpeedUpdated([this](api::PeerConnectionSpeed peerUplinkSpeed)
+            subscribeToUplinkSpeedUpdated(
+                [this](api::PeerConnectionSpeed peerUplinkSpeed)
                 {
                     ++m_uplinkSpeedTestsDone;
                     NX_DEBUG(this, "Received peerUplinkSpeed: %1", peerUplinkSpeed);
