@@ -117,16 +117,16 @@ void Server::registerStorageApiHandlers()
             network::http::Method::get);
 
     registerRequestProcessor<
-        RequestHandler<api::AddSystemRequest, api::System, RestArgFetcher<kStorageId>>>(
+        RequestHandler<api::AddSystemRequest, api::System, AuthInfoFetcher, RestArgFetcher<kStorageId>>>(
             api::kStorageIdSystems,
-            std::bind(&controller::StorageManager::addSystem, m_storageManager, _1, _2, _3),
+            std::bind(&controller::StorageManager::addSystem, m_storageManager, _1, _2, _3, _4),
             network::http::Method::put);
 
     registerRequestProcessor<
         RequestHandler<
-            void, void, RestArgFetcher<kStorageId>, RestArgFetcher<kSystemId>>>(
+            void, void, AuthInfoFetcher, RestArgFetcher<kStorageId>, RestArgFetcher<kSystemId>>>(
                 api::kStorageIdSystemId,
-                std::bind(&controller::StorageManager::removeSystem, m_storageManager, _1, _2, _3),
+                std::bind(&controller::StorageManager::removeSystem, m_storageManager, _1, _2, _3, _4),
                 network::http::Method::delete_);
 }
 

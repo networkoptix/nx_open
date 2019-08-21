@@ -34,9 +34,9 @@ public:
         const api::Storage& storage,
         nx::utils::MoveOnlyFunc<void(bool)> handler);
 
-    bool removeStorageAllowed(
+    bool isStorageOwner(
         const nx::utils::stree::ResourceContainer& authInfo,
-        const api::Storage& storage) const;
+        const api::Storage& storage);
 
 private:
     struct ReadStorageContext

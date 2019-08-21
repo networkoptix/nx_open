@@ -21,7 +21,7 @@ static std::string getAccountOwner(const nx::utils::stree::ResourceContainer& au
 
 QString toString(const db::api::UserAuthorization& userAuth)
 {
-    return lm("{requestMethod:%1, requestAuthorization=%2}")
+    return lm("{requestMethod: %1, requestAuthorization: %2}")
         .args(userAuth.requestMethod, userAuth.requestAuthorization);
 }
 
@@ -40,6 +40,7 @@ std::pair<bool, std::string> AccessManager::addStorageAllowed(
     auto accountOwner = getAccountOwner(authInfo);
     return {!accountOwner.empty(), accountOwner};
 }
+
 void AccessManager::readStorageAllowed(
     const nx::utils::stree::ResourceContainer& authInfo,
     const api::Storage& storage,
@@ -80,8 +81,9 @@ void AccessManager::readStorageAllowed(
         });
 }
 
-bool AccessManager::removeStorageAllowed(
-    const nx::utils::stree::ResourceContainer& authInfo, const api::Storage& storage) const
+bool AccessManager::isStorageOwner(
+    const nx::utils::stree::ResourceContainer& authInfo,
+    const api::Storage& storage)
 {
     return getAccountOwner(authInfo) == storage.owner;
 }

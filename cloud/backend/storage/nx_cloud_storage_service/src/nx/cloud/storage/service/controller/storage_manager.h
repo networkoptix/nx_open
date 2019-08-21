@@ -80,13 +80,15 @@ public:
         nx::utils::MoveOnlyFunc<void(api::Result, api::StorageCredentials)> handler);
 
     void addSystem(
-        const std::string& storageId,
-        const api::AddSystemRequest& request,
+        nx::utils::stree::ResourceContainer authInfo,
+        std::string storageId,
+        api::AddSystemRequest request,
         nx::utils::MoveOnlyFunc<void(api::Result, api::System)> handler);
 
     void removeSystem(
-        const std::string& storageId,
-        const std::string& systemId,
+        nx::utils::stree::ResourceContainer authInfo,
+        std::string storageId,
+        std::string systemId,
         nx::utils::MoveOnlyFunc<void(api::Result)> handler);
 
 private:
@@ -107,7 +109,6 @@ private:
         nx::utils::stree::ResourceContainer authInfo;
         bool withDataUsage = false;
         GetStorageHandler handler;
-
         api::Storage storage;
         bool found = false;
 
@@ -122,7 +123,7 @@ private:
     void getStorage(
         std::shared_ptr<ReadStorageContext> readStorageContext);
 
-    void readStorageIfAllowed(
+    void checkReadStorageAllowed(
         std::shared_ptr<ReadStorageContext> readStorageContext);
 
     void getCredentialsForStorage(
@@ -145,6 +146,14 @@ private:
 
     std::shared_ptr<s3::DataUsageCalculator> createDataUsageCalculator();
     void removeDataUsageCalculator(const std::shared_ptr<s3::DataUsageCalculator>& calculator);
+
+    template<typename Command, typename DbFunc, typename Handler>
+    void modifySystemStorageRelation(
+        nx::utils::stree::ResourceContainer authInfo,
+        std::string storageId,
+        std::string systemId,
+        DbFunc dbFunc,
+        Handler handler);
 
     void registerSyncEngineCommandHandlers();
 

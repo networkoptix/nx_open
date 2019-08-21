@@ -255,7 +255,7 @@ void StorageManager::removeStorage(
             if (!*storage)
                 return handler(api::ResultCode::ok);
 
-            if (!m_accessManager->removeStorageAllowed(authInfo, **storage))
+            if (!m_accessManager->isStorageOwner(authInfo, **storage))
                 return handler(api::ResultCode::unauthorized);
 
             handler(api::Result());
@@ -293,80 +293,33 @@ void StorageManager::getCredentials(
 }
 
 void StorageManager::addSystem(
-    const std::string& storageId,
-    const api::AddSystemRequest& request,
+    nx::utils::stree::ResourceContainer authInfo,
+    std::string storageId,
+    api::AddSystemRequest request,
     nx::utils::MoveOnlyFunc<void(api::Result, api::System)> handler)
 {
-    if (storageId.empty())
-        return handler(utils::badRequest("Empty storageId"), api::System());
-
-    if (request.id.empty())
-        return handler(utils::badRequest("Empty System.id"), api::System());
-
-    auto system = std::make_shared<api::System>();
-    system->storageId = storageId;
-    system->id = request.id;
-
-    m_database->synchronizationEngine().transactionLog().startDbTransaction(
-        m_settings.database().synchronization.clusterId,
-        [this, system](auto queryContext)
-        {
-            return modifyDbAndSynchronize<command::SaveSystem>(
-                queryContext,
-                *system,
-                std::bind(&AbstractStorageDao::addSystem, m_storageDao, _1, _2));
-        },
-        [this, system, handler = std::move(handler)](auto dbResult)
-        {
-            if (dbResult != nx::sql::DBResult::ok)
-            {
-                api::Result error(utils::toResultCode(dbResult));
-                error.error = lm("addSystem(storageId=%1, systemId=%2) failed with sql error: %3")
-                    .args(system->storageId, system->id, toString(dbResult)).toStdString();
-                NX_ERROR(this, error.error);
-                return handler(std::move(error), api::System());
-            }
-
-            handler(api::Result(), std::move(*system));
-        });
+    modifySystemStorageRelation<command::SaveSystem>(
+        std::move(authInfo),
+        storageId,
+        request.id,
+        std::bind(&AbstractStorageDao::addSystem, m_storageDao, _1, _2),
+        std::move(handler));
 }
 
 void StorageManager::removeSystem(
-    const std::string& storageId,
-    const std::string& systemId,
+    nx::utils::stree::ResourceContainer authInfo,
+    std::string storageId,
+    std::string systemId,
     nx::utils::MoveOnlyFunc<void(api::Result)> handler)
 {
-    if (storageId.empty())
-        return handler(utils::badRequest("Empty storageId"));
-
-    if (systemId.empty())
-        return handler(utils::badRequest("Empty systemId"));
-
-    auto system = std::make_shared<api::System>();
-    system->storageId = storageId;
-    system->id = systemId;
-
-    m_database->synchronizationEngine().transactionLog().startDbTransaction(
-        m_settings.database().synchronization.clusterId,
-        [this, system = std::move(system)](auto queryContext)
+    modifySystemStorageRelation<command::RemoveSystem>(
+        std::move(authInfo),
+        storageId,
+        systemId,
+        std::bind(&AbstractStorageDao::removeSystem, m_storageDao, _1, _2),
+        [handler = std::move(handler)](auto result, auto /*system*/)
         {
-            return modifyDbAndSynchronize<command::RemoveSystem>(
-                queryContext,
-                *system,
-                std::bind(&AbstractStorageDao::removeSystem, m_storageDao, _1, _2));
-        },
-        [this, system, handler = std::move(handler)](auto dbResult)
-        {
-            if (dbResult != nx::sql::DBResult::ok)
-            {
-                api::Result error(utils::toResultCode(dbResult));
-                error.error = lm("removeSystem(storageId=%1, systemId=%2) failed with sql error: %3")
-                    .args(system->storageId, system->id, toString(dbResult)).toStdString();
-                NX_ERROR(this, error.error);
-                return handler(std::move(error));
-            }
-
-            handler(api::Result());
+            handler(result);
         });
 }
 
@@ -384,6 +337,11 @@ void StorageManager::getStorage(
             readStorageContext->found = storage.has_value();
             if (storage)
                 readStorageContext->storage = std::move(*storage);
+
+            // TODO where to get information about storage type?
+            for (auto& device : readStorageContext->storage.ioDevices)
+                device.type = kStorageType;
+
             return nx::sql::DBResult::ok;
         },
         [this, readStorageContext](auto dbResult) mutable
@@ -404,11 +362,11 @@ void StorageManager::getStorage(
                     api::Storage());
             }
 
-            readStorageIfAllowed(std::move(readStorageContext));
+            checkReadStorageAllowed(std::move(readStorageContext));
         });
 }
 
-void StorageManager::readStorageIfAllowed(
+void StorageManager::checkReadStorageAllowed(
     std::shared_ptr<StorageManager::ReadStorageContext> readStorageContext)
 {
     m_accessManager->readStorageAllowed(
@@ -422,10 +380,6 @@ void StorageManager::readStorageIfAllowed(
                     api::Result(api::ResultCode::unauthorized),
                     api::Storage());
             }
-
-            // TODO where to get information about storage type?
-            for (auto& device : readStorageContext->storage.ioDevices)
-                device.type = kStorageType;
 
             if (!readStorageContext->withDataUsage)
             {
@@ -614,6 +568,61 @@ void StorageManager::registerSyncEngineCommandHandlers()
 
     registerCommandHandler<command::RemoveSystem>(
         std::bind(&AbstractStorageDao::removeSystem, m_storageDao, _1, _2));
+}
+
+template<typename Command, typename DbFunc, typename Handler>
+void StorageManager::modifySystemStorageRelation(
+    nx::utils::stree::ResourceContainer authInfo,
+    std::string storageId,
+    std::string systemId,
+    DbFunc dbFunc,
+    Handler handler)
+{
+    if (storageId.empty())
+        return handler(utils::badRequest("Empty storageId"), api::System());
+    if (systemId.empty())
+        return handler(utils::badRequest("Empty systemId"), api::System());
+
+    auto storage = std::make_shared<std::optional<api::Storage>>();
+    auto system = std::make_shared<api::System>();
+    system->storageId = storageId;
+    system->id = systemId;
+
+    m_database->synchronizationEngine().transactionLog().startDbTransaction(
+        m_settings.database().synchronization.clusterId,
+        [this, storage, system, dbFunc = std::move(dbFunc)](auto queryContext)
+        {
+            *storage = m_storageDao->readStorage(queryContext, system->storageId);
+            if (!*storage)
+                return nx::sql::DBResult::ok;
+
+            return modifyDbAndSynchronize<Command>(
+                queryContext,
+                *system,
+                std::move(dbFunc));
+        },
+        [this, authInfo = std::move(authInfo), storage, system,
+            handler = std::move(handler)](
+                auto dbResult)
+        {
+            if (dbResult != nx::sql::DBResult::ok)
+            {
+                api::Result error(
+                    utils::toResultCode(dbResult),
+                    lm("Request with storageId:%1, systemId:%2 failed with sql error: %3")
+                    .args(system->storageId, system->id, toString(dbResult)).toStdString());
+                NX_ERROR(this, error.error);
+                return handler(std::move(error), api::System());
+            }
+
+            if (!*storage)
+                return handler(api::ResultCode::notFound, api::System());
+
+            if (!m_accessManager->isStorageOwner(authInfo, **storage))
+                return handler(api::ResultCode::unauthorized, api::System());
+
+            handler(api::Result(), std::move(*system));
+        });
 }
 
 } // namespace nx::cloud::storage::service::controller
