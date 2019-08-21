@@ -70,7 +70,9 @@ enum class ViolationType
     manifestLogicalError,
 
     nullEngine,
-    nullDeviceAgent,
+
+    inconsistentActionResult,
+    invalidActionResultUrl,
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ViolationType);

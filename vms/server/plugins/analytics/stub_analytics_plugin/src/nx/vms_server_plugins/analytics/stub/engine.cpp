@@ -7,6 +7,7 @@
 
 #include <nx/sdk/i_device_info.h>
 #include <nx/sdk/helpers/uuid_helper.h>
+#include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/error.h>
 
 #include "utils.h"
@@ -299,6 +300,14 @@ std::string Engine::manifestString() const
                                 "caption": "Generate preview packet",
                                 "defaultValue": true,
                                 "value": true
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": ")json" + kGeneratePreviewAfterNFramesSetting + R"json(",
+                                "caption": "Generate preview after N frames",
+                                "defaultValue": 30,
+                                "minValue": 1,
+                                "maxValue": 100000
                             }
                         ]
                     },
@@ -424,7 +433,14 @@ static std::string objectTrackToString(
     if (track->count() == 0)
         return "empty";
 
-    std::string result = format("%d metadata items", track->count());
+    const auto firstMetadataOfTrack = track->at(0);
+    if (!firstMetadataOfTrack)
+        return "INTERNAL ERROR: Invalid Track metadata list";
+
+    std::string result = format(
+        "%d metadata items, Track start time, us: %lld",
+        track->count(),
+        firstMetadataOfTrack->timestampUs());
 
     Uuid trackld;
     for (int i = 0; i < track->count(); ++i)
@@ -435,7 +451,7 @@ static std::string objectTrackToString(
         {
             if (!result.empty())
                 result += "; ";
-            result += format("INTERNAL ERROR: Track id #%d %s does not equal track id #0 %s",
+            result += format("INTERNAL ERROR: Track id #%d %s does not equal Track id #0 %s",
                 i,
                 UuidHelper::toStdString(trackld).c_str(),
                 UuidHelper::toStdString(track->at(0)->trackId()).c_str());
@@ -447,7 +463,7 @@ static std::string objectTrackToString(
     {
         if (!result.empty())
             result += "; ";
-        result += format("INTERNAL ERROR: Track id in the track is %s, but in the action is %s",
+        result += format("INTERNAL ERROR: Track id in the Track is %s, but in the Action is %s",
             UuidHelper::toStdString(trackld).c_str(),
             UuidHelper::toStdString(expectedTrackId).c_str());
     }
@@ -464,28 +480,28 @@ static std::string uncompressedVideoFrameToString(Ptr<const IUncompressedVideoFr
         frame->width(), frame->height(), pixelFormatToStdString(frame->pixelFormat()).c_str());
 }
 
-Result<void> Engine::executeAction(
+Result<IAction::Result> Engine::executeAction(
     const std::string& actionId,
     Uuid trackId,
     Uuid /*deviceId*/,
     int64_t /*timestampUs*/,
     nx::sdk::Ptr<IObjectTrackInfo> objectTrackInfo,
-    const std::map<std::string, std::string>& params,
-    std::string* outActionUrl,
-    std::string* outMessageToUser)
+    const std::map<std::string, std::string>& params)
 {
+    std::string messageToUser;
+    std::string actionUrl;
+
     if (actionId == "nx.stub.addToList")
     {
-        *outMessageToUser =
-            std::string("Track id: ") + UuidHelper::toStdString(trackId) + "\n\n";
+        messageToUser = std::string("Track id: ") + UuidHelper::toStdString(trackId) + "\n\n";
 
         if (!objectTrackInfo)
         {
-            *outMessageToUser += "No object track info provided.\n\n";
+            messageToUser += "No object track info provided.\n\n";
         }
         else
         {
-            *outMessageToUser += std::string("Object track info:\n")
+            messageToUser += std::string("Object track info:\n")
                 + "    Track: " + objectTrackToString(objectTrackInfo->track(), trackId) + "\n"
                 + "    Best shot frame: "
                     + uncompressedVideoFrameToString(objectTrackInfo->bestShotVideoFrame()) + "\n"
@@ -496,7 +512,7 @@ Result<void> Engine::executeAction(
 
         if (!params.empty())
         {
-            *outMessageToUser += std::string("Your param values are:\n");
+            messageToUser += std::string("Your param values are:\n");
             bool first = true;
             for (const auto& entry: params)
             {
@@ -504,25 +520,25 @@ Result<void> Engine::executeAction(
                 const auto& parameterValue = entry.second;
 
                 if (!first)
-                    *outMessageToUser += ",\n";
+                    messageToUser += ",\n";
                 else
                     first = false;
-                *outMessageToUser += parameterName + ": [" + parameterValue + "]";
+                messageToUser += parameterName + ": [" + parameterValue + "]";
             }
         }
         else
         {
-            *outMessageToUser += "No param values provided.";
+            messageToUser += "No param values provided.";
         }
 
         NX_PRINT << __func__ << "(): Returning a message: "
-            << nx::kit::utils::toString(*outMessageToUser);
+            << nx::kit::utils::toString(messageToUser);
     }
     else if (actionId == "nx.stub.addPerson")
     {
-        *outActionUrl =
+        actionUrl =
             "http://internal.server/addPerson?trackId=" + UuidHelper::toStdString(trackId);
-        NX_PRINT << __func__ << "(): Returning URL: " << nx::kit::utils::toString(*outActionUrl);
+        NX_PRINT << __func__ << "(): Returning URL: " << nx::kit::utils::toString(actionUrl);
     }
     else
     {
@@ -530,7 +546,7 @@ Result<void> Engine::executeAction(
         return error(ErrorCode::invalidParams, "Unsupported actionId");
     }
 
-    return {};
+    return IAction::Result{makePtr<String>(actionUrl), makePtr<String>(messageToUser)};
 }
 
 } // namespace stub

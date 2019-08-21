@@ -7364,6 +7364,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Wybierz obszar wideo, aby filtrować wyniki</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>W zaznaczonym obszarze</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Wybrana kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Wybrane urządzenie</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Wybrane media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>brak</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9431,14 +9459,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Wybierz obszar wideo, aby filtrować wyniki</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>W zaznaczonym obszarze</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Brak ruchu</translation>
     </message>
@@ -9454,23 +9474,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n zdarzeń ruchu</numerusform>
         <numerusform>%n zdarzeń ruchu</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Wybrana kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Wybrane urządzenie</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Wybrane media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>brak</translation>
     </message>
   </context>
   <context>

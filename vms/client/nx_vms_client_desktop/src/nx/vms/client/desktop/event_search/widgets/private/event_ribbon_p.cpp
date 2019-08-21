@@ -91,9 +91,14 @@ bool shouldAnimateTile(const QModelIndex& index)
 
 int maxSimultaneousPreviewLoads(const QnMediaServerResourcePtr& server)
 {
-    return QnMediaServerResource::isArmServer(server)
-        ? std::clamp(ini().maxSimultaneousTilePreviewLoadsArm, 1, 5)
-        : std::clamp(ini().maxSimultaneousTilePreviewLoads, 1, 15);
+    if (QnMediaServerResource::isArmServer(server))
+    {
+        return std::clamp(ini().maxSimultaneousTilePreviewLoadsArm,
+            1, EventRibbon::kSimultaneousPreviewLoadsLimitArm);
+    }
+
+    return std::clamp(ini().maxSimultaneousTilePreviewLoads,
+        1, EventRibbon::kSimultaneousPreviewLoadsLimit);
 }
 
 QnMediaServerResourcePtr previewServer(const ResourceThumbnailProvider* provider)
@@ -107,6 +112,7 @@ QnMediaServerResourcePtr previewServer(const ResourceThumbnailProvider* provider
 } // namespace
 
 EventRibbon::Private::Private(EventRibbon* q):
+    QnWorkbenchContextAware(q),
     q(q),
     m_scrollBar(new QScrollBar(Qt::Vertical, q)),
     m_viewport(new QWidget(q)),
@@ -379,7 +385,8 @@ ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
     auto provider = new ResourceThumbnailProvider(request);
 
     connect(provider, &QObject::destroyed, this,
-        [this, provider]() { handleLoadingEnded(provider); });
+        [this, provider]() { handleLoadingEnded(provider); },
+        Qt::QueuedConnection);
 
     connect(provider, &ImageProvider::statusChanged, this,
         [this, provider](Qn::ThumbnailStatus status)
@@ -392,23 +399,24 @@ ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
                 case Qn::ThumbnailStatus::Loading:
                 case Qn::ThumbnailStatus::Refreshing:
                 {
-                    const auto timeoutTimer = executeDelayedParented(
-                        [this, provider]() { handleLoadingEnded(provider); },
-                        kPreviewLoadTimeout,
-                        provider);
+                    const QSharedPointer<QTimer> timeoutTimer(new QTimer(),
+                        [](QTimer* timer)
+                        {
+                            if (!timer)
+                                return;
+
+                            timer->stop();
+                            timer->deleteLater();
+                        });
+
+                    connect(timeoutTimer.get(), &QTimer::timeout, this,
+                        [this, provider]() { handleLoadingEnded(provider); });
+
+                    timeoutTimer->setSingleShot(true);
+                    timeoutTimer->start(kPreviewLoadTimeout);
 
                     const auto server = previewServer(provider);
-
-                    m_loadingByProvider.insert(provider, {server,
-                        QSharedPointer<QTimer>(timeoutTimer,
-                            [](QTimer* timer)
-                            {
-                                if (!timer)
-                                    return;
-
-                                timer->stop();
-                                timer->deleteLater();
-                            })});
+                    m_loadingByProvider.insert(provider, {server, timeoutTimer});
 
                     auto& serverData = m_loadingByServer[server];
                     ++serverData.loadingCounter;
@@ -554,11 +562,57 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
     if (!m_model)
         return;
 
-    const auto index = m_model->index(indexOf(tile));
-    const auto menu = index.data(Qn::ContextMenuRole).value<QSharedPointer<QMenu>>();
+    const QPersistentModelIndex index = m_model->index(indexOf(tile));
+    auto menu = index.data(Qn::ContextMenuRole).value<QSharedPointer<QMenu>>();
+
+    const auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>();
+    if (!resourceList.empty())
+    {
+        if (!menu || !NX_ASSERT(!menu->isEmpty()))
+            menu.reset(new QMenu());
+        else
+            menu->insertSeparator(menu->actions()[0]);
+
+        // TODO: #vkutin #gdm
+        // Add new translatable strings in 4.2 and remove workbench context awareness.
+
+        const auto openAction = new QAction(
+            action(ui::action::OpenInCurrentLayoutAction)->text(), menu.get());
+
+        connect(openAction, &QAction::triggered, this,
+            [this, index]()
+            {
+                if (index.isValid())
+                    emit q->openRequested(index, /*inNewTab*/ false);
+            });
+
+        const auto openInNewTabAction = new QAction(
+            action(ui::action::OpenInNewTabAction)->text(), menu.get());
+
+        connect(openInNewTabAction, &QAction::triggered, this,
+            [this, index]()
+            {
+                if (index.isValid())
+                    emit q->openRequested(index, /*inNewTab*/ true);
+            });
+
+        QList<QAction*> actions({openAction, openInNewTabAction});
+        if (menu->isEmpty())
+            menu->addActions(actions);
+        else
+            menu->insertActions(menu->actions()[0], actions);
+    }
 
     if (!menu)
         return;
+
+    connect(m_model, &QAbstractItemModel::modelAboutToBeReset, menu.get(), &QObject::deleteLater);
+    connect(m_model, &QAbstractItemModel::rowsAboutToBeRemoved, menu.get(),
+        [menu, index](const QModelIndex& parent, int first, int last)
+        {
+            if (!parent.isValid() && index.row() >= first && index.row() <= last)
+                menu->close();
+        });
 
     menu->setWindowFlags(menu->windowFlags() | Qt::BypassGraphicsProxyWidget);
 

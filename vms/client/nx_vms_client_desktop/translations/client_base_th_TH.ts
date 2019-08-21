@@ -7070,6 +7070,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>เลือกพื้นที่บนวิดีโอเพื่อกรองผลลัพธ์</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>ในพื้นที่ที่เลือก</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>เลือกกล้อง</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>เลือกอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>เลือกสื่อ</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ไม่มี</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9075,14 +9103,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>เลือกพื้นที่บนวิดีโอเพื่อกรองผลลัพธ์</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>ในพื้นที่ที่เลือก</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>ไม่มีการเคลื่อนไหว</translation>
     </message>
@@ -9095,23 +9115,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>
         <numerusform>กิจกรรมเคลื่อนไหว %n</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>เลือกกล้อง</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>เลือกอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>เลือกสื่อ</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ไม่มี</translation>
     </message>
   </context>
   <context>

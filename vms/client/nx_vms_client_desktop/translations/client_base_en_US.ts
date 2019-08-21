@@ -1721,23 +1721,11 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Business rule updated</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Server removed</source>
         <translation></translation>
     </message>
     <message>
-        <source>Business rule removed</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>User removed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Business rule reseted</source>
         <translation></translation>
     </message>
     <message>
@@ -1834,6 +1822,18 @@ to view more bookmarks</source>
             <numerusform>%n action</numerusform>
             <numerusform>%n actions</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Event rule changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event rule removed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event rules reset to default</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7167,6 +7167,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
 </context>
 <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+        <source>Select area on the video to filter results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In selected area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected media</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>none</source>
+        <comment>No currently selected camera</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>StreamQualityStrings</name>
     <message>
         <source>Lowest</source>
@@ -9192,14 +9220,6 @@ If you intended to move analytics data to another storage location, please conta
 <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-        <source>Select area on the video to filter results</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>In selected area</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>No motion</source>
         <translation></translation>
     </message>
@@ -9213,23 +9233,6 @@ If you intended to move analytics data to another storage location, please conta
             <numerusform>%n motion event</numerusform>
             <numerusform>%n motion events</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Selected camera</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Selected device</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Selected media</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>none</source>
-        <comment>No currently selected camera</comment>
-        <translation></translation>
     </message>
 </context>
 <context>

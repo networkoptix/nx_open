@@ -374,7 +374,7 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
     auto fileContent = dbFileContent();
 
     if (!measureTime(
-            [this, &fileContent, &parsedData]()
+            [&fileContent, &parsedData]()
             {
                 return nx::media_db::DbReader::parse(fileContent, parsedData.get());
             },

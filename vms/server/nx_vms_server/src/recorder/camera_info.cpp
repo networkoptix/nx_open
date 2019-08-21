@@ -391,7 +391,6 @@ boost::optional<Reader::ParseResult> Reader::parseLine(const QString& line) cons
 
     QString key;
     QString value;
-    int quoteCount = 0;
     bool finished = false;
 
     for (int i = 0; i < line.size(); ++i)

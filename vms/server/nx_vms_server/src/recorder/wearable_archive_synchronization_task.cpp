@@ -212,7 +212,7 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
 
     if (!m_withMotion)
     {
-        auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& motion) { return false; };
+        auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& /*motion*/) { return false; };
         m_recorder->setSaveMotionHandler(saveMotionHandler);
     }
 

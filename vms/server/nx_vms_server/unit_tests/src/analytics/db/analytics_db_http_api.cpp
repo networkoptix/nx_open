@@ -9,7 +9,7 @@
 #include <api/mediaserver_client.h>
 #include <test_support/mediaserver_launcher.h>
 
-#include "analytics_storage_types.h"
+#include "attribute_dictionary.h"
 
 namespace nx::analytics::db::test {
 
@@ -24,7 +24,7 @@ struct LookupRequestData
     LookupResult responseData;
 };
 
-class StorageMock:
+class StorageMock final:
     public AbstractEventsStorage
 {
 public:
@@ -94,10 +94,12 @@ public:
         FAIL();
     }
 
-    virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override
+    virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* /*outResult*/) override
     {
         return false;
     }
+
+    virtual bool initialized() const override { return true; }
 
 private:
     nx::utils::SyncQueue<LookupRequestData>* m_lookupRequestQueue;

@@ -55,7 +55,11 @@ Data createCamerasData(
 
     for (const auto camera: accessibleCameras)
     {
-        const auto parentServerId = camera->getParentServer()->getId();
+        const auto server = camera->getParentServer();
+        if (!server)
+            continue;
+
+        const auto parentServerId = server->getId();
         const auto cameraId = camera->getId();
 
         if (!camera->getGroupId().isNull())

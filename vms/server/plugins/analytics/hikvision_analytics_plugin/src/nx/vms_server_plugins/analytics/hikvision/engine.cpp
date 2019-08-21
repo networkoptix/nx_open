@@ -85,7 +85,8 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
     auto supportedEventTypeIds = fetchSupportedEventTypeIds(deviceInfo);
     if (!supportedEventTypeIds)
     {
-        *outResult = error(ErrorCode::internalError, "No supported event types");
+        NX_DEBUG(this, "Supported Event Type list is empty for the Device %1 (%2)",
+            deviceInfo->name(), deviceInfo->id());
         return;
     }
 
@@ -185,7 +186,7 @@ const Hikvision::EngineManifest& Engine::engineManifest() const
     return m_engineManifest;
 }
 
-void Engine::doExecuteAction(Result<void>* /*outResult*/, IAction* /*action*/)
+void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
 {
 }
 

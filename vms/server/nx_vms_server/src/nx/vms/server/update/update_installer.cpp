@@ -229,6 +229,8 @@ bool UpdateInstaller::checkFreeSpaceForInstallation() const
 {
     const qint64 required = m_freeSpaceRequiredToUpdate > 0
         ? m_freeSpaceRequiredToUpdate
+        // If we don't know exactly how much space is required, assume we need 10% of extracted
+        // size after extraction over old files.
         : m_bytesExtracted / 10;
 
     return checkFreeSpace(

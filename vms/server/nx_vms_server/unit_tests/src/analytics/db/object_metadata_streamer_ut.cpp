@@ -10,7 +10,7 @@
 #include <nx/vms/server/analytics/db/object_metadata_streamer.h>
 #include <utils/common/util.h>
 
-#include "analytics_storage_types.h"
+#include "attribute_dictionary.h"
 
 namespace nx::analytics::db::test {
 
@@ -45,7 +45,7 @@ private:
 static const std::chrono::microseconds kInitialTimestamp(1000);
 static const std::chrono::microseconds kTimestampStep(10);
 
-class EventsStorageStub:
+class EventsStorageStub final:
     public AbstractEventsStorage
 {
     friend class Cursor;
@@ -162,10 +162,12 @@ public:
             m_objectMetadataPackets.push_back(packet);
         }
     }
-    virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) override
+    virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* /*outResult*/) override
     {
         return false;
     }
+
+    virtual bool initialized() const override { return true; }
 
 private:
     nx::utils::SyncQueue<Cursor*>* m_createdCursors;

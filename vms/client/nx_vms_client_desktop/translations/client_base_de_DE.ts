@@ -7169,6 +7169,34 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Wählen Sie einen Bereich im Video aus, um die Ergebnisse zu filtern</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Im ausgewählten Bereich</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Ausgewählte Kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Ausgewähltes Gerät</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Ausgewählte Medien</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>keine</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -9194,14 +9222,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Wählen Sie einen Bereich im Video aus, um die Ergebnisse zu filtern</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Im ausgewählten Bereich</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Keine Bewegung</translation>
     </message>
@@ -9215,23 +9235,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
         <numerusform>%n Bewegungsereignis</numerusform>
         <numerusform>%n Bewegungsereignisse</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Ausgewählte Kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Ausgewähltes Gerät</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Ausgewählte Medien</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>keine</translation>
     </message>
   </context>
   <context>

@@ -638,7 +638,7 @@ void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded(const QnCompressedVideo
 }
 
 void QnLiveStreamProvider::saveBitrateIfNeeded(
-    const QnCompressedVideoDataPtr& videoData,
+    const QnCompressedVideoDataPtr& /*videoData*/,
     const QnLiveStreamParams& liveParams,
     bool isCameraConfigured)
 {

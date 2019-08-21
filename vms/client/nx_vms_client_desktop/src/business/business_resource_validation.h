@@ -283,3 +283,21 @@ private:
     const GlobalPermission m_requiredPermission;
     const QString m_permissionName;
 };
+
+class QnLayoutAccessValidationPolicy: public QnSubjectValidationPolicy
+{
+    using base_type = QnSubjectValidationPolicy;
+
+public:
+    QnLayoutAccessValidationPolicy(QnCommonModule* common);
+
+    virtual QValidator::State roleValidity(const QnUuid& roleId) const override;
+    virtual bool userValidity(const QnUserResourcePtr& user) const override;
+
+    void setLayout(const QnLayoutResourcePtr& layout);
+
+private:
+    const QnResourceAccessManager* m_accessManager;
+    const QnUserRolesManager* m_rolesManager;
+    QnLayoutResourcePtr m_layout;
+};

@@ -200,11 +200,12 @@ bool SdkObjectFactory::initPluginResources()
         pluginResource->setSdkPlugin(std::make_shared<wrappers::Plugin>(
             serverModule(), pluginResource, sdkPluginItr->second, pluginInfo->libName));
 
-        if (const bool result = pluginResource->init())
+        if (!pluginResource->init())
         {
             NX_WARNING(this, "Error while initializing the Plugin resource %1", pluginResource);
             continue;
         }
+
         pluginResource->setStatus(Qn::Online);
     }
 

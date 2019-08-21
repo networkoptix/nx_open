@@ -117,7 +117,7 @@ void RemoteArchiveSynchronizationTask::createArchiveReaderThreadUnsafe(
 }
 
 bool RemoteArchiveSynchronizationTask::prepareDataSource(
-    const QnTimePeriod& timePeriod,
+    const QnTimePeriod& /*timePeriod*/,
     const nx::core::resource::RemoteArchiveChunk& chunk)
 {
     auto manager = m_resource->remoteArchiveManager();

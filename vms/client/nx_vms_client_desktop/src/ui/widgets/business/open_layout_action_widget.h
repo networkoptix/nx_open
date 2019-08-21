@@ -8,6 +8,7 @@ namespace Ui {
 class OpenLayoutActionWidget;
 } // namespace Ui
 
+class QnLayoutAccessValidationPolicy;
 class QnResourceListModel;
 
 namespace nx::vms::client::desktop {
@@ -61,7 +62,7 @@ private:
     // Can return nullptr.
     QnLayoutResourcePtr getSelectedLayout();
 
-    QnUserResourceList getSelectedUsers(bool& rolesSelected);
+    std::pair<QnUserResourceList, QList<QnUuid>> getSelectedUsersAndRoles();
 
     // Updates button state according to selected layouts.
     void updateLayoutsButton();
@@ -75,6 +76,8 @@ private:
     QScopedPointer<Ui::OpenLayoutActionWidget> ui;
 
     QnLayoutResourcePtr m_selectedLayout;
+
+    QnLayoutAccessValidationPolicy* m_validator = nullptr;
 };
 
 } // namespace nx::vms::client::desktop

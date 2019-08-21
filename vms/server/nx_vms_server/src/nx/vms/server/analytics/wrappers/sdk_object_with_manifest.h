@@ -35,6 +35,8 @@ public:
             return;
     }
 
+    virtual ~SdkObjectWithManifest() = default;
+
     std::optional<ManifestType> manifest(
         std::unique_ptr<StringBuilder>* outStringBuilder = nullptr) const
     {
@@ -88,7 +90,7 @@ protected:
         const GenericError& error,
         ReturnType returnValue) const
     {
-        StringBuilder stringBuilder(sdkMethod, sdkObjectDescription(), error);
+        const StringBuilder stringBuilder(sdkMethod, sdkObjectDescription(), error);
         NX_DEBUG(this, stringBuilder.buildLogString());
         throwPluginEvent(
             stringBuilder.buildPluginDiagnosticEventCaption(),

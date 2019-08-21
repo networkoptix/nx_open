@@ -16,9 +16,9 @@
 #include <QtCore/QHash>
 #include <QtCore/QSharedPointer>
 
-#include <client_core/connection_context_aware.h>
 #include <ui/common/notification_levels.h>
 #include <ui/style/helper.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/interval.h>
@@ -34,7 +34,7 @@ namespace nx::vms::client::desktop {
 
 class EventRibbon::Private:
     public QObject,
-    public QnConnectionContextAware
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
     using PrivateSignal = EventRibbon::QPrivateSignal;

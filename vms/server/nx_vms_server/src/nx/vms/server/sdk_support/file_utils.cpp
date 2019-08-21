@@ -1,12 +1,26 @@
 #include "file_utils.h"
 
 #include <nx/utils/log/assert.h>
+#include <nx/fusion/model_functions.h>
 
 #include <core/resource/camera_resource.h>
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <media_server/media_server_module.h>
 #include <plugins/plugin_manager.h>
+
+QN_FUSION_DEFINE_FUNCTIONS(
+    nx::vms::server::sdk_support::FilenameGenerationOption, (numeric)(debug))
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::server::sdk_support, FilenameGenerationOption,
+    (nx::vms::server::sdk_support::FilenameGenerationOption::engineSpecific, "engineSpecific")
+    (nx::vms::server::sdk_support::FilenameGenerationOption::deviceSpecific, "deviceSpecific")
+)
+QN_FUSION_DEFINE_FUNCTIONS(
+    nx::vms::server::sdk_support::FilenameGenerationOptions, (numeric)(debug))
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::server::sdk_support, FilenameGenerationOptions,
+    (nx::vms::server::sdk_support::FilenameGenerationOption::engineSpecific, "engineSpecific")
+    (nx::vms::server::sdk_support::FilenameGenerationOption::deviceSpecific, "deviceSpecific")
+)
 
 namespace nx::vms::server::sdk_support {
 
@@ -152,15 +166,25 @@ QString baseNameOfFileToDumpOrLoadData(
     const resource::AnalyticsPluginResourcePtr& plugin,
     const resource::AnalyticsEngineResourcePtr& engine,
     const QnVirtualCameraResourcePtr& device,
-    bool isEngineSpecific,
-    bool isDeviceSpecific)
+    FilenameGenerationOptions filenameGenerationOptions)
 {
     if (device && engine) //< Filename for something related to a DeviceAgent.
-        return nameOfFileToDumpOrLoadDataForDevice(device, engine, isDeviceSpecific);
+    {
+        return nameOfFileToDumpOrLoadDataForDevice(
+            device,
+            engine,
+            filenameGenerationOptions.testFlag(FilenameGenerationOption::deviceSpecific));
+    }
     else if (engine) //< Filename for something related to an Engine.
-        return nameOfFileToDumpOrLoadDataForEngine(engine, isEngineSpecific);
+    {
+        return nameOfFileToDumpOrLoadDataForEngine(
+            engine,
+            filenameGenerationOptions.testFlag(FilenameGenerationOption::engineSpecific));
+    }
     else if (plugin) //< Filename for something related to a Plugin.
+    {
         return plugin->libName();
+    }
 
     NX_ASSERT(false, "Incorrect parameters");
     return QString();

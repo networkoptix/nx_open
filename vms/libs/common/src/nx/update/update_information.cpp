@@ -122,6 +122,15 @@ nx::utils::SoftwareVersion UpdateContents::getVersion() const
     return nx::utils::SoftwareVersion(info.version);
 }
 
+UpdateDeliveryInfo UpdateContents::getUpdateDeliveryInfo() const
+{
+    UpdateDeliveryInfo result;
+    result.version = info.version;
+    result.releaseDateMs = info.releaseDateMs;
+    result.releaseDeliveryDays = info.releaseDeliveryDays;
+    return result;
+}
+
 bool UpdateContents::isValidToInstall() const
 {
     return missingUpdate.empty()

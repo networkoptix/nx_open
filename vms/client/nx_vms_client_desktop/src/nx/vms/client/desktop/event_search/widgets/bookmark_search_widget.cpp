@@ -29,6 +29,9 @@ static constexpr milliseconds kUpdateTimerResolution = 500ms;
 
 struct BookmarkSearchWidget::Private
 {
+    Q_DECLARE_TR_FUNCTIONS(BookmarkSearchWidget::Private)
+
+public: //< Overrides 'private:' in macro above.
     BookmarkSearchListModel* const model;
 
     nx::utils::ElapsedTimer sinceLastRequest;

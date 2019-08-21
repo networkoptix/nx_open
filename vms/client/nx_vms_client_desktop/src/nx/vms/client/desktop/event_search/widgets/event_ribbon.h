@@ -80,6 +80,9 @@ public:
     void setInsertionMode(UpdateMode updateMode, bool scrollDown);
     void setRemovalMode(UpdateMode updateMode);
 
+    static constexpr int kSimultaneousPreviewLoadsLimit = 15;
+    static constexpr int kSimultaneousPreviewLoadsLimitArm = 5;
+
 signals:
     void countChanged(int count);
     void unreadCountChanged(int unreadCount, QnNotificationLevel::Value importance, QPrivateSignal);
@@ -91,6 +94,7 @@ signals:
     void doubleClicked(const QModelIndex& index); //< With left mouse button.
     void dragStarted(const QModelIndex& index, const QPoint& pos, const QSize& size);
     void linkActivated(const QModelIndex& index, const QString& link);
+    void openRequested(const QModelIndex& index, bool inNewTab);
 
 protected:
     virtual bool event(QEvent* event) override;

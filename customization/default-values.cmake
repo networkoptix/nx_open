@@ -61,7 +61,9 @@ set(translations
     zh_TW
     he_IL
     hu_HU
+    nl_BE
     nl_NL
+    no_NO
     pl_PL
     pt_BR
     pt_PT

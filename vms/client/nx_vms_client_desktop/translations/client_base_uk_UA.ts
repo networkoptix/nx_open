@@ -9,15 +9,15 @@
     </message>
     <message>
       <source>Select area</source>
-      <translation>Виберіть область</translation>
+      <translation>Оберiть область</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation>Виберіть ділянку на відео...</translation>
+      <translation>Оберiть проміжок запису...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation>У вибраній ділянці</translation>
+      <translation>У обраній ділянці</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
@@ -177,7 +177,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Browse Local Files</source>
-      <translation>Переглянути Локальні Файли</translation>
+      <translation>Перегляд Локальних Файлів</translation>
     </message>
     <message>
       <source>Show Welcome Screen</source>
@@ -209,15 +209,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>New User...</source>
-      <translation>Новий користувач...</translation>
+      <translation>Новий Користувач...</translation>
     </message>
     <message>
       <source>Video Wall...</source>
-      <translation>Відеостіна...</translation>
+      <translation>Відео Стіна...</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>Нова Відеостіна...</translation>
+      <translation>Нова Відео Стіна...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -261,7 +261,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Save Video Wall View</source>
-      <translation>Зберегти Налаштування Перегляду Відеостіни</translation>
+      <translation>Зберегти Налаштування Перегляду Відео Стіни</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
@@ -452,11 +452,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
-      <translation>Переключитися в режим відеостіни...</translation>
+      <translation>Перехід у Режим Відео Стіни...</translation>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation>Зберегти Відеостіну</translation>
+      <translation>Зберегти Відео Стіну</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
@@ -472,7 +472,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation>Зупинити Відеостіну</translation>
+      <translation>Зупинити Відео Стіну</translation>
     </message>
     <message>
       <source>Clear Screen</source>
@@ -780,7 +780,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Jump to Live</source>
-      <translation>Перехiд до Відео у Реальному Часі</translation>
+      <translation>Перехiд до он-лайн Відео</translation>
     </message>
     <message>
       <source>Synchronize Streams</source>
@@ -1146,7 +1146,7 @@ to view more bookmarks</source>
     <name>FullscreenActionHelper</name>
     <message>
       <source>Source camera</source>
-      <translation>Source camera</translation>
+      <translation>Початкова камера</translation>
     </message>
     <message>
       <source>Select device...</source>
@@ -1179,7 +1179,7 @@ to view more bookmarks</source>
     <name>GraphicsScrollBar</name>
     <message>
       <source>Scroll Here</source>
-      <translation>Прокрутіть тут</translation>
+      <translation>Прокрутка</translation>
     </message>
     <message>
       <source>Left Edge</source>
@@ -1234,7 +1234,7 @@ to view more bookmarks</source>
     <name>LayoutTourTextFactory</name>
     <message>
       <source>Start Showreel</source>
-      <translation>Почати Прокрутку</translation>
+      <translation>Почати Showreel</translation>
     </message>
   </context>
   <context>
@@ -1726,7 +1726,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Watching live</source>
-      <translation>Перегляд відео в реальному часі</translation>
+      <translation>Перегляд он-лайн відео</translation>
     </message>
     <message>
       <source>Watching archive</source>
@@ -1754,7 +1754,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Business rule updated</source>
-      <translation>Оновлені правила поведінки</translation>
+      <translation>Business rule updated</translation>
     </message>
     <message>
       <source>Server removed</source>
@@ -1762,7 +1762,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Business rule removed</source>
-      <translation>Правило поведінки видалено</translation>
+      <translation>Business rule removed</translation>
     </message>
     <message>
       <source>User removed</source>
@@ -1770,7 +1770,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Business rule reseted</source>
-      <translation>Правило поведінки скинуто</translation>
+      <translation>Business rule reseted</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1978,7 +1978,7 @@ to view more bookmarks</source>
     <name>QnBuildNumberDialog</name>
     <message>
       <source>Build Number</source>
-      <translation>Номер Випуску системи</translation>
+      <translation>Номер Випуску програмного забезпечення</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1986,11 +1986,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation>Неправильний пароль.</translation>
+      <translation>Пароль не правильний.</translation>
     </message>
     <message>
       <source>Select Build</source>
-      <translation>Обрати файл, випуск системи</translation>
+      <translation>Обрати файл, Випуск програмного забезпечення</translation>
     </message>
   </context>
   <context>
@@ -2032,11 +2032,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any Device</source>
-      <translation>Будь-який пристрій</translation>
+      <translation>Будь-який Пристрій</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation>Будь-яка камера</translation>
+      <translation>Будь-яка Камера</translation>
     </message>
   </context>
   <context>
@@ -2091,7 +2091,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>N/A</source>
-      <translation>Недоступний</translation>
+      <translation>Не доступний</translation>
     </message>
     <message>
       <source>Every %1</source>
@@ -2204,11 +2204,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Some rules are not valid. Disable them?</source>
-      <translation>Деякі правила некоректні. Вимкнути їх?</translation>
+      <translation>Деякі правила не коректні. Вимкнути їх?</translation>
     </message>
     <message>
       <source>Apply changes before exit?</source>
-      <translation>Застосувати зміни перед виходом?</translation>
+      <translation>Застосувати зміни налаштувань перед виходом?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -2216,7 +2216,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Restore all rules to default?</source>
-      <translation>Встановити всі правила за замовчуванням?</translation>
+      <translation>Встановити всі правила на почтаковi налаштування?</translation>
     </message>
   </context>
   <context>
@@ -2239,18 +2239,18 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Target</source>
-      <translation>Об’єкт</translation>
+      <translation>Ціль</translation>
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation>Інтервал спрацьовування</translation>
+      <translation>Інтервал спрацьовування Дії</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation>Аналітика недоступна для %1</translation>
+      <translation>Аналітика не доступна для %1</translation>
     </message>
   </context>
   <context>
@@ -2289,7 +2289,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Evaluating media stream for errors.</source>
-      <translation>Перевірка коректності медіапотоку.</translation>
+      <translation>Оцінка медіапотоку на предмет помилок.</translation>
     </message>
     <message>
       <source>Diagnostics for device %1</source>
@@ -2317,11 +2317,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Confirming target device provides media stream.</source>
-      <translation>Вибраний пристрій надає медіа потік.</translation>
+      <translation>Обраний пристрій надає медіа потік.</translation>
     </message>
     <message>
       <source>Confirming target camera provides media stream.</source>
-      <translation>Вибрана камера надає медіа потік.</translation>
+      <translation>Обрана камера надає медіа потік.</translation>
     </message>
     <message>
       <source>Diagnostics for I/O module %1</source>
@@ -2329,15 +2329,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Diagnostics</source>
-      <translation>Діагностика модуля вводу/виводу</translation>
+      <translation>Діагностика Модуля вводу/виводу</translation>
     </message>
     <message>
       <source>Confirming I/O module is accessible.</source>
-      <translation>Підтвердження доступності модуля введення/виводу.</translation>
+      <translation>Модуля вводу/ виводу доступний.</translation>
     </message>
     <message>
       <source>Confirming target I/O module provides media stream.</source>
-      <translation>Підтвердження отримання даних з модуля введення/виводу.</translation>
+      <translation>Модуль вводу / виводу надає медіапотік.</translation>
     </message>
     <message>
       <source>Diagnostics complete</source>
@@ -2348,7 +2348,7 @@ to view more bookmarks</source>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
       <source>automatic</source>
-      <translation>автоматична</translation>
+      <translation>автоматично</translation>
     </message>
   </context>
   <context>
@@ -2389,27 +2389,27 @@ to view more bookmarks</source>
       <source>%n devices found</source>
       <translation>
         <numerusform>Знайдено %n пристрій</numerusform>
-        <numerusform>Знайдено %n пристроїв</numerusform>
-        <numerusform>Знайдено %n пристроїв</numerusform>
-        <numerusform>Знайдено %n пристроїв</numerusform>
+        <numerusform>%n знайдено пристроїв</numerusform>
+        <numerusform>%n знайдено пристроїв</numerusform>
+        <numerusform>%n знайдено пристроїв</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
       <translation>
-        <numerusform>Знайдено %n камеру</numerusform>
-        <numerusform>Знайдено %n камер</numerusform>
-        <numerusform>Знайдено %n камер</numerusform>
-        <numerusform>Знайдено %n камер</numerusform>
+        <numerusform>%n знайдено камеру</numerusform>
+        <numerusform>%n знайдено камер</numerusform>
+        <numerusform>%n знайдено камер</numerusform>
+        <numerusform>%n знайдено камер</numerusform>
       </translation>
     </message>
     <message>
       <source>Export selected devices to a file.</source>
-      <translation>Експорт вибраних пристроїв у файл.</translation>
+      <translation>Експортувати обранi пристрої у файл.</translation>
     </message>
     <message>
       <source>Export selected cameras to a file.</source>
-      <translation>Експортувати вибрані камери у файл.</translation>
+      <translation>Експортувати обрані камери у файл.</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
@@ -2459,11 +2459,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>IP/Name</source>
-      <translation>IP/ Ім’я хоста</translation>
+      <translation>IP адреса/Ім’я хоста</translation>
     </message>
     <message>
       <source>MAC address</source>
-      <translation>MAC- адреса</translation>
+      <translation>MAC адреса</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2471,18 +2471,18 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>ID</source>
-      <translation>ID</translation>
+      <translation>ID ідентифікатор</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>Логічний ID</translation>
+      <translation>Логічний ID ідентифікатор</translation>
     </message>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>Запис або детекцiя руху вимкненi для %1</translation>
+      <translation>Запис або функцiя виявлення руху вимкненi для %1</translation>
     </message>
   </context>
   <context>
@@ -2639,7 +2639,7 @@ to %1</source>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation>Невірний пароль</translation>
+      <translation>Не правильний пароль</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -2650,7 +2650,7 @@ to %1</source>
     <name>QnCloudStatusPanel</name>
     <message>
       <source>Logging in...</source>
-      <translation>Вхід...</translation>
+      <translation>Здійснюється вхід...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
@@ -2695,7 +2695,7 @@ to %1</source>
     <message>
       <source>Enter %1 Account</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Введіть обліковий запис %1</translation>
+      <translation>Введіть %1 Обліковий запис</translation>
     </message>
   </context>
   <context>
@@ -2751,7 +2751,7 @@ to %1</source>
     </message>
     <message>
       <source>The username or password you have entered is incorrect. Please try again.</source>
-      <translation>Введене ім'я користувача або пароль неправильні. Будь ласка спробуйте ще раз.</translation>
+      <translation>Введене ім'я користувача або пароль не правильні. Будь ласка, спробуйте ще раз.</translation>
     </message>
     <message>
       <source>Unable to connect to the server</source>
@@ -2881,7 +2881,7 @@ to %1</source>
     <name>QnConnectionTestingDialog</name>
     <message>
       <source>Success</source>
-      <translation>З'єднання встановлено</translation>
+      <translation>Успішно</translation>
     </message>
     <message>
       <source>Request timeout</source>
@@ -2904,7 +2904,7 @@ to %1</source>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>Подія буде спрацьовувати тільки в тому випадку, якщо в джерелі є збіги з будь-яким з введених ключових слів.</translation>
+      <translation>Подія буде спрацьовувати тільки в тому випадку, якщо в первинному програмному коді є збіги з будь-яким з введених ключових слів.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
@@ -2920,34 +2920,34 @@ to %1</source>
     </message>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
-      <translation>Для створення довільної події зверністься до %1.</translation>
+      <translation>Для створення Аналітичної Події зверніться до %1.</translation>
     </message>
   </context>
   <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
-      <translation>Зберегти резервну копію бази даних...</translation>
+      <translation>Зберегти Резервну Копію бази даних...</translation>
     </message>
     <message>
       <source>Downloading Database Backup</source>
-      <translation>Завантаження резервної копії баз даних</translation>
+      <translation>Завантаження Резервної Копії баз даних</translation>
     </message>
     <message>
       <source>Database backup is being downloaded from the server. Please wait.</source>
-      <translation>Резервна копія баз даних завантажується з сервера. Будь ласка, зачекайте.</translation>
+      <translation>Резервна Копія Баз даних завантажується з сервера. Будь ласка, зачекайте.</translation>
     </message>
     <message>
       <source>Open Database Backup...</source>
-      <translation>Відкрити резервну копію бази даних...</translation>
+      <translation>Відкрити Резервну Копію Бази Даних...</translation>
     </message>
     <message>
       <source>Restoring Database Backup</source>
-      <translation>Відновлення резервної копії баз даних</translation>
+      <translation>Відновлення Резервної Копії Бази Даних</translation>
     </message>
     <message>
       <source>Database backup is being uploaded to the server. Please wait.</source>
-      <translation>Резервна копія баз даних завантажується на сервер. Будь ласка, зачекайте.</translation>
+      <translation>Резервна Копія Бази Даних завантажується на сервер. Будь ласка, зачекайте.</translation>
     </message>
     <message>
       <source>You need to connect to a server prior to backup start.</source>
@@ -2959,7 +2959,7 @@ to %1</source>
     </message>
     <message>
       <source>Database backed up to file</source>
-      <translation>Резервне копіювання бази даних в файл виконано</translation>
+      <translation>Резервне Копіювання бази даних у файл виконано</translation>
     </message>
     <message>
       <source>Failed to open file</source>
@@ -2975,7 +2975,7 @@ to %1</source>
     </message>
     <message>
       <source>Server application will restart shortly.</source>
-      <translation>Сервер незабаром перезапуститься.</translation>
+      <translation>Сервер скоро перезапуститься.</translation>
     </message>
     <message>
       <source>Failed to restore database</source>
@@ -2983,18 +2983,18 @@ to %1</source>
     </message>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
-      <translation>Конфігурація системи буде відновлена з резервної копії, сервер буде перезапущений.</translation>
+      <translation>Конфігурація системи буде відновлена з резервної копії, Сервер буде перезапущений.</translation>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation>Файл резервної копії бази даних</translation>
+      <translation>Файли Резервної Копії Бази Даних</translation>
     </message>
   </context>
   <context>
     <name>QnDesktopDataProvider</name>
     <message>
       <source>Could not find video encoder %1.</source>
-      <translation>Неможливо виявити відео кодек %1.</translation>
+      <translation>Неможливо виявити відео енкодер %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -3022,7 +3022,7 @@ to %1</source>
     </message>
     <message>
       <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>Формати 44 і 48 кГц не підтримуються пристроєм захвату звуку. Будь ласка, виберіть інший пристрій або значення &quot;ні&quot; в налаштуваннях захоплення екрану.</translation>
+      <translation>Формати 44 і 48 кГц не підтримуються пристроєм захвату звуку. Будь ласка, виберіть інший пристрій або значення &quot;жоден&quot; в налаштуваннях захоплення екрану.</translation>
     </message>
   </context>
   <context>
@@ -3049,11 +3049,11 @@ to %1</source>
     </message>
     <message>
       <source>Internal Error</source>
-      <translation>Внутрішня помилка</translation>
+      <translation>Внутрішня Помилка</translation>
     </message>
     <message>
       <source>Wrong Password</source>
-      <translation>Невірний пароль</translation>
+      <translation>Неправильний Пароль</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -3069,17 +3069,17 @@ to %1</source>
     </message>
     <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
-      <translation>Ви будете від'єднані від цієї системи і зможете знову ввійти через локальну мережу за допомогою локального облікового запису</translation>
+      <translation>Ви будете від'єднані від цієї системи і зможете знову увійти через локальну мережу за допомогою локального облікового запису</translation>
     </message>
     <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Не вдалося відключити систему від %1</translation>
+      <translation>Не вдалося відключити Систему від %1</translation>
     </message>
     <message>
       <source>Disconnect System from %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Відключити систему від %1?</translation>
+      <translation>Відключити Систему від %1?</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
@@ -3089,7 +3089,7 @@ to %1</source>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Ви не зможете підключитися до цієї системи з вашим обліковим записом %1 після від'єднання цієї системи від %1.</translation>
+      <translation>Ви не зможете підключитися до цієї Системи з вашим %1 обліковим записом після від'єднання цієї Системи від %1.</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
@@ -3100,7 +3100,7 @@ to %1</source>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>Режим Panic Recording перемикає параметри запису для всіх камер на максимальну частоту кадрів і якість.</translation>
+      <translation>Режим запису Panic Recording перемикає параметри запису для всіх камер на максимальну частоту кадрів та якість.</translation>
     </message>
   </context>
   <context>
@@ -3123,7 +3123,7 @@ to %1</source>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation>Очистити фільтр</translation>
+      <translation>Скинути налаштування Фільтру</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
@@ -3131,7 +3131,7 @@ to %1</source>
     </message>
     <message>
       <source>Any Action</source>
-      <translation>Будь-яка дія</translation>
+      <translation>Будь-яка Дія</translation>
     </message>
     <message>
       <source>No events</source>
@@ -3162,11 +3162,11 @@ to %1</source>
     <name>QnEventLogModel</name>
     <message>
       <source>Motion video</source>
-      <translation>Рухи у відео</translation>
+      <translation>Виявлення Руху відео</translation>
     </message>
     <message>
       <source>Date/Time</source>
-      <translation>Дата й час</translation>
+      <translation>Дата/Час</translation>
     </message>
     <message>
       <source>Event</source>
@@ -3256,7 +3256,7 @@ to %1</source>
     </message>
     <message>
       <source>Basic</source>
-      <translation>Основний</translation>
+      <translation>Базовий</translation>
     </message>
   </context>
   <context>
@@ -3274,7 +3274,7 @@ to %1</source>
     <name>QnFailoverPriorityDialog</name>
     <message>
       <source>Failover Priority</source>
-      <translation>Пріоритет резервування</translation>
+      <translation>Failover Пріоритет</translation>
     </message>
     <message>
       <source>Never</source>
@@ -3301,15 +3301,15 @@ to %1</source>
     <name>QnFailoverPriorityDialogDelegate</name>
     <message>
       <source>Set Priority:</source>
-      <translation>Задати пріоритет:</translation>
+      <translation>Задати Пріоритет:</translation>
     </message>
     <message>
       <source>Select devices to setup failover priority</source>
-      <translation>Виберіть пристрої для настройки пріоритету резервування</translation>
+      <translation>Виберіть пристрої для налаштування Failover пріоритету</translation>
     </message>
     <message>
       <source>Select cameras to setup failover priority</source>
-      <translation>Виберіть камери для настройки пріоритету резервування</translation>
+      <translation>Виберіть камери для налаштування Failover пріоритету</translation>
     </message>
   </context>
   <context>
@@ -3327,11 +3327,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation>Ця камера наразі не використовується для деяких вибраних макетів. Дія буде працювати, якщо камера буде додана до початку тригера.</translation>
+      <translation>Ця камера зараз не використовується для деяких вибраних розкладок. Дія буде працювати, якщо камера буде додана до початку тригера.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation>Ця камера наразі не використовується для деяких вибраних макетів. Дія буде працювати, якщо камера буде додана до початку тригера.</translation>
+      <translation>Ця камера наразі не використовується для деяких вибраних розкладок. Дія буде працювати, якщо камера буде додана до початку тригера.</translation>
     </message>
   </context>
   <context>
@@ -3345,7 +3345,7 @@ to %1</source>
     <name>QnGLCheckerInstrument</name>
     <message>
       <source>Video card drivers are outdated or not installed</source>
-      <translation>Драйвери відеокарти застаріли або не встановлені</translation>
+      <translation>Драйвери відео карти застаріли або не встановлені</translation>
     </message>
     <message>
       <source>%1 may not work properly.</source>
@@ -3356,7 +3356,7 @@ to %1</source>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
-      <translation>Вибрати папку...</translation>
+      <translation>Обрати папку...</translation>
     </message>
     <message>
       <source>Folder already added</source>
@@ -3379,11 +3379,11 @@ to %1</source>
     </message>
     <message>
       <source>Open Bookmarks List</source>
-      <translation>Відкрийте список закладок</translation>
+      <translation>Відкрийте Список Закладок</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation>Правила подій</translation>
+      <translation>Правила Подій</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -3391,11 +3391,11 @@ to %1</source>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation>Аудит</translation>
+      <translation>Audit Trail</translation>
     </message>
     <message>
       <source>Health Monitoring</source>
-      <translation>Моніторинг ресурсів</translation>
+      <translation>Моніторинг Стану Системи</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -3403,39 +3403,39 @@ to %1</source>
     </message>
     <message>
       <source>Device List</source>
-      <translation>Перелік пристроїв</translation>
+      <translation>Перелік Пристроїв</translation>
     </message>
     <message>
       <source>Camera List</source>
-      <translation>Список камер</translation>
+      <translation>Список Камер</translation>
     </message>
     <message>
       <source>Open Event Rules Management</source>
-      <translation>Відкрити налаштування правил зв'язків з подіями</translation>
+      <translation>Відкрити Керування Налаштуваннями Правил для Подiй</translation>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
-      <translation>Відкрити журнал аудиту</translation>
+      <translation>Відкрити Журнал Audit Trail</translation>
     </message>
     <message>
       <source>Monitor All Servers on a Single Layout</source>
-      <translation>Моніторинг всіх серверів на одній розкладці</translation>
+      <translation>Моніторинг Всіх Серверів на Одній Розкладці</translation>
     </message>
     <message>
       <source>Open Device List</source>
-      <translation>Відкрити список пристроїв</translation>
+      <translation>Відкрити Список Пристроїв</translation>
     </message>
     <message>
       <source>Open Camera List</source>
-      <translation>Відкрити список камер</translation>
+      <translation>Відкрити Список Камер</translation>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>Резервне копіювання включає в себе налаштування серверів і камер, користувачів, веб-сторінки, правила подій і т. д. Відео не зберігається.</translation>
+      <translation>Резервне копіювання включає в себе налаштування серверів і камер, користувачів, веб-сторінок, правил подій і т. д. Відео не зберігається.</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation>Створює резервну копію системних налаштувань для відновлення в разі краху системи.</translation>
+      <translation>Створює резервну копію Системних налаштувань для відновлення при виході з ладу системи.</translation>
     </message>
   </context>
   <context>
@@ -3496,7 +3496,7 @@ to %1</source>
     </message>
     <message>
       <source>On click</source>
-      <translation>По натисненню</translation>
+      <translation>По клiку</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -3526,29 +3526,29 @@ to %1</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation>Будь ласка введіть значення.</translation>
+      <translation>Будь ласка, введіть значення.</translation>
     </message>
   </context>
   <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
       <source>Failed to turn off I/O port %1</source>
-      <translation>Не вдалося вимкнути %1 порт введення-виведення</translation>
+      <translation>Не вдалося вимкнути %1 порт введення/виведення</translation>
     </message>
     <message>
       <source>Failed to turn on I/O port %1</source>
-      <translation>Не вдалося увімкнути %1 порт введення-виведення</translation>
+      <translation>Не вдалося увімкнути %1 порт введення/виведення</translation>
     </message>
   </context>
   <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
-      <translation>Перевірка</translation>
+      <translation>Тестування</translation>
     </message>
     <message>
       <source>Test failed</source>
-      <translation>Перевірка не вдалася</translation>
+      <translation>Тест не вдався</translation>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
@@ -3561,22 +3561,22 @@ to %1</source>
     </message>
     <message>
       <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>Зміна будь-яких параметрів LDAP, відмінних від &quot;фільтр пошуку&quot;, призведе до втрати зв'язку всих користувачів LDAP.</translation>
+      <translation>Зміна будь-яких параметрів LDAP, відмінних від &quot;Фільтр Пошуку&quot;, призведе до втрати зв'язку всих користувачів LDAP.</translation>
     </message>
   </context>
   <context>
     <name>QnLdapSettingsDialogPrivate</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation>Зазначені параметри не вірні.</translation>
+      <translation>Зазначені налаштування не дійсні.</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation>Неможливо виконати перевірку.</translation>
+      <translation>Неможливо виконати тест.</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation>Вичерпано час очікування</translation>
+      <translation>Вичерпано Час Очікування</translation>
     </message>
   </context>
   <context>
@@ -3626,22 +3626,22 @@ to %1</source>
     </message>
     <message>
       <source>Import Selected</source>
-      <translation>Імпортувати вибрані</translation>
+      <translation>Імпортувати Обране</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>Screens Allowed:</source>
-      <translation>Дозволена кількість екранів:</translation>
+      <translation>Дозволена кількість Екранів:</translation>
     </message>
     <message>
       <source>Control Sessions Allowed:</source>
-      <translation>Дозволена кількість керованих підключень:</translation>
+      <translation>Дозволенi Підключення Керувань:</translation>
     </message>
     <message>
       <source>Archive Streams Allowed:</source>
-      <translation>Дозволена кількість потоків запису:</translation>
+      <translation>Дозволені Потоки Архіву:</translation>
     </message>
     <message>
       <source>Generic:</source>
@@ -3649,19 +3649,19 @@ to %1</source>
     </message>
     <message>
       <source>License Type</source>
-      <translation>Тип ліцензії</translation>
+      <translation>Тип Ліцензії</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>Ліцензійний ключ</translation>
+      <translation>Ліцензійний Ключ</translation>
     </message>
     <message>
       <source>Features:</source>
-      <translation>Особливості:</translation>
+      <translation>Функції:</translation>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
-      <translation>Прив'язане до апаратного Id</translation>
+      <translation>Прив'язане до Апаратного ID</translation>
     </message>
   </context>
   <context>
@@ -3688,7 +3688,7 @@ to %1</source>
     </message>
     <message>
       <source>Expired</source>
-      <translation>Термін дії закінчився</translation>
+      <translation>Термін Дії Закінчився</translation>
     </message>
     <message>
       <source>OK</source>
@@ -3704,7 +3704,7 @@ to %1</source>
     </message>
     <message>
       <source>Expires</source>
-      <translation>Термін дії</translation>
+      <translation>Термін Дії Закінчується</translation>
     </message>
     <message>
       <source>License is active</source>
@@ -3720,24 +3720,24 @@ to %1</source>
     </message>
     <message>
       <source>License expires today</source>
-      <translation>Ліцензія закінчується сьогодні</translation>
+      <translation>Термін дії Ліцензії закінчується сьогодні</translation>
     </message>
     <message>
       <source>License expires tomorrow</source>
-      <translation>Ліцензія закінчується завтра</translation>
+      <translation>Термін дії Ліцензії закінчується завтра</translation>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
       <translation>
-        <numerusform>Ліцензія закінчується через %n день</numerusform>
-        <numerusform>Ліцензія закінчується через %n днів</numerusform>
-        <numerusform>Ліцензія закінчується через %n днів</numerusform>
-        <numerusform>Ліцензія закінчується через %n днів</numerusform>
+        <numerusform>Термін дії Ліцензії закінчується через %n день</numerusform>
+        <numerusform>Термін дії Ліцензії закінчується через %n днів</numerusform>
+        <numerusform>Термін дії Ліцензії закінчується через %n днів</numerusform>
+        <numerusform>Термін дії Ліцензії закінчується через %n днів</numerusform>
       </translation>
     </message>
     <message>
       <source>Channels</source>
-      <translation>Каналів</translation>
+      <translation>Канали</translation>
     </message>
   </context>
   <context>
@@ -3748,7 +3748,7 @@ to %1</source>
     </message>
     <message>
       <source>Please activate your commercial or trial license.</source>
-      <translation>Будь ласка, активуйте комерційну або пробну ліцензію.</translation>
+      <translation>Будь ласка, активуйте комерційну або тестову ліцензію.</translation>
     </message>
     <message>
       <source>Please activate your commercial license.</source>
@@ -3764,7 +3764,7 @@ to %1</source>
     </message>
     <message>
       <source>Copy To Clipboard</source>
-      <translation>Копіювати у буфер обміну</translation>
+      <translation>Копіювати у Буфер Обміну</translation>
     </message>
     <message>
       <source>Incompatible license</source>
@@ -3784,11 +3784,11 @@ to %1</source>
     </message>
     <message>
       <source>Failed to remove license from Server</source>
-      <translation>Не вдалося видалити ліцензію з сервера</translation>
+      <translation>Не вдалося видалити ліцензію з Сервера</translation>
     </message>
     <message>
       <source>Invalid activation key file</source>
-      <translation>Неприпустимий файл з ключами активації</translation>
+      <translation>Недійсний ключ активації</translation>
     </message>
     <message>
       <source>Select a valid activation key file to continue.</source>
@@ -3800,7 +3800,7 @@ to %1</source>
     </message>
     <message>
       <source>Invalid data received. Please contact Customer Support to report the issue.</source>
-      <translation>Отримано неприпустимі дані. Будь ласка, зв'яжіться з службою підтримки, щоб повідомити про проблему.</translation>
+      <translation>Отримано недійсні дані. Будь ласка, зв'яжіться з службою підтримки, щоб повідомити про помилку.</translation>
     </message>
     <message>
       <source>Failed to activate license</source>
@@ -3812,7 +3812,7 @@ to %1</source>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
-      <translation>Якщо проблема залишається невирішеною, зверніться в службу підтримки.</translation>
+      <translation>Якщо проблема залишається невирішеною, зверніться в Службу Підтримки.</translation>
     </message>
     <message>
       <source>License already activated on another server</source>
@@ -3847,10 +3847,10 @@ to %1</source>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
       <translation>
-        <numerusform>%1 з %n ліцензій не можна бути відключена</numerusform>
-        <numerusform>%1 з %n ліцензій не можуть бути відключені</numerusform>
-        <numerusform>%1 з %n ліцензій не можуть бути відключені</numerusform>
-        <numerusform>%1 з %n ліцензій не можуть бути відключені</numerusform>
+        <numerusform>%1 з %n ліцензій не можна бути деактивована</numerusform>
+        <numerusform>%1 з %n ліцензій не можуть бути деактивовані</numerusform>
+        <numerusform>%1 з %n ліцензій не можуть бути деактивовані</numerusform>
+        <numerusform>%1 з %n ліцензій не можуть бути деактивовані</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3864,15 +3864,15 @@ to %1</source>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
-      <translation>Не вдається підключитися до сервера ліцензій</translation>
+      <translation>Не вдається підключитися до Сервера Ліцензій</translation>
     </message>
     <message>
       <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation>Будь ласка, переконайтесь, що ваш серверпідключений до Інтернету або перевірте параметри брандмауера.</translation>
+      <translation>Будь ласка, переконайтесь, що ваш сервер підключений до Інтернету або перевірте параметри firewall.</translation>
     </message>
     <message>
       <source>License Server error</source>
-      <translation>Помилка сервера ліцензії</translation>
+      <translation>Помилка Cервера Ліцензій</translation>
     </message>
     <message>
       <source>License deactivated</source>
@@ -3906,7 +3906,7 @@ to %1</source>
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation>Будь ласка, зверніться до команди підтримки.</translation>
+      <translation>Будь ласка, зверніться до Команди Підтримки.</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
@@ -3919,19 +3919,19 @@ to %1</source>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>Неприпустимий ліцензійний ключ</translation>
+      <translation>Недійсний Ліцензійний Ключ</translation>
     </message>
     <message>
       <source>Please contact Customer Support to obtain a valid License Key.</source>
-      <translation>Будь ласка, зв'яжіться з службою підтримки клієнтів, щоб отримати дійсний ліцензійний ключ.</translation>
+      <translation>Будь ласка, зв'яжіться з Службою Підтримки, щоб отримати дійсний Ліцензійний Ключ.</translation>
     </message>
     <message>
       <source>Please contact Customer Support to activate License Key manually.</source>
-      <translation>Будь ласка, зв'яжіться з службою підтримки, щоб активувати ліцензійний ключ вручну.</translation>
+      <translation>Будь ласка, зв'яжіться з Службою Підтримки, щоб активувати Ліцензійний Ключ вручну.</translation>
     </message>
     <message>
       <source>Please contact Customer Support to get a valid License Key.</source>
-      <translation>Будь ласка, зв'яжіться з службою підтримки клієнтів, щоб отримати дійсний ліцензійний ключ.</translation>
+      <translation>Будь ласка, зв'яжіться з Службою Підтримки, щоб отримати дійсний Ліцензійний Ключ.</translation>
     </message>
     <message>
       <source>If the problem persists please contact Customer Support.</source>
@@ -3939,15 +3939,15 @@ to %1</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>Ця ліцензія вже активована і пов'язана з апаратним ID%1</translation>
+      <translation>Ця ліцензія вже активована і пов'язана з Hardware ID %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>Ця ліцензія вже активована і пов'язана з апаратним ID%1 на %2</translation>
+      <translation>Ця ліцензія вже активована і пов'язана з апаратним Hardware ID%1 на %2</translation>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation>Кожну ліцензію можна деактивувати лише кілька разів.</translation>
+      <translation>Кожну ліцензію можна деактивувати лише кілька раз.</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
@@ -3974,15 +3974,15 @@ to %1</source>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation>Активувати тимчасову ліцензію</translation>
+      <translation>Активувати Тимчасову Ліцензію</translation>
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation>Активувати безкоштовну ліцензію</translation>
+      <translation>Активувати Безкоштовну Ліцензію</translation>
     </message>
     <message>
       <source>Open License File</source>
-      <translation>Відкритий файл ліцензії</translation>
+      <translation>Відкритий Файл Ліцензії</translation>
     </message>
     <message>
       <source>Failed to open file</source>
@@ -3990,11 +3990,11 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Для отримання ліцензійного ключа необхідно відіслати серійний номер і апаратний ID на %1.</translation>
+      <translation>Для отримання ліцензійного ключа необхідно відіслати серійний номер і апаратний Hardware ID на %1.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>Будь ласка, надішліть наданий ліцензійний ключ і апаратний ID на %1 щоб отримати файл з ключем активації.</translation>
+      <translation>Будь ласка, надішліть наданий Ліцензійний Ключ і апаратний Hardware ID на %1 щоб отримати файл з Ключем Активації.</translation>
     </message>
   </context>
   <context>
@@ -4017,7 +4017,7 @@ to %1</source>
     </message>
     <message>
       <source>Screen Recording</source>
-      <translation>Запис екрану</translation>
+      <translation>Запис Екрану</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -4033,7 +4033,7 @@ to %1</source>
     </message>
     <message>
       <source>Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation>Налаштування неможливо зберегти. Будь ласка, зв'яжіться зі своїм системним адміністратором. Всі зміни будуть втрачені після виходу програми.</translation>
+      <translation>Налаштування не можна зберегти. Будь ласка, зв'яжіться зі своїм системним адміністратором. Всі зміни будуть втрачені після виходу програми.</translation>
     </message>
     <message>
       <source>Restart required</source>
@@ -4041,15 +4041,15 @@ to %1</source>
     </message>
     <message>
       <source>Restart Now</source>
-      <translation>Перезапустити зараз</translation>
+      <translation>Перезавантажити додаток Негайно</translation>
     </message>
     <message>
       <source>Restart Later</source>
-      <translation>Перезавантажити пізніше</translation>
+      <translation>Перезавантажити Пізніше</translation>
     </message>
     <message>
       <source>Some changes will take effect only after %1 restart</source>
-      <translation>Деякі зміни набудуть чинності лише після перезавантаження %1</translation>
+      <translation>Деякі зміни набудуть чинності лише після %1 перезавантаження</translation>
     </message>
   </context>
   <context>
@@ -4064,11 +4064,11 @@ to %1</source>
     </message>
     <message>
       <source>Saved Sessions</source>
-      <translation>Збережені сеанси</translation>
+      <translation>Збережені Сеанси</translation>
     </message>
     <message>
       <source>Auto-Discovered Servers</source>
-      <translation>Знайдені сервери</translation>
+      <translation>Автоматично-Знайдені Сервери</translation>
     </message>
     <message>
       <source>* Last used connection *</source>
@@ -4092,7 +4092,7 @@ to %1</source>
     </message>
     <message>
       <source>none</source>
-      <translation>ні</translation>
+      <translation>жоден</translation>
     </message>
   </context>
   <context>
@@ -4115,7 +4115,7 @@ to %1</source>
     </message>
     <message>
       <source>Learn more about</source>
-      <translation>Дізнайтеся більше</translation>
+      <translation>Дізнайтеся більше про</translation>
     </message>
     <message>
       <source>Log in to %1</source>
@@ -4132,7 +4132,7 @@ to %1</source>
     <name>QnLookAndFeelPreferencesWidget</name>
     <message>
       <source>Preparing Image...</source>
-      <translation>Підготовка зображення...</translation>
+      <translation>Підготовка Зображення...</translation>
     </message>
     <message>
       <source>Please wait while image is being prepared...</source>
@@ -4144,7 +4144,7 @@ to %1</source>
     </message>
     <message>
       <source>Client Time</source>
-      <translation>Час клієнта</translation>
+      <translation>Час Клієнта</translation>
     </message>
     <message>
       <source>Stretch</source>
@@ -4160,11 +4160,11 @@ to %1</source>
     </message>
     <message>
       <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
-      <translation>Ця параметрне вплине на розклад запису. Розклад запису завжди ведеться з урахуванням часу сервера.</translation>
+      <translation>Ця параметрне вплине на Розклад Запису. Розклад Запису завжди ведеться з урахуванням Часу Сервера.</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation>Обрати файл...</translation>
+      <translation>Обрати Файл...</translation>
     </message>
     <message>
       <source>No image</source>
@@ -4172,26 +4172,26 @@ to %1</source>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation>Встановлює час для використання в клієнті (тимчасова шкала, тимчасові мітки і т. Д.), коли клієнтські і серверні машини перебувають в різних часових поясах.</translation>
+      <translation>Встановлює час для використання в клієнті (часова шкала, часові мітки і т. д.), коли клієнтські і серверні машини перебувають в різних часових поясах.</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Показує IP-адреси для камер і серверів і ролі для користувачів.</translation>
+      <translation>Показує IP адреси для камер і серверів і ролі для користувачів.</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation>Скільки часу кожна камера буде відображатися на розкладці при запуску туру.</translation>
+      <translation>Скільки часу кожна камера буде відображатися на розкладці при запуску Туру.</translation>
     </message>
   </context>
   <context>
     <name>QnMediaResourceWidget</name>
     <message>
       <source>Screenshot</source>
-      <translation>Знімок екрана</translation>
+      <translation>Скріншот</translation>
     </message>
     <message>
       <source>Smart Search</source>
-      <translation>Пошук по руху</translation>
+      <translation>Виявлення Руху</translation>
     </message>
     <message>
       <source>PTZ</source>
@@ -4199,11 +4199,11 @@ to %1</source>
     </message>
     <message>
       <source>Dewarping</source>
-      <translation>Корекція викривлення</translation>
+      <translation>Розгортання</translation>
     </message>
     <message>
       <source>Create Zoom Window</source>
-      <translation>Створити вікно збільшення</translation>
+      <translation>Створити Вікно Збільшення</translation>
     </message>
     <message>
       <source>Image Enhancement</source>
@@ -4219,11 +4219,11 @@ to %1</source>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
-      <translation>%1 (Активний маршрут обхода &quot;%2&quot;)</translation>
+      <translation>%1 (Тур &quot;%2&quot; активовано)</translation>
     </message>
     <message>
       <source>Zoom Window</source>
-      <translation>Вікно збільшення</translation>
+      <translation>Вікно Збільшення</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -4257,7 +4257,7 @@ to %1</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation>Збільшити область</translation>
+      <translation>Область Збільшення</translation>
     </message>
   </context>
   <context>
@@ -4280,7 +4280,7 @@ to %1</source>
     </message>
     <message>
       <source>Merging Systems...</source>
-      <translation>Об'єднати системи...</translation>
+      <translation>Об'єднання Систем...</translation>
     </message>
     <message>
       <source>The login cannot be empty.</source>
@@ -4296,19 +4296,19 @@ to %1</source>
     </message>
     <message>
       <source>URL is invalid.</source>
-      <translation>URL-адреса недійсна.</translation>
+      <translation>URL адреса недійсна.</translation>
     </message>
     <message>
       <source>You are about to merge the current System %1 with System</source>
-      <translation>Ви збираєтеся об'єднати поточну систему %1 із системою</translation>
+      <translation>Ви збираєтеся об'єднати поточну Систему %1 із Системою</translation>
     </message>
     <message>
       <source>This is the current System URL.</source>
-      <translation>Це поточна системна URL-адреса.</translation>
+      <translation>Це поточна системна URL адреса.</translation>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree when the database synchronization is finished.</source>
-      <translation>Сервери з іншої системи з'являться в дереві ресурсів після завершення синхронізації бази даних.</translation>
+      <translation>Сервери з іншої Системи з'являться в дереві ресурсів після завершення синхронізації бази даних.</translation>
     </message>
     <message>
       <source>Systems will be merged shortly</source>
@@ -4370,7 +4370,7 @@ to %1</source>
     </message>
     <message>
       <source>Next Chunk</source>
-      <translation>Наступний фрагмент</translation>
+      <translation>Наступний Фрагмент</translation>
     </message>
     <message>
       <source>To End</source>
@@ -4378,7 +4378,7 @@ to %1</source>
     </message>
     <message>
       <source>Previous Chunk</source>
-      <translation>Попередній фрагмент</translation>
+      <translation>Попередній Фрагмент</translation>
     </message>
     <message>
       <source>NVR cameras do not support not-synchronized playback</source>
@@ -4412,15 +4412,15 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation>Віртуальна камера</translation>
+      <translation>Віртуальна Камера</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation>Віртуальна камера %1</translation>
+      <translation>Віртуальна Камера %1</translation>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;віртуальна камера&quot; - це віртуальне сховище для відеофайлів, яке може бути завантажене на будь-який сервер вашої системи і доступно будь-якому користувачеві.</translation>
+      <translation>&quot;Віртуальна Камера&quot; - це віртуальне сховище для відеофайлів, яке може бути завантажене на будь-який сервер вашої Системи і доступно будь-якому користувачеві.</translation>
     </message>
   </context>
   <context>
@@ -4431,7 +4431,7 @@ to %1</source>
     </message>
     <message>
       <source>Rename sound</source>
-      <translation>Перейменувати звук</translation>
+      <translation>Перейменувати назву запису звуку</translation>
     </message>
     <message>
       <source>Custom title:</source>
@@ -4439,7 +4439,7 @@ to %1</source>
     </message>
     <message>
       <source>Sound Files</source>
-      <translation>Звукові файли</translation>
+      <translation>Звукові Файли</translation>
     </message>
     <message>
       <source>Select File...</source>
@@ -4447,7 +4447,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter New Title:</source>
-      <translation>Введіть новий заголовок:</translation>
+      <translation>Введіть Новий Заголовок:</translation>
     </message>
     <message>
       <source>Failed to add file</source>
@@ -4470,7 +4470,7 @@ to %1</source>
     </message>
     <message>
       <source>No Sound</source>
-      <translation>Немає звуку</translation>
+      <translation>Немає Звуку</translation>
     </message>
     <message>
       <source>Downloading sound...</source>
@@ -4496,34 +4496,34 @@ to %1</source>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
-      <translation>Продуктивність цього комп'ютера дозволяє запускати %1 тільки в режимі налаштування.</translation>
+      <translation>Характеристики цього комп'ютера дозволяють запускати %1 тільки в режимі налаштування.</translation>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation>Для повноцінного режиму використовуйте інший комп'ютер</translation>
+      <translation>Для повнофункціонального режиму, будь ласка, використовуйте інший комп'ютер</translation>
     </message>
   </context>
   <context>
     <name>QnPermissionsWidget</name>
     <message>
       <source>Edit camera settings</source>
-      <translation>Редагувати параметри камери</translation>
+      <translation>Редагувати налаштування камери</translation>
     </message>
     <message>
       <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>А також налаштування PTZ позицій і турів.</translation>
+      <translation>Це також потрібно для створення / редагування пресетів PTZ та турів.</translation>
     </message>
     <message>
       <source>Control video walls</source>
-      <translation>Управління відеостінами</translation>
+      <translation>Керування відео стінами</translation>
     </message>
     <message>
       <source>View event log</source>
-      <translation>Перегляд журналу подій</translation>
+      <translation>Перегляд Журналу Подій</translation>
     </message>
     <message>
       <source>View archive</source>
-      <translation>Переглянути архів</translation>
+      <translation>Перегляд Архіву</translation>
     </message>
     <message>
       <source>Export archive</source>
@@ -4539,11 +4539,11 @@ to %1</source>
     </message>
     <message>
       <source>User Input</source>
-      <translation>Інші дії</translation>
+      <translation>Дії Користувача</translation>
     </message>
     <message>
       <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation>PTZ, вихід пристрою, двостороннє аудіо, програмні тригери.</translation>
+      <translation>PTZ, Device Output, 2-стороннє аудіо, Soft Triggers.</translation>
     </message>
   </context>
   <context>
@@ -4554,7 +4554,7 @@ to %1</source>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation>Повідомлення буде показуватися поки один з користувачів, які його бачать, не створить закладку з описом події</translation>
+      <translation>Оповіщення буде активним, показуватися поки один з користувачів, які його бачать, не створить закладку з описом події</translation>
     </message>
   </context>
   <context>
@@ -4583,7 +4583,7 @@ to %1</source>
     </message>
     <message>
       <source>Hotkey</source>
-      <translation>Гаряча клавіша</translation>
+      <translation>Hotkey</translation>
     </message>
     <message>
       <source>Home</source>
@@ -4595,7 +4595,7 @@ to %1</source>
     </message>
     <message>
       <source>Tours</source>
-      <translation>Маршрути</translation>
+      <translation>Тури</translation>
     </message>
     <message>
       <source>Positions</source>
@@ -4617,10 +4617,10 @@ to %1</source>
     <message numerus="yes">
       <source>Tour has %n identical positions</source>
       <translation>
-        <numerusform>Маршрут обходу має %n однакову позицію</numerusform>
-        <numerusform>Маршрут обходу має %n однакових позицій</numerusform>
-        <numerusform>Маршрут обходу має %n однакових позицій</numerusform>
-        <numerusform>Маршрут обходу має %n однакових позицій</numerusform>
+        <numerusform>Тур обходу має %n однакову позицію</numerusform>
+        <numerusform>Тур обходу має %n однакових позицій</numerusform>
+        <numerusform>Тур обходу має %n однакових позицій</numerusform>
+        <numerusform>Тур обходу має %n однакових позицій</numerusform>
       </translation>
     </message>
     <message>
@@ -4629,23 +4629,23 @@ to %1</source>
     </message>
     <message>
       <source>Invalid tour</source>
-      <translation>Некоректний маршрут обходу</translation>
+      <translation>Некоректний тур обходу</translation>
     </message>
     <message>
       <source>New Tour %1</source>
-      <translation>Новий маршрут %1</translation>
+      <translation>Новий Тур %1</translation>
     </message>
     <message>
       <source>Saved Position %1</source>
-      <translation>Збережена позиція %1</translation>
+      <translation>Збережена Позиція %1</translation>
     </message>
     <message>
       <source>Tour should contain at least 2 positions.</source>
-      <translation>Маршрут обходу повинен містити хоча б 2 позиції.</translation>
+      <translation>Тур обходу повинен містити хоча б 2 позиції.</translation>
     </message>
     <message>
       <source>Tour Time: %1.</source>
-      <translation>Час маршруту обходу: %1.</translation>
+      <translation>Час туру обходу: %1.</translation>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
@@ -4680,11 +4680,11 @@ to %1</source>
     </message>
     <message>
       <source>Hotkey used by preset &quot;%1&quot;</source>
-      <translation>Гаряча клавіша вже використовується позицією &quot;%1&quot;</translation>
+      <translation>Hotkey вже використовується позицією &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
-      <translation>Гаряча клавіша вже використовується туром &quot;%1&quot;</translation>
+      <translation>Hotkey вже використовується туром &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -4719,7 +4719,7 @@ to %1</source>
     </message>
     <message>
       <source>Stay Time</source>
-      <translation>Час зупинки</translation>
+      <translation>Час Зупинки</translation>
     </message>
     <message>
       <source>Speed</source>
@@ -4738,7 +4738,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 (Primary)</source>
-      <translation>%1 (основний)</translation>
+      <translation>%1 (Основний)</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -4754,7 +4754,7 @@ to %1</source>
     </message>
     <message>
       <source>Performance</source>
-      <translation>Продуктивність</translation>
+      <translation>Характеристики</translation>
     </message>
     <message>
       <source>Native</source>
@@ -4769,7 +4769,7 @@ to %1</source>
     <name>QnRecordingStats</name>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation>Камери з інших серверів, а також віддалені камери</translation>
+      <translation>Камери з інших серверів, а також видалені камери</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -4785,7 +4785,7 @@ to %1</source>
       <source>Total %1 %n cameras</source>
       <comment>%1 is long dash, do not replace</comment>
       <translation>
-        <numerusform>Всього %1 %n камери</numerusform>
+        <numerusform>Всього %1 %n камера</numerusform>
         <numerusform>Всього %1 %n камер</numerusform>
         <numerusform>Всього %1 %n камер</numerusform>
         <numerusform>Всього %1 %n камер</numerusform>
@@ -4810,7 +4810,7 @@ to %1</source>
     </message>
     <message>
       <source>Calendar Days</source>
-      <translation>Днів</translation>
+      <translation>Календарних Днів</translation>
     </message>
     <message>
       <source>less than an hour</source>
@@ -4822,7 +4822,7 @@ to %1</source>
     </message>
     <message>
       <source>empty</source>
-      <translation>порожньо</translation>
+      <translation>порожній</translation>
     </message>
     <message>
       <source>Device</source>
@@ -4842,7 +4842,7 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation>Бажаний бітрейт</translation>
+      <translation>Поточний бітрейт</translation>
     </message>
     <message>
       <source>no data for forecast</source>
@@ -4912,7 +4912,7 @@ to %1</source>
     </message>
     <message>
       <source>open all at a new layout</source>
-      <translation>відкрити все в новій розкладці</translation>
+      <translation>відкрити усi в новій розкладці</translation>
     </message>
     <message>
       <source>open all</source>
@@ -4936,11 +4936,11 @@ to %1</source>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation>Відеостіни</translation>
+      <translation>Відео Стіни</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation>Веб-сторінки</translation>
+      <translation>Веб Сторінки</translation>
     </message>
     <message>
       <source>Users</source>
@@ -4948,7 +4948,7 @@ to %1</source>
     </message>
     <message>
       <source>Local Files</source>
-      <translation>Локальні файли</translation>
+      <translation>Локальні Файли</translation>
     </message>
     <message>
       <source>Search</source>
@@ -4956,25 +4956,25 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>Усі камери та пристрої</translation>
+      <translation>Камери та Пристрої</translation>
     </message>
   </context>
   <context>
     <name>QnResourceItemDelegate</name>
     <message>
       <source>Health Monitor</source>
-      <translation>Моніторинг ресурсів</translation>
+      <translation>Моніторинг Стану</translation>
     </message>
   </context>
   <context>
     <name>QnResourceSelectionDialog</name>
     <message>
       <source>Select Devices...</source>
-      <translation>Виберіть пристрої...</translation>
+      <translation>Оберіть пристрої...</translation>
     </message>
     <message>
       <source>Select Cameras...</source>
-      <translation>Виберіть Камери...</translation>
+      <translation>Оберіть Камери...</translation>
     </message>
   </context>
   <context>
@@ -4985,7 +4985,7 @@ to %1</source>
     </message>
     <message>
       <source>Other Systems</source>
-      <translation>Інші системи</translation>
+      <translation>Інші Системи</translation>
     </message>
     <message>
       <source>Users</source>
@@ -5009,7 +5009,7 @@ to %1</source>
     </message>
     <message>
       <source>All Shared Layouts</source>
-      <translation>Все Розкладки із загальним доступом</translation>
+      <translation>Всi Розкладки із загальним доступом</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
@@ -5033,11 +5033,11 @@ to %1</source>
     </message>
     <message>
       <source>Videowalls</source>
-      <translation>Відеостіни</translation>
+      <translation>Відео Cтіни</translation>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation>Подія Аналітики</translation>
+      <translation>Analytics Engines</translation>
     </message>
   </context>
   <context>
@@ -5059,14 +5059,14 @@ to %1</source>
     </message>
     <message>
       <source>Rotate</source>
-      <translation>Повернути</translation>
+      <translation>Обертати</translation>
     </message>
   </context>
   <context>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Enter URL</source>
-      <translation>Введіть URL-адресу</translation>
+      <translation>Введіть URL адресу</translation>
     </message>
     <message>
       <source>URL</source>
@@ -5078,11 +5078,11 @@ to %1</source>
     </message>
     <message>
       <source>Invalid URL</source>
-      <translation>Невірний URL</translation>
+      <translation>Недійсна URL адреса</translation>
     </message>
     <message>
       <source>URL already added</source>
-      <translation>URL-адресу вже додано</translation>
+      <translation>URL адресу вже додано</translation>
     </message>
   </context>
   <context>
@@ -5147,7 +5147,7 @@ to %1</source>
     </message>
     <message>
       <source>All Devices</source>
-      <translation>Всі пристрої</translation>
+      <translation>Всі Пристрої</translation>
     </message>
     <message>
       <source>All Cameras</source>
@@ -5155,11 +5155,11 @@ to %1</source>
     </message>
     <message>
       <source>Select devices...</source>
-      <translation>Виберіть пристрої...</translation>
+      <translation>Оберіть пристрої...</translation>
     </message>
     <message>
       <source>Select cameras...</source>
-      <translation>Виберіть Камери...</translation>
+      <translation>Оберіть камери...</translation>
     </message>
   </context>
   <context>
@@ -5174,7 +5174,7 @@ to %1</source>
     </message>
     <message>
       <source>Select Servers...</source>
-      <translation>Виберіть Сервери...</translation>
+      <translation>Оберіть Сервери...</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
@@ -5190,7 +5190,7 @@ to %1</source>
     <name>QnSelectUsersButton</name>
     <message>
       <source>Any User</source>
-      <translation>Будь-який користувач</translation>
+      <translation>Будь-який Користувач</translation>
     </message>
     <message>
       <source>All Users</source>
@@ -5198,7 +5198,7 @@ to %1</source>
     </message>
     <message>
       <source>Select Users...</source>
-      <translation>Виберіть користувачів...</translation>
+      <translation>Оберіть Користувачів...</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -5215,41 +5215,41 @@ to %1</source>
     <message numerus="yes">
       <source>%n additional</source>
       <translation>
-        <numerusform>ще %n</numerusform>
-        <numerusform>ще %n</numerusform>
-        <numerusform>ще %n</numerusform>
-        <numerusform>ще %n</numerusform>
+        <numerusform>%n додатковий</numerusform>
+        <numerusform>%n додатковi</numerusform>
+        <numerusform>%n додатковi</numerusform>
+        <numerusform>%n додатковi</numerusform>
       </translation>
     </message>
     <message>
       <source>User %1 has invalid email address</source>
-      <translation>У користувача %1 неправильний Email</translation>
+      <translation>Користувач %1 має недійсну електронну адресу</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
       <translation>
-        <numerusform>У %n із %1 користувачів недійсний Email</numerusform>
-        <numerusform>У %n із %1 користувачів недійсний Email</numerusform>
-        <numerusform>У %n із %1 користувачів недійсний Email</numerusform>
-        <numerusform>У %n із %1 користувачів недійсний Email</numerusform>
+        <numerusform>%n із %1 користувачів мають недійсну електронну адресу</numerusform>
+        <numerusform>%n із %1 користувачів мають недійсну електронну адресу</numerusform>
+        <numerusform>%n із %1 користувачів мають недійсну електронну адресу</numerusform>
+        <numerusform>%n із %1 користувачів мають недійсну електронну адресу</numerusform>
       </translation>
     </message>
     <message>
       <source>Invalid email address %1</source>
-      <translation>Невірна E-mail адреса %1</translation>
+      <translation>Недійсна електронна адреса %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 additional email addresses are invalid</source>
       <translation>
-        <numerusform>%n із %1 додатковий Email недійсні</numerusform>
-        <numerusform>%n із %1 додатковий Email недійсні</numerusform>
-        <numerusform>%n із %1 додатковий Email недійсні</numerusform>
-        <numerusform>%n із %1 додатковий Email недійсні</numerusform>
+        <numerusform>%n з %1 додаткових адрес електронної пошти недійсні</numerusform>
+        <numerusform>%n з %1 додаткових адрес електронної пошти недійсні</numerusform>
+        <numerusform>%n з %1 додаткових адрес електронної пошти недійсні</numerusform>
+        <numerusform>%n з %1 додаткових адрес електронної пошти недійсні</numerusform>
       </translation>
     </message>
     <message>
       <source>Send email to %1</source>
-      <translation>Відправити Email до %1</translation>
+      <translation>Надішліть електронний лист до %1</translation>
     </message>
   </context>
   <context>
@@ -5263,11 +5263,11 @@ to %1</source>
     <name>QnServerResourceWidget</name>
     <message>
       <source>Show Log</source>
-      <translation>Показати журнал</translation>
+      <translation>Показати Журнал</translation>
     </message>
     <message>
       <source>Check Issues</source>
-      <translation>Перевірити проблеми</translation>
+      <translation>Перевірити Проблеми</translation>
     </message>
     <message>
       <source>%1 (up %2)</source>
@@ -5282,15 +5282,15 @@ to %1</source>
     </message>
     <message>
       <source>Storage Analytics</source>
-      <translation>Аналіз сховища</translation>
+      <translation>Аналітика Сховища</translation>
     </message>
     <message>
       <source>Server Settings - %1 (readonly)</source>
-      <translation>Параметри сервера - %1 (лише для читання)</translation>
+      <translation>Налаштування Сервера - %1 (лише для читання)</translation>
     </message>
     <message>
       <source>Server Settings - %1</source>
-      <translation>Налаштування сервера - %1</translation>
+      <translation>Налаштування Сервера - %1</translation>
     </message>
     <message>
       <source>Server Settings</source>
@@ -5298,11 +5298,11 @@ to %1</source>
     </message>
     <message>
       <source>Storage Management</source>
-      <translation>Управління сховищами</translation>
+      <translation>Управління Сховищем</translation>
     </message>
     <message>
       <source>Apply changes before switching to another server?</source>
-      <translation>Застосувати зміни перед переходом на іншу сервер?</translation>
+      <translation>Застосувати зміни перед переходом на інший сервер?</translation>
     </message>
     <message>
       <source>Server Web Page</source>
@@ -5317,7 +5317,7 @@ to %1</source>
     <name>QnServerSettingsWidget</name>
     <message>
       <source>At least two servers are required for this feature.</source>
-      <translation>Для цього потрібно як мінімум 2 сервера.</translation>
+      <translation>Для цієї функціональності потрібні як мінімум два сервери.</translation>
     </message>
     <message>
       <source>Max devices on this server:</source>
@@ -5345,11 +5345,11 @@ to %1</source>
     </message>
     <message>
       <source>Failover</source>
-      <translation>Аварійне переключення</translation>
+      <translation>Failover</translation>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>Сервери з включеним резервуванням будуть автоматично брати камери з відключених серверів.</translation>
+      <translation>Сервери з failover функціональністю будуть автоматично брати камери з відключених серверів.</translation>
     </message>
   </context>
   <context>
@@ -5360,7 +5360,7 @@ to %1</source>
     </message>
     <message>
       <source>Save changes before exit?</source>
-      <translation>Застосувати зміни перед виходом?</translation>
+      <translation>Зберегти зміни перед виходом?</translation>
     </message>
   </context>
   <context>
@@ -5370,8 +5370,8 @@ to %1</source>
 &lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
       <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
 &apos; sequence</comment>
-      <translation>У тексті можуть бути використані наступні Html теги:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</translation>
+      <translation>Теги Html можуть використовуватися у власному тексті:
+&lt;h4&gt;Заголовки (h1-h6)&lt;/h4&gt;Також можна застосувати різні &lt;font color=&quot;red&quot;&gt;кольори&lt;/font&gt; та &lt;font size=&quot;18&quot;&gt;розмірів&lt;/font&gt;. Текст може бути &lt;s&gt;закресленим&lt;/s&gt;, &lt;u&gt;підкресленим&lt;/u&gt;, &lt;b&gt;жирним шрифтом&lt;/b&gt; або &lt;i&gt;курсивом&lt;/i&gt;</translation>
     </message>
   </context>
   <context>
@@ -5405,7 +5405,7 @@ to %1</source>
     </message>
     <message>
       <source>SMTP Server</source>
-      <translation>SMTP сервер</translation>
+      <translation>SMTP Cервер</translation>
     </message>
     <message>
       <source>Server cannot be empty.</source>
@@ -5421,15 +5421,15 @@ to %1</source>
     </message>
     <message>
       <source>System Signature</source>
-      <translation>Інформація про систему</translation>
+      <translation>Інформація про Cистему</translation>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation>Інформація про технічну підтримку</translation>
+      <translation>Інформація про Технічну Підтримку</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
-      <translation>Введіть короткий опис системи.</translation>
+      <translation>Введіть короткий опис Системи.</translation>
     </message>
   </context>
   <context>
@@ -5460,7 +5460,7 @@ to %1</source>
     </message>
     <message>
       <source>No preset found. Use &quot;Advanced&quot; option.</source>
-      <translation>Чи не знайдена налаштована позиція. Скористайтеся &quot;додатковими&quot; настройками.</translation>
+      <translation>Налаштована позиція не знайдена. Скористайтеся &quot;додатковими&quot; налаштуваннями.</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
@@ -5503,7 +5503,7 @@ to %1</source>
     </message>
     <message>
       <source>SMTP Error %1</source>
-      <translation>%1 помилка SMTP</translation>
+      <translation>SMTP Помилка %1</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -5515,11 +5515,11 @@ to %1</source>
     </message>
     <message>
       <source>Cannot perform the test.</source>
-      <translation>Не вдається виконати перевірку.</translation>
+      <translation>Не вдається виконати тест.</translation>
     </message>
     <message>
       <source>No Servers connected to Internet</source>
-      <translation>Немає серверів, підключених до Інтернету</translation>
+      <translation>Немає Серверів, підключених до Інтернету</translation>
     </message>
   </context>
   <context>
@@ -5568,15 +5568,15 @@ to %1</source>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation>Параметри пристрою</translation>
+      <translation>Налаштування Пристрою</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation>Налаштування камери</translation>
+      <translation>Налаштування Камери</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>Налаштування модуля вводу-виводу</translation>
+      <translation>Налаштування Модуля вводу/виводу</translation>
     </message>
     <message>
       <source>Diagnostics</source>
@@ -5588,15 +5588,15 @@ to %1</source>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>Активувати ліцензію</translation>
+      <translation>Активувати Ліцензію</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
-      <translation>Будь ласка, перевірте налаштування аутентифікації</translation>
+      <translation>Будь-ласка, перевірте інформацію про аутентифікацію</translation>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation>НЕМАЄ ВІДЕО В РЕАЛЬНОМУ ЧАСІ</translation>
+      <translation>НЕМАЄ ОН-ЛАЙН ВІДЕО</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
@@ -5674,7 +5674,7 @@ to %1</source>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation>Прогноз доступний лише для камер з ввімкненим записом.</translation>
+      <translation>Прогноз доступний лише для камер з увімкненим записом.</translation>
     </message>
   </context>
   <context>
@@ -5685,7 +5685,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot start backup while archive index rebuild is in progress.</source>
-      <translation>Неможливо розпочати резервне копіювання під час відновлення архіву.</translation>
+      <translation>Неможливо запустити резервне копіювання, поки триває відновлення індексу архіву.</translation>
     </message>
     <message>
       <source>Backup is in progress...</source>
@@ -5769,7 +5769,7 @@ to %1</source>
     </message>
     <message>
       <source>Select at least one camera in the Backup Settings to start backup.</source>
-      <translation>Виберіть хоча б одну камеру в налаштуваннях резервного копіювання для запуску.</translation>
+      <translation>Виберіть хоча б одну камеру в Налаштуваннях Резервного Копіювання для запуску.</translation>
     </message>
     <message>
       <source>Archive reindexing completed</source>
@@ -5826,11 +5826,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 (Checking...)</source>
-      <translation>%1 (перевірка...)</translation>
+      <translation>%1 (Перевірка...)</translation>
     </message>
     <message>
       <source>%1 (Scanning... %2%)</source>
-      <translation>%1 (сканування... %2%)</translation>
+      <translation>%1 (Сканування... %2%)</translation>
     </message>
     <message>
       <source>%1 (Rebuilding... %2%)</source>
@@ -5858,7 +5858,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics data</source>
-      <translation>Використовується для зберігання аналітичних даних</translation>
+      <translation>Використовувати для зберігання аналітичних даних</translation>
     </message>
     <message>
       <source>Stores analytics data</source>
@@ -5869,19 +5869,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnStorageRebuildWidget</name>
     <message>
       <source>Fast Backup Scan...</source>
-      <translation>Швидке сканування резервного архіву...</translation>
+      <translation>Швидке Сканування Резервного Архіву...</translation>
     </message>
     <message>
       <source>Fast Archive Scan...</source>
-      <translation>Швидке сканування архіву...</translation>
+      <translation>Швидке Сканування Архіву...</translation>
     </message>
     <message>
       <source>Reindexing Backup...</source>
-      <translation>Переіндексування резервного архіву...</translation>
+      <translation>Переіндексування Резервного Архіву...</translation>
     </message>
     <message>
       <source>Reindexing Archive...</source>
-      <translation>Переіндексування архіву...</translation>
+      <translation>Переіндексування Архіву...</translation>
     </message>
   </context>
   <context>
@@ -5892,7 +5892,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Network Shared Resource</source>
-      <translation>Загальний ресурс мережі Windows</translation>
+      <translation>Загальний Ресурс Мережі</translation>
     </message>
     <message>
       <source>Invalid credentials for external storage</source>
@@ -5900,7 +5900,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Invalid storage path</source>
-      <translation>Неприпустимий шлях до зовнішнього сховища</translation>
+      <translation>Неприпустимий шлях сховища</translation>
     </message>
     <message>
       <source>Add this storage anyway?</source>
@@ -5912,7 +5912,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add Storage</source>
-      <translation>Додати сховище</translation>
+      <translation>Додати Сховище</translation>
     </message>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
@@ -5939,11 +5939,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Routing Management</source>
-      <translation>Маршрутизація</translation>
+      <translation>Керування Маршрутизацією</translation>
     </message>
     <message>
       <source>Time Synchronization</source>
-      <translation>Синхронізація часу</translation>
+      <translation>Синхронізація Часу</translation>
     </message>
     <message>
       <source>Users</source>
@@ -5958,15 +5958,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnSystemHealthStringsHelper</name>
     <message>
       <source>Email address is not set</source>
-      <translation>Адреса Email не налаштована</translation>
+      <translation>Адреса електронної пошти не встановлена</translation>
     </message>
     <message>
       <source>No licenses</source>
-      <translation>Немає ліцензій</translation>
+      <translation>Немає Ліцензій</translation>
     </message>
     <message>
       <source>Email server is not set</source>
-      <translation>Адреса Email не налаштована</translation>
+      <translation>Сервер електронної пошти не встановлений</translation>
     </message>
     <message>
       <source>Storage is not configured</source>
@@ -5982,15 +5982,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email address is not set for user %1</source>
-      <translation>Користувач %1 не налашував адресу Email</translation>
+      <translation>Адреса електронної пошти для користувача не налаштована %1</translation>
     </message>
     <message>
       <source>Email address is not set.</source>
-      <translation>Адреса Email не налаштована.</translation>
+      <translation>Адреса електронної пошти не налаштована.</translation>
     </message>
     <message>
       <source>Email server is not set.</source>
-      <translation>Адреса Email не налаштована.</translation>
+      <translation>Сервер електронної пошти не налаштований.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -7366,6 +7366,34 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Session duration limit can be changed by the system administrators</source>
       <translation>Межа тривалості сеансу може бути змінена системними адміністраторами</translation>
+    </message>
+  </context>
+  <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Виберіть область відео, щоб фільтрувати результати</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>У обраній ділянці</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Вибрана камера</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Вибраний пристрій</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Вибрані медіа</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>жоден</translation>
     </message>
   </context>
   <context>
@@ -8935,7 +8963,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please contact Customer Support.</source>
-      <translation>Будь ласка, зверніться до команди підтримки.</translation>
+      <translation>Будь ласка, зверніться до Команди Підтримки.</translation>
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
@@ -9436,14 +9464,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Виберіть область відео, щоб фільтрувати результати</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>У вибраній ділянці</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Немає руху</translation>
     </message>
@@ -9459,23 +9479,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n події руху</numerusform>
         <numerusform>%n події руху</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Вибрана камера</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Вибраний пристрій</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Вибрані медіа</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ні</translation>
     </message>
   </context>
   <context>

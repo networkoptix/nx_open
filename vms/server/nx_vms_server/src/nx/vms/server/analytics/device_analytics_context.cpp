@@ -12,7 +12,6 @@
 #include <nx/vms/server/analytics/data_packet_adapter.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
 #include <nx/vms/server/sdk_support/conversion_utils.h>
-#include <nx/vms/server/sdk_support/file_utils.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
 #include <nx/vms/server/event/event_connector.h>
@@ -207,45 +206,46 @@ QVariantMap DeviceAnalyticsContext::prepareSettings(
 std::optional<QVariantMap> DeviceAnalyticsContext::loadSettingsFromFile(
     const resource::AnalyticsEngineResourcePtr& engine) const
 {
-    const auto loadSettings =
-        [this, &engine](
-            bool isEngineSpecificFilename,
-            bool isDeviceSpecificFilename) -> std::optional<QVariantMap>
-        {
-            const QString settingsFilename = sdk_support::debugFileAbsolutePath(
-                pluginsIni().analyticsSettingsSubstitutePath,
-                sdk_support::baseNameOfFileToDumpOrLoadData(
-                    engine->plugin().dynamicCast<resource::AnalyticsPluginResource>(),
-                    engine,
-                    m_device,
-                    isEngineSpecificFilename,
-                    isDeviceSpecificFilename)) + "_settings.json";
+    using namespace nx::vms::server::sdk_support;
 
-            std::optional<QString> settingsString = sdk_support::loadStringFromFile(
-                nx::utils::log::Tag(typeid(this)),
-                settingsFilename);
+    std::optional<QVariantMap> result = loadSettingsFromSpecificFile(
+        engine,
+        FilenameGenerationOption::engineSpecific | FilenameGenerationOption::deviceSpecific);
 
-            if (!settingsString)
-                return std::nullopt;
-
-            return sdk_support::toQVariantMap(*settingsString);
-        };
-
-    std::optional<QVariantMap> result = loadSettings(
-        /*isEngineSpecificFilename*/ true,
-        /*isDeviceSpecificFilename*/ true);
     if (result)
         return result;
 
-    result = loadSettings(/*isEngineSpecificFilename*/ false, /*isDeviceSpecificFilename*/ true);
+    result = loadSettingsFromSpecificFile(engine, FilenameGenerationOption::deviceSpecific);
     if (result)
         return result;
 
-    result = loadSettings(/*isEngineSpecificFilename*/ true, /*isDeviceSpecificFilename*/ false);
+    result = loadSettingsFromSpecificFile(engine, FilenameGenerationOption::engineSpecific);
     if (result)
         return result;
 
-    return loadSettings(/*isEngineSpecificFilename*/ false, /*isDeviceSpecificFilename*/ false);
+    return loadSettingsFromSpecificFile(engine, FilenameGenerationOptions());
+}
+
+std::optional<QVariantMap> DeviceAnalyticsContext::loadSettingsFromSpecificFile(
+    const resource::AnalyticsEngineResourcePtr& engine,
+    sdk_support::FilenameGenerationOptions filenameGenerationOptions) const
+{
+    const QString settingsFilename = sdk_support::debugFileAbsolutePath(
+        pluginsIni().analyticsSettingsSubstitutePath,
+        sdk_support::baseNameOfFileToDumpOrLoadData(
+            engine->plugin().dynamicCast<resource::AnalyticsPluginResource>(),
+            engine,
+            m_device,
+            filenameGenerationOptions)) + "_settings.json";
+
+    std::optional<QString> settingsString = sdk_support::loadStringFromFile(
+        nx::utils::log::Tag(typeid(this)),
+        settingsFilename);
+
+    if (!settingsString)
+        return std::nullopt;
+
+    return sdk_support::toQVariantMap(*settingsString);
 }
 
 QVariantMap DeviceAnalyticsContext::getSettings(const QString& engineId) const
