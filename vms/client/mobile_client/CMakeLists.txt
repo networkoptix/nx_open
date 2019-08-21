@@ -14,6 +14,13 @@ file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js
 
 set(resources)
 
+if (IOS OR ANDROID)
+    set (TRANSLATION_FILES
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/common_translations.dat"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mobile_client_translations.dat"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/nx_vms_client_core_translations.dat")
+endif()
+
 if(IOS)
     if(NOT mobile_client_ios_launch_screen)
         set(mobile_client_ios_launch_screen

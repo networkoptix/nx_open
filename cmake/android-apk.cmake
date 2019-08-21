@@ -102,17 +102,16 @@ function(add_android_apk target)
     endif()
 
     set(apk_dir "${CMAKE_CURRENT_BINARY_DIR}/${APK_TARGET}_apk")
-
     set(translations_dir "${PACKAGE_SOURCE}/assets/translations")
-
     add_custom_command(
         OUTPUT ${APK_FILE_NAME}
         DEPENDS ${APK_TARGET}
+        DEPENDS ${TRANSLATIONS}
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${PACKAGE_SOURCE}
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${APK_PACKAGE_SOURCES} ${PACKAGE_SOURCE}
         COMMAND ${CMAKE_COMMAND} -E make_directory "${apk_dir}/libs/${CMAKE_ANDROID_ARCH_ABI}"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${translations_dir}"
-        COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/../../../bin/*.dat "${translations_dir}"
+        COMMAND ${CMAKE_COMMAND} -E copy ${TRANSLATION_FILES} ${translations_dir}
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:${APK_TARGET}>"
             "${apk_dir}/libs/${CMAKE_ANDROID_ARCH_ABI}"
         COMMAND ${ANDROIDDEPLOYQT_EXECUTABLE} ${build_type} ${sign_parameters}
