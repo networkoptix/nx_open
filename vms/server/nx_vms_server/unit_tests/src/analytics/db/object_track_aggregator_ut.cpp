@@ -3,7 +3,7 @@
 #include <analytics/db/config.h>
 #include <nx/vms/server/analytics/db/object_track_aggregator.h>
 
-#include "analytics_storage_types.h"
+#include "attribute_dictionary.h"
 
 namespace nx::analytics::db::test {
 

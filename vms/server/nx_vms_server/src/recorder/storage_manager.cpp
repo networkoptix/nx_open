@@ -1786,10 +1786,14 @@ void QnStorageManager::checkMetadataStorageSpace()
     {
         if (storage->getId() != server->metadataStorageId())
             continue;
+
         if (storage->getStatus() != Qn::Online)
             emit storageFailure(storage, nx::vms::api::EventReason::metadataStorageOffline);
         else if (storage->getFreeSpace()< kMinMetadataStorageFreeSpace)
             emit storageFailure(storage, nx::vms::api::EventReason::metadataStorageFull);
+
+        if (m_analyticsEventsStorage && !m_analyticsEventsStorage->initialized())
+            emit storageFailure(storage, nx::vms::api::EventReason::metadataStorageOffline);
     }
 }
 
