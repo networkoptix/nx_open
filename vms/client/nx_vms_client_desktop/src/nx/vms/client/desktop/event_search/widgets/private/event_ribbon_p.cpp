@@ -399,23 +399,24 @@ ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
                 case Qn::ThumbnailStatus::Loading:
                 case Qn::ThumbnailStatus::Refreshing:
                 {
-                    const auto timeoutTimer = executeDelayedParented(
-                        [this, provider]() { handleLoadingEnded(provider); },
-                        kPreviewLoadTimeout,
-                        provider);
+                    const QSharedPointer<QTimer> timeoutTimer(new QTimer(),
+                        [](QTimer* timer)
+                        {
+                            if (!timer)
+                                return;
+
+                            timer->stop();
+                            timer->deleteLater();
+                        });
+
+                    connect(timeoutTimer.get(), &QTimer::timeout, this,
+                        [this, provider]() { handleLoadingEnded(provider); });
+
+                    timeoutTimer->setSingleShot(true);
+                    timeoutTimer->start(kPreviewLoadTimeout);
 
                     const auto server = previewServer(provider);
-
-                    m_loadingByProvider.insert(provider, {server,
-                        QSharedPointer<QTimer>(timeoutTimer,
-                            [](QTimer* timer)
-                            {
-                                if (!timer)
-                                    return;
-
-                                timer->stop();
-                                timer->deleteLater();
-                            })});
+                    m_loadingByProvider.insert(provider, {server, timeoutTimer});
 
                     auto& serverData = m_loadingByServer[server];
                     ++serverData.loadingCounter;
