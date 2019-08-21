@@ -118,10 +118,14 @@ function(setup_ios_application target)
             --output "${app_dir}/qt_qml"
         COMMENT "Copying QML imports for ${target}"
     )
-    set(copy_translations_command
-        COMMAND ${CMAKE_COMMAND} -E copy ${APP_TRANSLATIONS} ${app_dir}
-        COMMENT "Copying translations for ${target}"
-        )
+
+    set(copy_translations_command)
+    if(APP_TRANSLATIONS)
+        set(copy_translations_command
+            COMMAND ${CMAKE_COMMAND} -E copy ${APP_TRANSLATIONS} ${app_dir}
+            COMMENT "Copying translations for ${target}"
+            )
+    endif()
 
     add_custom_command(
         TARGET ${target}
