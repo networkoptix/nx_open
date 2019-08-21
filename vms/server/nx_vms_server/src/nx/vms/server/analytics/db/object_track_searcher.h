@@ -98,7 +98,7 @@ private:
 
     void fetchTracksFromDb(
         nx::sql::QueryContext* queryContext,
-        const std::vector<std::int64_t>& trackGroups,
+        const std::set<std::int64_t>& trackGroups,
         std::vector<ObjectTrack>* result);
 
     void prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* query);

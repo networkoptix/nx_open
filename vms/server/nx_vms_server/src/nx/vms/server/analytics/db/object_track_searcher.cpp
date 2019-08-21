@@ -311,16 +311,18 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
             *archiveFilter);
         const int fetchedObjectGroupsCount = matchResult.trackGroups.size();
 
-        matchResult.trackGroups.erase(
-            std::remove_if(
-                matchResult.trackGroups.begin(), matchResult.trackGroups.end(),
-                [&analyzedObjectGroups](auto id) { return analyzedObjectGroups.count(id) > 0; }),
-            matchResult.trackGroups.end());
-        std::copy(
-            matchResult.trackGroups.begin(), matchResult.trackGroups.end(),
-            std::inserter(analyzedObjectGroups, analyzedObjectGroups.end()));
+        const std::set<std::int64_t> uniqueTrackGroups(
+            matchResult.trackGroups.begin(), matchResult.trackGroups.end());
 
-        fetchTracksFromDb(queryContext, matchResult.trackGroups, &result);
+        std::set<std::int64_t> newTrackGroups;
+        std::set_difference(
+            uniqueTrackGroups.begin(), uniqueTrackGroups.end(),
+            analyzedObjectGroups.begin(), analyzedObjectGroups.end(),
+            std::inserter(newTrackGroups, newTrackGroups.end()));
+
+        analyzedObjectGroups.insert(newTrackGroups.begin(), newTrackGroups.end());
+
+        fetchTracksFromDb(queryContext, newTrackGroups, &result);
 
         if ((int) result.size() >= m_filter.maxObjectTracksToSelect ||
             fetchedObjectGroupsCount < archiveFilter->limit)
@@ -346,7 +348,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
 
 void ObjectTrackSearcher::fetchTracksFromDb(
     nx::sql::QueryContext* queryContext,
-    const std::vector<std::int64_t>& objectTrackGroups,
+    const std::set<std::int64_t>& objectTrackGroups,
     std::vector<ObjectTrack>* result)
 {
     nx::sql::SqlFilterFieldAnyOf objectGroupFilter(
