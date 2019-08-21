@@ -237,7 +237,6 @@ nx::utils::Url MediatorInstance::buildMediatorTcpUrl(const QString& urlScheme) c
         return stunTcpBaseUrl();
     if (urlScheme == "http")
         return httpUrl();
-    network::SocketAddress endpoint;
     if (urlScheme == "https")
         return network::url::Builder().setScheme(urlScheme).setEndpoint(httpsEndpoint());
     return {};
