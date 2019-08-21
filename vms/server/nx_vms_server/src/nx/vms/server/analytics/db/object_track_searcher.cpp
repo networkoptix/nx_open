@@ -303,7 +303,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
 
     std::set<std::int64_t> analyzedObjectGroups;
 
-    std::vector<ObjectTrack> result;
+    TrackQueryResult result;
     for (int i = 0; i < kMaxObjectLookupIterations; ++i)
     {
         auto matchResult = m_analyticsArchive->matchObjects(
@@ -324,12 +324,16 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
 
         fetchTracksFromDb(queryContext, newTrackGroups, &result);
 
-        if ((int) result.size() >= m_filter.maxObjectTracksToSelect ||
+        if ((int) result.tracks.size() >= m_filter.maxObjectTracksToSelect ||
             fetchedObjectGroupsCount < archiveFilter->limit)
         {
-            if ((int) result.size() > m_filter.maxObjectTracksToSelect)
-                result.erase(result.begin() + m_filter.maxObjectTracksToSelect, result.end());
-            return result;
+            if ((int) result.tracks.size() > m_filter.maxObjectTracksToSelect)
+            {
+                result.tracks.erase(
+                    result.tracks.begin() + m_filter.maxObjectTracksToSelect,
+                    result.tracks.end());
+            }
+            return std::move(result.tracks);
         }
 
         // Repeating match.
@@ -343,13 +347,13 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
     NX_WARNING(this, "Failed to select all required objects in %1 iterations. Filter %2",
         kMaxObjectLookupIterations, m_filter);
 
-    return result;
+    return std::move(result.tracks);
 }
 
 void ObjectTrackSearcher::fetchTracksFromDb(
     nx::sql::QueryContext* queryContext,
     const std::set<std::int64_t>& objectTrackGroups,
-    std::vector<ObjectTrack>* result)
+    TrackQueryResult* result)
 {
     nx::sql::SqlFilterFieldAnyOf objectGroupFilter(
         "tg.group_id",
@@ -377,7 +381,14 @@ void ObjectTrackSearcher::fetchTracksFromDb(
     if (m_filter.sortOrder == Qt::AscendingOrder)
         std::reverse(tracks.begin(), tracks.end());
 
-    std::move(tracks.begin(), tracks.end(), std::back_inserter(*result));
+    for (auto& track: tracks)
+    {
+        if (result->ids.count(track.id) > 0)
+            continue;
+
+        result->ids.insert(track.id);
+        result->tracks.push_back(std::move(track));
+    }
 }
 
 void ObjectTrackSearcher::prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* query)
