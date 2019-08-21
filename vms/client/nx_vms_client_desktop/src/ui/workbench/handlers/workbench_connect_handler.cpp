@@ -649,7 +649,6 @@ void QnWorkbenchConnectHandler::showWarnMessagesOnce()
 
     menu()->triggerIfPossible(action::AllowStatisticsReportMessageAction);
     menu()->triggerIfPossible(action::VersionMismatchMessageAction);
-    menu()->triggerIfPossible(action::ConfirmAnalyticsStorageAction);
 
     context()->instance<QnWorkbenchLicenseNotifier>()->checkLicenses();
 }
