@@ -103,7 +103,7 @@ private:
 
     QString currentDeviceText() const;
 
-    void setCurrentDate(const QDate& value);
+    void setCurrentDate(const QDateTime& value);
 
 private:
     const QScopedPointer<AbstractSearchListModel> m_mainModel;
@@ -147,7 +147,7 @@ private:
 
     std::optional<bool> m_isAllowed; //< std::optional for lazy initialization.
 
-    QDate m_currentDate; //< Local settings aware.
+    QDateTime m_currentDate; //< Local settings aware.
 };
 
 inline uint qHash(AbstractSearchWidget::Period source)
