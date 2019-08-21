@@ -303,7 +303,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
 
     std::set<std::int64_t> analyzedObjectGroups;
 
-    std::vector<ObjectTrack> result;
+    TrackQueryResult result;
     for (int i = 0; i < kMaxObjectLookupIterations; ++i)
     {
         auto matchResult = m_analyticsArchive->matchObjects(
@@ -311,23 +311,29 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
             *archiveFilter);
         const int fetchedObjectGroupsCount = matchResult.trackGroups.size();
 
-        matchResult.trackGroups.erase(
-            std::remove_if(
-                matchResult.trackGroups.begin(), matchResult.trackGroups.end(),
-                [&analyzedObjectGroups](auto id) { return analyzedObjectGroups.count(id) > 0; }),
-            matchResult.trackGroups.end());
-        std::copy(
-            matchResult.trackGroups.begin(), matchResult.trackGroups.end(),
-            std::inserter(analyzedObjectGroups, analyzedObjectGroups.end()));
+        const std::set<std::int64_t> uniqueTrackGroups(
+            matchResult.trackGroups.begin(), matchResult.trackGroups.end());
 
-        fetchTracksFromDb(queryContext, matchResult.trackGroups, &result);
+        std::set<std::int64_t> newTrackGroups;
+        std::set_difference(
+            uniqueTrackGroups.begin(), uniqueTrackGroups.end(),
+            analyzedObjectGroups.begin(), analyzedObjectGroups.end(),
+            std::inserter(newTrackGroups, newTrackGroups.end()));
 
-        if ((int) result.size() >= m_filter.maxObjectTracksToSelect ||
+        analyzedObjectGroups.insert(newTrackGroups.begin(), newTrackGroups.end());
+
+        fetchTracksFromDb(queryContext, newTrackGroups, &result);
+
+        if ((int) result.tracks.size() >= m_filter.maxObjectTracksToSelect ||
             fetchedObjectGroupsCount < archiveFilter->limit)
         {
-            if ((int) result.size() > m_filter.maxObjectTracksToSelect)
-                result.erase(result.begin() + m_filter.maxObjectTracksToSelect, result.end());
-            return result;
+            if ((int) result.tracks.size() > m_filter.maxObjectTracksToSelect)
+            {
+                result.tracks.erase(
+                    result.tracks.begin() + m_filter.maxObjectTracksToSelect,
+                    result.tracks.end());
+            }
+            return std::move(result.tracks);
         }
 
         // Repeating match.
@@ -341,13 +347,13 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookupTracksUsingArchive(
     NX_WARNING(this, "Failed to select all required objects in %1 iterations. Filter %2",
         kMaxObjectLookupIterations, m_filter);
 
-    return result;
+    return std::move(result.tracks);
 }
 
 void ObjectTrackSearcher::fetchTracksFromDb(
     nx::sql::QueryContext* queryContext,
-    const std::vector<std::int64_t>& objectTrackGroups,
-    std::vector<ObjectTrack>* result)
+    const std::set<std::int64_t>& objectTrackGroups,
+    TrackQueryResult* result)
 {
     nx::sql::SqlFilterFieldAnyOf objectGroupFilter(
         "tg.group_id",
@@ -375,7 +381,14 @@ void ObjectTrackSearcher::fetchTracksFromDb(
     if (m_filter.sortOrder == Qt::AscendingOrder)
         std::reverse(tracks.begin(), tracks.end());
 
-    std::move(tracks.begin(), tracks.end(), std::back_inserter(*result));
+    for (auto& track: tracks)
+    {
+        if (result->ids.count(track.id) > 0)
+            continue;
+
+        result->ids.insert(track.id);
+        result->tracks.push_back(std::move(track));
+    }
 }
 
 void ObjectTrackSearcher::prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* query)
