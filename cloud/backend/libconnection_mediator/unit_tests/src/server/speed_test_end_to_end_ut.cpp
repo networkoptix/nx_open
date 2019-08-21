@@ -80,8 +80,7 @@ protected:
         ASSERT_TRUE(startAndWaitUntilStarted());
 
         m_uplinkSpeedUpdatedId = moduleInstance()->impl()->listeningPeerDb().
-            subscribeToUplinkSpeedUpdated(
-                [this](api::PeerConnectionSpeed peerUplinkSpeed)
+            subscribeToUplinkSpeedUpdated([this](api::PeerConnectionSpeed peerUplinkSpeed)
                 {
                     ++m_uplinkSpeedTestsDone;
                     NX_DEBUG(this, "Received peerUplinkSpeed: %1", peerUplinkSpeed);
@@ -160,16 +159,17 @@ private:
             m_system = addRandomSystem();
 
         {
+            auto mediaServer = addRandomServer(
+                *m_system,
+                boost::none,
+                ServerTweak::defaultBehavior,
+                network::http::kUrlSchemeName);
+            ASSERT_NE(nullptr, mediaServer);
+
             QnMutexLocker lock(&m_mutex);
+            
             m_servers.emplace_back(TestContext());
-            NX_DEBUG(this, "addRandomServer");
-            m_servers.back().mediaserver =
-                addRandomServer(
-                    *m_system,
-                    boost::none,
-                    ServerTweak::defaultBehavior,
-                    network::http::kUrlSchemeName);
-            ASSERT_NE(m_servers.back().mediaserver, nullptr);
+            m_servers.back().mediaserver = std::move(mediaServer);
 
             m_servers.back().uplinkSpeed.serverId =
                 nx::toStdString(m_servers.back().mediaserver->serverId());
