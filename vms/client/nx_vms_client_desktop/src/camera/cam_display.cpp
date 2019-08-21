@@ -942,6 +942,7 @@ void QnCamDisplay::onBeforeJump(qint64 time)
     if (m_executingJump > 1)
         clearUnprocessedData();
     m_processedPackets = 0;
+    m_gotKeyDataInfo.clear();
 }
 
 void QnCamDisplay::onJumpOccured(qint64 time)
@@ -1325,6 +1326,27 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         return true;
 
     QnCompressedVideoDataPtr vd = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
+
+    if (vd && vd->channelNumber <= CL_MAX_CHANNELS)
+    {
+        QnMutexLocker lock(&m_timeMutex);
+        if (vd->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+        {
+            if (m_gotKeyDataInfo.size() <= vd->channelNumber)
+                m_gotKeyDataInfo.resize(vd->channelNumber + 1);
+            m_gotKeyDataInfo[vd->channelNumber] = true;
+        }
+        else
+        {
+            if (m_gotKeyDataInfo.size() <= vd->channelNumber ||
+                !m_gotKeyDataInfo[vd->channelNumber])
+            {
+                return true; //< Wait for key frame.
+            }
+        }
+    }
+
+
     QnCompressedAudioDataPtr ad = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
 
     m_processedPackets++;
