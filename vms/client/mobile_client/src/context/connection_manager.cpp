@@ -2,6 +2,7 @@
 
 #include <QtGui/QGuiApplication>
 #include <QtCore/QMetaEnum>
+#include <QtQml/QQmlEngine>
 
 #include <client_core/connection_context_aware.h>
 #include <client_core/client_core_module.h>
@@ -37,23 +38,49 @@
 
 namespace {
 
-    const QString kLiteClientConnectionScheme = "liteclient";
-    enum { kInvalidHandle = -1 };
+const QString kLiteClientConnectionScheme = "liteclient";
+enum { kInvalidHandle = -1 };
 
-    QnConnectionManager::ConnectionType connectionTypeForUrl(const nx::utils::Url& url)
+QnConnectionManager::ConnectionType connectionTypeForUrl(const nx::utils::Url& url)
+{
+    if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host())
+        || url.scheme() == QnConnectionManager::kCloudConnectionScheme)
     {
-        if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host())
-            || url.scheme() == QnConnectionManager::kCloudConnectionScheme)
-        {
-            return QnConnectionManager::CloudConnection;
-        }
-
-        if (url.scheme() == kLiteClientConnectionScheme)
-            return QnConnectionManager::LiteClientConnection;
-
-        return QnConnectionManager::NormalConnection;
+        return QnConnectionManager::CloudConnection;
     }
 
+    if (url.scheme() == kLiteClientConnectionScheme)
+        return QnConnectionManager::LiteClientConnection;
+
+    return QnConnectionManager::NormalConnection;
+}
+
+using CallbackType = std::function<void (
+    QnConnectionManager::State state,
+    Qn::ConnectionResult result,
+    const QVariant& extraInfo)>;
+
+CallbackType makeCallback(QJSValue callback)
+{
+    return
+        [callback](QnConnectionManager::State state,
+            Qn::ConnectionResult result,
+            const QVariant& extraInfo) mutable
+        {
+            if (callback.isCallable())
+                callback.call(QJSValueList({state, result, extraInfo.toString()}));
+        };
+}
+
+void callCallback(
+    const CallbackType& callback,
+    QnConnectionManager::State state,
+    Qn::ConnectionResult result = Qn::SuccessConnectionResult,
+    const QVariant& extraInfo = QVariant())
+{
+    if (callback)
+        callback(state, result, extraInfo);
+}
 } // namespace
 
 const QString QnConnectionManager::kCloudConnectionScheme = "cloud";
@@ -73,7 +100,10 @@ public:
     void suspend();
     void resume();
 
-    bool doConnect(bool restoringConnection);
+    bool doConnect(
+        bool restoringConnection,
+        CallbackType callback = CallbackType());
+
     void doDisconnect();
     void tryResotreConnection();
 
@@ -85,7 +115,10 @@ public:
 
     void updateRestoringConnectionValue();
     void setRestoringConnectionFlag(bool value);
-    bool connectToServerInternal(const nx::utils::Url& url, bool restoringConnection);
+    bool connectToServerInternal(
+        const nx::utils::Url& url,
+        bool restoringConnection,
+        CallbackType callback = CallbackType());
 
 public:
     QTimer setRestoringConnectionTimer;
@@ -219,30 +252,34 @@ bool QnConnectionManager::restoringConnection() const
     return d->restoringConnectionFlag;
 }
 
-bool QnConnectionManager::connectToServer(const nx::utils::Url& url)
+bool QnConnectionManager::connectToServer(
+    const nx::utils::Url& url,
+    QJSValue callback)
 {
     Q_D(QnConnectionManager);
-    return d->connectToServerInternal(url, false);
+    return d->connectToServerInternal(url, false, makeCallback(callback));
 }
 
 bool QnConnectionManager::connectToServer(
     const nx::utils::Url &url,
     const QString& userName,
     const QString& password,
-    bool cloudConnection)
+    bool cloudConnection,
+    QJSValue callback)
 {
     auto urlWithAuth = url;
     urlWithAuth.setUserName(userName);
     urlWithAuth.setPassword(password);
     if (cloudConnection)
         urlWithAuth.setScheme(kCloudConnectionScheme);
-    return connectToServer(urlWithAuth);
+    return connectToServer(urlWithAuth, callback);
 }
 
 bool QnConnectionManager::connectByUserInput(
     const QString& address,
     const QString& userName,
-    const QString& password)
+    const QString& password,
+    QJSValue callback)
 {
     nx::utils::Url url = nx::utils::Url::fromUserInput(address);
     if (url.port() <= 0)
@@ -250,7 +287,7 @@ bool QnConnectionManager::connectByUserInput(
 
     url.setUserName(userName);
     url.setPassword(password);
-    return connectToServer(url);
+    return connectToServer(url, callback);
 }
 
 void QnConnectionManager::disconnectFromServer()
@@ -336,7 +373,9 @@ void QnConnectionManagerPrivate::resume()
     doConnect(false);
 }
 
-bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
+bool QnConnectionManagerPrivate::doConnect(
+    bool restoringConnection,
+    CallbackType callback)
 {
     NX_DEBUG(this, "doConnect() BEGIN: url: %1", url);
     if (!url.isValid() || url.host().isEmpty())
@@ -345,6 +384,12 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
         updateConnectionState();
         emit q->connectionFailed(Qn::NetworkErrorConnectionResult, QVariant());
         NX_DEBUG(this, "doConnect() END: Invalid URL");
+
+        callCallback(
+            callback,
+            QnConnectionManager::State::Disconnected,
+            Qn::NetworkErrorConnectionResult);
+
         return false;
     }
 
@@ -365,17 +410,25 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
     if (connectionHandle == kInvalidHandle)
     {
         delete result;
+        callCallback(
+            callback,
+            QnConnectionManager::State::Disconnected,
+            Qn::NetworkErrorConnectionResult);
         return false;
     }
 
     connect(result, &QnEc2ConnectionRequestResult::replyProcessed, this,
-        [this, result, connectUrl, restoringConnection]()
+        [this, result, connectUrl, restoringConnection, callback]()
         {
             result->deleteLater();
 
             if (connectionHandle != result->handle())
             {
                 NX_DEBUG(this, "doConnect() Invalid handle");
+                callCallback(
+                    callback,
+                    QnConnectionManager::State::Disconnected,
+                    Qn::NetworkErrorConnectionResult);
                 return;
             }
 
@@ -384,7 +437,11 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
             const auto errorCode = ec2::ErrorCode(result->status());
             const auto connectionInfo = result->reply<QnConnectionInfo>();
 
-            auto status = QnConnectionValidator::validateConnection(connectionInfo, errorCode);
+            // We treat factory server connection as error only in mobile client
+            auto status = connectionInfo.newSystem
+                ? Qn::FactoryServerConnectionResult
+                : QnConnectionValidator::validateConnection(connectionInfo, errorCode);
+
             QVariant infoParameter;
 
             if (status == Qn::IncompatibleVersionConnectionResult)
@@ -408,12 +465,29 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
                 if (restoringConnection)
                     tryResotreConnection();
                 else
-                    emit q->connectionFailed(status, infoParameter);
+                    callCallback(callback, QnConnectionManager::State::Disconnected, status);
+
 
                 NX_DEBUG(this, "doConnect() END: Bad status");
                 return;
             }
 
+            const auto connectionStatus = qnClientMessageProcessor->connectionStatus();
+            const auto callbackConnection(QSharedPointer<QMetaObject::Connection>(new QMetaObject::Connection()));
+            *callbackConnection = connect(
+                connectionStatus, &QnClientConnectionStatus::stateChanged, this,
+                    [this, callbackConnection, callback](QnConnectionState value)
+                    {
+                        if (value == QnConnectionState::Connecting)
+                        {
+                            callCallback(callback, QnConnectionManager::Connecting);
+                        }
+                        else if (value == QnConnectionState::Connected)
+                        {
+                            QObject::disconnect(*callbackConnection);
+                            callCallback(callback, QnConnectionManager::Connected);
+                        }
+                    });
             reconnectHelper.reset();
 
             const auto ec2Connection = result->connection();
@@ -447,9 +521,17 @@ bool QnConnectionManagerPrivate::doConnect(bool restoringConnection)
             {
                 const auto localId = helpers::getLocalSystemId(connectionInfo);
                 using namespace nx::vms::client::core::helpers;
-                if (connectionTypeForUrl(url) != QnConnectionManager::CloudConnection)
+
+                const bool isCloudConnection =
+                    connectionTypeForUrl(url) == QnConnectionManager::CloudConnection;
+                const auto user = isCloudConnection
+                    ? qnCloudStatusWatcher->cloudLogin()
+                    : url.userName();
+                emit q->sessionParametersChanged(localId, user);
+
+                if (!isCloudConnection)
                 {
-                    nx::vms::common::Credentials credentials(url.userName(), {});
+                    nx::vms::common::Credentials credentials(user, {});
                     if (qnSettings->savePasswords())
                         credentials.password = url.password();
                     storeCredentials(localId, credentials);
@@ -612,7 +694,8 @@ void QnConnectionManagerPrivate::updateRestoringConnectionValue()
 
 bool QnConnectionManagerPrivate::connectToServerInternal(
     const nx::utils::Url& url,
-    bool restoringConnection)
+    bool restoringConnection,
+    CallbackType callback)
 {
     Q_Q(QnConnectionManager);
     if (!restoringConnection)
@@ -627,5 +710,5 @@ bool QnConnectionManagerPrivate::connectToServerInternal(
         actualUrl.setPort(q->defaultServerPort());
     actualUrl.setUserName(actualUrl.userName().toLower());
     setUrl(actualUrl);
-    return doConnect(restoringConnection);
+    return doConnect(restoringConnection, callback);
 }

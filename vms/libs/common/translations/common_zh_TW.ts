@@ -5,7 +5,7 @@
     <name>DateTimeFormats</name>
     <message>
       <source>MM/dd</source>
-      <translation>月/日</translation>
+      <translation>MM/dd</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>

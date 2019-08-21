@@ -33,6 +33,7 @@
 #include <finders/systems_finder.h>
 #include <utils/common/delayed.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/mobile_client/controllers/audio_controller.h>
 
 using namespace nx::vms::utils;
 
@@ -44,6 +45,7 @@ static const nx::utils::SoftwareVersion kUserRightsRefactoredVersion(3, 0);
 
 QnContext::QnContext(QObject* parent) :
     base_type(parent),
+    m_audioController(new AudioController(this)),
     m_connectionManager(new QnConnectionManager(this)),
     m_settings(new QmlSettingsAdaptor(this)),
     m_appInfo(new QnMobileAppInfo(this)),
@@ -55,6 +57,9 @@ QnContext::QnContext(QObject* parent) :
     m_localPrefix(lit("qrc:///")),
     m_customMargins()
 {
+    connect(m_connectionManager, &QnConnectionManager::sessionParametersChanged,
+        m_audioController, &AudioController::setSessionParameters);
+
     const auto screen = qApp->primaryScreen();
     screen->setOrientationUpdateMask(Qt::PortraitOrientation | Qt::InvertedPortraitOrientation
         | Qt::LandscapeOrientation | Qt::InvertedLandscapeOrientation);
@@ -110,6 +115,15 @@ QnContext::QnContext(QObject* parent) :
         };
 
     connect(qApp->screens().first(), &QScreen::geometryChanged, this, updateMarginsCallback);
+
+    using UserWatcher = nx::vms::client::core::UserWatcher;
+    const auto userWatcher = commonModule()->instance<UserWatcher>();
+    connect(userWatcher, &UserWatcher::userNameChanged, this,
+        [this, userWatcher]()
+        {
+            if (userWatcher->userName().isEmpty())
+                m_uiController->disconnectFromSystem();
+        });
 }
 
 QnContext::~QnContext() {}
@@ -331,7 +345,7 @@ bool QnContext::setCloudCredentials(const QString& login, const QString& passwor
 {
     const nx::vms::common::Credentials credentials{login, password};
     nx::vms::client::core::settings()->cloudCredentials = credentials;
-    const bool result = cloudStatusWatcher()->setCredentials(credentials);
+    const bool result = cloudStatusWatcher()->forcedSetCredentials(credentials);
     return result;
 }
 

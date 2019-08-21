@@ -64,6 +64,11 @@ Rectangle
         }
     ]
 
+    function showScheduleError()
+    {
+        showHint("", qsTr("Disabled by schedule"), "", true)
+    }
+
     function showHint(prefix, text, iconPath, keepOpened)
     {
         if (keepOpened)
@@ -153,6 +158,11 @@ Rectangle
         control.state = "visible"
     }
 
+    function hideDelayed()
+    {
+        hideTimer.restart()
+    }
+
     function hide()
     {
         hideTimer.stop()
@@ -175,7 +185,7 @@ Rectangle
 
         Item
         {
-            width: 48
+            width: visualDataLoader.hasEmptyImage ? 12 : 48
             height: 48
             anchors.verticalCenter: parent.verticalCenter
 
@@ -189,6 +199,9 @@ Rectangle
             {
                 id: visualDataLoader
                 anchors.centerIn: parent
+
+                readonly property bool hasEmptyImage: sourceComponent === imageComponent
+                    && (!item || !item.source.toString().length)
             }
         }
     }

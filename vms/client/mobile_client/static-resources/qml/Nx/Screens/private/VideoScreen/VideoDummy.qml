@@ -135,7 +135,15 @@ DummyMessage
                 target: dummyMessage
                 image: lp("/images/alert_sound.png")
             }
+        },
+        State
+        {
+            name: "noLiveStream"
+            PropertyChanges
+            {
+                target: dummyMessage
+                title: qsTr("No live stream")
+            }
         }
-
     ]
 }

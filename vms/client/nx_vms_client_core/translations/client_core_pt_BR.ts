@@ -115,7 +115,7 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>Demasiadas tentativas. Tente novamente dentro de um minuto.</translation>
+      <translation>Demasiadas tentativas. Tente novamente mais tarde.</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>

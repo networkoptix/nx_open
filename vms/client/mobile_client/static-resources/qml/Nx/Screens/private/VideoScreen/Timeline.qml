@@ -4,7 +4,7 @@ import com.networkoptix.qml 1.0
 
 Item
 {
-    id: root
+    id: control
 
     property alias defaultWindowSize: timeline.defaultWindowSize
     property alias windowStart: timeline.windowStart
@@ -26,6 +26,7 @@ Item
     readonly property bool dragging: timeline.dragging
     readonly property bool moving: timeline.moving
     readonly property var timelineView: timeline
+    property real bottomOverlap: 0
 
     signal positionTapped(real position)
 
@@ -47,11 +48,6 @@ Item
     function clearCorrection()
     {
         timelineView.clearCorrection()
-    }
-
-    function jumpTo(position)
-    {
-        timeline.setPositionImmediately(position)
     }
 
     QnTimelineView
@@ -107,7 +103,8 @@ Item
 
             property int pressX: -1
 
-            anchors.fill: parent
+            width: parent.width
+            height: parent.height + control.bottomOverlap
             acceptedButtons: Qt.LeftButton
             drag.threshold: 10
 

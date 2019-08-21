@@ -13,15 +13,15 @@ TextInput
 
     property bool showError: false
 
-    property bool mobileMode: Utils.isMobile()
+    property bool enableCustomHandles: Qt.platform.os == "android"
 
     property color inactiveColor: showError ? ColorTheme.red_d1 : ColorTheme.base10
     property color activeColor: showError ? ColorTheme.red_main : ColorTheme.brand_main
     property color placeholderColor: ColorTheme.base10
     property color cursorColor: activeColor
     property bool selectionAllowed: true
-    scrollByMouse: mobileMode
-    selectByMouse: !mobileMode
+    scrollByMouse: Utils.isMobile()
+    selectByMouse: !Utils.isMobile()
     color: showError ? ColorTheme.red_main : ColorTheme.windowText
 
     leftPadding: 8
@@ -124,7 +124,7 @@ TextInput
 
         function showCursorHandle()
         {
-            if (!mobileMode)
+            if (!enableCustomHandles)
                 return
 
             cursorHandle.opacity = 0.0
@@ -134,7 +134,7 @@ TextInput
 
         function hideCursorHandle()
         {
-            if (!mobileMode)
+            if (!enableCustomHandles)
                 return
 
             cursorHandle.opacity = 0.0
@@ -149,7 +149,7 @@ TextInput
 
         function updateSelectionHandles()
         {
-            if (!mobileMode)
+            if (!enableCustomHandles)
                 return
 
             if (cursorHandle.pressed)
@@ -197,19 +197,13 @@ TextInput
 
         function selectWordAndOpenContextMenu(event, autoSelect)
         {
-            var pos = positionAt(event.x, event.y)
-            if (selectionStart < selectionEnd
-                && (pos < selectionStart || pos > selectionEnd))
-            {
-                cursorPosition = pos
-            }
-            else if (autoSelect)
-            {
-                cursorPosition = pos
-                selectWord()
-            }
+            if (!enableCustomHandles)
+                return
 
-            openContextMenu()
+            selectAndOpenMenuTimer.x = event.x
+            selectAndOpenMenuTimer.y = event.y
+            selectAndOpenMenuTimer.autoSelect = autoSelect
+            selectAndOpenMenuTimer.restart()
         }
 
         function openContextMenu()
@@ -218,21 +212,17 @@ TextInput
             needRestoreContextMenu = false
             contextMenu.open()
             contextMenu.adjustPosition()
-            persistentSelection = false
         }
     }
 
     onClicked:
     {
-        if (event.button === Qt.RightButton)
-        {
-            d.selectWordAndOpenContextMenu(event, false)
-            return
-        }
-
+        if (!selectAndOpenMenuTimer.running && enableCustomHandles)
+            openMenuTimer.restart()
         if (displayText && selectionStart == selectionEnd)
             d.showCursorHandle()
     }
+
     onPressAndHold: d.selectWordAndOpenContextMenu(event, true)
     onDoubleClicked: d.selectWordAndOpenContextMenu(event, true)
 
@@ -263,6 +253,62 @@ TextInput
         contextMenu.close()
     }
 
+    Timer
+    {
+        id: openMenuTimer
+
+        property int lastCursorPosition: -1
+        property bool allowMenu: true
+
+        interval: 250
+        onTriggered:
+        {
+            if (selectAndOpenMenuTimer.running)
+                return
+
+            if (allowMenu && lastCursorPosition == cursorPosition)
+            {
+                allowMenu = !allowMenu
+                d.openContextMenu()
+                return
+            }
+
+            allowMenu = true
+            lastCursorPosition = cursorPosition
+        }
+    }
+
+    Timer
+    {
+        id: selectAndOpenMenuTimer
+
+        property real x
+        property real y
+        property bool autoSelect
+
+        interval: 150
+
+        onTriggered:
+        {
+            openMenuTimer.stop()
+            openMenuTimer.allowMenu = false
+
+            var pos = positionAt(x, y)
+            if (selectionStart < selectionEnd
+                && (pos < selectionStart || pos > selectionEnd))
+            {
+                cursorPosition = pos
+            }
+            else if (autoSelect)
+            {
+                cursorPosition = pos
+                selectWord()
+            }
+
+            d.openContextMenu()
+        }
+    }
+
     QnScenePositionListener
     {
         id: positionListener
@@ -277,7 +323,7 @@ TextInput
         autoHide: !contextMenu.visible
         x: positionListener.scenePos.x + localX
         y: positionListener.scenePos.y + localY
-        parent: Window.contentItem
+        parent: control
     }
 
     InputHandle
@@ -287,7 +333,7 @@ TextInput
         input: control
         x: positionListener.scenePos.x + localX
         y: positionListener.scenePos.y + localY
-        parent: Window.contentItem
+        parent: control
 
         onPressedChanged:
         {
@@ -303,7 +349,7 @@ TextInput
         input: control
         x: positionListener.scenePos.x + localX
         y: positionListener.scenePos.y + localY
-        parent: Window.contentItem
+        parent: control
 
         onPressedChanged:
         {
@@ -356,7 +402,7 @@ TextInput
             x = leftPadding + positionToRectangle(
                 selectionStart == selectionEnd
                     ? cursorPosition : selectionStart).x
-            var yOffset = cursorRectangle.height + (mobileMode ? 28 : 4)
+            var yOffset = cursorRectangle.height + (enableCustomHandles ? 28 : 4)
             y = cursorRectangle.y + yOffset
 
             var window = control.ApplicationWindow.window
@@ -388,6 +434,7 @@ TextInput
 
         onImplicitWidthChanged: adjustPosition()
         onImplicitHeightChanged: adjustPosition()
+        onClosed: control.persistentSelection = false
     }
 
     Component.onCompleted:

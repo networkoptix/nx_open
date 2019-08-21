@@ -25,7 +25,7 @@ qint64 chooseNearestTimeMs(
         ? jumpTimeMs < targetTimeMs
         : jumpTimeMs > targetTimeMs;
 
-    return useJumpTime && periods.containTime(jumpTimeMs)
+    return useJumpTime && periods.containTime(jumpTimeMs) && jumpTimeMs <= QDateTime::currentMSecsSinceEpoch()
         ? jumpTimeMs
         : targetTimeMs;
 }
@@ -168,7 +168,7 @@ void ChunkPositionWatcher::setPosition(qint64 value)
     if (d->position == value)
         return;
 
-    d->position = value;
+    d->position = value == -1 ? DATETIME_NOW : value;
     emit positionChanged();
 }
 

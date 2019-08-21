@@ -5,7 +5,7 @@
     <name>QnLayoutsModelUnsorted</name>
     <message>
       <source>All Cameras</source>
-      <translation>Tất cả máy ảnh</translation>
+      <translation>Tất cả camera</translation>
     </message>
   </context>
   <context>

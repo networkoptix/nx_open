@@ -58,8 +58,7 @@ ApplicationWindow
 
             if (!url.isEmpty())
             {
-                Workflow.openResourcesScreen(systemName)
-                connectionManager.connectToServer(url)
+                ConnectionController.connectToServerByUrl(url, systemName)
                 return
             }
         }
