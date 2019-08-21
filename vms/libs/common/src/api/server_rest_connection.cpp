@@ -72,15 +72,39 @@ ServerConnection::ServerConnection(
     m_serverId(serverId),
     m_directUrl(directUrl)
 {
-    Qn::directConnect(
-        httpClientPool(), &nx::network::http::ClientPool::done,
-        this, &ServerConnection::onHttpClientDone);
+    Qn::directConnect(httpClientPool(), &nx::network::http::ClientPool::requestIsDone, this,
+        [this](nx::network::http::ClientPool::ContextPtr context)
+        {
+            auto requestId = context->handle;
+            QnMutexLocker lock(&m_mutex);
+            auto itr = m_runningRequests.find(requestId);
+            if (itr == m_runningRequests.end())
+                return; //< Request cancelled.
+
+            m_runningRequests.remove(requestId);
+            lock.unlock();
+
+            SystemError::ErrorCode systemError = context->response.systemError;
+            auto statusCode = context->getStatusCode();
+            nx::network::http::StringType contentType;
+            nx::network::http::BufferType messageBody;
+
+            if (context->completionFunc)
+            {
+                //response ? response->headers : nx::network::http::HttpHeaders();
+                //const auto response = httpClient->response();
+                const auto headers = context->response.headers;
+                context->completionFunc(
+                    requestId,
+                    systemError, statusCode, contentType, messageBody, headers);
+            }
+        });
 }
 
 ServerConnection::~ServerConnection()
 {
     directDisconnectAll();
-    for (const auto& handle : m_runningRequests.keys())
+    for (const auto& handle: m_runningRequests)
         httpClientPool()->terminate(handle);
 }
 
@@ -1653,46 +1677,12 @@ Handle ServerConnection::sendRequest(
     HttpCompletionFunc callback)
 {
     QnMutexLocker lock(&m_mutex);
-    Handle requestId = httpClientPool()->sendRequest(request);
-    m_runningRequests.insert(requestId, callback);
+    nx::network::http::ClientPool::ContextPtr context(new nx::network::http::ClientPool::Context());
+    context->request = request;
+    context->completionFunc = callback;
+    Handle requestId = httpClientPool()->sendRequest(context);
+    m_runningRequests.insert(requestId);
     return requestId;
 }
-
-void ServerConnection::onHttpClientDone(
-    int requestId, nx::network::http::AsyncHttpClientPtr httpClient)
-{
-    QnMutexLocker lock(&m_mutex);
-    auto itr = m_runningRequests.find(requestId);
-    if (itr == m_runningRequests.end())
-        return; //< Request cancelled.
-
-    HttpCompletionFunc callback = itr.value();
-    m_runningRequests.remove(requestId);
-    lock.unlock();
-
-    SystemError::ErrorCode systemError = SystemError::noError;
-    nx::network::http::StatusCode::Value statusCode = nx::network::http::StatusCode::ok;
-    nx::network::http::StringType contentType;
-    nx::network::http::BufferType messageBody;
-
-    if (httpClient->failed())
-    {
-        systemError = SystemError::connectionReset;
-    }
-    else
-    {
-        statusCode =
-            (nx::network::http::StatusCode::Value) httpClient->response()->statusLine.statusCode;
-        contentType = httpClient->contentType();
-        messageBody = httpClient->fetchMessageBodyBuffer();
-    }
-
-    if (callback)
-    {
-        const auto response = httpClient->response();
-        const auto headers = response ? response->headers : nx::network::http::HttpHeaders();
-        callback(requestId, systemError, statusCode, contentType, messageBody, headers);
-    }
-};
 
 } // namespace rest

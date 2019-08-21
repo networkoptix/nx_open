@@ -617,9 +617,13 @@ public:
     // Get ID of the server we are connected to.
     QnUuid getServerId() const;
 
-private slots:
-    void onHttpClientDone(int requestId, nx::network::http::AsyncHttpClientPtr httpClient);
-
+    using HttpCompletionFunc = std::function<void (
+        Handle handle,
+        SystemError::ErrorCode errorCode,
+        int statusCode,
+        nx::network::http::StringType contentType,
+        nx::network::http::BufferType msgBody,
+        const nx::network::http::HttpHeaders& headers)>;
 private:
     template <typename ResultType>
     Handle executeRequest(const nx::network::http::ClientPool::Request& request,
@@ -658,15 +662,8 @@ private:
         const nx::network::http::StringType& contentType = nx::network::http::StringType(),
         const nx::network::http::StringType& messageBody = nx::network::http::StringType());
 
-    using HttpCompletionFunc = std::function<void (
-        Handle handle,
-        SystemError::ErrorCode errorCode,
-        int statusCode,
-        nx::network::http::StringType contentType,
-        nx::network::http::BufferType msgBody,
-        const nx::network::http::HttpHeaders& headers)>;
-
-    Handle sendRequest(const nx::network::http::ClientPool::Request& request,
+    Handle sendRequest(
+        const nx::network::http::ClientPool::Request& request,
         HttpCompletionFunc callback = HttpCompletionFunc());
 
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
@@ -675,7 +672,7 @@ private:
 
 private:
     QnUuid m_serverId;
-    QMap<Handle, HttpCompletionFunc> m_runningRequests;
+    QSet<Handle> m_runningRequests;
     mutable QnMutex m_mutex;
     nx::utils::Url m_directUrl;
 

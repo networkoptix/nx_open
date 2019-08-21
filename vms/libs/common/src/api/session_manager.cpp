@@ -30,9 +30,39 @@ QnSessionManager::QnSessionManager(QObject* parent):
 {
     qRegisterMetaType<AsyncRequestInfo>();
 
-    Qn::directConnect(
-        httpClientPool(), &nx::network::http::ClientPool::done,
-        this, &QnSessionManager::onHttpClientDone);
+    Qn::directConnect(httpClientPool(), &nx::network::http::ClientPool::requestIsDone, this,
+        [this](nx::network::http::ClientPool::ContextPtr context)
+        {
+            AsyncRequestInfo requestInfo;
+            {
+                QnMutexLocker lk(&m_mutex);
+                auto it = m_requestInProgress.find(context->handle);
+                if (it == m_requestInProgress.end())
+                    return; //request has been cancelled?
+                requestInfo = std::move(it->second);
+                m_requestInProgress.erase(it);
+            }
+
+            const auto& response = context->response;
+            QnHTTPRawResponse httpRequestResult(
+                response.systemError,
+                response.statusLine,
+                response.contentType,
+                response.messageBody);
+
+            if (requestInfo.object)
+            {
+                QMetaObject::invokeMethod(
+                    requestInfo.object, requestInfo.slot, requestInfo.connectionType,
+                    QGenericReturnArgument(),
+                    Q_ARG(QnHTTPRawResponse, httpRequestResult),
+                    Q_ARG(int, requestInfo.handle));
+            }
+            else if (requestInfo.requestedCompletedPromise)
+            {
+                requestInfo.requestedCompletedPromise->set_value(std::move(httpRequestResult));
+            }
+        });
 }
 
 QnSessionManager::~QnSessionManager()

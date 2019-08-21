@@ -40,8 +40,8 @@ struct UpdateItem
      * It is displayed only in debug mode.
      */
     QString debugMessage;
-    /** Message generated from nx::update::Status::errorCode. */
-    QString statusMessage;
+
+    QString statusMessage; /**< Message generated from nx::update::Status::errorCode. */
     ErrorCode errorCode = ErrorCode::noError;
 
     QString verificationMessage;

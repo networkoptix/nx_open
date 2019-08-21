@@ -22,6 +22,10 @@ class ClientPool: public QObject
     Q_OBJECT
 public:
 
+    /**
+     * Wraps request data and intermediate values.
+     * TODO: Should be merged with nx::network::http::Request later.
+     */
     struct Request
     {
         Request():
@@ -42,6 +46,70 @@ public:
         nx::network::http::AuthType authType;
         std::optional<std::chrono::milliseconds> timeout{std::nullopt};
     };
+
+    // TODO: Should be merged with nx::network::http::Response
+    struct Response
+    {
+        SystemError::ErrorCode systemError = SystemError::noError;
+        nx::network::http::StatusLine statusLine;
+        nx::network::http::StringType contentType;
+        nx::network::http::HttpHeaders headers;
+        nx::network::http::BufferType messageBody;
+
+        /** Clean up all internal values to default state. */
+        void reset();
+        // TODO: Here we can add more parsers
+    };
+
+    using HttpCompletionFunc = std::function<void (
+        int handle,
+        SystemError::ErrorCode errorCode,
+        int statusCode,
+        nx::network::http::StringType contentType,
+        nx::network::http::BufferType msgBody,
+        const nx::network::http::HttpHeaders& headers)>;
+
+    using Clock = std::chrono::steady_clock;
+    using TimePoint = std::chrono::time_point<Clock>;
+
+    /**
+     * Wraps up all the data for request, response and all intermediate routines.
+     * Context exists all the time from request creation to the point response is handled.
+     * Its data can be accessed from following threads:
+     *  - thread for ClientPool::sendRequest
+     *  - AioThread, at a callback at_HttpClientDone
+     */
+    struct Context
+    {
+        enum class State
+        {
+            initial,
+            sending,
+            waitingResponse,
+            /** Got an error in RestResponse */
+            hasResponse,
+            /** Failed to get any response due to network error. */
+            noResponse,
+        };
+        State state = State::initial;
+        Request request;
+        Response response;
+        /** Time when request was sent to AsyncHttpClientPtr. */
+        TimePoint stampSent;
+        /** Time when response was received by ClientPool. */
+        TimePoint stampReceived;
+        /** Handle of request being served by this connection right now. */
+        int handle = 0;
+        /** Callback to be called when response is received. */
+        HttpCompletionFunc completionFunc;
+
+        mutable QnMutex mutex;
+
+        bool hasResponse() const;
+        StatusCode::Value getStatusCode() const;
+        nx::utils::Url getUrl() const;
+    };
+    using ContextPtr = QSharedPointer<Context>;
 
     ClientPool(QObject *parent = nullptr);
     virtual ~ClientPool();
@@ -65,7 +133,9 @@ public:
     /**
      * It is used to run all the requests from rest::ServerConnection.
      */
-    int sendRequest(const Request& request);
+    //int sendRequest(Request&& request);
+
+    int sendRequest(ContextPtr request);
 
     void terminate(int handle);
     void setPoolSize(int value);
@@ -78,8 +148,11 @@ public:
         std::chrono::milliseconds response,
         std::chrono::milliseconds messageBody);
 
+    /** Fills in response data to Context, using response from httpClient. */
+    static void readHttpResponse(Context& context, AsyncHttpClientPtr httpClient);
+
 signals:
-    void done(int requestId, AsyncHttpClientPtr httpClient);
+    void requestIsDone(QSharedPointer<Context> context);
 
 private slots:
     void at_HttpClientDone(AsyncHttpClientPtr httpClient);
@@ -87,24 +160,15 @@ private slots:
 private:
     AsyncHttpClientPtr createHttpConnection();
 
-    struct HttpConnection
-    {
-        HttpConnection(AsyncHttpClientPtr client = AsyncHttpClientPtr(), int handle = 0):
-            client(client),
-            handle(handle)
-        {
-            idleTimeout.restart();
-        }
-
-        AsyncHttpClientPtr client;
-        QElapsedTimer idleTimeout;
-        /** Handle of request being served by this connection right now. */
-        int handle;
-    };
+    /**
+     * Contains http connection and data for active request.
+     * HttpConnection instance is reused after request is complete.
+     */
+    struct HttpConnection;
 
 private:
     HttpConnection* getUnusedConnection(const nx::utils::Url &url);
-    void sendRequestUnsafe(const Request& request, AsyncHttpClientPtr httpClient);
+    void sendRequestUnsafe(ContextPtr context, AsyncHttpClientPtr httpClient);
     void sendNextRequestUnsafe();
     void cleanupDisconnectedUnsafe();
 
@@ -112,7 +176,9 @@ private:
     mutable QnMutex m_mutex;
     typedef std::unique_ptr<HttpConnection> HttpConnectionPtr;
     std::multimap<QString /*endpointWithProtocol*/, HttpConnectionPtr> m_connectionPool;
-    std::map<int, Request> m_awaitingRequests;
+
+    /** A sequence of requests to be passed to connection pool to process. */
+    std::map<int, ContextPtr> m_awaitingRequests;
     int m_maxPoolSize;
     int m_requestId;
     std::chrono::milliseconds m_defaultRequestTimeout{std::chrono::minutes(1)};
