@@ -177,6 +177,7 @@ if(IOS)
     setup_ios_application(mobile_client
         ADDITIONAL_PLUGINS qtmedia_audioengine qtaudio_coreaudio qsvg
         QML_ROOT "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
+        TRANSLATIONS ${translation_files}
     )
 
     target_link_libraries(mobile_client PRIVATE
