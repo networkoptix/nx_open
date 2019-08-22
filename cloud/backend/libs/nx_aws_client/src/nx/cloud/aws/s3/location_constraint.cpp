@@ -1,7 +1,9 @@
 #include "location_constraint.h"
 
-#include <vector>
 #include <functional>
+#include <vector>
+
+#include <QRegularExpression>
 
 namespace nx::cloud::aws {
 
@@ -18,52 +20,26 @@ static constexpr char kLocationTemplate[] = R"xml(
     <LocationConstraint xmlns="http://s3.amazonaws.com/doc/2006-03-01/">%1</LocationConstraint>
 )xml";
 
+static constexpr char kLocationConstraint[] = "LocationConstraint";
+static constexpr char kRegion[] = "Region";
+
+std::string getTagValue(const QString& tag, const QByteArray& messageBody)
+{
+    QRegularExpression regex("<" + tag + ".*>(.*)</" + tag + ">");
+    return regex.match(messageBody).captured(1).toStdString();
+}
+
 static std::string parseLocationConstraintResponse(const QByteArray& messageBody)
 {
-    /**
-     * Parses aws-region-x between tags <LocationConstraint>aws-region-x</LocationRestraint>
-     * if </LocationConstraint> end tag is missing, the region is assumed to be us-east-1 per
-     * AWS docs: https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
-     */
-
-    static constexpr char kLocationConstraint[] = "LocationConstraint";
-    if (messageBody.indexOf(kLocationConstraint) == -1) //< Required xml tag is missing
-        return {};
-
-    static constexpr char kXmlEndTag[] = "</LocationConstraint>";
-
-    int end = messageBody.indexOf(kXmlEndTag);
-    if (end == -1)
+    auto value = getTagValue(kLocationConstraint, messageBody);
+    if (value.empty() && messageBody.contains(kLocationConstraint))
         return kDefaultRegion;
-
-    for (int i = end - 1; i >= 0; --i)
-    {
-        if (messageBody.at(i) == '>')
-            return messageBody.mid(i + 1, end - i - 1).trimmed().toStdString();
-    }
-
-    return {};
+    return value;
 }
 
 static std::string parseWrongRegionResponse(const QByteArray& messageBody)
 {
-    // Parses 'aws-region-x' between tags: <Region>aws-region-x</Region>
-    static QByteArray kRegionStartTag = "<Region>";
-    static QByteArray kRegionEndTag = "</Region>";
-
-    int start = messageBody.indexOf(kRegionStartTag);
-    if (start == -1)
-        return {};
-    start += kRegionStartTag.size();
-
-    int end = messageBody.indexOf(kRegionEndTag, start);
-    if (end == -1)
-        return {};
-
-    if (end <= start)
-        return {};
-
-    return messageBody.mid(start, end - start).trimmed().toStdString();
+    return getTagValue(kRegion, messageBody);
 }
 
 static std::vector<std::function<std::string(const QByteArray&)>> kLocationXmlParsers = {
