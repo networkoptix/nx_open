@@ -3369,7 +3369,7 @@ nx::utils::log::Settings MediaServerProcess::makeLogSettings(
     s.loggers.front().maxBackupCount = settings.logArchiveSize();
     s.loggers.front().directory = settings.logDir();
     s.loggers.front().maxFileSize = settings.maxLogFileSize();
-    s.updateDirectoryIfEmpty(settings.dataDir());
+    s.updateDirectoryIfEmpty(settings.dataDir() + "/log");
 
     for (const auto& loggerArg: cmdLineArguments().auxLoggers)
     {
