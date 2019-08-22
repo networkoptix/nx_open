@@ -580,7 +580,7 @@ void QnClientModule::initLog()
         ? ("client_log" + logFileNameSuffix)
         : logFile;
     logSettings.updateDirectoryIfEmpty(
-        QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/log");
 
     setMainLogger(
         buildLogger(logSettings, qApp->applicationName(), qApp->applicationFilePath()));
@@ -599,7 +599,7 @@ bool QnClientModule::initLogFromFile(const QString& filename, const QString& suf
 
     return nx::utils::log::initializeFromConfigFile(
         logConfigFile,
-        QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/log",
         qApp->applicationName(),
         qApp->applicationFilePath(),
         suffix);
