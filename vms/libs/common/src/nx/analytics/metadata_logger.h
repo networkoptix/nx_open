@@ -23,7 +23,7 @@ public:
     ~MetadataLogger();
 
     void pushData(
-        const QnConstAbstractMediaDataPtr& data,
+        const QnConstAbstractMediaDataPtr& abstractMediaData,
         const QString& additionalInfo = QString());
 
     void pushFrameInfo(
