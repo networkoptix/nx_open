@@ -2,6 +2,8 @@ import QtQuick 2.6
 import QtQuick.Controls.impl 2.4
 import QtQuick.Layouts 1.11
 
+import Nx.Controls 1.0
+
 import "private"
 
 TileBase
