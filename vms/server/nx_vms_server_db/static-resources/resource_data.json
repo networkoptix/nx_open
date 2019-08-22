@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.108",
+    "version": "1.0.1.109",
     "data": [
         {
             "keys": [
@@ -993,11 +993,11 @@
             "isRTSPSupported": false
         },
         {
-            "keys": ["ArecontVision|20185DN", "ArecontVision|AV20CPD-118"],
+            "keys": ["ArecontVision|20185DN", "ArecontVision|AV20CPD-118","ArecontVision|AV08CPD-118" ],
             "forceRtspSupport": true
         },
         {
-            "keys": ["ArecontVision|AV20CPD-118"],
+            "keys": ["ArecontVision|AV20CPD-118","ArecontVision|AV08CPD-118" ],
             "totalMdZones": 1024
         },
         {
