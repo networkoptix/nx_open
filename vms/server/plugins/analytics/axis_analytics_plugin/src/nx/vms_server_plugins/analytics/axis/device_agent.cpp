@@ -57,14 +57,10 @@ void DeviceAgent::doSetNeededMetadataTypes(
         *outResult = error(ErrorCode::internalError, kMessage);
         return;
     }
+    stopFetchingMetadata();
 
-    if (eventTypeIds->count() == 0)
-    {
-        stopFetchingMetadata();
-        return;
-    }
-
-    *outResult = startFetchingMetadata(neededMetadataTypes);
+    if (eventTypeIds->count() != 0)
+        *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
 void DeviceAgent::doSetSettings(
