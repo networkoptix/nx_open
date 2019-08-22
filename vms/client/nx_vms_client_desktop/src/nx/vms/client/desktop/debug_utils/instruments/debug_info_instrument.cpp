@@ -1,9 +1,6 @@
 #include "debug_info_instrument.h"
 
-#include <QtCore/QElapsedTimer>
-
 #include <client/client_runtime_settings.h>
-
 #include <boost/circular_buffer.hpp>
 #include <nx/utils/math/fuzzy.h>
 #include <nx/utils/log/log.h>
@@ -29,13 +26,66 @@ static constexpr int kMaxThreadCount = 250; //< More is considered as suspicious
 
 } // namespace
 
+DebugMetric::DebugMetric(std::chrono::milliseconds interval, bool profileMode)
+    :updateInterval(interval), profileMode(profileMode)
+{}
+
+void DebugMetric::restart()
+{
+    timer.restart();
+}
+
+void DebugMetric::invalidate()
+{
+    timer.invalidate();
+}
+
+bool DebugMetric::needProfileMode() const
+{
+    return profileMode;
+}
+
+bool DebugMetric::check()
+{
+    if (!timer.hasExpired(updateInterval.count()))
+        return false;
+    updateData();
+    timer.restart();
+    return true;
+}
+
+#if defined(Q_OS_WIN)
+class WindowsHandlesMetric: public DebugMetric
+{
+public:
+    WindowsHandlesMetric(): DebugMetric(kHandlesInterval) {}
+
+    virtual void submitData(QStringList& debugInfoLines) override
+    {
+        if (gdiHandleCount)
+            debugInfoLines.append(QString("GDI: %1").arg(*gdiHandleCount));
+        if (userHandleCount)
+            debugInfoLines.append(QString("User: %1").arg(*userHandleCount));
+    }
+
+    virtual void updateData() override
+    {
+        const auto processHandle = GetCurrentProcess();
+        gdiHandleCount = GetGuiResources(processHandle, GR_GDIOBJECTS);
+        userHandleCount = GetGuiResources(processHandle, GR_USEROBJECTS);
+    }
+
+    std::optional<int> gdiHandleCount;
+    std::optional<int> userHandleCount;
+};
+#endif
+
 struct DebugInfoInstrument::Private
 {
     const bool profilerMode = ini().profilerMode;
     const int updateIntervalMs = profilerMode ? 10000 : 1000;
 
     QElapsedTimer fpsTimer;
-    QElapsedTimer handlesTimer;
     QElapsedTimer threadsTimer;
     QElapsedTimer logTimer;
     QElapsedTimer totalTimer;
@@ -46,24 +96,13 @@ struct DebugInfoInstrument::Private
     qint64 frameTimeMs = 0;
     boost::circular_buffer<qint64> frameTimePoints{
         static_cast<std::size_t>(ini().storeFrameTimePoints)};
-    std::optional<int> gdiHandleCount;
-    std::optional<int> userHandleCount;
     std::optional<int> threadCount;
+
+    std::list<std::unique_ptr<DebugMetric>> metrics;
 
     QString highlightedLine(const QString& line) const
     {
         return QString("<span style=\"font-weight: bold; color: red;\">%1</span>").arg(line);
-    }
-
-    void updateHandles()
-    {
-        if (!profilerMode)
-            return;
-        #if defined(Q_OS_WIN)
-            const auto processHandle = GetCurrentProcess();
-            gdiHandleCount = GetGuiResources(processHandle, GR_GDIOBJECTS);
-            userHandleCount = GetGuiResources(processHandle, GR_USEROBJECTS);
-        #endif
     }
 
     void updateThreads()
@@ -118,10 +157,6 @@ struct DebugInfoInstrument::Private
         else
         {
             debugInfoLines.append(QString("%1 (%2ms)").arg(fps).arg(frameTimeMs));
-            if (gdiHandleCount)
-                debugInfoLines.append(QString("GDI: %1").arg(*gdiHandleCount));
-            if (userHandleCount)
-                debugInfoLines.append(QString("User: %1").arg(*userHandleCount));
             if (threadCount)
             {
                 auto threadsLine = QString("Threads: %1").arg(*threadCount);
@@ -129,6 +164,8 @@ struct DebugInfoInstrument::Private
                     threadsLine = highlightedLine(threadsLine);
                 debugInfoLines.append(threadsLine);
             }
+            for (auto& metric: metrics)
+                metric->submitData(debugInfoLines);
         }
         return debugInfoLines.join("<br>");
     }
@@ -139,6 +176,10 @@ DebugInfoInstrument::DebugInfoInstrument(QObject* parent):
     d(new Private())
 {
     d->totalTimer.start();
+
+    #if defined(Q_OS_WIN)
+    addDebugMetric(new WindowsHandlesMetric());
+    #endif
 }
 
 DebugInfoInstrument::~DebugInfoInstrument()
@@ -157,19 +198,26 @@ std::vector<qint64> DebugInfoInstrument::getFrameTimePoints()
 void DebugInfoInstrument::enabledNotify()
 {
     d->fpsTimer.restart();
-    d->handlesTimer.restart();
     d->threadsTimer.restart();
     d->logTimer.restart();
     d->frameCount = 0;
+    for (auto& metric: d->metrics)
+        metric->restart();
 }
 
 void DebugInfoInstrument::aboutToBeDisabledNotify()
 {
     d->logTimer.invalidate();
-    d->handlesTimer.invalidate();
     d->threadsTimer.invalidate();
     d->fpsTimer.invalidate();
     d->frameCount = 0;
+    for (auto& metric: d->metrics)
+        metric->invalidate();
+}
+
+void DebugInfoInstrument::addDebugMetric(std::unique_ptr<DebugMetric> metric)
+{
+    d->metrics.push_back(std::move(metric));
 }
 
 bool DebugInfoInstrument::paintEvent(QWidget* /*viewport*/, QPaintEvent* /*event*/)
@@ -188,13 +236,6 @@ bool DebugInfoInstrument::paintEvent(QWidget* /*viewport*/, QPaintEvent* /*event
         changed = true;
     }
 
-    if (d->handlesTimer.hasExpired(kHandlesInterval.count()))
-    {
-        d->updateHandles();
-        d->handlesTimer.restart();
-        changed = true;
-    }
-
     if (d->threadsTimer.hasExpired(kThreadsInterval.count()))
     {
         d->updateThreads();
@@ -202,22 +243,28 @@ bool DebugInfoInstrument::paintEvent(QWidget* /*viewport*/, QPaintEvent* /*event
         changed = true;
     }
 
+    for (auto& metric: d->metrics)
+    {
+        if (metric->needProfileMode() && !d->profilerMode)
+            continue;
+        changed |= metric->check();
+    }
+
     if (d->logTimer.hasExpired(kLogInterval.count()))
     {
-        if (d->gdiHandleCount || d->userHandleCount || d->threadCount)
-        {
-            QStringList logMessageLines;
-            if (d->gdiHandleCount)
-                logMessageLines.append(QString("GDI: %1").arg(*d->gdiHandleCount));
-            if (d->userHandleCount)
-                logMessageLines.append(QString("User: %1").arg(*d->userHandleCount));
-            if (d->threadCount)
-                logMessageLines.append(QString("Threads: %1").arg(*d->threadCount));
+        QStringList logMessageLines;
+        if (d->threadCount)
+            logMessageLines.append(QString("Threads: %1").arg(*d->threadCount));
 
+        for (auto& metric: d->metrics)
+            metric->submitData(logMessageLines);
+
+        if (!logMessageLines.empty())
+        {
             NX_INFO(this, lm(QString("Client profiling info: %1")
                 .arg(logMessageLines.join(", "))));
-            d->logTimer.restart();
         }
+        d->logTimer.restart();
     }
 
     if (changed)

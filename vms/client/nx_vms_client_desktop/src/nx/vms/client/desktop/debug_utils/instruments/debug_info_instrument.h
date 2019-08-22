@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QVector>
 #include <QtCore/QObject>
 #include <QtCore/QString>
@@ -10,6 +11,27 @@
 
 namespace nx::vms::client::desktop {
 
+class DebugMetric
+{
+public:
+    DebugMetric(std::chrono::milliseconds interval, bool profileMode = true);
+    virtual ~DebugMetric() = default;
+    virtual void submitData(QStringList& debugInfoLines) = 0;
+    virtual void updateData() = 0;
+
+    void restart();
+    void invalidate();
+    bool needProfileMode() const;
+
+    // Checks if metric was updated
+    bool check();
+
+protected:
+    QElapsedTimer timer;
+    std::chrono::milliseconds updateInterval;
+    bool profileMode = true;
+};
+
 class DebugInfoInstrument: public Instrument
 {
     Q_OBJECT
@@ -19,6 +41,7 @@ public:
     virtual ~DebugInfoInstrument() override;
 
     std::vector<qint64> getFrameTimePoints();
+    void addDebugMetric(std::unique_ptr<DebugMetric> metric);
 
 signals:
     void debugInfoChanged(const QString& richText);
