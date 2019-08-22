@@ -3369,7 +3369,7 @@ nx::utils::log::Settings MediaServerProcess::makeLogSettings(
     s.loggers.front().maxBackupCount = settings.logArchiveSize();
     s.loggers.front().directory = settings.logDir();
     s.loggers.front().maxFileSize = settings.maxLogFileSize();
-    s.updateDirectoryIfEmpty(settings.dataDir());
+    s.updateDirectoryIfEmpty(settings.dataDir() + "/log");
 
     for (const auto& loggerArg: cmdLineArguments().auxLoggers)
     {
@@ -3390,24 +3390,37 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
 
     const auto binaryPath = QFile::decodeName(m_argv[0]);
 
-    // TODO: Implement "--log-file" option like in client_startup_parameters.cpp.
-
-    auto logSettings = makeLogSettings(settings);
-    logSettings.loggers.front().level.parse(cmdLineArguments().logLevel,
-        settings.logLevel(), toString(nx::utils::log::kDefaultLevel));
-    logSettings.loggers.front().logBaseName = "log_file";
-    setMainLogger(
-        buildLogger(
-            logSettings,
+    const QString logConfigFile(
+        QDir(nx::kit::IniConfig::iniFilesDir()).absoluteFilePath("nx_vms_server_log.ini"));
+    if (cmdLineArguments().logLevel.isEmpty() && QFile::exists(logConfigFile))
+    {
+        initializeFromConfigFile(
+            logConfigFile,
+            settings.logDir().isEmpty() ? settings.dataDir() + "/log" : settings.logDir(),
             qApp->applicationName(),
-            binaryPath));
+            binaryPath);
+    }
+    else
+    {
+        // TODO: Implement "--log-file" option like in client_startup_parameters.cpp.
+
+        auto logSettings = makeLogSettings(settings);
+        logSettings.loggers.front().level.parse(cmdLineArguments().logLevel,
+            settings.logLevel(), toString(nx::utils::log::kDefaultLevel));
+        logSettings.loggers.front().logBaseName = "log_file";
+        setMainLogger(
+            buildLogger(
+                logSettings,
+                qApp->applicationName(),
+                binaryPath));
+    }
 
     if (auto path = mainLogger()->filePath())
         roSettings->setValue("logFile", path->replace(".log", ""));
     else
         roSettings->remove("logFile");
 
-    logSettings = makeLogSettings(settings);
+    auto logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().httpLogLevel,
         settings.httpLogLevel(), toString(Level::none));
     logSettings.loggers.front().logBaseName = "http_log";

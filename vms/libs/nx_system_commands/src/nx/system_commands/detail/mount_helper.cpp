@@ -1,4 +1,5 @@
 #include "mount_helper.h"
+#include "escape_quotes.h"
 #include <sstream>
 #include <cctype>
 #include <iostream>
@@ -11,8 +12,8 @@ MountHelper::MountHelper(
     const boost::optional<std::string>& password,
     const MountHelperDelegates& delegates)
     :
-    m_username(username ? *username : "guest"),
-    m_password(password ? *password : ""),
+    m_username(username ? escapeQuotes(*username) : "guest"),
+    m_password(password ? escapeQuotes(*password) : ""),
     m_delegates(delegates)
 {
     if (username && !checkAndParseUsername())
@@ -29,7 +30,7 @@ SystemCommands::MountCode MountHelper::mount(
     if (m_invalidUsername)
         return SystemCommands::MountCode::otherError;
 
-    m_url = url;
+    m_url = escapeQuotes(url);
     m_directory = directory;
 
     if (m_url.size() < 3 || m_url[0] != '/' || m_url[1] != '/' || !isalnum(m_url[2]))

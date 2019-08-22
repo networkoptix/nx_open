@@ -87,7 +87,7 @@
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>OFFLINE</translation>
+      <translation>ODŁĄCZONY</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>

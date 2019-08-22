@@ -83,7 +83,7 @@
     <name>SystemTile</name>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation>НЕСУМІСНА</translation>
+      <translation>НЕСУМІСНИЙ</translation>
     </message>
     <message>
       <source>OFFLINE</source>

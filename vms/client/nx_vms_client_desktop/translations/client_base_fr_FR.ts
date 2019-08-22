@@ -1722,24 +1722,12 @@ pour afficher plus de signets</translation>
       <translation>Serveur mis à jour</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Règle d'affaires mis à jour</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Serveur retiré</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Règle d'affaires retiré</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Usager retiré</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Règle d'affaires réinitialisé</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1835,6 +1823,18 @@ pour afficher plus de signets</translation>
         <numerusform>%n action</numerusform>
         <numerusform>%n actions</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation type="unfinished">Event rule changed</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation type="unfinished">Event rule removed</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation type="unfinished">Event rules reset to default</translation>
     </message>
   </context>
   <context>

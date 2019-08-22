@@ -89,7 +89,7 @@ AbstractPeerManager::RequestContextPtr<QByteArray> InternetOnlyPeerManager::down
     auto promise = std::make_shared<std::promise<std::optional<QByteArray>>>();
 
     httpClient->doGet(url,
-        [promise, httpClient = httpClient.get(), thread = thread()]()
+        [promise, httpClient = httpClient.get()]()
         {
             if (httpClient->hasRequestSucceeded())
                 setPromiseValueIfEmpty(promise, {httpClient->fetchMessageBodyBuffer()});

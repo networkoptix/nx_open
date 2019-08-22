@@ -1,5 +1,5 @@
 <div class="container">
-    <h1><a href="#/metrics/">New: System health report</a></h1>
+    <h1><a href="#/metrics/">신규: 시스템 상태 보고서</a></h1>
 </div>
 <div class="container">
     <h1>고급 서버 설정</h1>
@@ -120,7 +120,7 @@
     <h2>로그 설정</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} log level</label>
+            <label class="col-sm-4">{{name}} 로그 레벨</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
                     <option value="none">없음: 로그 사용할 수 없습니다.</option>
@@ -128,8 +128,8 @@
                     <option value="error">오류: 로그 오류만.</option>
                     <option value="warning">경고: 경고 및 오류 로그.</option>
                     <option value="info">정보: 오류, 경고 및 모든 메시지를 기록합니다.</option>
-                    <option value="debug">Debug: Log every System message and debug information.</option>
-                    <option value="verbose">Verbose: Log all information available.</option>
+                    <option value="debug">디버그: 모든 시스템 메시지와 디버그 정보를 기록.</option>
+                    <option value="verbose">자세한 정보: 모든 정보를 기록.</option>
                 </select>
             </div>
         </div>
@@ -138,7 +138,7 @@
         </div>
     </form>
 
-    <h1>Advanced System settings</h1>
+    <h1>고급 시스템 설정</h1>
     <div class="alert alert-danger" role="alert">
         <b>경고!</b> 변경사항으로 인해 시스템 오동작 될 수있습니다.
     </div>
@@ -186,7 +186,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Warning!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>주의!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >현재 서버 다시 시작</button>
         </div>
