@@ -125,10 +125,10 @@ void PermissionsTester::onDeleteFileDone(aws::Result result)
     nx::utils::swapAndCall(m_handler, api::Result(), m_bucketLocation);
 }
 
-void PermissionsTester::testFailed(std::string_view operation, const aws::Result& result)
+void PermissionsTester::testFailed(const char* operation, const aws::Result& result)
 {
-    NX_ERROR(this, "%1 failed: %2, %3",
-        operation.data(), aws::toString(result.code()).data(), result.text());
+    NX_DEBUG(this, "%1 failed: %2, %3",
+        operation, aws::toString(result.code()), result.text());
     nx::utils::swapAndCall(m_handler, utils::toResult(result), std::string());
 }
 

@@ -19,11 +19,21 @@ class PermissionsTester:
     using base_type = nx::network::aio::BasicPollable;
 
 public:
+    /**
+     * @param credentials the credentials of the s3 bucket at bucketUrl
+     * @param bucketUrl the url of the s3 bucket, e.g. "http://exampleBucket.s3.amazonaws.com"
+     */
     PermissionsTester(
         const network::http::Credentials& credentials,
         const nx::utils::Url& bucketUrl);
     ~PermissionsTester();
 
+    /**
+     * Resolves the location of the S3 bucket and performs a file upload, download, and deletion
+     * with a small amount data using credentials from the constructor.
+     * Upon successful completion, the location of the bucket, which needs to be resolved to do the
+     * test, is given to the caller.
+     */
     void doTest(nx::utils::MoveOnlyFunc<void(api::Result, std::string /*location*/)> handler);
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
@@ -40,7 +50,7 @@ private:
     void onDownloadFileDone(aws::Result result, nx::Buffer fileData);
     void onDeleteFileDone(aws::Result result);
 
-    void testFailed(std::string_view operation, const aws::Result& result);
+    void testFailed(const char* operation, const aws::Result& result);
 
 private:
     const network::http::Credentials m_credentials;
