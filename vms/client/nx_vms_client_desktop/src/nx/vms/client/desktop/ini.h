@@ -195,6 +195,13 @@ struct Ini: nx::kit::IniConfig
         "on scene items for cameras not satisfying Right Panel camera filter.\n"
         "If this flag isn't set, specific data satisfying other filters is displayed.\n"
         "If this flag is set, no data is displayed.");
+
+    NX_INI_INT(1, showAnalitycsObjectTypeOnCamera,
+        "Show analitics object type on the camera overlay. Different modes:\n"
+        " * 0 - Hide.\n"
+        " * 1 - Show only title.\n"
+        " * 2 - Show 'Type -> title'.\n"
+    );
 };
 
 inline Ini& ini()
