@@ -1722,24 +1722,12 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Szerver frissítve</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Üzleti szabályok frissítve</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Szerver eltávolítva</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Üzleti szabályok eltávolítva</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Felhasználó eltávolítva</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Üzleti szabályok visszaállítva</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1835,6 +1823,18 @@ több könyvjelző megjelenítéséhez</translation>
         <numerusform>%n actions</numerusform>
         <numerusform>%n actions</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation type="unfinished">Event rule changed</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation type="unfinished">Event rule removed</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation type="unfinished">Event rules reset to default</translation>
     </message>
   </context>
   <context>

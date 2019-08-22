@@ -1722,24 +1722,12 @@ nähdäksesi lisää kirjanmerkkejä</translation>
       <translation>Palvelin päivitetty</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Liiketoimintasääntö päivitetty</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Palvelin poistettu</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Liiketoimintasääntö poistettu</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Käyttäjä poistettu</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Liiketoimintasääntö palautettu</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1835,6 +1823,18 @@ nähdäksesi lisää kirjanmerkkejä</translation>
         <numerusform>%n toimintoa</numerusform>
         <numerusform>%n toimintoa</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation type="unfinished">Event rule changed</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation type="unfinished">Event rule removed</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation type="unfinished">Event rules reset to default</translation>
     </message>
   </context>
   <context>

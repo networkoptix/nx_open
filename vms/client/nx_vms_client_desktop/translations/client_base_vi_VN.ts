@@ -1705,24 +1705,12 @@ to view more bookmarks</source>
       <translation>Máy chủ cập nhật</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Quy tắc kinh doanh cập nhật</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Quy tắc kinh doanh cập nhật</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Quy luật kinh doanh bỏ</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Người dùng xóa</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Quy luật kinh doanh bỏ</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1817,6 +1805,18 @@ to view more bookmarks</source>
       <translation>
         <numerusform>%n hành động</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation type="unfinished">Event rule changed</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation type="unfinished">Event rule removed</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation type="unfinished">Event rules reset to default</translation>
     </message>
   </context>
   <context>
