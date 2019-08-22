@@ -6,7 +6,7 @@ namespace nx::utils {
 /**
  * Replaces every entry like "{name}" in templateString by calling resolve("name").
  */
-QString stringTemplate(
+NX_UTILS_API QString stringTemplate(
     const QString& template_,
     const std::function<QString(QStringRef name)> resolve);
 
