@@ -30,6 +30,7 @@
 #include <nx/analytics/frame_info.h>
 #include <nx/analytics/metadata_logger.h>
 #include <nx/analytics/analytics_logging_ini.h>
+#include <nx/analytics/object_type_descriptor_manager.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -205,8 +206,26 @@ WidgetAnalyticsController::Private::ObjectInfo&
     objectInfo.color = settings->objectColor(objectMetadata);
 
     objectInfo.rectangle = objectMetadata.boundingBox;
-    objectInfo.basicDescription = objectDescription(settings->briefAttributes(objectMetadata));
-    objectInfo.description = objectDescription(settings->visibleAttributes(objectMetadata));
+
+    QString objectTitle;
+    if (ini().showAnalitycsObjectTypeOnCamera > 0)
+    {
+        const auto descriptor = commonModule()->analyticsObjectTypeDescriptorManager()
+            ->descriptor(objectMetadata.typeId);
+        if (descriptor && !descriptor->name.isEmpty())
+        {
+            const bool showTypeKeyword = (ini().showAnalitycsObjectTypeOnCamera == 2);
+            objectTitle = showTypeKeyword
+                ? tr("Type") + '\t' + descriptor->name + '\n'
+                : descriptor->name + '\n';
+        }
+    }
+
+    objectInfo.basicDescription = objectTitle +
+        objectDescription(settings->briefAttributes(objectMetadata));
+    objectInfo.description = objectTitle +
+        objectDescription(settings->visibleAttributes(objectMetadata));
+    qDebug() << objectInfo.basicDescription;
 
     objectInfo.rawData = objectMetadata;
 
