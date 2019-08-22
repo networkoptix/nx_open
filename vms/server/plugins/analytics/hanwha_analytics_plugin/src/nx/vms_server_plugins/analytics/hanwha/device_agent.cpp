@@ -53,13 +53,10 @@ void DeviceAgent::doSetNeededMetadataTypes(
         return;
     }
 
-    if (eventTypeIds->count() == 0)
-    {
-        stopFetchingMetadata();
-        return;
-    }
+    stopFetchingMetadata();
 
-    *outResult = startFetchingMetadata(neededMetadataTypes);
+    if (eventTypeIds->count() != 0)
+        *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
 void DeviceAgent::doSetSettings(
