@@ -137,12 +137,7 @@ void assertionFailed(
 //-------------------------------------------------------------------------------------------------
 // Print info
 
-namespace detail {
-
-/**
- * @param bytesPerLine Used to calculate space padding, 0 means no padding.
- */
-static std::string hexDumpLine(const char* bytes, int size, int bytesPerLine)
+std::string hexDumpLine(const char* bytes, int size, int bytesPerLine)
 {
     if (size <= 0)
         return "";
@@ -172,6 +167,8 @@ static std::string hexDumpLine(const char* bytes, int size, int bytesPerLine)
     }
     return result;
 }
+
+namespace detail {
 
 static constexpr int kHexDumpBytesPerLine = 16;
 
