@@ -1721,24 +1721,12 @@ to view more bookmarks</source>
       <translation>Servidor actualizado</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Regla de negocio actualizada</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Servidor eliminado</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Regla de negocio eliminada</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Usuario eliminado</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Regla de Negocios se restablecieron</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1834,6 +1822,18 @@ to view more bookmarks</source>
         <numerusform>%n acciones</numerusform>
         <numerusform>%n acciones</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>Regla de evento cambiada</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>Regla de evento eliminada</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>Reglas de eventos restablecidas a las predeterminadas</translation>
     </message>
   </context>
   <context>

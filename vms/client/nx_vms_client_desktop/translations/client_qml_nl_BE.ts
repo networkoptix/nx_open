@@ -42,11 +42,11 @@
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Save password</source>
@@ -83,7 +83,7 @@
     <name>SystemTile</name>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation>NIET COMPATIBEL</translation>
+      <translation>INCOMPATIBELE</translation>
     </message>
     <message>
       <source>OFFLINE</source>
