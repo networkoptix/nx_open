@@ -137,6 +137,7 @@ wrappers::DeviceAgentPtr Engine::obtainDeviceAgent(QnVirtualCameraResourcePtr de
         NX_DEBUG(this, "Engine %1 (%2) returned null DeviceAgent for the Device %3 (%4)",
             engineResource->getName(), engineResource->getId(),
             device->getUserDefinedName(), device->getId());
+        return nullptr;
     }
 
     return std::make_shared<wrappers::DeviceAgent>(
