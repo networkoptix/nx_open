@@ -18,6 +18,7 @@
 #include "resource_tree_model_index_condition.h"
 
 namespace nx::vms::client::desktop {
+namespace test {
 
 class ResourceTreeModelTest: public testing::Test
 {
@@ -78,4 +79,5 @@ protected:
     QSharedPointer<QnResourceTreeSortProxyModel> m_resourceTreeProxyModel;
 };
 
+} // namespace test
 } // namespace nx::vms::client::desktop

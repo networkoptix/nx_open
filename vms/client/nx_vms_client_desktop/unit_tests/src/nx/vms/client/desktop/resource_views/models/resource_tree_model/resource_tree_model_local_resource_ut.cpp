@@ -9,20 +9,21 @@
 using namespace nx;
 using namespace nx::vms::api;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::index_condition;
+using namespace nx::vms::client::desktop::test;
+using namespace nx::vms::client::desktop::test::index_condition;
 
 TEST_F(ResourceTreeModelTest, offlineMediaResourcesAreNotDisplayed)
 {
     // String constants.
-    static constexpr auto imageFilePath = "picture.bmp";
-    static constexpr auto videoFilePath = "video.mov";
-    static constexpr auto layoutFilePath = "layout.nov";
+    static constexpr auto kImageFilePath = "picture.bmp";
+    static constexpr auto kVideoFilePath = "video.mov";
+    static constexpr auto kLayoutFilePath = "layout.nov";
 
     // Set up environment.
     loginAsAdmin("admin");
-    addLocalMedia(imageFilePath)->setStatus(Qn::Offline);
-    addLocalMedia(videoFilePath)->setStatus(Qn::Offline);
-    addLocalMedia(layoutFilePath)->setStatus(Qn::Offline);
+    addLocalMedia(kImageFilePath)->setStatus(Qn::Offline);
+    addLocalMedia(kVideoFilePath)->setStatus(Qn::Offline);
+    addLocalMedia(kLayoutFilePath)->setStatus(Qn::Offline);
 
     // Check tree.
     ASSERT_TRUE(onlyOneMatches(
@@ -34,21 +35,21 @@ TEST_F(ResourceTreeModelTest, offlineMediaResourcesAreNotDisplayed)
 
     ASSERT_TRUE(noneMatches(
         anyOf(
-            displayContains(imageFilePath),
-            displayContains(videoFilePath),
-            displayContains(layoutFilePath))));
+            displayContains(kImageFilePath),
+            displayContains(kVideoFilePath),
+            displayContains(kLayoutFilePath))));
 }
 
 TEST_F(ResourceTreeModelTest, localResourceVisibilityTransitions)
 {
     // String constants.
-    static constexpr auto resourceName = "test_resource.mkv";
+    static constexpr auto kResourceName = "test_resource.mkv";
 
     // Reference conditions.
-    const auto condition = displayFullMatch(resourceName);
+    const auto condition = displayFullMatch(kResourceName);
 
     // Perform actions and checks.
-    const auto mediaResource = addLocalMedia(resourceName);
+    const auto mediaResource = addLocalMedia(kResourceName);
     mediaResource->setStatus(Qn::Online);
     ASSERT_TRUE(onlyOneMatches(condition));
 

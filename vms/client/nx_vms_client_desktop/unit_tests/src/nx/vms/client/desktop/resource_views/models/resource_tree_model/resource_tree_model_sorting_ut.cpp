@@ -8,7 +8,8 @@
 using namespace nx;
 using namespace nx::vms::api;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::index_condition;
+using namespace nx::vms::client::desktop::test;
+using namespace nx::vms::client::desktop::test::index_condition;
 
 TEST_P(ResourceTreeModelSortingTest, sorting)
 {

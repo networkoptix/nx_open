@@ -8,115 +8,116 @@
 using namespace nx;
 using namespace nx::vms::api;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::index_condition;
+using namespace nx::vms::client::desktop::test;
+using namespace nx::vms::client::desktop::test::index_condition;
 
 TEST_F(ResourceTreeModelTest, webPageAdds)
 {
     // String constants.
-    static constexpr auto webPageName = "unique_web_page_name";
+    static constexpr auto kWebPageName = "unique_web_page_name";
 
     // Set up environment.
     loginAsAdmin("admin");
-    addWebPage(webPageName);
+    addWebPage(kWebPageName);
 
     // Check tree.
-    ASSERT_TRUE(onlyOneMatches(displayFullMatch(webPageName)));
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch(kWebPageName)));
 }
 
 TEST_F(ResourceTreeModelTest, webPageRemoves)
 {
     // String constants.
-    static constexpr auto webPageName = "unique_web_page_name";
+    static constexpr auto kWebPageName = "unique_web_page_name";
 
     // Set up environment.
     loginAsAdmin("admin");
-    auto webPage = addWebPage(webPageName);
+    auto webPage = addWebPage(kWebPageName);
 
     // Perform actions and checks.
-    ASSERT_TRUE(onlyOneMatches(displayFullMatch(webPageName)));
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch(kWebPageName)));
 
     resourcePool()->removeResource(webPage);
-    ASSERT_TRUE(noneMatches(displayFullMatch(webPageName)));
+    ASSERT_TRUE(noneMatches(displayFullMatch(kWebPageName)));
 }
 
 TEST_F(ResourceTreeModelTest, webPagesIcons)
 {
     // String constants.
-    static constexpr auto regularWebPageName = "regular_web_page_name";
-    static constexpr auto c2pWebPageName = "c2p_web_page_name";
+    static constexpr auto kRegularWebPageName = "regular_web_page_name";
+    static constexpr auto kC2pWebPageName = "c2p_web_page_name";
 
     // Set up environment.
     loginAsAdmin("admin");
-    auto regularWebPage = addWebPage(regularWebPageName);
-    auto c2pWebPage = addWebPage(c2pWebPageName);
+    auto regularWebPage = addWebPage(kRegularWebPageName);
+    auto c2pWebPage = addWebPage(kC2pWebPageName);
     regularWebPage->setSubtype(WebPageSubtype::none);
     c2pWebPage->setSubtype(WebPageSubtype::c2p);
 
     // Check tree.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            displayFullMatch(regularWebPageName),
+            displayFullMatch(kRegularWebPageName),
             iconTypeMatch(QnResourceIconCache::WebPage))));
 
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            displayFullMatch(c2pWebPageName),
+            displayFullMatch(kC2pWebPageName),
             iconTypeMatch(QnResourceIconCache::C2P))));
 }
 
 TEST_F(ResourceTreeModelTest, webPagesAreChildrenOfCorrespondingTopLevelNode)
 {
     // String constants.
-    static constexpr auto webPageName1 = "unique_web_page_name_1";
-    static constexpr auto webPageName2 = "unique_web_page_name_2";
+    static constexpr auto kWebPageName1 = "unique_web_page_name_1";
+    static constexpr auto kWebPageName2 = "unique_web_page_name_2";
 
     // Set up environment.
     loginAsAdmin("admin");
-    addWebPage(webPageName1);
-    addWebPage(webPageName2);
+    addWebPage(kWebPageName1);
+    addWebPage(kWebPageName2);
 
     // Check tree.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
             directChildOf(webPagesNodeCondition()),
-            displayFullMatch(webPageName1))));
+            displayFullMatch(kWebPageName1))));
 
     ASSERT_TRUE(onlyOneMatches(
         allOf(
             directChildOf(webPagesNodeCondition()),
-            displayFullMatch(webPageName2))));
+            displayFullMatch(kWebPageName2))));
 }
 
 TEST_F(ResourceTreeModelTest, webPageIsDisplayedToAnyUser)
 {
     // String constants.
-    static constexpr auto webPageName = "unique_web_page_name";
+    static constexpr auto kWebPageName = "unique_web_page_name";
 
     // Set up environment.
-    addWebPage(webPageName);
+    addWebPage(kWebPageName);
 
     // Perform actions and checks.
     loginAsAdmin("admin");
-    ASSERT_TRUE(onlyOneMatches(displayFullMatch(webPageName)));
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch(kWebPageName)));
 
     loginAsLiveViewer("live_viewer");
-    ASSERT_TRUE(onlyOneMatches(displayFullMatch(webPageName)));
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch(kWebPageName)));
 }
 
 TEST_F(ResourceTreeModelTest, webPageIsNotDisplayedIfNotLoggedIn)
 {
     // String constants.
-    static constexpr auto webPageName = "unique_web_page_name";
+    static constexpr auto kWebPageName = "unique_web_page_name";
 
     // Set up environment.
-    addWebPage(webPageName);
+    addWebPage(kWebPageName);
 
     // Perform actions and checks.
     loginAsAdmin("admin");
-    ASSERT_TRUE(onlyOneMatches(displayFullMatch(webPageName)));
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch(kWebPageName)));
 
     logout();
-    ASSERT_TRUE(noneMatches(displayFullMatch(webPageName)));
+    ASSERT_TRUE(noneMatches(displayFullMatch(kWebPageName)));
     ASSERT_TRUE(noneMatches(
         anyOf(
             iconTypeMatch(QnResourceIconCache::WebPage),
@@ -126,47 +127,47 @@ TEST_F(ResourceTreeModelTest, webPageIsNotDisplayedIfNotLoggedIn)
 TEST_F(ResourceTreeModelTest, webPageHelpTopic)
 {
     // String constants.
-    static constexpr auto webPageName = "unique_web_page_name";
+    static constexpr auto kWebPageName = "unique_web_page_name";
 
     // Set up environment.
-    addWebPage(webPageName);
+    addWebPage(kWebPageName);
     loginAsAdmin("admin");
 
     // Check tree.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            displayFullMatch(webPageName),
+            displayFullMatch(kWebPageName),
             dataMatch(Qn::HelpTopicIdRole, Qn::MainWindow_Tree_WebPage_Help))));
 }
 
 TEST_F(ResourceTreeModelTest, webPageTooltip)
 {
     // String constants.
-    static constexpr auto webPageName = "unique_web_page_name";
+    static constexpr auto kWebPageName = "unique_web_page_name";
 
     // Set up environment.
-    addWebPage(webPageName);
+    addWebPage(kWebPageName);
     loginAsAdmin("admin");
 
     // Check tree.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            displayFullMatch(webPageName),
-            dataMatch(Qt::ToolTipRole, webPageName))));
+            displayFullMatch(kWebPageName),
+            dataMatch(Qt::ToolTipRole, kWebPageName))));
 }
 
 TEST_F(ResourceTreeModelTest, webPageDisplayNameMapping)
 {
     // String constants.
-    static constexpr auto webPageName = "unique_web_page_name";
+    static constexpr auto kWebPageName = "unique_web_page_name";
 
     // Set up environment.
-    auto webPage = addWebPage(webPageName);
+    auto webPage = addWebPage(kWebPageName);
     loginAsAdmin("admin");
 
     // Check tree.
-    ASSERT_TRUE(onlyOneMatches(displayFullMatch(webPageName)));
-    ASSERT_EQ(webPage->getName(), webPageName);
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch(kWebPageName)));
+    ASSERT_EQ(webPage->getName(), kWebPageName);
 }
 
 // TODO: #vbreus user with live viewer permissions able to modify web page item due to absence of
@@ -175,22 +176,22 @@ TEST_F(ResourceTreeModelTest, webPageDisplayNameMapping)
 TEST_F(ResourceTreeModelTest, DISABLED_webPageItemIsEditableOnlyByAdmin)
 {
     // String constants.
-    static constexpr auto webPageName = "unique_web_page_name";
+    static constexpr auto kWebPageName = "unique_web_page_name";
 
     // Set up environment.
-    addWebPage(webPageName);
+    addWebPage(kWebPageName);
 
     // Perform actions and checks.
     loginAsAdmin("admin");
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            displayFullMatch(webPageName),
+            displayFullMatch(kWebPageName),
             hasFlag(Qt::ItemIsEditable))));
 
     loginAsLiveViewer("live_viewer");
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            displayFullMatch(webPageName),
+            displayFullMatch(kWebPageName),
             noneOf(hasFlag(Qt::ItemIsEditable)))));
 }
 
@@ -199,35 +200,35 @@ TEST_F(ResourceTreeModelTest, DISABLED_webPageItemIsEditableOnlyByAdmin)
 TEST_F(ResourceTreeModelTest, DISABLED_webPageEditActionAffectsResourceName)
 {
     // String constants.
-    static constexpr auto webPageName = "unique_web_page_name";
-    static constexpr auto newPageName = "renamed_web_page_name";
+    static constexpr auto kWebPageName = "unique_web_page_name";
+    static constexpr auto kNewWebPageName = "renamed_web_page_name";
 
     // Set up environment.
     loginAsAdmin("admin");
-    auto webPage = addWebPage(webPageName);
-    auto index = uniqueMatchingIndex(displayFullMatch(webPageName));
+    auto webPage = addWebPage(kWebPageName);
+    auto index = uniqueMatchingIndex(displayFullMatch(kWebPageName));
 
     // Perform actions and checks.
-    ASSERT_TRUE(onlyOneMatches(displayFullMatch(webPageName)));
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch(kWebPageName)));
 
-    model()->setData(index, newPageName);
-    ASSERT_TRUE(noneMatches(displayFullMatch(webPageName)));
-    ASSERT_TRUE(onlyOneMatches(displayFullMatch(newPageName)));
+    model()->setData(index, kNewWebPageName);
+    ASSERT_TRUE(noneMatches(displayFullMatch(kWebPageName)));
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch(kNewWebPageName)));
 }
 
 TEST_F(ResourceTreeModelTest, webPageItemIsDragEnabled)
 {
     // String constants.
-    static constexpr auto webPageName = "unique_web_page_name";
+    static constexpr auto kWebPageName = "unique_web_page_name";
 
     // Set up environment.
     loginAsAdmin("admin");
-    addWebPage(webPageName);
+    addWebPage(kWebPageName);
 
     // Check tree.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            displayFullMatch(webPageName),
+            displayFullMatch(kWebPageName),
             hasFlag(Qt::ItemIsDragEnabled))));
 }
 
@@ -235,17 +236,17 @@ TEST_F(ResourceTreeModelTest, webPageItemIsDragEnabled)
 TEST_F(ResourceTreeModelTest, DISABLED_webPageHasItemNeverHasChildrenFlag)
 {
     // String constants.
-    static constexpr auto webPageName = "unique_web_page_name";
+    static constexpr auto kWebPageName = "unique_web_page_name";
 
     // Set up environment.
     loginAsAdmin("admin");
-    addWebPage(webPageName);
+    addWebPage(kWebPageName);
 
     // Check tree.
-    ASSERT_TRUE(onlyOneMatches(displayFullMatch(webPageName)));
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch(kWebPageName)));
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            displayFullMatch(webPageName),
+            displayFullMatch(kWebPageName),
             hasFlag(Qt::ItemNeverHasChildren))));
 }
 
@@ -253,16 +254,16 @@ TEST_F(ResourceTreeModelTest, DISABLED_webPageHasItemNeverHasChildrenFlag)
 TEST_F(ResourceTreeModelTest, DISABLED_webPageItemIsNotDropEnabled)
 {
     // String constants.
-    static constexpr auto webPageName = "unique_web_page_name";
+    static constexpr auto kWebPageName = "unique_web_page_name";
 
     // Set up environment.
     loginAsAdmin("admin");
-    addWebPage(webPageName);
+    addWebPage(kWebPageName);
 
     // Check tree.
-    ASSERT_TRUE(onlyOneMatches(displayFullMatch(webPageName)));
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch(kWebPageName)));
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            displayFullMatch(webPageName),
+            displayFullMatch(kWebPageName),
             noneOf(hasFlag(Qt::ItemIsDropEnabled)))));
 }

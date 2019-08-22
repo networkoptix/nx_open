@@ -4,6 +4,7 @@
 #include "resource_tree_model_index_condition.h"
 
 namespace nx::vms::client::desktop {
+namespace test {
 
 using ConditionWithCaption = std::tuple<index_condition::Condition, std::string>;
 
@@ -21,4 +22,5 @@ public:
     };
 };
 
+} // namespace test
 } // namespace nx::vms::client::desktop

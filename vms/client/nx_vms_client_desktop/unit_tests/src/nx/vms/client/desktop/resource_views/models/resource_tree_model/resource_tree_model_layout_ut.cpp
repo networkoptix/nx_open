@@ -8,19 +8,20 @@
 using namespace nx;
 using namespace nx::vms::api;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::index_condition;
+using namespace nx::vms::client::desktop::test;
+using namespace nx::vms::client::desktop::test::index_condition;
 
 TEST_F(ResourceTreeModelTest, layoutModificationMark)
 {
     // String constants.
-    static constexpr auto layoutName = "unique_layout_name";
-    static constexpr auto modifiedLayoutName = "modified_layout_name";
+    static constexpr auto kLayoutName = "unique_layout_name";
+    static constexpr auto kModifiedLayoutName = "modified_layout_name";
 
     // Set up environment.
     const auto user = loginAsAdmin("admin");
     const auto userId = user->getId();
-    addLayout(layoutName, userId);
-    auto modifiedLayout = addLayout(modifiedLayoutName, userId);
+    addLayout(kLayoutName, userId);
+    auto modifiedLayout = addLayout(kModifiedLayoutName, userId);
     layoutSnapshotManager()->markChanged(modifiedLayout->getId(), true);
 
     // Check tree.
@@ -30,7 +31,7 @@ TEST_F(ResourceTreeModelTest, layoutModificationMark)
 
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            displayStartsWith(modifiedLayoutName),
+            displayStartsWith(kModifiedLayoutName),
             displayEndsWith("*"),
             directChildOf(layoutsNodeCondition()))));
 }

@@ -3,7 +3,7 @@
 #include <client/client_globals.h>
 
 namespace nx::vms::client::desktop {
-
+namespace test {
 namespace index_condition {
 
 Condition topLevelNode()
@@ -209,5 +209,5 @@ Condition webPagesNodeCondition()
 }
 
 } // namespace index_condition
-
+} // namespace test
 } // namespace nx::vms::client::desktop

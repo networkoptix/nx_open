@@ -15,29 +15,30 @@
 using namespace nx;
 using namespace nx::vms::api;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::index_condition;
+using namespace nx::vms::client::desktop::test;
+using namespace nx::vms::client::desktop::test::index_condition;
 
 TEST_F(ResourceTreeModelTest, shouldShowPinnedNodesIfLoggedIn)
 {
     // String constants.
-    static constexpr auto systemName = "test_system";
-    static constexpr auto userName = "test_admin";
+    static constexpr auto kSystemName = "test_system";
+    static constexpr auto kUserName = "test_admin";
 
     // Set up environment.
-    setSystemName(systemName);
-    loginAsAdmin(userName);
+    setSystemName(kSystemName);
+    loginAsAdmin(kUserName);
 
     // Check tree.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            displayFullMatch(systemName),
+            displayFullMatch(kSystemName),
             iconFullMatch(QnResourceIconCache::CurrentSystem),
             topLevelNode(),
             atRow(0))));
 
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            displayFullMatch(userName),
+            displayFullMatch(kUserName),
             iconFullMatch(QnResourceIconCache::User),
             topLevelNode(),
             atRow(1))));
@@ -53,16 +54,16 @@ TEST_F(ResourceTreeModelTest, shouldShowPinnedNodesIfLoggedIn)
 TEST_F(ResourceTreeModelTest, singleServerShouldBeTopLevelNode)
 {
     // String constants.
-    static constexpr auto serverName = "test_server";
+    static constexpr auto kServerName = "test_server";
 
     // Set up environment.
     loginAsAdmin("admin");
-    addServer(serverName);
+    addServer(kServerName);
 
     // Check tree.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            displayFullMatch(serverName),
+            displayFullMatch(kServerName),
             iconTypeMatch(QnResourceIconCache::Server),
             topLevelNode(),
             atRow(3))));
@@ -71,13 +72,13 @@ TEST_F(ResourceTreeModelTest, singleServerShouldBeTopLevelNode)
 TEST_F(ResourceTreeModelTest, shouldGroupServersIfNotSingle)
 {
     // String constants.
-    static constexpr auto serverName1 = "test_server_1";
-    static constexpr auto serverName2 = "test_server_2";
+    static constexpr auto kServerName1 = "test_server_1";
+    static constexpr auto kServerName2 = "test_server_2";
 
     // Set up environment.
     loginAsAdmin("admin");
-    addServer(serverName1);
-    addServer(serverName2);
+    addServer(kServerName1);
+    addServer(kServerName2);
 
     // Check tree.
     ASSERT_TRUE(onlyOneMatches(
@@ -89,7 +90,7 @@ TEST_F(ResourceTreeModelTest, shouldGroupServersIfNotSingle)
 
     ASSERT_EQ(2, matchCount(
         allOf(
-            anyOf(displayFullMatch(serverName1), displayFullMatch(serverName2)),
+            anyOf(displayFullMatch(kServerName1), displayFullMatch(kServerName2)),
             iconTypeMatch(QnResourceIconCache::Server),
             noneOf(topLevelNode()))));
 }
@@ -160,29 +161,29 @@ TEST_F(ResourceTreeModelTest, showreelsNodeAreDisplayedOnlyIfShowreelsExist)
 TEST_F(ResourceTreeModelTest, topLevelNodesOrder)
 {
     // String constants.
-    static constexpr auto systemName = "test_system";
-    static constexpr auto userName = "test_admin";
-    static constexpr auto serverName = "test_server";
-    static constexpr auto videowallName = "videowall";
+    static constexpr auto kSystemName = "test_system";
+    static constexpr auto kUserName = "test_admin";
+    static constexpr auto kServerName = "test_server";
+    static constexpr auto kVideowallName = "videowall";
 
     // Set up environment.
-    setSystemName(systemName);
-    const auto user = loginAsAdmin(userName);
+    setSystemName(kSystemName);
+    const auto user = loginAsAdmin(kUserName);
     const auto userId = user->getId();
-    addServer(serverName);
+    addServer(kServerName);
     addLayout("layout", userId);
-    addVideoWall(videowallName);
+    addVideoWall(kVideowallName);
     addLayoutTour("showreel", userId);
 
     // Reference data.
     std::vector<QString> referenceSequence = {
-        systemName,
-        userName,
+        kSystemName,
+        kUserName,
         "",
-        serverName,
+        kServerName,
         "Layouts",
         "Showreels",
-        videowallName,
+        kVideowallName,
         "Web Pages",
         "Users",
         "Local Files"};

@@ -10,72 +10,73 @@
 using namespace nx;
 using namespace nx::vms::api;
 using namespace nx::vms::client::desktop;
-using namespace nx::vms::client::desktop::index_condition;
+using namespace nx::vms::client::desktop::test;
+using namespace nx::vms::client::desktop::test::index_condition;
 
 TEST_F(ResourceTreeModelTest, showreelAdds)
 {
     // String constants.
-    static constexpr auto showreelName = "unique_showreel_name";
+    static constexpr auto kShowreelName = "unique_showreel_name";
 
     // Set up environment.
     loginAsAdmin("admin");
-    addLayoutTour(showreelName);
+    addLayoutTour(kShowreelName);
 
     // Check tree.
-    ASSERT_TRUE(onlyOneMatches(displayFullMatch(showreelName)));
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch(kShowreelName)));
 }
 
 TEST_F(ResourceTreeModelTest, showreelRemoves)
 {
     // String constants.
-    static constexpr auto showreelName = "unique_showreel_name";
+    static constexpr auto kShowreelName = "unique_showreel_name";
 
     // Set up environment.
     loginAsAdmin("admin");
-    auto showreel = addLayoutTour(showreelName);
+    auto showreel = addLayoutTour(kShowreelName);
 
     // Perform actions and checks.
-    ASSERT_TRUE(onlyOneMatches(displayFullMatch(showreelName)));
+    ASSERT_TRUE(onlyOneMatches(displayFullMatch(kShowreelName)));
 
     commonModule()->layoutTourManager()->removeTour(showreel.id);
-    ASSERT_TRUE(noneMatches(displayFullMatch(showreelName)));
+    ASSERT_TRUE(noneMatches(displayFullMatch(kShowreelName)));
 }
 
 TEST_F(ResourceTreeModelTest, showreelIcon)
 {
     // String constants.
-    static constexpr auto showreelName = "unique_showreel_name";
+    static constexpr auto kShowreelName = "unique_showreel_name";
 
     // Set up environment.
     loginAsAdmin("admin");
-    addLayoutTour(showreelName);
+    addLayoutTour(kShowreelName);
 
     // Check tree.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
-            displayFullMatch(showreelName),
+            displayFullMatch(kShowreelName),
             iconTypeMatch(QnResourceIconCache::LayoutTour))));
 }
 
 TEST_F(ResourceTreeModelTest, showreelsAreChildrenOfCorrespondingTopLevelNode)
 {
     // String constants.
-    static constexpr auto showreelName1 = "unique_showreel_name_1";
-    static constexpr auto showreelName2 = "unique_showreel_name_2";
+    static constexpr auto kShowreelName1 = "unique_showreel_name_1";
+    static constexpr auto kShowreelName2 = "unique_showreel_name_2";
 
     // Set up environment.
     loginAsAdmin("admin");
-    addLayoutTour(showreelName1);
-    addLayoutTour(showreelName2);
+    addLayoutTour(kShowreelName1);
+    addLayoutTour(kShowreelName2);
 
     // Check tree.
     ASSERT_TRUE(onlyOneMatches(
         allOf(
             directChildOf(showreelsNodeCondition()),
-            displayFullMatch(showreelName1))));
+            displayFullMatch(kShowreelName1))));
 
     ASSERT_TRUE(onlyOneMatches(
         allOf(
             directChildOf(showreelsNodeCondition()),
-            displayFullMatch(showreelName2))));
+            displayFullMatch(kShowreelName2))));
 }

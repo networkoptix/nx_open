@@ -6,7 +6,7 @@
 #include <ui/style/resource_icon_cache.h>
 
 namespace nx::vms::client::desktop {
-
+namespace test {
 namespace index_condition {
 
 using Condition = std::function<bool(const QModelIndex& index)>;
@@ -97,5 +97,5 @@ T noneOf(T condition, Args... conditions)
 }
 
 } // namespace index_condition
-
+} // namespace test
 } // namespace nx::vms::client::desktop
