@@ -51,7 +51,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::server::analytics::wrappers, 
         "manifestLogicalError"
     )
     (nx::vms::server::analytics::wrappers::ViolationType::nullEngine, "nullEngine")
-    (nx::vms::server::analytics::wrappers::ViolationType::nullDeviceAgent, "nullDeviceAgent")
     (nx::vms::server::analytics::wrappers::ViolationType::inconsistentActionResult,
         "inconsistentActionResult")
     (nx::vms::server::analytics::wrappers::ViolationType::invalidActionResultUrl,

@@ -108,6 +108,10 @@ wrappers::DeviceAgentPtr Engine::obtainDeviceAgent(QnVirtualCameraResourcePtr de
     if (!NX_ASSERT(engine))
         return nullptr;
 
+    const auto engineResource = this->engineResource();
+    if (!NX_ASSERT(engineResource))
+        return nullptr;
+
     const auto deviceInfo = sdk_support::deviceInfoFromResource(device);
     if (!deviceInfo)
     {
@@ -130,15 +134,15 @@ wrappers::DeviceAgentPtr Engine::obtainDeviceAgent(QnVirtualCameraResourcePtr de
 
     if (!result.value())
     {
-        return handleViolation(
-            SdkMethod::obtainDeviceAgent,
-            {ViolationType::nullDeviceAgent, /*details*/ QString()},
-            /*returnValue*/ nullptr);
+        NX_DEBUG(this, "Engine %1 (%2) returned null DeviceAgent for the Device %3 (%4)",
+            engineResource->getName(), engineResource->getId(),
+            device->getUserDefinedName(), device->getId());
+        return nullptr;
     }
 
     return std::make_shared<wrappers::DeviceAgent>(
         serverModule(),
-        engineResource(),
+        engineResource,
         device,
         result.value(),
         libName());

@@ -10,7 +10,7 @@ message(STATUS "Generating files for Storage SDK")
 
 set(sdk_name storage_sdk)
 set(zip_file ${distribution_output_dir}/${storage_sdk_distribution_name}.zip)
-set(server_resource_zip_file ${CMAKE_CURRENT_BINARY_DIR}/../sdk.zip)
+set(server_resource_zip_file ${CMAKE_CURRENT_BINARY_DIR}/../storage_sdk.zip)
 set(sdk_dir ${CMAKE_CURRENT_BINARY_DIR}/${sdk_name})
 set(logs_dir ${CMAKE_BINARY_DIR}/build_logs)
 set(sample_build_log ${logs_dir}/${sdk_name}_sample_build.log)

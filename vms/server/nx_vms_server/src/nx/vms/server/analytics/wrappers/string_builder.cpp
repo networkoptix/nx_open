@@ -38,8 +38,6 @@ static QString toHumanReadableString(ViolationType violation)
             return "Manifest contains logical errors";
         case ViolationType::nullEngine:
             return "Engine is null while no error present";
-        case ViolationType::nullDeviceAgent:
-            return "DeviceAgent is null while no error present";
         case ViolationType::inconsistentActionResult:
             return "Action result is inconsistent: more than one exclusive value returned";
         case ViolationType::invalidActionResultUrl:

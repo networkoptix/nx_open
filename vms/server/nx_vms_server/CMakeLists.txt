@@ -57,12 +57,10 @@ add_custom_command(
 
 set(old_sdk_static_resources "")
 if(TARGET nx_storage_sdk)
-    set(old_sdk_static_resources ${old_sdk_static_resources}
-        ${CMAKE_CURRENT_BINARY_DIR}/../storage_sdk.zip)
+    list(APPEND old_sdk_static_resources ${CMAKE_CURRENT_BINARY_DIR}/../storage_sdk.zip)
 endif()
 if(TARGET nx_camera_sdk)
-    set(old_sdk_static_resources ${old_sdk_static_resources}
-        ${CMAKE_CURRENT_BINARY_DIR}/../sdk.zip)
+    list(APPEND old_sdk_static_resources ${CMAKE_CURRENT_BINARY_DIR}/../sdk.zip)
 endif()
 
 set(static_resources
