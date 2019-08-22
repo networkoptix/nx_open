@@ -28,4 +28,4 @@ private:
     QUrlQuery m_query;
 };
 
-}
+} // namespace nx::utils

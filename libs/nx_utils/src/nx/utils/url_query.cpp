@@ -28,4 +28,4 @@ UrlQuery::operator const QUrlQuery&() const
     return m_query;
 }
 
-} // namespace nx::network::url
+} // namespace nx::utils
