@@ -225,7 +225,6 @@ WidgetAnalyticsController::Private::ObjectInfo&
         objectDescription(settings->briefAttributes(objectMetadata));
     objectInfo.description = objectTitle +
         objectDescription(settings->visibleAttributes(objectMetadata));
-    qDebug() << objectInfo.basicDescription;
 
     objectInfo.rawData = objectMetadata;
 
