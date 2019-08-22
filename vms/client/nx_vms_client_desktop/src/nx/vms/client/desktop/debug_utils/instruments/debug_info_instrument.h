@@ -11,19 +11,26 @@
 
 namespace nx::vms::client::desktop {
 
+/**
+ * Wraps all measurements for a specific metric.
+ */
 class DebugMetric
 {
 public:
     DebugMetric(std::chrono::milliseconds interval, bool profileMode = true);
     virtual ~DebugMetric() = default;
-    virtual void submitData(QStringList& debugInfoLines) = 0;
+
+    /** Called by DebugInfoInstrument to get output data. */
+    virtual void submitData(QStringList& debugInfoLines, bool toLog) = 0;
+
+    /** Called periodically to update internal data. */
     virtual void updateData() = 0;
 
     void restart();
     void invalidate();
     bool needProfileMode() const;
 
-    // Checks if metric was updated
+    /** Checks if internal data was updated. */
     bool check();
 
 protected:
