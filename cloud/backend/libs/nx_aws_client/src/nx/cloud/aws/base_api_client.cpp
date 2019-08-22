@@ -88,8 +88,7 @@ std::tuple<nx::String, bool> BaseApiClient::calculateAuthorizationHeader(
     const std::string& region,
     const std::string& service)
 {
-    SignatureCalculator calculator;
-    return calculator.calculateAuthorizationHeader(
+    return SignatureCalculator().calculateAuthorizationHeader(
         request,
         credentials,
         region,

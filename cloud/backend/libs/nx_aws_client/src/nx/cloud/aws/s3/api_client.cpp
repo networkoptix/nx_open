@@ -3,9 +3,8 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/url_query.h>
 
-
-#include "nx/cloud/aws/format_query.h"
 #include "nx/cloud/aws/http_request_paths.h"
 #include "aws_signature_v4.h"
 #include "http_request_paths.h"
@@ -16,6 +15,27 @@ namespace nx::cloud::aws::s3 {
 namespace {
 
 static constexpr char kAwsS3ServiceName[] = "s3";
+
+nx::utils::UrlQuery buildQuery(const ListBucketRequest& request)
+{
+    nx::utils::UrlQuery query;
+    query.add(http::kListType, http::kListTypeValue);
+
+    if (!request.delimiter.empty())
+        query.add("delimiter", request.delimiter);
+    if (!request.encodingType.empty())
+        query.add("encoding-type", request.encodingType);
+    if (request.maxKeys > 0)
+        query.add("max-keys", request.maxKeys);
+    if (!request.prefix.empty())
+        query.add("prefix", request.prefix);
+    if (!request.continuationToken.empty())
+        query.add("continuation-token", request.continuationToken);
+    if (!request.startAfter.empty())
+        query.add("start-after", request.startAfter);
+
+    return query.add("fetch-owner", request.fetchOwner);
+}
 
 } // namespace
 
@@ -121,29 +141,6 @@ std::tuple<nx::String, bool> ApiClient::calculateAuthorizationHeader(
         credentials,
         region,
         service);
-}
-
-QString ApiClient::buildQuery(const ListBucketRequest& request)
-{
-    QString query;
-    query.reserve(1024);
-
-    query += http::kListTypeQuery;
-    if (!request.delimiter.empty())
-        query += formatQuery("&delimiter", request.delimiter);
-    if (!request.encodingType.empty())
-        query += formatQuery("&encoding-type", request.encodingType);
-    if (request.maxKeys > 0)
-        query += formatQuery("&max-keys", request.maxKeys);
-    if (!request.prefix.empty())
-        query += formatQuery("&prefix", request.prefix);
-    if (!request.continuationToken.empty())
-        query += formatQuery("&continuation-token", request.continuationToken);
-    query += formatQuery("&fetch-owner", request.fetchOwner);
-    if (!request.startAfter.empty())
-    query += formatQuery("&start-after", request.startAfter);
-
-    return query;
 }
 
 } // namespace nx::cloud::aws::s3

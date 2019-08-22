@@ -21,9 +21,6 @@ public:
     void assumeRole(
         const AssumeRoleRequest& request,
         nx::utils::MoveOnlyFunc<void(Result, AssumeRoleResult)> handler);
-
-private:
-    QString buildQuery(const AssumeRoleRequest& request) const;
 };
 
 } // namespace nx::cloud::aws::sts

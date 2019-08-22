@@ -70,8 +70,6 @@ private:
         const network::http::Credentials& credentials,
         const std::string& region,
         const std::string& service) override;
-
-    QString buildQuery(const ListBucketRequest& request);
 };
 
 } // namespace nx::cloud::aws::s3
