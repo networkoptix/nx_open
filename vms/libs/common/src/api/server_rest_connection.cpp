@@ -84,15 +84,15 @@ ServerConnection::ServerConnection(
             m_runningRequests.remove(requestId);
             lock.unlock();
 
+            // TODO: We could do these changes in ClientPool directly
             SystemError::ErrorCode systemError = context->response.systemError;
             auto statusCode = context->getStatusCode();
             nx::network::http::StringType contentType;
             nx::network::http::BufferType messageBody;
 
+            // It maps to the function
             if (context->completionFunc)
             {
-                //response ? response->headers : nx::network::http::HttpHeaders();
-                //const auto response = httpClient->response();
                 const auto headers = context->response.headers;
                 context->completionFunc(
                     requestId,
@@ -1380,45 +1380,11 @@ Handle ServerConnection::executeDelete(
     return handle;
 }
 
-template <typename ResultType>
-void invoke(Callback<ResultType> callback,
-            QThread* targetThread,
-            bool success,
-            const Handle& id,
-            ResultType result,
-            const QString &serverId,
-            const QElapsedTimer& elapsed
-            )
-{
-    if (success)
-        trace(serverId, id, lit("Reply success for %1ms").arg(elapsed.elapsed()));
-    else
-        trace(serverId, id, lit("Reply failed for %1ms").arg(elapsed.elapsed()));
-
-    if (!callback)
-        return;
-
-    if (targetThread)
-    {
-         auto ptr = std::make_shared<ResultType>(std::move(result));
-         executeLaterInThread([callback, success, id, ptr]() mutable
-             {
-                 callback(success, id, std::move(*ptr));
-             },
-             targetThread);
-    }
-    else
-    {
-        callback(success, id, std::move(result));
-    }
-}
-
-void invoke(ServerConnection::Result<QByteArray>::type callback,
+void invoke_simpler(
+    std::function<void ()> callback,
     QThread* targetThread,
     bool success,
     const Handle& id,
-    QByteArray result,
-    const nx::network::http::HttpHeaders& headers,
     const QString &serverId,
     const QElapsedTimer& elapsed
 )
@@ -1428,23 +1394,10 @@ void invoke(ServerConnection::Result<QByteArray>::type callback,
     else
         trace(serverId, id, lit("Reply failed for %1ms").arg(elapsed.elapsed()));
 
-    if (!callback)
-        return;
-
     if (targetThread)
-    {
-        auto ptr = std::make_shared<QByteArray>(result);
-        executeLaterInThread(
-            [callback, headers, success, id, ptr]() mutable
-            {
-                callback(success, id, std::move(*ptr), headers);
-            },
-            targetThread);
-    }
+        executeLaterInThread(callback, targetThread);
     else
-    {
-        callback(success, id, result, headers);
-    }
+        callback();
 }
 
 template <typename ResultType>
@@ -1471,15 +1424,21 @@ Handle ServerConnection::executeRequest(
                 bool success = false;
                 const auto format = Qn::serializationFormatFromHttpContentType(contentType);
                 bool goodFormat = format == Qn::JsonFormat || format == Qn::UbjsonFormat;
-                auto result = goodFormat ?
-                    parseMessageBody<ResultType>(format, msgBody, &success) : ResultType();
+                auto result = std::make_shared<ResultType>(goodFormat ?
+                    parseMessageBody<ResultType>(format, msgBody, &success) : ResultType());
 
                 if (osErrorCode != SystemError::noError
                     || statusCode != nx::network::http::StatusCode::ok)
                 {
                     success = false;
                 }
-                invoke(callback, targetThread, success, id, std::move(result), serverId, timer);
+                auto internal_callback = [callback, success, id, result]()
+                    {
+                        if (callback)
+                            callback(success, id, std::move(*result));
+                    };
+
+                invoke_simpler(internal_callback, targetThread, success, id, serverId, timer);
             });
     }
 
@@ -1517,8 +1476,12 @@ Handle ServerConnection::executeRequest(
                 if (targetThread && targetThreadGuard.isNull())
                     return;
 
-                invoke(callback, targetThread, success, id, std::move(msgBody), headers, serverId,
-                    timer);
+                auto internal_callback = [callback, success, id, msgBody, headers]()
+                    {
+                        callback(success, id, msgBody, headers);
+                    };
+
+                invoke_simpler(internal_callback, targetThread, success, id, serverId, timer);
             });
     }
 
@@ -1551,9 +1514,17 @@ Handle ServerConnection::executeRequest(
                     && statusCode <= nx::network::http::StatusCode::partialContent);
 
                 if (targetThread && targetThreadGuard.isNull())
+                {
+                    // Target thread seems to be dead already.
                     return;
+                }
 
-                invoke(callback, targetThread, success, id, EmptyResponseType(), serverId, timer);
+                auto internal_callback = [callback, success, id]()
+                    {
+                        callback(success, id, EmptyResponseType());
+                    };
+
+                invoke_simpler(internal_callback, targetThread, success, id, serverId, timer);
             });
     }
 

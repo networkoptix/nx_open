@@ -171,6 +171,23 @@ void ClientPool::terminate(int handle)
     }
 }
 
+ClientPool::RequestStats ClientPool::getRequestStats() const
+{
+    RequestStats stats;
+    QnMutexLocker lock(&m_mutex);
+    int total = m_awaitingRequests.size();
+    stats.queued = total;
+    for (auto itr = m_connectionPool.begin(); itr != m_connectionPool.end(); ++itr)
+    {
+        const HttpConnection* connection = itr->second.get();
+        if (connection->getHandle())
+            ++total;
+    }
+    stats.connections = m_connectionPool.size();
+    stats.sent = total - stats.queued;
+    return stats;
+}
+
 int ClientPool::size() const
 {
     QnMutexLocker lock(&m_mutex);
@@ -374,31 +391,13 @@ void ClientPool::at_HttpClientDone(nx::network::http::AsyncHttpClientPtr clientP
             }
         }
     }
-    // We have complete request. We should take Context and clean up current connection
 
-    //if (requestId > 0)
-    //    emit done(requestId, clientPtr);
+    // We have complete request. We should take Context and clean up current connection
     if (context)
     {
         readHttpResponse(*context, clientPtr);
         emit requestIsDone(std::move(context));
     }
-
-    /*
-    QnMutexLocker lock(&m_mutex);
-    // free connection
-    if (requestId > 0)
-    {
-        for (auto itr = m_connectionPool.begin(); itr != m_connectionPool.end(); ++itr)
-        {
-            HttpConnection* connection = itr->second.get();
-            if (connection->getHandle() == requestId)
-            {
-                connection->handle = 0;
-                break;
-            }
-        }
-    }*/
 
     {
         QnMutexLocker lock(&m_mutex);

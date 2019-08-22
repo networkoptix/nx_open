@@ -81,6 +81,8 @@ public:
      */
     struct Context
     {
+        virtual ~Context() = default;
+
         enum class State
         {
             initial,
@@ -91,6 +93,7 @@ public:
             /** Failed to get any response due to network error. */
             noResponse,
         };
+
         State state = State::initial;
         Request request;
         Response response;
@@ -102,6 +105,8 @@ public:
         int handle = 0;
         /** Callback to be called when response is received. */
         HttpCompletionFunc completionFunc;
+
+        std::optional<QPointer<QThread>> targetThread;
 
         mutable QnMutex mutex;
 
@@ -133,12 +138,20 @@ public:
     /**
      * It is used to run all the requests from rest::ServerConnection.
      */
-    //int sendRequest(Request&& request);
-
     int sendRequest(ContextPtr request);
 
     void terminate(int handle);
     void setPoolSize(int value);
+
+    struct RequestStats
+    {
+        int total = 0;
+        int sent = 0;
+        int queued = 0;
+        int connections = 0;
+    };
+
+    RequestStats getRequestStats() const;
 
     /** Returns amount of requests which are running or awaiting to be run */
     int size() const;
