@@ -36,7 +36,7 @@ void Client::readStorage(
 {
     base_type::template makeAsyncCall<Storage>(
         Method::get,
-        rest::substituteParameters(api::kStorageId, {storageId}),
+        rest::substituteParameters(api::kStorage, {storageId}),
         std::move(handler));
 }
 
@@ -46,7 +46,7 @@ void Client::removeStorage(
 {
     base_type::template makeAsyncCall<void>(
         Method::delete_,
-        rest::substituteParameters(api::kStorageId, {storageId}),
+        rest::substituteParameters(api::kStorage, {storageId}),
         std::move(handler));
 }
 
@@ -57,7 +57,7 @@ void Client::addSystem(
 {
     base_type::template makeAsyncCall<System>(
         Method::put,
-        rest::substituteParameters(api::kStorageIdSystems, {storageId}),
+        rest::substituteParameters(api::kSystems, {storageId}),
         std::move(handler),
         request);
 }
@@ -69,7 +69,7 @@ void Client::removeSystem(
 {
     base_type::template makeAsyncCall<void>(
         Method::delete_,
-        rest::substituteParameters(api::kStorageIdSystemId, {storageId, systemId}),
+        rest::substituteParameters(api::kSystem, {storageId, systemId}),
         std::move(handler));
 }
 
@@ -99,7 +99,7 @@ void Client::removeBucket(
 {
     base_type::template makeAsyncCall<void>(
         Method::delete_,
-        rest::substituteParameters(api::kAwsBucketName, {bucketName}),
+        rest::substituteParameters(api::kAwsBucket, {bucketName}),
         std::move(handler));
 }
 

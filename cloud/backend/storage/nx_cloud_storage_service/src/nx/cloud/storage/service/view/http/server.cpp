@@ -17,7 +17,7 @@ namespace {
 
 static constexpr char kStorageId[] = "storageId";
 static constexpr char kSystemId[] = "systemId";
-static constexpr char kBucketNameParam[] = "name";
+static constexpr char kBucketName[] = "bucketName";
 
 } // namespace
 
@@ -100,13 +100,13 @@ void Server::registerStorageApiHandlers()
 
     registerRequestProcessor<
         RequestHandler<void, api::Storage, AuthInfoFetcher, RestArgFetcher<kStorageId>>>(
-            api::kStorageId,
+            api::kStorage,
             std::bind(&controller::StorageManager::readStorage, m_storageManager, _1, _2, _3),
             network::http::Method::get);
 
     registerRequestProcessor<
         RequestHandler<void, void, AuthInfoFetcher, RestArgFetcher<kStorageId>>>(
-            api::kStorageId,
+            api::kStorage,
             std::bind(&controller::StorageManager::removeStorage, m_storageManager, _1, _2, _3),
             network::http::Method::delete_);
 
@@ -118,14 +118,14 @@ void Server::registerStorageApiHandlers()
 
     registerRequestProcessor<
         RequestHandler<api::AddSystemRequest, api::System, AuthInfoFetcher, RestArgFetcher<kStorageId>>>(
-            api::kStorageIdSystems,
+            api::kSystems,
             std::bind(&controller::StorageManager::addSystem, m_storageManager, _1, _2, _3, _4),
             network::http::Method::put);
 
     registerRequestProcessor<
         RequestHandler<
             void, void, AuthInfoFetcher, RestArgFetcher<kStorageId>, RestArgFetcher<kSystemId>>>(
-                api::kStorageIdSystemId,
+                api::kSystem,
                 std::bind(&controller::StorageManager::removeSystem, m_storageManager, _1, _2, _3, _4),
                 network::http::Method::delete_);
 }
@@ -145,8 +145,8 @@ void Server::registerBucketApiHandlers()
         std::bind(&controller::BucketManager::listBuckets, m_bucketManager, _1),
         network::http::Method::get);
 
-    registerRequestProcessor<RequestHandler<void, void, RestArgFetcher<kBucketNameParam>>>(
-        api::kAwsBucketName,
+    registerRequestProcessor<RequestHandler<void, void, RestArgFetcher<kBucketName>>>(
+        api::kAwsBucket,
         std::bind(&controller::BucketManager::removeBucket, m_bucketManager, _1, _2),
         network::http::Method::delete_);
 }
