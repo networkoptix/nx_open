@@ -13,8 +13,8 @@ QString removeProtocolPrefix(const QString& url)
     if (prefixPos == -1)
         return url;
 
-    const auto result = url.mid(prefixPos + 3);
-    return result.startsWith('/') ? result.mid(1) : result;
+    const auto result = url.midRef(prefixPos + 3);
+    return (result.startsWith('/') ? result.mid(1) : result).toString();
 }
 
 } // namespace
