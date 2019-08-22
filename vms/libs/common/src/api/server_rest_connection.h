@@ -588,7 +588,7 @@ private:
 
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 
-    void trace(int handle, const QString& message) const;
+    void trace(Handle handle, const QString& message) const;
     std::pair<QString, QString> getRequestCredentials(
         const QnMediaServerResourcePtr& targetServer) const;
 

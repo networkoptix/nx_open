@@ -45,7 +45,7 @@ namespace {
 
 static const nx::network::http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
 
-void trace(const QString& serverId, int handle, const QString& message)
+void trace(const QString& serverId, rest::Handle handle, const QString& message)
 {
     static const nx::utils::log::Tag kTag(typeid(rest::ServerConnection));
     NX_VERBOSE(kTag) << lm("%1 <%2>: %3").args(serverId, handle, message);
@@ -170,7 +170,7 @@ QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
     return QnMediaServerResourcePtr(); //< no internet access found
 }
 
-void ServerConnection::trace(int handle, const QString& message) const
+void ServerConnection::trace(rest::Handle handle, const QString& message) const
 {
     ::trace(m_serverId.toString(), handle, message);
 }
