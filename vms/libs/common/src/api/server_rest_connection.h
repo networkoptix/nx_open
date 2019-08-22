@@ -597,6 +597,7 @@ private:
     QMap<Handle, HttpCompletionFunc> m_runningRequests;
     mutable QnMutex m_mutex;
     nx::utils::Url m_directUrl;
+    nx::utils::log::Tag m_logTag;
 
     /**
      * Generic requests, for the types, that should not be exposed to common library.
