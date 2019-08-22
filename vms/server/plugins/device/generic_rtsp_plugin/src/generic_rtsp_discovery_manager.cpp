@@ -111,12 +111,12 @@ int GenericRTSPDiscoveryManager::fromMDNSData(
     int /*mdnsResponsePacketSize*/,
     nxcip::CameraInfo* /*cameraInfo*/ )
 {
-    return nxcip::NX_NO_ERROR;
+    return 0;
 }
 
 int GenericRTSPDiscoveryManager::fromUpnpData( const char* /*upnpXMLData*/, int /*upnpXMLDataSize*/, nxcip::CameraInfo* /*cameraInfo*/ )
 {
-    return nxcip::NX_NO_ERROR;
+    return 0;
 }
 
 nxcip::BaseCameraManager* GenericRTSPDiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )

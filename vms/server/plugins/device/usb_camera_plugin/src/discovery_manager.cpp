@@ -117,7 +117,7 @@ int DiscoveryManager::fromMDNSData(
     int /*mdnsResponsePacketSize*/,
     nxcip::CameraInfo* /*cameraInfo*/)
 {
-    return nxcip::NX_NO_ERROR;
+    return 0;
 }
 
 int DiscoveryManager::fromUpnpData(
@@ -125,7 +125,7 @@ int DiscoveryManager::fromUpnpData(
     int /*upnpXMLDataSize*/,
     nxcip::CameraInfo* /*cameraInfo*/)
 {
-    return nxcip::NX_NO_ERROR;
+    return 0;
 }
 
 nxcip::BaseCameraManager* DiscoveryManager::createCameraManager(const nxcip::CameraInfo& info)

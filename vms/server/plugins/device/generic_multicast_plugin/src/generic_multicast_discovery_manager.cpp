@@ -98,7 +98,7 @@ int GenericMulticastDiscoveryManager::fromMDNSData(
     int /*mdnsResponsePacketSize*/,
     nxcip::CameraInfo* /*cameraInfo*/ )
 {
-    return nxcip::NX_NO_ERROR;
+    return 0;
 }
 
 int GenericMulticastDiscoveryManager::fromUpnpData(
@@ -106,7 +106,7 @@ int GenericMulticastDiscoveryManager::fromUpnpData(
     int /*upnpXMLDataSize*/,
     nxcip::CameraInfo* /*cameraInfo*/ )
 {
-    return nxcip::NX_NO_ERROR;
+    return 0;
 }
 
 nxcip::BaseCameraManager* GenericMulticastDiscoveryManager::createCameraManager(const nxcip::CameraInfo& info)
