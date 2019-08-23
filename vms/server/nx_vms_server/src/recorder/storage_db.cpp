@@ -387,7 +387,10 @@ void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix,
 
 QString QnStorageDb::baseFileName(int64_t seqId)
 {
-    return moduleGUID().toSimpleString() + kSeparator + QString::number((long long) seqId) + ".nxdb";
+    return moduleGUID().toSimpleString()
+        + kSeparator
+        + QString::number(static_cast<long long>(seqId))
+        + ".nxdb";
 }
 
 bool QnStorageDb::startDbFile(const QString& basePath, bool incVersion)
@@ -533,7 +536,8 @@ bool QnStorageDb::writeVacuumedData(
     for (const auto& catalog: parsedData->addRecords)
     {
         expectedBufferSize +=
-            (int) catalog.second.size() * nx::media_db::MediaFileOperation::kSerializedRecordSize;
+            static_cast<int>(catalog.second.size())
+            * nx::media_db::MediaFileOperation::kSerializedRecordSize;
     }
 
     ByteStreamWriter writer(expectedBufferSize);
@@ -576,7 +580,7 @@ void QnStorageDb::putRecordsToCatalog(
     DeviceFileCatalogPtr newFileCatalog(new DeviceFileCatalog(
         serverModule(),
         cameraUuidIt->get_left(),
-        (QnServer::ChunksCatalog) catalogIndex,
+        static_cast<QnServer::ChunksCatalog>(catalogIndex),
         QnServer::StoragePool::None));
     std::sort(chunks.begin(), chunks.end());
 
@@ -592,9 +596,9 @@ nx::vms::server::Chunk QnStorageDb::toChunk(
         m_storageIndex,
         mediaData.getFileTypeIndex(),
         mediaData.getDuration(),
-        mediaData.getTimeZone(),
-        (quint16)(mediaData.getFileSize() >> 32),
-        (quint32)mediaData.getFileSize());
+        static_cast<int16_t>(mediaData.getTimeZone()),
+        static_cast<quint16>(mediaData.getFileSize() >> 32),
+        static_cast<quint32>(mediaData.getFileSize()));
 }
 
 void QnStorageDb::processDbContent(
@@ -610,7 +614,7 @@ void QnStorageDb::processDbContent(
             continue;
 
         uuidToHash.insert(UuidToHash::value_type(
-            cameraData.getCameraUniqueId(), cameraData.getCameraId()));
+            cameraData.getCameraUniqueId(), static_cast<uint16_t>(cameraData.getCameraId())));
         cameraData.serialize(writer);
     }
 
