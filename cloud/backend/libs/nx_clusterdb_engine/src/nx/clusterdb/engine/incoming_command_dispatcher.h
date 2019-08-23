@@ -27,6 +27,11 @@ public:
         const CommandTransportHeader&,
         const CommandHeader&>;
 
+    template<typename DbFunc, typename DataArg>
+    using DbFuncResult = typename std::invoke_result_t<
+        DbFunc,
+        nx::sql::QueryContext*, std::string, DataArg>;
+
     IncomingCommandDispatcher(CommandLog* const transactionLog);
     virtual ~IncomingCommandDispatcher();
 
@@ -42,11 +47,14 @@ public:
      * Register processor function by command type.
      */
     template<typename CommandDescriptor, typename DbFunc>
-    void registerCommandHandler(DbFunc processTranFunc,
-        std::enable_if_t<std::is_same_v<std::invoke_result_t<DbFunc,
-        nx::sql::QueryContext*, const std::string&, Command<typename CommandDescriptor::Data>>, nx::sql::DBResult>>* = nullptr )
+    void registerCommandHandler(
+        DbFunc processTranFunc,
+        typename std::enable_if_t<
+            std::is_same_v<
+                DbFuncResult<DbFunc, Command<typename CommandDescriptor::Data>>,
+                nx::sql::DBResult>,
+        DbFunc>* = nullptr)
     {
-        // typename CommandProcessor<CommandDescriptor>::ProcessEc2TransactionFunc processTranFunc
         using SpecificCommandProcessor = CommandProcessor<CommandDescriptor>;
 
         auto context = std::make_unique<CommandProcessorContext>();
@@ -60,26 +68,27 @@ public:
     }
 
     /**
-     * DbFunc must have the signature: void(nx::sql::QueryContext*, CommandDescriptor::Data)
+     * DbFunc must have the signature: void(nx::sql::QueryContext*, std::string, CommandDescriptor::Data)
      *
      * @param clusterId if non-empty and not matching the clusterId supplied with the transaction,
      * dbFunc is not invoked. If empty, dbFunc is always invoked.
      */
     template<typename CommandDescriptor, typename DbFunc>
     void registerCommandHandler(
-        DbFunc dbFunc,
-        std::enable_if_t<std::is_same_v<std::invoke_result_t<DbFunc,
-        nx::sql::QueryContext*, const std::string&, typename CommandDescriptor::Data>, void>>* = nullptr)
+        DbFunc processTranFunc,
+        typename std::enable_if_t<
+            std::is_same_v<DbFuncResult<DbFunc, typename CommandDescriptor::Data>, void>,
+            DbFunc>* = nullptr)
     {
         registerCommandHandler<CommandDescriptor>(
-            [dbFunc = std::move(dbFunc)](
+            [processTranFunc = std::move(processTranFunc)](
                 auto queryContext,
                 auto clusterId,
-                auto command)->nx::sql::DBResult
-        {
-            dbFunc(queryContext, clusterId, command.params);
-            return nx::sql::DBResult::ok;
-        });
+                auto command) -> nx::sql::DBResult
+            {
+                processTranFunc(queryContext, std::move(clusterId), std::move(command.params));
+                return nx::sql::DBResult::ok;
+            });
     }
 
     /**
