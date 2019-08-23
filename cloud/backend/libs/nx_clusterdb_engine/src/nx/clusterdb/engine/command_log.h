@@ -175,6 +175,24 @@ public:
     }
 
     /**
+     * Invokes dbFunc(queryContext, transactionData) and generates a synchronization command with
+     * the same transactionData.
+     */
+    template<typename CommandDescriptor, typename DbFunc>
+    nx::sql::DBResult saveDbOperationToLog(
+        nx::sql::QueryContext* queryContext,
+        const std::string& clusterId,
+        typename const CommandDescriptor::Data& transactionData,
+        DbFunc dbFunc)
+    {
+        dbFunc(queryContext, transactionData);
+        return generateTransactionAndSaveToLog<CommandDescriptor>(
+            queryContext,
+            clusterId,
+            transactionData);
+    }
+
+    /**
      * This method should be used when generating new transactions.
      */
     nx::sql::DBResult saveLocalTransaction(
