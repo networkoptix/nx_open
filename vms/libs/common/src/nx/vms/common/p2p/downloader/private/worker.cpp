@@ -378,6 +378,9 @@ void Worker::requestFileInformationInternal()
     int requestCount = 0;
     for (const auto& peer: peers)
     {
+        if (needToStop())
+            break;
+
         NX_VERBOSE(m_logTag, "Requesting %1 from server %2.",
             requestSubjectString(m_state), peer);
 
@@ -501,12 +504,12 @@ void Worker::requestChecksums()
         return;
     }
 
-    while (!peers.isEmpty())
+    while (!peers.isEmpty() && !needToStop())
     {
         using Context = RequestContext<QVector<QByteArray>, Peer>;
         std::vector<Context> contexts;
 
-        while (!peers.isEmpty() && contexts.size() < kMaxPeersToCheckAtOnce)
+        while (!peers.isEmpty() && contexts.size() < kMaxPeersToCheckAtOnce && !needToStop())
         {
             const Peer& peer = peers.takeFirst();
 
@@ -613,11 +616,11 @@ void Worker::downloadChunks()
     QSet<int> downloadingChunks;
     QSet<Peer> busyPeers;
 
-    while (chunksLeft > 0)
+    while (chunksLeft > 0 && !needToStop())
     {
         for (int i = 0;
             contexts.size() < kMaxSimultaneousDownloads && i < kMaxSimultaneousDownloads
-                && chunksLeft > 0;
+                && chunksLeft > 0 && !needToStop();
             ++i)
         {
             const int chunk = selectNextChunk(downloadingChunks);
