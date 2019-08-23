@@ -35,9 +35,6 @@
 #   include <unistd.h>
 #   include <errno.h>
 #   include <dirent.h>
-#   ifdef __APPLE__
-#      include <sys/mount.h>
-#   endif
 #endif
 
 #ifdef WIN32
@@ -54,12 +51,6 @@
 #else
     const QString QnFileStorageResource::FROM_SEP = lit("/");
     const QString QnFileStorageResource::TO_SEP = lit("\\");
-#endif
-
-#ifdef __APPLE__
-static const auto MS_NODEV = MNT_NODEV;
-static const auto MS_NOSUID = MNT_NOSUID;
-static const auto MS_NOEXEC = MNT_NOEXEC;
 #endif
 
 
@@ -635,15 +626,13 @@ QnFileStorageResource::~QnFileStorageResource()
 #ifndef _WIN32
     if (!m_localPath.isEmpty())
     {
-#if __linux__
+#ifdef Q_OS_UNIX
         auto result = rootTool()->unmount(m_localPath);
         NX_VERBOSE(
             this,
             lm("[mount] unmounting folder %1 while destructing object result: %2")
                 .args(m_localPath, nx::SystemCommands::unmountCodeToString(result)));
-#elif __APPLE__
-        unmount(m_localPath.toLatin1().constData(), 0);
-#endif
+#endif // Q_OS_UNIX
         rmdir(m_localPath.toLatin1().constData());
     }
 #endif
@@ -932,10 +921,10 @@ float QnFileStorageResource::getAvarageWritingUsage() const
     return writer ? writer->getAvarageUsage() : 0;
 }
 
-#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
+#ifdef _WIN32
 bool QnFileStorageResource::isStorageDirMounted() const
 {
-    return true;    //common check is enough on Windows and macOS
+    return true;    //common check is enough on mswin
 }
 
 #else
