@@ -102,6 +102,7 @@ private:
     bool readDbHeader() const;
     QStringList allDbFiles(const QString& basePath) const;
     QString baseFileName(int64_t seqId);
+    void removeFiles(const QStringList& toRemove, const QString& except);
 };
 
 typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;
