@@ -39,15 +39,6 @@ auto measureTime(F f, const QString& message) -> std::invoke_result_t<F>
     return f();
 }
 
-void removeFiles(const QStringList& toRemove, const QString& except)
-{
-    for (const auto& path: toRemove)
-    {
-        if (path != except)
-            QFile(path).remove();
-    }
-}
-
 int64_t sequenceIdFromFilePath(const QString& filePath)
 {
     const auto baseName = QFileInfo(filePath).baseName();
@@ -113,7 +104,7 @@ boost::optional<nx::media_db::CameraOperation> QnStorageDb::createCameraOperatio
     const QString& cameraUniqueId)
 {
     std::unordered_set<int> usedIds;
-    for (const auto uuidCamIdPair: m_uuidToHash.right)
+    for (const auto& uuidCamIdPair: m_uuidToHash.right)
         usedIds.insert(uuidCamIdPair.first);
 
     nx::media_db::CameraOperation cameraOperation;
@@ -136,7 +127,7 @@ boost::optional<nx::media_db::CameraOperation> QnStorageDb::createCameraOperatio
         return boost::none;
     }
 
-    m_uuidToHash.insert(UuidToHash::value_type(cameraUniqueId, cameraId));
+    m_uuidToHash.insert(UuidToHash::value_type(cameraUniqueId, static_cast<uint16_t>(cameraId)));
 
     cameraOperation.setCameraId(cameraId);
     cameraOperation.setRecordType(nx::media_db::RecordType::CameraOperationAdd);
@@ -170,10 +161,7 @@ void QnStorageDb::deleteRecords(
     qint64 startTimeMs)
 {
     serverModule()->storageDbPool()->addTask(nx::utils::guarded(this,
-        [this,
-        cameraUniqueId,
-        catalog,
-        startTimeMs]()
+        [this, cameraUniqueId, catalog, startTimeMs]()
         {
             const int cameraId = getOrGenerateCameraIdHash(cameraUniqueId);
             if (cameraId == -1)
@@ -249,8 +237,18 @@ bool QnStorageDb::readDbHeader() const
     return true;
 }
 
+void QnStorageDb::removeFiles(const QStringList& toRemove, const QString& except)
+{
+    for (const auto& path: toRemove)
+    {
+        if (path != except)
+            m_storage->removeFile(path);
+    }
+}
+
 bool QnStorageDb::open(const QString& basePath)
 {
+    qDebug() << "open()";
     const auto dbFiles = allDbFiles(basePath);
     if (dbFiles.isEmpty())
     {
@@ -293,15 +291,36 @@ bool QnStorageDb::openDbFile()
 QStringList QnStorageDb::allDbFiles(const QString& basePath) const
 {
     const auto moduleGuid = moduleGUID().toSimpleString();
-    QStringList filters = {moduleGuid + "_media.nxdb", moduleGuid + "--*.nxdb"};
-    auto candidates = QDir(basePath).entryInfoList(filters, QDir::Files);
-    NX_DEBUG(this, "Gathering DB files. Candidates are: %1", candidates);
+    QStringList filters = {moduleGuid + "_media.nxdb", moduleGuid + "--\\.nxdb"};
+
+    qDebug() << "base path:" << basePath;
+    auto candidates = m_storage->getFileList(basePath);
+    candidates.erase(
+        std::remove_if(
+            candidates.begin(), candidates.end(),
+            [&filters](const auto& fileInfo)
+            {
+                return fileInfo.isDir()
+                    || std::none_of(
+                           filters.cbegin(), filters.cend(),
+                           [&fileInfo](const QString& filter)
+                           {
+                               return QRegularExpression(filter).match(filter).hasMatch();
+                               return fileInfo.absoluteFilePath().endsWith(filter);
+                           });
+            }),
+        candidates.end());
 
     QStringList result;
     std::transform(
         candidates.begin(), candidates.end(), std::back_inserter(result),
-        [](const QFileInfo& fileInfo) { return fileInfo.absoluteFilePath(); });
+        [](const auto& fileInfo) { return fileInfo.absoluteFilePath(); });
 
+    qDebug() << "Candidates:";
+    for (auto r: result)
+        qDebug() << "--" << r;
+
+    NX_DEBUG(this, "Gathering DB files. Candidates are: %1", result);
     std::sort(
         result.begin(), result.end(),
         [](const auto& path1, const auto& path2)
@@ -379,6 +398,7 @@ QString QnStorageDb::baseFileName(int64_t seqId)
 bool QnStorageDb::startDbFile(const QString& basePath, bool incVersion)
 {
     m_ioDevice.reset();
+    qDebug() << "startDbFile";
     const auto dbFiles = allDbFiles(basePath);
     int64_t newSeqId = 1;
 
@@ -394,7 +414,7 @@ bool QnStorageDb::startDbFile(const QString& basePath, bool incVersion)
         if (prevSeqId == std::numeric_limits<int64_t>::max())
         {
             const auto newPrevFileName = QDir(basePath).absoluteFilePath(baseFileName(/*seqId*/ 1));
-            if (!QFile(dbFiles[dbFiles.size() - 1]).rename(newPrevFileName))
+            if (!m_storage->renameFile(dbFiles[dbFiles.size() - 1], newPrevFileName))
             {
                 NX_WARNING(
                     this, "Failed to rename the DB file with max sequence id (%1)",
@@ -479,7 +499,7 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
     auto fileContent = dbFileContent();
 
     if (!measureTime(
-            [this, &fileContent, &parsedData]()
+            [&fileContent, &parsedData]()
             {
                 return nx::media_db::DbReader::parse(fileContent, parsedData.get());
             },
@@ -533,6 +553,7 @@ bool QnStorageDb::writeVacuumedData(
     if (!startDbFile(QFileInfo(m_dbFileName).absolutePath(), /*incVersion*/ true))
         return false;
 
+    qDebug() << "writeVacuumedData";
     const auto dbFiles = allDbFiles(QFileInfo(m_dbFileName).absolutePath());
     NX_ASSERT(dbFiles.size() == 2);
 
