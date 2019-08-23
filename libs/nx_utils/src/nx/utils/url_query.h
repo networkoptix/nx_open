@@ -13,8 +13,7 @@ public:
 
     template<
         typename NumericType,
-        typename =
-            typename std::enable_if<std::is_arithmetic<NumericType>::value, NumericType>::type>
+        typename = typename std::enable_if_t<std::is_arithmetic_v<NumericType>, NumericType>>
     UrlQuery& add(const QString& key, NumericType value)
     {
         return add(key, QString::number(value));
