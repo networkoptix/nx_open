@@ -106,7 +106,7 @@ std::string MountHelper::makeCommandString(
         << " -o credentials=" << credentialFile;
 
     if (!domain.empty())
-        ss << ",domain=" << domain;
+        ss << ",domain='" << escapeSingleQuotes(domain) << "'";
 
     if (!ver.empty())
         ss << ",vers=" << ver;
