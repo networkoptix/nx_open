@@ -12,17 +12,15 @@ MountHelper::MountHelper(
     const boost::optional<std::string>& password,
     const MountHelperDelegates& delegates)
     :
-    m_username(username ? escapeSingleQuotes(*username) : "guest"),
-    m_password(password ? escapeSingleQuotes(*password) : ""),
+    m_username(username ? *username : "guest"),
+    m_password(password ? *password : ""),
     m_delegates(delegates)
 {
     if (username && !checkAndParseUsername())
         m_invalidUsername = true;
 }
 
-SystemCommands::MountCode MountHelper::mount(
-    const std::string& url,
-    const std::string& directory)
+SystemCommands::MountCode MountHelper::mount(const std::string& url, const std::string& directory)
 {
     if (!m_delegates.isPathAllowed(directory))
         return SystemCommands::MountCode::otherError;
@@ -58,7 +56,7 @@ bool MountHelper::checkAndParseUsername()
 
     std::string domain = m_username.substr(domainSeparatorPos + 1);
     m_username = m_username.substr(0, domainSeparatorPos);
-    m_domains.push_back(domain);
+    m_domains.push_back(escapeSingleQuotes(domain));
 
     return true;
 }
@@ -124,7 +122,8 @@ std::string MountHelper::makeCommandString(
 {
     std::ostringstream ss;
     ss << "mount -t cifs '" << m_url << "' '" << m_directory << "'"
-        << " -o username='" << username << "',password='" << password << "'";
+       << " -o username='" << escapeSingleQuotes(username)
+       << "',password='" << escapeSingleQuotes(password) << "'";
 
     if (!domain.empty())
         ss << ",domain=" << domain;
