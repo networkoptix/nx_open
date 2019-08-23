@@ -40,7 +40,6 @@ nx::utils::UrlQuery buildQuery(const ListBucketRequest& request)
 } // namespace
 
 ApiClient::ApiClient(
-    const std::string& /*storageClientId*/,
     const std::string& awsRegion,
     const nx::utils::Url& url,
     const nx::network::http::Credentials& credentials)

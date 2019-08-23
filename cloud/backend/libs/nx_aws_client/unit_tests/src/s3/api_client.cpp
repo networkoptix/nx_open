@@ -29,7 +29,6 @@ protected:
         m_awsS3Emulator->saveOrReplaceFile(kExistingFilePath, kExistingFileBody);
 
         m_client = std::make_unique<aws::s3::ApiClient>(
-            "id",
             "us-east-1",
             nx::network::url::Builder()
                 .setScheme(nx::network::http::kUrlSchemeName)

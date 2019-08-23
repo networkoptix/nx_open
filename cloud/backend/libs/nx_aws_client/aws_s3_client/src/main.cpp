@@ -8,6 +8,7 @@
 #include <nx/utils/std/filesystem.h>
 
 #include <nx/cloud/aws/s3/api_client.h>
+#include <nx/cloud/aws/sts/api_client.h>
 
 void printHelp(const char* name)
 {
@@ -22,8 +23,10 @@ void printHelp(const char* name)
         "   To download and print to STDOUT use \"" << name << " [URL]\"." << std::endl <<
         "   To download and save to file use \"" << name << " [URL] -O file\"." << std::endl <<
         "   To upload file: \"" << name << " -u -i file [URL]\"" <<
-        "   To delete file: \"" << name << " -d [URL]\"" <<
+        "   To delete file: \"" << name << " -d [URL]\"" << std::endl <<
         std::endl <<
+        "STS calls: " << std::endl <<
+        "   --sts-assume-role" << std::endl <<
         std::endl;
 }
 
@@ -78,7 +81,7 @@ struct CommonSettings
     }
 };
 
-template<typename Settings>
+template<typename Client, typename Settings>
 class AbstractOperation
 {
 public:
@@ -105,15 +108,13 @@ public:
 protected:
     const nx::utils::ArgumentParser& m_arguments;
     Settings m_settings;
-    std::unique_ptr<nx::cloud::aws::s3::ApiClient> m_client;
+    std::unique_ptr<Client> m_client;
 
     virtual int runImpl() = 0;
 
-    std::unique_ptr<nx::cloud::aws::s3::ApiClient>
-        prepareApiClient(const CommonSettings& settings)
+    std::unique_ptr<Client> prepareApiClient(const CommonSettings& settings)
     {
-        return std::make_unique<nx::cloud::aws::s3::ApiClient>(
-            "cmd_line_client",
+        return std::make_unique<Client>(
             settings.region,
             nx::utils::Url(settings.url),
             nx::network::http::Credentials(
@@ -150,7 +151,7 @@ protected:
         typename OutputTuple = typename DeriveResultTupleFromHandler<Handler>::type
     >
     OutputTuple invoke(
-        void (nx::cloud::aws::s3::ApiClient::*func)(FuncInputArgs...),
+        void (Client::*func)(FuncInputArgs...),
         InputArgs&&... inputArgs)
     {
         std::promise<OutputTuple> done;
@@ -197,7 +198,7 @@ struct UploadSettings
 };
 
 class UploadOperation:
-    public AbstractOperation<UploadSettings>
+    public AbstractOperation<nx::cloud::aws::s3::ApiClient, UploadSettings>
 {
     using base_type = AbstractOperation;
 
@@ -231,7 +232,7 @@ public:
 //-------------------------------------------------------------------------------------------------
 
 class DeleteOperation:
-    public AbstractOperation<CommonSettings>
+    public AbstractOperation<nx::cloud::aws::s3::ApiClient, CommonSettings>
 {
     using base_type = AbstractOperation;
 
@@ -270,7 +271,7 @@ struct DownloadSettings
 };
 
 class DownloadOperation:
-    public AbstractOperation<DownloadSettings>
+    public AbstractOperation<nx::cloud::aws::s3::ApiClient, DownloadSettings>
 {
     using base_type = AbstractOperation;
 
@@ -306,6 +307,37 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+class StsAssumeRole:
+    public AbstractOperation<nx::cloud::aws::sts::ApiClient, CommonSettings>
+{
+    using base_type = AbstractOperation;
+
+public:
+    using base_type::base_type;
+
+    virtual int runImpl() override
+    {
+        nx::cloud::aws::sts::AssumeRoleRequest request;
+        request.roleArn = "arn:aws:iam::009544449203:role/example-role";
+        request.roleSessionName = "Test";
+
+        const auto [result, assumeRoleResult] = invoke(
+            &nx::cloud::aws::sts::ApiClient::assumeRole,
+            request);
+        if (!result.ok())
+            return 2;
+
+        std::cout << "Temporary credentials: " << std::endl <<
+            assumeRoleResult.credentials.accessKeyId << ":" <<
+            assumeRoleResult.credentials.secretAccessKey << std::endl <<
+            "are valid until " << assumeRoleResult.credentials.expiration << std::endl;
+
+        return 0;
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
+
 int main(int argc, const char* argv[])
 {
     nx::utils::ArgumentParser arguments(argc - 1, argv + 1);
@@ -320,6 +352,8 @@ int main(int argc, const char* argv[])
 
     nx::network::SocketGlobalsHolder socketGlobalsHolder;
 
+    if (arguments.contains("sts-assume-role"))
+        return StsAssumeRole(arguments).run();
     if (arguments.contains("u"))
         return UploadOperation(arguments).run();
     else if (arguments.contains("d"))

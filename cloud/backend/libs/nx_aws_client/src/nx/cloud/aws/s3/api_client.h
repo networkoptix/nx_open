@@ -31,7 +31,6 @@ public:
      * Though, this class will not parse and use BucketName.
      */
     ApiClient(
-        const std::string& storageClientId,
         const std::string& awsRegion,
         const nx::utils::Url& url,
         const nx::network::http::Credentials& credentials);
