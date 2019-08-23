@@ -19,11 +19,11 @@ bool isMounted(FilterConfig config, const QString& path)
         return true;
 
     int mediaFolderPos = path.indexOf(config.mediaFolderName);
-    const QString toCheck = mediaFolderPos == -1 ? path : path.left(mediaFolderPos);
+    const QString toCheck = QDir::cleanPath(mediaFolderPos == -1 ? path : path.left(mediaFolderPos));
 
     return std::any_of(
         config.partitions.cbegin(), config.partitions.cend(),
-        [&toCheck](const auto& partition) { return partition.path == QDir::cleanPath(toCheck); });
+        [&toCheck](const auto& partition) { return partition.path == toCheck; });
 }
 
 } // namespace media_paths
