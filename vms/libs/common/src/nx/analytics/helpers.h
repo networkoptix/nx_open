@@ -2,6 +2,7 @@
 
 #include <set>
 #include <optional>
+#include "QtCore/QString"
 
 #include <QtCore/QString>
 
