@@ -42,6 +42,10 @@ protected:
         Filter restoredFilter;
         deserializeFromParams(m_serializedFilter, &restoredFilter);
 
+        // NOTE: the order does not matter.
+        std::sort(m_filter.objectTypeId.begin(), m_filter.objectTypeId.end());
+        std::sort(restoredFilter.objectTypeId.begin(), restoredFilter.objectTypeId.end());
+
         ASSERT_EQ(m_filter, restoredFilter);
     }
 
