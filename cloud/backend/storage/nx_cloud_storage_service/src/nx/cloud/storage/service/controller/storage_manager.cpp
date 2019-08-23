@@ -7,6 +7,7 @@
 
 #include "nx/cloud/storage/service/settings.h"
 #include "nx/cloud/storage/service/utils.h"
+#include "nx/cloud/storage/service/model/command.h"
 #include "nx/cloud/storage/service/model/model.h"
 #include "nx/cloud/storage/service/model/database.h"
 #include "nx/cloud/storage/service/model/dao/storage_dao.h"
@@ -118,10 +119,8 @@ StorageManager::StorageManager(
     model::Model* model,
     BucketManager* bucketManager)
     :
-    BaseManager(
-        settings.database().synchronization.clusterId,
-        &model->database().synchronizationEngine()),
     m_settings(settings),
+    m_clusterId(settings.database().synchronization.clusterId),
     m_database(&model->database()),
     m_storageDao(&model->storageDao()),
     m_bucketManager(bucketManager),
@@ -139,7 +138,12 @@ StorageManager::StorageManager(
 StorageManager::~StorageManager()
 {
     m_stsClient->pleaseStopSync();
+    m_asyncCounter.wait();
+
     QnMutexLocker lock(&m_mutex);
+    auto dataUsageCalculators = std::move(m_dataUsageCalculators);
+    lock.unlock();
+
     for (auto& calculator: m_dataUsageCalculators)
         calculator->pleaseStopSync();
 }
@@ -163,9 +167,11 @@ void StorageManager::addStorage(
 
     auto addStorageContext = std::make_shared<AddStorageContext>();
 
-    m_database->synchronizationEngine().transactionLog().startDbTransaction(
-        m_settings.database().synchronization.clusterId,
-        [this, addStorageContext, request, clientEndpoint, accountOwner = accountOwner](auto queryContext)
+    m_database->syncEngine().transactionLog().startDbTransaction(
+        m_clusterId,
+        [this, guard = m_asyncCounter.getScopedIncrement(), addStorageContext, request,
+            clientEndpoint, accountOwner = std::move(accountOwner)](
+                 auto queryContext)
         {
             auto buckets = m_bucketManager->fetchBuckets(queryContext);
 
@@ -179,12 +185,15 @@ void StorageManager::addStorage(
 
             addStorageContext->initializeStorage(accountOwner, bucket, request);
 
-            return modifyDbAndSynchronize<command::SaveStorage>(
-                queryContext,
-                addStorageContext->storage,
-                std::bind(&AbstractStorageDao::addStorage, m_storageDao, _1, _2));
+            return m_database->syncEngine().transactionLog()
+                .saveDbOperationToLog<model::command::SaveStorage>(
+                    queryContext,
+                    m_clusterId,
+                    addStorageContext->storage,
+                    std::bind(&AbstractStorageDao::addStorage, m_storageDao, _1, _2));
         },
-        [this, handler = std::move(handler), addStorageContext](auto dbResult)
+        [this, guard = m_asyncCounter.getScopedIncrement(), handler = std::move(handler), addStorageContext](
+            auto dbResult)
         {
             if (dbResult != nx::sql::DBResult::ok)
             {
@@ -226,21 +235,23 @@ void StorageManager::removeStorage(
 
     auto storage = std::make_shared<std::optional<api::Storage>>();
 
-    m_database->synchronizationEngine().transactionLog().startDbTransaction(
+    m_database->syncEngine().transactionLog().startDbTransaction(
         m_settings.database().synchronization.clusterId,
-        [this, storageId, storage](auto queryContext)
+        [this, guard = m_asyncCounter.getScopedIncrement(), storageId, storage](auto queryContext)
         {
             *storage = m_storageDao->readStorage(queryContext, storageId);
             if (!storage)
                 return nx::sql::DBResult::ok;
 
-            return modifyDbAndSynchronize<command::RemoveStorage>(
-                queryContext,
-                storageId,
-                std::bind(&AbstractStorageDao::removeStorage, m_storageDao, _1, _2));
+            return m_database->syncEngine().transactionLog()
+                .saveDbOperationToLog<model::command::RemoveStorage>(
+                    queryContext,
+                    m_clusterId,
+                    storageId,
+                    std::bind(&AbstractStorageDao::removeStorage, m_storageDao, _1, _2));
         },
-        [this, authInfo = std::move(authInfo), storageId, storage,
-            handler = std::move(handler)](
+        [this, guard = m_asyncCounter.getScopedIncrement(), authInfo = std::move(authInfo),
+            storage, storageId, handler = std::move(handler)](
                 auto dbResult)
         {
             if (dbResult != nx::sql::DBResult::ok)
@@ -274,8 +285,6 @@ void StorageManager::getCredentials(
     std::string storageId,
     nx::utils::MoveOnlyFunc<void(api::Result, api::StorageCredentials)> handler)
 {
-    // TODO decide if withDataUsage is necessary, e.g. data usage is always calculated.
-    // it can be used to deny credentials if storage utilization exceeds storage size
     auto readStorageContext =
         std::make_shared<StorageManager::ReadStorageContext>(
             std::move(storageId),
@@ -298,7 +307,7 @@ void StorageManager::addSystem(
     api::AddSystemRequest request,
     nx::utils::MoveOnlyFunc<void(api::Result, api::System)> handler)
 {
-    modifySystemStorageRelation<command::SaveSystem>(
+    modifySystemStorageRelation<model::command::SaveSystem>(
         std::move(authInfo),
         storageId,
         request.id,
@@ -312,7 +321,7 @@ void StorageManager::removeSystem(
     std::string systemId,
     nx::utils::MoveOnlyFunc<void(api::Result)> handler)
 {
-    modifySystemStorageRelation<command::RemoveSystem>(
+    modifySystemStorageRelation<model::command::RemoveSystem>(
         std::move(authInfo),
         storageId,
         systemId,
@@ -329,9 +338,8 @@ void StorageManager::getStorage(
     if (readStorageContext->storageId.empty())
         return readStorageContext->handler(utils::badRequest("Empty storageId"), api::Storage());
 
-    m_database->synchronizationEngine().transactionLog().startDbTransaction(
-        m_settings.database().synchronization.clusterId,
-        [this, readStorageContext](auto queryContext)
+    m_database->queryExecutor().executeSelect(
+        [this, guard = m_asyncCounter.getScopedIncrement(), readStorageContext](auto queryContext)
         {
             auto storage = m_storageDao->readStorage(queryContext, readStorageContext->storageId);
             readStorageContext->found = storage.has_value();
@@ -344,7 +352,8 @@ void StorageManager::getStorage(
 
             return nx::sql::DBResult::ok;
         },
-        [this, readStorageContext](auto dbResult) mutable
+        [this, guard = m_asyncCounter.getScopedIncrement(), readStorageContext](
+            auto dbResult) mutable
         {
             if (dbResult != nx::sql::DBResult::ok)
             {
@@ -413,7 +422,7 @@ void StorageManager::getCredentialsForStorage(
         {
             if (!awsResult.ok())
             {
-                NX_ERROR(this, "sts:AssumeRole failed: %1", awsResult.text());
+                NX_INFO(this, "sts:AssumeRole failed: %1", awsResult.text());
                 return handler(utils::toResult(awsResult), api::StorageCredentials());
             }
 
@@ -557,17 +566,37 @@ void StorageManager::removeDataUsageCalculator(
 
 void StorageManager::registerSyncEngineCommandHandlers()
 {
-    registerCommandHandler<command::SaveStorage>(
-        std::bind(&AbstractStorageDao::addStorage, m_storageDao, _1, _2));
 
-    registerCommandHandler<command::RemoveStorage>(
-        std::bind(&AbstractStorageDao::removeStorage, m_storageDao, _1, _2));
+    m_database->syncEngine().incomingCommandDispatcher()
+        .registerCommandHandler<model::command::SaveStorage>(
+            std::bind(&AbstractStorageDao::addStorage, m_storageDao, _1, _3));
 
-    registerCommandHandler<command::SaveSystem>(
-        std::bind(&AbstractStorageDao::addSystem, m_storageDao, _1, _2));
+    m_database->syncEngine().incomingCommandDispatcher()
+        .registerCommandHandler<model::command::RemoveStorage>(
+            std::bind(&AbstractStorageDao::removeStorage, m_storageDao, _1, _3));
 
-    registerCommandHandler<command::RemoveSystem>(
-        std::bind(&AbstractStorageDao::removeSystem, m_storageDao, _1, _2));
+    m_database->syncEngine().incomingCommandDispatcher()
+        .registerCommandHandler<model::command::SaveSystem>(
+            std::bind(&AbstractStorageDao::addSystem, m_storageDao, _1, _3));
+
+    m_database->syncEngine().incomingCommandDispatcher()
+        .registerCommandHandler<model::command::RemoveSystem>(
+            std::bind(&AbstractStorageDao::removeSystem, m_storageDao, _1, _3));
+}
+
+void StorageManager::unregisterSyncEngineCommandHandlers()
+{
+    m_database->syncEngine().incomingCommandDispatcher()
+        .removeHandler<model::command::SaveStorage>();
+
+    m_database->syncEngine().incomingCommandDispatcher()
+        .removeHandler<model::command::RemoveStorage>();
+
+    m_database->syncEngine().incomingCommandDispatcher()
+        .removeHandler<model::command::SaveSystem>();
+
+    m_database->syncEngine().incomingCommandDispatcher()
+        .removeHandler<model::command::RemoveSystem>();
 }
 
 template<typename Command, typename DbFunc, typename Handler>
@@ -588,21 +617,25 @@ void StorageManager::modifySystemStorageRelation(
     system->storageId = storageId;
     system->id = systemId;
 
-    m_database->synchronizationEngine().transactionLog().startDbTransaction(
+    m_database->syncEngine().transactionLog().startDbTransaction(
         m_settings.database().synchronization.clusterId,
-        [this, storage, system, dbFunc = std::move(dbFunc)](auto queryContext)
+        [this, guard = m_asyncCounter.getScopedIncrement(), storage, system,
+            dbFunc = std::move(dbFunc)](
+                auto queryContext)
         {
             *storage = m_storageDao->readStorage(queryContext, system->storageId);
             if (!*storage)
                 return nx::sql::DBResult::ok;
 
-            return modifyDbAndSynchronize<Command>(
-                queryContext,
-                *system,
-                std::move(dbFunc));
+            return m_database->syncEngine().transactionLog()
+                .saveDbOperationToLog<Command>(
+                    queryContext,
+                    m_clusterId,
+                    *system,
+                    std::move(dbFunc));
         },
-        [this, authInfo = std::move(authInfo), storage, system,
-            handler = std::move(handler)](
+        [this, guard = m_asyncCounter.getScopedIncrement(), authInfo = std::move(authInfo),
+            storage, system, handler = std::move(handler)](
                 auto dbResult)
         {
             if (dbResult != nx::sql::DBResult::ok)

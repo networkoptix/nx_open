@@ -9,7 +9,8 @@
 #include <nx/cloud/storage/service/api/storage_credentials.h>
 #include <nx/cloud/storage/service/api/system.h>
 #include <nx/sql/query_context.h>
-#include <nx/utils/basic_factory.h>
+#include <nx/utils/counter.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 #include "bucket_manager.h"
 #include "geo_ip_resolver.h"
@@ -17,6 +18,7 @@
 
 namespace nx {
 
+namespace clusterdb::engine { class Synchroni; }
 namespace utils::stree { class ResourceContainer; }
 
 namespace network { class SocketAddress; }
@@ -44,8 +46,7 @@ class AccessManager;
 
 using GetStorageHandler = nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)>;
 
-class StorageManager:
-    public BaseManager
+class StorageManager
 {
 public:
     StorageManager(
@@ -156,9 +157,11 @@ private:
         Handler handler);
 
     void registerSyncEngineCommandHandlers();
+    void unregisterSyncEngineCommandHandlers();
 
 private:
     const conf::Settings& m_settings;
+    const std::string& m_clusterId;
     model::Database* m_database = nullptr;
     model::dao::AbstractStorageDao* m_storageDao = nullptr;
     BucketManager* m_bucketManager = nullptr;
@@ -167,6 +170,7 @@ private:
     QnMutex m_mutex;
     std::set<std::shared_ptr<s3::DataUsageCalculator>> m_dataUsageCalculators;
     std::unique_ptr<aws::sts::ApiClient> m_stsClient;
+    nx::utils::Counter m_asyncCounter;
 };
 
 } // namespace controller

@@ -8,7 +8,7 @@
 #include <nx/cloud/storage/service/api/storage.h>
 #include <nx/cloud/storage/service/api/system.h>
 
-namespace nx::cloud::storage::service::controller {
+namespace nx::cloud::storage::service::model {
 
 namespace command {
 
@@ -97,4 +97,4 @@ struct RemoveSystem
 
 } // namespace command
 
-} // namespace nx::cloud::storage::service::controller
+} // namespace nx::cloud::storage::service::model

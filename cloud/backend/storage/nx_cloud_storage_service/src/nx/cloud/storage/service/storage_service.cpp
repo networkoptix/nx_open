@@ -77,7 +77,7 @@ void StorageService::registerThisInstanceInCluster()
         return;
     }
 
-    m_model->database().synchronizationEngine().registerHttpApi(
+    m_model->database().syncEngine().registerHttpApi(
         clusterdb::engine::kBaseSynchronizationPath,
         &m_view->httpServer()->messageDispatcher());
 
@@ -90,7 +90,7 @@ void StorageService::registerThisInstanceInCluster()
             http::rest::substituteParameters(
                 clusterdb::engine::kBaseSynchronizationPath, {clusterId}));
 
-    m_model->database().synchronizationEngine().discoveryManager().start(
+    m_model->database().syncEngine().discoveryManager().start(
         clusterId,
         syncEngineUrl);
 }

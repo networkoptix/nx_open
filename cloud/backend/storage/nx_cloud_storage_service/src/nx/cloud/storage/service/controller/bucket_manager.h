@@ -4,9 +4,8 @@
 #include <nx/cloud/storage/service/api/add_bucket.h>
 #include <nx/cloud/storage/service/api/bucket.h>
 #include <nx/sql/query_context.h>
+#include <nx/utils/counter.h>
 
-#include "base_manager.h"
-#include "command.h"
 #include "s3/permissions_tester.h"
 
 namespace nx::cloud {
@@ -20,6 +19,7 @@ namespace conf { class Settings; }
 namespace model {
 
 namespace dao { class AbstractBucketDao; }
+
 class Database;
 class Model;
 
@@ -29,7 +29,7 @@ namespace controller {
 
 using AddBucketHandler = nx::utils::MoveOnlyFunc<void(api::Result, api::Bucket)>;
 
-class BucketManager: public BaseManager
+class BucketManager
 {
 public:
     BucketManager(const conf::Settings& settings, model::Model* model);
@@ -58,13 +58,16 @@ private:
     void removePermissionsTest(const std::shared_ptr<s3::PermissionsTester>& permissionsTester);
 
     void registerSyncEngineCommandHandlers();
+    void unregisterSyncEngineCommandHandlers();
 
 private:
     const conf::Settings& m_settings;
+    const std::string& m_clusterId;
     model::Database* m_database = nullptr;
     model::dao::AbstractBucketDao* m_bucketDao = nullptr;
     QnMutex m_mutex;
     std::set<std::shared_ptr<s3::PermissionsTester>> m_permissionsTesters;
+    nx::utils::Counter m_asyncCounter;
 };
 
 } // namespace controller

@@ -5,11 +5,11 @@
 #include <nx/network/url/url_builder.h>
 
 #include "nx/cloud/storage/service/settings.h"
+#include "nx/cloud/storage/service/model/command.h"
 #include "nx/cloud/storage/service/model/model.h"
 #include "nx/cloud/storage/service/model/database.h"
 #include "nx/cloud/storage/service/model/dao/bucket_dao.h"
 #include "nx/cloud/storage/service/utils.h"
-#include "command.h"
 #include "utils.h"
 
 namespace nx::cloud::storage::service::controller {
@@ -18,10 +18,8 @@ using namespace std::placeholders;
 using namespace model::dao;
 
 BucketManager::BucketManager(const conf::Settings& settings, model::Model* model):
-    BaseManager(
-        settings.database().synchronization.clusterId,
-        &model->database().synchronizationEngine()),
     m_settings(settings),
+    m_clusterId(settings.database().synchronization.clusterId),
     m_database(&model->database()),
     m_bucketDao(&model->bucketDao())
 {
@@ -30,8 +28,14 @@ BucketManager::BucketManager(const conf::Settings& settings, model::Model* model
 
 BucketManager::~BucketManager()
 {
+    unregisterSyncEngineCommandHandlers();
+    m_asyncCounter.wait();
+
     QnMutexLocker lock(&m_mutex);
-    for (auto& permissionsTester: m_permissionsTesters)
+    auto permissionsTesters = std::move(m_permissionsTesters);
+    lock.unlock();
+
+    for (auto& permissionsTester: permissionsTesters)
         permissionsTester->pleaseStopSync();
 }
 
@@ -45,15 +49,16 @@ void BucketManager::addBucket(const api::AddBucketRequest& request, AddBucketHan
     auto permissionsTester = createPermissionsTest(request.name);
 
     permissionsTester->doTest(
-        [this, request, handler = std::move(handler), permissionsTester](
-            auto result,
-            auto region) mutable
+        [this, request, handler = std::move(handler),
+            permissionsTester](
+                auto result,
+                auto region) mutable
         {
             removePermissionsTest(permissionsTester);
 
             if (result.resultCode != api::ResultCode::ok)
             {
-                NX_ERROR(this, "S3 permissions test failed: %1, %2",
+                NX_INFO(this, "S3 permissions test failed: %1, %2",
                     toString(result.resultCode), result.error);
                 return handler(std::move(result), api::Bucket());
             }
@@ -67,14 +72,15 @@ void BucketManager::listBuckets(
 {
     auto buckets = std::make_shared<api::Buckets>();
 
-    m_database->synchronizationEngine().transactionLog().startDbTransaction(
-        m_settings.database().synchronization.clusterId,
-        [this, buckets](auto queryContext)
+    m_database->queryExecutor().executeSelect(
+        [this, guard = m_asyncCounter.getScopedIncrement(), buckets](auto queryContext)
         {
             buckets->buckets = fetchBuckets(queryContext, true /*withStorageCount*/);
             return nx::sql::DBResult::ok;
         },
-        [this, handler = std::move(handler), buckets](auto dbResult)
+        [this, guard = m_asyncCounter.getScopedIncrement(),
+            handler = std::move(handler), buckets](
+                auto dbResult)
         {
             if (dbResult != nx::sql::DBResult::ok)
             {
@@ -93,16 +99,19 @@ void BucketManager::removeBucket(
     const std::string& bucketName,
     nx::utils::MoveOnlyFunc<void(api::Result)> handler)
 {
-    m_database->synchronizationEngine().transactionLog().startDbTransaction(
-        m_settings.database().synchronization.clusterId,
-        [this, bucketName](auto queryContext)
+    m_database->queryExecutor().executeUpdate(
+        [this, guard = m_asyncCounter.getScopedIncrement(), bucketName](auto queryContext)
         {
-            return modifyDbAndSynchronize<command::RemoveBucket>(
-                queryContext,
-                bucketName,
-                std::bind(&AbstractBucketDao::removeBucket, m_bucketDao, _1, _2));
+            return m_database->syncEngine().transactionLog()
+                .saveDbOperationToLog<model::command::RemoveBucket>(
+                    queryContext,
+                    m_clusterId,
+                    bucketName,
+                    std::bind(&AbstractBucketDao::removeBucket, m_bucketDao, _1, _2));
         },
-        [this, handler = std::move(handler), bucketName](nx::sql::DBResult dbResult)
+        [this, guard = m_asyncCounter.getScopedIncrement(), handler = std::move(handler),
+            bucketName](
+                auto dbResult)
         {
             if (dbResult != nx::sql::DBResult::ok)
             {
@@ -134,16 +143,20 @@ void BucketManager::addBucketToDb(
     bucket->region = std::move(region);
     bucket->cloudStorageCount = 0;
 
-    m_database->synchronizationEngine().transactionLog().startDbTransaction(
-        m_settings.database().synchronization.clusterId,
-        [this, bucket](auto queryContext)
+    m_database->syncEngine().transactionLog().startDbTransaction(
+        m_clusterId,
+        [this, guard = m_asyncCounter.getScopedIncrement(), bucket](auto queryContext)
         {
-            return modifyDbAndSynchronize<command::SaveBucket>(
-                queryContext,
-                *bucket,
-                std::bind(&AbstractBucketDao::addBucket, m_bucketDao, _1, _2));
+            return m_database->syncEngine().transactionLog()
+                .saveDbOperationToLog<model::command::SaveBucket>(
+                    queryContext,
+                    m_clusterId,
+                    *bucket,
+                    std::bind(&AbstractBucketDao::addBucket, m_bucketDao, _1, _2));
         },
-        [this, handler = std::move(handler), bucket](auto dbResult)
+        [this, guard = m_asyncCounter.getScopedIncrement(), handler = std::move(handler),
+            bucket](
+                auto dbResult)
         {
             if (dbResult != nx::sql::DBResult::ok)
             {
@@ -183,11 +196,22 @@ void BucketManager::removePermissionsTest(
 
 void BucketManager::registerSyncEngineCommandHandlers()
 {
-    registerCommandHandler<command::SaveBucket>(
-        std::bind(&AbstractBucketDao::addBucket, m_bucketDao, _1, _2));
+    m_database->syncEngine().incomingCommandDispatcher()
+        .registerCommandHandler<model::command::SaveBucket>(
+            std::bind(&AbstractBucketDao::addBucket, m_bucketDao, _1, _3));
 
-    registerCommandHandler<command::RemoveBucket>(
-        std::bind(&AbstractBucketDao::removeBucket, m_bucketDao, _1, _2));
+    m_database->syncEngine().incomingCommandDispatcher()
+        .registerCommandHandler<model::command::RemoveBucket>(
+            std::bind(&AbstractBucketDao::removeBucket, m_bucketDao, _1, _3));
+}
+
+void BucketManager::unregisterSyncEngineCommandHandlers()
+{
+    m_database->syncEngine().incomingCommandDispatcher()
+        .removeHandler<model::command::SaveBucket>();
+
+    m_database->syncEngine().incomingCommandDispatcher()
+        .removeHandler<model::command::RemoveBucket>();
 }
 
 } // namespace nx::cloud::storage::service::controller
