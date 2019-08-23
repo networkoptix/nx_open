@@ -30,6 +30,9 @@ enum class Format
 };
 
 
+bool is24HoursTimeFormat();
+QString getLocalizedHours(const QDateTime& value);
+QString getHoursTimeFormatMark(const QDateTime& value);
 QString toString(const QDateTime& time, Format format = Format::yyyy_MM_dd_hh_mm_ss);
 QString toString(const QTime& time, Format format = Format::hh_mm_ss);
 QString toString(const QDate& date, Format format = Format::dd_MM_yyyy);

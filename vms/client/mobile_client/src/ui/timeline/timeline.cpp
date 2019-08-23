@@ -192,31 +192,31 @@ public:
         const int min = 60 * sec;
         const int hour = 60 * min;
 
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Milliseconds,    10));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Milliseconds,    50));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Milliseconds,    100));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Milliseconds,    500));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Seconds,         sec));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Seconds,         5 * sec));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Seconds,         10 * sec));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Seconds,         30 * sec));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Minutes,         min));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Minutes,         5 * min));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Minutes,         10 * min));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Minutes,         30 * min));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           hour));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           3 * hour));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           6 * hour));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Hours,           12 * hour));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Days,            1));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Days,            5));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Days,            15));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Months,          1));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Months,          3));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Months,          6));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Years,           1));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Years,           5));
-        zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Years,           10));
+        zoomLevels.append({QnTimelineZoomLevel::Milliseconds, 10});
+        zoomLevels.append({QnTimelineZoomLevel::Milliseconds, 50});
+        zoomLevels.append({QnTimelineZoomLevel::Milliseconds, 100});
+        zoomLevels.append({QnTimelineZoomLevel::Milliseconds, 500});
+        zoomLevels.append({QnTimelineZoomLevel::Seconds, sec});
+        zoomLevels.append({QnTimelineZoomLevel::Seconds, 5 * sec});
+        zoomLevels.append({QnTimelineZoomLevel::Seconds, 10 * sec});
+        zoomLevels.append({QnTimelineZoomLevel::Seconds, 30 * sec});
+        zoomLevels.append({QnTimelineZoomLevel::Minutes, min});
+        zoomLevels.append({QnTimelineZoomLevel::Minutes, 5 * min});
+        zoomLevels.append({QnTimelineZoomLevel::Minutes, 10 * min});
+        zoomLevels.append({QnTimelineZoomLevel::Minutes, 30 * min});
+        zoomLevels.append({QnTimelineZoomLevel::Hours, hour});
+        zoomLevels.append({QnTimelineZoomLevel::Hours, 3 * hour});
+        zoomLevels.append({QnTimelineZoomLevel::Hours, 6 * hour});
+        zoomLevels.append({QnTimelineZoomLevel::Hours, 12 * hour});
+        zoomLevels.append({QnTimelineZoomLevel::Days, 1});
+        zoomLevels.append({QnTimelineZoomLevel::Days, 5});
+        zoomLevels.append({QnTimelineZoomLevel::Days, 15});
+        zoomLevels.append({QnTimelineZoomLevel::Months, 1});
+        zoomLevels.append({QnTimelineZoomLevel::Months, 3});
+        zoomLevels.append({QnTimelineZoomLevel::Months, 6});
+        zoomLevels.append({QnTimelineZoomLevel::Years,  1});
+        zoomLevels.append({QnTimelineZoomLevel::Years, 5});
+        zoomLevels.append({QnTimelineZoomLevel::Years, 10});
         targetZoomLevel = zoomLevel = zoomLevels.size() - zoomLevelsVisible;
 
         static constexpr int kMaxStickyPointSpeed = 15;
@@ -374,7 +374,7 @@ public:
     int calculateTargetTextLevel() const;
     QVector<TextMarkInfo> calculateVisibleTextMarks() const;
 
-    void placeDigit(qreal x, qreal y, int digit, QSGGeometry::TexturedPoint2D* points);
+    QSize placeSymbol(qreal x, qreal y, QChar symbol, QSGGeometry::TexturedPoint2D* points);
     int placeText(const TextMarkInfo& textMark, int textLevel, QSGGeometry::TexturedPoint2D* points);
 
     bool hasArchive() const;
@@ -390,7 +390,7 @@ QnTimeline::QnTimeline(QQuickItem* parent):
     connect(this, &QnTimeline::positionChanged, this, &QnTimeline::positionDateChanged);
     connect(this, &QnTimeline::widthChanged, this, [this](){ d->updateZoomLevel(); });
 
-    d->suffixList << "ms" << "s" << ":";
+    d->suffixList << "ms" << "s" << ":" << "AM" << "PM";
 
     QLocale locale;
     for (int i = 1; i <= 12; ++i)
@@ -1211,18 +1211,15 @@ QSGNode* QnTimeline::updateTextNode(QSGNode* rootNode)
     {
         const auto& zoomLevel = d->zoomLevels[textMark.zoomIndex];
 
-        const auto baseValueSize = zoomLevel.baseValue(textMark.tick).size();
-        const auto subValueSize = zoomLevel.subValue(textMark.tick).size();
+        const auto valueSize = zoomLevel.value(textMark.tick).size();
         const auto suffixSize = zoomLevel.suffix(textMark.tick).isEmpty() ? 0 : 1;
 
-        lowerTextCount += baseValueSize;
-        lowerTextCount += subValueSize;
+        lowerTextCount += valueSize;
         lowerTextCount += suffixSize;
 
         if (textMark.zoomIndex > textMarkLevel)
         {
-            textCount += baseValueSize;
-            textCount += subValueSize;
+            textCount += valueSize;
             textCount += suffixSize;
         }
     }
@@ -1964,72 +1961,72 @@ QVector<TextMarkInfo> QnTimelinePrivate::calculateVisibleTextMarks() const
     return result;
 }
 
-void QnTimelinePrivate::placeDigit(
-    qreal x, qreal y, int digit, QSGGeometry::TexturedPoint2D* points)
+QSize QnTimelinePrivate::placeSymbol(
+    qreal x,
+    qreal y,
+    QChar symbol,
+    QSGGeometry::TexturedPoint2D* points)
 {
-    QSize digitSize = textHelper->digitSize();
+    const auto size = textHelper->stringSize(symbol);
+    const qreal height = size.height();
+    const qreal width = size.width();
 
-    QRectF texCoord = textHelper->digitCoordinates(digit);
-    points[0].set(x, y, texCoord.left(), texCoord.top());
-    points[1].set(x + digitSize.width(), y, texCoord.right(), texCoord.top());
-    points[2].set(x + digitSize.width(), y + digitSize.height(), texCoord.right(), texCoord.bottom());
+    const auto coord = textHelper->symbolCoordinates(symbol);
+    const qreal top = coord.top();
+    const qreal bottom = coord.bottom();
+    const qreal left = coord.left();
+    const qreal right = coord.right();
+
+    points[0].set(x, y, left, top);
+    points[1].set(x + width, y, right, top);
+    points[2].set(x + width, y + height, right, bottom);
     points[3] = points[0];
     points[4] = points[2];
-    points[5].set(x, y + digitSize.height(), texCoord.left(), texCoord.bottom());
+    points[5].set(x, y + height, left, bottom);
+    return size;
 }
 
 int QnTimelinePrivate::placeText(
     const TextMarkInfo& textMark, int textLevel, QSGGeometry::TexturedPoint2D* points)
 {
-    QString baseValue = zoomLevels[textLevel].baseValue(textMark.tick);
-    QString subValue = zoomLevels[textLevel].subValue(textMark.tick);
-    QString suffix = zoomLevels[textLevel].suffix(textMark.tick);
-    QSize suffixSize = textHelper->stringSize(suffix);
+    const auto value = zoomLevels[textLevel].value(textMark.tick);
+    const auto suffix = zoomLevels[textLevel].suffix(textMark.tick);
+    const auto suffixSize = textHelper->stringSize(suffix);
+    const auto suffixWidth = suffixSize.width();
 
-    QSize digitSize = textHelper->digitSize();
+    qreal textWidth = textHelper->stringSize(value).width();
+    if (suffixWidth)
+        textWidth += suffixWidth;
 
-    qreal tw = digitSize.width() * (baseValue.size() + subValue.size()) + suffixSize.width();
-    if (baseValue.isEmpty())
-        tw += textHelper->spaceWidth() * 2;
-
-    qreal x = qFloor(textMark.x - tw / 2);
+    qreal x = qFloor(textMark.x - textWidth / 2);
     qreal y = textY >= 0
         ? textY
         : qFloor((parent->height() - chunkBarHeight - textHelper->lineHeight()) / 2);
     int shift = 0;
 
-    for (int i = 0; i < baseValue.size(); ++i)
+    for (QChar symbol: value)
     {
-        placeDigit(x, y, baseValue.mid(i, 1).toInt(), points);
+        const auto symbolWidth = placeSymbol(x, y, symbol, points).width();
         points += 6;
         shift += 6;
-        x += digitSize.width();
+        x += symbolWidth;
     }
-
-    if (subValue.isEmpty())
-        x += textHelper->spaceWidth();
 
     if (!suffix.isEmpty())
     {
-        QRectF texCoord = textHelper->stringCoordinates(suffix);
-        points[0].set(x, y, texCoord.left(), texCoord.top());
-        points[1].set(x + suffixSize.width(), y, texCoord.right(), texCoord.top());
-        points[2].set(x + suffixSize.width(), y + suffixSize.height(),
-            texCoord.right(), texCoord.bottom());
+        x += textHelper->spaceWidth();
+
+        const auto coord = textHelper->stringCoordinates(suffix);
+        points[0].set(x, y, coord.left(), coord.top());
+        points[1].set(x + suffixWidth, y, coord.right(), coord.top());
+        points[2].set(x + suffixWidth, y + suffixSize.height(),
+            coord.right(), coord.bottom());
         points[3] = points[0];
         points[4] = points[2];
-        points[5].set(x, y + suffixSize.height(), texCoord.left(), texCoord.bottom());
+        points[5].set(x, y + suffixSize.height(), coord.left(), coord.bottom());
         points += 6;
         shift += 6;
-        x += suffixSize.width();
-    }
-
-    for (int i = 0; i < subValue.size(); ++i)
-    {
-        placeDigit(x, y, subValue.mid(i, 1).toInt(), points);
-        points += 6;
-        shift += 6;
-        x += digitSize.width();
+        x += suffixWidth;
     }
 
     return shift;

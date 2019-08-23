@@ -62,6 +62,7 @@ class QnContext: public QObject, public QnConnectionContextAware
     Q_PROPERTY(int rightCustomMargin READ rightCustomMargin NOTIFY customMarginsChanged)
     Q_PROPERTY(int topCustomMargin READ topCustomMargin NOTIFY customMarginsChanged)
     Q_PROPERTY(int bottomCustomMargin READ bottomCustomMargin NOTIFY customMarginsChanged)
+    Q_PROPERTY(bool is24HoursTimeFormat MEMBER m_is24HoursFormat CONSTANT)
 
 public:
     QnContext(QObject *parent = NULL);
@@ -129,6 +130,9 @@ public:
 
     Q_INVOKABLE void makeShortVibration();
 
+    Q_INVOKABLE QString getHoursTimeFormatMark(const QDateTime& value);
+    Q_INVOKABLE QString getLocalizedHours(const QDateTime& value);
+
     int leftCustomMargin() const;
     int rightCustomMargin() const;
     int topCustomMargin() const;
@@ -142,6 +146,7 @@ signals:
     void customMarginsChanged();
 
 private:
+    const bool m_is24HoursFormat;
     AudioController* const m_audioController;
     QnConnectionManager* const m_connectionManager;
     QmlSettingsAdaptor* const m_settings;

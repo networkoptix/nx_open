@@ -52,10 +52,8 @@ std::map<Format, QString> formatStrings =
 
 void DateTimeFormats::setFormats()
 {
-    QLocale locale = QLocale::system(); //< We now use OS locale for time instead of client locale.
-    const bool amPm = locale.timeFormat().contains(lit("AP"), Qt::CaseInsensitive);
-
-    formatStrings[Format::hh] = amPm ? lit("h AP") : lit("hh:00");
+    const auto locale = QLocale::system();
+    formatStrings[Format::hh] = is24HoursTimeFormat() ? lit("hh:00") : lit("h AP");
     formatStrings[Format::hh_mm] = locale.timeFormat(QLocale::ShortFormat);
     formatStrings[Format::hh_mm_ss] = locale.timeFormat(QLocale::LongFormat);
 
@@ -84,9 +82,9 @@ void DateTimeFormats::setFormats()
     removeTimezone(formatStrings[Format::yyyy_MM_dd_hh_mm_ss]);
     removeTimezone(formatStrings[Format::dddd_d_MMMM_yyyy_hh_mm_ss]);
 
-    formatStrings[Format::filename_date] = amPm
-        ? lit("yyyy_MM_dd_hAP_mm_ss")
-        : lit("yyyy_MM_dd_hh_mm_ss");
+    formatStrings[Format::filename_date] = is24HoursTimeFormat()
+        ? lit("yyyy_MM_dd_hh_mm_ss")
+        : lit("yyyy_MM_dd_hAP_mm_ss");
 }
 
 bool localeEverInited = false;
@@ -98,6 +96,36 @@ void checkInited()
 }
 
 } // namespace
+
+bool is24HoursTimeFormat()
+{
+    static const bool result =
+        []()
+        {
+            // We now use OS locale for time instead of client locale.
+            QLocale locale = QLocale::system();
+            return !locale.timeFormat().contains(lit("AP"), Qt::CaseInsensitive);
+        }();
+    return result;
+}
+
+QString getLocalizedHours(const QDateTime& value)
+{
+    return is24HoursTimeFormat()
+        ? value.toString(QStringLiteral("hh"))
+        : QString::number(value.time().hour() % 12);
+}
+
+QString getHoursTimeFormatMark(const QDateTime& value)
+{
+    if (is24HoursTimeFormat())
+        return QString();
+
+    // We don't localize AM/PM markers.
+    return value.time().hour() < 12
+        ? "AM"
+        : "PM";
+}
 
 QString toString(const QDateTime& time, Format format)
 {
