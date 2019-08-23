@@ -16,7 +16,6 @@ namespace http {
 
 void ClientPool::Response::reset()
 {
-    systemError = SystemError::noError;
     statusLine = {};
     messageBody = {};
     contentType = {};
@@ -26,6 +25,23 @@ StatusCode::Value ClientPool::Context::getStatusCode() const
 {
     NX_MUTEX_LOCKER lock(&mutex);
     return static_cast<StatusCode::Value>(response.statusLine.statusCode);
+}
+
+QThread* ClientPool::Context::getTargetThread() const
+{
+    return *targetThread;
+}
+
+void ClientPool::Context::setTargetThread(QThread* thread)
+{
+    if (thread)
+        targetThread = thread;
+}
+
+bool ClientPool::Context::targetThreadIsDead() const
+{
+    NX_MUTEX_LOCKER lock(&mutex);
+    return targetThread.has_value() && *targetThread == nullptr;
 }
 
 bool ClientPool::Context::hasResponse() const
@@ -100,7 +116,7 @@ int ClientPool::doGet(
     context->request.method = Method::get;
     context->request.url = url;
     context->request.headers = headers;
-    context->request.timeout = timeout;
+    context->timeout = timeout;
     return sendRequest(std::move(context));
 }
 
@@ -117,23 +133,9 @@ int ClientPool::doPost(
     context->request.headers = headers;
     context->request.contentType = contentType;
     context->request.messageBody = msgBody;
-    context->request.timeout = timeout;
+    context->timeout = timeout;
     return sendRequest(std::move(context));
 }
-
-/*
-int ClientPool::sendRequest(Request&& request)
-{
-    QnMutexLocker lock(&m_mutex);
-    int requestId = ++m_requestId;
-    auto context = QSharedPointer<Context>(new Context());
-    context->request = std::move(request);
-    context->handle = requestId;
-
-    m_awaitingRequests.emplace(requestId, context);
-    sendNextRequestUnsafe();
-    return requestId;
-}*/
 
 int ClientPool::sendRequest(ContextPtr context)
 {
@@ -160,6 +162,15 @@ void ClientPool::terminate(int handle)
         if (connection->getHandle() == handle)
         {
             AsyncHttpClientPtr client = connection->client;
+            if (connection->context)
+            {
+                auto url = connection->context->getUrl();
+                NX_VERBOSE(this, "terminate(%1) - terminating request to \"%2\"", handle, url);
+            }
+            else
+            {
+                NX_VERBOSE(this, "terminate(%1) - terminating orphaned connection", handle);
+            }
 
             connection->client = createHttpConnection();
             connection->context.reset();
@@ -219,10 +230,10 @@ void ClientPool::sendRequestUnsafe(ContextPtr context, AsyncHttpClientPtr httpCl
     NX_MUTEX_LOCKER lock(&context->mutex);
     const Request& request = context->request;
 
-    if (request.timeout)
+    if (context->timeout)
     {
-        httpClient->setResponseReadTimeoutMs(httpTimeoutMs(*request.timeout));
-        httpClient->setMessageBodyReadTimeoutMs(httpTimeoutMs(*request.timeout));
+        httpClient->setResponseReadTimeoutMs(httpTimeoutMs(*context->timeout));
+        httpClient->setMessageBodyReadTimeoutMs(httpTimeoutMs(*context->timeout));
     }
     else
     {
@@ -315,6 +326,7 @@ ClientPool::HttpConnection* ClientPool::getUnusedConnection(const nx::utils::Url
 
     if (!result && count < m_maxPoolSize)
     {
+        NX_VERBOSE(this, "getUnusedConnection(%1) - creating new connection");
         result = new HttpConnection();
         result->client = createHttpConnection();
 
@@ -349,7 +361,7 @@ void ClientPool::readHttpResponse(Context& context, AsyncHttpClientPtr httpClien
     Response& response = context.response;
     response.reset();
 
-    response.systemError = SystemError::noError;
+    context.systemError = SystemError::noError;
 
     if (httpClient->response())
     {
@@ -364,7 +376,7 @@ void ClientPool::readHttpResponse(Context& context, AsyncHttpClientPtr httpClien
 
     if (httpClient->failed())
     {
-        response.systemError = SystemError::connectionReset;
+        context.systemError = SystemError::connectionReset;
     }
     else
     {
@@ -396,7 +408,13 @@ void ClientPool::at_HttpClientDone(nx::network::http::AsyncHttpClientPtr clientP
     if (context)
     {
         readHttpResponse(*context, clientPtr);
-        emit requestIsDone(std::move(context));
+        if (!context->targetThreadIsDead())
+        {
+            if (context->completionFunc)
+                context->completionFunc(context);
+            emit requestIsDone(context);
+        }
+        context.reset();
     }
 
     {

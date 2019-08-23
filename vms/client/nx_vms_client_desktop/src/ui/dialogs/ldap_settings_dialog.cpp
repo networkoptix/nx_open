@@ -12,7 +12,7 @@
 #include <core/resource/user_resource.h>
 
 #include <api/app_server_connection.h>
-#include <api/media_server_connection.h>
+#include <api/server_rest_connection.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <utils/common/ldap.h>
@@ -75,8 +75,8 @@ void QnLdapSettingsDialogPrivate::testSettings()
     if (!settings.isValid())
     {
         stopTesting(tr("The provided settings are not valid.")
-			+ '\n'
-			+ tr("Could not perform a test."));
+            + '\n'
+            + tr("Could not perform a test."));
         return;
     }
 
@@ -101,10 +101,11 @@ void QnLdapSettingsDialogPrivate::testSettings()
     timeoutTimer->setInterval(settings.searchTimeoutS * 1000 / q->ui->testProgressBar->maximum());
     timeoutTimer->start();
 
-    testHandle = server->apiConnection()->testLdapSettingsAsync(
-        settings,
-        q,
-        SLOT(at_testLdapSettingsFinished(int, const QnLdapUsers &,int, const QString &)));
+    testHandle = server->restConnection()->testLdapSettingsAsync(settings,
+        [q](bool success, int handle, const QnLdapUsers &users, const QString &errorString)
+        {
+            q->at_testLdapSettingsFinished(success, handle, users, errorString);
+        }, thread());
 }
 
 void QnLdapSettingsDialogPrivate::showTestResult(const QString &text) {
@@ -258,18 +259,24 @@ QnLdapSettingsDialog::QnLdapSettingsDialog(QWidget *parent)
 
 QnLdapSettingsDialog::~QnLdapSettingsDialog() {}
 
-void QnLdapSettingsDialog::at_testLdapSettingsFinished(int status, const QnLdapUsers &users, int handle, const QString &errorString) {
+void QnLdapSettingsDialog::at_testLdapSettingsFinished(
+    bool success, int handle, const QnLdapUsers &users,
+    const QString &errorString)
+{
     Q_D(QnLdapSettingsDialog);
 
     if (handle != d->testHandle)
         return;
 
     QString result;
-    if (status != 0 || !errorString.isEmpty()) {
+    if (!success || !errorString.isEmpty())
+    {
         result = tr("Test failed");
-    if (!errorString.isEmpty())
-        result += lit(" (%1)").arg(errorString);
-    } else {
+        if (!errorString.isEmpty())
+            result += lit(" (%1)").arg(errorString);
+    }
+    else
+    {
         result = tr("Test completed successfully: %n users found.", 0, users.size());
     }
     d->stopTesting(result);

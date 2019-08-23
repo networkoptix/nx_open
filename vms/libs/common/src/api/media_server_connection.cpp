@@ -20,7 +20,6 @@
 
 #include <nx_ec/data/api_conversion_functions.h>
 
-#include <utils/common/ldap.h>
 #include <utils/common/warnings.h>
 #include <utils/common/request_param.h>
 
@@ -56,7 +55,6 @@ namespace {
 QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (PingSystemObject, "pingSystem")
     (GetNonceObject, "getRemoteNonce")
-    (TestLdapSettingsObject, "testLdapSettings")
 );
 
 void trace(const QString& serverId, int handle, int obj, const QString& message = QString())
@@ -96,9 +94,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             break;
         case GetNonceObject:
             processJsonReply<QnGetNonceReply>(this, response, handle);
-            break;
-        case TestLdapSettingsObject:
-            processJsonReply<QnLdapUsers>(this, response, handle);
             break;
         default:
             NX_ASSERT(false);
@@ -218,17 +213,6 @@ int QnMediaServerConnection::sendAsyncPostRequestLogged(
 void QnMediaServerConnection::trace(int handle, int obj, const QString& message /*= QString()*/)
 {
     ::trace(m_serverId, handle, obj, message);
-}
-
-int QnMediaServerConnection::testLdapSettingsAsync(
-    const QnLdapSettings& settings, QObject* target, const char* slot)
-{
-    nx::network::http::HttpHeaders headers;
-    headers.emplace(nx::network::http::header::kContentType, "application/json");
-    std::chrono::seconds timeout(settings.searchTimeoutS);
-    return sendAsyncPostRequestLogged(TestLdapSettingsObject, std::move(headers),
-        QnRequestParamList(), QJson::serialized(settings),
-        QN_STRINGIZE_TYPE(QnLdapUsers), target, slot, timeout);
 }
 
 int QnMediaServerConnection::pingSystemAsync(

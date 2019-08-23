@@ -1,11 +1,12 @@
 #pragma once
 
 #include <optional>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QPointer>
 
 #include <nx/network/deprecated/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
-
-#include <QtCore/QElapsedTimer>
 #include <nx/utils/timer_manager.h>
 
 namespace nx {
@@ -44,13 +45,11 @@ public:
         nx::network::http::StringType contentType;
         nx::network::http::StringType messageBody;
         nx::network::http::AuthType authType;
-        std::optional<std::chrono::milliseconds> timeout{std::nullopt};
     };
 
     // TODO: Should be merged with nx::network::http::Response
     struct Response
     {
-        SystemError::ErrorCode systemError = SystemError::noError;
         nx::network::http::StatusLine statusLine;
         nx::network::http::StringType contentType;
         nx::network::http::HttpHeaders headers;
@@ -79,8 +78,9 @@ public:
      *  - thread for ClientPool::sendRequest
      *  - AioThread, at a callback at_HttpClientDone
      */
-    struct Context
+    class Context
     {
+    public:
         virtual ~Context() = default;
 
         enum class State
@@ -101,18 +101,31 @@ public:
         TimePoint stampSent;
         /** Time when response was received by ClientPool. */
         TimePoint stampReceived;
+
+        SystemError::ErrorCode systemError = SystemError::noError;
+
+        std::optional<std::chrono::milliseconds> timeout{std::nullopt};
         /** Handle of request being served by this connection right now. */
         int handle = 0;
         /** Callback to be called when response is received. */
-        HttpCompletionFunc completionFunc;
-
-        std::optional<QPointer<QThread>> targetThread;
+        std::function<void (QSharedPointer<Context> context)> completionFunc;
 
         mutable QnMutex mutex;
 
+        QThread* getTargetThread() const;
+        /** Set thread for dispatched callback. */
+        void setTargetThread(QThread* thread);
+        /** Checks if target thread is dead. */
+        bool targetThreadIsDead() const;
+        /** Check if there is any response. */
         bool hasResponse() const;
+        /** Get HTTP status code of a response. */
         StatusCode::Value getStatusCode() const;
+        /** Get request URL. */
         nx::utils::Url getUrl() const;
+
+    protected:
+        std::optional<QPointer<QThread>> targetThread;
     };
     using ContextPtr = QSharedPointer<Context>;
 

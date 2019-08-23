@@ -7,6 +7,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/utils/system_error.h>
 #include <utils/camera/camera_diagnostics.h>
+#include <utils/common/ldap_fwd.h>
 #include <utils/common/request_param.h>
 #include <nx_ec/data/api_fwd.h>
 #include <api/helpers/request_helpers_fwd.h>
@@ -122,6 +123,8 @@ public:
     typedef Result<EmptyResponseType>::type PostCallback;   // use this type for POST requests without result data
 
     typedef Result<QnJsonRestResult>::type GetCallback; /**< Default callback type for GET requests without result data. */
+
+    using ContextPtr = nx::network::http::ClientPool::ContextPtr;
 
     /**
     * Load information about cross-server archive
@@ -556,6 +559,13 @@ public:
         Result<RestResultWithData<QnCameraDiagnosticsReply>>::type&& callback,
         QThread* targetThread = nullptr);
 
+    using LdapSettingsCallback = std::function<void (
+        bool success, Handle requestId, const QnLdapUsers& result, const QString& message)>;
+
+    Handle testLdapSettingsAsync(const QnLdapSettings& settings,
+        LdapSettingsCallback&& callback,
+        QThread* targetThread = nullptr);
+
     Handle debug(
         const QString& action,
         const QString& value,
@@ -568,7 +578,7 @@ public:
         const QnRequestParamList& params,
         const nx::Buffer& body,
         std::function<void(bool, Handle, const QnJsonRestResult& response)>&& callback,
-        QThread* targetThread = nullptr);
+        QThread* targetThread = nullptr, std::chrono::milliseconds timeout = {});
 
     /** Sends POST request with a response to be an Ubjson. */
     Handle postUbJsonResult(
@@ -617,6 +627,7 @@ public:
     // Get ID of the server we are connected to.
     QnUuid getServerId() const;
 
+    // TODO: Should get rid if it. ClientPool::Context wraps this data well
     using HttpCompletionFunc = std::function<void (
         Handle handle,
         SystemError::ErrorCode errorCode,
@@ -624,19 +635,20 @@ public:
         nx::network::http::StringType contentType,
         nx::network::http::BufferType msgBody,
         const nx::network::http::HttpHeaders& headers)>;
+
 private:
     template <typename ResultType>
     Handle executeRequest(const nx::network::http::ClientPool::Request& request,
         Callback<ResultType> callback,
-        QThread* targetThread);
+        QThread* targetThread, std::chrono::milliseconds timeout = {});
 
     Handle executeRequest(const nx::network::http::ClientPool::Request& request,
         Result<QByteArray>::type callback,
-        QThread* targetThread);
+        QThread* targetThread, std::chrono::milliseconds timeout = {});
 
     Handle executeRequest(const nx::network::http::ClientPool::Request& request,
         Callback<EmptyResponseType> callback,
-        QThread* targetThread);
+        QThread* targetThread, std::chrono::milliseconds timeout = {});
 
     QUrl prepareUrl(const QString& path, const QnRequestParamList& params) const;
 
@@ -656,15 +668,16 @@ private:
         const nx::network::http::StringType& contentType = nx::network::http::StringType(),
         const nx::network::http::StringType& messageBody = nx::network::http::StringType());
 
-    nx::network::http::ClientPool::Request prepareDirectRequest(
-        nx::network::http::Method::ValueType method,
-        const QUrl& url,
-        const nx::network::http::StringType& contentType = nx::network::http::StringType(),
-        const nx::network::http::StringType& messageBody = nx::network::http::StringType());
 
+    /** Passes request to ClientPool. */
     Handle sendRequest(
         const nx::network::http::ClientPool::Request& request,
-        HttpCompletionFunc callback = HttpCompletionFunc());
+        std::function<void (ContextPtr)> callback = {},
+        QThread* thread = nullptr,
+        std::chrono::milliseconds timeout = {});
+
+    /** Passes Context to ClientPool. */
+    Handle sendRequest(const nx::network::http::ClientPool::ContextPtr& context);
 
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 
@@ -689,7 +702,8 @@ private:
         const QString& path,
         const QnRequestParamList& params,
         Callback<ResultType> callback,
-        QThread* targetThread);
+        QThread* targetThread,
+        std::chrono::milliseconds timeout = {});
 
     /**
      * This overload thould only be used if API requires custum message body so paramiters can only
@@ -701,7 +715,8 @@ private:
         const nx::network::http::StringType& contentType,
         const nx::network::http::StringType& messageBody,
         Callback<ResultType> callback,
-        QThread* targetThread);
+        QThread* targetThread,
+        std::chrono::milliseconds timeout = {});
 
     /**
      * This overload thould only be used if API requires custum message body so paramiters can only

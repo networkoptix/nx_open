@@ -45,7 +45,7 @@ QnSessionManager::QnSessionManager(QObject* parent):
 
             const auto& response = context->response;
             QnHTTPRawResponse httpRequestResult(
-                response.systemError,
+                context->systemError,
                 response.statusLine,
                 response.contentType,
                 response.messageBody);
