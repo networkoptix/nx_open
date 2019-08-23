@@ -130,23 +130,26 @@ protected:
     {
         NX_ASSERT(srcTran.command != ApiCommand::NotDefined);
 
-        if (!connection->shouldTransactionBeSentToPeer(srcTran))
-            return; //< This peer doesn't handle transactions of such type.
-
-        if (transportHeader.via.find(connection->remotePeer().id) != transportHeader.via.end())
-            return; //< Already processed by remote peer
-
         const vms::api::PersistentIdData remotePeer(connection->remotePeer());
+        if (!connection->shouldTransactionBeSentToPeer(srcTran))
+        {
+            NX_VERBOSE(this, "Peer %1 does not handler transactions like %2", remotePeer.id, srcTran);
+            return;
+        }
+
+        if (transportHeader.via.find(remotePeer.id) != transportHeader.via.end())
+        {
+            NX_VERBOSE(this, "Peer %1 already handled transaction %2", remotePeer.id, srcTran);
+            return;
+        }
+
         const auto& descriptor = ec2::getTransactionDescriptorByTransaction(srcTran);
         auto remoteAccess = descriptor->checkRemotePeerAccessFunc(
             commonModule(), connection.staticCast<Connection>()->userAccessData(), srcTran.params);
         if (remoteAccess == RemotePeerAccess::Forbidden)
         {
-            NX_VERBOSE(
-                this,
-                lm("Permission check failed while sending transaction %1 to peer %2")
-                .arg(srcTran.toString())
-                .arg(remotePeer.id.toString()));
+            NX_VERBOSE(this, "Permission check failed while sending transaction %1 to peer %2",
+                srcTran, remotePeer.id);
             return;
         }
 
@@ -173,23 +176,51 @@ protected:
         {
             if (descriptor->isPersistent)
             {
-                if (context->sendDataInProgress || !context->updateSequence(tran))
+                if (context->sendDataInProgress)
+                {
+                    NX_VERBOSE(this, "Send to server %1 already in progress", remotePeer.id);
                     return;
+                }
+
+                if (!context->updateSequence(tran))
+                {
+                    NX_VERBOSE(this, "Server %1 already knows transaction %2", remotePeer.id, tran);
+                    return;
+                }
             }
             else
             {
                 if (!context->isRemotePeerSubscribedTo(tran.peerID))
+                {
+                    NX_VERBOSE(this, "Peer %1 is not subscribed for %2", remotePeer.id, tran.peerID);
                     return;
+                }
             }
         }
         else if (remotePeer == peerId)
         {
+            NX_VERBOSE(this, "Peer %1 is myself");
             return;
         }
         else if (connection->remotePeer().isCloudServer())
         {
-            if (!descriptor->isPersistent || context->sendDataInProgress || !context->updateSequence(tran))
+            if (!descriptor->isPersistent)
+            {
+                NX_VERBOSE(this, "Cloud %1 is not iterested in non-persistent transactions", remotePeer.id);
                 return;
+            }
+
+            if (context->sendDataInProgress)
+            {
+                NX_VERBOSE(this, "Send to cloud %1 already in progress", remotePeer.id);
+                return;
+            }
+
+            if (!context->updateSequence(tran))
+            {
+                NX_VERBOSE(this, "Cloud %1 already knows transaction %2", remotePeer.id, tran);
+                return;
+            }
         }
 
         NX_ASSERT(!(remotePeer == peerId)); //< loop

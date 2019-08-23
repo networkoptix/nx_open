@@ -1,5 +1,7 @@
 #include "action_builder.h"
 
+#include <QScopedValueRollback>
+
 #include "action_field.h"
 
 namespace nx::vms::rules {
@@ -76,9 +78,29 @@ seconds ActionBuilder::aggregationInterval() const
     return m_interval;
 }
 
+void ActionBuilder::connectSignals()
+{
+    for (auto& field: m_fields)
+    {
+        field->connectSignals();
+        connect(field, &Field::stateChanged, this, &ActionBuilder::updateState);
+    }
+}
+
 void ActionBuilder::onTimeout()
 {
     // emit aggregated action
+}
+
+void ActionBuilder::updateState()
+{
+    //TODO: #spanasenko Update derived values (error messages, etc.)
+
+    if (m_updateInProgress)
+        return;
+
+    QScopedValueRollback<bool> guard(m_updateInProgress, true);
+    emit stateChanged();
 }
 
 } // namespace nx::vms::rules

@@ -468,7 +468,7 @@ void QBufferedFile::setSystemFlags(int systemFlags)
     m_systemDependentFlags = systemFlags;
 }
 
-float QueueFileWriter::getAvarageUsage()
+float QueueFileWriter::getAverageUsage()
 {
     QnMutexLocker lock(&m_timingsMutex);
     removeOldWritingStatistics(getUsecTimer());

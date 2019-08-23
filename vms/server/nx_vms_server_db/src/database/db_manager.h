@@ -145,7 +145,7 @@ namespace detail
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
             NX_ASSERT(!tran.persistentInfo.isNull(), "You must register transaction command in persistent command list!");
-            QnDbTransactionLocker lock(getTransaction());
+            QnDbTransactionLocker lock(getTransaction(), __FILE__, __LINE__);
             ErrorCode result = executeTransactionNoLock(tran, serializedTran);
             if (result == ErrorCode::ok) {
                 if (!lock.commit())
@@ -340,11 +340,12 @@ namespace detail
             nx::vms::api::ResourceParamWithRefDataList& params);
 
         // FullInfoData
-        ErrorCode readFullInfoDataComplete(nx::vms::api::FullInfoData* data);
+        ErrorCode readFullInfoDataComplete(
+            nx::vms::api::FullInfoData* data, const Qn::UserAccessData& userAccess);
 
         // FullInfoData abridged for Mobile Client
         ErrorCode readFullInfoDataForMobileClient(
-            nx::vms::api::FullInfoData* data, const QnUuid& userId);
+            nx::vms::api::FullInfoData* data, const Qn::UserAccessData& userAccess);
 
         //getLicenses
         ErrorCode doQueryNoLock(
@@ -727,11 +728,11 @@ namespace detail
             {
             }
 
-            virtual bool beginTran() override;
+            virtual bool beginTran(const char* sourceFile, int sourceLine) override;
             virtual void rollback() override;
             virtual bool commit() override;
 
-            bool beginLazyTran();
+            bool beginLazyTran(const char* sourceFile, int sourceLine);
             bool commitLazyTran();
         private:
             void physicalCommitLazyData();
@@ -746,7 +747,7 @@ namespace detail
         class QnLazyTransactionLocker: public QnAbstractTransactionLocker
         {
         public:
-            QnLazyTransactionLocker(QnDbTransactionExt* tran);
+            QnLazyTransactionLocker(QnDbTransactionExt* tran, const char* sourceFile, int sourceLine);
             virtual ~QnLazyTransactionLocker();
             virtual bool commit() override;
 
@@ -786,6 +787,9 @@ namespace detail
         Q_DECLARE_FLAGS(ResyncFlags, ResyncFlag)
 
         QMap<int, QnUuid> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
+
+        ErrorCode  loadUserListFiltered(
+            nx::vms::api::FullInfoData* data, const Qn::UserAccessData& userAccess, bool forceFiltering);
 
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnUuid>& guids);
         bool updateResourceTypeGuids();
@@ -912,13 +916,13 @@ public:
     ErrorCode doQuery(ApiCommand::Value command, std::nullptr_t /*dummy*/, nx::vms::api::FullInfoData& data)
     {
         NX_ASSERT(command == ApiCommand::getFullInfo);
-        return readFullInfoDataComplete(&data);
+        return readFullInfoDataComplete(&data, userAccessData());
     }
 
-    ErrorCode readFullInfoDataComplete(nx::vms::api::FullInfoData* data)
+    ErrorCode readFullInfoDataComplete(nx::vms::api::FullInfoData* data, const Qn::UserAccessData& userAccess)
     {
         const ErrorCode errorCode =
-            m_dbManager->readFullInfoDataComplete(data);
+            m_dbManager->readFullInfoDataComplete(data, userAccess);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
@@ -948,7 +952,7 @@ public:
     }
 
     ErrorCode readFullInfoDataForMobileClient(
-        nx::vms::api::FullInfoData* data, const QnUuid& userId);
+        nx::vms::api::FullInfoData* data, const Qn::UserAccessData& userAccess);
 
     QnDbHelper::QnDbTransaction* getTransaction();
     ApiObjectType getObjectTypeNoLock(const QnUuid& objectId);

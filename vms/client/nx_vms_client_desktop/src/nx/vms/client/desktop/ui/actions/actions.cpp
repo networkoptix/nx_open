@@ -1890,6 +1890,12 @@ void initialize(Manager* manager, Action* root)
             .shortcut("Ctrl+Shift+E")
             .autoRepeat(false);
 
+        factory(CreateResourceTreeModelSnapshotAction)
+            .flags(GlobalHotkey | Main | DevMode)
+            .text("Create Resource Tree Model Snapshot")
+            .shortcut("Ctrl+Shift+R")
+            .autoRepeat(false);
+
         factory(ShowDebugOverlayAction)
             .flags(GlobalHotkey | Main | DevMode)
             .text("Show Debug Overlay")

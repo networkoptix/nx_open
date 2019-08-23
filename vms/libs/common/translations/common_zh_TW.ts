@@ -5,7 +5,7 @@
     <name>DateTimeFormats</name>
     <message>
       <source>MM/dd</source>
-      <translation>月/日</translation>
+      <translation>MM/dd</translation>
     </message>
     <message>
       <source>MMMM yyyy</source>
@@ -1010,7 +1010,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>未知錯誤.</translation>
+      <translation>未知的錯誤.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>

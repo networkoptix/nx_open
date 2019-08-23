@@ -37,41 +37,8 @@ public:
         const QnUuid& videowallGuid = QnUuid(),
         bool enableOfflineRequests = false);
 
-    /**
-     * Check the list of cameras for discovery. Forms a new list which contains only accessible
-     * cameras.
-     *
-     * Returns immediately. On request completion the specified slot of the specified target is
-     * called with signature <tt>(int status, QImage reply, int handle)</tt>.
-     * Status is 0 in case of success, in other cases it holds error code.
-     *
-     * @return Request handle.
-     */
-    int checkCameraList(const QnNetworkResourceList& cameras, QObject* target, const char* slot);
-
-    /**
-     * @param fastRequest Request information about existing storages only. Getting full info may
-     *     be quite slow.
-     * @return information about storages space.
-     */
-    int getStorageSpaceAsync(bool fastRequest, QObject* target, const char* slot);
-
-    int getStorageStatusAsync(const QString& storageUrl, QObject* target, const char* slot);
-
-    /**
-     * @param slot Slot MUST have signature (int, QnStorageScanData, int).
-     * @return Request handle. -1 In case of failure to start async request.
-     */
-    int doRebuildArchiveAsync(
-        Qn::RebuildAction action, bool isMainPool, QObject* target, const char* slot);
-
-    int backupControlActionAsync(Qn::BackupAction action, QObject* target, const char* slot);
-
-    int pingSystemAsync(const nx::utils::Url &url, const QString& getKey, QObject* target, const char* slot);
+    int pingSystemAsync(const nx::utils::Url& url, const QString& getKey, QObject* target, const char* slot);
     int getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot);
-    int getRecordingStatisticsAsync(
-        qint64 bitrateAnalyzePeriodMs, QObject* target, const char* slot);
-
     // It expects (int status, const QnLdapUsers& users, int handle, const QString& errorString) slot.
     int testLdapSettingsAsync(const QnLdapSettings& settings, QObject* target, const char* slot);
 

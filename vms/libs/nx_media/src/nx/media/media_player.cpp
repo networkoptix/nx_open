@@ -1059,6 +1059,7 @@ void Player::play()
 void Player::pause()
 {
     Q_D(Player);
+    checkReadyToPlay(); //< We need to be sure we are able to show paused frame on camera switch.
     d->log("pause()");
     d->setState(State::Paused);
     d->execTimer->stop(); //< stop next frame displaying
@@ -1123,21 +1124,26 @@ void Player::setSource(const QUrl& url)
 
     stop();
     d->url = newUrl;
-
-    const QString path(d->url.path().mid(1));
     d->isLocalFile = d->url.scheme() == "file";
+
     if (d->isLocalFile)
     {
-        d->resource.reset(new QnAviResource(path, commonModule()));
+        d->resource.reset(new QnAviResource(d->url.toString(), commonModule()));
         d->resource->setStatus(Qn::Online);
+        d->setLiveMode(false);
     }
     else
     {
-        d->resource = commonModule()->resourcePool()->getResourceById(QnUuid(path));
+        d->resource = commonModule()->resourcePool()->getResourceById(QnUuid(d->url.path().mid(1)));
     }
 
-    if (d->resource && currentState == State::Playing)
-        play();
+    if (d->resource)
+    {
+        if (currentState == State::Playing)
+            play();
+        else if (currentState == State::Paused)
+            pause();
+    }
 
     d->log("emit sourceChanged()");
     emit sourceChanged();

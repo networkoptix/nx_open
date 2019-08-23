@@ -17,6 +17,7 @@
 #include <nx/vms/client/desktop/node_view/resource_node_view/resource_node_view_constants.h>
 #include <nx/vms/client/desktop/node_view/resource_node_view/details/resource_node_view_item_delegate.h>
 #include <client/client_settings.h>
+#include <core/resource_access/resource_access_subject.h>
 
 namespace {
 

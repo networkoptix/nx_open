@@ -30,8 +30,14 @@ public:
         Qn::ConnectionRole role);
 
 signals:
-    void dataDropped(QnArchiveStreamReader* reader);
+    void dataDropped();
 
+protected slots:
+    virtual void resetCachedValues() override;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
+private:
+    Qn::ResourceFlags calculateFlags() const;
+private:
+    mutable std::atomic<Qn::ResourceFlags> m_cachedFlags{};
 };

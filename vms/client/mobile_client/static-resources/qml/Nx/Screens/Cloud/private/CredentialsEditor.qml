@@ -74,6 +74,7 @@ Item
                 id: accountWarningPanel
 
                 width: parent.availableWidth
+                opened: text.length
             }
 
             LinkButton
@@ -115,6 +116,7 @@ Item
             {
                 id: bottomWarningPanel
                 width: parent.availableWidth
+                opened: text.length
             }
         }
 
@@ -201,26 +203,31 @@ Item
         if (error == QnCloudStatusWatcher.InvalidEmail)
         {
             d.invalidUser = true
-            showAccountWarning(qsTr("Account not found"))
+            accountWarningPanel.text = qsTr("Account not found")
             passwordField.text = ""
         }
         else if (error == QnCloudStatusWatcher.InvalidPassword)
         {
             d.invalidPassword = true
-            showBottomWarning(qsTr("Wrong password"))
+            bottomWarningPanel.text = qsTr("Wrong password")
             passwordField.text = ""
         }
         else if (error == QnCloudStatusWatcher.AccountNotActivated)
         {
             d.notActivated = true
             d.lastNotActivatedAccount = emailField.text
-            showAccountWarning(qsTr("Account not activated"))
+            accountWarningPanel.text = qsTr("Account not activated")
             passwordField.text = ""
+        }
+        else if (error == QnCloudStatusWatcher.UserTemporaryLockedOut)
+        {
+            bottomWarningPanel.text = LoginUtils.lockoutConnectionErrorText()
         }
         else
         {
-            showBottomWarning(qsTr("Cannot connect to %1", "%1 is the short cloud name (like 'Cloud')")
-                .arg(applicationInfo.cloudName()))
+            bottomWarningPanel.text =
+                qsTr("Cannot connect to %1", "%1 is the short cloud name (like 'Cloud')")
+                    .arg(applicationInfo.cloudName())
         }
     }
 
@@ -232,14 +239,14 @@ Item
         if (!emailField.text.trim())
         {
             d.invalidUser = true
-            showAccountWarning(qsTr("Email cannot be empty"))
+            accountWarningPanel.text = qsTr("Email cannot be empty")
             return
         }
 
         if (!passwordField.text.trim())
         {
             d.invalidPassword = true
-            showBottomWarning(qsTr("Password cannot be empty"))
+            bottomWarningPanel.text = qsTr("Password cannot be empty")
             return
         }
 
@@ -249,26 +256,10 @@ Item
             handleConnectStatusChanged()
     }
 
-    function showAccountWarning(text)
-    {
-        bottomWarningPanel.opened = false
-
-        accountWarningPanel.text = text
-        accountWarningPanel.opened = true
-    }
-
-    function showBottomWarning(text)
-    {
-        accountWarningPanel.opened = false
-
-        bottomWarningPanel.text = text
-        bottomWarningPanel.opened = true
-    }
-
     function hideWarnings()
     {
-        bottomWarningPanel.opened = false
-        accountWarningPanel.opened = false
+        accountWarningPanel.text = ""
+        bottomWarningPanel.text = ""
         d.invalidUser = false
         d.invalidPassword = false
         d.notActivated = false

@@ -183,7 +183,7 @@ void LocalResourceProducer::createLocalResources(const QStringList& pathList)
         if (!resource)
             continue;
         if (resource->getId().isNull() && !resource->getUniqueId().isEmpty())
-            resource->setId(guidFromArbitraryData(resource->getUniqueId().toUtf8())); //< Create same IDs for the same files.
+            resource->setIdUnsafe(guidFromArbitraryData(resource->getUniqueId().toUtf8())); //< Create same IDs for the same files.
 
         newResources.append(resource);
     }

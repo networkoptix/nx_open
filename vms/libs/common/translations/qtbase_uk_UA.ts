@@ -964,7 +964,7 @@ Do you want to delete it anyway?</source>
     <name>QProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Відміна</translation>
+      <translation>Відмінити</translation>
     </message>
   </context>
   <context>

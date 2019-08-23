@@ -133,7 +133,7 @@ rest::Handle ServerConnection::softwareTriggerCommand(const QnUuid& cameraId, co
     params.insert(lit("eventResourceId"), cameraId.toString());
     if (toggleState != nx::vms::api::EventState::undefined)
         params.insert(lit("state"), QnLexical::serialized(toggleState));
-    return executePost(lit("/api/createEvent"), params, callback, targetThread);
+    return executeGet(lit("/api/createEvent"), params, callback, targetThread);
 }
 
 Handle ServerConnection::createGenericEvent(
@@ -801,6 +801,21 @@ Handle ServerConnection::changeCameraPassword(
     trace(handle, request.url.toString());
     return handle;
 }
+
+int ServerConnection::checkCameraList(const QnNetworkResourceList& cameras,
+    Result<QnCameraListReply>::type callback,
+    QThread* targetThread)
+{
+    QnCameraListReply camList;
+    for (const QnResourcePtr& c: cameras)
+        camList.uniqueIdList << c->getUniqueId();
+
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+
+    return executePost("/api/checkDiscovery", QnRequestParamList(),
+        contentType, QJson::serialized(camList), callback,  targetThread);
+}
+
 
 Handle ServerConnection::lookupObjectTracks(
     const nx::analytics::db::Filter& request,

@@ -36,12 +36,7 @@
     <message>
         <location/>
         <source>Customer Support</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>ARM support policy</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -320,7 +315,7 @@
     <message>
         <location/>
         <source>on the next day</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -705,7 +700,7 @@
     <message>
         <location/>
         <source>Detect motion during archive import</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -778,7 +773,7 @@
     <message>
         <location/>
         <source>Logical ID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -879,7 +874,7 @@
     <message>
         <location/>
         <source>Select Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1102,17 +1097,17 @@
     <message>
         <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>I Do Not Agree</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>I Agree</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1534,47 +1529,47 @@
     <message>
         <location filename="../src/nx/vms/client/desktop/resource_properties/layout/widgets/layout_background_settings_widget.ui"/>
         <source>Processing Image...Please Wait.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>View...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Width:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Keep Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Opacity:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Height:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Crop to monitor aspect ratio</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1582,37 +1577,37 @@
     <message>
         <location filename="../src/nx/vms/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
         <source>Locked</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Height</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Logical ID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Generate</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Minimum Grid Size</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1620,17 +1615,17 @@
     <message>
         <location filename="../src/nx/vms/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
         <source>Select layout</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Shared layouts</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1673,12 +1668,12 @@
     <message>
         <location/>
         <source>Search Timeout (s)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Admin DN or CN</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2036,7 +2031,7 @@
     <message>
         <location/>
         <source>Select Layouts</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2098,42 +2093,42 @@
     <message>
         <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
         <source>Source:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Caption contains:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Keywords separated by space</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Description contains:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Level:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>ERROR</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>WARNING</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>INFO</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2354,7 +2349,7 @@
     <message>
         <location filename="../src/ui/dialogs/common/message_box.ui"/>
         <source>Do not show this message again</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2771,7 +2766,7 @@
     <message>
         <location/>
         <source>Limit session duration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3064,22 +3059,22 @@
     <message>
         <location/>
         <source>Analytics data will continue to be stored on the disabled storage.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Recording was enabled on the USB storage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
-        <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-        <translation type="unfinished"></translation>
+        <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3323,7 +3318,7 @@
     <message>
         <location/>
         <source>Detect motion</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>

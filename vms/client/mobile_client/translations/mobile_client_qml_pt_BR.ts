@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pt-BR" sourcelanguage="en">
   <context>
+    <name>ActionButtonsHint</name>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Desativado por agendamento</translation>
+    </message>
+  </context>
+  <context>
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
@@ -29,6 +36,10 @@
     <message>
       <source>Offline</source>
       <translation>Desligado</translation>
+    </message>
+    <message>
+      <source>I/O module</source>
+      <translation>Módulo I/O</translation>
     </message>
   </context>
   <context>
@@ -325,13 +336,6 @@
     </message>
   </context>
   <context>
-    <name>LiveVideoNavigation</name>
-    <message>
-      <source>LIVE</source>
-      <translation>Em Directo</translation>
-    </message>
-  </context>
-  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -359,6 +363,14 @@
     <message>
       <source>Incompatible server version %1</source>
       <translation>Versão do servidor incompatível %1</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Demasiadas tentativas. Tente novamente mais tarde.</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation>Conecte-se a este servidor pelo navegador da Web ou pelo cliente de desktop para configurá-lo</translation>
     </message>
   </context>
   <context>
@@ -479,7 +491,7 @@
     </message>
   </context>
   <context>
-    <name>SearchToolBar</name>
+    <name>SearchEdit</name>
     <message>
       <source>Search</source>
       <translation>Pesquisar</translation>
@@ -586,6 +598,10 @@
       <comment>%1 is a system name</comment>
       <translation>Não é possível conectar ao sistema &quot;%1&quot;</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Nada encontrado</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -608,6 +624,10 @@
     <message>
       <source>Delete</source>
       <translation>Apagar</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Manter</translation>
     </message>
   </context>
   <context>
@@ -769,6 +789,10 @@
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>Neste aplicação o módulo I/O pode ser usado como um dispositivo de entrada de som apenas. Para usá-lo como um módulo de controlo, por favor, use a versão desktop do %1</translation>
     </message>
+    <message>
+      <source>No live stream</source>
+      <translation type="unfinished">No live stream</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -818,6 +842,10 @@
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
       <translation>Área personalizada inválida. Por favor, desenhe uma área correta.</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Audio</translation>
     </message>
   </context>
   <context>

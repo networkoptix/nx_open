@@ -304,7 +304,7 @@
         <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Ім'я користувача" required>
+                   placeholder="Логін" required>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
@@ -375,7 +375,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>Система готова до використання</h2>
-    <p>Ім'я користувача</p>
+    <p>Логін</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Налаштування розділеного доступу і облікового запису</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="відкрити {{Config.cloud.productName}}"
@@ -453,7 +453,7 @@
         Опис помилки: {{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Спробуйте ще раз</button>
+        <button class="btn btn-default" ng-click="retry()">Повторіть спробу</button>
     </p>
 </div>
 
@@ -471,7 +471,7 @@
             <div class="text-center"><b>За допомогою програми {{Config.productName}}</b></div>
             <div class="col-xs-6 text-right">Вузол</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
             <div class="col-xs-6 text-right">Порт</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">Ім'я користувача</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">Логін</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
             <div class="col-xs-6 text-right">Пароль</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>

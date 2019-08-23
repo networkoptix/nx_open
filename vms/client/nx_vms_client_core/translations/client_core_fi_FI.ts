@@ -132,7 +132,7 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation>Omistaja</translation>
+      <translation>Omistaja: %1</translation>
     </message>
     <message>
       <source>Your System</source>
@@ -175,7 +175,7 @@
     <message>
       <source>Owner: %1</source>
       <comment>%1 is a user name</comment>
-      <translation>Omistaja</translation>
+      <translation>Omistaja: %1</translation>
     </message>
     <message>
       <source>Your System</source>

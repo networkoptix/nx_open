@@ -126,6 +126,14 @@ public:
 
     AbstractSearchListModel* searchModel();
 
+    enum Role
+    {
+        PreviewIdRole = Qn::ItemDataRoleCount,
+        PreviewStateRole,
+        PreviewAspectRatioRole,
+        ItemIsVisibleRole
+    };
+
 private:
     void recreateSourceModel();
     void createDeadlines(int first, int count);
@@ -232,16 +240,16 @@ QVariant RightPanelModelsAdapter::data(const QModelIndex& index, int role) const
             return result;
         }
 
-        case Qt::EditRole:
+        case Private::ItemIsVisibleRole:
             return d->isVisible(index);
 
-        case Qn::PreviewIdRole:
+        case Private::PreviewIdRole:
             return d->previewId(index.row());
 
-        case Qn::PreviewStateRole:
+        case Private::PreviewStateRole:
             return QVariant::fromValue(d->previewState(index.row()));
 
-        case Qn::PreviewAspectRatioRole:
+        case Private::PreviewAspectRatioRole:
             return d->previewAspectRatio(index.row());
 
         default:
@@ -251,7 +259,7 @@ QVariant RightPanelModelsAdapter::data(const QModelIndex& index, int role) const
 
 bool RightPanelModelsAdapter::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-    if (role != Qt::EditRole || !NX_ASSERT(checkIndex(index)))
+    if (role != Private::ItemIsVisibleRole || !NX_ASSERT(checkIndex(index)))
         return false;
 
     return d->setVisible(index, value.toBool());
@@ -272,10 +280,10 @@ QHash<int, QByteArray> RightPanelModelsAdapter::roleNames() const
     roles[Qn::RemovableRole] = "isCloseable";
     roles[Qn::AlternateColorRole] = "isInformer";
     roles[Qn::ProgressValueRole] = "progressValue";
-    roles[Qt::EditRole] = "visible";
-    roles[Qn::PreviewIdRole] = "previewId";
-    roles[Qn::PreviewStateRole] = "previewState";
-    roles[Qn::PreviewAspectRatioRole] = "previewAspectRatio";
+    roles[Private::ItemIsVisibleRole] = "visible";
+    roles[Private::PreviewIdRole] = "previewId";
+    roles[Private::PreviewStateRole] = "previewState";
+    roles[Private::PreviewAspectRatioRole] = "previewAspectRatio";
     return roles;
 }
 
@@ -499,7 +507,7 @@ void RightPanelModelsAdapter::Private::createPreviewProviders(int first, int cou
 
 void RightPanelModelsAdapter::Private::updatePreviewProvider(int row)
 {
-    if (!NX_ASSERT(row >= 0 && row < m_previews.size()))
+    if (!NX_ASSERT(row >= 0 && row < m_previews.size() && m_previews.size() == q->rowCount()))
         return;
 
     const auto index = q->index(row, 0);
@@ -655,7 +663,8 @@ void RightPanelModelsAdapter::Private::loadNextPreview()
     int row = std::numeric_limits<int>::max();
     for (const auto& index: m_visibleItems)
     {
-        if (NX_ASSERT(index.isValid()) && index.row() < row
+        if (NX_ASSERT(index.isValid())
+            && index.row() < row
             && requiresLoading(m_previews[index.row()]))
         {
             row = index.row();
@@ -689,7 +698,7 @@ void RightPanelModelsAdapter::Private::requestPreview(int row)
                 return;
 
             static const QVector<int> roles({
-                Qn::PreviewIdRole, Qn::PreviewStateRole, Qn::PreviewAspectRatioRole});
+                Private::PreviewIdRole, Private::PreviewStateRole, Private::PreviewAspectRatioRole});
 
             emit q->dataChanged(index, index, roles);
         });
@@ -723,7 +732,7 @@ AbstractSearchListModel* RightPanelModelsAdapter::Private::searchModel()
 // ------------------------------------------------------------------------------------------------
 
 QImage RightPanelImageProvider::requestImage(
-    const QString& id, QSize* size, [[maybe_unused]] const QSize& requestedSize)
+    const QString& id, QSize* size, const QSize& /*requestedSize*/)
 {
     const auto provider = previewsById().value(id.toLongLong());
     return provider ? provider->image() : QImage();

@@ -11,6 +11,7 @@
 #include <nx/client/core/watchers/user_watcher.h>
 #include <utils/common/synctime.h>
 #include <nx/vms/event/strings_helper.h>
+#include <core/resource_access/resource_access_subject.h>
 
 namespace {
 

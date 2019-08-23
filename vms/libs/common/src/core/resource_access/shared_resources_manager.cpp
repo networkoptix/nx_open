@@ -71,6 +71,13 @@ QSet<QnUuid> QnSharedResourcesManager::sharedResources(
     return m_sharedResources[subject.effectiveId()];
 }
 
+bool QnSharedResourcesManager::hasSharedResource(
+    const QnResourceAccessSubject& subject, const QnUuid& resourceId) const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_sharedResources[subject.effectiveId()].contains(resourceId);
+}
+
 void QnSharedResourcesManager::setSharedResources(const QnResourceAccessSubject& subject,
     const QSet<QnUuid>& resources)
 {

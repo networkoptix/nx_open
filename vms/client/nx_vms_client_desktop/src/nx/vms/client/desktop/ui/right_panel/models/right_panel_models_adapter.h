@@ -58,7 +58,7 @@ class RightPanelImageProvider: public QQuickImageProvider
 {
 public:
     RightPanelImageProvider(): QQuickImageProvider(Image) {}
-    virtual QImage requestImage(const QString& id, QSize* size, const QSize& requestedSize);
+    virtual QImage requestImage(const QString& id, QSize* size, const QSize& /*requestedSize*/);
 };
 
 } // namespace nx::vms::client::desktop

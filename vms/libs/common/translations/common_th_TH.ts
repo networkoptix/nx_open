@@ -1010,7 +1010,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
+      <translation>ข้อผิดพลาดที่ไม่รู้จัก.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>
@@ -1517,31 +1517,31 @@
     </message>
     <message>
       <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
-      <translation type="unfinished">Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</translation>
+      <translation>ตรวจพบข้อขัดแย้งที่อยู่หลายผู้รับ ที่อยู่ %1 ถูกใช้งานโดย %2 ใน %3 สตรีม</translation>
     </message>
     <message>
       <source>Network address %1 is not a multicast address</source>
-      <translation type="unfinished">Network address %1 is not a multicast address</translation>
+      <translation>ที่อยู่เครือข่าย %1 ไม่ใช่ที่อยู่แบบหลายผู้รับ</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is offline.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is offline.</translation>
+      <translation>ที่เก็บข้อมูล Analytics &quot;%1&quot; ออฟไลน์</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; is almost full.</translation>
+      <translation>พื้นที่เก็บข้อมูล Analytics &quot;%1&quot; ใกล้จะเต็มแล้ว</translation>
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation type="unfinished">Plugin Diagnostic Event</translation>
+      <translation>เหตุการณ์การวิเคราะห์ปลั๊กอิน</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>เหตุการณ์การวิเคราะห์ปลั๊กอินที่ไม่รู้จัก</translation>
     </message>
     <message>
       <source>RAID error. %1.</source>
-      <translation type="unfinished">RAID error. %1.</translation>
+      <translation>ข้อผิดพลาดของ RAID %1.</translation>
     </message>
   </context>
   <context>

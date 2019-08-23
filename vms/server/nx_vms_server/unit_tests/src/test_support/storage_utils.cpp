@@ -46,6 +46,7 @@ public:
         storage->setStorageType("local");
         storage->setUsedForWriting(
             storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
+        storage->setIdUnsafe(QnUuid::createUuid());
 
         NX_ASSERT(storage->isUsedForWriting());
 
@@ -114,7 +115,7 @@ public:
     {
         setSpaceLimit(spaceLimit);
         setUsedForWriting(isUsedForWriting);
-        setId(QnUuid::createUuid());
+        setIdUnsafe(QnUuid::createUuid());
     }
 
     virtual QIODevice* open(const QString& /*fileName*/, QIODevice::OpenMode /*openMode*/) override
@@ -122,7 +123,7 @@ public:
         return nullptr;
     }
 
-    virtual float getAvarageWritingUsage() const override
+    virtual float getAverageWritingUsage() const override
     {
         return 0.0;
     }

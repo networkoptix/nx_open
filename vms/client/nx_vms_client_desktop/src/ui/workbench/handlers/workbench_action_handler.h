@@ -180,7 +180,7 @@ protected slots:
 
     void at_queueAppRestartAction_triggered();
     void at_selectTimeServerAction_triggered();
-    void at_cameraListChecked(int status, const QnCameraListReply& reply, int handle);
+    void at_cameraListChecked(bool success, int handle, const QnCameraListReply& reply);
 
     void at_convertCameraToEntropix_triggered();
 

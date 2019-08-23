@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <translation>MMMM yyyy</translation>
+      <translation type="unfinished">MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -124,7 +124,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>Ok</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -344,7 +344,7 @@
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation>Errore Interno del Server</translation>
+      <translation>Errore interno del server. %1</translation>
     </message>
   </context>
   <context>
@@ -682,8 +682,8 @@
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n Licenze gratuite</numerusform>
-        <numerusform>%n Licenze gratuite</numerusform>
+        <numerusform>%n/%1 licenza gratuita</numerusform>
+        <numerusform>%n/%1 Licenze gratuite</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -824,7 +824,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>Moduli I / O</translation>
+      <translation>Modulo I / O</translation>
     </message>
     <message>
       <source>I/O module</source>

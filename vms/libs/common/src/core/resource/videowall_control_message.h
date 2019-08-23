@@ -1,10 +1,11 @@
 #pragma once
 
+#include <string>
+
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
-#include <QtCore/QDebug>
 
 #include <nx/utils/uuid.h>
 
@@ -59,8 +60,8 @@ public:
     QString& operator[](const QString &key) { return params[key]; }
     const QString operator[](const QString &key) const {return params[key]; }
     bool contains(const QString& key) const { return params.contains(key); }
-};
 
-QDebug operator<<(QDebug dbg, const QnVideoWallControlMessage &message);
+    std::string toString() const;
+};
 
 Q_DECLARE_METATYPE(QnVideoWallControlMessage)

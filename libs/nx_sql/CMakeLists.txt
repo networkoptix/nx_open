@@ -14,6 +14,10 @@ target_compile_definitions(nx_sql
     PRIVATE NX_SQL_API=${API_EXPORT_MACRO}
     INTERFACE NX_SQL_API=${API_IMPORT_MACRO})
 
+if(LINUX AND NOT ANDROID)
+    target_link_libraries(nx_sql PRIVATE pthread)
+endif()
+
 if(withTests)
     add_subdirectory(tests)
 endif()

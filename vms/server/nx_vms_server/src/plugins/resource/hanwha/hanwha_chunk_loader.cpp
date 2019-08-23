@@ -108,8 +108,6 @@ qint64 HanwhaChunkLoader::startTimeUsec(int channelNumber) const
     {
         const auto overlappedId = entry.first;
         const auto& chunksByChannel = entry.second;
-
-        NX_ASSERT(chunksByChannel.size() > channelNumber);
         if (chunksByChannel.size() <= channelNumber || chunksByChannel[channelNumber].isEmpty())
             continue;
 
@@ -138,8 +136,6 @@ qint64 HanwhaChunkLoader::endTimeUsec(int channelNumber) const
     {
         const auto overlappedId = entry.first;
         const auto& chunksByChannel = entry.second;
-
-        NX_ASSERT(chunksByChannel.size() > channelNumber);
         if (chunksByChannel.size() <= channelNumber || chunksByChannel[channelNumber].isEmpty())
             continue;
 

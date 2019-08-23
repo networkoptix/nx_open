@@ -3,10 +3,11 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QDir>
-
 #include <QtGui/QStandardItem>
 #include <QtGui/QStandardItemModel>
-
+#include <QtQml/QQmlContext>
+#include <QtQuick/QQuickItem>
+#include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QApplication>
 
 #include <api/app_server_connection.h>
@@ -43,16 +44,17 @@
 
 #include <nx/vms/client/desktop/system_logon/data/logon_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/connection_name_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
+#include <ui/graphics/opengl/gl_functions.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/rendering_widget.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
 #include <helpers/system_helpers.h>
@@ -144,6 +146,21 @@ struct AutoFoundSystemViewModel
     }
 };
 
+class IntroContainer: public QWidget
+{
+public:
+    IntroContainer(QWidget* intro, QWidget* parent = nullptr): QWidget(parent)
+    {
+        intro->setParent(this);
+        anchorWidgetToParent(intro);
+    }
+
+    static constexpr qreal kAspectRatio = 16.0 / 9.0;
+
+    virtual bool hasHeightForWidth() const override { return true; }
+    virtual int heightForWidth(int width) const override { return width / kAspectRatio; }
+};
+
 } // namespace
 
 /************************************************************************/
@@ -174,8 +191,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::LoginDialog),
-    m_connectionsModel(new QStandardItemModel(this)),
-    m_renderingWidget(new QnRenderingWidget(this))
+    m_connectionsModel(new QStandardItemModel(this))
 {
     ui->setupUi(this);
 
@@ -183,8 +199,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
 
     setWindowTitle(tr("Connect to Server..."));
     setHelpTopic(this, Qn::Login_Help);
-
-    m_renderingWidget->setEffectiveWidth(kMinIntroWidth);
 
     QHBoxLayout* bbLayout = dynamic_cast<QHBoxLayout*>(ui->buttonBox->layout());
     NX_ASSERT(bbLayout);
@@ -198,30 +212,11 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
         bbLayout->insertWidget(0, versionLabel);
     }
 
-    QString introPath;
-    for (auto name: kIntroNames)
-    {
-        introPath = qnSkin->path(name);
-        if (!introPath.isEmpty())
-            break;
-    }
-
-    QnAviResourcePtr resource =
-        QnAviResourcePtr(new QnAviResource(lit("qtfile://") + introPath, commonModule()));
-    if (FileTypeSupport::isImageFileExt(introPath))
-        resource->addFlags(Qn::still_image);
-    resource->setCommonModule(commonModule());
-
-    m_renderingWidget->setResource(resource);
-
-    QVBoxLayout* layout = new QVBoxLayout(ui->videoSpacer);
-    layout->setSpacing(0);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(m_renderingWidget);
+    setupIntroView();
 
     ui->connectionsComboBox->setModel(m_connectionsModel);
 
-    m_lastUsedItem = NULL;
+    m_lastUsedItem = nullptr;
     m_savedSessionsItem = new QStandardItem(tr("Saved Sessions"));
     m_savedSessionsItem->setFlags(Qt::ItemIsEnabled);
     m_autoFoundItem = new QStandardItem(tr("Auto-Discovered Servers"));
@@ -261,6 +256,46 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
 
 QnLoginDialog::~QnLoginDialog()
 {
+}
+
+void QnLoginDialog::setupIntroView()
+{
+    QString introPath;
+    for (auto name: kIntroNames)
+    {
+        introPath = qnSkin->path(name);
+        if (!introPath.isEmpty())
+            break;
+    }
+
+    if (!NX_ASSERT(!introPath.isEmpty()))
+        return;
+
+    introPath.replace('\\', "/");
+
+    auto layout = new QVBoxLayout(ui->videoSpacer);
+    layout->setSpacing(0);
+    layout->setContentsMargins({});
+
+    QImage image;
+    if (image.load(introPath))
+    {
+        const auto staticIntro = new QLabel(this);
+        staticIntro->setAlignment(Qt::AlignCenter);
+        staticIntro->setPixmap(QPixmap::fromImage(image));
+        layout->addWidget(new IntroContainer(staticIntro));
+    }
+    else
+    {
+        const auto introWidget = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), this);
+        introWidget->rootContext()->setContextProperty("maxTextureSize",
+            QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
+
+        introWidget->setSource({ "Nx/Intro/Intro.qml" });
+        introWidget->rootObject()->setProperty("introPath", QString("file:///") + introPath);
+        introWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+        layout->addWidget(new IntroContainer(introWidget));
+    }
 }
 
 void QnLoginDialog::updateFocus()
@@ -397,12 +432,6 @@ void QnLoginDialog::showEvent(QShowEvent *event)
     if (focusWidget())
         focusWidget()->activateWindow();
 #endif
-}
-
-void QnLoginDialog::hideEvent(QHideEvent *event)
-{
-    base_type::hideEvent(event);
-    m_renderingWidget->stopPlayback();
 }
 
 QString QnLoginDialog::defaultLastUsedConnectionName()

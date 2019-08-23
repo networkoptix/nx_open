@@ -117,4 +117,8 @@ function(setup_ios_application target)
             --output "${app_dir}/qt_qml"
         COMMENT "Copying QML imports for ${target}"
     )
+    add_custom_command(TARGET ${target} PRE_LINK
+        COMMAND cp ${app_dir}/../*.dat ${app_dir}
+        COMMENT "Copying translations for ${target}"
+    )
 endfunction()

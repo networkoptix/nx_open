@@ -17,6 +17,7 @@
 #include <core/resource_access/user_access_data.h>
 #include <common/common_module.h>
 #include <network/http_connection_listener.h>
+#include <core/resource_access/resource_access_subject.h>
 
 static const QByteArray NOT_AUTHORIZED_HTML("\
     <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\

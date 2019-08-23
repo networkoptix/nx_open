@@ -120,7 +120,7 @@
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Servizio non disponibile. Si prega di provare più tardi.</translation>
+      <translation>%1 non disponibile. Si prega di provare più tardi.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>

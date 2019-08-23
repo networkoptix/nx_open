@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="cs" sourcelanguage="en">
   <context>
+    <name>ActionButtonsHint</name>
+    <message>
+      <source>Disabled by schedule</source>
+      <translation>Zakázáno rozvrhem</translation>
+    </message>
+  </context>
+  <context>
     <name>ActionButtonsPanel</name>
     <message>
       <source>Press and hold to</source>
@@ -29,6 +36,10 @@
     <message>
       <source>Offline</source>
       <translation>Offline</translation>
+    </message>
+    <message>
+      <source>I/O module</source>
+      <translation>I/O modul</translation>
     </message>
   </context>
   <context>
@@ -325,13 +336,6 @@
     </message>
   </context>
   <context>
-    <name>LiveVideoNavigation</name>
-    <message>
-      <source>LIVE</source>
-      <translation>ŽIVĚ</translation>
-    </message>
-  </context>
-  <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
@@ -359,6 +363,14 @@
     <message>
       <source>Incompatible server version %1</source>
       <translation>Nekompatibilní verze serveru %1</translation>
+    </message>
+    <message>
+      <source>Too many attempts. Try again in a minute.</source>
+      <translation>Příliš mnoho pokusů. Zkuste to znovu za chvíli.</translation>
+    </message>
+    <message>
+      <source>Connect to this server from web browser or through desktop client to set it up</source>
+      <translation>Připojte se k tomuto serveru z webového prohlížeče nebo pomocí stolního klienta a nastavte jej</translation>
     </message>
   </context>
   <context>
@@ -479,7 +491,7 @@
     </message>
   </context>
   <context>
-    <name>SearchToolBar</name>
+    <name>SearchEdit</name>
     <message>
       <source>Search</source>
       <translation>Hledat</translation>
@@ -586,6 +598,10 @@
       <comment>%1 is a system name</comment>
       <translation>Nelze se připojit k systému &quot;%1&quot;</translation>
     </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Nic nenalezeno</translation>
+    </message>
   </context>
   <context>
     <name>SettingsScreen</name>
@@ -608,6 +624,10 @@
     <message>
       <source>Delete</source>
       <translation>Smazat</translation>
+    </message>
+    <message>
+      <source>Keep</source>
+      <translation>Ponechat</translation>
     </message>
   </context>
   <context>
@@ -769,6 +789,10 @@
       <comment>%1 is the short desktop client name (like &apos;Nx Witness&apos;)</comment>
       <translation>V této aplikaci může být I/O modul použít pouze jako vstupní zvukové zařízení. Chcete-li jej použít jako řídicí modul, použijte prosím verzi pro stolní počítače %1</translation>
     </message>
+    <message>
+      <source>No live stream</source>
+      <translation type="unfinished">No live stream</translation>
+    </message>
   </context>
   <context>
     <name>VideoNavigation</name>
@@ -818,6 +842,10 @@
     <message>
       <source>Invalid custom area. Please draw a correct one.</source>
       <translation>Neplatná oblast. Nakreslete prosím znovu.</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Zvuk</translation>
     </message>
   </context>
   <context>

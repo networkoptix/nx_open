@@ -51,9 +51,9 @@
   <!-- __onvifEvents_pps__PullMessages(..., _onvifEvents__PullMessagesResponse &onvifEvents__PullMessagesResponse) -->
   <onvifEvents:PullMessagesResponse>
    <!-- time_t CurrentTime -->
-   <onvifEvents:CurrentTime>2019-06-26T13:17:19Z</onvifEvents:CurrentTime>
+   <onvifEvents:CurrentTime>2019-08-15T16:06:01Z</onvifEvents:CurrentTime>
    <!-- time_t TerminationTime -->
-   <onvifEvents:TerminationTime>2019-06-26T13:17:19Z</onvifEvents:TerminationTime>
+   <onvifEvents:TerminationTime>2019-08-15T16:06:01Z</onvifEvents:TerminationTime>
    <!-- std::vector<wsnt__NotificationMessageHolderType *> wsnt__NotificationMessage -->
    <!-- a repetition of 0 or more of the following -->
    <wsnt:NotificationMessage>

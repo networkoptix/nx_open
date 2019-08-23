@@ -11,8 +11,7 @@
 using namespace nx::vms::event;
 using namespace nx::test;
 
-namespace nx::vms::server::event::test
-{
+namespace nx::vms::server::event::test {
 
 TEST(EventRules, httpPostAction)
 {
@@ -34,7 +33,7 @@ TEST(EventRules, httpPostAction)
         .setPath("/ec2/saveUser").toString();
 
     actionParams.text = R"json(
-        {"name": "liver", "password":"LiveLive123", "isLdap": false, "isEnabled": true}
+        {"name": "liver", "password": "LiveLive123", "isLdap": false, "isEnabled": true}
     )json";
     rule.actionParams = QJson::serialized(actionParams);
 

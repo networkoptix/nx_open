@@ -115,7 +115,7 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>Demasiadas tentativas. Tente novamente dentro de um minuto.</translation>
+      <translation>Demasiadas tentativas. Tente novamente mais tarde.</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
@@ -147,7 +147,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Não foi possível iniciar o codificador de áudio.</translation>
+      <translation>Não foi possível inicializar o encoder de áudio.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>

@@ -36,7 +36,7 @@ Page
         {
             if (sideNavigation.opened)
                 sideNavigation.close()
-            else if (isConnecting())
+            else if (ConnectionController.connecting)
                 uiController.disconnectFromSystem()
             else if (stackView.depth > 1)
                 Workflow.popCurrentScreen()
@@ -56,12 +56,6 @@ Page
         }
     }
 
-    function isConnecting()
-    {
-        var state = connectionManager.connectionState
-        return state == QnConnectionManager.Connecting
-            || (state == QnConnectionManager.Connected && !connectionManager.online)
-    }
     function updateSideNavigation()
     {
         if (!sideNavigationEnabled)

@@ -5,6 +5,7 @@ import time
 import sys
 import logging
 import json
+import base64
 import traceback
 from urllib.parse import quote
 from datetime import datetime
@@ -16,8 +17,6 @@ from requests.auth import HTTPDigestAuth
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-MEDIASERVER_VERSION = '3.1.0.17256'
-CLOUD_CONNECT_TEST_UTIL_VERSION = '18.3.0.20101'
 RETRY_TIMEOUT = 10  # seconds
 
 log = logging.getLogger('simple_cloud_test')
@@ -145,22 +144,26 @@ testmethod.counter = 1
 
 @testclass
 class CloudSession(object):
-    def __init__(self, host, debug):
+    def __init__(self, configuration):
         """
             This class defines tests to be run.
 
             Test are being run in order they appear in the code.
         """
-        self.host = host
-        self.debug = debug
+        self.host = configuration['host']
+        self.debug = configuration['debug'].lower() == 'true'
+        self.cloud_connect_test_util_version = configuration['cloud_connect_test_util_version']
+        self.metric_namespace = configuration['metric_namespace']
+        self.email_sqs_queue_name = configuration['email_sqs_queue_name']
+        self.dynamodb_table = configuration['dynamodb_table']
 
-        self.base_url = 'https://{}'.format(host)
+        self.base_url = 'https://{}'.format(self.host)
         self.session = requests.Session()
 
         self.cloud_sender = 'Nx Cloud <service@networkoptix.com>'
-        self.email = 'noptixqa-owner@hdw.mx'
-        self.password = 'qweasd123'
-        self.user_email = 'vasily@hdw.mx'
+        self.email = configuration['email']
+        self.password = configuration['password']
+        self.user_email = configuration['share_with_email']
 
         self.auth = HTTPDigestAuth(self.email, self.password)
 
@@ -265,12 +268,12 @@ class CloudSession(object):
 
         cloudwatch = boto3.client('cloudwatch')
         cloudwatch.put_metric_data(
-            Namespace='prod__monitoring',
+            Namespace=self.metric_namespace,
             MetricData=self._metric_data()
         )
 
         dynamodb = boto3.resource('dynamodb')
-        table = dynamodb.Table('prod-health-records')
+        table = dynamodb.Table(self.dynamodb_table)
         table.put_item(Item=self._dynamodb_item())
 
     def run_tests(self):
@@ -335,12 +338,12 @@ class CloudSession(object):
 
     def test_cctu_base(self, command):
         image = '009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/cloud_connect_test_util:{}'.format(
-            CLOUD_CONNECT_TEST_UTIL_VERSION)
+            self.cloud_connect_test_util_version)
 
         log.info('Running image: {} command: {}'.format(image, command))
 
         client = docker.client.from_env()
-        container = client.containers.run(image, command, detach=True)
+        container = client.containers.run(image, '{} {}'.format(self.host, command), detach=True)
         status = container.wait()
         log.info('Container exited with exit status {}'.format(status))
         out = container.logs(stdout=True, stderr=True)
@@ -417,7 +420,7 @@ class CloudSession(object):
     @testmethod(metric='email_failure', continue_if_fails=True, debug_skip=True)
     def restore_password(self):
         sqs = boto3.resource('sqs')
-        queue = sqs.get_queue_by_name(QueueName='noptixqa-owner-queue')
+        queue = sqs.get_queue_by_name(QueueName=self.email_sqs_queue_name)
 
         self.purge_queue(queue)
 
@@ -548,8 +551,11 @@ class CloudSession(object):
 
 
 @contextmanager
-def mediaserver():
-    image = "009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/mediaserver:{}".format(MEDIASERVER_VERSION)
+def mediaserver(configuration):
+    cloud_host = configuration['host']
+    mediaserver_version = configuration['mediaserver_version']
+
+    image = "009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/mediaserver:{}".format(mediaserver_version)
 
     client = docker.client.from_env()
 
@@ -557,7 +563,7 @@ def mediaserver():
                 '/srv/containers/mediaserver/var': {'bind': '/opt/networkoptix/mediaserver/var', 'mode': 'rw'}}
 
     log.info('Running mediaserver')
-    container = client.containers.run(image, ports={7001: 7001},volumes=volumes,  detach=True)
+    container = client.containers.run(image, ports={7001: 7001},volumes=volumes, command=[cloud_host], detach=True)
 
     try:
         mediaserver_ip = client.containers.get(container.id).attrs['NetworkSettings']['IPAddress']
@@ -605,15 +611,10 @@ def mediaserver():
 def main():
     setup_logging()
 
-    host = sys.argv[1]
+    configuration = json.loads(base64.b64decode(sys.argv[1]))
 
-    debug = False
-
-    if len(sys.argv) == 3:
-        debug = sys.argv[2] == "debug"
-
-    with mediaserver():
-        session = CloudSession(host, debug)
+    with mediaserver(configuration):
+        session = CloudSession(configuration)
         status = session.run_tests()
         session.close()
 

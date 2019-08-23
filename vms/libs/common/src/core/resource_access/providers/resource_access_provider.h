@@ -23,6 +23,8 @@ public:
     virtual bool hasAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const override;
 
+    virtual QSet<QnUuid> accessibleResources(const QnResourceAccessSubject& subject) const override;
+
     virtual Source accessibleVia(
         const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource,

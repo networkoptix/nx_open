@@ -43,6 +43,7 @@
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <core/resource_access/resource_access_subject.h>
 
 namespace {
 
@@ -318,7 +319,7 @@ void StartupActionsHandler::handleAcsModeResources(
         windowStart = maxTime - kAcsModeTimelineWindowSize;
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid());
+    layout->setIdUnsafe(QnUuid::createUuid());
     layout->setParentId(context()->user()->getId());
     layout->setCellSpacing(0);
     resourcePool()->addResource(layout);
@@ -357,7 +358,7 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
     const bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
     if (systemIsCloud)
     {
-        qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
+        qnClientModule->cloudStatusWatcher()->setInitialCredentials(credentials);
         NX_DEBUG(this, "Custom URI: System is cloud, connecting to the cloud first");
     }
 
@@ -450,7 +451,7 @@ bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& st
     const nx::vms::common::Credentials credentials(auth.user, auth.password);
 
     NX_DEBUG(this, "Custom URI: Connecting to cloud as %1", auth.user);
-    qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
+    qnClientModule->cloudStatusWatcher()->setInitialCredentials(credentials);
     return true;
 }
 

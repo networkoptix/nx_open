@@ -52,7 +52,7 @@
   <onvifMedia:GetVideoEncoderConfigurationsResponse>
    <!-- std::vector<tt__VideoEncoderConfiguration *> Configurations -->
    <!-- a repetition of 0 or more of the following -->
-   <onvifMedia:Configurations token="">
+   <onvifMedia:Configurations GuaranteedFrameRate="false" token="">
     <!-- std::string Name -->
     <tt:Name></tt:Name>
     <!-- int UseCount -->

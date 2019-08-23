@@ -60,7 +60,7 @@
 
         <div class="form-group has-error" ng-if="forms.systemNameForm.systemName.$touched && forms.systemNameForm.systemName.$error.required">
             <div class="help-block">
-                É necessário o nome do Sistema
+                O nome do sistema é obrigatório
             </div>
         </div>
 
@@ -362,7 +362,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Tentar novamente</button>
+        <button class="btn btn-default" ng-click="retry()">Tente Novamente</button>
     </p>
 </div>
 
@@ -406,7 +406,7 @@
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
-        <button class="btn btn-primary" ng-click="retry()">Guardar as definições e reinicar o dispositivo</button>
+        <button class="btn btn-primary" ng-click="retry()">Guardar as definições e reiniciar o dispositivo</button>
     </p>
 </div>
 
@@ -456,7 +456,7 @@
         Descrição do erro:{{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Tentar novamente</button>
+        <button class="btn btn-default" ng-click="retry()">Tente Novamente</button>
     </p>
 </div>
 

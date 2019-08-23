@@ -85,6 +85,7 @@ namespace ResourcePropertyKey
 
     static const QString kVideoLayout("VideoLayout");
 
+    static const QString kOnvifIgnoreMedia2("onvifIgnoreMedia2");
     namespace Onvif
     {
         static const QString kMediaUrl("MediaUrl");
@@ -201,6 +202,8 @@ namespace ResourceDataKey
 
     static const QString kRepeatIntervalForSendVideoEncoderMS("repeatIntervalForSendVideoEncoderMS");
     static const QString kMulticastIsSupported("multicastIsSupported");
+    static const QString kOnvifIgnoreMedia2("onvifIgnoreMedia2");
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 
 #include <core/ptz/media_dewarping_params.h>
 
+#include <nx/client/core/media/media_player.h>
 #include <nx/client/core/resource/resource_helper.h>
 
 namespace nx::vms::client::core {
@@ -25,7 +26,9 @@ class MediaResourceHelper: public ResourceHelper
     Q_PROPERTY(bool analogCameraWithoutLicense READ analogCameraWithoutLicense
         NOTIFY analogCameraWithoutLicenseChanged)
     Q_PROPERTY(bool isWearableCamera READ isWearableCamera NOTIFY wearableCameraChanged)
-
+    Q_PROPERTY(bool audioSupported READ audioSupported NOTIFY audioSupportedChanged)
+    Q_PROPERTY(int livePreviewVideoQuality READ livePreviewVideoQuality
+        NOTIFY livePreviewVideoQualityChanged)
     Q_ENUMS(Qn::ResourceStatus)
 
     using base_type = ResourceHelper;
@@ -44,6 +47,8 @@ public:
     bool analogCameraWithoutLicense() const;
     Q_INVOKABLE QPoint channelPosition(int channel) const;
     bool isWearableCamera() const;
+    bool audioSupported() const;
+    MediaPlayer::VideoQuality livePreviewVideoQuality() const;
 
 signals:
     void serverNameChanged();
@@ -54,6 +59,8 @@ signals:
     void fisheyeParamsChanged();
     void analogCameraWithoutLicenseChanged();
     void wearableCameraChanged();
+    void audioSupportedChanged();
+    void livePreviewVideoQualityChanged();
 
 private:
     class Private;

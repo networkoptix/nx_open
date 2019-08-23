@@ -25,6 +25,8 @@ CompactTabButton 1.0 CompactTabButton.qml
 TabBar 1.0 TabBar.qml
 Fader 1.0 Fader.qml
 ProgressBar 1.0 ProgressBar.qml
+CloseButton 1.0 CloseButton.qml
+SelectableTextButton 1.0 SelectableTextButton.qml
 
 ArrowIcon 1.0 ArrowIcon.qml
 SwitchIcon 1.0 SwitchIcon.qml

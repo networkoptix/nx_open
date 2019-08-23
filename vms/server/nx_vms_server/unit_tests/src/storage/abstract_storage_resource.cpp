@@ -7,6 +7,7 @@
 #include <unordered_map>
 
 #include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/random_qt_device.h>
 #include <utils/common/writer_pool.h>
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource_management/resource_pool.h>
@@ -152,7 +153,7 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
     const char dummyData[] = "abcdefgh";
     const int dummyDataLen = (int) strlen(dummyData);
 
-    std::random_device rd;
+    nx::utils::random::QtDevice rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> nameDistribution(0, 15);
     std::uniform_int_distribution<> pathDistribution(1, 5);
@@ -296,7 +297,7 @@ TEST_F(AbstractStorageResourceTest, IODevice)
         const size_t newDataSize = strlen(newData);
         std::vector<char> data(dataSize);
 
-        std::random_device rd;
+        nx::utils::random::QtDevice rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dataDistribution(-127, 127);
 

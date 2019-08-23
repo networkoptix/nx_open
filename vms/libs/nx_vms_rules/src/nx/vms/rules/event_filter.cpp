@@ -1,5 +1,7 @@
 #include "event_filter.h"
 
+#include <QScopedValueRollback>
+
 #include "event_field.h"
 
 namespace nx::vms::rules {
@@ -44,6 +46,26 @@ bool EventFilter::match(const EventPtr& event) const
             return false;
     }
     return true;
+}
+
+void EventFilter::connectSignals()
+{
+    for (auto& field: m_fields)
+    {
+        field->connectSignals();
+        connect(field, &Field::stateChanged, this, &EventFilter::updateState);
+    }
+}
+
+void EventFilter::updateState()
+{
+    //TODO: #spanasenko Update derived values (error messages, etc.)
+
+    if (m_updateInProgress)
+        return;
+
+    QScopedValueRollback<bool> guard(m_updateInProgress, true);
+    emit stateChanged();
 }
 
 } // namespace nx::vms::rules

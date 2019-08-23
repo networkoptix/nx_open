@@ -44,6 +44,8 @@ public:
         LastUsedSessionId,
         SavePasswords,
 
+        AudioSettings,
+
         VariableCount
     };
 
@@ -106,7 +108,8 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isSettingsMigrated,         setSettingsMigrated,        IsSettingsMigrated,         false)
         // \see QnMigratedSystemsFinder
         QN_DECLARE_RW_PROPERTY(QVariantList,                savedSessions,              setSavedSessions,           SavedSessions,              QVariantList())
-        QN_DECLARE_RW_PROPERTY(bool, savePasswords, setSavePasswords, SavePasswords, true)
+        QN_DECLARE_RW_PROPERTY(bool, savePasswords, setSavePasswords, SavePasswords, true)        
+        QN_DECLARE_RW_PROPERTY(QByteArray, audioSettings, setAudioSettings, AudioSettings, QByteArray())
     QN_END_PROPERTY_STORAGE()
 
 private:

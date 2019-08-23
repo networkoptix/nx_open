@@ -20,7 +20,7 @@
 <div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>Không thể thiết lập Hệ thống</h2>
-    <p class="master-description">The System cannot be configured. <br>
+    <p class="master-description">Hệ thống không thể được cấu hình. <br>
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
@@ -65,13 +65,13 @@
 
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('advanced', true)">Advanced System settings</a>
+        <a href="" ng-click="next('advanced', true)">Thiết lập hệ thống nâng cao</a>
     </p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('advanced')">
-    <h2>Advanced System settings</h2>
+    <h2>Thiết lập hệ thống nâng cao</h2>
     <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
@@ -138,7 +138,7 @@
     </div>
     <h2>{{Config.cloud.productName}} tài khoản</h2>
     <p class="master-description">
-        An account is required to use the cloud System {{Config.cloud.productName}}
+        Cần có tài khoản để sử dụng Hệ thống đám mây {{Config.cloud.productName}}
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" auto-focus> Tạo tài khoản mới </button> &nbsp;&nbsp; <button class="btn btn-default" ng-click="next('cloudLogin', true)"> Sử dụng hiện tại </button>
@@ -268,14 +268,14 @@
              ng-if= "forms.localForm.$valid &&
                      (settings.localPasswordConfirmation != settings.localPassword)">
             <div class="help-block">
-                Mật khẩu không khớp
+                Mật khẩu không trùng nhau
             </div>
         </div>
     </form>
 </div>
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
-    <h2>Connect the server to the existing System</h2>
+    <h2>Kết nối máy chủ với Hệ thống hiện có</h2>
     <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
 
@@ -287,7 +287,7 @@
                    uib-typeahead-show-hint="true"
                    uib-typeahead-focus-first="false"
                    uib-typeahead-focus
- placeholder="Existing System URL (https://host:port)"
+ placeholder="URL hệ thống hiện có (https://host:port)"
                    ng-change="clearRemoteError()"
                    required
  class="form-control">
@@ -334,13 +334,13 @@
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
     <h2>Sáp nhập hệ thống ...</h2>
-    <p class="master-description">Trying to connect to the System</p>
+    <p class="master-description">Đang cố gắng kết nối với hệ thống</p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Cannot merge Systems</h2>
+    <h2>Hệ thống không thể hợp nhất</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>

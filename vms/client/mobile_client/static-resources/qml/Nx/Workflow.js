@@ -29,7 +29,9 @@ function openSessionsScreen()
 
 function openSessionsScreenWithWarning(systemName)
 {
-    var item = stackView.safeReplace(null, Qt.resolvedUrl("Screens/SessionsScreen.qml"))
+    var item = stackView.currentItem && stackView.currentItem.objectName == "sessionsScreen"
+        ? stackView.currentItem
+        : stackView.safeReplace(null, Qt.resolvedUrl("Screens/SessionsScreen.qml"))
     if (item)
         item.openConnectionWarningDialog(systemName)
 }
@@ -116,7 +118,7 @@ function openVideoScreen(resourceId, screenshotUrl, xHint, yHint, timestamp)
     var targetTimestamp = timestamp > 0 ? timestamp : -1
     var properties =
         {
-            "resourceId": resourceId,
+            "initialResourceId": resourceId,
             "initialScreenshot": screenshotUrl,
             "targetTimestamp": targetTimestamp
         }
@@ -195,13 +197,14 @@ function openDialog(path, properties)
     return dialog
 }
 
-function openStandardDialog(title, message, buttonsModel)
+function openStandardDialog(title, message, buttonsModel, disableAutoClose)
 {
     return openDialog(
         "Dialogs/StandardDialog.qml",
         {
             "title": title,
             "message": message,
+            "disableAutoClose": disableAutoClose,
             "buttonsModel": buttonsModel ? buttonsModel : ["OK"]
         }
     )

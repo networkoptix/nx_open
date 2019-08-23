@@ -72,10 +72,6 @@ private:
 
     bool ptzButtonVisible() const;
 
-    ButtonList::const_iterator lowerBoundByTriggerButtonId(const QnUuid& ruleId) const;
-
-    int triggerButtonInsertionIndexById(const QnUuid& id) const;
-
     void addSoftwareTriggerButton(
         const QnUuid& id,
         const QString& iconPath,

@@ -171,7 +171,7 @@
     <form class="master-controls" name="forms.cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
-                   type="email" placeholder="Email" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
+                   type="email" placeholder="E-mail" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
@@ -375,7 +375,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>A rendszer használatra kész</h2>
-    <p>Bejelentkezés</p>
+    <p>Felhasználónév</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Megosztási és fiókbeállítások</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="{{Config.cloud.productName}} megnyitása"
@@ -384,7 +384,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
-    <h2>Rendszer készen áll a használatra</h2>
+    <h2>A rendszer használatra kész</h2>
     <p>Szerver címe</p>
     <h4>{{serverAddress}}</h4>
     <p>Adminisztrátor bejelentkezés</p>

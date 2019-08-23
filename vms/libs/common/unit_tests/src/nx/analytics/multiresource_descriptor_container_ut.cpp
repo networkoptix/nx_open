@@ -129,7 +129,7 @@ private:
     static QnResourcePtr makeResource()
     {
         QnResourcePtr resource(new nx::core::resource::DeviceMock());
-        resource->setId(QnUuid::createUuid());
+        resource->setIdUnsafe(QnUuid::createUuid());
         return resource;
     }
 

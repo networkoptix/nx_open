@@ -4,7 +4,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
-#include <nx/vms/server/server_update_manager.h>
+#include <nx/vms/server/update/update_manager.h>
 #include <api/global_settings.h>
 #include <nx/vms/server/settings.h>
 #include <nx/update/update_storages_helper.h>

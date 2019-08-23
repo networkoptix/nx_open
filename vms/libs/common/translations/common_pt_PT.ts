@@ -44,7 +44,7 @@
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation>Você está prestes a fazer &quot;merge&quot; de Sistemas com licenças Starter.</translation>
+      <translation>Você está prestes a fazer "merge" de Sistemas com licenças Starter.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
@@ -52,7 +52,7 @@
     </message>
     <message>
       <source>Merge anyway?</source>
-      <translation>Avançar com o &quot;merge&quot; mesmo assim?</translation>
+      <translation>Avançar com o "merge" mesmo assim?</translation>
     </message>
     <message>
       <source>System was not found.</source>
@@ -320,15 +320,15 @@
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua os fps nas configurações do dispositivo (erro &quot;%1&quot;).</translation>
+      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua os fps nas configurações da câmera (erro &quot;%1&quot;).</translation>
+      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>Primeiro, tente ligar a gravação (se estiver desligada) e diminua o fps nas configurações do módulo de E/S (erro &quot;%1&quot;).</translation>
+      <translation type="unfinished">First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
@@ -889,7 +889,7 @@
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation>Marca d&apos;água: %1</translation>
+      <translation>Marca d'água: %1</translation>
     </message>
     <message>
       <source>Time License</source>
@@ -904,7 +904,7 @@
     <name>QnStreamRecorder</name>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Não foi encontrado o &apos;container&apos; correspondente na biblioteca FFMPEG.</translation>
+      <translation>Não foi encontrado o 'container' correspondente na biblioteca FFMPEG.</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
@@ -1424,7 +1424,7 @@
     </message>
     <message>
       <source>Archive backup failed: File catalog error</source>
-      <translation>Falhou o backup do arquivo: Erro em &apos;Catálogo&apos; de ficheiros</translation>
+      <translation>Falhou o backup do arquivo: Erro em 'Catálogo' de ficheiros</translation>
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
@@ -1539,11 +1539,11 @@
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation>Definir para modo &quot;FullScreen&quot;</translation>
+      <translation>Definir para modo "FullScreen"</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
-      <translation>Sair do &quot;Full Screen&quot;</translation>
+      <translation>Sair do "Full Screen"</translation>
     </message>
     <message>
       <source>Open layout</source>

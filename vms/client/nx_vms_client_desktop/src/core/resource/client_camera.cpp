@@ -10,15 +10,30 @@
 QnClientCameraResource::QnClientCameraResource(const QnUuid& resourceTypeId):
     base_type(resourceTypeId)
 {
+    // Handle situation when flags are added externally after resource is created.
+    connect(this, &QnResource::flagsChanged, this,
+        [this]() { m_cachedFlags.store(calculateFlags()); }, Qt::DirectConnection);
 }
 
-Qn::ResourceFlags QnClientCameraResource::flags() const
+Qn::ResourceFlags QnClientCameraResource::calculateFlags() const
 {
     Qn::ResourceFlags result = base_type::flags();
     if (!isDtsBased() && supportedMotionType() != Qn::MotionType::MT_NoMotion)
         result |= Qn::motion;
-
     return result;
+}
+
+Qn::ResourceFlags QnClientCameraResource::flags() const
+{
+    if (m_cachedFlags.load() == Qn::ResourceFlags())
+        m_cachedFlags.store(calculateFlags());
+    return m_cachedFlags;
+}
+
+void QnClientCameraResource::resetCachedValues()
+{
+    base_type::resetCachedValues();
+    m_cachedFlags = calculateFlags();
 }
 
 void QnClientCameraResource::setAuthToCameraGroup(

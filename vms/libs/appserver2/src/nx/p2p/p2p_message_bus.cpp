@@ -1165,8 +1165,9 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
             info.isIncoming = connection->direction() == Connection::Direction::incoming;
             info.remotePeerId = connection->remotePeer().id;
             info.isStarted = context->isLocalStarted;
-            info.subscription = context->localSubscription;
             info.peerType = connection->remotePeer().peerType;
+            info.subscribedTo = context->localSubscription;
+            info.subscribedFrom = context->remoteSubscription.values.keys().toVector();
 
             // Has got peerInfo message from remote server. Open new connection is blocked
             // unless server have opening connection that hasn't got this answer from remote server

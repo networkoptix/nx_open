@@ -496,9 +496,20 @@ wsc2    = <http://schemas.xmlsoap.org/ws/2005/02/sc>
 
 #       WS-Trust 1.2 and 1.3
 
-wst     = <http://docs.oasis-open.org/ws-sx/ws-trust/200512/>
 wst     = <http://docs.oasis-open.org/ws-sx/ws-trust/200512>
-wst12   = <http://schemas.xmlsoap.org/ws/2005/02/trust>
+# Some WSDLs use the incorrect URI (below), if so, replace the above with:
+# wst     = <http://docs.oasis-open.org/ws-sx/ws-trust/200512/>
+wst2    = <http://schemas.xmlsoap.org/ws/2005/02/trust>
+
+wst__RequestSecurityToken                   = | wst__RequestSecurityTokenType*
+wst__RequestSecurityTokenResponse           = | wst__RequestSecurityTokenResponseType*
+wst__RequestSecurityTokenCollection         = | wst__RequestSecurityTokenCollectionType*
+wst__RequestSecurityTokenResponseCollection = | wst__RequestSecurityTokenResponseCollectionType*
+
+wst2__RequestSecurityToken                   = | wst__RequestSecurityTokenType*
+wst2__RequestSecurityTokenResponse           = | wst__RequestSecurityTokenResponseType*
+wst2__RequestSecurityTokenCollection         = | wst__RequestSecurityTokenCollectionType*
+wst2__RequestSecurityTokenResponseCollection = | wst__RequestSecurityTokenResponseCollectionType*
 
 #       SAML bindings
 

@@ -26,7 +26,7 @@ class VideoCache;
 
 } // namespace nx::vms::client::desktop
 
-class QnClientModule: public QObject, public Singleton<QnClientModule>
+class NX_VMS_CLIENT_DESKTOP_API QnClientModule: public QObject, public Singleton<QnClientModule>
 {
     Q_OBJECT
 
@@ -62,6 +62,11 @@ private:
     void initLocalResources();
     void initLocalInfo();
     void registerResourceDataProviders();
+
+private:
+    // Client module is instantiated with certain components ommited within testing environment.
+    // TODO: #vbreus QnClientModule shouldn't be used at all in unit tests ideally.
+    bool isTestingEnvironment() const;
 
 private:
     QnStartupParameters m_startupParameters;

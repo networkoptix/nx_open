@@ -1,5 +1,5 @@
 {
-    "language_name": "Português (Brazil)",
+    "language_name": "Português (PT)",
     "dialogs": {
         "okButton": "Ok",
         "openLink": "Visite este link",
@@ -182,7 +182,7 @@
         "selectFiles": "Selecione os ficheiros"
     },
     "advanced": {
-        "free": "Gratuito",
+        "free": "Livre",
         "total": "Total",
         "occupied": "Ocupado",
         "reserved": "Reservado"

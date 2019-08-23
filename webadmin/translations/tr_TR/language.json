@@ -21,7 +21,7 @@
         "tabs": {
             "server": "Sunucu",
             "system": "Sistem",
-            "device": "Cihaz"
+            "device": "Aygıt"
         },
         "confirmRestart": "Sunucuyu yeniden başlat?",
         "couldntCheckInternet": "Bulut bağlantısı kontrol edilemedi",
@@ -149,7 +149,7 @@
         "licenceError": "Uyarı! starter lisansına sahip sistemleri birleştiriyorsunuz. Sistem başına sadece bir starter lisansa izin verilir buna bağlı olarak ikinci lisans devre dışı kalacaktır. Yinede birleştirilsin mi?",
         "duplicateServersError": "Sistemler birleştirilemiyor çünkü en az 1 sunucunun ID'si aynı. Lütfen bu sunucuyu silin ve tekrar deneyin.",
         "connectionFailed": "Bağlantı başarısız: ",
-        "unknownError": "Bilinmeyen hata",
+        "unknownError": "Bilinmeyen Hata",
         "mergeFailed": "Birleştirme başarısız",
         "mergeSucceed": "Birleştirme başarılı.",
         "newSystemDisplayName": "Yeni sistem",
