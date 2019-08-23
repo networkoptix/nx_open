@@ -51,7 +51,7 @@ public:
      * Generally, "level=none" means "ignore everything else".
      */
     void parse(const QString& str);
-    void updateDirectoryIfEmpty(const QString& dataDirectory);
+    void updateDirectoryIfEmpty(const QString& logDirectory);
 
     bool operator==(const LoggerSettings& right) const;
 };
@@ -68,7 +68,7 @@ public:
     void load(const QnSettings& settings, const QString& prefix = QLatin1String("log"));
 
     /** Updates directory if it's not specified from dataDirectory */
-    void updateDirectoryIfEmpty(const QString& dataDirectory);
+    void updateDirectoryIfEmpty(const QString& logDirectory);
 
 private:
     void loadCompatibilityLogger(

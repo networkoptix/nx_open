@@ -49,7 +49,7 @@ template <typename Container, typename KeyType>
 auto fetchDescriptors(
     const Container* container,
     const std::set<KeyType>& ids,
-    const QString& descriptorTypeName)
+    const QString& /*descriptorTypeName*/)
 {
     using ReturnType = typename decltype(container->mergedDescriptors())::value_type;
     auto typeDescriptors = container->mergedDescriptors();

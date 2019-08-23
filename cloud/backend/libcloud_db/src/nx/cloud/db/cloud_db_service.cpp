@@ -48,7 +48,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     auto logSettings = settings.vmsSynchronizationLogging();
     for (auto& loggerSettings: logSettings.loggers)
         loggerSettings.logBaseName = "sync_log";
-    logSettings.updateDirectoryIfEmpty(settings.dataDir());
+    logSettings.updateDirectoryIfEmpty(settings.dataDir() + "/log");
     nx::utils::log::addLogger(
         nx::utils::log::buildLogger(
             logSettings,

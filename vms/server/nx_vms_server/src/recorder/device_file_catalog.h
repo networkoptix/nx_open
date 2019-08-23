@@ -327,7 +327,7 @@ public:
         const ScanFilter& filter);
 
     static std::deque<Chunk> mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2);
-    void addChunks(const std::deque<Chunk>& chunk);
+    void addChunks(std::deque<Chunk> chunk);
 
     template<typename It>
     void assignChunksUnsafe(It begin, It end) { m_chunks.assign(begin, end); }

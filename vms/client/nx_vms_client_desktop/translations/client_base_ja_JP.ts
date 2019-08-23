@@ -1705,24 +1705,12 @@ to view more bookmarks</source>
       <translation>サーバー更新</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>ビジネスルールの更新</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>サーバー削除</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>ビジネスルール削除</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>ユーザー削除</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>ビジネスルールリセット</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1817,6 +1805,18 @@ to view more bookmarks</source>
       <translation>
         <numerusform>%n アクション</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>イベントルールが変更されました</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>イベントルールが削除されました</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>イベントルールをデフォルトにリセット</translation>
     </message>
   </context>
   <context>

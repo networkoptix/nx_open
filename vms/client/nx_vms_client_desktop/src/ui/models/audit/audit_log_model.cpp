@@ -352,7 +352,7 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
         case Qn::AR_ServerUpdate:
             return tr("Server updated");
         case Qn::AR_BEventUpdate:
-            return tr("Business rule updated");
+            return tr("Event rule changed");
         case Qn::AR_EmailSettings:
             return tr("Email settings changed");
         case Qn::AR_CameraRemove:
@@ -364,11 +364,11 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
         case Qn::AR_ServerRemove:
             return tr("Server removed");
         case Qn::AR_BEventRemove:
-            return tr("Business rule removed");
+            return tr("Event rule removed");
         case Qn::AR_UserRemove:
             return tr("User removed");
         case Qn::AR_BEventReset:
-            return tr("Business rule reseted");
+            return tr("Event rules reset to default");
         case Qn::AR_DatabaseRestore:
             return tr("Database restored");
         case Qn::AR_UpdateInstall:

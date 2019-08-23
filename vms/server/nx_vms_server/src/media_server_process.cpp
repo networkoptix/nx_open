@@ -283,6 +283,7 @@
 #include <nx/network/http/http_client.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/storage_plugin_factory.h>
+#include <nx/analytics/utils.h>
 
 #include <providers/speech_synthesis_data_provider.h>
 #include <nx/utils/file_system.h>
@@ -327,6 +328,7 @@ static const int kPublicIpUpdateTimeoutMs = 60 * 2 * 1000;
 static nx::utils::log::Tag kLogTag(typeid(MediaServerProcess));
 
 static const int kMinimalGlobalThreadPoolSize = 4;
+static const int kCheckAnalyticsUsedTimeoutMs = 1000 * 5;
 
 void addFakeVideowallUser(QnCommonModule* commonModule)
 {
@@ -753,18 +755,15 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         for(const QnStorageResourcePtr &storage: modifiedStorages)
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
 
-        if (m_mediaServer->metadataStorageId().isNull() && !QFile::exists(getMetadataDatabaseName()))
-        {
-            m_mediaServer->setMetadataStorageId(selectDefaultStorageForAnalyticsEvents(m_mediaServer));
-            m_mediaServer->saveProperties();
-        }
-
         connect(m_mediaServer.get(), &QnMediaServerResource::propertyChanged, this,
             &MediaServerProcess::at_serverPropertyChanged);
-        initializeAnalyticsEvents();
+
+        if (!m_mediaServer->metadataStorageId().isNull() || QFile::exists(getMetadataDatabaseName()))
+            initializeAnalyticsEvents();
 
         serverModule()->normalStorageManager()->initDone();
         serverModule()->backupStorageManager()->initDone();
+        m_storageInitializationDone = true;
     });
 }
 
@@ -1389,6 +1388,26 @@ void MediaServerProcess::at_serverModuleConflict(nx::vms::discovery::ModuleEndpo
         QUrl(lm("http://%1").arg(module.endpoint.toString())));
 }
 
+void MediaServerProcess::at_checkAnalyticsUsed()
+{
+    if (!m_storageInitializationDone)
+        return; //< Initially analytics initialized from initStoragesAsync.
+
+    if (!m_oldAnalyticsStoragePath.isEmpty())
+        return; //< Analytics already initialized.
+
+    if (!nx::analytics::hasActiveObjectEngines(commonModule(), m_mediaServer->getId()))
+        return;
+
+    if (m_mediaServer->metadataStorageId().isNull() && !QFile::exists(getMetadataDatabaseName()))
+    {
+        m_mediaServer->setMetadataStorageId(selectDefaultStorageForAnalyticsEvents(m_mediaServer));
+        m_mediaServer->saveProperties();
+    }
+
+    initializeAnalyticsEvents();
+}
+
 void MediaServerProcess::at_timer()
 {
     if (isStopping())
@@ -1553,8 +1572,8 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc GET /api/getCameraParam
      * Read camera parameters. For instance: brightness, contrast e.t.c. Parameters to read should
      * be specified.
-     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
-     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
+     *     or MAC address (not supported for certain cameras).
      * %param[opt]:string <any_name> Parameter name to read. Request can contain one or more
      *     parameters.
      * %return:object JSON object with an error code, error string, and the reply on success.
@@ -1569,8 +1588,8 @@ void MediaServerProcess::registerRestHandlers(
     /**%apidoc POST /api/setCameraParam
      * Sets values of several camera parameters. These parameters are used on the Advanced tab in
      * camera settings. For instance: brightness, contrast, etc.
-     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
-     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
+     *     or MAC address (not supported for certain cameras).
      * %param:object paramValues Name-to-value map of camera parameters to set.
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
@@ -1661,8 +1680,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /api/ptz
      * Perform reading or writing PTZ operation
-     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
-     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
+     *     or MAC address (not supported for certain cameras).
      * %param:enum command PTZ operation
      *     %value ContinuousMovePtzCommand Start PTZ continues move. Parameters xSpeed, ySpeed and
      *         zSpeed are used in range [-1.0..+1.0]. To stop moving use value 0 for all
@@ -1726,8 +1745,7 @@ void MediaServerProcess::registerRestHandlers(
      *     <ul>
      *         <li>"cameraRefs" specifies the list of cameras which are linked to the event (e.g.
      *         the event will appear on their timelines), in the form of a list of camera ids (can
-     *         be obtained from "id" field via /ec2/getCamerasEx or
-     *         /ec2/getCameras?extraFormatting).</li>
+     *         be obtained from "id" field via /ec2/getCamerasEx).</li>
      *     </ul>
      * %param[opt]:enum state Generic events can be used either with "long" actions like
      *     "do recording", or instant actions like "send email". This parameter should be specified
@@ -1886,8 +1904,8 @@ void MediaServerProcess::registerRestHandlers(
      * This method is allowed for cameras with 'SetUserPasswordCapability' capability only.
      * Otherwise it returns an error in the JSON result.
      * %permissions Owner.
-     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
-     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
+     * or MAC address (not supported for certain cameras).
      * %param:string user User name.
      * %param:string password New password to set.
      * %return:object JSON object with error message and error code (0 means OK).
@@ -1938,7 +1956,7 @@ void MediaServerProcess::registerRestHandlers(
      *     <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code>
      *     - the format is auto-detected).
      * %param[opt]:string cameraId Camera id (can be obtained from "id" field via
-     *     /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not supported for
+     *     /ec2/getCamerasEx) or MAC address (not supported for
      *     certain cameras). Used to filter events log by a single camera.
      * %param[opt]:enum event_type Filter events log by specified event type.
      * %param[opt]:enum action_type Filter events log by specified action type.
@@ -2094,8 +2112,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /api/doCameraDiagnosticsStep
      * Performs camera diagnostics.
-     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
-     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
+     *     or MAC address (not supported for certain cameras).
      * %param:enum type Diagnostics to perform.
      *     %value mediaServerAvailability Checks server availability
      *     %value cameraAvailability Checks if camera is accessible from the server
@@ -2404,8 +2422,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/recordedTimePeriods
      * Return the recorded chunks info for the specified cameras.
-     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
-     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
+     *     or MAC address (not supported for certain cameras).
      *     This parameter can be used several times to define a list of cameras.
      * %param[opt]:string startTime Start time of the interval (as a string containing time in
      *     milliseconds since epoch, or a local time formatted like
@@ -2481,8 +2499,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/bookmarks
      * Read bookmarks using the specified parameters.
-     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
-     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
+     *     or MAC address (not supported for certain cameras).
      * %param[opt]:string startTime Start time of the interval with bookmarks (in milliseconds
      *     since epoch). Default value is 0. Should be less than endTime.
      * %param[opt]:string endTime End time of the interval with bookmarks (in milliseconds since
@@ -2506,8 +2524,8 @@ void MediaServerProcess::registerRestHandlers(
      **%apidoc GET /ec2/bookmarks/add
      * Add a bookmark to the target server.
      * %param:uuid guid Identifier of the bookmark.
-     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
-     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
+     *     or MAC address (not supported for certain cameras).
      * %param:string name Caption of the bookmark.
      * %param[opt]:string description Details of the bookmark.
      * %param[opt]:integer timeout Time during which the recorded period should be preserved (in
@@ -2542,8 +2560,8 @@ void MediaServerProcess::registerRestHandlers(
      **%apidoc GET /ec2/bookmarks/update
      * Update information for a bookmark.
      * %param:uuid guid Identifier of the bookmark.
-     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
-     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
+     *     or MAC address (not supported for certain cameras).
      * %param:string name Caption of the bookmark.
      * %param[opt]:string  description Details of the bookmark.
      * %param[opt]:integer timeout Time during which the recorded period should be preserved (in
@@ -2614,8 +2632,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/cameraThumbnail
      * Get the static image from the camera.
-     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
-     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
+     *     or MAC address (not supported for certain cameras).
      * %param[opt]:string time Timestamp of the requested image (in milliseconds since epoch).<br/>
      *     The special value "now" requires to retrieve the thumbnail only from the live stream.
      *     <br/>The special value "latest", which is the default value, requires to retrieve
@@ -3396,7 +3414,7 @@ nx::utils::log::Settings MediaServerProcess::makeLogSettings(
     s.loggers.front().maxBackupCount = settings.logArchiveSize();
     s.loggers.front().directory = settings.logDir();
     s.loggers.front().maxFileSize = settings.maxLogFileSize();
-    s.updateDirectoryIfEmpty(settings.dataDir());
+    s.updateDirectoryIfEmpty(settings.dataDir() + "/log");
 
     for (const auto& loggerArg: cmdLineArguments().auxLoggers)
     {
@@ -3417,24 +3435,37 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
 
     const auto binaryPath = QFile::decodeName(m_argv[0]);
 
-    // TODO: Implement "--log-file" option like in client_startup_parameters.cpp.
-
-    auto logSettings = makeLogSettings(settings);
-    logSettings.loggers.front().level.parse(cmdLineArguments().logLevel,
-        settings.logLevel(), toString(nx::utils::log::kDefaultLevel));
-    logSettings.loggers.front().logBaseName = "log_file";
-    setMainLogger(
-        buildLogger(
-            logSettings,
+    const QString logConfigFile(
+        QDir(nx::kit::IniConfig::iniFilesDir()).absoluteFilePath("nx_vms_server_log.ini"));
+    if (cmdLineArguments().logLevel.isEmpty() && QFile::exists(logConfigFile))
+    {
+        initializeFromConfigFile(
+            logConfigFile,
+            settings.logDir().isEmpty() ? settings.dataDir() + "/log" : settings.logDir(),
             qApp->applicationName(),
-            binaryPath));
+            binaryPath);
+    }
+    else
+    {
+        // TODO: Implement "--log-file" option like in client_startup_parameters.cpp.
+
+        auto logSettings = makeLogSettings(settings);
+        logSettings.loggers.front().level.parse(cmdLineArguments().logLevel,
+            settings.logLevel(), toString(nx::utils::log::kDefaultLevel));
+        logSettings.loggers.front().logBaseName = "log_file";
+        setMainLogger(
+            buildLogger(
+                logSettings,
+                qApp->applicationName(),
+                binaryPath));
+    }
 
     if (auto path = mainLogger()->filePath())
         roSettings->setValue("logFile", path->replace(".log", ""));
     else
         roSettings->remove("logFile");
 
-    logSettings = makeLogSettings(settings);
+    auto logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().httpLogLevel,
         settings.httpLogLevel(), toString(Level::none));
     logSettings.loggers.front().logBaseName = "http_log";
@@ -3735,6 +3766,7 @@ void MediaServerProcess::stopObjects()
     m_universalTcpListener->stop();
     serverModule()->stop();
 
+    m_checkAnalyticsTimer.reset();
     m_generalTaskTimer.reset();
     m_serverStartedTimer.reset();
     m_udtInternetTrafficTimer.reset();
@@ -4086,6 +4118,8 @@ void MediaServerProcess::connectSignals()
         &QnResourceDiscoveryManager::localInterfacesChanged, this,
         &MediaServerProcess::updateAddressesList);
 
+    m_checkAnalyticsTimer = std::make_unique<QTimer>();
+    connect(m_checkAnalyticsTimer .get(), SIGNAL(timeout()), this, SLOT(at_checkAnalyticsUsed()), Qt::DirectConnection);
     m_generalTaskTimer = std::make_unique<QTimer>();
     connect(m_generalTaskTimer.get(), SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
     m_serverStartedTimer = std::make_unique<QTimer>();
@@ -4381,6 +4415,7 @@ void MediaServerProcess::startObjects()
     // Write server started event with delay. In case of client has time to reconnect, it could display it on the right panel.
     m_serverStartedTimer->setSingleShot(true);
     m_serverStartedTimer->start(serverModule()->settings().serverStartedEventTimeoutMs());
+    m_checkAnalyticsTimer->start(kCheckAnalyticsUsedTimeoutMs);
 }
 
 std::map<QString, QVariant> MediaServerProcess::confParamsFromSettings() const

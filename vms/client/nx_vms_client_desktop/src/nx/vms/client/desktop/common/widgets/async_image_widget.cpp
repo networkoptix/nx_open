@@ -338,7 +338,7 @@ bool AsyncImageWidget::hasHeightForWidth() const
 int AsyncImageWidget::heightForWidth(int width) const
 {
     const QSizeF hint = sizeHint();
-    double height = hint.height();
+    qreal height = hint.height();
 
     if (autoScaleDown())
         height = qMin(height, qCeil(width / hint.width() * hint.height()));
@@ -346,7 +346,13 @@ int AsyncImageWidget::heightForWidth(int width) const
     if (autoScaleUp())
         height = qMax(height, qFloor(width / hint.width() * hint.height()));
 
-    return qRound(height);
+    height = qRound(height);
+
+    static constexpr qreal kDefaultRatio = 16.0 / 9.0;
+    if (qAbs(width / height - kDefaultRatio) < 0.05)
+        height = qRound(width / kDefaultRatio);
+
+    return height;
 }
 
 void AsyncImageWidget::retranslateUi()

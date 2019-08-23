@@ -283,9 +283,9 @@ bool DeviceFileCatalog::addChunk(const Chunk& chunk)
     return false;
 }
 
-void DeviceFileCatalog::addChunks(const std::deque<Chunk>& chunks)
+void DeviceFileCatalog::addChunks(std::deque<Chunk> chunks)
 {
-    NX_ASSERT(std::is_sorted(chunks.begin(), chunks.end()));
+    std::sort(chunks.begin(), chunks.end());
 
     QnMutexLocker lk( &m_mutex );
 

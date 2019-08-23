@@ -77,25 +77,21 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
     const Filter& filter,
     const TimePeriodsLookupOptions& options)
 {
-    ArchiveFilter archiveFilter =
-        AnalyticsArchiveDirectory::prepareArchiveFilter(filter, m_objectTypeDao);
-    archiveFilter.detailLevel = options.detailLevel;
+    auto archiveFilter =
+        AnalyticsArchiveDirectory::prepareArchiveFilter(
+            queryContext, filter, m_objectTypeDao, m_attributesDao);
 
-    nx::utils::ElapsedTimer timer;
-
-    if (!filter.freeText.isEmpty())
+    if (!archiveFilter)
     {
-        timer.restart();
-        const auto attributeGroups =
-            m_attributesDao->lookupCombinedAttributes(queryContext, filter.freeText);
-        std::copy(
-            attributeGroups.begin(), attributeGroups.end(),
-            std::back_inserter(archiveFilter.allAttributesHash));
-        NX_DEBUG(this, "Text '%1' lookup completed in %2", filter.freeText, timer.elapsed());
+        NX_DEBUG(this, "Time periods lookup canceled. The filter is %1", filter);
+        return QnTimePeriodList(); //< No records with such text.
     }
 
+    archiveFilter->detailLevel = options.detailLevel;
+
+    nx::utils::ElapsedTimer timer;
     timer.restart();
-    const auto timePeriods = m_analyticsArchive->matchPeriods(filter.deviceIds, archiveFilter);
+    const auto timePeriods = m_analyticsArchive->matchPeriods(filter.deviceIds, *archiveFilter);
     NX_DEBUG(this, "Time periods lookup completed in %1", timer.elapsed());
     return timePeriods;
 }

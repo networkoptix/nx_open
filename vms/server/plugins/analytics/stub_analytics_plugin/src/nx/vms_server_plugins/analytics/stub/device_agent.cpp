@@ -484,9 +484,8 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 
         ++(context.frameCounter);
 
-        static const int kNumberOfFramesBeforePreviewGeneration = 60;
         bool previewIsNeeded = m_deviceAgentSettings.generatePreviews
-            && context.frameCounter > kNumberOfFramesBeforePreviewGeneration
+            && context.frameCounter > m_deviceAgentSettings.numberOfFramesBeforePreviewGeneration
             && !context.isPreviewGenerated;
 
         if (previewIsNeeded)
@@ -651,9 +650,9 @@ void DeviceAgent::parseSettings()
             else
             {
                 NX_PRINT << "Received an incorrect setting value for '"
-                    << parameterName << "' "
-                    << parameterValueString
-                    << ". Expected an integer";
+                    << parameterName << "': "
+                    << nx::kit::utils::toString(parameterValueString)
+                    << ". Expected an integer.";
             }
         };
 
@@ -679,6 +678,10 @@ void DeviceAgent::parseSettings()
     assignIntegerSetting(
         kAdditionalFrameProcessingDelayMs,
         &m_deviceAgentSettings.additionalFrameProcessingDelay);
+
+    assignIntegerSetting(
+        kGeneratePreviewAfterNFramesSetting,
+        &m_deviceAgentSettings.numberOfFramesBeforePreviewGeneration);
 }
 
 void DeviceAgent::updateObjectGenerationParameters()

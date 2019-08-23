@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>선택된 영역에서</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
@@ -1705,24 +1705,12 @@ to view more bookmarks</source>
       <translation>서버 업데이트</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>비지니스롤 변경</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>서버삭제</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>비지니스롤 삭제</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>유저삭제</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>비지니스 롤 초기화</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1817,6 +1805,18 @@ to view more bookmarks</source>
       <translation>
         <numerusform>%n 작업들</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>이벤트 규칙이 변경되었습니다.</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>이벤트 규칙이 제거되었습니다.</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>이벤트 규칙이 기본값으로 재설정</translation>
     </message>
   </context>
   <context>
@@ -2092,7 +2092,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
+      <translation>카메라 식별자가 일반 이벤트 URL에서 사용되는 경우 강제 승인은 일반 이벤트에 대해서만 작동합니다.</translation>
     </message>
   </context>
   <context>
@@ -2625,7 +2625,7 @@ to %1</source>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
+      <translation>내부 서버 오류입니다. 나중에 다시 시도하십시오.</translation>
     </message>
   </context>
   <context>
@@ -2783,7 +2783,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>%1 버전의 호환성 모드를 실행하지 못했습니다</translation>
     </message>
   </context>
   <context>
@@ -3049,15 +3049,15 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>이벤트 로그 기간 %1에서 %2 사이에 - %n 개의 이벤트들이 발견되었습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>의 이벤트 로그 %1 - %n 이벤트 발견</numerusform>
       </translation>
     </message>
   </context>
@@ -3131,8 +3131,8 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (%n 카메라)</numerusform>
       </translation>
     </message>
   </context>
@@ -3215,11 +3215,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>이 카메라는 현재 선택된 레이아웃에 없습니다. 액션 트리거 전에 카메라를 추가하면 액션이 작동합니다.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>이 카메라는 현재 선택된 레이아웃 중 일부에 없습니다. 액션 트리거 전에 카메라를 추가하면 액션이 작동합니다.</translation>
     </message>
   </context>
   <context>
@@ -3256,7 +3256,7 @@ to %1</source>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>자동 (%1)</translation>
     </message>
   </context>
   <context>
@@ -3414,7 +3414,7 @@ to %1</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>값을 입력하십시오</translation>
     </message>
   </context>
   <context>
@@ -3808,20 +3808,20 @@ to %1</source>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+      <translation>모든 라이센스는 몇 번만 비활성화 할 수 있습니다.</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1는(가)  현재 사용 중 입니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>적어도 %1 개가 필요합니다</numerusform>
       </translation>
     </message>
   </context>
@@ -4109,7 +4109,7 @@ to %1</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>영역 줌</translation>
     </message>
   </context>
   <context>
@@ -4264,15 +4264,15 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>가상 카메라</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>가상 카메라 %1</translation>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;가상 카메라&quot; 는 시스템내의 모든 서버에 업로드 할 수 있고 모든 사용자가 액세스 할 수있는 비디오 파일 용 가상 저장소입니다.</translation>
     </message>
   </context>
   <context>
@@ -4495,8 +4495,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>약 %n 분</numerusform>
       </translation>
     </message>
   </context>
@@ -4676,11 +4676,11 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>현재 비트 레이트</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>예측할 데이터가 없습니다</translation>
     </message>
   </context>
   <context>
@@ -4724,11 +4724,11 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>로컬 파일</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>로컬 파일이 아닌</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4736,19 +4736,19 @@ to %1</source>
     </message>
     <message>
       <source>add to current layout</source>
-      <translation type="unfinished">add to current layout</translation>
+      <translation>현재 레이아웃에 추가</translation>
     </message>
     <message>
       <source>open all at a new layout</source>
-      <translation type="unfinished">open all at a new layout</translation>
+      <translation>새로운 레이아웃으로 모두 열기</translation>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>모두 열기</translation>
     </message>
     <message>
       <source>All types</source>
-      <translation type="unfinished">All types</translation>
+      <translation>모든 유형</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -4764,7 +4764,7 @@ to %1</source>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>비디오 월</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -4784,7 +4784,7 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>카메라 및 리소스</translation>
     </message>
   </context>
   <context>
@@ -4857,15 +4857,15 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>카메라 및 리소스</translation>
     </message>
     <message>
       <source>Videowalls</source>
-      <translation type="unfinished">Videowalls</translation>
+      <translation>비디오월</translation>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>분석 엔진</translation>
     </message>
   </context>
   <context>
@@ -5123,7 +5123,7 @@ to %1</source>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>플러그인</translation>
     </message>
   </context>
   <context>
@@ -5468,23 +5468,23 @@ to %1</source>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>지난 5 분</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>지난 60 분</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>지난 24시간</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>가능한 가장 긴 기간</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>예측은 녹화가 활성화 된 카메라에만 사용할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -5599,7 +5599,7 @@ to %1</source>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
+      <translation>현재 분석 데이터로 무엇을해야합니까?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -5616,8 +5616,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>현재 분석 데이터는 자동으로 다른 위치로 이동되지 않으며 액세스 할 수 없게됩니다. 보관하고 나중에 수동으로 이동하거나 영구적으로 삭제할 수 있습니다.
+분석 데이터를 다른 저장 위치로 이동하려면 계속 진행하기 전에 지원 센터에 문의하십시오.</translation>
     </message>
   </context>
   <context>
@@ -5668,11 +5668,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics data</source>
-      <translation type="unfinished">Use to store analytics data</translation>
+      <translation>분석 데이터를 저장하는 데 사용</translation>
     </message>
     <message>
       <source>Stores analytics data</source>
-      <translation type="unfinished">Stores analytics data</translation>
+      <translation>분석 데이터를 저장합니다</translation>
     </message>
   </context>
   <context>
@@ -5761,7 +5761,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>플러그인</translation>
     </message>
   </context>
   <context>
@@ -5898,27 +5898,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>시간 동기화를 위해 인터넷에 연결 할 수있는 서버가 없습니다</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>시스템 안전모드 상태 입니다</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>시스템은 시간 동기화를 위한 인터넷에 연결되어 있지 않습니다</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>시스템에 온라인 상태인 서버들중에 시간 동기화를 위한 인터넷에 연결되어 있지 않습니다.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation type="unfinished">The System is running in safe mode.</translation>
+      <translation>시스템이 안전 모드에서 실행 중입니다.</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+      <translation>원격 아카이브 동기화 중 오류가 발생했습니다</translation>
     </message>
   </context>
   <context>
@@ -5941,15 +5941,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+      <translation>장치 및 서버 자동 검색 및 자동화 된 장치 상태 확인 사용</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+      <translation>카메라 및 서버 자동 검색 및 자동 카메라 상태 확인 활성화</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+      <translation>활성화되면 시스템은 새로운 카메라와 서버를 지속적으로 검색하고 상태 업데이트를 위해 검색 요청을 카메라로 보냅니다.</translation>
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
@@ -5968,11 +5968,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>HTML 파일</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
+      <translation>스프레드 시트 (CSV) 파일</translation>
     </message>
   </context>
   <context>
@@ -6489,15 +6489,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 has been successfully configured.</source>
-      <translation type="unfinished">%1 has been successfully configured.</translation>
+      <translation>%1 이 성공적으로 구성되었습니다.</translation>
     </message>
     <message>
       <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+      <translation>프로세스를 완료하려면, 클라이언트로 연결하고 %1버전으로 업데이트하십시오.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation type="unfinished">Failed to merge %1 to our system.</translation>
+      <translation>시스템에 %1 을 병합하지 못했습니다.</translation>
     </message>
   </context>
   <context>
@@ -6619,11 +6619,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>PNG Image</source>
-      <translation type="unfinished">PNG Image</translation>
+      <translation>PNG 이미지</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation type="unfinished">JPEG Image</translation>
+      <translation>JPEG 이미지</translation>
     </message>
   </context>
   <context>
@@ -6831,20 +6831,20 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Uploading footage</source>
-      <translation type="unfinished">Uploading footage</translation>
+      <translation>영상 업로드</translation>
     </message>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation type="unfinished">Failed to add virtual camera</translation>
+      <translation>가상 카메라를 추가하는데 실패했습니다</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+      <translation>가상 카메라 녹화 열기...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>이러한 파일을 다른 가상 카메라 인스턴스에 업로드 할 수 있습니다.</numerusform>
       </translation>
     </message>
     <message>
@@ -7054,8 +7054,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>일부 비디오 파일들이 여전히 %n 가상 카메라에 업로드중입니다.</numerusform>
       </translation>
     </message>
   </context>
@@ -7063,22 +7063,22 @@ If you intended to move analytics data to another storage location, please conta
     <name>SessionExpiredDialog</name>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>세션이 만료되었습니다.</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by the system administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+      <translation>시스템 관리자가 세션 시간 제한을 변경할 수 있습니다</translation>
     </message>
   </context>
   <context>
     <name>SimpleMotionSearchWidget::Private</name>
     <message>
       <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
+      <translation>비디오에서 결과를 필터링 할 영역을 선택하십시오</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>선택된 영역에서</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -7086,11 +7086,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>선택된 장치</translation>
     </message>
     <message>
       <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
+      <translation>선택된 미디어</translation>
     </message>
     <message>
       <source>none</source>
@@ -7179,7 +7179,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>이 Linux 플랫폼은 더 이상 지원되지 않습니다</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
@@ -7188,12 +7188,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>이 %1 버전은 더 이상 지원되지 않습니다</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>%1 %2 은 더 이상 지원되지 않습니다</translation>
     </message>
   </context>
   <context>
@@ -7227,39 +7227,39 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AbstractSearchWidget::Private</name>
     <message>
       <source>Hide information</source>
-      <translation type="unfinished">Hide information</translation>
+      <translation>정보 숨기기</translation>
     </message>
     <message>
       <source>Show information</source>
-      <translation type="unfinished">Show information</translation>
+      <translation>정보 표시</translation>
     </message>
     <message>
       <source>Hide thumbnails</source>
-      <translation type="unfinished">Hide thumbnails</translation>
+      <translation>썸네일 숨김</translation>
     </message>
     <message>
       <source>Show thumbnails</source>
-      <translation type="unfinished">Show thumbnails</translation>
+      <translation>썸네일 표시</translation>
     </message>
     <message>
       <source>Last day</source>
-      <translation type="unfinished">Last day</translation>
+      <translation>마지막 날</translation>
     </message>
     <message>
       <source>Last 7 days</source>
-      <translation type="unfinished">Last 7 days</translation>
+      <translation>지난 7 일</translation>
     </message>
     <message>
       <source>Last 30 days</source>
-      <translation type="unfinished">Last 30 days</translation>
+      <translation>지난 30 일</translation>
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation type="unfinished">Selected on Timeline</translation>
+      <translation>타임 라인에서 선택</translation>
     </message>
     <message>
       <source>Any time</source>
-      <translation type="unfinished">Any time</translation>
+      <translation>아무때나</translation>
     </message>
     <message>
       <source>none</source>
@@ -7268,23 +7268,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>레이아웃에 있는 장치</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>레이아웃에 있는 카메라들</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>모든 장치</translation>
     </message>
     <message>
       <source>Any camera</source>
-      <translation type="unfinished">Any camera</translation>
+      <translation>모든 카메라</translation>
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>선택된 장치</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -7295,11 +7295,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
     <message>
       <source>Show Always</source>
-      <translation type="unfinished">Show Always</translation>
+      <translation>항상 표시</translation>
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+      <translation>&quot;객체&quot; 탭으로 로만 표시</translation>
     </message>
     <message>
       <source>Show</source>
@@ -7307,14 +7307,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Do Not Show</source>
-      <translation type="unfinished">Do Not Show</translation>
+      <translation>표시하지 않음</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>삭제 된 카메라</translation>
     </message>
     <message>
       <source>Unknown track</source>
@@ -7325,16 +7325,16 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>객체가 없습니다</translation>
     </message>
     <message>
       <source>No objects detected</source>
-      <translation type="unfinished">No objects detected</translation>
+      <translation>감지 된 개체가 없습니다</translation>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n 객체</numerusform>
       </translation>
     </message>
   </context>
@@ -7349,7 +7349,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>삭제 된 카메라</translation>
     </message>
   </context>
   <context>
@@ -7360,7 +7360,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select some period on timeline and click with right mouse button on it to create a bookmark.</source>
-      <translation type="unfinished">Select some period on timeline and click with right mouse button on it to create a bookmark.</translation>
+      <translation>타임 라인에서 일부 기간을 선택하고 마우스 오른쪽 버튼으로 클릭하여 북마크를 지정합니다.</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -7443,7 +7443,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>멀티 캐스트</translation>
     </message>
   </context>
   <context>
@@ -7462,19 +7462,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>More Info</source>
-      <translation type="unfinished">More Info</translation>
+      <translation>추가 정보</translation>
     </message>
     <message>
       <source>Less Info</source>
-      <translation type="unfinished">Less Info</translation>
+      <translation>적은 정보</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
     <message numerus="yes">
       <source>Use License</source>
-      <translation type="unfinished">
-        <numerusform>Use License</numerusform>
+      <translation>
+        <numerusform>라이센스 사용</numerusform>
       </translation>
     </message>
   </context>
@@ -7486,15 +7486,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Maximum number of motion detection rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of motion detection rectangles for current camera is reached</translation>
+      <translation>현재 카메라의 최대 모션 감지 사각형 수에 도달했습니다</translation>
     </message>
     <message>
       <source>Maximum number of ignore motion rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of ignore motion rectangles for current camera is reached</translation>
+      <translation>현재 카메라의 최대 모션 무시 사각형 수에 도달했습니다.</translation>
     </message>
     <message>
       <source>Maximum number of detect motion rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of detect motion rectangles for current camera is reached</translation>
+      <translation>현재 카메라의 최대 감지 모션 사각형 수에 도달했습니다</translation>
     </message>
     <message>
       <source>Reset motion regions to default?</source>
@@ -7548,13 +7548,13 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n 카메라들</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have any cameras</source>
-      <translation type="unfinished">You do not have any cameras</translation>
+      <translation>카메라가 없습니다</translation>
     </message>
   </context>
   <context>
@@ -7569,7 +7569,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>I/O Ports</source>
-      <translation type="unfinished">I/O Ports</translation>
+      <translation>I/O 포트</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -7639,7 +7639,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>플러그인</translation>
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
@@ -7655,14 +7655,14 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>%1 이 사용됩니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more required</source>
-      <translation type="unfinished">
-        <numerusform>%n more required</numerusform>
+      <translation>
+        <numerusform>%n 더 필요</numerusform>
       </translation>
     </message>
   </context>
@@ -7685,35 +7685,35 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>업데이트 파일을 찾을 수 없습니다</translation>
     </message>
     <message>
       <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
+      <translation>업데이트 패키지가 손상되었습니다</translation>
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>업데이트 패키지를 다운로드하지 못했습니다: %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>업데이트 패키지가 손상되었습니다: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>이 업데이트는 이미 설치되어 있습니다.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>이 버전은 설치되어 있지 않습니다.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>잘못된 버전 형식입니다.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>손상된 업데이트 패키지.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -7721,11 +7721,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+      <translation>클라이언트 업데이트를 설치할 디스크 공간이 부족합니다.</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation type="unfinished">Installation package has been lost.</translation>
+      <translation>설치 패키지가 손실되었습니다.</translation>
     </message>
   </context>
   <context>
@@ -7778,7 +7778,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>선택한 카메라 중 일부는 암호를 설정해야합니다.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -7793,15 +7793,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::DeviceAdditionDialog</name>
     <message>
       <source>Start address</source>
-      <translation type="unfinished">Start address</translation>
+      <translation>시작 주소</translation>
     </message>
     <message>
       <source>End address</source>
-      <translation type="unfinished">End address</translation>
+      <translation>끝 주소</translation>
     </message>
     <message>
       <source>IP / Hostname / RTSP link / UDP link</source>
-      <translation type="unfinished">IP / Hostname / RTSP link / UDP link</translation>
+      <translation>IP / 호스트 이름 / RTSP 링크 / UDP 링크</translation>
     </message>
     <message>
       <source>Examples:</source>
@@ -7839,19 +7839,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Checking host...</source>
-      <translation type="unfinished">Checking host...</translation>
+      <translation>호스트 확인 중...</translation>
     </message>
     <message>
       <source>Finished</source>
-      <translation type="unfinished">Finished</translation>
+      <translation>완료됨</translation>
     </message>
     <message>
       <source>Aborted</source>
-      <translation type="unfinished">Aborted</translation>
+      <translation>취소됨</translation>
     </message>
     <message>
       <source>Searching...</source>
-      <translation type="unfinished">Searching...</translation>
+      <translation>검색중...</translation>
     </message>
     <message>
       <source>No devices found</source>
@@ -7859,12 +7859,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>모든 장치가 이미 추가되었습니다</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>%n 장치가 추가되고 있습니다. 이 대화 상자를 닫거나 새 검색을 시작할 수 있습니다</numerusform>
       </translation>
     </message>
     <message>
@@ -7873,24 +7873,24 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Add %n Devices</source>
-      <translation type="unfinished">
-        <numerusform>Add %n Devices</numerusform>
+      <translation>
+        <numerusform>장치 %n 추가</numerusform>
       </translation>
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>주소 칸은 비워 둘 수 없습니다</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>계속 진행하려면 %1 을 검토하고 동의하십시오</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>소프트웨어를 사용하려면 사용자 라이센스 계약에 동의해야합니다</translation>
     </message>
   </context>
   <context>
@@ -7918,7 +7918,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Objects</source>
       <comment>Analytics tab title</comment>
-      <translation type="unfinished">Objects</translation>
+      <translation>객체</translation>
     </message>
   </context>
   <context>
@@ -7929,13 +7929,13 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n events</source>
-      <translation type="unfinished">
-        <numerusform>%n events</numerusform>
+      <translation>
+        <numerusform>%n 이벤트</numerusform>
       </translation>
     </message>
     <message>
       <source>No events occurred</source>
-      <translation type="unfinished">No events occurred</translation>
+      <translation>이벤트가 발생하지 않았습니다</translation>
     </message>
   </context>
   <context>
@@ -7951,7 +7951,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>암호를 입력하십시오.</translation>
     </message>
   </context>
   <context>
@@ -8100,7 +8100,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>긴 비디오를 내보내려고합니다. 저장 공간이 많이 필요하고 시간이 오래 걸릴 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -8134,7 +8134,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Image is not round</source>
-      <translation type="unfinished">Image is not round</translation>
+      <translation>이미지가 둥글 지 않습니다</translation>
     </message>
     <message>
       <source>Image might be too dim</source>
@@ -8172,14 +8172,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n 새로운</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>총 %n 개 장치</numerusform>
       </translation>
     </message>
   </context>
@@ -8224,7 +8224,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>링크 위치 복사</translation>
     </message>
   </context>
   <context>
@@ -8299,7 +8299,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ManualDeviceSearcher</name>
     <message>
       <source>Server is not specified</source>
-      <translation type="unfinished">Server is not specified</translation>
+      <translation>서버가 지정되지 않았습니다</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -8330,11 +8330,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>삭제 된 카메라</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation type="unfinished">Bookmark it...</translation>
+      <translation>북마크함...</translation>
     </message>
   </context>
   <context>
@@ -8345,27 +8345,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Checking for updates automatically</source>
-      <translation type="unfinished">Checking for updates automatically</translation>
+      <translation>자동으로 업데이트 확인중</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>업데이트 확인</translation>
     </message>
     <message>
       <source>Force check</source>
-      <translation type="unfinished">Force check</translation>
+      <translation>강제 검사</translation>
     </message>
     <message>
       <source>Disable Automatically Checking</source>
-      <translation type="unfinished">Disable Automatically Checking</translation>
+      <translation>자동 확인 비활성화</translation>
     </message>
     <message>
       <source>Check Once</source>
-      <translation type="unfinished">Check Once</translation>
+      <translation>한 번 확인</translation>
     </message>
     <message>
       <source>Check Automatically</source>
-      <translation type="unfinished">Check Automatically</translation>
+      <translation>자동 확인</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -8377,39 +8377,39 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation type="unfinished">You have already installed this version.</translation>
+      <translation>이 버전을 이미 설치했습니다.</translation>
     </message>
     <message>
       <source>Unable to check updates on the internet</source>
-      <translation type="unfinished">Unable to check updates on the internet</translation>
+      <translation>인터넷에서 업데이트를 확인할 수 없습니다</translation>
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>빌드를 찾을 수 없습니다</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation type="unfinished">Cannot update from the selected file</translation>
+      <translation>선택한 파일에서 업데이트 할 수 없습니다</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation type="unfinished">Invalid update information</translation>
+      <translation>잘못된 업데이트 정보</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+      <translation>이전 버전으로 다운 그레이드 할 수 없습니다</translation>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>업데이트 파일을 찾을 수 없습니다</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation type="unfinished">Upgrade package is broken</translation>
+      <translation>업그레이드 패키지가 손상됨</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation type="unfinished">Missing update package for some servers</translation>
+      <translation>일부 서버에 대한 업데이트 패키지가 없습니다.</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
@@ -8418,7 +8418,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No update package available</source>
-      <translation type="unfinished">No update package available</translation>
+      <translation>업데이트 패키지 없슴</translation>
     </message>
     <message>
       <source>Select Update File...</source>
@@ -8430,45 +8430,45 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some servers are offline and will not be updated. Skip them?</source>
-      <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
+      <translation>일부 서버는 오프라인 상태이며 업데이트되지 않습니다. 건너 뛰시겠습니까?</translation>
     </message>
     <message numerus="yes">
       <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
+      <translation>
+        <numerusform>클라이언트 및 %n 서버에 대한 업데이트 패키지가 없습니다.</numerusform>
       </translation>
     </message>
     <message>
       <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
+      <translation>클라이언트의 업데이트 패키지가 없습니다.</translation>
     </message>
     <message>
       <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
+      <translation>업데이트 할 온라인 서버가 없습니다.</translation>
     </message>
     <message>
       <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+      <translation>업데이트를 취소하고 다운로드 한 모든 데이터를 삭제 하시겠습니까?</translation>
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+      <translation>일부 구성 요소의 OS 버전은 더 이상 지원되지 않습니다. 시스템에서 제거하거나 OS를 지원되는 버전으로 업데이트하십시오.</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+      <translation>클라이언트의 OS 버전은 더 이상 지원되지 않습니다. 해당 OS를 지원되는 버전으로 업데이트하십시오.</translation>
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
+      <translation>업데이트를 시작 실패</translation>
     </message>
     <message>
       <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
+      <translation>업데이트 취소 실패</translation>
     </message>
     <message>
       <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
+      <translation>설치를 시작하지 못했습니다</translation>
     </message>
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
@@ -8476,7 +8476,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
+      <translation>일부 구성 요소로 업데이트 패키지를 다운로드하지 못했습니다.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -8496,7 +8496,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+      <translation>업데이트가 완료되었지만 일부 구성 요소가 업데이트에 실패했습니다</translation>
     </message>
     <message>
       <source>Please update %1 manually using an installation package.</source>
@@ -8512,7 +8512,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
+      <translation>업데이트를 설치하는 동안 오류가 발생했습니다:</translation>
     </message>
     <message>
       <source>Downloading updates...</source>
@@ -8520,7 +8520,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
+      <translation>업데이트 완료</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -8528,23 +8528,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
+      <translation>최신 버전이 이미 설치되어 있습니다</translation>
     </message>
     <message>
       <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
+      <translation>이 버전은 이미 설치되어 있습니다</translation>
     </message>
     <message>
       <source>Install update</source>
-      <translation type="unfinished">Install update</translation>
+      <translation>업데이트 설치</translation>
     </message>
     <message>
       <source>Upload</source>
-      <translation type="unfinished">Upload</translation>
+      <translation>업로드</translation>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation type="unfinished">Upload &amp;&amp; Install</translation>
+      <translation>업로드 &amp;&amp; 설치</translation>
     </message>
     <message>
       <source>Download</source>
@@ -8556,11 +8556,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation type="unfinished">Browse for Another File...</translation>
+      <translation>다른 파일 찾아보기...</translation>
     </message>
     <message>
       <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
+      <translation>다른 빌드를 선택</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8568,11 +8568,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation type="unfinished">Uploading updates...</translation>
+      <translation>업데이트 업로드 중...</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation type="unfinished">Downloading client package...</translation>
+      <translation>클라이언트 패키지 다운로드 중...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
@@ -8580,11 +8580,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation type="unfinished">Installing client updates...</translation>
+      <translation>클라이언트 업데이트 설치 중...</translation>
     </message>
     <message>
       <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
+      <translation>로 업데이트 시작 중 ...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -8592,11 +8592,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Ready to update to</source>
-      <translation type="unfinished">Ready to update to</translation>
+      <translation>업데이트 준비됨</translation>
     </message>
     <message>
       <source>System updated to</source>
-      <translation type="unfinished">System updated to</translation>
+      <translation>시스템이 업데이트</translation>
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
@@ -8612,7 +8612,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
+      <translation>일부 서버가 오프라인 상태입니다. 온라인 상태가 될 때까지 기다려주십시오.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8636,7 +8636,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation type="unfinished">Update from mediaservers</translation>
+      <translation>미디어 서버에서 업데이트</translation>
     </message>
   </context>
   <context>
@@ -8649,7 +8649,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>레이아웃이 없습니다</translation>
     </message>
   </context>
   <context>
@@ -8668,15 +8668,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>장치 연결 끊김</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>카메라 연결끊김</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>I/O 모듈 이 끊어졌습니다.</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
@@ -8687,14 +8687,14 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::NotificationListWidget::Private</name>
     <message>
       <source>No new notifications</source>
-      <translation type="unfinished">No new notifications</translation>
+      <translation>새 알림 없음</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
-      <translation type="unfinished">None of selected users have access to the selected layout. Action will not work.</translation>
+      <translation>선택한 사용자 중 누구도 선택한 레이아웃에 액세스 할 수 없습니다. 동작이 작동하지 않습니다.</translation>
     </message>
     <message>
       <source>Select layout...</source>
@@ -8706,11 +8706,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation type="unfinished">Local layouts can only be shown to their owners.</translation>
+      <translation>로컬 레이아웃은 소유자에게만 표시 할 수 있습니다.</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>선택된 사용자 역할 중 어느 것도 사용자를 포함하지 않습니다. 작동하지 않을것입니다.</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
@@ -8721,71 +8721,71 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
       <source>The server is taking too long to respond</source>
-      <translation type="unfinished">The server is taking too long to respond</translation>
+      <translation>서버가 응답하는 데 시간이 너무 오래 걸림</translation>
     </message>
     <message>
       <source>No update task</source>
-      <translation type="unfinished">No update task</translation>
+      <translation>업데이트 작업이 없습니다</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation type="unfinished">Ready to download update</translation>
+      <translation>업데이트 다운로드 준비됨</translation>
     </message>
     <message>
       <source>Downloading update</source>
-      <translation type="unfinished">Downloading update</translation>
+      <translation>업데이트 다운로드 중</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
-      <translation type="unfinished">Ready to restart to the new version</translation>
+      <translation>새 버전으로 다시 시작할 준비가되었습니다.</translation>
     </message>
     <message>
       <source>Installing update</source>
-      <translation type="unfinished">Installing update</translation>
+      <translation>업데이트 설치 중</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>설치됨</translation>
     </message>
     <message>
       <source>Failed to download update</source>
-      <translation type="unfinished">Failed to download update</translation>
+      <translation>업데이트 다운로드 실패</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation type="unfinished">Waiting for peer data</translation>
+      <translation>피어 데이터 대기</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation type="unfinished">There is not enough space to download update files.</translation>
+      <translation>업데이트 파일을 다운로드 할 공간이 충분하지 않습니다.</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation type="unfinished">There is not enough space to extract update files.</translation>
+      <translation>업데이트 파일을 추출 할 공간이 충분하지 않습니다.</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>업데이트 패키지를 다운로드하지 못했습니다.</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation type="unfinished">Update contents are invalid.</translation>
+      <translation>업데이트 내용이 유효하지 않습니다.</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation type="unfinished">Update archive is corrupted.</translation>
+      <translation>아카이브 업데이트가 손상되었습니다.</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation type="unfinished">Update files cannot be extracted.</translation>
+      <translation>업데이트 파일을 추출 할 수 없습니다.</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation type="unfinished">Internal downloader error.</translation>
+      <translation>내부 다운로더 오류.</translation>
     </message>
     <message>
       <source>Internal client error.</source>
-      <translation type="unfinished">Internal client error.</translation>
+      <translation>내부 클라이언트 오류</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -8793,19 +8793,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation type="unfinished">Unexpected error code.</translation>
+      <translation>예기치 않은 오류 코드</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation type="unfinished">Ready to install update</translation>
+      <translation>업데이트 설치 준비됨</translation>
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>업데이트 패키지를 찾을 수 없습니다.</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>업데이트를 설치할 공간이 충분하지 않습니다.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
@@ -8820,11 +8820,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::PresentedStateDelegate</name>
     <message>
       <source>Added</source>
-      <translation type="unfinished">Added</translation>
+      <translation>추가됨</translation>
     </message>
     <message>
       <source>Adding</source>
-      <translation type="unfinished">Adding</translation>
+      <translation>추가 중</translation>
     </message>
   </context>
   <context>
@@ -8890,7 +8890,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion + Low-Res</source>
-      <translation type="unfinished">Motion + Low-Res</translation>
+      <translation>움직임 + 저해상도</translation>
     </message>
   </context>
   <context>
@@ -8950,7 +8950,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>세션이 지정된 기간을 초과하면 사용자가 자동으로 로그 아웃됩니다.</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
@@ -8961,7 +8961,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
       <source>Library</source>
-      <translation type="unfinished">Library</translation>
+      <translation>라이브러리</translation>
     </message>
     <message>
       <source>Version</source>
@@ -8973,27 +8973,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>오류 없음</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>라이브러리 파일을 로드 할 수 없습니다</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>유효하지 않거나 호환되지 않는 플러그인 라이브러리</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>플러그인 라이브러리를 초기화하지 못했습니다</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>플러그인이 잘못된 매니페스트를 반환했습니다.</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>플러그인 API 버전은 더 이상 지원되지 않습니다</translation>
     </message>
     <message>
       <source>unknown error</source>
@@ -9001,15 +9001,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>로드되지 않음</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>로드 됨</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>플러그인은 블랙리스트에 있습니다</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9017,7 +9017,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>플러그인은 선택 사항이며 화이트리스트에 없습니다</translation>
     </message>
     <message>
       <source>internal error</source>
@@ -9028,30 +9028,30 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
     <message>
       <source>Skipped</source>
-      <translation type="unfinished">Skipped</translation>
+      <translation>건너뜀</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>설치됨</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>설치 중…</translation>
     </message>
     <message>
       <source>Downloaded</source>
-      <translation type="unfinished">Downloaded</translation>
+      <translation>다운로드됨</translation>
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation type="unfinished">Waiting for server to respond...</translation>
+      <translation>서버가 응답하기를 기다리는 중...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>서버에 연결되지 않았습니다.</translation>
     </message>
     <message>
       <source>Network error.</source>
@@ -9070,11 +9070,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Message</source>
-      <translation type="unfinished">Message</translation>
+      <translation>메시지</translation>
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>업데이트 파일 저장</translation>
     </message>
     <message>
       <source>Client</source>
@@ -9082,11 +9082,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>구성요소</translation>
     </message>
     <message>
       <source>Installed Version</source>
-      <translation type="unfinished">Installed Version</translation>
+      <translation>설치된 버전</translation>
     </message>
   </context>
   <context>
@@ -9097,23 +9097,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation type="unfinished">Bookmark it...</translation>
+      <translation>북마크함...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>No motion</source>
-      <translation type="unfinished">No motion</translation>
+      <translation>동작 없음</translation>
     </message>
     <message>
       <source>No motion detected</source>
-      <translation type="unfinished">No motion detected</translation>
+      <translation>감지된 동작 없음</translation>
     </message>
     <message numerus="yes">
       <source>%n motion events</source>
-      <translation type="unfinished">
-        <numerusform>%n motion events</numerusform>
+      <translation>
+        <numerusform>%n 모션 이벤트</numerusform>
       </translation>
     </message>
   </context>
@@ -9128,8 +9128,8 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>%n 명의 사용자들의 이메일 주소가 설정되지 않았습니다</numerusform>
       </translation>
     </message>
     <message>
@@ -9147,13 +9147,13 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>현재 레이아웃에 카메라를 추가하려면 두 번 클릭하고 새 탭에서 열려면 Ctrl + 클릭</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>사용 가능한 아카이브가 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -9164,7 +9164,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>시간대</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9172,42 +9172,42 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>서버 OS 시간</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS 시간</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>시간은 공통적이고 모든 서버간에 동기화 됩니다. 어느 서버에서건 OS 시간과 다를 수 있습니다.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>인터넷과 동기화 됨</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>선택한 서버에서 현지 시간과 동기화</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>동기화되지 않았습니다. 각 서버는 자체 현지 시간을 사용합니다.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>서버 현지 시간과 동일</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>인터넷에 연결되지 않음. 시간이 동기화되지 않습니다.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>시간 서버가 오프라인입니다. 시간이 동기화되지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -9233,7 +9233,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>서버 측에서 업로드를 만들 수 없습니다: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9249,22 +9249,22 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>원격 파일 &quot;%1&quot; 가 손상되었습니다.</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>서버에 이미 이파일 &quot;%1&quot; 이 있습니다</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>비디오 업로드 중에 만 모션이 감지되고 있습니다.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>이 설정을 활성화하거나 비활성화해도 기존 아카이브의 내용은 변경되지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -9304,7 +9304,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::WebWidget</name>
     <message>
       <source>Failed to load page</source>
-      <translation type="unfinished">Failed to load page</translation>
+      <translation>페이지 불러오기 실패</translation>
     </message>
   </context>
   <context>
@@ -9362,27 +9362,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>내보내기 시작 중...</translation>
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>레이아웃 저장중</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation type="unfinished">Stop Saving</translation>
+      <translation>저장 중지</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation type="unfinished">Saving failed</translation>
+      <translation>저장 실패</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation type="unfinished">Starting saving...</translation>
+      <translation>저장 시작 중...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>내보내기 프로세스를 위해 파일을 준비 중입니다. 몇 초 정도 기다리십시오.</translation>
     </message>
   </context>
   <context>
@@ -9419,7 +9419,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>해상도 재구성</translation>
     </message>
   </context>
   <context>
@@ -9591,7 +9591,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>레이아웃이 가득 찼습니다</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -9643,7 +9643,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>가상 카메라는 서버간에 이동할 수 없습니다</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -9655,7 +9655,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>모무 지원함</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9758,17 +9758,17 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>%1대중 %n개 카메라의 비밀번호를 변경하지 못했습니다.</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>이 빌드는 테스트 목적으로 만 사용됩니다.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>서버 설정 열기</translation>
     </message>
     <message>
       <source>OK</source>
@@ -9776,21 +9776,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>&quot;%1&quot; 에 대한 분석 데이터의 저장 위치 확인</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>사용 가능한 가장 큰 파티션</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>분석 데이터베이스는 로컬 드라이브에만 저장해야하며 많은 양의 공간을 차지할 수 있습니다.
+분석 데이터를 저장할 위치를 선택하면 기존 데이터를 잃지 않고 쉽게 변경할 수 없습니다. 위치를 신중하게 선택하고 시스템 파티션을 사용하지 않도록하십시오. 심각한 시스템 오작동을 유발할 수 있습니다.
+기본적으로 분석 데이터는 %1에 저장됩니다.
+Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스토리지 관리)&quot; 탭에서 다른 저장 위치를 선택할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -9809,7 +9809,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <message>
       <source>Switch by</source>
       <comment>Arrows will follow</comment>
-      <translation type="unfinished">Switch by</translation>
+      <translation>로 전환</translation>
     </message>
     <message>
       <source>Display for</source>

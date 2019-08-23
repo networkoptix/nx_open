@@ -580,7 +580,7 @@ void QnClientModule::initLog()
         ? ("client_log" + logFileNameSuffix)
         : logFile;
     logSettings.updateDirectoryIfEmpty(
-        QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/log");
 
     setMainLogger(
         buildLogger(logSettings, qApp->applicationName(), qApp->applicationFilePath()));
@@ -599,7 +599,7 @@ bool QnClientModule::initLogFromFile(const QString& filename, const QString& suf
 
     return nx::utils::log::initializeFromConfigFile(
         logConfigFile,
-        QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/log",
         qApp->applicationName(),
         qApp->applicationFilePath(),
         suffix);
@@ -697,11 +697,12 @@ void QnClientModule::initLocalResources()
     commonModule->store(new QnLocalResourceStatusWatcher());
     if (!m_startupParameters.skipMediaFolderScan && !m_startupParameters.acsMode)
     {
-        auto localFilesSearcher = commonModule->store(new ResourceDirectoryBrowser());
         QStringList paths;
         paths.append(qnSettings->mediaFolder());
         paths.append(qnSettings->extraMediaFolders());
-        localFilesSearcher->setLocalResourcesDirectories(paths);
+
+        m_resourceDirectoryBrowser.reset(new ResourceDirectoryBrowser());
+        m_resourceDirectoryBrowser->setLocalResourcesDirectories(paths);
     }
 }
 
@@ -743,6 +744,12 @@ WearableManager* QnClientModule::wearableManager() const
 VideoCache* QnClientModule::videoCache() const
 {
     return m_videoCache;
+}
+
+nx::vms::client::desktop::ResourceDirectoryBrowser*
+    QnClientModule::resourceDirectoryBrowser() const
+{
+    return m_resourceDirectoryBrowser.data();
 }
 
 void QnClientModule::initLocalInfo()

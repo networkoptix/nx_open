@@ -3,6 +3,8 @@
 #include <set>
 #include <optional>
 
+#include <QtCore/QString>
+
 namespace nx::analytics {
 
 std::optional<std::set<QString>> mergeEntityIds(

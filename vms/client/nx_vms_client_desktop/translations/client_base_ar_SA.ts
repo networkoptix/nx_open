@@ -1786,24 +1786,12 @@ to view more bookmarks</translation>
       <translation>Server updated</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Business rule updated</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Server removed</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Business rule removed</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>User removed</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Business rule reseted</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1903,6 +1891,18 @@ to view more bookmarks</translation>
         <numerusform>%n actions</numerusform>
         <numerusform>%n actions</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation type="unfinished">Event rule changed</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation type="unfinished">Event rule removed</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation type="unfinished">Event rules reset to default</translation>
     </message>
   </context>
   <context>

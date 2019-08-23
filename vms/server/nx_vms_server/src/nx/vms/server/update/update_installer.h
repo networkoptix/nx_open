@@ -69,7 +69,7 @@ private:
     mutable QString m_version;
     mutable QString m_executable;
     qint64 m_bytesExtracted = 0;
-    mutable qint64 m_freeSpaceRequiredToUpdate;
+    mutable qint64 m_freeSpaceRequiredToUpdate = 0;
     mutable State m_state = State::idle;
     std::unique_ptr<QTimer> m_installationTimer;
 };

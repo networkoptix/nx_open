@@ -143,6 +143,8 @@ private:
         std::atomic<bool> leakFrames{false};
         std::atomic<std::chrono::milliseconds> additionalFrameProcessingDelay{
             std::chrono::milliseconds::zero()};
+
+        std::atomic<int> numberOfFramesBeforePreviewGeneration{30};
     };
 
     DeviceAgentSettings m_deviceAgentSettings;

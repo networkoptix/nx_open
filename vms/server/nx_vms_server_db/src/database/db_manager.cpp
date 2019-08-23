@@ -2061,6 +2061,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20190704_encrypt_action_parameters.sql")))
         return encryptBusinessRules() && resyncIfNeeded({ResyncRules});
 
+    if (updateName.endsWith(lit("/99_20190821_fix_analytics_engine_guids.sql")))
+        return resyncIfNeeded(ResyncRules);
+
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;
 }

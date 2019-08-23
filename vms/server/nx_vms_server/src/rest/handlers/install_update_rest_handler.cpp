@@ -2,7 +2,7 @@
 #include "private/multiserver_request_helper.h"
 #include "private/multiserver_update_request_helpers.h"
 #include <rest/server/rest_connection_processor.h>
-#include <rest/helpers/permissions_helper.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <nx/utils/system_error.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
@@ -43,7 +43,7 @@ void makeSureParticipantsAreReadyForInstall(
     detail::checkUpdateStatusRemotely(
         ifParticipantPredicate,
         serverModule,
-        "/ec2/updateStatus",
+        "/ec2/retryUpdate", //< This will also re-check free space available for installation.
         &reply,
         &context);
 
@@ -161,9 +161,11 @@ int QnInstallUpdateRestHandler::executePost(
     const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
         processor->resourcePool(), params);
 
-    const auto accessRights = processor->accessRights();
-    if (!QnPermissionsHelper::hasOwnerPermissions(serverModule()->resourcePool(), accessRights))
+    if (!serverModule()->resourceAccessManager()->hasGlobalPermission(
+            processor->accessRights(), GlobalPermission::admin))
+    {
         return nx::network::http::StatusCode::forbidden;
+    }
 
     m_onTriggeredCallback();
 

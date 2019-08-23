@@ -211,8 +211,9 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("any/certificates", path_variable="certificates_path")
 
     if have_mediaserver:
-        sync("any/nx_sdk-1.7.1")
-        sync("any/nx_storage_sdk-1.7.1")
+        if platform == "windows" or (platform == "linux" and arch == "x64"):
+            sync("nx_box_tool-dev")
+
         sync("sigar")
         sync("any/apidoctool-2.1", path_variable="APIDOCTOOL_PATH")
         if not sync("any/server-external", optional=True):

@@ -1722,24 +1722,12 @@ om du vill visa fler bokmärken</translation>
       <translation>Server updated</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Affärsregel uppdaterad</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Server borttagen</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Affärsregel borttagen</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Användaren borttagen</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Affärsregeln har återställts</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1835,6 +1823,18 @@ om du vill visa fler bokmärken</translation>
         <numerusform>%n åtgärder</numerusform>
         <numerusform>%n åtgärder</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>Händelsesregel har ändrats</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>Händelsesregel har tagits bort</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>Händelseregler återställs till standard</translation>
     </message>
   </context>
   <context>

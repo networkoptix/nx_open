@@ -9,8 +9,11 @@
 
 #include "media_server/media_server_module.h"
 
+namespace nx::sql { class QueryContext; }
+
 namespace nx::analytics::db {
 
+class AttributesDao;
 class ObjectTypeDao;
 
 using ArchiveFilter = nx::vms::server::metadata::AnalyticsArchive::AnalyticsFilter;
@@ -58,9 +61,15 @@ public:
         std::vector<QnUuid> deviceIds,
         ArchiveFilter filter);
 
-    static ArchiveFilter prepareArchiveFilter(
+    /**
+     * @return std::nullopt if filter specifies an empty data set.
+     * I.e., no lookup makes sense.
+     */
+    static std::optional<ArchiveFilter> prepareArchiveFilter(
+        nx::sql::QueryContext* queryContext,
         const db::Filter& filter,
-        const ObjectTypeDao& objectTypeDao);
+        const ObjectTypeDao& objectTypeDao,
+        AttributesDao* attributesDao);
 
 private:
     QnMediaServerModule* m_mediaServerModule = nullptr;

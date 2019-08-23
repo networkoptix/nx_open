@@ -402,17 +402,17 @@ void DeviceAgent::doSetNeededMetadataTypes(
     Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
     const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
-    if (const char* const kMessage = "Event type id list is nullptr";
+    if (const char* const kMessage = "Event type id list is null";
         !NX_ASSERT(eventTypeIds, kMessage))
     {
         *outResult = error(ErrorCode::internalError, kMessage);
         return;
     }
 
-    if (eventTypeIds->count() == 0)
-        stopFetchingMetadata();
+    stopFetchingMetadata();
 
-    *outResult = startFetchingMetadata(neededMetadataTypes);
+    if (eventTypeIds->count() != 0)
+        *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
 Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)

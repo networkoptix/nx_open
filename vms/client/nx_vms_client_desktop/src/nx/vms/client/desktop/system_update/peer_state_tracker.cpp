@@ -1167,7 +1167,6 @@ void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)
 void PeerStateTracker::atClientUpdateStateChanged(int state, int percentComplete, const QString& message)
 {
     using State = ClientUpdateTool::State;
-    NX_ASSERT(m_clientItem);
     if (!m_clientItem)
     {
         NX_VERBOSE(this, "atClientupdateStateChanged(%1, %2) - client item is already destroyed",

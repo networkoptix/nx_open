@@ -8,8 +8,10 @@
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
+#include <core/resource/media_server_resource.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/views/resource_list_view.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <ui/common/read_only.h>
@@ -45,6 +47,7 @@
 
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
 namespace nx::vms::client::desktop {
@@ -120,6 +123,20 @@ struct CameraSettingsDialog::Private: public QObject
         {
             if (!licenseUsageHelper->canEnableRecording(cameras))
                 store->setRecordingEnabled(false);
+        }
+
+        if (!store->state().analytics.enabledEngines().empty())
+        {
+            for (const auto& camera: cameras)
+            {
+                if (camera->getParentServer()->metadataStorageId().isNull())
+                {
+                    // We need to choose analytics storage locations.
+                    q->workbench()->context()->menu()->triggerIfPossible(
+                        ui::action::ConfirmAnalyticsStorageAction);
+                            //< TODO: #spanasenko Specify the server ID?
+                }
+            }
         }
 
         deviceAgentSettingsAdaptor->applySettings();

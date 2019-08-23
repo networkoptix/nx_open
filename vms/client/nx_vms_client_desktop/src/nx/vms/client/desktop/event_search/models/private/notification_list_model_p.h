@@ -52,7 +52,7 @@ private:
     QHash<QnUuid/*ruleId*/, QHash<QnResourcePtr, QSet<QnUuid /*itemId*/>>> m_uuidHashes;
     QMultiHash<QString, QnUuid> m_itemsByLoadingSound;
     QHash<QnUuid, QSharedPointer<AudioPlayer>> m_players;
-    int m_maximumCount = 100;
+    int m_maximumCount = NotificationListModel::kDefaultMaximumCount;
 };
 
 } // namespace nx::vms::client::desktop

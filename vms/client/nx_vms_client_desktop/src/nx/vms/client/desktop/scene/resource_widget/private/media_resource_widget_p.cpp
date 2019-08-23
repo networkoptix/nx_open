@@ -208,7 +208,7 @@ void MediaResourceWidgetPrivate::setMotionEnabled(bool enabled)
     setStreamDataFilter(nx::vms::api::StreamDataFilter::motion, enabled);
 }
 
-bool MediaResourceWidgetPrivate::isAnalyticsEnabled() const
+bool MediaResourceWidgetPrivate::isAnalyticsEnabledInStream() const
 {
     if (!isAnalyticsSupported || m_forceDisabledAnalytics)
         return false;
@@ -219,24 +219,20 @@ bool MediaResourceWidgetPrivate::isAnalyticsEnabled() const
     return false;
 }
 
-void MediaResourceWidgetPrivate::setAnalyticsEnabled(bool enabled)
+void MediaResourceWidgetPrivate::setAnalyticsEnabledInStream(bool enabled)
 {
+    NX_VERBOSE(this, "Setting analytics frames %1", enabled ? "enabled" : "disabled");
+
     setStreamDataFilter(nx::vms::api::StreamDataFilter::objectDetection, enabled);
 
-    if (enabled)
-    {
-        display()->camDisplay()->setForcedVideoBufferLength(
-            milliseconds(ini().analyticsVideoBufferLengthMs));
-    }
-    else
-    {
-        analyticsController->clearAreas();
+    // Earlier we didn't unset forced video buffer length to avoid micro-freezes required to
+    // fill in the video buffer on succeeding analytics mode activations. But it looks like this
+    // mode causes a lot of glitches when enabled, so we'd prefer to leave on a safe side.
+    const auto forcedVideoBufferLength = enabled
+        ? milliseconds(ini().analyticsVideoBufferLengthMs)
+        : milliseconds::zero();
 
-        // Earlier we didn't unset forced video buffer length to avoid micro-freezes required to
-        // fill in the video buffer on succeeding analytics mode activations. But it looks like this
-        // mode causes a lot of glitches when enabled, so we'd prefer to leave on a safe side.
-        display()->camDisplay()->setForcedVideoBufferLength(milliseconds::zero());
-    }
+    display()->camDisplay()->setForcedVideoBufferLength(forcedVideoBufferLength);
 }
 
 void MediaResourceWidgetPrivate::setAnalyticsFilter(const nx::analytics::db::Filter& value)
@@ -334,7 +330,7 @@ void MediaResourceWidgetPrivate::requestAnalyticsObjectsExistence()
 {
     NX_ASSERT(camera);
     const auto server = camera->getParentServer();
-    if (!NX_ASSERT(server))
+    if (!server)
         return;
 
     const auto connection = server->restConnection();

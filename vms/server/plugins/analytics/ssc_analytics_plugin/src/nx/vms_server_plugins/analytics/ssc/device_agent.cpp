@@ -75,9 +75,10 @@ void DeviceAgent::sendEventPacket(const EventType& event) const
         << event.internalName.toUtf8().constData() << " sent to server";
 }
 
-void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
+Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
     m_engine->registerCamera(m_cameraLogicalId, this);
+    return {};
 }
 
 void DeviceAgent::stopFetchingMetadata()
@@ -107,10 +108,10 @@ void DeviceAgent::doSetNeededMetadataTypes(
         return;
     }
 
-    if (eventTypeIds->count() == 0)
-        stopFetchingMetadata();
+    stopFetchingMetadata();
 
-    startFetchingMetadata(neededMetadataTypes);
+    if (eventTypeIds->count() != 0)
+        *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
 void DeviceAgent::doSetSettings(

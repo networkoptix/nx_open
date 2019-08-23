@@ -31,6 +31,8 @@
 
 #include <nx/utils/math/fuzzy.h>
 
+#include "workbench_layout_synchronizer.h"
+
 using namespace nx::vms::client::desktop;
 using namespace ui;
 using namespace workbench;
@@ -233,6 +235,8 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout)
                 return;
             }
             layout::reloadFromFile(resource, password);
+            if (auto synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource))
+                synchronizer->update();
             snapshotManager()->store(resource);
         }
     }
@@ -368,9 +372,14 @@ void QnWorkbench::updateActiveRoleItem(const QnWorkbenchItem* removedItem)
     if (m_itemByRole[Qn::ActiveRole] && m_itemByRole[Qn::ActiveRole] != removedItem)
         return;
 
-    const auto& itemsToSelectFrom = removedItem
-        ? m_currentLayout->items(removedItem->resource())
-        : m_currentLayout->items();
+    // Try to select the same camera as just removed (if any left).
+    QSet<QnWorkbenchItem*> sameResourceItems;
+    if (removedItem)
+        sameResourceItems = m_currentLayout->items(removedItem->resource());
+
+    const auto& itemsToSelectFrom = sameResourceItems.empty()
+        ? m_currentLayout->items()
+        : sameResourceItems;
 
     if (!itemsToSelectFrom.isEmpty())
         activeItem = *itemsToSelectFrom.begin();

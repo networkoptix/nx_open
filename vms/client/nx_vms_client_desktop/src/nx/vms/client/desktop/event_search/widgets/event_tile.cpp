@@ -13,6 +13,7 @@
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/elided_label.h>
+#include <utils/common/delayed.h>
 #include <utils/common/html.h>
 
 #include <nx/vms/client/desktop/ini.h>
@@ -225,10 +226,11 @@ struct EventTile::Private
 
     void updatePreview(milliseconds delay)
     {
-        if (kPreviewLoadDelay > 0ms)
+        if (delay <= 0ms)
         {
+            // Still must be delayed.
             if (isPreviewUpdateRequired())
-                requestPreview();
+                executeLater([this]() { requestPreview(); }, q);
         }
         else
         {

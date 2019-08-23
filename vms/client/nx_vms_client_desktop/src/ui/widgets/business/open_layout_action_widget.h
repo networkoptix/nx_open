@@ -8,11 +8,10 @@ namespace Ui {
 class OpenLayoutActionWidget;
 } // namespace Ui
 
+class QnLayoutAccessValidationPolicy;
 class QnResourceListModel;
 
 namespace nx::vms::client::desktop {
-
-class AccessValidator;
 
 /**
  * A widget to edit parameters for openLayoutAction
@@ -78,7 +77,7 @@ private:
 
     QnLayoutResourcePtr m_selectedLayout;
 
-    AccessValidator* m_validator;
+    QnLayoutAccessValidationPolicy* m_validator = nullptr;
 };
 
 } // namespace nx::vms::client::desktop

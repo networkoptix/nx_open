@@ -1722,24 +1722,12 @@ para ver mais favoritos</translation>
       <translation>Servidor Actualizado</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Regra "Business" actualizada</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Servidor Removido</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Regra "Business" removida</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Utilizador Removido</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Regra "Business" restabelecida</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1835,6 +1823,18 @@ para ver mais favoritos</translation>
         <numerusform>%n actions</numerusform>
         <numerusform>%n actions</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation type="unfinished">Event rule changed</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation type="unfinished">Event rule removed</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation type="unfinished">Event rules reset to default</translation>
     </message>
   </context>
   <context>

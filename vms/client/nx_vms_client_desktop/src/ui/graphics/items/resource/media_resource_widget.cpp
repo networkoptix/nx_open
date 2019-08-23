@@ -41,6 +41,7 @@
 #include <core/resource/client_camera.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <core/resource_management/resources_changes_manager.h>
@@ -2760,20 +2761,22 @@ bool QnMediaResourceWidget::isAnalyticsSupported() const
 
 bool QnMediaResourceWidget::isAnalyticsEnabled() const
 {
-    return d->isAnalyticsEnabled();
+    return d->isAnalyticsEnabledInStream();
 }
 
-void QnMediaResourceWidget::setAnalyticsEnabled(bool analyticsEnabled)
+void QnMediaResourceWidget::setAnalyticsEnabled(bool enabled)
 {
-    // We should be able to disable analytics if it is not supported anymore.
-    if (analyticsEnabled && !isAnalyticsSupported())
+    // Cleanup existing object frames in any case.
+    if (!enabled)
+        d->analyticsController->clearAreas();
+
+    // Zoom window must not control the video stream.
+    if (isZoomWindow())
         return;
 
-    NX_VERBOSE(this, "Setting analytics frames %1 for %2",
-        analyticsEnabled ? "enabled" : "disabled",
-        this);
-
-    d->setAnalyticsEnabled(analyticsEnabled);
+    // We should be able to disable analytics if it is not supported anymore.
+    if (isAnalyticsSupported() || !enabled)
+        d->setAnalyticsEnabledInStream(enabled);
 }
 
 nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr
@@ -2799,11 +2802,11 @@ void QnMediaResourceWidget::updateWatermark()
     if (resource().dynamicCast<QnAviResource>())
         watermark = {};
 
-    // Force using layout watermark if it exists and is visible.
+    // For exported layouts force using watermark if it exists.
     bool useLayoutWatermark = false;
-    if (item() && item()->layout())
+    if (const auto exportedLayout = layoutResource().dynamicCast<QnFileLayoutResource>())
     {
-        auto watermarkVariant = item()->layout()->data(Qn::LayoutWatermarkRole);
+        auto watermarkVariant = exportedLayout->data(Qn::LayoutWatermarkRole);
         if (watermarkVariant.isValid())
         {
             auto layoutWatermark = watermarkVariant.value<nx::core::Watermark>();

@@ -1721,24 +1721,12 @@ to view more bookmarks</source>
       <translation>Server wurde aktualisiert</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Geschäftsregel wurde aktualisiert</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Server wurde entfernt</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Geschäftsregel wurde entfernt</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Benutzer wurde entfernt</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Geschäftsregel wurde zurückgesetzt</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1834,6 +1822,18 @@ to view more bookmarks</source>
         <numerusform>%n Aktion</numerusform>
         <numerusform>%n Aktionen</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>Ereignisregel geändert</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>Ereignisregel entfernt</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>Ereignisregeln auf Standard zurückgesetzt</translation>
     </message>
   </context>
   <context>
