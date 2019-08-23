@@ -219,11 +219,11 @@ void SignatureCalculator::hashQuery(
         const auto tokens = queryItems[i].split('=');
         if (!tokens.isEmpty())
         {
-            hash->addData(tokens[0]);
+            hash->addData(QUrl::toPercentEncoding(tokens[0]));
             hash->addData("=");
         }
         if (tokens.size() > 1)
-            hash->addData(tokens[1]);
+            hash->addData(QUrl::toPercentEncoding(tokens[1]));
     }
 }
 
