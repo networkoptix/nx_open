@@ -362,11 +362,21 @@ void Worker::requestFileInformationInternal()
 
     NX_VERBOSE(m_logTag, "Trying to get %1.", requestSubjectString(m_state));
 
+    const auto& sleepOrEnterDownloadingChunks =
+        [this]()
+        {
+            if (m_state == State::requestingAvailableChunks && haveChunksToDownload())
+                setState(State::foundAvailableChunks);
+            else
+                sleep();
+        };
+
     const QSet<Peer>& peers = getPeersToCheckInfo();
     if (peers.isEmpty())
     {
-        reviveBannedPeers();
-        sleep();
+        sleepOrEnterDownloadingChunks();
+        if (m_state != State::foundAvailableChunks)
+            reviveBannedPeers();
         return;
     }
 
@@ -401,7 +411,7 @@ void Worker::requestFileInformationInternal()
 
     if (contexts.empty())
     {
-        sleep();
+        sleepOrEnterDownloadingChunks();
         return;
     }
 
@@ -413,7 +423,7 @@ void Worker::requestFileInformationInternal()
         });
 
     if (m_state == State::requestingFileInformation || m_state == State::requestingAvailableChunks)
-        sleep();
+        sleepOrEnterDownloadingChunks();
 }
 
 void Worker::handleFileInformationReply(
