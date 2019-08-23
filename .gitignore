@@ -18,3 +18,8 @@ CMakeLists.txt.user
 # Repository temp files.
 *.orig
 *.rej
+
+# Build folders in the repository root.
+/build/
+/build-.*/
+

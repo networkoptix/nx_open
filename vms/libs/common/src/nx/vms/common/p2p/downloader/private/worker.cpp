@@ -187,14 +187,19 @@ Worker::State Worker::state() const
 
 bool Worker::haveChunksToDownload()
 {
+    NX_VERBOSE(m_logTag, "Checking if we have chunks to download...");
+
     const auto& fileInfo = fileInformation();
     if (!fileInfo.isValid())
         return false;
 
-    for (const PeerInformation& peer: m_peerInfoByPeer)
+    for (auto it = m_peerInfoByPeer.begin(); it != m_peerInfoByPeer.end(); ++it)
     {
-        if (peer.isInternet && !peer.isBanned())
+        if (it->isInternet && !it->isBanned())
+        {
+            NX_VERBOSE(m_logTag, "Not banned internet peer %1 is found.", it.key());
             return true;
+        }
     }
 
     const int chunksCount = fileInfo.downloadedChunks.size();
@@ -204,8 +209,13 @@ bool Worker::haveChunksToDownload()
     for (int i = 0; i < chunksCount; ++i)
     {
         if (m_availableChunks[i] && !fileInfo.downloadedChunks[i])
+        {
+            NX_VERBOSE(m_logTag, "Chunk %1 is available to download", i);
             return true;
+        }
     }
+
+    NX_VERBOSE(m_logTag, "No chunks are available to download.");
     return false;
 }
 
@@ -703,14 +713,6 @@ void Worker::handleDownloadChunkReply(
     {
         emit chunkDownloadFailed(m_fileName);
         decreasePeerRank(peer);
-
-        if (auto& info = m_peerInfoByPeer[peer]; info.isBanned())
-        {
-            // The peer probably lost the file. Need to re-check.
-            info.isInternet = false;
-            info.downloadedChunks.clear();
-        }
-
         return;
     }
 
@@ -743,6 +745,9 @@ int Worker::updateAvailableChunks()
 
     for (const PeerInformation& peer: m_peerInfoByPeer)
     {
+        if (peer.isBanned())
+            continue;
+
         if (availableChunksCount == m_availableChunks.size())
             break;
 
@@ -992,6 +997,13 @@ void Worker::decreasePeerRank(const Peer& peer, int value)
 {
     auto& peerInfo = m_peerInfoByPeer[peer];
     peerInfo.decreaseRank(value);
+    if (peerInfo.isBanned())
+    {
+        // The peer probably lost the file. Need to re-check.
+        peerInfo.isInternet = false;
+        peerInfo.downloadedChunks.clear();
+        updateAvailableChunks();
+    }
     NX_VERBOSE(m_logTag, "Decreasing rank of %1: %2", peer, peerInfo.rank);
 }
 

@@ -1,0 +1,7 @@
+.git
+.gitignore
+.idea
+*.d
+*.o
+*.so*
+
