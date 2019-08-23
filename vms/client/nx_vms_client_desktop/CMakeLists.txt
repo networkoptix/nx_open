@@ -24,13 +24,11 @@ if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
-nx_add_external_resources_target(nx_vms_client_desktop_skin
-        "${CMAKE_CURRENT_LIST_DIR}/external_resources"
-        "${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}"
-        "${customization_dir}/nx_client_desktop/resources"
-        "${customization_dir}/icons/all/logo.png"
-    OUTPUT
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/nx_vms_client_desktop.dat
+nx_add_external_resources(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/nx_vms_client_desktop.dat
+    ${CMAKE_CURRENT_LIST_DIR}/external_resources
+    ${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}
+    ${customization_dir}/nx_client_desktop/resources
+    ${customization_dir}/icons/all/logo.png
 )
 
 file(GLOB_RECURSE QML_FILES qml/*)
