@@ -72,14 +72,14 @@ bool Filter::acceptsBoundingBox(const QRectF& boundingBox) const
 bool Filter::acceptsAttributes(const std::vector<nx::common::metadata::Attribute>& attributes) const
 {
     const auto filterWords = freeText.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
-    if (filterWords.empty())
-        return true;
+    if (attributes.empty())
+        return filterWords.empty();
 
-    return std::any_of(attributes.cbegin(), attributes.cend(),
-        [&filterWords](const nx::common::metadata::Attribute& attribute) -> bool
+    return std::all_of(filterWords.cbegin(), filterWords.cend(),
+        [&attributes](const QString& filterWord) -> bool
         {
-            return std::all_of(filterWords.cbegin(), filterWords.cend(),
-                [&attribute](const QString& filterWord) -> bool
+            return std::any_of(attributes.cbegin(), attributes.cend(),
+                [&filterWord](const nx::common::metadata::Attribute& attribute) -> bool
                 {
                     return attribute.name.contains(filterWord, Qt::CaseInsensitive)
                         || attribute.value.contains(filterWord, Qt::CaseInsensitive);
