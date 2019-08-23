@@ -69,7 +69,7 @@ public:
     /*
      * Returns storage usage in range [0..1]
      */
-    virtual float getAvarageWritingUsage() const;
+    virtual float getAverageWritingUsage() const;
 
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 

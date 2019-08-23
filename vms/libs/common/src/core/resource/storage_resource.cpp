@@ -142,7 +142,7 @@ QString QnStorageResource::urlWithoutCredentials(const QString& url)
     return result.toString();
 }
 
-float QnStorageResource::getAvarageWritingUsage() const
+float QnStorageResource::getAverageWritingUsage() const
 {
     return 0.0;
 }

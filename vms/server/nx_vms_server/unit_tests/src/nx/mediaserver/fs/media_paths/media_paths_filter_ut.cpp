@@ -12,6 +12,11 @@ namespace test {
 
 class MediaPathFilter: public ::testing::Test
 {
+public:
+    static const QnUuid kServerUuid;
+    static const QString kMediaFolder;
+    static const QString kDataDirectory;
+
 protected:
     enum class Os
     {
@@ -166,10 +171,6 @@ protected:
     }
 
 private:
-    static const QnUuid kServerUuid;
-    static const QString kMediaFolder;
-    static const QString kDataDirectory;
-
     FilterConfig m_filterConfig;
     QList<QString> m_mediaPaths;
     bool m_isMultipleInstances = false;
@@ -272,6 +273,27 @@ TEST_F(MediaPathFilter, FilterOutNonUnique)
 
     thenNumberOfStoragesReturnedShouldBeEqualTo(3);
     thenPathsShouldBeAmendedCorrectly();
+}
+
+TEST(MediaPath, IsMounted)
+{
+    auto filter = media_paths::FilterConfig{
+        .dataDirectory = MediaPathFilter::kDataDirectory,
+        .mediaFolderName = MediaPathFilter::kMediaFolder,
+        .partitions = {
+            QnPlatformMonitor::PartitionSpace("/", 0, 0),
+            QnPlatformMonitor::PartitionSpace("/media/disk1", 0, 0),
+            QnPlatformMonitor::PartitionSpace("/tmp/server-guid", 0, 0),
+        }
+    };
+
+    ASSERT_TRUE(media_paths::isMounted(filter, MediaPathFilter::kDataDirectory + "/data"));
+    ASSERT_TRUE(media_paths::isMounted(filter, "/media/disk1/" + MediaPathFilter::kMediaFolder));
+    ASSERT_TRUE(media_paths::isMounted(filter, "/tmp/server-guid/"));
+
+    ASSERT_FALSE(media_paths::isMounted(filter, "/media/disk2/" + MediaPathFilter::kMediaFolder));
+    ASSERT_FALSE(media_paths::isMounted(filter, "/tmp/server-guid2/" + MediaPathFilter::kMediaFolder));
+    ASSERT_FALSE(media_paths::isMounted(filter, "/mnt/hdd2/" + MediaPathFilter::kMediaFolder));
 }
 
 } // namespace test
