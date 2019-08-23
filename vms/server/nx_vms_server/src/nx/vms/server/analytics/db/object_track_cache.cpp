@@ -35,6 +35,7 @@ std::vector<ObjectTrack> ObjectTrackCache::getTracksToInsert(bool flush)
             continue;
         }
         ctx.insertionReported = true;
+        ctx.modified = false;
 
         ctx.lastReportTime = currentClock;
         m_timerPool.addTimer(
@@ -62,6 +63,7 @@ std::optional<ObjectTrack> ObjectTrackCache::getTrackToInsertForced(const QnUuid
     if (ctx.insertionReported)
         return std::nullopt;
     ctx.insertionReported = true;
+    ctx.modified = false;
 
     ctx.lastReportTime = nx::utils::monotonicTime();
     m_timerPool.addTimer(
@@ -92,6 +94,7 @@ std::vector<ObjectTrackUpdate> ObjectTrackCache::getTracksToUpdate(bool flush)
         }
 
         ctx.lastReportTime = currentClock;
+        ctx.modified = false;
         m_timerPool.addTimer(
             ctx.track.id,
             m_maxObjectLifetime);
@@ -192,10 +195,11 @@ void ObjectTrackCache::updateObject(
         trackContext.track.firstAppearanceTimeUs = packet.timestampUs;
 
         trackContext.lastReportTime = nx::utils::monotonicTime();
-
-        m_timerPool.addTimer(
-            trackContext.track.id,
-            m_maxObjectLifetime);
+    }
+    else
+    {
+        trackContext.modified = true;
+        m_timerPool.removeTimer(trackContext.track.id);
     }
 
     if (objectMetadata.bestShot)
@@ -251,7 +255,14 @@ void ObjectTrackCache::addNewAttributes(
 
 void ObjectTrackCache::removeTrack(const QnUuid& trackId)
 {
-    m_tracksById.erase(trackId);
+    auto it = m_tracksById.find(trackId);
+    if (it == m_tracksById.end())
+        return;
+
+    if (!it->second.insertionReported || it->second.modified)
+        return; //< Never dropping unsaved data.
+
+    m_tracksById.erase(it);
 }
 
 } // namespace nx::analytics::db
