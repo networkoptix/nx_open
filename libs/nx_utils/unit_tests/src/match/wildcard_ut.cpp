@@ -2,7 +2,7 @@
 
 #include <nx/utils/match/wildcard.h>
 
-TEST(MatchFunctions, wildcardMatch)
+TEST(MatchFunctionsWildcard, case_sensitive)
 {
     ASSERT_TRUE(wildcardMatch("*hren?", "odin hrenn"));
     ASSERT_FALSE(wildcardMatch("*hren?", "odin hren"));
@@ -24,4 +24,12 @@ TEST(MatchFunctions, wildcardMatch)
     ASSERT_TRUE(wildcardMatch("/account/*/systems", "/account/pupkin/systems"));
     ASSERT_FALSE(wildcardMatch("/account/*/systems/", "/account/pupkin/systems"));
     ASSERT_FALSE(wildcardMatch("/account/*/systems/", "/account/pupkin/syst"));
+}
+
+TEST(MatchFunctionsWildcard, case_insensitive)
+{
+    const auto mode = MatchMode::caseInsensitive;
+
+    ASSERT_TRUE(wildcardMatch("abC*def*Hren?z??", "aBcdefhRen1Z11", mode));
+    ASSERT_FALSE(wildcardMatch("/account/*/systems/", "/account/pupkin/systems", mode));
 }
