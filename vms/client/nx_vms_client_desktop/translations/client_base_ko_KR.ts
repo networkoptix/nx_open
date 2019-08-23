@@ -4272,7 +4272,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;가상 카메라&quot; 는 시스템내의 모든 서버에 업로드 할 수 있고 모든 사용자가 액세스 할 수있는 비디오 파일 용 가상 저장소입니다.</translation>
     </message>
   </context>
   <context>
@@ -5616,8 +5616,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>현재 분석 데이터는 자동으로 다른 위치로 이동되지 않으며 액세스 할 수 없게됩니다. 보관하고 나중에 수동으로 이동하거나 영구적으로 삭제할 수 있습니다.
+분석 데이터를 다른 저장 위치로 이동하려면 계속 진행하기 전에 지원 센터에 문의하십시오.</translation>
     </message>
   </context>
   <context>
@@ -9787,10 +9787,10 @@ If you intended to move analytics data to another storage location, please conta
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>분석 데이터베이스는 로컬 드라이브에만 저장해야하며 많은 양의 공간을 차지할 수 있습니다.
+분석 데이터를 저장할 위치를 선택하면 기존 데이터를 잃지 않고 쉽게 변경할 수 없습니다. 위치를 신중하게 선택하고 시스템 파티션을 사용하지 않도록하십시오. 심각한 시스템 오작동을 유발할 수 있습니다.
+기본적으로 분석 데이터는 %1에 저장됩니다.
+Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스토리지 관리)&quot; 탭에서 다른 저장 위치를 선택할 수 있습니다.</translation>
     </message>
   </context>
   <context>
