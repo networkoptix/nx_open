@@ -257,7 +257,14 @@ void QnWorkbenchItem::setDewarpingParams(const nx::vms::api::DewarpingData& para
     if (m_itemDewarpingParams == params)
         return;
 
+    // Suppress signals if dewarping parameters are disabled. They are not actual anyway. Otherwise
+    // dataChanged will be propagated to layout synchronizer, which will queue changes and post them
+    // to the snapshot manager, which will display '*'.
+    const bool changesAreActual = m_itemDewarpingParams.enabled || params.enabled;
     m_itemDewarpingParams = params;
+    if (!changesAreActual)
+        return;
+
     emit dewarpingParamsChanged();
     emit dataChanged(Qn::ItemImageDewarpingRole);
 }

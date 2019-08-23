@@ -117,7 +117,10 @@ private:
         const Peer& peer, const std::optional<QVector<QByteArray>>& checksums);
     void downloadChunks();
     void handleDownloadChunkReply(
-        const Peer& peer, int chunkIndex, const std::optional<QByteArray>& data);
+        const Peer& peer,
+        int chunkIndex,
+        const std::optional<QByteArray>& data,
+        bool decreaseRankOnFailure = true);
 
     void finish(State state = State::finished);
 
@@ -180,6 +183,7 @@ private:
         // The default value `0` here is intentional. When we find a new peer, we'll prefer it and
         // measure its chunk download time.
         milliseconds averageChunkDownloadTime{0};
+        time_point<steady_clock> lastSuccessfulRequestTime{};
 
         void increaseRank(int value = 1);
         void decreaseRank(int value = 1);

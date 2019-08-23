@@ -10,6 +10,7 @@ namespace nx::vms::client::desktop {
 namespace {
 
 static constexpr int kSpacing = 8;
+static constexpr int kAdditionalTitleSpacing = 4;
 
 using Line = QPair<QString, QString>;
 
@@ -100,7 +101,7 @@ QPixmap HighlightedAreaTextPainter::paintText(const QString& text) const
     const int lineSpacing =
         std::max(nameLineSpacing, valueLineSpacing);
     const int titleSpacing = hasTitle
-        ? titleFontMetrics.lineSpacing()
+        ? titleFontMetrics.lineSpacing() + kAdditionalTitleSpacing
         : 0;
 
     static const auto ratio = qApp->devicePixelRatio();
