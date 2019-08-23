@@ -11,13 +11,52 @@ class Camera:
         self.name = name
         self.mac = mac
 
-    def enable_recording(self, enable=True):
+    def enable_recording(self, highStreamFps=30, enable=True):
         request = urllib.request.Request(f"http://{self.api.ip}:{self.api.port}/ec2/saveCameraUserAttributes")
         credentials = f"{self.api.user}:{self.api.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
         request.add_header('Content-Type', 'application/json')
         request.get_method = lambda: 'POST'
+        scheduleTasks = [
+            {
+                "startTime": 0,
+                "endTime": 86400,
+                "dayOfWeek": day_of_week,
+                "fps": highStreamFps,
+                "recordingType": "RT_Always"
+            }
+            for day_of_week in range(0, 7)
+        ]
+
+        if enable:
+            response = urllib.request.urlopen(request, data=json.dumps({
+                "cameraId": self.id,
+                "scheduleEnabled": enable,
+                "scheduleTasks": scheduleTasks,
+            }).encode())
+        else:
+            response = urllib.request.urlopen(request, data=json.dumps({
+                "cameraId": self.id,
+                "scheduleEnabled": enable,
+            }).encode())
+
+        if 200 <= response.code < 300:
+            return True
+
+        from pprint import pprint
+        pprint(json.loads(response.read()))
+        #print(f"{json.loads(response.read())}", file=sys.stderr)
+
+        return False
+
+    def recorded_time_periods(self):
+        request = urllib.request.Request(f"http://{self.api.ip}:{self.api.port}/ec2/recordedTimePeriods")
+        credentials = f"{self.api.user}:{self.api.password}"
+        encoded_credentials = base64.b64encode(credentials.encode('ascii'))
+        request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
+        request.add_header('Content-Type', 'application/json')
+        request.get_method = lambda: 'GET'
         scheduleTasks = [
             {
                 "startTime": 0,
@@ -49,6 +88,7 @@ class Camera:
         #print(f"{json.loads(response.read())}", file=sys.stderr)
 
         return False
+        "/ec2/recordedTimePeriods"
 
     def disable_recording(self):
         return self.enable_recording(False)
