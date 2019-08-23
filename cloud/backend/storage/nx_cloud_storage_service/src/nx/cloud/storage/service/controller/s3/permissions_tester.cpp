@@ -55,7 +55,6 @@ void PermissionsTester::stopWhileInAioThread()
 void PermissionsTester::initializeS3Client()
 {
     m_s3Client = std::make_unique<aws::s3::ApiClient>(
-        std::string() /*storageClientId*/,
         m_bucketLocation,
         m_url,
         m_credentials);

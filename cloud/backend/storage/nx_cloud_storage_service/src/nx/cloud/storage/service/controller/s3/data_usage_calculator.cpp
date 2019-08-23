@@ -67,7 +67,6 @@ void DataUsageCalculator::initializeS3Clients(
         m_contexts.back().bucket = std::move(bucket);
         m_contexts.back().client =
             std::make_unique<aws::s3::ApiClient>(
-                std::string() /*storageClientId*/,
                 m_contexts.back().bucket.region,
                 m_contexts.back().bucket.url,
                 m_credentials);
