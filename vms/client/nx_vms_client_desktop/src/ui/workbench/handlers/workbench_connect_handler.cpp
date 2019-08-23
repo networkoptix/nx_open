@@ -102,6 +102,8 @@
 
 #include <nx/vms/client/desktop/ini.h>
 
+#include <nx/analytics/utils.h>
+
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
@@ -651,6 +653,18 @@ void QnWorkbenchConnectHandler::showWarnMessagesOnce()
     menu()->triggerIfPossible(action::VersionMismatchMessageAction);
 
     context()->instance<QnWorkbenchLicenseNotifier>()->checkLicenses();
+
+    // Ask user for analytics storage locations (e.g. in the case of migration).
+    const auto& servers = context()->resourcePool()->getAllServers(Qn::AnyStatus);
+    if (std::any_of(servers.begin(), servers.end(),
+        [this](const auto& server)
+        {
+            return server->metadataStorageId().isNull()
+                && nx::analytics::hasActiveObjectEngines(commonModule(), server->getId());
+        }))
+    {
+        menu()->triggerIfPossible(action::ConfirmAnalyticsStorageAction);
+    }
 }
 
 void QnWorkbenchConnectHandler::stopReconnecting()
