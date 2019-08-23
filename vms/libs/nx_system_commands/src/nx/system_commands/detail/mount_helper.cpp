@@ -56,7 +56,7 @@ bool MountHelper::checkAndParseUsername()
 
     std::string domain = m_username.substr(domainSeparatorPos + 1);
     m_username = m_username.substr(0, domainSeparatorPos);
-    m_domains.push_back(escapeSingleQuotes(domain));
+    m_domains.push_back(domain);
 
     return true;
 }
@@ -126,7 +126,7 @@ std::string MountHelper::makeCommandString(
        << "',password='" << escapeSingleQuotes(password) << "'";
 
     if (!domain.empty())
-        ss << ",domain=" << domain;
+        ss << ",domain='" << escapeSingleQuotes(domain) << "'";
 
     if (!ver.empty())
         ss << ",vers=" << ver;
