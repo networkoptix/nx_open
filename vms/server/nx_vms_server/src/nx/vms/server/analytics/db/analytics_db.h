@@ -76,7 +76,7 @@ private:
     ObjectTypeDao m_objectTypeDao;
     DeviceDao m_deviceDao;
     std::unique_ptr<AnalyticsArchiveDirectory> m_analyticsArchiveDirectory;
-    ObjectTrackCache m_objectTrackCache;
+    std::unique_ptr<ObjectTrackCache> m_objectTrackCache;
     ObjectTrackAggregator m_trackAggregator;
     ObjectTrackGroupDao m_trackGroupDao;
     bool m_stopped = false;

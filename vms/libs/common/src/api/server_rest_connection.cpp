@@ -45,7 +45,7 @@ namespace {
 
 static const nx::network::http::StringType kJsonContentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
 
-void trace(const QString& serverId, int handle, const QString& message)
+void trace(const QString& serverId, rest::Handle handle, const QString& message)
 {
     static const nx::utils::log::Tag kTag(typeid(rest::ServerConnection));
     NX_VERBOSE(kTag) << lm("%1 <%2>: %3").args(serverId, handle, message);
@@ -66,7 +66,8 @@ ServerConnection::ServerConnection(
     QObject(),
     QnCommonModuleAware(commonModule),
     m_serverId(serverId),
-    m_directUrl(directUrl)
+    m_directUrl(directUrl),
+    m_logTag(QStringLiteral("%1 [%2]").arg(::toString(this), serverId.toString()))
 {
     Qn::directConnect(
         httpClientPool(), &nx::network::http::ClientPool::done,
@@ -170,7 +171,7 @@ QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
     return QnMediaServerResourcePtr(); //< no internet access found
 }
 
-void ServerConnection::trace(int handle, const QString& message) const
+void ServerConnection::trace(rest::Handle handle, const QString& message) const
 {
     ::trace(m_serverId.toString(), handle, message);
 }
@@ -1273,7 +1274,7 @@ Handle ServerConnection::executeRequest(
         timer.start();
 
         return sendRequest(request,
-            [callback, targetThread, serverId, timer](
+            [this, callback, targetThread, serverId, timer](
                 Handle id,
                 SystemError::ErrorCode osErrorCode,
                 int statusCode,
@@ -1281,11 +1282,17 @@ Handle ServerConnection::executeRequest(
                 nx::network::http::BufferType msgBody,
                 const nx::network::http::HttpHeaders& /*headers*/)
             {
+                NX_VERBOSE(m_logTag, "<%1> Got serialized reply. OS error: %2, HTTP status: %3",
+                    id, osErrorCode, statusCode);
+
                 bool success = false;
                 const auto format = Qn::serializationFormatFromHttpContentType(contentType);
                 bool goodFormat = format == Qn::JsonFormat || format == Qn::UbjsonFormat;
                 auto result = goodFormat ?
                     parseMessageBody<ResultType>(format, msgBody, &success) : ResultType();
+
+                if (!success)
+                    NX_VERBOSE(m_logTag, "<%1> Could not parse message body.", id);
 
                 if (osErrorCode != SystemError::noError
                     || statusCode != nx::network::http::StatusCode::ok)
@@ -1312,14 +1319,18 @@ Handle ServerConnection::executeRequest(
 
         QPointer<QThread> targetThreadGuard(targetThread);
         return sendRequest(request,
-            [callback, targetThread, targetThreadGuard, serverId, timer](
+            [this, callback, targetThread, targetThreadGuard, serverId, timer](
                 Handle id,
                 SystemError::ErrorCode osErrorCode,
                 int statusCode,
-                nx::network::http::StringType /*contentType*/,
+                nx::network::http::StringType contentType,
                 nx::network::http::BufferType msgBody,
                 const nx::network::http::HttpHeaders& headers)
             {
+                NX_VERBOSE(m_logTag,
+                    "<%1> Got %2 byte(s) reply of content type %3. OS error: %4, HTTP status: %5",
+                    id, msgBody, QString::fromLatin1(contentType), osErrorCode, statusCode);
+
                 bool success = (osErrorCode == SystemError::noError
                     && statusCode >= nx::network::http::StatusCode::ok
                     && statusCode <= nx::network::http::StatusCode::partialContent);
@@ -1348,7 +1359,7 @@ Handle ServerConnection::executeRequest(
 
         QPointer<QThread> targetThreadGuard(targetThread);
         return sendRequest(request,
-            [callback, targetThread, targetThreadGuard, serverId, timer](
+            [this, callback, targetThread, targetThreadGuard, serverId, timer](
                 Handle id,
                 SystemError::ErrorCode osErrorCode,
                 int statusCode,
@@ -1356,6 +1367,9 @@ Handle ServerConnection::executeRequest(
                 nx::network::http::BufferType /*msgBody*/,
                 const nx::network::http::HttpHeaders& /*headers*/)
             {
+                NX_VERBOSE(m_logTag, "<%1> Got reply. OS error: %2, HTTP status: %3",
+                    id, osErrorCode, statusCode);
+
                 bool success = (osErrorCode == SystemError::noError
                     && statusCode >= nx::network::http::StatusCode::ok
                     && statusCode <= nx::network::http::StatusCode::partialContent);
@@ -1372,6 +1386,7 @@ Handle ServerConnection::executeRequest(
 
 void ServerConnection::cancelRequest(const Handle& requestId)
 {
+    NX_VERBOSE(m_logTag, "<%1> Cancelling request...", requestId);
     httpClientPool()->terminate(requestId);
     QnMutexLocker lock(&m_mutex);
     m_runningRequests.remove(requestId);

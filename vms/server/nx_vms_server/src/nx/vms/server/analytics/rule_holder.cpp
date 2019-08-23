@@ -66,7 +66,7 @@ RuleHolder::AffectedResources RuleHolder::resetRules(const nx::vms::event::RuleL
     {
         if (isAnyResourceRule(rule))
             m_anyResourceRules.insert(rule->id());
-        else
+        else if (needToWatchRule(rule))
             m_watchedRules.insert(rule->id());
     }
 

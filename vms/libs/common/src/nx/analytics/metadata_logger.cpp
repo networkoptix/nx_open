@@ -155,24 +155,24 @@ MetadataLogger::~MetadataLogger()
 }
 
 void MetadataLogger::pushData(
-    const QnConstAbstractMediaDataPtr& data,
+    const QnConstAbstractMediaDataPtr& abstractMediaData,
     const QString& additionalInfo)
 {
-    if (!data || (!m_isAlwaysEnabled && !loggingIni().isLoggingEnabled()))
+    if (!abstractMediaData || (!m_isAlwaysEnabled && !loggingIni().isLoggingEnabled()))
         return;
 
-    if (data->dataType == QnAbstractMediaData::DataType::VIDEO)
+    if (abstractMediaData->dataType == QnAbstractMediaData::DataType::VIDEO)
     {
-        const FrameInfo frameInfo{microseconds(data->timestamp)};
+        const FrameInfo frameInfo{microseconds(abstractMediaData->timestamp)};
         logLine(buildFrameLogString(frameInfo, buildAdditionalInfoStr(__func__, additionalInfo)));
         m_prevFrameTimestamp = frameInfo.timestamp;
     }
-    else if (data->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA)
+    else if (abstractMediaData->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA)
     {
-        if (const ConstObjectMetadataPacketPtr objectMetadata = fromCompressedMetadataPacket(
-            std::dynamic_pointer_cast<const QnCompressedMetadata>(data)))
+        if (const ConstObjectMetadataPacketPtr objectMetadataPacket = fromCompressedMetadataPacket(
+            std::dynamic_pointer_cast<const QnCompressedMetadata>(abstractMediaData)))
         {
-            doPushObjectMetadata(__func__, *objectMetadata, additionalInfo);
+            doPushObjectMetadata(__func__, *objectMetadataPacket, additionalInfo);
         }
     }
 }

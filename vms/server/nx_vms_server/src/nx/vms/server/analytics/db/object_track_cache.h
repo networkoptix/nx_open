@@ -100,6 +100,7 @@ private:
 
         std::chrono::steady_clock::time_point lastReportTime;
         bool insertionReported = false;
+        bool modified = false;
 
         std::map<QString, QString> allAttributes;
     };

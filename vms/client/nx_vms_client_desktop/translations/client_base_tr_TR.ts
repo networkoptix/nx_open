@@ -1721,24 +1721,12 @@ to view more bookmarks</source>
       <translation>Sunucu Güncellendi</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>İş Kuralları Güncellendi</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Sunucu Kaldırıldı</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>İş Kuralları Kaldırıldı</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Kullanıcı Kaldırıldı</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>İş Kuralları Sıfırlandı</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1834,6 +1822,18 @@ to view more bookmarks</source>
         <numerusform>%n işlemler</numerusform>
         <numerusform>%n işlemler</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>Etkinlik kuralı değişti</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>Etkinlik kuralı kaldırıldı</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>Etkinlik kuralları varsayılana sıfırlandı</translation>
     </message>
   </context>
   <context>

@@ -26,7 +26,6 @@ static constexpr char kSaveEventQueryAggregationKey[] = "c119fb61-b7d3-42c5-b833
 
 EventsStorage::EventsStorage(QnMediaServerModule* mediaServerModule):
     m_mediaServerModule(mediaServerModule),
-    m_objectTrackCache(kTrackAggregationPeriod, kMaxCachedObjectLifeTime),
     m_trackAggregator(
         kTrackSearchResolutionX,
         kTrackSearchResolutionY,
@@ -62,6 +61,10 @@ bool EventsStorage::initialize(const Settings& settings)
         NX_ASSERT(false, "Reinitializing is not supported by this class");
         return false;
     }
+
+    m_objectTrackCache = std::make_unique<ObjectTrackCache>(
+        kTrackAggregationPeriod,
+        settings.maxCachedObjectLifeTime);
 
     auto dbConnectionOptions = settings.dbConnectionOptions;
     dbConnectionOptions.dbName = closeDirPath(settings.path) + dbConnectionOptions.dbName;
@@ -370,7 +373,7 @@ void EventsStorage::savePacketDataToCache(
 {
     using namespace std::chrono;
 
-    m_objectTrackCache.add(packet);
+    m_objectTrackCache->add(packet);
 
     for (const auto& objectMetadata: packet->objectMetadataList)
     {
@@ -390,12 +393,12 @@ ObjectTrackDataSaver EventsStorage::takeDataToSave(
         &m_deviceDao,
         &m_objectTypeDao,
         &m_trackGroupDao,
-        &m_objectTrackCache,
+        m_objectTrackCache.get(),
         m_analyticsArchiveDirectory.get());
 
     detectionDataSaver.load(&m_trackAggregator, flushData);
 
-    m_objectTrackCache.removeExpiredData();
+    m_objectTrackCache->removeExpiredData();
 
     return detectionDataSaver;
 }

@@ -118,11 +118,11 @@
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation>Připojování k jinému serveru...</translation>
+      <translation>Připojit k jinému serveru...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>Připojování k serveru...</translation>
+      <translation>Připojit k serveru...</translation>
     </message>
     <message>
       <source>Loading...</source>

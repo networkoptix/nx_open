@@ -1753,24 +1753,12 @@ to view more bookmarks</source>
       <translation>השרת עודכן</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>כלל העסק עודכן</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>השרת הוסר</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>כלל העסק הוסר</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>המשתמש הוסר</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>כלל העסק אותחל</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1868,6 +1856,18 @@ to view more bookmarks</source>
         <numerusform>%n פעולות</numerusform>
         <numerusform>%n פעולות</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation type="unfinished">Event rule changed</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation type="unfinished">Event rule removed</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation type="unfinished">Event rules reset to default</translation>
     </message>
   </context>
   <context>
