@@ -63,9 +63,9 @@ private:
 
     struct ObjectTrackDbAttributes
     {
+        int64_t dbId = kInvalidDbId;
         QnUuid deviceId;
-        int objectTypeId = -1;
-        int64_t attributesDbId = -1;
+        int64_t objectTypeDbId = -1;
     };
 
     AttributesDao* m_attributesDao = nullptr;
@@ -78,11 +78,20 @@ private:
     std::vector<ObjectTrack> m_tracksToInsert;
     std::vector<ObjectTrackUpdate> m_tracksToUpdate;
     std::vector<AggregatedTrackData> m_trackSearchData;
-    std::map<QnUuid, int64_t> m_trackGuidToId;
+
+    std::map<QnUuid, ObjectTrackDbAttributes> m_trackDbAttributes;
 
     void resolveTrackIds();
 
     void insertObjects(nx::sql::QueryContext* queryContext);
+
+    void resolveUnknownTrackIdsThroughDb(nx::sql::QueryContext* queryContext);
+
+    void makeSureTrackIdIsResolved(
+        nx::sql::QueryContext* queryContext, const QnUuid& trackId);
+
+    ObjectTrackDbAttributes fetchTrackDbAttributes(
+        nx::sql::QueryContext* queryContext, const QnUuid& trackId);
 
     std::pair<qint64, qint64> findMinMaxTimestamp(const std::vector<ObjectPosition>& track);
 
@@ -90,7 +99,6 @@ private:
 
     void saveToAnalyticsArchive(nx::sql::QueryContext* queryContext);
     std::vector<AnalyticsArchiveItem> prepareArchiveData(nx::sql::QueryContext* queryContext);
-    ObjectTrackDbAttributes getTrackDbDataById(const QnUuid& trackId);
 };
 
 } // namespace nx::analytics::db
