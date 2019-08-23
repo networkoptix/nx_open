@@ -1,21 +1,24 @@
 #include "system_commands.h"
+#include "system_commands/detail/mount_helper.h"
 
 #include <set>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <stdio.h>
 #include <fcntl.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/statvfs.h>
+#include <sys/mount.h>
+
+#include <QtGlobal> // For platform defines.
 
 #ifdef Q_OS_LINUX
 #include "system_commands/domain_socket/send_linux.h"
-#include "system_commands/detail/mount_helper.h"
 
 #include <algorithm>
 #include <assert.h>
-#include <fstream>
 #include <grp.h>
 #include <iomanip>
 #include <iterator>
@@ -24,7 +27,6 @@
 #include <signal.h>
 #include <string>
 #include <string.h>
-#include <sys/mount.h>
 #include <sys/socket.h>
 #include <sys/syscall.h>
 #include <sys/time.h>
@@ -32,8 +34,6 @@
 #include <sys/un.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#else // Q_OS_LINUX
-#include <QtGlobal> // for Q_UNUSED
 #endif // Q_OS_LINUX
 
 namespace nx {
@@ -52,7 +52,12 @@ namespace nx {
 #ifdef Q_OS_MAC
 #define stat64 stat
 #define statvfs64 statvfs
-#endif // Q_OS_MAC
+#define unmount_path_syscall(path) ::unmount((path), 0)
+#elif defined(Q_OS_LINUX)
+#define unmount_path_syscall(path) umount(path)
+#else // defined(Q_OS_LINUX)
+#error Unsupported OS
+#endif // defined(Q_OS_LINUX)
 
 namespace {
 
@@ -216,13 +221,14 @@ SystemCommands::MountCode SystemCommands::mount(
     const boost::optional<std::string>& username,
     const boost::optional<std::string>& password)
 {
-#ifdef Q_OS_LINUX
     system_commands::MountHelperDelegates delegates;
     std::string credentialsFile;
     delegates.credentialsFileName =
         [this, &credentialsFile](const std::string& username, const std::string& password)
         {
+#ifdef Q_OS_LINUX
             credentialsFile = makeCredentialsFile(username, password, &m_lastError);
+#endif // Q_OS_LINUX
             return credentialsFile;
         };
     delegates.isPathAllowed =
@@ -243,25 +249,17 @@ SystemCommands::MountCode SystemCommands::mount(
     if (!credentialsFile.empty())
         unlink(credentialsFile.c_str());
     return result;
-#else // Q_OS_LINUX
-    Q_UNUSED(url);
-    Q_UNUSED(directory);
-    Q_UNUSED(username);
-    Q_UNUSED(password);
-    return MountCode::otherError;
-#endif // Q_OS_LINUX
 }
 
 SystemCommands::UnmountCode SystemCommands::unmount(const std::string& directory)
 {
-#ifdef Q_OS_LINUX
     UnmountCode result = UnmountCode::noPermissions;
 
     if (!checkMountPermissions(directory))
     {
         result = UnmountCode::noPermissions;
     }
-    else if (umount(directory.c_str()) == 0)
+    else if (unmount_path_syscall(directory.c_str()) == 0)
     {
         result = UnmountCode::ok;
     }
@@ -288,10 +286,6 @@ SystemCommands::UnmountCode SystemCommands::unmount(const std::string& directory
     }
 
     return result;
-#else // Q_OS_LINUX
-    Q_UNUSED(directory);
-    return UnmountCode::noPermissions;
-#endif // Q_OS_LINUX
 }
 
 bool SystemCommands::changeOwner(const std::string& path, int uid, int gid, bool isRecursive)
