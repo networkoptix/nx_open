@@ -63,7 +63,7 @@ void ApiClient::assumeRole(
     nx::utils::MoveOnlyFunc<void(Result, AssumeRoleResult)> handler)
 {
     doAwsApiCall(
-        nx::network::http::Method::post,
+        nx::network::http::Method::get,
         nx::network::url::Builder(m_url).setPath("/").setQuery(buildQuery(request)),
         std::move(handler));
 }
