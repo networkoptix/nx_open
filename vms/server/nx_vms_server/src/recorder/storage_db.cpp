@@ -248,7 +248,6 @@ void QnStorageDb::removeFiles(const QStringList& toRemove, const QString& except
 
 bool QnStorageDb::open(const QString& basePath)
 {
-    qDebug() << "open()";
     const auto dbFiles = allDbFiles(basePath);
     if (dbFiles.isEmpty())
     {
@@ -291,9 +290,8 @@ bool QnStorageDb::openDbFile()
 QStringList QnStorageDb::allDbFiles(const QString& basePath) const
 {
     const auto moduleGuid = moduleGUID().toSimpleString();
-    QStringList filters = {moduleGuid + "_media.nxdb", moduleGuid + "--\\.nxdb"};
+    QStringList filters = {moduleGuid + "_media\\.nxdb", moduleGuid + "--\\d+\\.nxdb"};
 
-    qDebug() << "base path:" << basePath;
     auto candidates = m_storage->getFileList(basePath);
     candidates.erase(
         std::remove_if(
@@ -305,8 +303,9 @@ QStringList QnStorageDb::allDbFiles(const QString& basePath) const
                            filters.cbegin(), filters.cend(),
                            [&fileInfo](const QString& filter)
                            {
-                               return QRegularExpression(filter).match(filter).hasMatch();
-                               return fileInfo.absoluteFilePath().endsWith(filter);
+                               return QRegularExpression(filter)
+                                   .match(fileInfo.absoluteFilePath())
+                                   .hasMatch();
                            });
             }),
         candidates.end());
@@ -315,10 +314,6 @@ QStringList QnStorageDb::allDbFiles(const QString& basePath) const
     std::transform(
         candidates.begin(), candidates.end(), std::back_inserter(result),
         [](const auto& fileInfo) { return fileInfo.absoluteFilePath(); });
-
-    qDebug() << "Candidates:";
-    for (auto r: result)
-        qDebug() << "--" << r;
 
     NX_DEBUG(this, "Gathering DB files. Candidates are: %1", result);
     std::sort(
@@ -398,7 +393,6 @@ QString QnStorageDb::baseFileName(int64_t seqId)
 bool QnStorageDb::startDbFile(const QString& basePath, bool incVersion)
 {
     m_ioDevice.reset();
-    qDebug() << "startDbFile";
     const auto dbFiles = allDbFiles(basePath);
     int64_t newSeqId = 1;
 
@@ -553,7 +547,6 @@ bool QnStorageDb::writeVacuumedData(
     if (!startDbFile(QFileInfo(m_dbFileName).absolutePath(), /*incVersion*/ true))
         return false;
 
-    qDebug() << "writeVacuumedData";
     const auto dbFiles = allDbFiles(QFileInfo(m_dbFileName).absolutePath());
     NX_ASSERT(dbFiles.size() == 2);
 
