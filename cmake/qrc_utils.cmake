@@ -115,10 +115,7 @@ endfunction()
 
 function(nx_add_external_resources file_name)
     set(qrc_file ${file_name}.qrc)
-    nx_generate_qrc(${qrc_file}
-        ${QRC_UNPARSED_ARGUMENTS}
-        USED_FILES_VARIABLE qrc_used_files
-    )
+    nx_generate_qrc(${qrc_file} ${ARGN} USED_FILES_VARIABLE qrc_used_files)
 
     get_filename_component(resource_name ${file_name} NAME_WE)
 
