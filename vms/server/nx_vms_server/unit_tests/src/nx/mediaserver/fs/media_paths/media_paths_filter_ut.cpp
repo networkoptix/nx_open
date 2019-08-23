@@ -277,14 +277,13 @@ TEST_F(MediaPathFilter, FilterOutNonUnique)
 
 TEST(MediaPath, IsMounted)
 {
-    auto filter = media_paths::FilterConfig{
-        .dataDirectory = MediaPathFilter::kDataDirectory,
-        .mediaFolderName = MediaPathFilter::kMediaFolder,
-        .partitions = {
-            QnPlatformMonitor::PartitionSpace("/", 0, 0),
-            QnPlatformMonitor::PartitionSpace("/media/disk1", 0, 0),
-            QnPlatformMonitor::PartitionSpace("/tmp/server-guid", 0, 0),
-        }
+    media_paths::FilterConfig filter;
+    filter.dataDirectory = MediaPathFilter::kDataDirectory,
+    filter.mediaFolderName = MediaPathFilter::kMediaFolder,
+    filter.partitions = {
+        QnPlatformMonitor::PartitionSpace("/", 0, 0),
+        QnPlatformMonitor::PartitionSpace("/media/disk1", 0, 0),
+        QnPlatformMonitor::PartitionSpace("/tmp/server-guid", 0, 0),
     };
 
     ASSERT_TRUE(media_paths::isMounted(filter, MediaPathFilter::kDataDirectory + "/data"));
