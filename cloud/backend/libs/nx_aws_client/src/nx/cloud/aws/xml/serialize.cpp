@@ -19,9 +19,4 @@ void writeElement(QXmlStreamWriter* writer, const QString& name, bool value)
     writeElement(writer, name, value ? QString("true") : QString("false"));
 }
 
-void writeElement(QXmlStreamWriter* writer, const QString& name, int value)
-{
-    writeElement(writer, name, QString::number(value));
-}
-
 } // namespace nx::cloud::aws::xml

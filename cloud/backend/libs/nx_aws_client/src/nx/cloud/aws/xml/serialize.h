@@ -4,10 +4,17 @@
 
 namespace nx::cloud::aws::xml {
 
-void writeElement(QXmlStreamWriter* xml, const QString& name, const QString& value);
-void writeElement(QXmlStreamWriter* xml, const QString& name, const std::string& value);
-void writeElement(QXmlStreamWriter* xml, const QString& name, bool value);
-void writeElement(QXmlStreamWriter* xml, const QString& name, int value);
+void writeElement(QXmlStreamWriter* writer, const QString& name, const QString& value);
+void writeElement(QXmlStreamWriter* writer, const QString& name, const std::string& value);
+void writeElement(QXmlStreamWriter* writer, const QString& name, bool value);
+
+template<
+    typename NumericType,
+    typename = typename std::enable_if_t<std::is_arithmetic_v<NumericType>, NumericType>>
+void writeElement(QXmlStreamWriter* writer, const QString& name, NumericType value)
+{
+    return writeElement(writer, name, QString::number(value));
+}
 
 template<typename ObjectType>
 QString className(const ObjectType& object)
