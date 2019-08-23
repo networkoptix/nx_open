@@ -69,7 +69,7 @@ bool deserialize(QXmlStreamReader* reader, sts::AssumeRoleResult* outObject)
 
         if (reader->name() == kAssumedRoleUser)
         {
-            if (!deserialize(reader, kAssumedRoleUserParsers, kCredentials, &outObject->assumedRoleUser))
+            if (!deserialize(reader, kAssumedRoleUserParsers, kAssumedRoleUser, &outObject->assumedRoleUser))
                 return false;
         }
 
