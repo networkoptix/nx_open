@@ -7,6 +7,7 @@
 #include <QtCore/QLocale>
 
 #include <nx/utils/literal.h>
+#include <nx/utils/std/optional.h>
 
 namespace datetime {
 
@@ -95,18 +96,28 @@ void checkInited()
         initLocale();
 }
 
+std::optional<bool> is24HoursTimeFormatValue;
+
 } // namespace
 
 bool is24HoursTimeFormat()
 {
-    static const bool result =
-        []()
-        {
-            // We now use OS locale for time instead of client locale.
-            QLocale locale = QLocale::system();
-            return !locale.timeFormat().contains(lit("AP"), Qt::CaseInsensitive);
-        }();
-    return result;
+    if (!is24HoursTimeFormatValue)
+    {
+        // We now use OS locale for time instead of client locale.
+        const auto format = QLocale::system().timeFormat();
+        is24HoursTimeFormatValue = !format.contains(lit("AP"), Qt::CaseInsensitive);
+    };
+    return is24HoursTimeFormatValue.value();
+}
+
+void set24HoursTimeFormat(bool value)
+{
+    if (is24HoursTimeFormat() == value)
+        return;
+
+    is24HoursTimeFormatValue = value;
+    DateTimeFormats::setFormats();
 }
 
 QString getLocalizedHours(const QDateTime& value)
