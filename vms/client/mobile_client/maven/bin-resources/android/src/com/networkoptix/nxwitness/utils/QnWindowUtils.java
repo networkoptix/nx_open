@@ -162,7 +162,7 @@ public class QnWindowUtils {
 
     public static boolean is24HoursTimeFormat()
     {
-	return DateFormat.is24HourFormat(QtNative.activity());
+        return DateFormat.is24HourFormat(QtNative.activity());
     }
 
     public static void setKeepScreenOn(final boolean keepScreenOn) {
