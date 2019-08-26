@@ -1,8 +1,7 @@
 #include "object_track_searcher.h"
 
-#include <QtCore/QRegExp>
-
 #include <nx/fusion/serialization/sql_functions.h>
+#include <nx/utils/match/wildcard.h>
 #include <nx/utils/std/algorithm.h>
 
 #include <analytics/db/config.h>
@@ -175,16 +174,18 @@ bool ObjectTrackSearcher::matchAttributes(
     const std::vector<nx::common::metadata::Attribute>& attributes,
     const QString& filter)
 {
-    const auto filterWords = filter.split(L' ');
+    const auto filterWords = filter.split(L' ', QString::SkipEmptyParts);
     // Attributes have to contain all words.
     for (const auto& filterWord: filterWords)
     {
-        QRegExp expr(filterWord, Qt::CaseInsensitive, QRegExp::PatternSyntax::Wildcard);
+        // Matching given filter anywhere in the text.
+        const auto mask = "*" + filterWord + "*";
 
         bool found = false;
         for (const auto& attribute: attributes)
         {
-            if (expr.indexIn(attribute.name) != -1 || expr.indexIn(attribute.value) != -1)
+            if (wildcardMatch(mask, attribute.name, MatchMode::caseInsensitive) ||
+                wildcardMatch(mask, attribute.value, MatchMode::caseInsensitive))
             {
                 found = true;
                 break;
