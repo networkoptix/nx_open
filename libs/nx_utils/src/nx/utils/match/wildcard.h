@@ -2,6 +2,12 @@
 
 #include <QString>
 
+enum class MatchMode
+{
+    caseSensitive = 0,
+    caseInsensitive,
+};
+
 /**
  * Check whether a string matches a wildcard expression.
  *
@@ -10,9 +16,18 @@
  * '.') and '*' (matches any number of any chars).
  * @return Whether str matches mask.
  */
-NX_UTILS_API bool wildcardMatch(const char* mask, const char* str);
+NX_UTILS_API bool wildcardMatch(
+    const char* mask,
+    const char* str,
+    MatchMode mode = MatchMode::caseSensitive);
 
-inline bool wildcardMatch(const QString& mask, const QString& str)
+inline bool wildcardMatch(
+    const QString& mask,
+    const QString& str,
+    MatchMode mode = MatchMode::caseSensitive)
 {
-    return wildcardMatch(mask.toLatin1().constData(), str.toLatin1().constData());
+    return wildcardMatch(
+        mask.toLatin1().constData(),
+        str.toLatin1().constData(),
+        mode);
 }
