@@ -1754,24 +1754,12 @@ to view more bookmarks</source>
       <translation>Сервер обновлён</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Обновлены правила поведения</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Сервер удалён</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Правило поведения удалено</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Пользователь удалён</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Правило поведения сброшено</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1869,6 +1857,18 @@ to view more bookmarks</source>
         <numerusform>%n действий</numerusform>
         <numerusform>%n действий</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>Правило события изменено</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>Правило события удалено</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>Правила событий сброшены по умолчанию</translation>
     </message>
   </context>
   <context>

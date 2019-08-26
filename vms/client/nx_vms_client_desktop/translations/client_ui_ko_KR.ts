@@ -547,7 +547,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/dialogs/camera_credentials_dialog.ui"/>
       <source>Authentication credentials</source>
-      <translation type="unfinished">Authentication credentials</translation>
+      <translation>인증 증명</translation>
     </message>
   </context>
   <context>
@@ -1439,7 +1439,7 @@
     <message>
       <location/>
       <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation type="unfinished">Encrypting video traffic will significantly increase CPU usage.</translation>
+      <translation>비디오 트래픽을 암호화하면 CPU 사용량이 크게 증가합니다.</translation>
     </message>
   </context>
   <context>
@@ -2647,7 +2647,7 @@
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>이미지 또는 비디오 파일을 응용 프로그램 창으로 드래그하여 재생하십시오.</translation>
     </message>
   </context>
   <context>
@@ -2741,12 +2741,12 @@
     <message>
       <location/>
       <source>Allow only secure connections</source>
-      <translation type="unfinished">Allow only secure connections</translation>
+      <translation>보안 연결 만 허용</translation>
     </message>
     <message>
       <location/>
       <source>Encrypt video traffic</source>
-      <translation type="unfinished">Encrypt video traffic</translation>
+      <translation>비디오 트래픽 암호화</translation>
     </message>
     <message>
       <location/>
@@ -2766,7 +2766,7 @@
     <message>
       <location/>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
+      <translation>세션 기간 제한</translation>
     </message>
   </context>
   <context>
@@ -3006,12 +3006,12 @@
     <message>
       <location/>
       <source>Additional storage</source>
-      <translation type="unfinished">Additional storage</translation>
+      <translation>추가 정장장치</translation>
     </message>
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>기록 된 데이터에 대한 기본 예측</translation>
     </message>
   </context>
   <context>
@@ -3059,12 +3059,12 @@
     <message>
       <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+      <translation>분석 데이터는 계속 비활성화 된 스토리지에 저장됩니다.</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>비활성화 된 저장 장치에 녹화는 중지됩니다. 그러나 오래된 영상을 삭제하는 것은 계속합니다.</translation>
     </message>
     <message>
       <location/>
@@ -3187,17 +3187,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>인터넷과 시간 동기화</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>VMS 시간</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>서버간에 시간을 동기화하지 마십시오</translation>
     </message>
   </context>
   <context>
@@ -3305,7 +3305,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>움직임 감지</translation>
     </message>
   </context>
   <context>
@@ -3318,7 +3318,7 @@
     <message>
       <location/>
       <source>Upload Footage</source>
-      <translation type="unfinished">Upload Footage</translation>
+      <translation>영상 업로드</translation>
     </message>
     <message>
       <location/>

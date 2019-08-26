@@ -126,6 +126,9 @@ public:
      */
     const QnResourcePtr &resource() const;
 
+    /** Layout resource, owning this item. */
+    QnLayoutResourcePtr layoutResource() const;
+
     /**
      * \returns                         Workbench item associated with this widget. Never returns NULL.
      */

@@ -48,11 +48,12 @@ protected:
         ASSERT_TRUE(initializeStorage());
     }
 
-    void whenSaveEvent()
+    common::metadata::ObjectMetadataPacketPtr whenSaveEvent()
     {
-        generateRandomPackets(1);
-        whenIssueSavePacket(m_analyticsDataPackets[0]);
+        auto packet = generateRandomPackets(1).front();
+        whenIssueSavePacket(packet);
         flushData();
+        return packet;
     }
 
     void whenSaveMultipleEventsConcurrently()
@@ -167,7 +168,11 @@ protected:
                 objectPositionIter != trackIter->objectPositionSequence.end();
                 )
             {
-                if (satisfiesFilter(filter, *objectPositionIter))
+                // NOTE: If object position does not satisfy the region filter -
+                // it is still returned with the matched object.
+                // But, if position does not specify time range - it is dropped.
+                // That's a functional requirement.
+                if (satisfiesCommonConditions(filter, *objectPositionIter))
                     ++objectPositionIter;
                 else
                     objectPositionIter = trackIter->objectPositionSequence.erase(objectPositionIter);
@@ -398,6 +403,16 @@ protected:
         AttributeDictionary* attributeDictionary = nullptr)
     {
         auto packet = test::generateRandomPacket(1, attributeDictionary);
+
+        if (m_fixedObjectId)
+        {
+            for (auto& object: packet->objectMetadataList)
+            {
+                object.trackId = *m_fixedObjectId;
+                object.typeId = m_fixedObjectId->toSimpleString();
+            }
+        }
+
         if (m_lastTimestamp)
         {
             packet->timestampUs =
@@ -412,10 +427,15 @@ protected:
         return packet;
     }
 
-    void generateRandomPackets(int count)
+    std::vector<common::metadata::ObjectMetadataPacketPtr>
+        generateRandomPackets(int count)
     {
+        std::vector<common::metadata::ObjectMetadataPacketPtr> packets;
+
         for (int i = 0; i < count; ++i)
-            m_analyticsDataPackets.push_back(generateRandomPacket());
+            packets.push_back(generateRandomPacket());
+
+        std::copy(packets.begin(), packets.end(), std::back_inserter(m_analyticsDataPackets));
 
         std::sort(
             m_analyticsDataPackets.begin(), m_analyticsDataPackets.end(),
@@ -423,6 +443,8 @@ protected:
             {
                 return left->timestampUs < right->timestampUs;
             });
+
+        return packets;
     }
 
     Filter buildEmptyFilter()
@@ -430,9 +452,19 @@ protected:
         return Filter();
     }
 
-    Settings settings() const
+    const Settings& settings() const
     {
         return m_settings;
+    }
+
+    Settings& settings()
+    {
+        return m_settings;
+    }
+
+    void setAllowedObjectId(const QnUuid& trackId)
+    {
+        m_fixedObjectId = trackId;
     }
 
 private:
@@ -448,6 +480,7 @@ private:
     nx::utils::SyncQueue<LookupResult> m_lookupResultQueue;
     std::optional<LookupResult> m_prevLookupResult;
     std::optional<qint64> m_lastTimestamp;
+    std::optional<QnUuid> m_fixedObjectId;
 
     std::vector<QnUuid> m_allowedDeviceIds;
     std::pair<std::chrono::system_clock::time_point, std::chrono::system_clock::time_point>
@@ -907,6 +940,19 @@ protected:
         m_filter.freeText = attributeDictionary().getRandomText();
     }
 
+    void addRandomTextPrefixFoundInDataToFilter()
+    {
+        QString text;
+        for (int i = 0; i < 10; ++i)
+        {
+            text = attributeDictionary().getRandomText();
+            if (text.size() >= 2)
+                break;
+        }
+
+        m_filter.freeText = text.mid(0, text.size() / 2) + "*";
+    }
+
     void addRandomUnknownText()
     {
         m_filter.freeText = QnUuid::createUuid().toSimpleString();
@@ -1234,6 +1280,14 @@ TEST_F(AnalyticsDbLookup, full_text_search)
     thenResultMatchesExpectations();
 }
 
+TEST_F(AnalyticsDbLookup, full_text_search_by_prefix)
+{
+    addRandomTextPrefixFoundInDataToFilter();
+    whenLookupObjectTracks();
+
+    thenResultMatchesExpectations();
+}
+
 TEST_F(AnalyticsDbLookup, lookup_by_unknown_text_produces_no_objects)
 {
     addRandomUnknownText();
@@ -1286,6 +1340,42 @@ TEST_F(AnalyticsDbLookup, lookup_stress_test)
 TEST_F(AnalyticsDbLookup, quering_data_from_multiple_cameras)
 {
     givenRandomFilterWithMultipleDeviceIds();
+    whenLookupObjectTracks();
+    thenResultMatchesExpectations();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class AnalyticsDbLookupTrackAddedWithLargeTimeGap:
+    public AnalyticsDbLookup
+{
+    using base_type = AnalyticsDbLookup;
+
+protected:
+    virtual void SetUp() override
+    {
+        settings().maxCachedObjectLifeTime = std::chrono::milliseconds(1);
+
+        base_type::SetUp();
+    }
+};
+
+TEST_F(
+    AnalyticsDbLookupTrackAddedWithLargeTimeGap,
+    data_saved_with_a_large_delay_is_still_found)
+{
+    const auto deviceId = QnUuid::createUuid();
+    setAllowedDeviceIds({deviceId});
+    setAllowedObjectId(QnUuid::createUuid());
+
+    whenSaveEvent();
+    std::this_thread::sleep_for(settings().maxCachedObjectLifeTime * 10);
+    const auto packet = whenSaveEvent();
+
+    filter().boundingBox = packet->objectMetadataList.front().boundingBox;
+    filter().deviceIds = {deviceId};
+    filter().maxObjectTrackSize = 0;
+
     whenLookupObjectTracks();
     thenResultMatchesExpectations();
 }

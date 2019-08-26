@@ -41,6 +41,7 @@
 #include <core/resource/client_camera.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/file_layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <core/resource_management/resources_changes_manager.h>
@@ -2801,11 +2802,11 @@ void QnMediaResourceWidget::updateWatermark()
     if (resource().dynamicCast<QnAviResource>())
         watermark = {};
 
-    // Force using layout watermark if it exists and is visible.
+    // For exported layouts force using watermark if it exists.
     bool useLayoutWatermark = false;
-    if (item() && item()->layout())
+    if (const auto exportedLayout = layoutResource().dynamicCast<QnFileLayoutResource>())
     {
-        auto watermarkVariant = item()->layout()->data(Qn::LayoutWatermarkRole);
+        auto watermarkVariant = exportedLayout->data(Qn::LayoutWatermarkRole);
         if (watermarkVariant.isValid())
         {
             auto layoutWatermark = watermarkVariant.value<nx::core::Watermark>();

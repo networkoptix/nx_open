@@ -59,7 +59,7 @@ static void validateEndpoints(std::set<nx::network::SocketAddress>* endpoints)
     const auto& resolver = nx::network::SocketGlobals::addressResolver();
     for (auto it = endpoints->begin(); it != endpoints->end(); )
     {
-        NX_ASSERT(resolver.isValidForConnect(*it), lm("Invalid endpoint: %1").arg(*it));
+        NX_ASSERT(resolver.isValidForConnect(*it), "Invalid endpoint: %1", *it);
 
         if (resolver.isValidForConnect(*it))
             ++it;
@@ -117,7 +117,7 @@ void ModuleConnector::deactivate()
         [this]()
         {
             m_isPassiveMode = true;
-            NX_DEBUG(this, "Diactivated");
+            NX_DEBUG(this, "Deactivated");
         });
 }
 
@@ -255,7 +255,7 @@ ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
 
 ModuleConnector::Module::~Module()
 {
-    NX_DEBUG(this) << "Delete";
+    NX_DEBUG(this, "Deleted");
     NX_ASSERT(m_reconnectTimer.isInSelfAioThread());
     m_attemptingReaders.clear();
     if (!m_connectedReader)
@@ -267,7 +267,7 @@ ModuleConnector::Module::~Module()
 
 void ModuleConnector::Module::addEndpoints(std::set<nx::network::SocketAddress> endpoints)
 {
-    NX_VERBOSE(this, lm("Add endpoints %1").container(endpoints));
+    NX_VERBOSE(this, "Add endpoints %1", containerString(endpoints));
     if (m_id.isNull())
     {
         // For unknown server connect to every new endpoint.
@@ -319,7 +319,7 @@ void ModuleConnector::Module::setForbiddenEndpoints(std::set<nx::network::Socket
 
     if (m_forbiddenEndpoints != newEndpoints)
     {
-        NX_DEBUG(this, lm("Forbid endpoints: %1").container(newEndpoints));
+        NX_DEBUG(this, "Forbid endpoints: %1", containerString(newEndpoints));
         m_forbiddenEndpoints = std::move(newEndpoints);
         if (m_connectedReader || !m_attemptingReaders.empty())
             remakeConnection();
@@ -371,7 +371,7 @@ boost::optional<ModuleConnector::Module::Endpoints::iterator>
     const auto group = getGroup(hostPriority(endpoint.address));
     if (insertIntoGroup(group, endpoint))
     {
-        NX_DEBUG(this, lm("Save endpoint %1 to %2").args(endpoint, group->first));
+        NX_DEBUG(this, "Save endpoint %1 to %2", endpoint, group->first);
         return group;
     }
 
@@ -402,7 +402,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
         if (!m_id.isNull())
         {
             m_reconnectTimer.scheduleNextTry([this](){ connectToGroup(m_endpoints.begin()); });
-            NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(m_reconnectTimer.currentDelay()));
+            NX_VERBOSE(this, "No more endpoints, retry in %1", m_reconnectTimer.currentDelay());
             m_parent->m_disconnectedHandler(m_id);
         }
 
@@ -412,8 +412,9 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     if (m_connectedReader)
         return;
 
-    NX_VERBOSE(this, lm("Connect to group %1: %2").args(
-        endpointsGroup->first, containerString(endpointsGroup->second)));
+    NX_VERBOSE(this, "Connect to group %1: %2",
+        endpointsGroup->first,
+        containerString(endpointsGroup->second));
 
     // Initiate parallel connects to each endpoint in a group.
     size_t endpointsInProgress = 0;
@@ -445,7 +446,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 void ModuleConnector::Module::connectToEndpoint(
     const nx::network::SocketAddress& endpoint, Endpoints::iterator endpointsGroup)
 {
-    NX_VERBOSE(this, lm("Attempt to connect by %1").arg(endpoint));
+    NX_VERBOSE(this, "Attempt to connect by %1", endpoint);
     m_attemptingReaders.push_front(std::make_unique<InformationReader>(m_parent));
 
     const auto readerIt = m_attemptingReaders.begin();
@@ -454,12 +455,12 @@ void ModuleConnector::Module::connectToEndpoint(
         [this, endpoint, endpointsGroup, readerIt](
             boost::optional<nx::vms::api::ModuleInformation> information,
             const QString& description) mutable
-       {
-           std::unique_ptr<InformationReader> reader(std::move(*readerIt));
-           m_attemptingReaders.erase(readerIt);
+        {
+            std::unique_ptr<InformationReader> reader(std::move(*readerIt));
+            m_attemptingReaders.erase(readerIt);
 
-           if (information)
-           {
+            if (information)
+            {
                 if (information->id == m_id)
                 {
                     if (saveConnection(std::move(endpoint), std::move(reader), *information))
@@ -468,27 +469,27 @@ void ModuleConnector::Module::connectToEndpoint(
                 else
                 {
                     endpointsGroup->second.erase(endpoint); //< Wrong endpoint.
-                    m_parent->getModule(information->id)->saveConnection(
-                        std::move(endpoint), std::move(reader), *information);
+                    m_parent->getModule(information->id)
+                        ->saveConnection(std::move(endpoint), std::move(reader), *information);
                 }
-           }
+            }
 
-           if (m_id.isNull())
-           {
-               endpointsGroup->second.erase(endpoint);
-               return;
-           }
+            if (m_id.isNull())
+            {
+                endpointsGroup->second.erase(endpoint);
+                return;
+            }
 
-           NX_DEBUG(this, lm("Could not connect to %1: %2").args(endpoint, description));
+            NX_DEBUG(this, "Could not connect to %1: %2", endpoint, description);
 
-           // When the last endpoint in a group fails try the next group.
-           if (m_attemptingReaders.empty())
-           {
-               NX_VERBOSE(this, "Group %1 endpoints are not availabe for %2",
+            // When the last endpoint in a group fails try the next group.
+            if (m_attemptingReaders.empty())
+            {
+                NX_VERBOSE(this, "Group %1 endpoints are not available for %2",
                     endpointsGroup->first, m_id);
-               connectToGroup(std::next(endpointsGroup));
-           }
-       });
+                connectToGroup(std::next(endpointsGroup));
+            }
+        });
 }
 
 bool ModuleConnector::Module::saveConnection(nx::network::SocketAddress endpoint,
@@ -502,7 +503,7 @@ bool ModuleConnector::Module::saveConnection(nx::network::SocketAddress endpoint
     if (m_connectedReader)
         return true;
 
-    NX_VERBOSE(this, lm("Save connection to %1").args(endpoint));
+    NX_VERBOSE(this, "Save connection to %1", endpoint);
     m_attemptingReaders.clear();
     m_disconnectTimer.cancelSync();
 
@@ -517,7 +518,7 @@ bool ModuleConnector::Module::saveConnection(nx::network::SocketAddress endpoint
                 return m_parent->m_connectedHandler(*information, endpoint, m_connectedReader->address());
             }
 
-            NX_VERBOSE(this, lm("Connection to %1 is closed: %2").args(endpoint, description));
+            NX_VERBOSE(this, "Connection to %1 is closed: %2", endpoint, description);
             m_connectedReader.reset();
             ensureConnection(); //< Reconnect attempt.
 
@@ -526,7 +527,7 @@ bool ModuleConnector::Module::saveConnection(nx::network::SocketAddress endpoint
             m_disconnectTimer.start(reconnectTimeout,
                 [this, reconnectTimeout]()
                 {
-                    NX_VERBOSE(this, lm("Reconnect did not happen in %1").arg(reconnectTimeout));
+                    NX_VERBOSE(this, "Reconnect did not happen in %1", reconnectTimeout);
                     m_parent->m_disconnectedHandler(m_id);
                 });
         });

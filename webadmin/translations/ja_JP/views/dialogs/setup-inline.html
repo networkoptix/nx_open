@@ -42,7 +42,7 @@
             <span class="line"></span>
         </div>
         <button class="btn btn-default" ng-click="skip()">既存のシステムに追加</button><br>
-        <small>({{Config.productName}}が既に設定されている場合)</small><br>
+        <small>(もし{{Config.productName}} が既に設定されている場合)</small><br>
         <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
 </div>
@@ -444,7 +444,7 @@
         {{cloudError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">もう一度試してください</button>       
+        <button class="btn btn-default" ng-click="retry()">再試行</button>       
 <button class="btn btn-default" ng-click="skip()">ローカルシステムをセットアップします</button>
     </p>
 </div>

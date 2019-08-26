@@ -5,11 +5,11 @@
     <name>AnalyticsSettings</name>
     <message>
       <source>Enable</source>
-      <translation>Увімкнути</translation>
+      <translation>Включити</translation>
     </message>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation>Аналітика камери працюватиме лише під час перегляду камери. Увімкніть запис, щоб вона працювала весь час.</translation>
+      <translation>Аналітика камери працюватиме лише під час перегляду камери. Активуйте запис, щоб вона працювала весь час.</translation>
     </message>
     <message>
       <source>This is the built-in functionality</source>
@@ -28,14 +28,14 @@
     </message>
     <message>
       <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>
-      <translation>Перевірте підключення або натисніть кнопку &quot;Підключитися до сервера &quot;, щоб ввести адресу сервера</translation>
+      <translation>Перевірте підключення або натисніть клавiшу &quot;Підключитися до Сервера &quot;, щоб ввести адресу сервера</translation>
     </message>
   </context>
   <context>
     <name>FactorySystemTileArea</name>
     <message>
       <source>Click to setup</source>
-      <translation>Натисніть для налаштування</translation>
+      <translation>Клiкнiть, щоб початы налаштування</translation>
     </message>
   </context>
   <context>
@@ -58,7 +58,7 @@
     </message>
     <message>
       <source>Connect</source>
-      <translation>Під’єднатися</translation>
+      <translation>Підключитись</translation>
     </message>
   </context>
   <context>
@@ -72,22 +72,22 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation>Не встановлено плагінів</translation>
+      <translation>Плагіни не встановлені</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation>Сервер не в мережі</translation>
+      <translation>Сервер офлайн</translation>
     </message>
   </context>
   <context>
     <name>SystemTile</name>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation>НЕСУМІСНА</translation>
+      <translation>НЕСУМІСНИЙ</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>НЕ В МЕРЕЖІ</translation>
+      <translation>ОФЛАЙН</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
@@ -99,7 +99,7 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation>Новий сервер</translation>
+      <translation>Новий Сервер</translation>
     </message>
     <message>
       <source>Edit</source>
@@ -118,11 +118,11 @@
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation>Підключитися до іншого серверу...</translation>
+      <translation>Підключитися до іншого Серверу...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>Підключитися до сервера...</translation>
+      <translation>Підключитися до Сервера...</translation>
     </message>
     <message>
       <source>Loading...</source>

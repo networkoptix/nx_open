@@ -1705,24 +1705,12 @@ to view more bookmarks</source>
       <translation>การปรับปรุงเซิร์ฟเวอร์</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>การปรับปรุง กฎ ธุรกิจ</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>ลบ เซิร์ฟเวอร์ ออก</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>ลบ กฎ ทางธุรกิจออก</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>ลบ ผู้ใช้ ออก</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>การตั้งค่า กฎ ทางธุรกิจ</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1817,6 +1805,18 @@ to view more bookmarks</source>
       <translation>
         <numerusform>%n การกระทำ</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>กฎกิจกรรมเปลี่ยนไป</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>ลบกฎกิจกรรมแล้ว</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>กฎกิจกรรมถูกรีเซ็ตเป็นค่าเริ่มต้น</translation>
     </message>
   </context>
   <context>

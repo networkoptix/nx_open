@@ -237,6 +237,8 @@ void QnCamDisplay::addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bo
         }
         int rendersCount = m_display[i]->addRenderer(vw);
         m_multiView = rendersCount > 1;
+        if (!isRunning())
+            m_display[i]->updateRenderList();
     }
 }
 

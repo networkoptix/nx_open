@@ -70,7 +70,7 @@ public:
 
 
         /** Latest known update info. */
-        LATEST_UPDATE_INFO,
+        UPDATE_DELIVERY_INFO,
 
         /** Estimated update delivery date (in msecs since epoch). */
         UPDATE_DELIVERY_DATE,
@@ -220,7 +220,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     updateCombineUrl,       setUpdateCombinerUrl,       UPDATE_COMBINER_URL,        QString())
         QN_DECLARE_RW_PROPERTY(QVariantList,                alternativeUpdateServers,   setAlternativeUpdateServers,    ALTERNATIVE_UPDATE_SERVERS, QVariantList())
         QN_DECLARE_RW_PROPERTY(nx::vms::api::SoftwareVersion, ignoredUpdateVersion, setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     {})
-        QN_DECLARE_RW_PROPERTY(nx::update::UpdateDeliveryInfo,     latestUpdateInfo,       setLatestUpdateInfo, LATEST_UPDATE_INFO,         nx::update::UpdateDeliveryInfo())
+        QN_DECLARE_RW_PROPERTY(nx::update::UpdateDeliveryInfo, updateDeliveryInfo,       setUpdateDeliveryInfo, UPDATE_DELIVERY_INFO,         nx::update::UpdateDeliveryInfo())
         QN_DECLARE_RW_PROPERTY(qint64,                      updateDeliveryDate,     setUpdateDeliveryDate,      UPDATE_DELIVERY_DATE,       0)
 
         QN_DECLARE_RW_PROPERTY(int,                         tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)

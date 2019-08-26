@@ -402,8 +402,8 @@ ResourceThumbnailProvider* EventRibbon::Private::createPreviewProvider(
                     const QSharedPointer<QTimer> timeoutTimer(new QTimer(),
                         [](QTimer* timer)
                         {
-                            if (!timer)
-                                return;
+                            if (!timer) // TODO: #vkutin Remove these lines in 4.2
+                                return; // - they are totally not necessary.
 
                             timer->stop();
                             timer->deleteLater();

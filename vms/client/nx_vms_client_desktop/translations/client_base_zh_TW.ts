@@ -1706,24 +1706,12 @@ to view more bookmarks</source>
       <translation>伺服器更新</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>商業規則更新</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>伺服器移除</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>商業規則移除</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>使用者移除</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>商業規則重置</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1818,6 +1806,18 @@ to view more bookmarks</source>
       <translation>
         <numerusform>%n 個動作</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>事件規則已更改</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>事件規則已刪除</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>事件規則重置為初始預設</translation>
     </message>
   </context>
   <context>

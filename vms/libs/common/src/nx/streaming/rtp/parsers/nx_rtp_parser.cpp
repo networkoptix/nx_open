@@ -1,5 +1,6 @@
 #include "nx_rtp_parser.h"
 
+#include <nx/kit/utils.h>
 #include <nx/utils/log/log.h>
 
 #include <analytics/common/object_metadata.h>
@@ -13,7 +14,6 @@
 
 #include <nx/debugging/visual_metadata_debugger_factory.h>
 
-#include <nx/analytics/frame_info.h>
 #include <nx/analytics/analytics_logging_ini.h>
 
 #include <motion/motion_detection.h>
@@ -35,12 +35,12 @@ QnNxRtpParser::QnNxRtpParser(QnUuid deviceId):
     m_isAudioEnabled(true),
     m_visualDebugger(VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::nxRtpParser)),
     m_primaryLogger(
-        "rtp_parser_",
+        lm("rtp_parser_@%1_").arg(nx::kit::utils::toString(this)),
         m_deviceId,
         /*engineId*/ QnUuid(),
         nx::vms::api::StreamIndex::primary),
     m_secondaryLogger(
-        "rtp_parser_",
+        lm("rtp_parser_@%1_").arg(nx::kit::utils::toString(this)),
         m_deviceId,
         /*engineId*/ QnUuid(),
         nx::vms::api::StreamIndex::secondary)
@@ -49,7 +49,7 @@ QnNxRtpParser::QnNxRtpParser(QnUuid deviceId):
 
 void QnNxRtpParser::logMediaData(const QnAbstractMediaDataPtr& data)
 {
-    if (!nx::analytics::loggingIni().isLoggingEnabled())
+    if (!nx::analytics::loggingIni().isLoggingEnabled() || !data)
         return;
 
     const bool isSecondaryProvider = data->flags & QnAbstractMediaData::MediaFlags_LowQuality;
@@ -221,12 +221,10 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 m_nextDataPacket->compressionType = context->getCodecId();
             m_nextDataPacket->timestamp =
                 qFromBigEndian(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
-
-            logMediaData(m_nextDataPacket);
         }
 
-        NX_ASSERT(m_nextDataPacketBuffer);
-        m_nextDataPacketBuffer->write((const char*) payload, dataSize);
+        if (NX_ASSERT(m_nextDataPacketBuffer))
+            m_nextDataPacketBuffer->write((const char*) payload, dataSize);
 
         if (m_nextDataPacket->dataType == QnAbstractMediaData::VIDEO)
             m_lastFramePtsUs = m_nextDataPacket->timestamp;
@@ -245,6 +243,7 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
             else
             {
                 m_mediaData = m_nextDataPacket;
+                logMediaData(m_mediaData);
                 gotData = true;
 
                 if (m_nextDataPacket->dataType == QnAbstractMediaData::DataType::VIDEO)

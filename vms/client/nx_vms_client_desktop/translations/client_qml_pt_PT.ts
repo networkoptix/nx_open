@@ -42,11 +42,11 @@
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation>Entrar</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Senha</translation>
     </message>
     <message>
       <source>Save password</source>
@@ -99,15 +99,7 @@
     </message>
     <message>
       <source>New Server</source>
-      <translation>Novo servidor</translation>
-    </message>
-    <message>
-      <source>Edit</source>
-      <translation>Editar</translation>
-    </message>
-    <message>
-      <source>Hide</source>
-      <translation>Ocultar</translation>
+      <translation>Novo Servidor</translation>
     </message>
     <message>
       <source>Edit</source>

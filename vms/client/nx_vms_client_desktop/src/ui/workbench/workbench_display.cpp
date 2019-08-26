@@ -1197,6 +1197,9 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     // If we are opening the widget for the first time, show info button by default if needed.
     else if (qnSettings->showInfoByDefault())
     {
+        // Block item signals to avoid dataChanged propagation to layout synchronizer. Otherwise it
+        // will queue changes and post them to the snapshot manager, which will display '*'.
+        QSignalBlocker blocker(widget->item());
         widget->setCheckedButtons(Qn::InfoButton);
     }
 

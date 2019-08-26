@@ -2880,7 +2880,7 @@ void MediaServerProcess::registerRestHandlers(
         new nx::vms::server::rest::AnalyticsEngineSettingsHandler(serverModule()));
 
     /**%apidoc GET /ec2/deviceAnalyticsSettings
-     * Return settings values of the specified device-engine pair.
+     * Return settings values of the specified DeviceAgent (which is a device-engine pair).
      * %param:string analyticsEngineId Unique id of an Analytics Engine.
      * %param:string deviceId Id of a device.
      * %return:object JSON object with an error code, error string, and the reply on success.
@@ -2892,7 +2892,8 @@ void MediaServerProcess::registerRestHandlers(
      *             according to each setting type.
      *
      * %apidoc POST /ec2/deviceAnalyticsSettings
-     * Applies passed settings values to the correspondent device-engine pair.
+     * Applies passed settings values to the corresponding DeviceAgent (which is a device-engine
+     * pair).
      * %param:string engineId Unique id of an Analytics Engine.
      * %param:string deviceId Id of a device.
      * %param:object settings Name-value map with setting values, using JSON types according to
@@ -2909,8 +2910,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/deviceAnalyticsSettings",
         new nx::vms::server::rest::DeviceAnalyticsSettingsHandler(serverModule()));
 
-    reg(
-        nx::network::http::Method::options,
+    reg(nx::network::http::Method::options,
         QnRestProcessorPool::kAnyPath,
         new OptionsRequestHandler());
 }
@@ -3388,7 +3388,7 @@ nx::utils::log::Settings MediaServerProcess::makeLogSettings(
     s.loggers.front().maxBackupCount = settings.logArchiveSize();
     s.loggers.front().directory = settings.logDir();
     s.loggers.front().maxFileSize = settings.maxLogFileSize();
-    s.updateDirectoryIfEmpty(settings.dataDir());
+    s.updateDirectoryIfEmpty(settings.dataDir() + "/log");
 
     for (const auto& loggerArg: cmdLineArguments().auxLoggers)
     {
@@ -3409,24 +3409,37 @@ void MediaServerProcess::initializeLogging(MSSettings* serverSettings)
 
     const auto binaryPath = QFile::decodeName(m_argv[0]);
 
-    // TODO: Implement "--log-file" option like in client_startup_parameters.cpp.
-
-    auto logSettings = makeLogSettings(settings);
-    logSettings.loggers.front().level.parse(cmdLineArguments().logLevel,
-        settings.logLevel(), toString(nx::utils::log::kDefaultLevel));
-    logSettings.loggers.front().logBaseName = "log_file";
-    setMainLogger(
-        buildLogger(
-            logSettings,
+    const QString logConfigFile(
+        QDir(nx::kit::IniConfig::iniFilesDir()).absoluteFilePath("nx_vms_server_log.ini"));
+    if (cmdLineArguments().logLevel.isEmpty() && QFile::exists(logConfigFile))
+    {
+        initializeFromConfigFile(
+            logConfigFile,
+            settings.logDir().isEmpty() ? settings.dataDir() + "/log" : settings.logDir(),
             qApp->applicationName(),
-            binaryPath));
+            binaryPath);
+    }
+    else
+    {
+        // TODO: Implement "--log-file" option like in client_startup_parameters.cpp.
+
+        auto logSettings = makeLogSettings(settings);
+        logSettings.loggers.front().level.parse(cmdLineArguments().logLevel,
+            settings.logLevel(), toString(nx::utils::log::kDefaultLevel));
+        logSettings.loggers.front().logBaseName = "log_file";
+        setMainLogger(
+            buildLogger(
+                logSettings,
+                qApp->applicationName(),
+                binaryPath));
+    }
 
     if (auto path = mainLogger()->filePath())
         roSettings->setValue("logFile", path->replace(".log", ""));
     else
         roSettings->remove("logFile");
 
-    logSettings = makeLogSettings(settings);
+    auto logSettings = makeLogSettings(settings);
     logSettings.loggers.front().level.parse(cmdLineArguments().httpLogLevel,
         settings.httpLogLevel(), toString(Level::none));
     logSettings.loggers.front().logBaseName = "http_log";
