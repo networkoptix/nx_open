@@ -50,14 +50,14 @@ namespace nx {
 #endif
 
 #ifdef Q_OS_MAC
-#define stat64 stat
-#define statvfs64 statvfs
-#define unmount_path_syscall(path) ::unmount((path), 0)
+    #define stat64 stat
+    #define statvfs64 statvfs
+    #define unmount_path_syscall(path) ::unmount((path), 0)
 #elif defined(Q_OS_LINUX)
-#define unmount_path_syscall(path) umount(path)
-#else // defined(Q_OS_LINUX)
-#error Unsupported OS
-#endif // defined(Q_OS_LINUX)
+    #define unmount_path_syscall(path) ::umount(path)
+#else
+    #error Unsupported OS
+#endif
 
 namespace {
 
