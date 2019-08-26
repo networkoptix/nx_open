@@ -64,35 +64,6 @@ void ObjectTrackSearcher::loadCurrentRecord(
     *object = *loadTrack(query, [](auto&&...) { return true; });
 }
 
-void ObjectTrackSearcher::addTrackFilterConditions(
-    const Filter& filter,
-    const DeviceDao& deviceDao,
-    const ObjectTypeDao& objectTypeDao,
-    const ObjectFields& fieldNames,
-    nx::sql::Filter* sqlFilter)
-{
-    if (!filter.deviceIds.empty())
-        addDeviceFilterCondition(filter.deviceIds, deviceDao, sqlFilter);
-
-    if (!filter.objectTrackId.isNull())
-    {
-        sqlFilter->addCondition(std::make_unique<nx::sql::SqlFilterFieldEqual>(
-            fieldNames.trackId, ":trackId",
-            QnSql::serialized_field(filter.objectTrackId)));
-    }
-
-    if (!filter.objectTypeId.empty())
-        addObjectTypeIdToFilter(filter.objectTypeId, objectTypeDao, sqlFilter);
-
-    if (!filter.timePeriod.isNull())
-    {
-        addTimePeriodToFilter<std::chrono::milliseconds>(
-            filter.timePeriod,
-            fieldNames.timeRange,
-            sqlFilter);
-    }
-}
-
 void ObjectTrackSearcher::addDeviceFilterCondition(
     const std::vector<QnUuid>& deviceIds,
     const DeviceDao& deviceDao,
@@ -103,35 +74,6 @@ void ObjectTrackSearcher::addDeviceFilterCondition(
     for (const auto& deviceGuid: deviceIds)
         condition->addValue(deviceDao.deviceIdFromGuid(deviceGuid));
     sqlFilter->addCondition(std::move(condition));
-}
-
-void ObjectTrackSearcher::addBoundingBoxToFilter(
-    const QRect& boundingBox,
-    nx::sql::Filter* sqlFilter)
-{
-    auto topLeftXFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
-        "box_top_left_x",
-        ":boxBottomRightX",
-        QnSql::serialized_field(boundingBox.bottomRight().x()));
-    sqlFilter->addCondition(std::move(topLeftXFilter));
-
-    auto bottomRightXFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
-        "box_bottom_right_x",
-        ":boxTopLeftX",
-        QnSql::serialized_field(boundingBox.topLeft().x()));
-    sqlFilter->addCondition(std::move(bottomRightXFilter));
-
-    auto topLeftYFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
-        "box_top_left_y",
-        ":boxBottomRightY",
-        QnSql::serialized_field(boundingBox.bottomRight().y()));
-    sqlFilter->addCondition(std::move(topLeftYFilter));
-
-    auto bottomRightYFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
-        "box_bottom_right_y",
-        ":boxTopLeftY",
-        QnSql::serialized_field(boundingBox.topLeft().y()));
-    sqlFilter->addCondition(std::move(bottomRightYFilter));
 }
 
 template<typename FieldType>
@@ -431,59 +373,6 @@ void ObjectTrackSearcher::prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* quer
         limitExpr));
 
     sqlFilter.bindFields(&query->impl());
-}
-
-std::tuple<QString /*query text*/, nx::sql::Filter> ObjectTrackSearcher::prepareBoxFilterSubQuery()
-{
-    using namespace std::chrono;
-
-    NX_ASSERT(m_filter.boundingBox);
-
-    nx::sql::Filter sqlFilter;
-    addBoundingBoxToFilter(
-        translateToSearchGrid(*m_filter.boundingBox),
-        &sqlFilter);
-
-    if (!m_filter.timePeriod.isEmpty())
-    {
-        // Making time period's right boundary inclusive to take into account
-        // "to seconds" conversion error.
-        auto localTimePeriod = m_filter.timePeriod;
-        if (!localTimePeriod.isInfinite())
-        {
-            localTimePeriod.setEndTime(
-                duration_cast<seconds>(localTimePeriod.endTime()) + seconds(1));
-        }
-
-        addTimePeriodToFilter<std::chrono::seconds>(
-            localTimePeriod,
-            {"timestamp_seconds_utc", "timestamp_seconds_utc"},
-            &sqlFilter);
-    }
-
-    QString queryText = lm(R"sql(
-        SELECT DISTINCT og.object_id
-          FROM object_group og, object_search os
-          WHERE
-            %1 AND
-            og.group_id = os.object_group_id
-    )sql").args(sqlFilter.toString());
-
-    return std::make_tuple(std::move(queryText), std::move(sqlFilter));
-}
-
-nx::sql::Filter ObjectTrackSearcher::prepareTrackFilterSqlExpression()
-{
-    nx::sql::Filter sqlFilter;
-
-    addTrackFilterConditions(
-        m_filter,
-        m_deviceDao,
-        m_objectTypeDao,
-        {"guid", {"track_start_ms", "track_end_ms"}},
-        &sqlFilter);
-
-    return sqlFilter;
 }
 
 std::vector<ObjectTrack> ObjectTrackSearcher::loadTracks(
