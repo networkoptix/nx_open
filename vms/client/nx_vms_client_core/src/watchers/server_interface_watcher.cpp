@@ -8,18 +8,21 @@
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
 
-QnServerInterfaceWatcher::QnServerInterfaceWatcher(QObject *parent) :
-    QObject(parent)
+QnServerInterfaceWatcher::QnServerInterfaceWatcher(QObject* parent): QObject(parent)
 {
     commonModule()->moduleDiscoveryManager()->onSignals(this,
         &QnServerInterfaceWatcher::at_connectionChanged,
         &QnServerInterfaceWatcher::at_connectionChanged,
         &QnServerInterfaceWatcher::at_connectionChangedById);
 
-    connect(resourcePool(), &QnResourcePool::statusChanged,
-        this, &QnServerInterfaceWatcher::at_resourcePool_statusChanged);
-    connect(resourcePool(), &QnResourcePool::resourceAdded,
-        this, &QnServerInterfaceWatcher::at_resourcePool_resourceAdded);
+    connect(resourcePool(),
+        &QnResourcePool::statusChanged,
+        this,
+        &QnServerInterfaceWatcher::at_resourcePool_statusChanged);
+    connect(resourcePool(),
+        &QnResourcePool::resourceAdded,
+        this,
+        &QnServerInterfaceWatcher::at_resourcePool_resourceAdded);
 }
 
 void QnServerInterfaceWatcher::at_connectionChanged(nx::vms::discovery::ModuleEndpoint module)
@@ -33,7 +36,8 @@ void QnServerInterfaceWatcher::at_connectionChangedById(QnUuid id)
         updatePrimaryInterface(server);
 }
 
-void QnServerInterfaceWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
+void QnServerInterfaceWatcher::at_resourcePool_resourceAdded(const QnResourcePtr& resource)
+{
     if (!resource->hasFlags(Qn::server))
         return;
 
@@ -41,16 +45,17 @@ void QnServerInterfaceWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
     if (resource != currentServer)
         return;
 
-    const nx::network::SocketAddress address = 
-        nx::network::url::getEndpoint(commonModule()->currentUrl());
+    const auto address = nx::network::url::getEndpoint(commonModule()->currentUrl());
     currentServer->setPrimaryAddress(address);
-    NX_DEBUG(this, lit("QnServerInterfaceWatcher: Set primary address of %1 (%2) to default %3")
-            .arg(currentServer->getName())
-            .arg(currentServer->getId().toString())
-            .arg(address.toString()));
+    NX_DEBUG(this,
+        "Initial set primary address of %1 (%2) to default %3",
+        currentServer->getName(),
+        currentServer->getId().toString(),
+        address.toString());
 }
 
-void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr &resource) {
+void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr& resource)
+{
     if (!resource->hasFlags(Qn::server))
         return;
 
@@ -61,7 +66,7 @@ void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr
     updatePrimaryInterface(server);
 }
 
-void QnServerInterfaceWatcher::updatePrimaryInterface(const QnMediaServerResourcePtr &server)
+void QnServerInterfaceWatcher::updatePrimaryInterface(const QnMediaServerResourcePtr& server)
 {
     const auto serverId = server->getId();
     const auto module = commonModule()->moduleDiscoveryManager()->getModule(serverId);
@@ -71,10 +76,14 @@ void QnServerInterfaceWatcher::updatePrimaryInterface(const QnMediaServerResourc
     if (module->sslAllowed != server->isSslAllowed())
         server->setSslAllowed(module->sslAllowed);
 
-    if (module->endpoint != server->getPrimaryAddress())
+    const auto address = module->endpoint;
+    if (address != server->getPrimaryAddress())
     {
         server->setPrimaryAddress(module->endpoint);
-        NX_DEBUG(this, lm("QnServerInterfaceWatcher: Set primary address of %1 (%2) to %3")
-            .args(server->getName(), server->getId(), module->endpoint));
+        NX_DEBUG(this,
+            "Update primary address of %1 (%2) to default %3",
+            server->getName(),
+            server->getId().toString(),
+            address.toString());
     }
 }
