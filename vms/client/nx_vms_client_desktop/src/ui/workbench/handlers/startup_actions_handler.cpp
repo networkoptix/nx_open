@@ -4,6 +4,7 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QAction>
+#include <QJSEngine>
 
 #include <common/common_module.h>
 
@@ -23,6 +24,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/director/director.h>
 
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/widgets/main_window.h>
@@ -288,6 +290,11 @@ void StartupActionsHandler::handleStartupParameters()
 
     if (ini().developerMode || ini().profilerMode)
         menu()->trigger(ShowFpsAction);
+
+    if (!startupParameters.scriptFile.isEmpty())
+    {
+        handleScriptFile(startupParameters.scriptFile);
+    }
 }
 
 void StartupActionsHandler::handleInstantDrops(const QnResourceList& resources)
@@ -336,6 +343,34 @@ void StartupActionsHandler::handleAcsModeResources(
     timeSlider->setWindow(windowStart, windowStart + kAcsModeTimelineWindowSize, false);
 
     navigator()->setPosition(timeStampMs * 1000);
+}
+
+void StartupActionsHandler::handleScriptFile(const QString& path)
+{
+    QFile scriptFile(path);
+    if (!scriptFile.open(QIODevice::ReadOnly))
+    {
+        NX_ERROR(this, "Script file not found : %1", path);
+        return;
+    }
+
+    auto engine = new QJSEngine(this);
+    nx::vmx::client::desktop::Director::instance()->setupJSEngine(engine);
+
+    QTextStream stream(&scriptFile);
+    QString contents = stream.readAll();
+    scriptFile.close();
+
+    // TODO: Introduce modules support after switching to Qt 5.12+
+    QJSValue result = engine->evaluate(contents, path);
+    if (result.isError())
+    {
+        NX_ERROR(this, "Uncaught exception at %1:%2 : %3",
+            result.property("fileName").toString(),
+            result.property("lineNumber").toInt(),
+            result.toString());
+        return;
+    }
 }
 
 bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUri& uri)
