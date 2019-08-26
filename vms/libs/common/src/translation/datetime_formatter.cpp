@@ -108,7 +108,7 @@ bool is24HoursTimeFormat()
         const auto format = QLocale::system().timeFormat();
         is24HoursTimeFormatValue = !format.contains(lit("AP"), Qt::CaseInsensitive);
     };
-    return is24HoursTimeFormatValue.value();
+    return *is24HoursTimeFormatValue;
 }
 
 void set24HoursTimeFormat(bool value)

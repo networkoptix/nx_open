@@ -73,7 +73,7 @@ QWindow *getMainWindow()
     bool is24HoursTimeFormat()
     {
         const auto format = QLocale::system().timeFormat();
-        return !format.contains(lit("AP"), Qt::CaseInsensitive);
+        return !format.contains("AP", Qt::CaseInsensitive);
     }
 #endif // !defined(Q_OS_ANDROID)
 
