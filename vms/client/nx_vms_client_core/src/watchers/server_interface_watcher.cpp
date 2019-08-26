@@ -52,6 +52,7 @@ void QnServerInterfaceWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
         currentServer->getName(),
         currentServer->getId().toString(),
         address.toString());
+    updatePrimaryInterface(currentServer);
 }
 
 void QnServerInterfaceWatcher::at_resourcePool_statusChanged(const QnResourcePtr& resource)
