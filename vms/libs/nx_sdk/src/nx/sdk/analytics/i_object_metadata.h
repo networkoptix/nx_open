@@ -14,7 +14,7 @@ namespace sdk {
 namespace analytics {
 
 /**
- * A single object detected on the scene.
+ * A single object detected on the scene on a particular video frame, defined as a bounding box.
  */
 class IObjectMetadata: public Interface<IObjectMetadata, IMetadata>
 {
@@ -22,10 +22,11 @@ public:
     static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IObjectMetadata"); }
 
     /**
-     * Id of the object. If the object (e.g. a particular person) is detected on multiple frames,
-     * this parameter should be the same each time.
+     * @return Id of the object track. Object track is a sequence of object detections from its
+     *     first appearance on the scene till its disappearing. The same object can have multiple
+     *     tracks (e.g. the same person entered and exited a room several times).
      */
-    virtual Uuid id() const = 0;
+    virtual Uuid trackId() const = 0;
 
     /**
      * @return Subclass of the object (e.g. vehicle type: truck, car, etc.).

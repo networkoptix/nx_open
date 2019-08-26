@@ -28,7 +28,7 @@ public:
     virtual Qn::ThumbnailStatus status() const override;
 
     nx::api::CameraImageRequest requestData() const;
-    void setRequestData(const nx::api::CameraImageRequest& data);
+    void setRequestData(const nx::api::CameraImageRequest& data, bool resetStatus = false);
 
     qint64 timestampUs() const;
 

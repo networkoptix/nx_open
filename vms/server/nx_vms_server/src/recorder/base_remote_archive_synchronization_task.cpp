@@ -367,6 +367,9 @@ bool BaseRemoteArchiveSynchronizationTask::writeTimePeriodToArchive(
 
     {
         QnMutexLocker lock(&m_mutex);
+        if (m_recorder && m_archiveReader)
+            m_archiveReader->removeDataProcessor(m_recorder.get());
+
         createArchiveReaderThreadUnsafe(timePeriod, chunk);
         createStreamRecorderThreadUnsafe(timePeriod);
     }

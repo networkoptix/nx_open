@@ -233,7 +233,7 @@ public:
      * We connect it to ClientUpdateTool::updateStateChanged and turn it to a proper
      * peer state inside our task sets.
      */
-    void atClientupdateStateChanged(int state, int percentComplete);
+    void atClientUpdateStateChanged(int state, int percentComplete, const QString& message);
 
 signals:
     /**

@@ -1,5 +1,5 @@
 <div class="container">
-    <h1><a href="#/metrics/">New: System health report</a></h1>
+    <h1><a href="#/metrics/">Nytt: Systemhälsorapport</a></h1>
 </div>
 <div class="container">
     <h1>Avancerade serverinställningar</h1>
@@ -120,7 +120,7 @@
     <h2>Logginställningar</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} log level</label>
+            <label class="col-sm-4">{{name}} lognivå</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
                     <option value="none">Ingen: Logg inaktiverad.</option>
@@ -128,7 +128,7 @@
                     <option value="error">Fel: Endast fel.</option>
                     <option value="warning">Varning: Logga varningar och fel.</option>
                     <option value="info">Info: Logga fel, varningar och alla meddelanden.</option>
-                    <option value="debug">Debug: Log every System message and debug information.</option>
+                    <option value="debug">Felsökning: Logga in varje systemmeddelande och felsökningsinformation.</option>
                     <option value="verbose">Verbose: Logga all tillgänglig information.</option>
                 </select>
             </div>
@@ -138,7 +138,7 @@
         </div>
     </form>
 
-    <h1>Advanced System settings</h1>
+    <h1>Avancerade systeminställningar</h1>
     <div class="alert alert-danger" role="alert">
         <b>Varning!</b> Ändringar på denna sida kan orsaka servern att fungera felaktigt.
     </div>

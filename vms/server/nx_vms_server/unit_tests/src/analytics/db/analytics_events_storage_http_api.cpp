@@ -43,7 +43,7 @@ public:
         return true;
     }
 
-    virtual void save(nx::common::metadata::ConstDetectionMetadataPacketPtr /*packet*/) override
+    virtual void save(nx::common::metadata::ConstObjectMetadataPacketPtr /*packet*/) override
     {
     }
 
@@ -139,7 +139,7 @@ protected:
 
         m_filter = nx::analytics::db::test::generateRandomFilter();
 
-        m_mediaserverClient->ec2AnalyticsLookupDetectedObjects(
+        m_mediaserverClient->ec2AnalyticsLookupObjectTracks(
             m_filter,
             std::bind(&AnalyticsDbHttpApi::saveLookupResult, this, _1, _2));
     }
@@ -214,7 +214,7 @@ private:
     }
 };
 
-TEST_F(AnalyticsDbHttpApi, analyticsLookupDetectedObjects_correctly_returns_data)
+TEST_F(AnalyticsDbHttpApi, analyticsLookupObjectTracks_correctly_returns_data)
 {
     whenIssueLookup();
 

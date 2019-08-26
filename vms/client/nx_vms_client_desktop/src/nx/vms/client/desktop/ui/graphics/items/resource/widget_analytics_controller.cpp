@@ -75,7 +75,7 @@ QRectF interpolatedRectangle(
 }
 
 microseconds calculateAverageMetadataPeriod(
-    const QList<DetectionMetadataPacketPtr>& metadataList)
+    const QList<ObjectMetadataPacketPtr>& metadataList)
 {
     if (metadataList.size() <= 1)
         return 0us;
@@ -83,7 +83,7 @@ microseconds calculateAverageMetadataPeriod(
     microseconds result = 0us;
 
     for (auto it = metadataList.begin() + 1; it != metadataList.end(); ++it)
-        result += microseconds((*it)->timestampUsec - (*(it - 1))->timestampUsec);
+        result += microseconds((*it)->timestampUs - (*(it - 1))->timestampUs);
 
     result /= metadataList.size() - 1;
 
@@ -116,7 +116,7 @@ public:
 
     QnLayoutResourcePtr layoutResource() const;
 
-    ObjectInfo& addOrUpdateObject(const DetectedObject& object);
+    ObjectInfo& addOrUpdateObject(const ObjectMetadata& object);
     void removeArea(ObjectInfo& object);
 
     void updateObjectAreas(microseconds timestamp);
@@ -157,24 +157,24 @@ QnLayoutResourcePtr WidgetAnalyticsController::Private::layoutResource() const
 
 WidgetAnalyticsController::Private::ObjectInfo&
     WidgetAnalyticsController::Private::addOrUpdateObject(
-        const DetectedObject& object)
+        const ObjectMetadata& objectMetadata)
 {
     const auto settings = commonModule()->findInstance<ObjectDisplaySettings>();
 
-    auto& objectInfo = objectInfoById[object.objectId];
-    objectInfo.id = object.objectId;
-    objectInfo.color = settings->objectColor(object);
+    auto& objectInfo = objectInfoById[objectMetadata.trackId];
+    objectInfo.id = objectMetadata.trackId;
+    objectInfo.color = settings->objectColor(objectMetadata);
 
-    objectInfo.rectangle = object.boundingBox;
-    objectInfo.basicDescription = objectDescription(settings->briefAttributes(object));
-    objectInfo.description = objectDescription(settings->visibleAttributes(object));
+    objectInfo.rectangle = objectMetadata.boundingBox;
+    objectInfo.basicDescription = objectDescription(settings->briefAttributes(objectMetadata));
+    objectInfo.description = objectDescription(settings->visibleAttributes(objectMetadata));
 
     return objectInfo;
 }
 
-void WidgetAnalyticsController::Private::removeArea(ObjectInfo& object)
+void WidgetAnalyticsController::Private::removeArea(ObjectInfo& objectInfo)
 {
-    areaHighlightWidget->removeArea(object.id);
+    areaHighlightWidget->removeArea(objectInfo.id);
 }
 
 void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestamp)
@@ -183,7 +183,7 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
     {
         auto areaInfo = areaInfoFromObject(objectInfo);
 
-        if (ini().enableDetectedObjectsInterpolation)
+        if (ini().enableObjectMetadataInterpolation)
         {
             areaInfo.rectangle = interpolatedRectangle(
                 objectInfo.rectangle,
@@ -216,7 +216,7 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
             addInfoRow("id", "ID", objectInfo.id);
             addInfoRow("delay", "Delay", (timestamp - objectInfo.startTimestamp).count() / 1000);
             addInfoRow("actual_ts", "Timestamp", timestamp.count());
-            if (ini().enableDetectedObjectsInterpolation)
+            if (ini().enableObjectMetadataInterpolation)
                 addInfoRow("actual_rect", "Interpolated", areaInfo.rectangle);
             addInfoRow("object_ts", "Original TS", objectInfo.startTimestamp.count());
             addInfoRow("object_rect", "Original Rect", objectInfo.rectangle);
@@ -278,43 +278,43 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         return;
 
     if (d->logger)
-        d->logger->pushFrameInfo(std::make_unique<nx::analytics::FrameInfo>(timestamp));
+        d->logger->pushFrameInfo({timestamp});
 
-    auto metadataList = d->metadataProvider->metadataRange(
+    auto objectMetadataPackets = d->metadataProvider->metadataRange(
         timestamp,
         timestamp + kFutureMetadataLength,
         channel,
         kMaxFutureMetadataPackets);
 
-    if (microseconds period = calculateAverageMetadataPeriod(metadataList); period > 0us)
+    if (microseconds period = calculateAverageMetadataPeriod(objectMetadataPackets); period > 0us)
         d->averageMetadataPeriod = period;
 
     NX_VERBOSE(this, "Size of metadata list for resource %1: %2",
         d->mediaResourceWidget->resource()->toResourcePtr()->getId(),
-        metadataList.size());
+        objectMetadataPackets.size());
 
-    if (!metadataList.isEmpty())
+    if (!objectMetadataPackets.isEmpty())
     {
-        if (const auto& metadata = metadataList.first();
-            metadata->timestampUsec <= timestamp.count())
+        if (const auto& metadata = objectMetadataPackets.first();
+            metadata->timestampUs <= timestamp.count())
         {
             if (d->logger)
                 d->logger->pushObjectMetadata(*metadata);
 
-            for (const auto& object: metadata->objects)
+            for (const auto& objectMetadata: metadata->objectMetadataList)
             {
-                if (object.bestShot)
+                if (objectMetadata.bestShot)
                     continue; //< Skip specialized best shot records.
 
-                auto& objectInfo = d->addOrUpdateObject(object);
-                objectInfo.startTimestamp = microseconds(metadata->timestampUsec);
-                objectInfo.endTimestamp = metadata->durationUsec > 0
-                    ? objectInfo.startTimestamp + microseconds(metadata->durationUsec)
+                auto& objectInfo = d->addOrUpdateObject(objectMetadata);
+                objectInfo.startTimestamp = microseconds(metadata->timestampUs);
+                objectInfo.endTimestamp = metadata->durationUs > 0
+                    ? objectInfo.startTimestamp + microseconds(metadata->durationUs)
                     : objectInfo.startTimestamp + d->averageMetadataPeriod + kAdditionalTimeToLive;
                 objectInfo.futureRectangleTimestamp = objectInfo.startTimestamp;
             }
 
-            metadataList.removeFirst();
+            objectMetadataPackets.removeFirst();
         }
     }
 
@@ -329,14 +329,14 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
 
         [&]() // Find and update future rectangle for the object.
         {
-            for (const auto& metadata: metadataList)
+            for (const auto& packet: objectMetadataPackets)
             {
-                for (const auto& object: metadata->objects)
+                for (const auto& objectMetadata: packet->objectMetadataList)
                 {
-                    if (object.objectId == it.key())
+                    if (objectMetadata.trackId == it.key())
                     {
-                        it->futureRectangle = object.boundingBox;
-                        it->futureRectangleTimestamp = microseconds(metadata->timestampUsec);
+                        it->futureRectangle = objectMetadata.boundingBox;
+                        it->futureRectangleTimestamp = microseconds(packet->timestampUs);
                         return;
                     }
                 }

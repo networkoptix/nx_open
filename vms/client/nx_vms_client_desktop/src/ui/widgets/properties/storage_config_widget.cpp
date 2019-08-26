@@ -51,7 +51,6 @@
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/analytics/utils.h>
-#include <nx/utils/unused.h>
 
 using namespace nx;
 using namespace nx::vms::client::desktop;
@@ -501,8 +500,9 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain)
     if (!m_server || isReadOnly())
         return;
 
-    QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, this));
-    dialog->setProtocols(qnServerStorageManager->protocols(m_server));
+    auto storageManager = commonModule()->instance<QnServerStorageManager>();
+    QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, storageManager, this));
+    dialog->setProtocols(storageManager->protocols(m_server));
     dialog->setCurrentServerStorages(m_model->storages());
     if (!dialog->exec())
         return;

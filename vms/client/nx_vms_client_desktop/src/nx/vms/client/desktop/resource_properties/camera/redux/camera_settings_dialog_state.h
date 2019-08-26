@@ -99,7 +99,6 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
 
     struct SingleCameraSettings
     {
-        UserEditable<bool> enableMotionDetection;
         UserEditable<QList<QnMotionRegion>> motionRegionList;
 
         UserEditable<QnMediaDewarpingParams> fisheyeDewarping;
@@ -111,6 +110,8 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         QStringList sameLogicalIdCameraNames; //< Read-only informational value.
     };
     SingleCameraSettings singleCameraSettings;
+
+    UserEditableMultiple<bool> enableMotionDetection;
 
     struct IoModuleSettings
     {
@@ -282,7 +283,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
 
     int maxRecordingBrushFps() const
     {
-        if (isSingleCamera() && !singleCameraSettings.enableMotionDetection())
+        if (isSingleCamera() && !isMotionDetectionEnabled())
             return singleCameraProperties.maxFpsWithoutMotion;
 
         return recording.brush.recordingType == Qn::RecordingType::motionAndLow
@@ -290,31 +291,26 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
             : devicesDescription.maxFps;
     }
 
-    bool hasMotion() const
+    bool isMotionDetectionStreamEnabled() const
     {
-        bool result = devicesDescription.hasMotion == CombinedValue::All;
-
-        if (isSingleCamera())
-            result &= singleCameraSettings.enableMotionDetection();
-
-        if (settingsOptimizationEnabled)
-        {
-            if (expert.forcedMotionStreamType() != nx::vms::api::StreamIndex::primary)
-                result &= !expert.dualStreamingDisabled();
-        }
-
-        return result;
+        return !settingsOptimizationEnabled || expert.dualStreamingDisabled.equals(false)
+            || expert.forcedMotionStreamType.equals(nx::vms::api::StreamIndex::primary);
     }
 
-    bool hasDualStreaming() const
+    bool isMotionDetectionEnabled() const
+    {
+        return enableMotionDetection.equals(true) && isMotionDetectionStreamEnabled();
+    }
+
+    bool isDualStreamingEnabled() const
     {
         return devicesDescription.hasDualStreamingCapability == CombinedValue::All
-            && !(settingsOptimizationEnabled && expert.dualStreamingDisabled());
+            && (!settingsOptimizationEnabled || expert.dualStreamingDisabled.equals(false));
     }
 
     bool supportsMotionPlusLQ() const
     {
-        return hasMotion() && hasDualStreaming();
+        return isMotionDetectionEnabled() && isDualStreamingEnabled();
     }
 
     bool supportsSchedule() const

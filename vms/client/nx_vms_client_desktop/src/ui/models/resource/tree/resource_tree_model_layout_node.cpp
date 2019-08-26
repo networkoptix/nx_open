@@ -68,7 +68,7 @@ void QnResourceTreeModelLayoutNode::deinitialize()
 QnResourceAccessSubject QnResourceTreeModelLayoutNode::getOwner() const
 {
     if (type() == NodeType::resource)
-        return context()->user();
+        return model()->user();
 
     auto owner = parent();
     if (owner && owner->type() == NodeType::sharedLayouts)

@@ -21,9 +21,9 @@ float TimestampedObjectMetadata::confidence() const
     return m_objectMetadata->confidence();
 }
 
-Uuid TimestampedObjectMetadata::id() const
+Uuid TimestampedObjectMetadata::trackId() const
 {
-    return m_objectMetadata->id();
+    return m_objectMetadata->trackId();
 }
 
 const char* TimestampedObjectMetadata::subtype() const
@@ -61,9 +61,9 @@ void TimestampedObjectMetadata::setConfidence(float confidence)
     m_objectMetadata->setConfidence(confidence);
 }
 
-void TimestampedObjectMetadata::setId(const Uuid& value)
+void TimestampedObjectMetadata::setTrackId(const Uuid& value)
 {
-    m_objectMetadata->setId(std::move(value));
+    m_objectMetadata->setTrackId(std::move(value));
 }
 
 void TimestampedObjectMetadata::setSubtype(const std::string& value)

@@ -805,7 +805,7 @@
     <message numerus="yes">
       <source>%n Cameras</source>
       <translation>
-        <numerusform>%n camera</numerusform>
+        <numerusform>%n Camera</numerusform>
       </translation>
     </message>
     <message numerus="yes">

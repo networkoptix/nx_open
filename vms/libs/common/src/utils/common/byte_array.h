@@ -4,7 +4,7 @@
 #include <QtCore/QByteArray>
 #include <QtCore/qglobal.h>
 
-#include <utils/memory/abstract_allocator.h>
+#include <nx/utils/memory/abstract_allocator.h>
 
 class QByteArray;
 

@@ -3,23 +3,23 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
 
-#include <nx/vms/client/desktop/ini.h>
-
-#include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
 
 #include <client/client_settings.h>
 #include <client/client_module.h>
 
-#include <nx/vms/client/desktop/radass/radass_controller.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/client_camera.h>
 
-#include "core/resource/camera_resource.h"
-#include "nx/streaming/media_data_packet.h"
+#include <nx/fusion/model_functions.h>
+#include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/config.h>
-#include <nx/fusion//model_functions.h>
+#include <nx/streaming/media_data_packet.h>
+#include <nx/utils/log/log.h>
 
-#include "nx/streaming/archive_stream_reader.h"
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/radass/radass_controller.h>
 
 #include "video_stream_display.h"
 #include "audio_stream_display.h"
@@ -30,6 +30,8 @@
 #include <qt_windows.h>
 #include <plugins/resource/desktop_win/desktop_resource.h>
 #endif
+
+using nx::vms::client::desktop::AbstractVideoDisplay;
 
 Q_GLOBAL_STATIC(QnMutex, activityMutex)
 static qint64 activityTime = 0;
@@ -160,6 +162,12 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     int expectedPrebuferSize = m_isRealTimeSource ? REALTIME_AUDIO_PREBUFFER : DEFAULT_AUDIO_BUFF_SIZE/2;
     setAudioBufferSize(expectedBufferSize, expectedPrebuferSize);
 
+    if (auto clientCam = resource.dynamicCast<QnClientCameraResource>())
+    {
+        connect(clientCam.data(), &QnClientCameraResource::dataDropped, this,
+            [this] { qnClientModule->radassController()->onSlowStream(this); });
+    }
+
 #ifdef Q_OS_WIN
     QnDesktopResourcePtr desktopResource = resource.dynamicCast<QnDesktopResource>();
     if (desktopResource && desktopResource->isRendererSlow())
@@ -174,10 +182,33 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
         auto handler = [this] { playAudio(m_shouldPlayAudio); };
         connect(camera.data(), &QnSecurityCamResource::audioEnabledChanged, this, handler);
     }
+
+    if (camera)
+    {
+        connect(camera.get(), &QnResource::propertyChanged, this,
+            [this] (const QnResourcePtr& , const QString& propertyName)
+            {
+                if (m_streamsChangedCallback)
+                {
+                    if (propertyName == ResourcePropertyKey::kMediaCapabilities
+                        || propertyName == ResourcePropertyKey::kHasDualStreaming)
+                    {
+                        m_streamsChangedCallback();
+                    }
+                }
+            });
+
+        connect(camera.get(), &QnSecurityCamResource::disableDualStreamingChanged, this,
+            [this] { if (m_streamsChangedCallback) m_streamsChangedCallback(); });
+
+    }
 }
 
 QnCamDisplay::~QnCamDisplay()
 {
+    if (auto clientCam = m_resource.dynamicCast<QnClientCameraResource>())
+        clientCam->disconnect(this); // disconnecting radassController()->onSlowStream.
+
     qnClientModule->radassController()->unregisterConsumer(this);
 
     NX_ASSERT(!isRunning());
@@ -339,10 +370,7 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
         if (m_afterJumpTimer.elapsed()*1000 > REDASS_DELAY_INTERVAL)
         {
             if (m_receivedInterval/1000 < m_afterJumpTimer.elapsed()/2)
-            {
-                QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (media->dataProvider);
-                qnClientModule->radassController()->onSlowStream(reader);
-            }
+                qnClientModule->radassController()->onSlowStream(this);
         }
     }
 }
@@ -368,9 +396,7 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
             m_delayedFrameCount = qMax(0, m_delayedFrameCount);
             m_delayedFrameCount++;
             if (m_delayedFrameCount > 10 && m_archiveReader->getQuality() != MEDIA_Quality_Low /*&& canSwitchQuality()*/)
-            {
-                qnClientModule->radassController()->onSlowStream(m_archiveReader);
-            }
+                qnClientModule->radassController()->onSlowStream(this);
         }
         else if (realSleepTime >= 0)
         {
@@ -378,7 +404,7 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
             m_delayedFrameCount--;
             if (m_delayedFrameCount < -10 && m_dataQueue.size() >= m_dataQueue.size()*0.75)
             {
-                qnClientModule->radassController()->streamBackToNormal(m_archiveReader);
+                qnClientModule->radassController()->streamBackToNormal(this);
             }
         }
     }
@@ -443,8 +469,11 @@ qint64 QnCamDisplay::doSmartSleep(const qint64 needToSleep, float speed)
 
 bool QnCamDisplay::isDataQueueFull() const
 {
-    return std::chrono::microseconds(m_lastQueuedVideoTime - m_lastVideoPacketTime)
-        >= m_forcedVideoBufferLength;
+    const auto diff = std::chrono::microseconds(m_lastQueuedVideoTime - m_lastVideoPacketTime);
+    if (diff < std::chrono::seconds::zero())
+        return true;
+
+    return diff >= m_forcedVideoBufferLength;
 }
 
 int QnCamDisplay::maxDataQueueSize(QueueSizeType type) const
@@ -1281,7 +1310,7 @@ void QnCamDisplay::processMetadata(const QnAbstractCompressedMetadataPtr& metada
 {
     if (metadata->metadataType == MetadataType::MediaStreamEvent)
     {
-        QByteArray data = QByteArray::fromRawData(metadata->data(), metadata->dataSize());
+        QByteArray data = QByteArray::fromRawData(metadata->data(), (int) metadata->dataSize());
         auto mediaEvent = QnLexical::deserialized<Qn::MediaStreamEvent>(
             QString::fromLatin1(data));
 
@@ -2071,7 +2100,7 @@ void QnCamDisplay::setFisheyeEnabled(bool fisheyeEnabled)
     m_fisheyeEnabled = fisheyeEnabled;
 }
 
-int QnCamDisplay::getAvarageFps() const
+int QnCamDisplay::getAverageFps() const
 {
     return m_fpsStat.getFps();
 }
@@ -2133,6 +2162,66 @@ void QnCamDisplay::setForcedVideoBufferLength(std::chrono::milliseconds length)
 bool QnCamDisplay::isForcedBufferingEnabled() const
 {
     return m_forcedVideoBufferLength != std::chrono::microseconds::zero();
+}
+
+QString QnCamDisplay::getName() const
+{
+    return resource()->toResourcePtr()->getName();
+}
+
+bool QnCamDisplay::isRadassSupported() const
+{
+    const auto camera = m_resource.dynamicCast<QnVirtualCameraResource>();
+    return camera && camera->hasDualStreaming();
+}
+
+AbstractVideoDisplay::CameraID QnCamDisplay::getCameraID() const
+{
+    const auto reader = getArchiveReader();
+    NX_ASSERT(reader);
+    if (!reader)
+        return CameraID();
+
+    const auto& camera = reader->getResource().dynamicCast<QnVirtualCameraResource>();
+    return camera ? camera->getId() : CameraID();
+}
+
+MediaQuality QnCamDisplay::getQuality() const
+{
+    return getArchiveReader()->getQuality();
+}
+
+void QnCamDisplay::setQuality(MediaQuality quality, bool fastSwitch)
+{
+    NX_ASSERT(m_archiveReader);
+    getArchiveReader()->setQuality(quality, fastSwitch);
+}
+
+bool QnCamDisplay::isPaused() const
+{
+    NX_ASSERT(m_archiveReader);
+    return getArchiveReader()->isPaused();
+}
+
+bool QnCamDisplay::isMediaPaused() const
+{
+    NX_ASSERT(m_archiveReader);
+    return getArchiveReader()->isMediaPaused();
+}
+
+int QnCamDisplay::dataQueueSize() const
+{
+    return QnAbstractDataConsumer::queueSize();
+}
+
+int QnCamDisplay::maxDataQueueSize() const
+{
+    return QnAbstractDataConsumer::maxQueueSize();
+}
+
+void QnCamDisplay::setCallbackForStreamChanges(std::function<void()> callback)
+{
+    m_streamsChangedCallback = callback;
 }
 
 // -------------------------------- QnFpsStatistics -----------------------

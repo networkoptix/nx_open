@@ -80,8 +80,8 @@ struct Parameters
     std::optional<std::chrono::milliseconds> timeline;
 
     Parameters(const rest::Request& request):
-        flags(request.param("noRules") 
-            ? Controller::RequestFlag::none 
+        flags(request.param("noRules")
+            ? Controller::RequestFlag::none
             : Controller::RequestFlag::applyRules)
     {
         if (const auto value = request.param("timeline"))
@@ -105,7 +105,7 @@ rest::Response LocalRestHandler::executeGet(const rest::Request& request)
 
     if (request.path().endsWith("/values"))
         return rest::Response::reply(cleanJson(m_controller->values(params.flags, params.timeline)));
-     
+
     return rest::Response::error(http::StatusCode::notFound, rest::Result::BadRequest);
 }
 
@@ -125,7 +125,7 @@ rest::Response SystemRestHandler::executeGet(const rest::Request& request)
     Parameters params(request);
     auto systemValues = m_controller->values(
         params.flags | Controller::includeRemote, params.timeline);
-        
+
     for (const auto& server: serverModule()->commonModule()
         ->resourcePool()->getResources<QnMediaServerResource>())
     {
@@ -145,14 +145,11 @@ rest::Response SystemRestHandler::executeGet(const rest::Request& request)
             continue;
         }
 
-        http::BufferType msgBody;
-        while (!client.eof())
-            msgBody.append(client.fetchMessageBodyBuffer());
-
+        const auto message = client.fetchMessageBodyBuffer();
         const auto httpCode = client.response()->statusLine.statusCode;
-        const auto result = QJson::deserialized<rest::JsonResult>(msgBody);
-        if (!http::StatusCode::isSuccessCode(httpCode)
-            || result.error != rest::Result::Error::NoError)
+        const auto result = QJson::deserialized<rest::JsonResult>(message);
+        if (!nx::network::http::StatusCode::isSuccessCode(httpCode)
+            || result.error != rest::Result::NoError)
         {
             NX_DEBUG(this, "Query [ %1 ] has failed %1 (%2)", url, httpCode, result.errorString);
             continue;

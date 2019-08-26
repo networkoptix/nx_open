@@ -2,22 +2,23 @@
 
 #include "device_agent.h"
 
-#include <iostream>
+#include <vector>
+#include <string>
+#include <mutex>
 #include <chrono>
 #include <ctime>
-#include <cmath>
 
-#include <nx/sdk/helpers/uuid_helper.h>
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#include <nx/kit/debug.h>
+#include <nx/kit/utils.h>
+
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
 #include <nx/sdk/helpers/string_map.h>
-
-#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
-#include <nx/kit/debug.h>
-#include <nx/kit/utils.h>
+#include <nx/sdk/helpers/settings_response.h>
 
 #include "utils.h"
 #include "stub_analytics_plugin_ini.h"
@@ -98,21 +99,23 @@ static const std::vector<EventDescriptor> kEventsToFire = {
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
     VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
 {
-    m_pluginEventThread = std::make_unique<std::thread>([this]() { processPluginEvents(); });
+    m_pluginDiagnosticEventThread =
+        std::make_unique<std::thread>([this]() { processPluginDiagnosticEvents(); });
+
     m_eventThread = std::make_unique<std::thread>([this]() { processEvents(); });
 }
 
 DeviceAgent::~DeviceAgent()
 {
     {
-        std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+        std::unique_lock<std::mutex> lock(m_pluginDiagnosticEventGenerationLoopMutex);
         m_terminated = true;
-        m_pluginEventGenerationLoopCondition.notify_all();
+        m_pluginDiagnosticEventGenerationLoopCondition.notify_all();
         m_eventGenerationLoopCondition.notify_all();
     }
 
-    if (m_pluginEventThread)
-        m_pluginEventThread->join();
+    if (m_pluginDiagnosticEventThread)
+        m_pluginDiagnosticEventThread->join();
 
     if (m_eventThread)
         m_eventThread->join();
@@ -125,7 +128,7 @@ DeviceAgent::~DeviceAgent()
  * lists which are treated as white-list filters for the respective set (absent lists are treated
  * as empty lists, thus, disabling all types from the Engine).
  */
-std::string DeviceAgent::manifest() const
+std::string DeviceAgent::manifestString() const
 {
     return /*suppress newline*/1 + R"json(
 {
@@ -171,11 +174,13 @@ std::string DeviceAgent::manifest() const
 )json";
 }
 
-void DeviceAgent::settingsReceived()
+StringMapResult DeviceAgent::settingsReceived()
 {
     parseSettings();
     updateObjectGenerationParameters();
     updateEventGenerationParameters();
+
+    return nullptr;
 }
 
 /** @param func Name of the caller for logging; supply __func__. */
@@ -184,6 +189,12 @@ void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* f
     NX_OUTPUT << func << "(): timestamp " << videoFrame->timestampUs() << " us;"
         << " frame #" << m_frameCounter;
 
+    if (m_deviceAgentSettings.leakFrames)
+    {
+        NX_PRINT << "Intentionally creating a memomry leak with IDataPacket @"
+            << nx::kit::utils::toString(videoFrame);
+        videoFrame->addRef();
+    }
     if (m_frameCounter == ini().crashDeviceAgentOnFrameN)
     {
         const std::string message = nx::kit::utils::format(
@@ -246,25 +257,22 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
     return true;
 }
 
-Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
 {
     if (metadataTypes->isEmpty())
-    {
         stopFetchingMetadata();
-        return Error::noError;
-    }
 
-    return startFetchingMetadata(metadataTypes);
+    startFetchingMetadata(metadataTypes);
+    return {};
 }
 
-Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
+void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
 {
     NX_OUTPUT << __func__ << "() BEGIN";
     m_eventsNeeded = true;
     m_eventGenerationLoopCondition.notify_all();
     m_eventTypeId = kLineCrossingEventType; //< First event to produce.
     NX_OUTPUT << __func__ << "() END -> noError";
-    return Error::noError;
 }
 
 void DeviceAgent::stopFetchingMetadata()
@@ -292,48 +300,49 @@ void DeviceAgent::processEvents()
     }
 }
 
-void DeviceAgent::processPluginEvents()
+void DeviceAgent::processPluginDiagnosticEvents()
 {
     while (!m_terminated)
     {
-        if (m_needToThrowPluginEvents)
+        if (m_needToThrowPluginDiagnosticEvents)
         {
-            pushPluginEvent(
-                IPluginEvent::Level::info,
+            pushPluginDiagnosticEvent(
+                IPluginDiagnosticEvent::Level::info,
                 "Info message from DeviceAgent",
                 "Info message description");
 
-            pushPluginEvent(
-                IPluginEvent::Level::warning,
+            pushPluginDiagnosticEvent(
+                IPluginDiagnosticEvent::Level::warning,
                 "Warning message from DeviceAgent",
                 "Warning message description");
 
-            pushPluginEvent(
-                IPluginEvent::Level::error,
+            pushPluginDiagnosticEvent(
+                IPluginDiagnosticEvent::Level::error,
                 "Error message from DeviceAgent",
                 "Error message description");
         }
 
         {
-            std::unique_lock<std::mutex> lock(m_pluginEventGenerationLoopMutex);
+            std::unique_lock<std::mutex> lock(m_pluginDiagnosticEventGenerationLoopMutex);
             if (m_terminated)
                 break;
 
             // Sleep until the next event needs to be generated, or the thread is ordered to
             // terminate (hence condition variable instead of sleep()). Return value (whether
             // the timeout has occurred) and spurious wake-ups are ignored.
-            static const seconds kPluginEventGenerationPeriod{5};
-            m_pluginEventGenerationLoopCondition.wait_for(lock, kPluginEventGenerationPeriod);
+            static const seconds kPluginDiagnosticEventGenerationPeriod{5};
+            m_pluginDiagnosticEventGenerationLoopCondition.wait_for(
+                lock, kPluginDiagnosticEventGenerationPeriod);
         }
     }
 }
 
-IStringMap* DeviceAgent::pluginSideSettings() const
+SettingsResponseResult DeviceAgent::pluginSideSettings() const
 {
-    auto settings = new StringMap();
-    settings->addItem("plugin_side_number", "100");
+    auto response = new SettingsResponse();
+    response->setValue("pluginSideTestSpinBox", "100");
 
-    return settings;
+    return response;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -343,7 +352,7 @@ static IObjectMetadata* makeObjectMetadata(const AbstractObject* object)
 {
     auto objectMetadata = new ObjectMetadata();
     objectMetadata->setTypeId(object->typeId());
-    objectMetadata->setId(object->id());
+    objectMetadata->setTrackId(object->id());
     const auto position = object->position();
     const auto size = object->size();
     objectMetadata->setBoundingBox(Rect(position.x, position.y, size.width, size.height));
@@ -387,7 +396,7 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
     auto nextEventTypeIndex =
         [this]()
         {
-            return (m_eventContext.currentEventTypeIndex == kEventsToFire.size() - 1)
+            return (m_eventContext.currentEventTypeIndex == (int) kEventsToFire.size() - 1)
                 ? 0
                 : (m_eventContext.currentEventTypeIndex + 1);
         };
@@ -622,7 +631,7 @@ void DeviceAgent::parseSettings()
         {
             using namespace nx::kit::utils;
             int result = 0;
-            const auto parameterValueString = getParamValue(parameterName);
+            const auto parameterValueString = settingValue(parameterName);
             if (fromString(parameterValueString, &result))
             {
                 *target = result;
@@ -636,15 +645,16 @@ void DeviceAgent::parseSettings()
             }
         };
 
-    m_deviceAgentSettings.generateEvents = toBool(getParamValue(kGenerateEventsSetting));
-    m_deviceAgentSettings.generateCars = toBool(getParamValue(kGenerateCarsSetting));
-    m_deviceAgentSettings.generateTrucks = toBool(getParamValue(kGenerateTrucksSetting));
-    m_deviceAgentSettings.generatePedestrians = toBool(getParamValue(kGeneratePedestriansSetting));
-    m_deviceAgentSettings.generateHumanFaces = toBool(getParamValue(kGenerateHumanFacesSetting));
-    m_deviceAgentSettings.generateBicycles = toBool(getParamValue(kGenerateBicyclesSetting));
-    m_deviceAgentSettings.generatePreviews = toBool(getParamValue(kGeneratePreviewPacketSetting));
-    m_deviceAgentSettings.throwPluginEvents = toBool(
-        getParamValue(kThrowPluginEventsFromDeviceAgentSetting));
+    m_deviceAgentSettings.generateEvents = toBool(settingValue(kGenerateEventsSetting));
+    m_deviceAgentSettings.generateCars = toBool(settingValue(kGenerateCarsSetting));
+    m_deviceAgentSettings.generateTrucks = toBool(settingValue(kGenerateTrucksSetting));
+    m_deviceAgentSettings.generatePedestrians = toBool(settingValue(kGeneratePedestriansSetting));
+    m_deviceAgentSettings.generateHumanFaces = toBool(settingValue(kGenerateHumanFacesSetting));
+    m_deviceAgentSettings.generateBicycles = toBool(settingValue(kGenerateBicyclesSetting));
+    m_deviceAgentSettings.generatePreviews = toBool(settingValue(kGeneratePreviewPacketSetting));
+    m_deviceAgentSettings.throwPluginDiagnosticEvents = toBool(
+        settingValue(kThrowPluginDiagnosticEventsFromDeviceAgentSetting));
+    m_deviceAgentSettings.leakFrames = toBool(settingValue(kLeakFrames));
 
     assignIntegerSetting(
         kGenerateObjectsEveryNFramesSetting,
@@ -667,16 +677,16 @@ void DeviceAgent::updateObjectGenerationParameters()
 
 void DeviceAgent::updateEventGenerationParameters()
 {
-    if (m_deviceAgentSettings.throwPluginEvents)
+    if (m_deviceAgentSettings.throwPluginDiagnosticEvents)
     {
         NX_PRINT << __func__ << "(): Starting plugin event generation";
-        m_needToThrowPluginEvents = true;
+        m_needToThrowPluginDiagnosticEvents = true;
     }
     else
     {
         NX_PRINT << __func__ << "(): Stopping plugin event generation";
-        m_needToThrowPluginEvents = false;
-        m_pluginEventGenerationLoopCondition.notify_all();
+        m_needToThrowPluginDiagnosticEvents = false;
+        m_pluginDiagnosticEventGenerationLoopCondition.notify_all();
     }
 }
 

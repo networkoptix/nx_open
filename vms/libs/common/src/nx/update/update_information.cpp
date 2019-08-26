@@ -41,9 +41,12 @@ QString toString(InformationError error)
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (Variant)(Package)(Information)(PackageInformation),
+    (Variant)(Package)(Information),
     (ubjson)(json)(datastream)(eq),
     _Fields)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (PackageInformation), (json)(datastream), _Fields)
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::update::Status, Code)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::update::Status, ErrorCode)
@@ -102,6 +105,16 @@ void UpdateContents::resetVerification()
     peersWithUpdate.clear();
     manualPackages.clear();
     packagesGenerated = false;
+}
+
+uint64_t UpdateContents::getClientSpaceRequirements(bool withClient) const
+{
+    uint64_t spaceRequired = 0;
+    for (const auto& package: manualPackages)
+        spaceRequired += package.size;
+    if (withClient && clientPackage.isValid())
+        spaceRequired += clientPackage.size;
+    return spaceRequired;
 }
 
 nx::utils::SoftwareVersion UpdateContents::getVersion() const

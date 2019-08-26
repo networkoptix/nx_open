@@ -17,6 +17,26 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (eq)(ubjson)(xml)(json)(sql_record)(csv_record),
     _Fields)
 
+QString toString(PluginInfo::Optionality value)
+{
+    return QnLexical::serialized(value);
+}
+
+QString toString(PluginInfo::Status value)
+{
+    return QnLexical::serialized(value);
+}
+
+QString toString(PluginInfo::Error value)
+{
+    return QnLexical::serialized(value);
+}
+
+QString toString(PluginInfo::MainInterface value)
+{
+    return QnLexical::serialized(value);
+}
+
 } // namespace nx::vms::api
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::PluginInfo, Optionality,
