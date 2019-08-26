@@ -8,9 +8,9 @@
 namespace nx::cloud::storage::service::model {
 
 Model::Model(const conf::Settings& settings):
-    m_database(std::make_unique<Database>(settings)),
-    m_bucketDao(dao::BucketDaoFactory::instance().create()),
-    m_storageDao(dao::StorageDaoFactory::instance().create())
+    m_db(std::make_unique<Database>(settings)),
+    m_bucketDao(dao::BucketDaoFactory::instance().create(settings.database(), m_db.get())),
+    m_storageDao(dao::StorageDaoFactory::instance().create(settings.database(), m_db.get()))
 {
 }
 
@@ -21,12 +21,12 @@ Model::~Model()
 
 void Model::stop()
 {
-    m_database->stop();
+    m_db->stop();
 }
 
 Database& Model::database()
 {
-    return *m_database;
+    return *m_db;
 }
 
 dao::AbstractBucketDao& Model::bucketDao()

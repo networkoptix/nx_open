@@ -121,7 +121,6 @@ StorageManager::StorageManager(
     :
     m_settings(settings),
     m_clusterId(settings.database().synchronization.clusterId),
-    m_database(&model->database()),
     m_storageDao(&model->storageDao()),
     m_bucketManager(bucketManager),
     m_accessManager(std::make_unique<AccessManager>(settings.cloudDb())),
@@ -132,7 +131,6 @@ StorageManager::StorageManager(
             kStsUrl, //<TODO decide how to handle url, global or regional
             m_settings.aws().credentials))
 {
-    registerSyncEngineCommandHandlers();
 }
 
 StorageManager::~StorageManager()
@@ -167,8 +165,7 @@ void StorageManager::addStorage(
 
     auto addStorageContext = std::make_shared<AddStorageContext>();
 
-    m_database->syncEngine().transactionLog().startDbTransaction(
-        m_clusterId,
+    m_storageDao->queryExecutor().executeUpdate(
         [this, guard = m_asyncCounter.getScopedIncrement(), addStorageContext, request,
             clientEndpoint, accountOwner = std::move(accountOwner)](
                  auto queryContext)
@@ -185,12 +182,7 @@ void StorageManager::addStorage(
 
             addStorageContext->initializeStorage(accountOwner, bucket, request);
 
-            return m_database->syncEngine().transactionLog()
-                .saveDbOperationToLog<model::command::SaveStorage>(
-                    queryContext,
-                    m_clusterId,
-                    addStorageContext->storage,
-                    std::bind(&AbstractStorageDao::addStorage, m_storageDao, _1, _2));
+            return m_storageDao->addStorage(queryContext, addStorageContext->storage);
         },
         [this, guard = m_asyncCounter.getScopedIncrement(), handler = std::move(handler), addStorageContext](
             auto dbResult)
@@ -235,20 +227,14 @@ void StorageManager::removeStorage(
 
     auto storage = std::make_shared<std::optional<api::Storage>>();
 
-    m_database->syncEngine().transactionLog().startDbTransaction(
-        m_settings.database().synchronization.clusterId,
+    m_storageDao->queryExecutor().executeUpdate(
         [this, guard = m_asyncCounter.getScopedIncrement(), storageId, storage](auto queryContext)
         {
             *storage = m_storageDao->readStorage(queryContext, storageId);
             if (!storage)
                 return nx::sql::DBResult::ok;
 
-            return m_database->syncEngine().transactionLog()
-                .saveDbOperationToLog<model::command::RemoveStorage>(
-                    queryContext,
-                    m_clusterId,
-                    storageId,
-                    std::bind(&AbstractStorageDao::removeStorage, m_storageDao, _1, _2));
+            return m_storageDao->removeStorage(queryContext, storageId);
         },
         [this, guard = m_asyncCounter.getScopedIncrement(), authInfo = std::move(authInfo),
             storage, storageId, handler = std::move(handler)](
@@ -307,7 +293,7 @@ void StorageManager::addSystem(
     api::AddSystemRequest request,
     nx::utils::MoveOnlyFunc<void(api::Result, api::System)> handler)
 {
-    modifySystemStorageRelation<model::command::SaveSystem>(
+    modifySystemStorageRelation(
         std::move(authInfo),
         storageId,
         request.id,
@@ -321,7 +307,7 @@ void StorageManager::removeSystem(
     std::string systemId,
     nx::utils::MoveOnlyFunc<void(api::Result)> handler)
 {
-    modifySystemStorageRelation<model::command::RemoveSystem>(
+    modifySystemStorageRelation(
         std::move(authInfo),
         storageId,
         systemId,
@@ -338,7 +324,7 @@ void StorageManager::getStorage(
     if (readStorageContext->storageId.empty())
         return readStorageContext->handler(utils::badRequest("Empty storageId"), api::Storage());
 
-    m_database->queryExecutor().executeSelect(
+    m_storageDao->queryExecutor().executeSelect(
         [this, guard = m_asyncCounter.getScopedIncrement(), readStorageContext](auto queryContext)
         {
             auto storage = m_storageDao->readStorage(queryContext, readStorageContext->storageId);
@@ -564,42 +550,7 @@ void StorageManager::removeDataUsageCalculator(
     m_dataUsageCalculators.erase(calculator);
 }
 
-void StorageManager::registerSyncEngineCommandHandlers()
-{
-
-    m_database->syncEngine().incomingCommandDispatcher()
-        .registerCommandHandler<model::command::SaveStorage>(
-            std::bind(&AbstractStorageDao::addStorage, m_storageDao, _1, _3));
-
-    m_database->syncEngine().incomingCommandDispatcher()
-        .registerCommandHandler<model::command::RemoveStorage>(
-            std::bind(&AbstractStorageDao::removeStorage, m_storageDao, _1, _3));
-
-    m_database->syncEngine().incomingCommandDispatcher()
-        .registerCommandHandler<model::command::SaveSystem>(
-            std::bind(&AbstractStorageDao::addSystem, m_storageDao, _1, _3));
-
-    m_database->syncEngine().incomingCommandDispatcher()
-        .registerCommandHandler<model::command::RemoveSystem>(
-            std::bind(&AbstractStorageDao::removeSystem, m_storageDao, _1, _3));
-}
-
-void StorageManager::unregisterSyncEngineCommandHandlers()
-{
-    m_database->syncEngine().incomingCommandDispatcher()
-        .removeHandler<model::command::SaveStorage>();
-
-    m_database->syncEngine().incomingCommandDispatcher()
-        .removeHandler<model::command::RemoveStorage>();
-
-    m_database->syncEngine().incomingCommandDispatcher()
-        .removeHandler<model::command::SaveSystem>();
-
-    m_database->syncEngine().incomingCommandDispatcher()
-        .removeHandler<model::command::RemoveSystem>();
-}
-
-template<typename Command, typename DbFunc, typename Handler>
+template<typename DbFunc, typename Handler>
 void StorageManager::modifySystemStorageRelation(
     nx::utils::stree::ResourceContainer authInfo,
     std::string storageId,
@@ -617,8 +568,7 @@ void StorageManager::modifySystemStorageRelation(
     system->storageId = storageId;
     system->id = systemId;
 
-    m_database->syncEngine().transactionLog().startDbTransaction(
-        m_settings.database().synchronization.clusterId,
+    m_storageDao->queryExecutor().executeUpdate(
         [this, guard = m_asyncCounter.getScopedIncrement(), storage, system,
             dbFunc = std::move(dbFunc)](
                 auto queryContext)
@@ -627,12 +577,7 @@ void StorageManager::modifySystemStorageRelation(
             if (!*storage)
                 return nx::sql::DBResult::ok;
 
-            return m_database->syncEngine().transactionLog()
-                .saveDbOperationToLog<Command>(
-                    queryContext,
-                    m_clusterId,
-                    *system,
-                    std::move(dbFunc));
+            return dbFunc(queryContext, *system);
         },
         [this, guard = m_asyncCounter.getScopedIncrement(), authInfo = std::move(authInfo),
             storage, system, handler = std::move(handler)](

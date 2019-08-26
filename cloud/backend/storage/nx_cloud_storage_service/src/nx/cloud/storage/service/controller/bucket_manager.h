@@ -57,13 +57,9 @@ private:
     std::shared_ptr<s3::PermissionsTester> createPermissionsTest(const std::string& bucketName);
     void removePermissionsTest(const std::shared_ptr<s3::PermissionsTester>& permissionsTester);
 
-    void registerSyncEngineCommandHandlers();
-    void unregisterSyncEngineCommandHandlers();
-
 private:
     const conf::Settings& m_settings;
     const std::string& m_clusterId;
-    model::Database* m_database = nullptr;
     model::dao::AbstractBucketDao* m_bucketDao = nullptr;
     QnMutex m_mutex;
     std::set<std::shared_ptr<s3::PermissionsTester>> m_permissionsTesters;

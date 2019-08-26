@@ -1,10 +1,16 @@
 #include "bucket_dao.h"
 
-#include <nx/sql/query_context.h>
+#include <nx/cloud/storage/service/api/bucket.h>
+#include <nx/clusterdb/engine/synchronization_engine.h>
 
+#include "nx/cloud/storage/service/settings.h"
+#include "nx/cloud/storage/service/model/command.h"
+#include "nx/cloud/storage/service/model/database.h"
 #include "nx/cloud/storage/service/utils.h"
 
 namespace nx::cloud::storage::service::model::dao {
+
+using namespace std::placeholders;
 
 namespace {
 
@@ -60,28 +66,34 @@ static std::vector<api::Bucket> toVector(nx::sql::AbstractSqlQuery* query)
     return buckets;
 }
 
-static int getStorageCount(
-    nx::sql::QueryContext* queryContext,
-    const std::string& bucketName)
-{
-    auto query = queryContext->connection()->createQuery();
-    query->prepare(kCountStorages);
-    query->bindValue(kBucketNameBinding, bucketName);
-    query->exec();
-    return  query->next() ? query->value(kStorageCount).toInt() : -1;
-}
-
 } // namespace
 
-void BucketDao::addBucket(
+BucketDao::BucketDao(const conf::Database& settings, Database* db):
+    m_clusterId(settings.synchronization.clusterId),
+    m_db(db)
+{
+    registerCommandHandlers();
+}
+
+BucketDao::~BucketDao()
+{
+    unregisterCommandHandlers();
+}
+
+nx::sql::AbstractAsyncSqlQueryExecutor& BucketDao::queryExecutor()
+{
+    return m_db->queryExecutor();
+}
+
+nx::sql::DBResult BucketDao::addBucket(
     nx::sql::QueryContext* queryContext,
     const api::Bucket& bucket)
 {
-    auto query = queryContext->connection()->createQuery();
-    query->prepare(kAddBucket);
-    query->bindValue(kNameBinding, bucket.name);
-    query->bindValue(kRegionBinding, bucket.region);
-    query->exec();
+    return m_db->syncEngine().transactionLog().saveDbOperationToLog<command::SaveBucket>(
+            queryContext,
+            m_clusterId,
+            bucket,
+            std::bind(&BucketDao::addBucketToDb, this, _1, _2));
 }
 
 std::vector<api::Bucket> BucketDao::fetchBuckets(
@@ -102,9 +114,39 @@ std::vector<api::Bucket> BucketDao::fetchBuckets(
     return buckets;
 }
 
-void BucketDao::removeBucket(
+nx::sql::DBResult BucketDao::removeBucket(
     nx::sql::QueryContext* queryContext,
     const std::string& bucketName)
+{
+    return m_db->syncEngine().transactionLog()
+        .saveDbOperationToLog<command::RemoveBucket>(
+            queryContext,
+            m_clusterId,
+            bucketName,
+            std::bind(&BucketDao::removeBucketFromDb, this, _1, _2));
+}
+
+int BucketDao::getStorageCount(
+    nx::sql::QueryContext* queryContext,
+    const std::string& bucketName)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(kCountStorages);
+    query->bindValue(kBucketNameBinding, bucketName);
+    query->exec();
+    return  query->next() ? query->value(kStorageCount).toInt() : -1;
+}
+
+void BucketDao::addBucketToDb(nx::sql::QueryContext* queryContext, const api::Bucket& bucket)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(kAddBucket);
+    query->bindValue(kNameBinding, bucket.name);
+    query->bindValue(kRegionBinding, bucket.region);
+    query->exec();
+}
+
+void BucketDao::removeBucketFromDb(nx::sql::QueryContext* queryContext, const std::string& bucketName)
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(kRemoveBucket);
@@ -112,11 +154,28 @@ void BucketDao::removeBucket(
     query->exec();
 }
 
+void BucketDao::registerCommandHandlers()
+{
+    m_db->syncEngine().incomingCommandDispatcher()
+        .registerCommandHandler<command::SaveBucket>(
+            std::bind(&BucketDao::addBucketToDb, this, _1, _3));
+
+    m_db->syncEngine().incomingCommandDispatcher()
+        .registerCommandHandler<command::RemoveBucket>(
+            std::bind(&BucketDao::removeBucketFromDb, this, _1, _3));
+}
+
+void BucketDao::unregisterCommandHandlers()
+{
+    m_db->syncEngine().incomingCommandDispatcher().removeHandler<command::SaveBucket>();
+    m_db->syncEngine().incomingCommandDispatcher().removeHandler<command::RemoveBucket>();
+}
+
 //-------------------------------------------------------------------------------------------------
 // BucketDaoFactory
 
 BucketDaoFactory::BucketDaoFactory():
-    base_type(std::bind(&BucketDaoFactory::defaultFactoryFunction, this))
+    base_type(std::bind(&BucketDaoFactory::defaultFactoryFunction, this, _1, _2))
 {
 }
 
@@ -126,9 +185,11 @@ BucketDaoFactory& BucketDaoFactory::instance()
     return factory;
 }
 
-std::unique_ptr<AbstractBucketDao> BucketDaoFactory::defaultFactoryFunction()
+std::unique_ptr<AbstractBucketDao> BucketDaoFactory::defaultFactoryFunction(
+    const conf::Database& settings,
+    Database* db)
 {
-    return std::make_unique<BucketDao>();
+    return std::make_unique<BucketDao>(settings, db);
 }
 
 } // namespace nx::cloud::storage::service::model::dao

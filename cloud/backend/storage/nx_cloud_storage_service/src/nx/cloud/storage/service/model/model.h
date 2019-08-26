@@ -13,7 +13,7 @@ namespace dao {
 class AbstractBucketDao;
 class AbstractStorageDao;
 
-} // namespace
+} // namespace dao
 
 class Database;
 
@@ -30,7 +30,7 @@ public:
     dao::AbstractStorageDao& storageDao();
 
 private:
-    std::unique_ptr<Database> m_database;
+    std::unique_ptr<Database> m_db;
     std::unique_ptr<dao::AbstractBucketDao> m_bucketDao;
     std::unique_ptr<dao::AbstractStorageDao> m_storageDao;
 };

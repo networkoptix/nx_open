@@ -148,7 +148,7 @@ private:
     std::shared_ptr<s3::DataUsageCalculator> createDataUsageCalculator();
     void removeDataUsageCalculator(const std::shared_ptr<s3::DataUsageCalculator>& calculator);
 
-    template<typename Command, typename DbFunc, typename Handler>
+    template<typename DbFunc, typename Handler>
     void modifySystemStorageRelation(
         nx::utils::stree::ResourceContainer authInfo,
         std::string storageId,
@@ -156,13 +156,9 @@ private:
         DbFunc dbFunc,
         Handler handler);
 
-    void registerSyncEngineCommandHandlers();
-    void unregisterSyncEngineCommandHandlers();
-
 private:
     const conf::Settings& m_settings;
     const std::string& m_clusterId;
-    model::Database* m_database = nullptr;
     model::dao::AbstractStorageDao* m_storageDao = nullptr;
     BucketManager* m_bucketManager = nullptr;
     std::unique_ptr<AccessManager> m_accessManager;

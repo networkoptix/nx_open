@@ -1,5 +1,6 @@
 #include "storage_service.h"
 
+#include <nx/clusterdb/engine/synchronization_engine.h>
 #include <nx/clusterdb/engine/http/http_paths.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/http/rest/http_rest_client.h>

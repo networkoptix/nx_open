@@ -1,5 +1,8 @@
 #include "database.h"
 
+#include <nx/clusterdb/engine/synchronization_engine.h>
+#include <nx/sql/async_sql_query_executor.h>
+
 #include "nx/cloud/storage/service/settings.h"
 
 namespace nx::cloud::storage::service::model {
@@ -20,6 +23,11 @@ Database::Database(const conf::Settings& settings):
             settings.database().synchronization,
             nx::clusterdb::engine::ProtocolVersionRange::any,
             m_sqlExecutor.get());
+}
+
+Database::~Database()
+{
+    stop();
 }
 
 void Database::stop()

@@ -182,14 +182,14 @@ public:
     nx::sql::DBResult saveDbOperationToLog(
         nx::sql::QueryContext* queryContext,
         const std::string& clusterId,
-        typename const CommandDescriptor::Data& transactionData,
+        typename CommandDescriptor::Data transactionData,
         DbFunc dbFunc)
     {
         dbFunc(queryContext, transactionData);
         return generateTransactionAndSaveToLog<CommandDescriptor>(
             queryContext,
             clusterId,
-            transactionData);
+            std::move(transactionData));
     }
 
     /**

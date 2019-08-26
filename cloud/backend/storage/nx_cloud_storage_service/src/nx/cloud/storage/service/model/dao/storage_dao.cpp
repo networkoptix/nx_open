@@ -1,14 +1,17 @@
 #include "storage_dao.h"
 
-#include <nx/sql/query_context.h>
-
+#include <nx/clusterdb/engine/synchronization_engine.h>
 #include <nx/cloud/storage/service/api/storage.h>
 #include <nx/cloud/storage/service/api/system.h>
 
+#include "nx/cloud/storage/service/settings.h"
+#include "nx/cloud/storage/service/model/command.h"
 #include "nx/cloud/storage/service/model/database.h"
 #include "nx/cloud/storage/service/utils.h"
 
 namespace nx::cloud::storage::service::model::dao {
+
+using namespace std::placeholders;
 
 namespace {
 
@@ -81,6 +84,14 @@ storage_id=:storage_id AND system_id=:system_id
 
 )sql";
 
+static constexpr char kRemoveStorageSystemRelations[] = R"sql(
+
+DELETE FROM storage_system_relation
+    WHERE
+storage_id=:storage_id
+
+)sql";
+
 static constexpr char kFetchSystemsForStorage[] = R"sql(
 
 SELECT system_id FROM storage_system_relation
@@ -101,21 +112,33 @@ api::Storage toStorage(nx::sql::AbstractSqlQuery* query)
 
 } // namespace
 
-void StorageDao::addStorage(
+StorageDao::StorageDao(const conf::Database& settings, Database* db):
+    m_clusterId(settings.synchronization.clusterId),
+    m_db(db)
+{
+    registerCommandHandlers();
+}
+
+StorageDao::~StorageDao()
+{
+    unregisterCommandHandlers();
+}
+
+nx::sql::AbstractAsyncSqlQueryExecutor& StorageDao::queryExecutor()
+{
+    return m_db->queryExecutor();
+}
+
+nx::sql::DBResult StorageDao::addStorage(
     nx::sql::QueryContext* queryContext,
     const api::Storage& storage)
 {
-    if (storage.ioDevices.empty())
-        throw nx::sql::Exception(nx::sql::DBResult::logicError, "ioDevices is empty");
-
-    auto query = queryContext->connection()->createQuery();
-    query->prepare(kAddStorage);
-    query->bindValue(kIdBinding, storage.id);
-    query->bindValue(kTotalSpaceBinding, storage.totalSpace);
-    query->bindValue(kOwnerBinding, storage.owner);
-    query->exec();
-
-    addStorageBucketRelation(queryContext, storage);
+    return m_db->syncEngine().transactionLog()
+        .saveDbOperationToLog<command::SaveStorage>(
+            queryContext,
+            m_clusterId,
+            storage,
+            std::bind(&StorageDao::addStorageToDb, this, _1, _2));
 }
 
 std::optional<api::Storage> StorageDao::readStorage(
@@ -141,38 +164,55 @@ std::optional<api::Storage> StorageDao::readStorage(
     return storage;
 }
 
-void StorageDao::removeStorage(
+nx::sql::DBResult StorageDao::removeStorage(
     nx::sql::QueryContext* queryContext,
     const std::string& storageId)
 {
-    removeStorageBucketRelations(queryContext, storageId);
-
-    auto query = queryContext->connection()->createQuery();
-    query->prepare(kRemoveStorage);
-    query->bindValue(kIdBinding, storageId);
-    query->exec();
+    return m_db->syncEngine().transactionLog()
+        .saveDbOperationToLog<command::RemoveStorage>(
+            queryContext,
+            m_clusterId,
+            storageId,
+            std::bind(&StorageDao::removeStorageFromDb, this, _1, _2));
 }
 
-void StorageDao::addSystem(
+nx::sql::DBResult StorageDao::addSystem(
     nx::sql::QueryContext* queryContext,
     const api::System& system)
 {
-    auto query = queryContext->connection()->createQuery();
-    query->prepare(kAddStorageSystemRelation);
-    query->bindValue(kStorageIdBinding, system.storageId);
-    query->bindValue(kSystemIdBinding, system.id);
-    query->exec();
+    return m_db->syncEngine().transactionLog()
+        .saveDbOperationToLog<command::SaveSystem>(
+            queryContext,
+            m_clusterId,
+            system,
+            std::bind(&StorageDao::addSystemStorageRelation, this, _1, _2));
 }
 
-void StorageDao::removeSystem(
+nx::sql::DBResult StorageDao::removeSystem(
     nx::sql::QueryContext* queryContext,
     const api::System& system)
 {
+    return m_db->syncEngine().transactionLog()
+        .saveDbOperationToLog<command::RemoveSystem>(
+            queryContext,
+            m_clusterId,
+            system,
+            std::bind(&StorageDao::removeSystemStorageRelation, this, _1, _2));
+}
+
+void StorageDao::addStorageToDb(nx::sql::QueryContext* queryContext, const api::Storage& storage)
+{
+    if (storage.ioDevices.empty())
+        throw nx::sql::Exception(nx::sql::DBResult::logicError, "ioDevices is empty");
+
     auto query = queryContext->connection()->createQuery();
-    query->prepare(kRemoveStorageSystemRelation);
-    query->bindValue(kStorageIdBinding, system.storageId);
-    query->bindValue(kSystemIdBinding, system.id);
+    query->prepare(kAddStorage);
+    query->bindValue(kIdBinding, storage.id);
+    query->bindValue(kTotalSpaceBinding, storage.totalSpace);
+    query->bindValue(kOwnerBinding, storage.owner);
     query->exec();
+
+    addStorageBucketRelation(queryContext, storage);
 }
 
 void StorageDao::addStorageBucketRelation(
@@ -188,6 +228,90 @@ void StorageDao::addStorageBucketRelation(
         service::utils::bucketName(storage.ioDevices.back().dataUrl));
     query->bindValue(kRegionBinding, storage.ioDevices.back().region);
     query->exec();
+}
+
+void StorageDao::removeStorageFromDb(
+    nx::sql::QueryContext* queryContext,
+    const std::string& storageId)
+{
+    removeSystemStorageRelations(queryContext, storageId);
+    removeStorageBucketRelations(queryContext, storageId);
+
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(kRemoveStorage);
+    query->bindValue(kIdBinding, storageId);
+    query->exec();
+}
+
+void StorageDao::removeStorageBucketRelations(
+    nx::sql::QueryContext* queryContext,
+    const std::string& storageId)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(kRemoveStorageBucketRelations);
+    query->bindValue(kStorageIdBinding, storageId);
+    query->exec();
+}
+
+void StorageDao::addSystemStorageRelation(
+    nx::sql::QueryContext* queryContext,
+    const api::System& system)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(kAddStorageSystemRelation);
+    query->bindValue(kStorageIdBinding, system.storageId);
+    query->bindValue(kSystemIdBinding, system.id);
+    query->exec();
+}
+
+void StorageDao::removeSystemStorageRelation(
+    nx::sql::QueryContext* queryContext,
+    const api::System& system)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(kRemoveStorageSystemRelation);
+    query->bindValue(kStorageIdBinding, system.storageId);
+    query->bindValue(kSystemIdBinding, system.id);
+    query->exec();
+}
+
+
+void StorageDao::removeSystemStorageRelations(
+    nx::sql::QueryContext* queryContext,
+    const std::string& storageId)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(kRemoveStorageSystemRelations);
+    query->bindValue(kStorageIdBinding, storageId);
+    query->exec();
+}
+
+void StorageDao::registerCommandHandlers()
+{
+    m_db->syncEngine().incomingCommandDispatcher()
+        .registerCommandHandler<command::SaveStorage>(
+            std::bind(&StorageDao::addStorageToDb, this, _1, _3));
+
+    m_db->syncEngine().incomingCommandDispatcher()
+        .registerCommandHandler<command::RemoveStorage>(
+            std::bind(&StorageDao::removeStorageFromDb, this, _1, _3));
+
+    m_db->syncEngine().incomingCommandDispatcher()
+        .registerCommandHandler<command::SaveSystem>(
+            std::bind(&StorageDao::addSystemStorageRelation, this, _1, _3));
+
+    m_db->syncEngine().incomingCommandDispatcher()
+        .registerCommandHandler<command::RemoveSystem>(
+            std::bind(&StorageDao::removeSystemStorageRelation, this, _1, _3));
+
+}
+
+void StorageDao::unregisterCommandHandlers()
+{
+    m_db->syncEngine().incomingCommandDispatcher().removeHandler<command::SaveStorage>();
+    m_db->syncEngine().incomingCommandDispatcher().removeHandler<command::RemoveStorage>();
+    m_db->syncEngine().incomingCommandDispatcher().removeHandler<command::SaveSystem>();
+    m_db->syncEngine().incomingCommandDispatcher().removeHandler<command::RemoveSystem>();
 }
 
 std::vector<api::Device> StorageDao::getStorageDevices(
@@ -226,21 +350,11 @@ std::vector<std::string> StorageDao::getSystems(
     return systems;
 }
 
-void StorageDao::removeStorageBucketRelations(
-    nx::sql::QueryContext* queryContext,
-    const std::string& storageId)
-{
-    auto query = queryContext->connection()->createQuery();
-    query->prepare(kRemoveStorageBucketRelations);
-    query->bindValue(kStorageIdBinding, storageId);
-    query->exec();
-}
-
 //-------------------------------------------------------------------------------------------------
 // StorageDaoFactory
 
 StorageDaoFactory::StorageDaoFactory():
-    base_type(std::bind(&StorageDaoFactory::defaultFactoryFunction, this))
+    base_type(std::bind(&StorageDaoFactory::defaultFactoryFunction, this, _1, _2))
 {
 }
 
@@ -250,9 +364,11 @@ StorageDaoFactory& StorageDaoFactory::instance()
     return factory;
 }
 
-std::unique_ptr<AbstractStorageDao> StorageDaoFactory::defaultFactoryFunction()
+std::unique_ptr<AbstractStorageDao> StorageDaoFactory::defaultFactoryFunction(
+    const conf::Database& settings,
+    Database* db)
 {
-    return std::make_unique<StorageDao>();
+    return std::make_unique<StorageDao>(settings, db);
 }
 
 } // namespace nx::cloud::storage::service::model::dao
