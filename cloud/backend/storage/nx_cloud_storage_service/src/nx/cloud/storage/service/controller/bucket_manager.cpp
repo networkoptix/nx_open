@@ -22,7 +22,7 @@ namespace {
 
 QString toString(const Bucket& bucket)
 {
-    return QString("{name: %1, region: %2").arg(bucket.name.c_str()).arg(bucket.region.c_str());
+    return QString("{name: %1, region: %2}").arg(bucket.name.c_str()).arg(bucket.region.c_str());
 }
 
 } // namespace
