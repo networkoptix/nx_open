@@ -33,7 +33,7 @@ public:
         network::http::server::AuthenticationCompletionHandler completionHandler) override;
 
 private:
-    struct AuthenticationRequest
+    struct RequestContext
     {
         std::unique_ptr<db::api::CdbClient> cdbClient;
         network::http::server::AuthenticationCompletionHandler handler;
@@ -46,16 +46,16 @@ private:
     db::api::CdbClient* createAuthenticationRequest(
         network::http::server::AuthenticationCompletionHandler completionHandler);
 
-    AuthenticationRequest authenticationComplete(db::api::CdbClient* cdbClient);
+    RequestContext takeRequestContext(db::api::CdbClient* cdbClient);
 
-    network::http::server::AuthenticationResult failedAuthenticationResult(
+    network::http::server::AuthenticationResult prepareFailedAuthenticationResult(
         db::api::ResultCode code,
         QByteArray reason);
 
 private:
     const conf::CloudDb& m_settings;
     QnMutex m_mutex;
-    std::map<db::api::CdbClient*, AuthenticationRequest> m_cdbContexts;
+    std::map<db::api::CdbClient*, RequestContext> m_cdbContexts;
 };
 
 //-------------------------------------------------------------------------------------------------

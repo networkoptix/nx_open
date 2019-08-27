@@ -27,7 +27,7 @@ void AuthenticationForwarder::authenticate(
     if (authorizationIt == request.headers.end())
     {
         auto failedAuthentication =
-            failedAuthenticationResult(
+            prepareFailedAuthenticationResult(
                 ResultCode::notAuthorized,
                 "missing Authorization header");
         failedAuthentication.wwwAuthenticate = generateWwwAuthenticateHeader(generateNonce());
@@ -54,18 +54,18 @@ void AuthenticationForwarder::authenticateWithCloudDb(
             auto cdbResult,
             auto credentials) mutable
         {
-            auto request = authenticationComplete(cdbClient);
+            auto request = takeRequestContext(cdbClient);
 
             if (cdbResult != ResultCode::ok)
             {
                 return request.handler(
-                    failedAuthenticationResult(cdbResult, "resolveUserDigestFailed"));
+                    prepareFailedAuthenticationResult(cdbResult, "resolveUserDigestFailed"));
             }
 
             if (credentials.objectType != ObjectType::account || credentials.objectId.empty())
             {
                 return request.handler(
-                    failedAuthenticationResult(
+                    prepareFailedAuthenticationResult(
                         ResultCode::unknownError,
                         "received unexpected ObjectType in credentials"));
             }
@@ -82,7 +82,7 @@ void AuthenticationForwarder::authenticateWithCloudDb(
 CdbClient* AuthenticationForwarder::createAuthenticationRequest(
     server::AuthenticationCompletionHandler completionHandler)
 {
-    AuthenticationRequest request;
+    RequestContext request;
     request.cdbClient = std::make_unique<CdbClient>();
     request.cdbClient->setCloudUrl(m_settings.url.toStdString());
     request.handler = std::move(completionHandler);
@@ -95,8 +95,8 @@ CdbClient* AuthenticationForwarder::createAuthenticationRequest(
     return cdbClientPtr;
 }
 
-AuthenticationForwarder::AuthenticationRequest
-    AuthenticationForwarder::authenticationComplete(
+AuthenticationForwarder::RequestContext
+    AuthenticationForwarder::takeRequestContext(
         CdbClient* cdbClient)
 {
     QnMutexLocker lock(&m_mutex);
@@ -107,7 +107,7 @@ AuthenticationForwarder::AuthenticationRequest
     return request;
 }
 
-server::AuthenticationResult AuthenticationForwarder::failedAuthenticationResult(
+server::AuthenticationResult AuthenticationForwarder::prepareFailedAuthenticationResult(
     ResultCode resultCode,
     QByteArray reason)
 {
