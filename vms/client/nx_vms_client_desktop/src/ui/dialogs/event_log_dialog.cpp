@@ -685,13 +685,18 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
 
 void QnEventLogDialog::at_exportAction_triggered()
 {
-    QnTableExportHelper::exportToFile(ui->gridEvents, true, this,
+    QnTableExportHelper::exportToFile(
+        ui->gridEvents->model(),
+        ui->gridEvents->selectionModel()->selectedIndexes(),
+        this,
         tr("Export selected events to file"));
 }
 
 void QnEventLogDialog::at_clipboardAction_triggered()
 {
-    QnTableExportHelper::copyToClipboard(ui->gridEvents);
+    QnTableExportHelper::copyToClipboard(
+        ui->gridEvents->model(),
+        ui->gridEvents->selectionModel()->selectedIndexes());
 }
 
 void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)

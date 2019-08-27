@@ -1,6 +1,6 @@
 #pragma once
 
-#include <analytics/common/object_detection_metadata.h>
+#include <analytics/common/object_metadata.h>
 
 namespace nx::analytics::db {
 
@@ -12,7 +12,7 @@ public:
     /**
      * @return nullptr signals end of data.
      */
-    virtual common::metadata::ConstDetectionMetadataPacketPtr next() = 0;
+    virtual common::metadata::ConstObjectMetadataPacketPtr next() = 0;
 
     /**
      * The implementation MUST free the DB cursor in the method and every subsequent

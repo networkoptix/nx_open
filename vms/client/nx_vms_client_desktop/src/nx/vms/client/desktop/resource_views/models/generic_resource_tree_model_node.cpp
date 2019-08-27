@@ -11,7 +11,6 @@
 
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource/tree/resource_tree_model_recorder_node.h>
-#include <ui/workbench/workbench_context.h>
 
 namespace nx::vms::client::desktop {
 
@@ -26,12 +25,12 @@ GenericResourceTreeModelNode::GenericResourceTreeModelNode(
     connect(resourceAccessProvider(), &QnResourceAccessProvider::accessChanged, this,
         &GenericResourceTreeModelNode::handleAccessChanged);
 
-    connect(context(), &QnWorkbenchContext::userChanged, this,
+    connect(model, &QnResourceTreeModel::userChanged, this,
         &GenericResourceTreeModelNode::rebuild);
 
-    connect(context()->resourcePool(), &QnResourcePool::resourceAdded,
+    connect(resourcePool(), &QnResourcePool::resourceAdded,
         this, &GenericResourceTreeModelNode::tryEnsureResourceNode);
-    connect(context()->resourcePool(), &QnResourcePool::resourceRemoved,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, &GenericResourceTreeModelNode::tryRemoveResource);
 
     rebuild();
@@ -51,8 +50,8 @@ void GenericResourceTreeModelNode::initialize()
 
 void GenericResourceTreeModelNode::deinitialize()
 {
-    disconnect(resourceAccessProvider(), nullptr, this, nullptr);
-    disconnect(context(), nullptr, this, nullptr);
+    resourceAccessProvider()->disconnect(this);
+    model()->disconnect(this);
     clean();
     base_type::deinitialize();
 }
@@ -73,7 +72,7 @@ void GenericResourceTreeModelNode::handleAccessChanged(
     const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource)
 {
-    if (!context()->user() || subject.user() != context()->user())
+    if (!model()->user() || subject.user() != model()->user())
         return;
 
     if (resourceAccessProvider()->hasAccess(subject, resource))
@@ -149,7 +148,7 @@ void GenericResourceTreeModelNode::rebuild()
 {
     clean();
 
-    if (!context()->user())
+    if (!model()->user())
         return;
 
     for (const auto& resource: resourcePool()->getResources())

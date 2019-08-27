@@ -19,6 +19,9 @@ QnNewWearableCameraDialog::QnNewWearableCameraDialog(QWidget* parent):
     ui(new Ui::NewWearableCameraDialog)
 {
     ui->setupUi(this);
+    ui->headerLabel->setText(tr(
+        "\"Virtual Camera\" is a virtual storage for video files, which could be uploaded to any"
+        " server on your System and be accessed by any user."));
 
     // TODO: #wearable help topics?
     //setHelpTopic(, Qn::);

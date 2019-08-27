@@ -1384,7 +1384,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      */
     regUpdate<WebPageData>(p, ApiCommand::saveWebPage);
 
-
     /**%apidoc POST /ec2/removeWebPage
      * Delete the specified web page.
      * <p>
@@ -1921,7 +1920,7 @@ void LocalConnectionFactory::connectToOldEC(const nx::utils::Url& ecUrl, Handler
 }
 
 ErrorCode LocalConnectionFactory::fillConnectionInfo(
-    const ConnectionData& loginInfo,
+    [[maybe_unused]] const ConnectionData& loginInfo,
     QnConnectionInfo* const connectionInfo,
     nx::network::http::Response* response)
 {
@@ -1979,9 +1978,7 @@ ErrorCode LocalConnectionFactory::fillConnectionInfo(
             }
         });
     }
-#else
-    nx::utils::unused(loginInfo);
-#endif
+#endif // ENABLE_EXTENDED_STATISTICS
 
     return ErrorCode::ok;
 }

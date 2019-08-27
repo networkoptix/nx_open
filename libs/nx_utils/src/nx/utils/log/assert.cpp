@@ -9,8 +9,6 @@
 
 #include "log.h"
 
-#include <nx/utils/unused.h>
-
 namespace nx::utils {
 
 /** Change to see more or less records at the end of execution */

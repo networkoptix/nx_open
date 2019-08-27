@@ -25,9 +25,8 @@ bool isAcceptableForModelCamera(
     QnResourceTreeModel* model,
     const QnResourcePtr& resource)
 {
-    const auto context = model->context();
     return QnResourceAccessFilter::isShareableMedia(resource)
-        && context->resourceAccessProvider()->hasAccess(context->user(), resource)
+        && model->resourceAccessProvider()->hasAccess(model->user(), resource)
         && resource->hasFlags(Qn::live_cam);
 }
 
@@ -35,9 +34,8 @@ bool isAcceptableForModelLayout(
     QnResourceTreeModel* model,
     const QnResourcePtr& resource)
 {
-    const auto context = model->context();
     return model->scope() == QnResourceTreeModel::FullScope
-        && context->resourceAccessProvider()->hasAccess(context->user(), resource)
+        && model->resourceAccessProvider()->hasAccess(model->user(), resource)
         && resource->flags().testFlag(Qn::layout)
         && !resource->flags().testFlag(Qn::local);
 }
@@ -46,9 +44,8 @@ bool isAcceptableForModelServer(
     QnResourceTreeModel* model,
     const QnResourcePtr& resource)
 {
-    const auto context = model->context();
     return model->scope() == QnResourceTreeModel::FullScope
-        && context->resourceAccessProvider()->hasAccess(context->user(), resource)
+        && model->resourceAccessProvider()->hasAccess(model->user(), resource)
         && resource->hasFlags(Qn::server)
         && !resource->hasFlags(Qn::fake);
 }
@@ -57,9 +54,8 @@ bool isAcceptableForModelUser(
     QnResourceTreeModel* model,
     const QnResourcePtr& resource)
 {
-    const auto context = model->context();
     return model->scope() != QnResourceTreeModel::CamerasScope
-        && context->resourceAccessProvider()->hasAccess(context->user(), resource)
+        && model->resourceAccessProvider()->hasAccess(model->user(), resource)
         && resource->hasFlags(Qn::user);
 }
 
@@ -67,9 +63,8 @@ bool isAcceptableForModelVideowall(
     QnResourceTreeModel* model,
     const QnResourcePtr& resource)
 {
-    const auto context = model->context();
     return model->scope() == QnResourceTreeModel::FullScope
-        && context->resourceAccessProvider()->hasAccess(context->user(), resource)
+        && model->resourceAccessProvider()->hasAccess(model->user(), resource)
         && resource->hasFlags(Qn::videowall);
 }
 
@@ -170,7 +165,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createResourceNode(
 {
     NodeType nodeType = NodeType::resource;
 
-    if (model->context()->accessController()->hasGlobalPermission(GlobalPermission::admin)
+    if (model->accessController()->hasGlobalPermission(GlobalPermission::admin)
         && QnMediaServerResource::isHiddenServer(resource->getParentResource()))
     {
         nodeType = NodeType::edge;

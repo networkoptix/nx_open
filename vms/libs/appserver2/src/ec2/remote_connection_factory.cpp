@@ -360,7 +360,7 @@ void RemoteConnectionFactory::remoteTestConnectionFinished(
 }
 
 ErrorCode RemoteConnectionFactory::fillConnectionInfo(
-    const nx::vms::api::ConnectionData& loginInfo,
+    [[maybe_unused]] const nx::vms::api::ConnectionData& loginInfo,
     QnConnectionInfo* const connectionInfo,
     nx::network::http::Response* response)
 {
@@ -417,8 +417,6 @@ ErrorCode RemoteConnectionFactory::fillConnectionInfo(
                     }
                 });
         }
-    #else
-        nx::utils::unused(loginInfo);
     #endif
 
     return ErrorCode::ok;

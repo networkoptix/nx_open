@@ -4,12 +4,51 @@
 
 #include <nx/utils/settings.h>
 #include <network/multicodec_rtp_reader.h>
+#include <decoders/video/abstract_video_decoder.h>
 #include <network/system_helpers.h>
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
 
-namespace nx {
-namespace vms::server {
+
+// Type specific parsers
+namespace nx::utils {
+
+template<>
+inline bool nx::utils::Settings::Option<MultiThreadDecodePolicy>::fromQVariant(
+    const QVariant& value, MultiThreadDecodePolicy* result)
+{
+    if (!value.isValid())
+        return false;
+
+    QString valueString = value.toString();
+    if (valueString == "auto")
+        *result = MultiThreadDecodePolicy::autoDetect;
+    else if (valueString == "disabled")
+        *result = MultiThreadDecodePolicy::disabled;
+    else if (valueString == "enabled")
+        *result = MultiThreadDecodePolicy::enabled;
+    else
+        return false;
+    return true;
+}
+
+template<>
+inline QVariant Settings::Option<MultiThreadDecodePolicy>::toQVariant(
+    const MultiThreadDecodePolicy& value)
+{
+    QVariant result;
+    if (value == MultiThreadDecodePolicy::autoDetect)
+        result.setValue(QString("auto"));
+    if (value == MultiThreadDecodePolicy::disabled)
+        result.setValue(QString("disabled"));
+    if (value == MultiThreadDecodePolicy::enabled)
+        result.setValue(QString("enabled"));
+    return result;
+}
+
+}
+
+namespace nx::vms::server {
 
 class Settings: public nx::utils::Settings
 {
@@ -266,6 +305,12 @@ public:
         "Enable absolute RTCP timestamps for archive data, RTCP NTP timestamps will corresond to "
         "media data absolute timestamps"
     };
+    Option<MultiThreadDecodePolicy> multiThreadDecodePolicy{this, "multiThreadDecodePolicy",
+        MultiThreadDecodePolicy::disabled,
+        "Multiple thread decoding policy {auto, disabled, enabled}, used for RTSP streaming with "
+        "transcoding and motion estimation"
+    };
+
     Option<bool> ignoreRootTool{this, "ignoreRootTool", false,
         "Ignore root tool executable presense (if set to true, media server will try to execute all "
         "commands that require root access directly)"};
@@ -391,5 +436,4 @@ public:
     static constexpr std::chrono::seconds kDefaultVacuumIntervalSecacuumIntervalSec{3600 * 24};
 };
 
-} // namespace vms::server
-} // namespace nx
+} // namespace nx::vms::server

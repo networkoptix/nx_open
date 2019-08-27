@@ -24,9 +24,8 @@ class NX_VMS_UTILS_API AbstractParameterMonitor
 public:
     virtual ~AbstractParameterMonitor() = default;
 
-    virtual Values current() = 0;
-    virtual std::optional<Values> timeline(
-        uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length);
+    virtual Values current() const = 0;
+    virtual std::optional<Values> timeline(std::chrono::milliseconds length) const;
 };
 
 using ParameterMonitorPtr = std::unique_ptr<AbstractParameterMonitor>;
@@ -40,7 +39,7 @@ class RuntimeParameterMonitor: public AbstractParameterMonitor
 public:
     RuntimeParameterMonitor(const ResourceType& resource, const Getter<ResourceType>& getter);
 
-    Values current() override;
+    Values current() const override;
 
 protected:
     const ResourceType m_resource;
@@ -60,9 +59,8 @@ public:
         DataBase::Writer dbWriter,
         const Watch<ResourceType>& watch);
 
-    Values current() override;
-    std::optional<Values> timeline(
-        uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) override;
+    Values current() const override;
+    std::optional<Values> timeline(std::chrono::milliseconds length) const override;
 
 private:
     void updateValue();
@@ -81,9 +79,8 @@ class ParameterGroupMonitor: public AbstractParameterMonitor
 public:
     ParameterGroupMonitor(std::map<QString, ParameterMonitorPtr> monitors);
 
-    Values current() override;
-    std::optional<Values> timeline(
-        uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length) override;
+    Values current() const override;
+    std::optional<Values> timeline(std::chrono::milliseconds length) const override;
 
 private:
     std::map<QString, ParameterMonitorPtr> m_monitors;
@@ -102,7 +99,7 @@ RuntimeParameterMonitor<ResourceType>::RuntimeParameterMonitor(
 }
 
 template<typename ResourceType>
-Values RuntimeParameterMonitor<ResourceType>::current()
+Values RuntimeParameterMonitor<ResourceType>::current() const
 {
     return api::metrics::makeParameterValue(m_getter(m_resource));
 }
@@ -122,22 +119,22 @@ DataBaseParameterMonitor<ResourceType>::DataBaseParameterMonitor(
 }
 
 template<typename ResourceType>
-Values DataBaseParameterMonitor<ResourceType>::current()
+Values DataBaseParameterMonitor<ResourceType>::current() const
 {
     return api::metrics::makeParameterValue(m_dbWriter->current());
 }
 
 template<typename ResourceType>
 std::optional<Values> DataBaseParameterMonitor<ResourceType>::timeline(
-    uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length)
+    std::chrono::milliseconds length) const
 {
-    const auto timedValues = m_dbWriter->last(length);
-    const auto now = nx::utils::monotonicTime();
     QJsonObject values;
-    for (const auto& [value, time]: timedValues)
+    const auto rawValues = m_dbWriter->last(length);
+    for (const auto& [value, time]: rawValues)
     {
-        const auto delayS = std::chrono::duration_cast<std::chrono::seconds>(now - time).count();
-        values[QString::number(nowSecsSinceEpoch - delayS)] = value;
+        const auto durationS = std::chrono::duration_cast<std::chrono::seconds>(
+            time.time_since_epoch()).count();
+        values.insert(QString::number(durationS), value);
     }
 
     return api::metrics::makeParameterValue(values);
@@ -146,7 +143,8 @@ std::optional<Values> DataBaseParameterMonitor<ResourceType>::timeline(
 template<typename ResourceType>
 void DataBaseParameterMonitor<ResourceType>::updateValue()
 {
-    return m_dbWriter->update(this->m_getter(this->m_resource));
+    const auto value = this->m_getter(this->m_resource);
+    return m_dbWriter->update(value);
 }
 
 template<typename ResourceType>
@@ -158,7 +156,7 @@ ParameterGroupMonitor<ResourceType>::ParameterGroupMonitor(
 }
 
 template<typename ResourceType>
-Values ParameterGroupMonitor<ResourceType>::current()
+Values ParameterGroupMonitor<ResourceType>::current() const
 {
     Values values;
     for (const auto& [id, monior]: m_monitors)
@@ -169,12 +167,12 @@ Values ParameterGroupMonitor<ResourceType>::current()
 
 template<typename ResourceType>
 std::optional<Values> ParameterGroupMonitor<ResourceType>::timeline(
-    uint64_t nowSecsSinceEpoch, std::chrono::milliseconds length)
+    std::chrono::milliseconds length) const
 {
     Values values;
     for (const auto& [id, monitor]: m_monitors)
     {
-        if (auto value = monitor->timeline(nowSecsSinceEpoch, length))
+        if (auto value = monitor->timeline(length))
             values.group[id] = std::move(*value);
     }
 

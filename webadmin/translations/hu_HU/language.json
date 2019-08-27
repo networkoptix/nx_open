@@ -8,7 +8,7 @@
     "setup": {
         "createAccount": "fiók létrehozása",
         "errorNoHDD": "Ezen eszköz beépített merevlemezekkel történő működésre lett kifejlesztve.<br>\nKapcsolja ki a készüléket és telepítse a merevlemezt.",
-        "errorNoNetwork": "A készülék működéséhez Internetkapcsolat szükséges. <br>\nKérjük csatlakoztassa a rendszerét az Internetre"
+        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
     },
     "passwordRequirements": {
         "minLengthMessage": "A jelszónak legalább 8 karakterből kell állnia",
@@ -189,5 +189,52 @@
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} web interfész"
+    },
+    "common": {
+        "voiceCommands": {
+            "search": "keresés + [szöveg a keresősávhoz]",
+            "pause": "szünet",
+            "help": "súgó | parancsok megjelenítése",
+            "collapse all servers": "összes szerver összecsukása",
+            "collapse server": "szerver összecsukása + [szerver neve]",
+            "play": "letjátszás",
+            "clear search": "keresés törlése",
+            "live": "élőbe menni | mutatsd élőben",
+            "expand all servers": "összes szerver kibontása",
+            "stop listening": "figyelés leállítása",
+            "expand server": "szerver kibontása + [szerver neve]",
+            "view": "nézet + [kamera neve]"
+        },
+        "systemOffline": "A rendszer offline",
+        "cameraLinks": {
+            "copyToClipboard": "másolás vágólapra",
+            "highStream": "Elsődleges stream",
+            "copyDefaultText": "másolás",
+            "unknown": "Ismeretlen",
+            "lowStream": "Másodlagos stream",
+            "transcoding": "Transzkódolás",
+            "copyActiveText": "vágólapra másolva"
+        },
+        "searchCamPlaceholder": "Keresés",
+        "cameraStates": {
+            "noFormat": "Ez a böngésző nem támogatja erről a kameráról történő videofájl lejátszást.",
+            "ieWin10": "Kérjük, használjon Microsoft Edge vagy Google Chrome böngészőt.",
+            "iosVideoTooLarge": "Az iOS nem támogat FullHD-nál (2MP: 1920x1080) nagyobb videót.",
+            "unauthorized": "Hitelesítés szükséges",
+            "ubuntuNX": "Ez a böngésző nem támogatja a videók ARM-alapú szerverről való lejátszását. Használjon helyette Chromium böngészőt.",
+            "ieNoWebm": "Kérjük telepítsen <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> at Internet Explorerben.",
+            "flashOrWebmRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a>vagy<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec-et</a> a videó Internet Explorerben történő lejátszásához.",
+            "noArmSupport": "Ez a böngésző vagy eszköz nem támogatja az ARM-alapú szerverről történő videofájl lejátszást.",
+            "error": "Hiba",
+            "offline": "Offline",
+            "noData": "Nincs adat",
+            "flashRequired": "Kérjük <a href='https://get.adobe.com/flashplayer/' target='_blank'>telepítsen Adobe Flasht</a> a videók lejátszásához."
+        },
+        "chromeCastWarning": "A Chromecast erőforrás-igényes, és problémákat okozhat a kiszolgálón.",
+        "resolution": {
+            "high": "Elsődleges",
+            "auto": "Auto",
+            "low": "Alacsony"
+        }
     }
 }

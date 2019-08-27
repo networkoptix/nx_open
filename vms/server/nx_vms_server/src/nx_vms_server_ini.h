@@ -25,9 +25,6 @@ struct Ini: public nx::kit::IniConfig
         "libtegra_video.so bug).");
 
     NX_INI_FLAG(0, forceLiteClient, "Force Lite Client for this server.");
-	
-    NX_INI_FLAG(0, allowMtDecoding,
-        "Allow multithreading decoding of video when software motion detection is enabled.");
 
     #define NX_VMS_SERVER_INI_LIVE_STREAM_CACHE_HELP \
         "Live Stream Cache allows Desktop Client's Right Panel receive adequate thumbnails of\n" \

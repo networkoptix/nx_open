@@ -42,68 +42,125 @@ struct NX_VMS_API PluginInfo: Data
 
     enum class Error
     {
-        noError, /**<%apidoc No error.*/
-        cannotLoadLibrary, /**<%apidoc OS cannot load the library file.*/
+        /**%apidoc
+         * No error.
+         */
+        noError,
 
-        /**%apidoc The library does not seem to be a valid Nx Plugin library,
-         * e.g. no expected entry point functions found.
+        /**%apidoc
+         * OS cannot load the library file.
+         */
+        cannotLoadLibrary,
+
+        /**%apidoc
+         * The library does not seem to be a valid Nx Plugin library, e.g. no expected entry point
+         * functions found.
          */
         invalidLibrary,
 
-        /**%apidoc The plugin library failed to initialize, e.g. its entry point function returned
-         * an error.
+        /**%apidoc
+         * The plugin library failed to initialize, e.g. its entry point function returned an
+         * error.
          */
         libraryFailure,
 
-        /**%apidoc The plugin has returned a bad manifest, e.g. null, empty, non-json, or json with
-         * an unexpected structure.
+        /**%apidoc
+         * The plugin has returned a bad manifest, e.g. null, empty, non-json, or json with an
+         * unexpected structure.
          */
         badManifest,
 
-        unsupportedVersion /**<%apidoc The plugin API version is no longer supported.*/
+        /**%apidoc
+         * The plugin API version is no longer supported.
+         */
+        unsupportedVersion,
+
+        /**%apidoc
+         * Some internal error has occured which made the proper PluginInfo structure unavailable.
+         * In this case the error message is stored in statusMessage field.
+         */
+        internalError,
     };
 
     enum class MainInterface
     {
-        undefined, /**<%apidoc */
-        nxpl_PluginInterface, /**<%apidoc Base interface for the old 3.2 SDK.*/
-        nxpl_Plugin, /**<%apidoc Old 3.2 SDK plugin supporting roSettings.*/
-        nxpl_Plugin2, /**<%apidoc Old 3.2 SDK plugin supporting pluginContainer.*/
-        nx_sdk_IPlugin, /**<%apidoc Base interface for the new 4.0 SDK.*/
-        nx_sdk_analytics_IPlugin, /**<%apidoc New 4.0 SDK Analytics plugin.*/
+        undefined,
+        nxpl_PluginInterface, /**<%apidoc Base interface for the old 3.2 SDK. */
+        nxpl_Plugin, /**<%apidoc Old 3.2 SDK plugin supporting roSettings. */
+        nxpl_Plugin2, /**<%apidoc Old 3.2 SDK plugin supporting pluginContainer. */
+        nx_sdk_IPlugin, /**<%apidoc Base interface for the new 4.0 SDK. */
+        nx_sdk_analytics_IPlugin, /**<%apidoc New 4.0 SDK Analytics plugin. */
     };
 
-    QString name; /**<%apidoc Name of the plugin from its manifest.*/
-    QString description; /**<%apidoc Description of the plugin from its manifest.*/
+    /**%apidoc
+     * Name of the plugin from its manifest.
+     */
+    QString name;
 
-    /**%apidoc Absolute path to the plugin dynamic library.*/
+    /**%apidoc
+     * Description of the plugin from its manifest.
+     */
+    QString description;
+
+    /**%apidoc
+     * Plugin name for logging: library file name with no `lib` prefix (on Linux) and no extension.
+     */
+    QString libName;
+
+    /**%apidoc
+     * Absolute path to the plugin dynamic library.
+     */
     QString libraryFilename;
 
-    /**%apidoc Absolute path to the plugin's dedicated directory where its
-     * dynamic library resides together with its possible dependencies, or an empty
-     * string if the plugin resides in a common directory with other plugins.
+    /**%apidoc
+     * Absolute path to the plugin's dedicated directory where its dynamic library resides together
+     * with its possible dependencies, or an empty string if the plugin resides in a common
+     * directory with other plugins.
      */
     QString homeDir;
 
-    QString vendor; /**<%apidoc Vendor of the plugin from its manifest.*/
-    QString version; /**<%apidoc Version of the plugin from its manifest.*/
+    /**%apidoc
+     * Vendor of the plugin from its manifest.
+     */
+    QString vendor;
 
-    /**%apidoc Whether the plugin resides in "plugins_optional" folder
-     * or in the regular "plugins" folder.
+    /**%apidoc
+     * Version of the plugin from its manifest.
+     */
+    QString version;
+
+    /**%apidoc
+     * Whether the plugin resides in "plugins_optional" folder or in the regular "plugins" folder.
      */
     Optionality optionality = Optionality::nonOptional;
 
-    /**%apidoc Status of the plugin after the plugin loading attempt.*/
+    /**%apidoc
+     * Status of the plugin after the plugin loading attempt.
+     */
     Status status = Status::loaded;
 
-    /**%apidoc Message in English with details about the plugin loading attempt.*/
+    /**%apidoc
+     * Message in English with details about the plugin loading attempt.
+     */
     QString statusMessage;
 
-    /**%apidoc If the plugin status is "notLoadedBecauseOfError", describes the error.*/
+    /**%apidoc
+     * If the plugin status is "notLoadedBecauseOfError", describes the error.
+     */
     Error errorCode = Error::noError;
 
-    /**%apidoc The latest Interface type that the Plugin object supports via queryInterface().*/
+    /**%apidoc
+     * The highest interface that the Plugin object (the one returned by the plugin entry function)
+     * supports via queryInterface().
+     */
     MainInterface mainInterface = MainInterface::undefined;
+
+    /**%apidoc
+     * For non-Analytics plugins and for device-independent Analytics plugins, is always set to
+     * true. For device-dependent Analytics plugins, is set to true if and only if the plugin has
+     * ever had a DeviceAgent since the Server start.
+     */
+    bool isActive = true;
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Optionality)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Status)
@@ -111,6 +168,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Error)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::MainInterface)
 #define PluginInfo_Fields (name) \
     (description) \
+    (libName) \
     (libraryFilename) \
     (homeDir) \
     (vendor) \
@@ -119,7 +177,13 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::MainInterface)
     (status) \
     (statusMessage) \
     (errorCode) \
-    (mainInterface)
+    (mainInterface) \
+    (isActive)
+
+NX_VMS_API QString toString(PluginInfo::Optionality value);
+NX_VMS_API QString toString(PluginInfo::Status value);
+NX_VMS_API QString toString(PluginInfo::Error value);
+NX_VMS_API QString toString(PluginInfo::MainInterface value);
 
 } // namespace nx::vms::api
 

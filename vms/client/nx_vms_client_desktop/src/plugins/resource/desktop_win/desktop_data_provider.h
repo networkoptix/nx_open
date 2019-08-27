@@ -46,15 +46,16 @@ public:
 
     bool readyToStop() const;
 
+    qint64 currentTime() const;
 protected:
     virtual void run() override;
 private:
     friend class CaptureAudioStream;
 
-    bool init();
+    bool initVideoCapturing();
+    bool initAudioCapturing();
     virtual void closeStream();
 
-    qint64 currentTime() const;
     int calculateBitrate(const char* codecName = nullptr);
     int processData(bool flush);
     void putAudioData();
@@ -79,7 +80,7 @@ private:
         int audioPacketSize();
         bool setupFormat(QString& errMessage);
         bool setupPostProcess();
-        qint64 currentTime() const { return m_owner->m_grabber->currentTime(); }
+        qint64 currentTime() const { return m_owner->currentTime(); }
         bool start();
         void stop();
         int nameToWaveIndex();
@@ -127,11 +128,13 @@ private:
     qint64 m_initTime;
     mutable QnMutex m_startMutex;
     bool m_started = false;
-    bool m_isInitialized = false;
+    bool m_isAudioInitialized = false;
+    bool m_isVideoInitialized = false;
 
     QPointer<QnVoiceSpectrumAnalyzer> m_soundAnalyzer;
     AVFrame* m_inputAudioFrame = nullptr;
     AVPacket* m_outPacket = nullptr;
+    std::unique_ptr<QElapsedTimer> m_timer;
 
     friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance,
         DWORD_PTR dwParam1, DWORD_PTR dwParam2);

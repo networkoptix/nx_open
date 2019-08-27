@@ -5,6 +5,7 @@
 #include <nx/utils/uuid.h>
 
 #include <common/common_globals.h>
+#include <common/common_module_aware.h>
 
 #include <client/client_globals.h>
 
@@ -15,14 +16,12 @@
 #include <ui/models/resource/resource_tree_model_fwd.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 
-#include <ui/workbench/workbench_context_aware.h>
-
 #include <utils/common/from_this_to_shared.h>
 #include <utils/common/connective.h>
 
 class QnResourceTreeModelNode:
     public Connective<QObject>,
-    public QnWorkbenchContextAware,
+    public QnCommonModuleAware,
     public QnFromThisToShared<QnResourceTreeModelNode>
 {
     Q_OBJECT
@@ -47,17 +46,17 @@ public:
     /**
     * Constructor for other virtual group nodes (recorders, other systems).
     */
-    QnResourceTreeModelNode(QnResourceTreeModel* model, NodeType type, const QString &name);
+    QnResourceTreeModelNode(QnResourceTreeModel* model, NodeType type, const QString& name);
 
     /**
      * Constructor for resource nodes.
      */
-    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnResourcePtr &resource, NodeType nodeType);
+    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnResourcePtr& resource, NodeType nodeType);
 
     /**
      * Constructor for item nodes.
      */
-    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, NodeType nodeType);
+    QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid& uuid, NodeType nodeType);
 
     virtual ~QnResourceTreeModelNode();
 
@@ -106,6 +105,8 @@ protected:
     void setName(const QString& name);
 
     bool isInitialized() const;
+
+    bool isVisible() const; //< Valid, not a bastard and not under a bastard.
 
     QnResourceTreeModel* model() const;
 

@@ -10,18 +10,18 @@ class LocalFileAnalyticsMetadataProvider: public core::AbstractAnalyticsMetadata
 public:
     LocalFileAnalyticsMetadataProvider(const QnResourcePtr& resource);
 
-    virtual nx::common::metadata::DetectionMetadataPacketPtr metadata(
+    virtual nx::common::metadata::ObjectMetadataPacketPtr metadata(
         std::chrono::microseconds timestamp,
         int channel) const override;
 
-    virtual QList<nx::common::metadata::DetectionMetadataPacketPtr> metadataRange(
+    virtual QList<nx::common::metadata::ObjectMetadataPacketPtr> metadataRange(
         std::chrono::microseconds startTimestamp,
         std::chrono::microseconds endTimestamp,
         int channel,
         int maximumCount) const override;
 
 private:
-    std::vector<nx::common::metadata::DetectionMetadataPacket> m_metadata;
+    std::vector<nx::common::metadata::ObjectMetadataPacket> m_metadata;
 };
 
 class LocalFileAnalyticsMetadataProviderFactory:

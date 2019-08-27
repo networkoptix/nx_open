@@ -1,8 +1,5 @@
 #include "radass_action_handler.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QStandardPaths>
-
 #include <QtWidgets/QAction>
 
 #include <api/global_settings.h>
@@ -13,12 +10,12 @@
 #include <core/resource/camera_resource.h>
 
 #include <camera/resource_display.h>
+#include <camera/cam_display.h>
 
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
-#include <nx/vms/client/desktop/radass/radass_cameras_watcher.h>
 
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -49,7 +46,6 @@ namespace nx::vms::client::desktop {
 
 struct RadassActionHandler::Private
 {
-    QScopedPointer<RadassCamerasWatcher> camerasWatcher;
     RadassController* controller = nullptr;
     RadassResourceManager* manager = nullptr;
 
@@ -63,7 +59,6 @@ RadassActionHandler::RadassActionHandler(QObject* parent):
     d(new Private)
 {
     d->controller = qnClientModule->radassController();
-    d->camerasWatcher.reset(new RadassCamerasWatcher(d->controller, resourcePool()));
     // Manager must be available from actions factory.
     d->manager = context()->instance<RadassResourceManager>();
     d->manager->setCacheDirectory(getCacheDirectory());

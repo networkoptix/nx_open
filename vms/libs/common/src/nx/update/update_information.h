@@ -97,6 +97,7 @@ struct PackageInformation
     QString platform;
     QList<Variant> variants;
     QString installScript;
+    qint64 freeSpaceRequired = 0;
 
     bool isValid() const { return !version.isNull(); }
     bool isServer() const;
@@ -105,9 +106,9 @@ struct PackageInformation
 };
 
 #define PackageInformation_Fields (version)(component)(cloudHost)(platform)(variants) \
-    (installScript)
+    (installScript)(freeSpaceRequired)
 
-QN_FUSION_DECLARE_FUNCTIONS(PackageInformation, (ubjson)(json)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(PackageInformation, (json))
 
 enum class InformationError
 {
@@ -193,6 +194,8 @@ public:
         progress(progress)
     {}
 
+    bool suitableForRetrying() const { return code == Code::error || code == Code::idle; }
+
     friend inline uint qHash(nx::update::Status::ErrorCode key, uint seed)
     {
         return ::qHash(static_cast<uint>(key), seed);
@@ -251,7 +254,6 @@ struct UpdateContents
     QDir storageDir;
     /** A list of files to be uploaded. */
     QStringList filesToUpload;
-
     /** Information for the clent update. */
     nx::update::Package clientPackage;
 
@@ -262,6 +264,7 @@ struct UpdateContents
      * pushed to mediaservers without internet.
      */
     QList<Package> manualPackages;
+
     bool cloudIsCompatible = true;
 
     bool packagesGenerated = false;
@@ -270,6 +273,9 @@ struct UpdateContents
 
     /** Resets data from verification. */
     void resetVerification();
+
+    /** Estimated space to keep manual packages. */
+    uint64_t getClientSpaceRequirements(bool withClient) const;
 
     nx::utils::SoftwareVersion getVersion() const;
 

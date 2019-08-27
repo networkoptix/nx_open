@@ -3,6 +3,7 @@
 #include <array>
 
 #include <api/model/api_model_fwd.h>
+#include <api/model/recording_stats_reply.h>
 
 #include <client_core/connection_context_aware.h>
 
@@ -17,6 +18,8 @@
 #include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
 
+struct QnStorageStatusReply;
+
 /** Client-side class to monitor server-related storages state: rebuild and backup process. */
 class QnServerStorageManager:
     public Connective<QObject>,
@@ -26,6 +29,7 @@ class QnServerStorageManager:
     Q_OBJECT
 
     typedef Connective<QObject> base_type;
+
 public:
     QnServerStorageManager(QObject *parent = nullptr);
     virtual ~QnServerStorageManager();
@@ -45,6 +49,23 @@ public:
 
     void saveStorages(const QnStorageResourceList &storages);
     void deleteStorages(const nx::vms::api::IdDataList &ids);
+
+    /**
+     * Requests storage space from mediaserver.
+     * Response data can be retrieved from signal `storageSpaceRecieved`
+     * @returns request handle. It is zero if something goes wrong. 
+     */
+    int requestStorageSpace(const QnMediaServerResourcePtr& server);
+
+    int requestStorageStatus(
+        const QnMediaServerResourcePtr& server,
+        const QString& storageUrl,
+        std::function<void (bool, int, const QnStorageStatusReply&)> callback);
+
+    int requestRecordingStatistics(const QnMediaServerResourcePtr& server,
+        qint64 bitrateAnalyzePeriodMs,
+        std::function<void (bool, int, const QnRecordingStatsReply&)> callback);
+
 signals:
     void serverProtocolsChanged(const QnMediaServerResourcePtr &server, const QSet<QString> &protocols);
     void serverRebuildStatusChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageScanData &status);
@@ -57,21 +78,20 @@ signals:
     void storageChanged(const QnStorageResourcePtr &storage);
     void storageRemoved(const QnStorageResourcePtr &storage);
 
+    void storageSpaceRecieved(QnMediaServerResourcePtr server,
+        bool success, int handle, const QnStorageSpaceReply& reply);
+
 private:
     void invalidateRequests();
-
     bool isServerValid(const QnMediaServerResourcePtr &server) const;
 
     bool sendArchiveRebuildRequest(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, Qn::RebuildAction action = Qn::RebuildAction_ShowProgress);
     bool sendBackupRequest(const QnMediaServerResourcePtr &server, Qn::BackupAction action = Qn::BackupAction_ShowProgress);
-    bool sendStorageSpaceRequest(const QnMediaServerResourcePtr &server);
 
-private slots:
-    void at_archiveRebuildReply (int status, const QnStorageScanData    &reply, int handle);
-    void at_backupStatusReply   (int status, const QnBackupStatusData   &reply, int handle);
-    void at_storageSpaceReply   (int status, const QnStorageSpaceReply  &reply, int handle);
-
-
+private:
+    void at_archiveRebuildReply(bool success, int handle, const QnStorageScanData& reply);
+    void at_backupStatusReply(bool success, int handle, const QnBackupStatusData& reply);
+    void at_storageSpaceReply(bool success, int handle, const QnStorageSpaceReply& reply);
 
 private:
     struct ServerInfo;

@@ -112,9 +112,14 @@ int QnUpdateInformationRestHandler::checkInternetForUpdate(
     QByteArray* contentType,
     const UpdateInformationRequestData& request) const
 {
+    NX_DEBUG(this, "Checking the Internet for the update information...");
     nx::update::InformationError error;
     auto information = nx::update::updateInformation(m_settings->checkForUpdateUrl(),
         m_engineVersion, publicationKey, &error);
+
+    NX_DEBUG(
+        this, "Checking the Internet for the update information. Done. Success: %1",
+        error == nx::update::InformationError::noError);
 
     if (error == nx::update::InformationError::noError)
     {
@@ -234,6 +239,8 @@ int QnUpdateInformationRestHandler::executeGet(
     auto commonModule = processor->commonModule();
     const auto request = QnMultiserverRequestData::fromParams<UpdateInformationRequestData>(
         processor->resourcePool(), params);
+
+    NX_DEBUG(this, "Received /ec2/updateInformation request. IsLocal = %1", request.isLocal);
 
     QnMultiserverRequestContext<UpdateInformationRequestData> context(
         request, processor->owner()->getPort());

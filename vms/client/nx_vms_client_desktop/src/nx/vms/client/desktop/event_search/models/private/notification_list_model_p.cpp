@@ -440,7 +440,7 @@ QString NotificationListModel::Private::caption(const nx::vms::event::EventParam
                 ? tr("Generic Event")
                 : parameters.caption;
 
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
             return parameters.caption.isEmpty()
                 ? tr("Unknown Plugin Diagnostic Event")
                 : parameters.caption;
@@ -467,7 +467,7 @@ QString NotificationListModel::Private::description(
     switch (parameters.eventType)
     {
         case EventType::userDefinedEvent:
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
         case EventType::analyticsSdkEvent:
             return parameters.description;
 
@@ -550,7 +550,7 @@ QPixmap NotificationListModel::Private::pixmapForAction(
         case EventType::licenseIssueEvent:
             return qnSkin->pixmap("events/license.png");
 
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
             return qnSkin->pixmap("events/alert.png");
 
         default:

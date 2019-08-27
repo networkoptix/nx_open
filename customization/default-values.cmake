@@ -36,6 +36,7 @@ set(mac_certificate_file_password "qweasd123")
 # Additional Features
 set(vmax false)
 set(enable_hanwha false)
+set(useMetaVersion OFF)
 
 # if true, you can use --customization=<path> to specify customization
 set(dynamic.customization false)
@@ -67,6 +68,8 @@ set(translations
     uk_UA
     vi_VN
     th_TH
+    fi_FI
+    sv_SE
 )
 set(defaultTranslation en_US)
 
