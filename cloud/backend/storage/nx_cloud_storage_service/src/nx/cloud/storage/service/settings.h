@@ -34,7 +34,7 @@ struct Aws
     nx::utils::Url stsUrl;
     std::string assumeRoleArn;
     // Corresponds to aws default value
-    std::chrono::seconds storageCredentialsDuration = std::chrono::seconds(3600);
+    std::chrono::seconds storageCredentialsDuration;
 };
 
 struct GeoIp

@@ -44,6 +44,7 @@ static constexpr char kAccessKeyId[] = "accessKeyId";
 static constexpr char kSecretAccessKey[] = "secretAccessKey";
 static constexpr char kAssumeRoleArn[] = "assumeRoleArn";
 static constexpr char kStorageCredentialsDuration[] = "storageCredentialsDuration";
+static constexpr std::chrono::seconds kDefaultStorageCredentialsDuration;
 
 } // namespace aws
 
@@ -137,7 +138,7 @@ void Settings::loadAws()
             nx::utils::parseTimerDuration(
                 settings().value(lm("%1/%2").args(kGroupName, kStorageCredentialsDuration))
                     .toString(),
-                m_aws.storageCredentialsDuration));
+                kDefaultStorageCredentialsDuration));
 }
 
 void Settings::loadGeoIp()
