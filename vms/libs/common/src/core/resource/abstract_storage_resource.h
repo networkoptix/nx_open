@@ -28,11 +28,8 @@ public:
     {
     public:
         explicit FileInfo(const QString& uri, qint64 size, bool isDir = false):
-            m_fpath(uri),
-            m_size(size),
-            m_isDir(isDir)
+            m_fpath(uri), m_size(size), m_isDir(isDir)
         {
-            parseUri();
         }
 
         explicit FileInfo(const QFileInfo& qfi) : m_qFileInfo(new QFileInfo(qfi)) {}
@@ -65,17 +62,42 @@ public:
 
         QString absoluteDirPath() const
         {
-            return m_qFileInfo ? m_qFileInfo->absoluteDir().path() : m_dir;
+            if (m_qFileInfo)
+                return m_qFileInfo->absoluteDir().path();
+
+            if (m_isDir)
+                return m_fpath;
+
+            const auto lastSeparatorIndex = m_fpath.lastIndexOf(QDir().separator());
+            if (lastSeparatorIndex == -1)
+                return m_fpath;
+
+            return m_fpath.left(lastSeparatorIndex);
         }
 
         QString fileName() const
         {
-            return m_qFileInfo ? m_qFileInfo->fileName() : m_fname;
+            if (m_qFileInfo)
+                return m_qFileInfo->fileName();
+
+            const auto lastSeparatorIndex = m_fpath.lastIndexOf(QDir().separator());
+            if (lastSeparatorIndex == -1)
+                return m_fpath;
+
+            return m_fpath.mid(lastSeparatorIndex + 1);
         }
 
         QString baseName() const
         {
-            return m_qFileInfo ? m_qFileInfo->baseName() : m_basename;
+            if (m_qFileInfo)
+                return m_qFileInfo->baseName();
+
+            const auto fileName = this->fileName();
+            const int dotIndex = fileName.indexOf('.');
+            if (dotIndex == -1)
+                return fileName;
+
+            return fileName.left(dotIndex);
         }
 
         qint64 size() const
@@ -85,12 +107,17 @@ public:
 
         QDateTime created() const
         {
-            return m_qFileInfo ? m_qFileInfo->created() : m_created;
+            return m_qFileInfo ? m_qFileInfo->created() : QDateTime();
         }
 
         QString extension() const
         {
-            return "";
+            const auto fileName = this->fileName();
+            const int lastDotIndex = fileName.lastIndexOf('.');
+            if (lastDotIndex == -1)
+                return "";
+
+            return fileName.mid(lastDotIndex + 1);
         }
 
         QString toString() const
@@ -99,50 +126,10 @@ public:
         }
 
     private:
-        void parseUri()
-        {
-            QStringList pathEntries = m_fpath.split("/");
-            bool found = false;
-
-            auto assignBaseName =
-                [this]()
-                {
-                    int dotIndex = m_fname.lastIndexOf(".");
-                    if (dotIndex != -1)
-                        m_basename = m_fname.left(dotIndex);
-                    else
-                        m_basename = m_fname;
-                };
-
-            for (int i = pathEntries.size() - 1; i >= 0; --i)
-            {
-                if (!pathEntries[i].isEmpty())
-                {
-                    found = true;
-                    m_fname = pathEntries[i];
-                    assignBaseName();
-
-                    break;
-                }
-            }
-
-            if (!found && !m_fpath.isEmpty())
-            {
-                m_fname = m_fpath;
-                assignBaseName();
-            }
-
-        }
-
-    private:
         QString m_fpath;
-        QString m_basename;
-        QString m_fname;
-        QString m_dir;
         qint64 m_size = 0;
         bool m_isDir = false;
         std::shared_ptr<QFileInfo> m_qFileInfo;
-        QDateTime m_created;
     };
 
     typedef QList<FileInfo> FileInfoList;

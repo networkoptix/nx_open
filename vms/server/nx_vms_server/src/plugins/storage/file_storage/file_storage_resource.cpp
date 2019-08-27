@@ -142,7 +142,6 @@ QIODevice* QnFileStorageResource::open(
 
     QString fileName = removeProtocolPrefix(translateUrlToLocal(url));
 
-    qDebug() << "FILE STORAGE OPEN" << fileName;
     int ioBlockSize = 0;
     int ffmpegBufferSize = 0;
 

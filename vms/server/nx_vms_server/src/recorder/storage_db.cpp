@@ -242,7 +242,9 @@ void QnStorageDb::removeFiles(
     const QnAbstractStorageResource::FileInfoList& toRemove,
     const QnAbstractStorageResource::FileInfo& except)
 {
-    //NX_DEBUG(this, "QnStorageDb::removeFiles: To remove: %1, exception: %2", toRemove, except.toString());
+    NX_DEBUG(
+        this, "QnStorageDb::removeFiles: To remove: %1, exception: %2", containerString(toRemove),
+        except);
     for (const auto& fileInfo: toRemove)
     {
         if (fileInfo != except)
@@ -333,7 +335,7 @@ QnAbstractStorageResource::FileInfoList QnStorageDb::allDbFiles(const QString& b
             return path1 < path2;
         });
 
-    //NX_DEBUG(this, "DB files found: %1", candidates);
+    NX_DEBUG(this, "DB files found: %1", containerString(candidates));
     return candidates;
 }
 
@@ -367,7 +369,9 @@ void QnStorageDb::addCatalogFromMediaFolder(
 {
     QString root = closeDirPath(m_dbFileInfo.absoluteDirPath()) + postfix;
     const auto fileInfos = m_storage->getFileList(root);
-    //NX_DEBUG(this, "QnStorageDb::addCatalogFromMediaFolder: root: %1, files: %2", root, fileInfos);
+    NX_DEBUG(
+        this, "QnStorageDb::addCatalogFromMediaFolder: root: %1, files: %2", root,
+        containerString(fileInfos));
     for (const QnAbstractStorageResource::FileInfo& fi: fileInfos)
     {
         if (fi.isDir())
