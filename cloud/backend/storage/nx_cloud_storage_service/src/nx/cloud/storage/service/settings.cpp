@@ -44,7 +44,8 @@ static constexpr char kAccessKeyId[] = "accessKeyId";
 static constexpr char kSecretAccessKey[] = "secretAccessKey";
 static constexpr char kAssumeRoleArn[] = "assumeRoleArn";
 static constexpr char kStorageCredentialsDuration[] = "storageCredentialsDuration";
-static constexpr std::chrono::seconds kDefaultStorageCredentialsDuration;
+static constexpr std::chrono::seconds kDefaultStorageCredentialsDuration =
+    std::chrono::seconds(3600);
 
 } // namespace aws
 
