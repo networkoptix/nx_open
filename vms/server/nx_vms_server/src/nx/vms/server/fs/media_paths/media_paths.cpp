@@ -13,13 +13,17 @@ QStringList get(FilterConfig filterConfig)
     return detail::Filter(std::move(filterConfig)).get();
 }
 
-bool isMounted(FilterConfig config, const QString& path)
+bool isMounted(
+    FilterConfig config,
+    const QString& path,
+    nx::utils::MoveOnlyFunc<QString(const QString&)> toCanonical)
 {
     if (path.contains(config.dataDirectory))
         return true;
 
     int mediaFolderPos = path.indexOf(config.mediaFolderName);
-    const QString toCheck = QDir::cleanPath(mediaFolderPos == -1 ? path : path.left(mediaFolderPos));
+    QString toCheck = QDir::cleanPath(mediaFolderPos == -1 ? path : path.left(mediaFolderPos));
+    toCheck = toCanonical(toCheck);
 
     return std::any_of(
         config.partitions.cbegin(), config.partitions.cend(),
