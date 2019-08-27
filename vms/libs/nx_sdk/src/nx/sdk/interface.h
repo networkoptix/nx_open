@@ -19,7 +19,7 @@ namespace sdk {
  * class MyInterface: public nx::sdk::Interface<MyInterface, MyBaseInterface>
  * {
  * public:
- *     static auto interfaceId() { return interfaceId("my_namespace::MyInterface"); }
+ *     static auto interfaceId() { return makeId("my_namespace::MyInterface"); }
  *     ... // pure virtual methods
  * };
  * ```

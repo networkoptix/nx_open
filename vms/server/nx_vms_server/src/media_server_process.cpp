@@ -2887,7 +2887,7 @@ void MediaServerProcess::registerRestHandlers(
         new nx::vms::server::rest::AnalyticsEngineSettingsHandler(serverModule()));
 
     /**%apidoc GET /ec2/deviceAnalyticsSettings
-     * Return settings values of the specified device-engine pair.
+     * Return settings values of the specified DeviceAgent (which is a device-engine pair).
      * %param:string analyticsEngineId Unique id of an Analytics Engine.
      * %param:string deviceId Id of a device.
      * %return:object JSON object with an error code, error string, and the reply on success.
@@ -2899,7 +2899,8 @@ void MediaServerProcess::registerRestHandlers(
      *             according to each setting type.
      *
      * %apidoc POST /ec2/deviceAnalyticsSettings
-     * Applies passed settings values to the correspondent device-engine pair.
+     * Applies passed settings values to the corresponding DeviceAgent (which is a device-engine
+     * pair).
      * %param:string engineId Unique id of an Analytics Engine.
      * %param:string deviceId Id of a device.
      * %param:object settings Name-value map with setting values, using JSON types according to
@@ -2916,8 +2917,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/deviceAnalyticsSettings",
         new nx::vms::server::rest::DeviceAnalyticsSettingsHandler(serverModule()));
 
-    reg(
-        nx::network::http::Method::options,
+    reg(nx::network::http::Method::options,
         QnRestProcessorPool::kAnyPath,
         new OptionsRequestHandler());
 

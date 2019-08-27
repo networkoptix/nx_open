@@ -21,7 +21,7 @@
     <message>
       <location/>
       <source>GPU Information</source>
-      <translation>Графічний адаптер</translation>
+      <translation>Інформація про GPU</translation>
     </message>
     <message>
       <location/>
@@ -31,12 +31,12 @@
     <message>
       <location/>
       <source>System Servers</source>
-      <translation>Сервери в системі</translation>
+      <translation>Сервери в Cистемі</translation>
     </message>
     <message>
       <location/>
       <source>Customer Support</source>
-      <translation>Технічна підтримка</translation>
+      <translation>Технічна Пiдтримка</translation>
     </message>
   </context>
   <context>
@@ -44,7 +44,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/accessible_resources_widget.ui"/>
       <source>Filter</source>
-      <translation>Пошук</translation>
+      <translation>Фільтр</translation>
     </message>
   </context>
   <context>
@@ -90,32 +90,32 @@
     <message>
       <location/>
       <source>Double Buffering</source>
-      <translation>Подвійна буферизація</translation>
+      <translation>Подвійна Буферизація</translation>
     </message>
     <message>
       <location/>
       <source>Maximum Live Buffer Length</source>
-      <translation>Максимальний розмір буфера живого відео</translation>
+      <translation>Максимальна довжина Буфера в реальному часі</translation>
     </message>
     <message>
       <location/>
       <source>Browse Logs</source>
-      <translation>Перегляд журналу подій</translation>
+      <translation>Перегляд Логiв</translation>
     </message>
     <message>
       <location/>
       <source>Clear Local Cache</source>
-      <translation>Очистити локальний кеш</translation>
+      <translation>Очистити Локальний Кеш</translation>
     </message>
     <message>
       <location/>
       <source>Reset All Warnings</source>
-      <translation>Скинути всі попередження</translation>
+      <translation>Скинути Всі Попередження</translation>
     </message>
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation>На дисплеї Intel HD Graphics можуть виникнути проблеми, якщо включено розмиття. Ми настійно рекомендуємо залишити опцію як є.</translation>
+      <translation>На дисплеї Intel HD Graphics можуть виникнути проблеми, якщо включено розмиття. Ми рекомендуємо залишити опцію, як усталено.</translation>
     </message>
     <message>
       <location/>
@@ -166,7 +166,7 @@
     <message>
       <location/>
       <source>Event Type:</source>
-      <translation>Тип події:</translation>
+      <translation>Тип Події:</translation>
     </message>
   </context>
   <context>
@@ -174,7 +174,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/archive_length_widget.ui"/>
       <source>Fixed Archive Length</source>
-      <translation>Фіксована довжина архіву</translation>
+      <translation>Фіксована Довжина Архіву</translation>
     </message>
     <message>
       <location/>
@@ -227,7 +227,7 @@
     <message>
       <location/>
       <source>Event rules</source>
-      <translation>Règles d'événement</translation>
+      <translation>Правила подій</translation>
     </message>
     <message>
       <location/>
@@ -242,7 +242,7 @@
     <message>
       <location/>
       <source>Select all</source>
-      <translation>Вибрати все</translation>
+      <translation>Обрати все</translation>
     </message>
     <message>
       <location/>
@@ -267,12 +267,12 @@
     <message>
       <location/>
       <source>Email settings</source>
-      <translation>Налаштування e-mail</translation>
+      <translation>Налаштування електронної пошти</translation>
     </message>
     <message>
       <location/>
       <source>All servers are offline. Audit data is not available.</source>
-      <translation>Всі сервери відключені. Журнали недоступні.</translation>
+      <translation>Всі сервери офлайн. Журнали недоступні.</translation>
     </message>
   </context>
   <context>
@@ -280,17 +280,17 @@
     <message>
       <location filename="../src/ui/dialogs/backup_schedule_dialog.ui"/>
       <source>Backup Schedule...</source>
-      <translation>Розклад резервного копіювання...</translation>
+      <translation>Розклад Резервного Копіювання...</translation>
     </message>
     <message>
       <location/>
       <source>Execute backup on the following days:</source>
-      <translation>Створити резервну копію в наст. дні:</translation>
+      <translation>Виконати резервне копіювання в наступні дні:</translation>
     </message>
     <message>
       <location/>
       <source>Limit Bandwidth to:</source>
-      <translation>Обмежити пропускну здатність:</translation>
+      <translation>Обмежити Пропускну Здатність:</translation>
     </message>
     <message>
       <location/>
@@ -300,12 +300,12 @@
     <message>
       <location/>
       <source>Bitrate limitation could lead to backup failure.</source>
-      <translation>Обмеження бітрейта може привести до збоїв при резервному копіюванні.</translation>
+      <translation>Обмеження бітрейта може приpвести до збоїв при резервному копіюванні.</translation>
     </message>
     <message>
       <location/>
       <source>Finish</source>
-      <translation>Закінчити</translation>
+      <translation>Завершити</translation>
     </message>
     <message>
       <location/>
@@ -323,7 +323,7 @@
     <message>
       <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
       <source>Backup Settings</source>
-      <translation>Параметри резервного копіювання</translation>
+      <translation>Налаштування Резервного Копіювання</translation>
     </message>
     <message>
       <location/>
@@ -333,12 +333,12 @@
     <message>
       <location/>
       <source>Set Schedule...</source>
-      <translation>Встановити розклад...</translation>
+      <translation>Встановити Розклад...</translation>
     </message>
     <message>
       <location/>
       <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
-      <translation>Тільки подальний запис буде збережений. Існуючий архів резервуватися не буде.</translation>
+      <translation>Тільки пізніший запис буде збережений. Існуючий архів резервуватися не буде.</translation>
     </message>
     <message>
       <location/>
@@ -348,12 +348,12 @@
     <message>
       <location/>
       <source>Backup Archive From</source>
-      <translation>Резервувати архів від</translation>
+      <translation>Резервувати Архів від</translation>
     </message>
     <message>
       <location/>
       <source>Backup Quality</source>
-      <translation>Якість резервного копіювання</translation>
+      <translation>Якість Резервного Копіювання</translation>
     </message>
   </context>
   <context>
@@ -381,7 +381,7 @@
     <message>
       <location/>
       <source>Post-recording:</source>
-      <translation>Пост-запис:</translation>
+      <translation>Пост запис:</translation>
     </message>
   </context>
   <context>
@@ -399,17 +399,17 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>Ширина області</translation>
+      <translation>Ширина Області</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>Розмір шрифту</translation>
+      <translation>Розмір Шрифту</translation>
     </message>
     <message>
       <location/>
       <source>Include description</source>
-      <translation>Включити опис</translation>
+      <translation>Включити Опис</translation>
     </message>
   </context>
   <context>
@@ -493,7 +493,7 @@
     <message>
       <location/>
       <source>Do</source>
-      <translation>То</translation>
+      <translation>Зробити</translation>
     </message>
     <message>
       <location/>
@@ -560,7 +560,7 @@
     <message>
       <location/>
       <source>Do not archive secondary stream</source>
-      <translation>Не записувати вторинний потік</translation>
+      <translation>Не записувати другий потік</translation>
     </message>
     <message>
       <location/>
@@ -610,12 +610,12 @@
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation>Включити вторинний потік</translation>
+      <translation>Виключити другий потік</translation>
     </message>
     <message>
       <location/>
       <source>Motion Detection</source>
-      <translation>Детектор руху</translation>
+      <translation>Детекцiя Руху</translation>
     </message>
     <message>
       <location/>
@@ -625,7 +625,7 @@
     <message>
       <location/>
       <source>Media Streaming</source>
-      <translation>Потокове мовлення</translation>
+      <translation>Потокове Передавання Медіа</translation>
     </message>
     <message>
       <location/>
@@ -655,22 +655,22 @@
     <message>
       <location/>
       <source>RTP transport</source>
-      <translation>Транспорт RTP</translation>
+      <translation>RTP передача</translation>
     </message>
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation>Порт спеціального мультимедіа</translation>
+      <translation>Порт Спеціального Мультимедіа</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation>Довіряйте часовій мітці камери</translation>
+      <translation>Довіряти часовій мітці камери</translation>
     </message>
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation>Тип бажаного налаштування PTZ:</translation>
+      <translation>Тип бажаного пресету PTZ:</translation>
     </message>
     <message>
       <location/>
@@ -695,7 +695,7 @@
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation>Ця камера підтримує масштабування</translation>
+      <translation>Ця камера підтримує збiльшення зображення, zoom</translation>
     </message>
     <message>
       <location/>
@@ -718,12 +718,12 @@
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>IP-адреса</translation>
+      <translation>IP адреса</translation>
     </message>
     <message>
       <location/>
       <source>Ping</source>
-      <translation>Затримка</translation>
+      <translation>Пінг</translation>
     </message>
     <message>
       <location/>
@@ -753,7 +753,7 @@
     <message>
       <location/>
       <source>MAC Address</source>
-      <translation>MAC-адреса</translation>
+      <translation>MAC Адреса</translation>
     </message>
     <message>
       <location/>
@@ -768,7 +768,7 @@
     <message>
       <location/>
       <source>Camera rules</source>
-      <translation>Правила для камери</translation>
+      <translation>Правила камер</translation>
     </message>
     <message>
       <location/>
@@ -781,7 +781,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input ID</source>
-      <translation>ID тривожного входу</translation>
+      <translation>ID Тривожного входу</translation>
     </message>
   </context>
   <context>
@@ -789,7 +789,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_license_panel_widget.ui"/>
       <source>Activate License...</source>
-      <translation>Активувати ліцензію...</translation>
+      <translation>Активувати Ліцензію...</translation>
     </message>
   </context>
   <context>
@@ -828,7 +828,7 @@
     <message>
       <location/>
       <source>Output ID:</source>
-      <translation>ID тривожного виходу:</translation>
+      <translation>ID Тривожного виходу:</translation>
     </message>
   </context>
   <context>
@@ -836,7 +836,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_schedule_widget.ui"/>
       <source>Motion Recording</source>
-      <translation>Запис по руху</translation>
+      <translation>Запис по Руху</translation>
     </message>
     <message>
       <location/>
@@ -851,12 +851,12 @@
     <message>
       <location/>
       <source>Copying Schedule</source>
-      <translation>Копіювати розклад</translation>
+      <translation>Копіювати Розклад</translation>
     </message>
     <message>
       <location/>
       <source>Apply changes before copying schedule.</source>
-      <translation>Збережіть зміни перед копіюванням.</translation>
+      <translation>Збережіть зміни перед копіюванням розкладу.</translation>
     </message>
     <message>
       <location/>
@@ -874,7 +874,7 @@
     <message>
       <location/>
       <source>Select Cameras</source>
-      <translation>Виберіть Камери</translation>
+      <translation>Оберіть Камери</translation>
     </message>
   </context>
   <context>
@@ -887,7 +887,7 @@
     <message>
       <location/>
       <source>Edit Credentials</source>
-      <translation>Редагування повноважень</translation>
+      <translation>Редагування Облікових Даних</translation>
     </message>
     <message>
       <location/>
@@ -897,12 +897,12 @@
     <message>
       <location/>
       <source>Enable audio</source>
-      <translation>Увімкнути звук</translation>
+      <translation>Включити звук</translation>
     </message>
     <message>
       <location/>
       <source>Edit Streams...</source>
-      <translation>Редагувати потоки...</translation>
+      <translation>Редагувати Потоки...</translation>
     </message>
   </context>
   <context>
@@ -910,7 +910,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
       <source>Streams Addresses</source>
-      <translation>Поточні адреси</translation>
+      <translation>Поточні Адреси</translation>
     </message>
   </context>
   <context>
@@ -952,7 +952,7 @@
     <message>
       <location filename="../src/ui/dialogs/connection_testing_dialog.ui"/>
       <source>Connection Test</source>
-      <translation>Перевірка підключення</translation>
+      <translation>Перевірка Підключення</translation>
     </message>
     <message>
       <location/>
@@ -1001,12 +1001,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
       <source>Create Backup...</source>
-      <translation>Створити резервну копію...</translation>
+      <translation>Створити Резервну Копію...</translation>
     </message>
     <message>
       <location/>
       <source>Restore from Backup...</source>
-      <translation>Відновити з резервної копії...</translation>
+      <translation>Відновити з Резервної Копії...</translation>
     </message>
   </context>
   <context>
@@ -1019,17 +1019,17 @@
     <message>
       <location/>
       <source>SELECT SERVER</source>
-      <translation>ВИБЕРІТЬ СЕРВЕР</translation>
+      <translation>ОБЕРІТЬ СЕРВЕР</translation>
     </message>
     <message>
       <location/>
       <source>Known Address</source>
-      <translation>Відома адреса</translation>
+      <translation>Відома Адреса</translation>
     </message>
     <message>
       <location/>
       <source>Subnet Scan</source>
-      <translation>Сканування підмережі</translation>
+      <translation>Сканування Підмережі</translation>
     </message>
     <message>
       <location/>
@@ -1084,12 +1084,12 @@
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation>Додати пристрої</translation>
+      <translation>Додати Пристрої</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
-      <translation>За замовчанням</translation>
+      <translation>Як Усталено</translation>
     </message>
   </context>
   <context>
@@ -1102,12 +1102,12 @@
     <message>
       <location/>
       <source>I Do Not Agree</source>
-      <translation>Я не згідний</translation>
+      <translation>Я не Згоден</translation>
     </message>
     <message>
       <location/>
       <source>I Agree</source>
-      <translation>Я згоден</translation>
+      <translation>Я Згоден</translation>
     </message>
   </context>
   <context>
@@ -1130,7 +1130,7 @@
     <message>
       <location/>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation>Всі сервери відключені. Журнали недоступні.</translation>
+      <translation>Всі сервери офлайн. Логи недоступні.</translation>
     </message>
     <message>
       <location/>
@@ -1143,7 +1143,7 @@
     <message>
       <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
       <source>HTTP content</source>
-      <translation>HTTP-контент</translation>
+      <translation>HTTP контент</translation>
     </message>
     <message>
       <location/>
@@ -1158,7 +1158,7 @@
     <message>
       <location/>
       <source>Password to authenticate (optional)</source>
-      <translation>Ім'я користувача для аутентифікації (необов'язково)</translation>
+      <translation>Пароль користувача для автентифікації (необов'язково)</translation>
     </message>
     <message>
       <location/>
@@ -1173,12 +1173,12 @@
     <message>
       <location/>
       <source>HTTP URL</source>
-      <translation>URL HTTPS</translation>
+      <translation>URL HTTP</translation>
     </message>
     <message>
       <location/>
       <source>Authentication type</source>
-      <translation>Тип автентифікації</translation>
+      <translation>Тип Автентифікації</translation>
     </message>
     <message>
       <location/>
@@ -1191,7 +1191,7 @@
     <message>
       <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
       <source>PTZ preset:</source>
-      <translation>PTZ позиції:</translation>
+      <translation>PTZ пресет:</translation>
     </message>
   </context>
   <context>
@@ -1199,7 +1199,7 @@
     <message>
       <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
       <source>On layout</source>
-      <translation>На макеті</translation>
+      <translation>На закладку</translation>
     </message>
   </context>
   <context>
@@ -1225,12 +1225,12 @@
     <message>
       <location/>
       <source>Apply Filters</source>
-      <translation>Застосувати фільтри</translation>
+      <translation>Застосувати Фільтри</translation>
     </message>
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>Обертання, розгортка, поліпшення зображення тощо.</translation>
+      <translation>Обертання, Розгортка, Поліпшення Зображення, тощо.</translation>
     </message>
     <message>
       <location/>
@@ -1243,7 +1243,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation>Захист паролем</translation>
+      <translation>Захистіть паролем</translation>
     </message>
     <message>
       <location/>
@@ -1256,12 +1256,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
-      <translation>Експорт відео</translation>
+      <translation>Експорт Відео</translation>
     </message>
     <message>
       <location/>
       <source>Single Camera</source>
-      <translation>Окрема камера</translation>
+      <translation>Окрема Камера</translation>
     </message>
     <message>
       <location/>
@@ -1271,7 +1271,7 @@
     <message>
       <location/>
       <source>Multi Video</source>
-      <translation>Мульти відео</translation>
+      <translation>Мульти Відео</translation>
     </message>
   </context>
   <context>
@@ -1279,7 +1279,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/common/widgets/filename_panel.ui"/>
       <source>Browse...</source>
-      <translation>Огляд...</translation>
+      <translation>Перегляд...</translation>
     </message>
   </context>
   <context>
@@ -1287,7 +1287,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/details/filtered_resource_selection_widget.ui"/>
       <source>Nothing matches your search</source>
-      <translation>По вашому запиту немає результатів</translation>
+      <translation>За вашим запитом нічого не знайдено</translation>
     </message>
   </context>
   <context>
@@ -1295,32 +1295,32 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/fisheye/fisheye_settings_widget.ui"/>
       <source>Ceiling Mount</source>
-      <translation>Стельове кріплення</translation>
+      <translation>Стельове Кріплення</translation>
     </message>
     <message>
       <location/>
       <source>Wall Mount</source>
-      <translation>Настінне кріплення</translation>
+      <translation>Настінне Кріплення</translation>
     </message>
     <message>
       <location/>
       <source>Floor/Table Mount</source>
-      <translation>Підлогове / настільне кріплення</translation>
+      <translation>Кріплення на підлогу / Настільне</translation>
     </message>
     <message>
       <location/>
       <source>Fisheye Dewarping</source>
-      <translation>Розгортка камер "риб'яче око"</translation>
+      <translation>Розгортка камер Fisheye</translation>
     </message>
     <message>
       <location/>
       <source>Auto Calibration</source>
-      <translation>Автокалібровка</translation>
+      <translation>Авто Калібровка</translation>
     </message>
     <message>
       <location/>
       <source>Mount Angle Correction:</source>
-      <translation>Корекція кута нахилу:</translation>
+      <translation>Корекція Кута Нахилу:</translation>
     </message>
     <message>
       <location/>
@@ -1371,7 +1371,7 @@
     <message>
       <location/>
       <source>Auto Pause Video</source>
-      <translation>Приостанавливать воспроизведение</translation>
+      <translation>Автоматична Пауза Відео</translation>
     </message>
     <message>
       <location/>
@@ -1381,7 +1381,7 @@
     <message>
       <location/>
       <source>Minutes of Inactivity</source>
-      <translation>Хвилин бездії</translation>
+      <translation>Хвилин без Дії</translation>
     </message>
     <message>
       <location/>
@@ -1396,22 +1396,22 @@
     <message>
       <location/>
       <source>Local Media Folders</source>
-      <translation>Локальні медіа папки</translation>
+      <translation>Локальні Медіа Папки</translation>
     </message>
     <message>
       <location/>
       <source>Audio Input</source>
-      <translation>Аудіовхід</translation>
+      <translation>Аудіо Вхід</translation>
     </message>
     <message>
       <location/>
       <source>First Source</source>
-      <translation>Перше джерело</translation>
+      <translation>Перше Джерело</translation>
     </message>
     <message>
       <location/>
       <source>Second Source</source>
-      <translation>Друге джерело</translation>
+      <translation>Друге Джерело</translation>
     </message>
     <message>
       <location/>

@@ -53,20 +53,9 @@ public:
 
     void loadCurrentRecord(nx::sql::SqlQuery*, ObjectTrack*);
 
-    static void addTrackFilterConditions(
-        const Filter& filter,
-        const DeviceDao& deviceDao,
-        const ObjectTypeDao& objectTypeDao,
-        const ObjectFields& fieldNames,
-        nx::sql::Filter* sqlFilter);
-
     static void addDeviceFilterCondition(
         const std::vector<QnUuid>& deviceIds,
         const DeviceDao& deviceDao,
-        nx::sql::Filter* sqlFilter);
-
-    static void addBoundingBoxToFilter(
-        const QRect& boundingBox,
         nx::sql::Filter* sqlFilter);
 
     /**
@@ -110,10 +99,6 @@ private:
         TrackQueryResult* result);
 
     void prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* query);
-
-    std::tuple<QString /*query text*/, nx::sql::Filter> prepareBoxFilterSubQuery();
-
-    nx::sql::Filter prepareTrackFilterSqlExpression();
 
     std::vector<ObjectTrack> loadTracks(nx::sql::AbstractSqlQuery* query, int limit = 0);
 

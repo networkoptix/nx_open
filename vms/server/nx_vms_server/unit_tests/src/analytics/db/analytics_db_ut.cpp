@@ -940,6 +940,19 @@ protected:
         m_filter.freeText = attributeDictionary().getRandomText();
     }
 
+    void addRandomTextPrefixFoundInDataToFilter()
+    {
+        QString text;
+        for (int i = 0; i < 10; ++i)
+        {
+            text = attributeDictionary().getRandomText();
+            if (text.size() >= 2)
+                break;
+        }
+
+        m_filter.freeText = text.mid(0, text.size() / 2);
+    }
+
     void addRandomUnknownText()
     {
         m_filter.freeText = QnUuid::createUuid().toSimpleString();
@@ -1264,6 +1277,14 @@ TEST_F(AnalyticsDbLookup, sort_lookup_result_by_timestamp_descending)
 TEST_F(AnalyticsDbLookup, full_text_search)
 {
     whenLookupByRandomTextFoundInData();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbLookup, full_text_search_by_prefix)
+{
+    addRandomTextPrefixFoundInDataToFilter();
+    whenLookupObjectTracks();
+
     thenResultMatchesExpectations();
 }
 

@@ -51,9 +51,11 @@ void* Plugin::queryInterface( const nxpl::NX_GUID& interfaceID )
         sizeof(nxcip::IID_CameraDiscoveryManager)) == 0 )
     {
         if (!m_discoveryManager)
-            m_discoveryManager.reset(new DiscoveryManager(
-                &m_refManager,
-                m_timeProvider.get()));
+        {
+            m_discoveryManager = std::make_unique<DiscoveryManager>(
+                &m_refManager, m_timeProvider.get());
+        }
+
         m_discoveryManager->addRef();
         return m_discoveryManager.get();
     }

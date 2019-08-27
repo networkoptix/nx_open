@@ -211,18 +211,8 @@ State loadNetworkInfo(State state, const Camera& camera)
     state.singleCameraProperties.ipAddress = QnResourceDisplayInfo(camera).host();
     state.singleCameraProperties.webPage = calculateWebPage(camera);
     state.singleCameraProperties.settingsUrlPath = settingsUrlPath(camera);
-
-    const bool isIoModule = camera->isIOModule();
-    const bool hasPrimaryStream = !isIoModule || camera->isAudioSupported();
-    if (hasPrimaryStream)
-        state.singleCameraSettings.primaryStream.setBase(camera->sourceUrl(Qn::CR_LiveVideo));
-
-    const bool hasSecondaryStream = camera->hasDualStreaming();
-    if (hasSecondaryStream)
-    {
-        state.singleCameraSettings.secondaryStream.setBase(
-            camera->sourceUrl(Qn::CR_SecondaryLiveVideo));
-    }
+    state.singleCameraSettings.primaryStream.setBase(camera->sourceUrl(Qn::CR_LiveVideo));
+    state.singleCameraSettings.secondaryStream.setBase(camera->sourceUrl(Qn::CR_SecondaryLiveVideo));
 
     return state;
 }

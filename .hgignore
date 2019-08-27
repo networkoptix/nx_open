@@ -20,6 +20,7 @@ CMakeLists.txt.user*
 
 # Project-specific items.
 subinclude:vms/artifacts/.hgignore
+subinclude:vms/nx_box_tool/.hgignore
 subinclude:cloud_portal/.hgignore
 subinclude:webadmin/.hgignore
 
