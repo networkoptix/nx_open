@@ -1329,7 +1329,7 @@ Handle ServerConnection::executeRequest(
             {
                 NX_VERBOSE(m_logTag,
                     "<%1> Got %2 byte(s) reply of content type %3. OS error: %4, HTTP status: %5",
-                    id, msgBody, QString::fromLatin1(contentType), osErrorCode, statusCode);
+                    id, msgBody.size(), QString::fromLatin1(contentType), osErrorCode, statusCode);
 
                 bool success = (osErrorCode == SystemError::noError
                     && statusCode >= nx::network::http::StatusCode::ok

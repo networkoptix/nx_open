@@ -690,8 +690,17 @@ border-style: solid;
         </item>
         <item>
          <widget class="QLabel" name="debugStateLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
           </property>
           <property name="openExternalLinks">
            <bool>true</bool>

@@ -208,18 +208,10 @@ WidgetAnalyticsController::Private::ObjectInfo&
     objectInfo.rectangle = objectMetadata.boundingBox;
 
     QString objectTitle;
-    if (ini().showAnalitycsObjectTypeOnCamera > 0)
-    {
-        const auto descriptor = commonModule()->analyticsObjectTypeDescriptorManager()
-            ->descriptor(objectMetadata.typeId);
-        if (descriptor && !descriptor->name.isEmpty())
-        {
-            const bool showTypeKeyword = (ini().showAnalitycsObjectTypeOnCamera == 2);
-            objectTitle = showTypeKeyword
-                ? tr("Type") + '\t' + descriptor->name + '\n'
-                : descriptor->name + '\n';
-        }
-    }
+    const auto descriptor = commonModule()->analyticsObjectTypeDescriptorManager()->descriptor(
+        objectMetadata.typeId);
+    if (descriptor && !descriptor->name.isEmpty())
+        objectTitle = descriptor->name + '\n';
 
     objectInfo.basicDescription = objectTitle +
         objectDescription(settings->briefAttributes(objectMetadata));

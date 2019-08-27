@@ -1,6 +1,8 @@
+#include <cctype>
+
 #include "wildcard.h"
 
-bool wildcardMatch(const char* mask, const char* str)
+bool wildcardMatch(const char* mask, const char* str, MatchMode mode)
 {
     while (*str && *mask)
     {
@@ -12,7 +14,7 @@ bool wildcardMatch(const char* mask, const char* str)
                     return true; //< We have '*' at the end.
                 for (const char* str1 = str; *str1; ++str1)
                 {
-                    if (wildcardMatch(mask + 1, str1))
+                    if (wildcardMatch(mask + 1, str1, mode))
                         return true;
                 }
                 return false; //< Not matching.
@@ -24,9 +26,15 @@ bool wildcardMatch(const char* mask, const char* str)
                 break;
 
             default:
-                if (*str != *mask)
+            {
+                const bool match = mode == MatchMode::caseSensitive
+                    ? *str == *mask
+                    : std::tolower(*str) == std::tolower(*mask);
+
+                if (!match)
                     return false;
                 break;
+            }
         }
 
         ++str;

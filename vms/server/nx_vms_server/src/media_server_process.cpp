@@ -283,6 +283,7 @@
 #include <nx/network/http/http_client.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/storage_plugin_factory.h>
+#include <nx/analytics/utils.h>
 
 #include <providers/speech_synthesis_data_provider.h>
 #include <nx/utils/file_system.h>
@@ -320,6 +321,7 @@ static const int kPublicIpUpdateTimeoutMs = 60 * 2 * 1000;
 static nx::utils::log::Tag kLogTag(typeid(MediaServerProcess));
 
 static const int kMinimalGlobalThreadPoolSize = 4;
+static const int kCheckAnalyticsUsedTimeoutMs = 1000 * 5;
 
 void addFakeVideowallUser(QnCommonModule* commonModule)
 {
@@ -746,18 +748,15 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         for(const QnStorageResourcePtr &storage: modifiedStorages)
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
 
-        if (m_mediaServer->metadataStorageId().isNull() && !QFile::exists(getMetadataDatabaseName()))
-        {
-            m_mediaServer->setMetadataStorageId(selectDefaultStorageForAnalyticsEvents(m_mediaServer));
-            m_mediaServer->saveProperties();
-        }
-
         connect(m_mediaServer.get(), &QnMediaServerResource::propertyChanged, this,
             &MediaServerProcess::at_serverPropertyChanged);
-        initializeAnalyticsEvents();
+
+        if (!m_mediaServer->metadataStorageId().isNull() || QFile::exists(getMetadataDatabaseName()))
+            initializeAnalyticsEvents();
 
         serverModule()->normalStorageManager()->initDone();
         serverModule()->backupStorageManager()->initDone();
+        m_storageInitializationDone = true;
     });
 }
 
@@ -1380,6 +1379,26 @@ void MediaServerProcess::at_serverModuleConflict(nx::vms::discovery::ModuleEndpo
         qnSyncTime->currentUSecsSinceEpoch(),
         module,
         QUrl(lm("http://%1").arg(module.endpoint.toString())));
+}
+
+void MediaServerProcess::at_checkAnalyticsUsed()
+{
+    if (!m_storageInitializationDone)
+        return; //< Initially analytics initialized from initStoragesAsync.
+
+    if (!m_oldAnalyticsStoragePath.isEmpty())
+        return; //< Analytics already initialized.
+
+    if (!nx::analytics::hasActiveObjectEngines(commonModule(), m_mediaServer->getId()))
+        return;
+
+    if (m_mediaServer->metadataStorageId().isNull() && !QFile::exists(getMetadataDatabaseName()))
+    {
+        m_mediaServer->setMetadataStorageId(selectDefaultStorageForAnalyticsEvents(m_mediaServer));
+        m_mediaServer->saveProperties();
+    }
+
+    initializeAnalyticsEvents();
 }
 
 void MediaServerProcess::at_timer()
@@ -2861,7 +2880,7 @@ void MediaServerProcess::registerRestHandlers(
         new nx::vms::server::rest::AnalyticsEngineSettingsHandler(serverModule()));
 
     /**%apidoc GET /ec2/deviceAnalyticsSettings
-     * Return settings values of the specified device-engine pair.
+     * Return settings values of the specified DeviceAgent (which is a device-engine pair).
      * %param:string analyticsEngineId Unique id of an Analytics Engine.
      * %param:string deviceId Id of a device.
      * %return:object JSON object with an error code, error string, and the reply on success.
@@ -2873,7 +2892,8 @@ void MediaServerProcess::registerRestHandlers(
      *             according to each setting type.
      *
      * %apidoc POST /ec2/deviceAnalyticsSettings
-     * Applies passed settings values to the correspondent device-engine pair.
+     * Applies passed settings values to the corresponding DeviceAgent (which is a device-engine
+     * pair).
      * %param:string engineId Unique id of an Analytics Engine.
      * %param:string deviceId Id of a device.
      * %param:object settings Name-value map with setting values, using JSON types according to
@@ -2890,8 +2910,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/deviceAnalyticsSettings",
         new nx::vms::server::rest::DeviceAnalyticsSettingsHandler(serverModule()));
 
-    reg(
-        nx::network::http::Method::options,
+    reg(nx::network::http::Method::options,
         QnRestProcessorPool::kAnyPath,
         new OptionsRequestHandler());
 }
@@ -3721,6 +3740,7 @@ void MediaServerProcess::stopObjects()
     m_universalTcpListener->stop();
     serverModule()->stop();
 
+    m_checkAnalyticsTimer.reset();
     m_generalTaskTimer.reset();
     m_serverStartedTimer.reset();
     m_udtInternetTrafficTimer.reset();
@@ -4071,6 +4091,8 @@ void MediaServerProcess::connectSignals()
         &QnResourceDiscoveryManager::localInterfacesChanged, this,
         &MediaServerProcess::updateAddressesList);
 
+    m_checkAnalyticsTimer = std::make_unique<QTimer>();
+    connect(m_checkAnalyticsTimer .get(), SIGNAL(timeout()), this, SLOT(at_checkAnalyticsUsed()), Qt::DirectConnection);
     m_generalTaskTimer = std::make_unique<QTimer>();
     connect(m_generalTaskTimer.get(), SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
     m_serverStartedTimer = std::make_unique<QTimer>();
@@ -4366,6 +4388,7 @@ void MediaServerProcess::startObjects()
     // Write server started event with delay. In case of client has time to reconnect, it could display it on the right panel.
     m_serverStartedTimer->setSingleShot(true);
     m_serverStartedTimer->start(serverModule()->settings().serverStartedEventTimeoutMs());
+    m_checkAnalyticsTimer->start(kCheckAnalyticsUsedTimeoutMs);
 }
 
 std::map<QString, QVariant> MediaServerProcess::confParamsFromSettings() const

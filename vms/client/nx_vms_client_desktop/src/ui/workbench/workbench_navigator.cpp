@@ -952,17 +952,17 @@ void QnWorkbenchNavigator::jumpBackward()
     if (!m_currentMediaWidget)
         return;
 
-    QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader();
+    const auto reader = m_currentMediaWidget->display()->archiveReader();
     if (!reader)
         return;
 
     m_pausedOverride = false;
 
     qint64 pos = reader->startTime();
+
     if (auto loader = loaderByWidget(m_currentMediaWidget))
     {
-        const bool canUseMotion = m_currentWidget->options().testFlag(QnResourceWidget::DisplayMotion);
-        const auto content = canUseMotion ? Qn::MotionContent : Qn::RecordingContent;
+        const auto content = selectedExtraContent();
         QnTimePeriodList periods = loader->periods(content);
         if (content == Qn::RecordingContent)
             periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION_MS);
@@ -999,7 +999,7 @@ void QnWorkbenchNavigator::jumpForward()
     if (!m_currentMediaWidget)
         return;
 
-    QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader();
+    const auto reader = m_currentMediaWidget->display()->archiveReader();
     if (!reader)
         return;
 
@@ -1013,8 +1013,7 @@ void QnWorkbenchNavigator::jumpForward()
     }
     else if (auto loader = loaderByWidget(m_currentMediaWidget))
     {
-        const bool canUseMotion = m_currentWidget->options().testFlag(QnResourceWidget::DisplayMotion);
-        const auto content = canUseMotion ? Qn::MotionContent : Qn::RecordingContent;
+        const auto content = selectedExtraContent();
         QnTimePeriodList periods = loader->periods(content);
         if (content == Qn::RecordingContent)
             periods = QnTimePeriodList::aggregateTimePeriods(periods, MAX_FRAME_DURATION_MS);

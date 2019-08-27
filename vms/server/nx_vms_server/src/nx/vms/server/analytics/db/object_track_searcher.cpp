@@ -1,5 +1,7 @@
 #include "object_track_searcher.h"
 
+#include <QtCore/QRegExp>
+
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/utils/std/algorithm.h>
 
@@ -235,11 +237,12 @@ bool ObjectTrackSearcher::matchAttributes(
     // Attributes have to contain all words.
     for (const auto& filterWord: filterWords)
     {
+        QRegExp expr(filterWord, Qt::CaseInsensitive, QRegExp::PatternSyntax::Wildcard);
+
         bool found = false;
-        for (const auto& attribute : attributes)
+        for (const auto& attribute: attributes)
         {
-            if (attribute.name.indexOf(filterWord, 0, Qt::CaseInsensitive) != -1 ||
-                attribute.value.indexOf(filterWord, 0, Qt::CaseInsensitive) != -1)
+            if (expr.indexIn(attribute.name) != -1 || expr.indexIn(attribute.value) != -1)
             {
                 found = true;
                 break;
