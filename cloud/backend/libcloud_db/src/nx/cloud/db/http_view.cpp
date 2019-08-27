@@ -166,7 +166,7 @@ void HttpView::registerAuthenticators()
 }
 
 void HttpView::registerApiHandlers(
-    const SecurityManager& securityManager,
+    const SecurityManager& /*securityManager*/,
     AccountManager* const accountManager,
     SystemManager* const systemManager,
     AbstractSystemHealthInfoProvider* const systemHealthInfoProvider,
