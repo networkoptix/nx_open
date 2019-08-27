@@ -12,7 +12,7 @@ namespace nx::utils::math {
  * Calcultes elapsed time using std::chrono::steady_clock.
  * @param Duration std::chrono duration type.
  */
-template<typename Duration>
+template<typename Duration = std::chrono::milliseconds>
 class ElapsedTimer
 {
 public:
@@ -25,6 +25,16 @@ public:
     {
         return std::chrono::duration_cast<Duration>(
             std::chrono::steady_clock::now() - m_start);
+    }
+
+    /**
+     * @return Elapsed time.
+     */
+    Duration restart()
+    {
+        const auto now = std::chrono::steady_clock::now();
+        return std::chrono::duration_cast<Duration>(
+            std::chrono::steady_clock::now() - std::exchange(m_start, now));
     }
 
 private:
@@ -65,8 +75,8 @@ public:
     }
 
     /**
-     * NOTE: Anomality detection really starts after the specified period passes after
-     * the initial AbnormalValueDetector::process call.
+     * NOTE: Anomality detection really starts after accumulating data for the period
+     * specified in the constructor.
      */
     template<typename... AuxArgs>
     void add(Value value, AuxArgs&&... args)
@@ -77,11 +87,10 @@ public:
         }
         else
         {
-            const auto now = std::chrono::steady_clock::now();
-            if (!m_startTime)
-                m_startTime = now;
+            if (!m_initialDataAccumulationTimer)
+                m_initialDataAccumulationTimer = ElapsedTimer<>();
 
-            if (now - *m_startTime > m_period)
+            if (m_initialDataAccumulationTimer->elapsed() > m_period)
                 m_hasEnoughData = true;
         }
 
@@ -99,9 +108,8 @@ private:
     const std::chrono::milliseconds m_period;
     ReportAnomalyFunc m_reportAnomalyFunc;
 
-    int m_processedValueCount = 0;
     bool m_hasEnoughData = false;
-    std::optional<std::chrono::steady_clock::time_point> m_startTime;
+    std::optional<ElapsedTimer<>> m_initialDataAccumulationTimer;
 
     template<typename... AuxArgs>
     void testValue(Value value, AuxArgs&&... args)

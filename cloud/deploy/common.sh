@@ -124,7 +124,7 @@ function push()
     docker tag $MODULE:$VERSION $REPOSITORY/$MODULE:latest
     docker push $REPOSITORY/$MODULE:latest
 
-    pushns
+    #pushns
 }
 
 function publish()
@@ -132,7 +132,7 @@ function publish()
     stage
     pack
     push
-    pushns
+    #pushns
 }
 
 function clean()
