@@ -80,8 +80,7 @@ private:
     std::vector<TimeHelperPtr> m_videoTimeHelpers;
     std::vector<TimeHelperPtr> m_audioTimeHelpers;
     std::atomic_flag m_isMediaUrlValid;
-    QString m_lastSourceUrl;
-    bool m_lastDualStreamingInCustomUrl = false;
+    bool m_isServerSideUpdate = false;
     QnMutex m_sourceUrlMutex;
 
     void initializeAudioContext( const nxcip::AudioFormat& audioFormat, const Extras& extras );

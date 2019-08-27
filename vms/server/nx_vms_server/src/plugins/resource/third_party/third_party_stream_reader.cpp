@@ -57,12 +57,6 @@ bool isIFrame(const QnAbstractMediaDataPtr& packet)
 
 using namespace nx::sdk;
 
-bool hasDualStreamingInCustomUrl(const nx::vms::server::resource::CameraPtr& camera)
-{
-    return !camera->sourceUrl(Qn::ConnectionRole::CR_LiveVideo).isEmpty() &&
-        !camera->sourceUrl(Qn::ConnectionRole::CR_SecondaryLiveVideo).isEmpty();
-}
-
 
 ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnThirdPartyResourcePtr res,
@@ -70,7 +64,8 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
 :
     CLServerPushStreamReader(res),
     m_thirdPartyRes(res),
-    m_camManager(camManager)
+    m_camManager(camManager),
+    m_sourceUrlMutex(QnMutex::Recursive)
 {
     NX_ASSERT( m_thirdPartyRes );
 
@@ -86,9 +81,7 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
             {
                 {
                     QnMutexLocker lock(&m_sourceUrlMutex);
-                    const bool dualStreamingInCustomUrlChanged =
-                        hasDualStreamingInCustomUrl(m_thirdPartyRes) != m_lastDualStreamingInCustomUrl;
-                    if (!dualStreamingInCustomUrlChanged && m_thirdPartyRes->sourceUrl(getRole()) == m_lastSourceUrl)
+                    if (m_isServerSideUpdate)
                         return;
                 }
 
@@ -578,9 +571,9 @@ nx::utils::TimeHelper* ThirdPartyStreamReader::timeHelper(const QnAbstractMediaD
 void ThirdPartyStreamReader::updateSourceUrl(const QString& urlString)
 {
     QnMutexLocker lock(&m_sourceUrlMutex);
-    m_lastSourceUrl = urlString;
+    m_isServerSideUpdate = true;
     m_thirdPartyRes->updateSourceUrl(urlString, getRole());
-    m_lastDualStreamingInCustomUrl = hasDualStreamingInCustomUrl(m_thirdPartyRes);
+    m_isServerSideUpdate = false;
 }
 
 QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const
