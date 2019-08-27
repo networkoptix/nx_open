@@ -9,7 +9,7 @@
  * - only std::chars_format::general format is supported for floats
  */
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(ANDROID) || defined(__ANDROID__)
 #   define NX_CHARCONV_INTEGER
 #   define NX_CHARCONV_FROM_FLOAT
 #elif defined(__GNUG__)

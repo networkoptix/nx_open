@@ -6,9 +6,17 @@
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <type_traits>
 
 #include "buffer.h"
 #include "std/charconv.h"
+
+#if defined(ANDROID) || defined(__ANDROID__)
+namespace std {
+    template<typename... U> using is_invocable = __invokable_r<U...>;
+    template<typename... U> inline constexpr bool is_invocable_v = __invokable_r<U...>::value;
+}
+#endif
 
 namespace nx::utils {
 
@@ -31,11 +39,11 @@ String<CharType> maxPrefix(const String<CharType>& one, const String<CharType>& 
 //-------------------------------------------------------------------------------------------------
 
 template<typename CharType, typename IsSpaceFunc>
-// requires std::is_invocable<IsSpaceFunc, char>::value
+// requires std::is_invocable_v<IsSpaceFunc, char>
 void trim(
     std::basic_string_view<CharType>* str,
     IsSpaceFunc f,
-    typename std::enable_if<std::is_invocable<IsSpaceFunc, CharType>::value>::type* = nullptr)
+    typename std::enable_if<std::is_invocable_v<IsSpaceFunc, CharType>>::type* = nullptr)
 {
     while (!str->empty() && f(str->front()))
         str->remove_prefix(1);
@@ -44,11 +52,11 @@ void trim(
 }
 
 template<typename CharType, typename IsSpaceFunc>
-// requires std::is_invocable<IsSpaceFunc, char>::value
+// requires std::is_invocable_v<IsSpaceFunc, char>
 void trim(
     std::basic_string<CharType>* str,
     IsSpaceFunc f,
-    typename std::enable_if<std::is_invocable<IsSpaceFunc, CharType>::value>::type* = nullptr)
+    typename std::enable_if<std::is_invocable_v<IsSpaceFunc, CharType>>::type* = nullptr)
 {
     auto strView = (std::basic_string_view<CharType>) (*str);
     trim(&strView, std::move(f));
@@ -334,14 +342,14 @@ template<
     typename Separator,
     typename UnaryFunction
 >
-// requires std::is_invocable<UnaryFunction, std::basic_string_view<CharType>>::value
+// requires std::is_invocable_v<UnaryFunction, std::basic_string_view<CharType>>
 void split(
     const String<CharType>& str,
     Separator sep,
     UnaryFunction f,
     int groupToken = GroupToken::none,
     int flags = SplitterFlag::skipEmpty,
-    typename std::enable_if<std::is_invocable<UnaryFunction, std::basic_string_view<CharType>>::value>::type* = nullptr)
+    decltype(f(std::basic_string_view<CharType>()))* = nullptr)
 {
     auto splitter = makeSplitter(str, sep, groupToken, flags);
     while (splitter.next())
@@ -360,7 +368,7 @@ void split(
     OutputIt outIter,
     int groupToken = GroupToken::none,
     int flags = SplitterFlag::skipEmpty,
-    typename std::enable_if<!std::is_invocable<OutputIt, std::basic_string_view<CharType>>::value>::type* = nullptr)
+    typename std::iterator_traits<OutputIt>::value_type* = nullptr)
 {
     split(
         str, sep,
@@ -472,15 +480,15 @@ template<
     typename NameValueSeparator,
     typename Function
 >
-// requires std::is_invocable<Function, std::basic_string_view<CharType>, std::basic_string_view<CharType>>::value
+// requires std::is_invocable_v<Function, std::basic_string_view<CharType>, std::basic_string_view<CharType>>
 void splitNameValuePairs(
     const String<CharType>& str,
     PairSeparator pairSeparator,
     NameValueSeparator nameValueSeparator,
     Function f,
     int groupTokens = GroupToken::doubleQuotes,
-    typename std::enable_if<std::is_invocable<Function,
-        std::basic_string_view<CharType>, std::basic_string_view<CharType>>::value>::type* = nullptr)
+    typename std::enable_if<std::is_invocable_v<Function,
+        std::basic_string_view<CharType>, std::basic_string_view<CharType>>>::type* = nullptr)
 {
     split(
         str, pairSeparator,
@@ -528,8 +536,8 @@ void splitNameValuePairs(
     NameValueSeparator nameValueSeparator,
     OutputIt outIter,
     int groupTokens = GroupToken::doubleQuotes,
-    typename std::enable_if<!std::is_invocable<OutputIt,
-        std::basic_string_view<CharType>, std::basic_string_view<CharType>>::value>::type* = nullptr)
+    typename std::enable_if<!std::is_invocable_v<OutputIt,
+        std::basic_string_view<CharType>, std::basic_string_view<CharType>>>::type* = nullptr)
 {
     splitNameValuePairs(
         str, std::move(pairSeparator), std::move(nameValueSeparator),
