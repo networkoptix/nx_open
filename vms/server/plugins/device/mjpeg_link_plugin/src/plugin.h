@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <plugins/plugin_tools.h>
 
 #include <nx/sdk/ptr.h>
@@ -55,7 +57,7 @@ private:
 private:
     mutable QnMutex m_mutex;
     nxpt::CommonRefManager m_refManager;
-    nx::sdk::Ptr<DiscoveryManager> m_discoveryManager;
+    std::unique_ptr<DiscoveryManager> m_discoveryManager;
     nx::sdk::Ptr<nxpl::TimeProvider> m_timeProvider;
 
     nx::utils::ElapsedTimer m_streamStateCacheCleanupTimer;
