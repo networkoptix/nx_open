@@ -950,7 +950,7 @@ protected:
                 break;
         }
 
-        m_filter.freeText = text.mid(0, text.size() / 2) + "*";
+        m_filter.freeText = text.mid(0, text.size() / 2);
     }
 
     void addRandomUnknownText()
