@@ -9,10 +9,10 @@ Building an image from current directory
 You can use build.sh utility:
 
 ```bash
-# Building from existing debian package. It will copy it to build folder and build an image.
+# Building from existing debian package. It will copy it to the build folder and build the image.
 build.sh ~/Downloads/nxwitness-server-4.0.0.28737-linux64-beta-test.deb
 
-# Or using url to debian package. It will download it and build an image.
+# Or using url. It will download the debian package and build the image.
 build.sh https://beta.networkoptix.com/beta-builds/default/28608/linux/nxwitness-server-4.0.0.28608-linux64-beta-prod.deb
 ```
 
@@ -148,6 +148,7 @@ Things that won't invalidate a license:
 NOTE: If your license has been invalidated, it can be reactivated up to 3 times by contacting support
 
 ## Software Updates ##
+
 Both in-client and manual image updates will invalidate licenses.
 
 In-client update:
@@ -157,12 +158,12 @@ Currently in-client update works but not perfectly.
     2.  Input version number and password then click ok
     3.  Click the download button
     4.  Once finished click the install button
-    5.  The install will sit at "Installing..." for some time and then the "Finish Unstall" button will appear
+    5.  The install will sit at "Installing..." for some time and then the "Finish Update" button will appear
     6.  Click the Finish Update button
     7.  Then click yes
     8.  You will now be at the Reconnecting... dialog.  This will also sit in this state.  Click cancel
     9.  This will close the connection to the server
-    10. Stop your contianer
+    10. Stop your container
     11. Start it again
     12. Connect to it via the desktop client
     13. Open up to the in-client update page and you should get an update successful message
