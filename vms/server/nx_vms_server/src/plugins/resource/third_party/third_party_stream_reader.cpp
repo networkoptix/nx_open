@@ -84,13 +84,10 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
         {
             if (propertyName == ResourcePropertyKey::kStreamUrls)
             {
-                {
-                    QnMutexLocker lock(&m_sourceUrlMutex);
-                    const bool dualStreamingInCustomUrlChanged =
-                        hasDualStreamingInCustomUrl(m_thirdPartyRes) != m_lastDualStreamingInCustomUrl;
-                    if (!dualStreamingInCustomUrlChanged && m_thirdPartyRes->sourceUrl(getRole()) == m_lastSourceUrl)
-                        return;
-                }
+                // todo: Separate this property to 2 properties.
+                // Server and client side.
+                if (m_serverSideUpdate)
+                    return; //< Stream reader updates this property itself.
 
                 NX_VERBOSE(this, "Reinitializing camera driver. 'hasDualStreaming' may be changed.");
                 m_resource->setStatus(Qn::Offline);
@@ -577,10 +574,9 @@ nx::utils::TimeHelper* ThirdPartyStreamReader::timeHelper(const QnAbstractMediaD
 
 void ThirdPartyStreamReader::updateSourceUrl(const QString& urlString)
 {
-    QnMutexLocker lock(&m_sourceUrlMutex);
-    m_lastSourceUrl = urlString;
-    m_thirdPartyRes->updateSourceUrl(urlString, getRole());
-    m_lastDualStreamingInCustomUrl = hasDualStreamingInCustomUrl(m_thirdPartyRes);
+    m_thirdPartyRes->updateSourceUrl(urlString, getRole(), true,
+        [this]() {m_serverSideUpdate = true;},
+        [this]() {m_serverSideUpdate = false;});
 }
 
 QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const

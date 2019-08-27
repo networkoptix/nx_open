@@ -217,12 +217,9 @@ State loadNetworkInfo(State state, const Camera& camera)
     if (hasPrimaryStream)
         state.singleCameraSettings.primaryStream.setBase(camera->sourceUrl(Qn::CR_LiveVideo));
 
-    const bool hasSecondaryStream = camera->hasDualStreaming();
-    if (hasSecondaryStream)
-    {
-        state.singleCameraSettings.secondaryStream.setBase(
-            camera->sourceUrl(Qn::CR_SecondaryLiveVideo));
-    }
+    const auto url = camera->sourceUrl(Qn::CR_SecondaryLiveVideo);
+    if (!url.isEmpty())
+        state.singleCameraSettings.secondaryStream.setBase(url);
 
     return state;
 }
