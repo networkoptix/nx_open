@@ -53,10 +53,7 @@ public:
 
     //! Camera source URL, commonly - rtsp link.
     QString sourceUrl(Qn::ConnectionRole role) const;
-    void updateSourceUrl(const nx::utils::Url& url, Qn::ConnectionRole role,
-        bool save = true,
-        std::function<void()> beforeUpdate = nullptr,
-        std::function<void()> afterUpdate = nullptr);
+    void updateSourceUrl(const nx::utils::Url& url, Qn::ConnectionRole role, bool save = true);
 
     static int issuesTimeoutMs();
 

@@ -164,19 +164,6 @@ public:
         return setProperty(key, update(getProperty(key)));
     }
 
-    template<typename Update, typename BeforeUpdate, typename AfterUpdate>
-    bool updateProperty(const QString &key, const Update& update,
-        const BeforeUpdate& beforeUpdate, const AfterUpdate& afterUpdate)
-    {
-        QnMutexLocker lk(&m_mutex); // recursive
-        if (beforeUpdate)
-            beforeUpdate();
-        bool result = setProperty(key, update(getProperty(key)));
-        if (afterUpdate)
-            afterUpdate();
-        return result;
-    }
-
     //!Call this with proper field names to emit corresponding *changed signals.
     // Signal can be defined in a derived class.
     void emitModificationSignals(const QSet<QByteArray>& modifiedFields);
