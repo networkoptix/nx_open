@@ -1,10 +1,11 @@
 #include "bucket_api_ut.h"
 
-#include <nx/network/url/url_builder.h>
-#include <nx/cloud/storage/service/test_support/cloud_db_emulator.h>
+#include <nx/cloud/aws/test_support/aws_sts_emulator.h>
+#include <nx/cloud/db/api/cdb_client.h>
 #include <nx/cloud/storage/service/settings.h>
 #include <nx/cloud/storage/service/controller/cloud_db/authentication_manager.h>
-#include <nx/cloud/db/api/cdb_client.h>
+#include <nx/cloud/storage/service/test_support/cloud_db_emulator.h>
+#include <nx/network/url/url_builder.h>
 
 namespace nx::cloud::storage::service::api::test {
 
@@ -68,9 +69,12 @@ protected:
                         &m_cloudDbAuthenticationEvent);
                 });
 
+        ASSERT_TRUE(m_sts.bindAndListen());
         ASSERT_TRUE(m_cloudDb.bindAndListen());
 
+        addArg("-aws/assumeRoleArn", "arn::aws::sts::test-role");
         addArg("-cloud_db/url", m_cloudDb.url().toStdString());
+        addArg("-aws/stsUrl", m_sts.url().toStdString());
 
         base_type::SetUp();
     }
@@ -244,6 +248,18 @@ protected:
         m_lastCredentialsGotten = std::move(credentials);
     }
 
+    void andRoleIsAssumed()
+    {
+        auto assumeRoleResult = m_sts.getAssumedRole(m_lastCredentialsGotten.login);
+        ASSERT_NE(std::nullopt, assumeRoleResult);
+        ASSERT_EQ(assumeRoleResult->credentials.accessKeyId, m_lastCredentialsGotten.login);
+        ASSERT_EQ(assumeRoleResult->credentials.secretAccessKey, m_lastCredentialsGotten.password);
+        ASSERT_FALSE(m_lastCredentialsGotten.urls.empty());
+
+        auto url = m_lastCredentialsGotten.urls.front().toStdString();
+        ASSERT_NE(url.find(m_lastStorageAdded.id), std::string::npos);
+    }
+
     void thenAddSystemResponseIs(ResultCode resultCode)
     {
         auto [result, system] = m_addSystemResponse.pop();
@@ -377,6 +393,7 @@ private:
     }
 
 private:
+    nx::cloud::aws::sts::test::AwsStsEmulator m_sts;
     service::test::CloudDbEmulator m_cloudDb;
     std::string m_expectedCloudDbOwner;
     nx::utils::SyncQueue<std::pair<Result, Storage>> m_addStorageResponse;
@@ -489,7 +506,7 @@ TEST_F(StorageApi, remove_storage)
     andStorageIsNotInService();
 }
 
-TEST_F(StorageApi, DISABLED_get_credentials)
+TEST_F(StorageApi, get_credentials)
 {
     givenCloudDbAccount();
     givenAddedBucket();
@@ -498,6 +515,7 @@ TEST_F(StorageApi, DISABLED_get_credentials)
     whenGetCredentials();
 
     thenGetCredentialsSucceeds();
+    andRoleIsAssumed();
 }
 
 TEST_F(StorageApi, add_system_storage_relation)
