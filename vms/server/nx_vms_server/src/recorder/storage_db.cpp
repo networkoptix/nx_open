@@ -39,13 +39,12 @@ auto measureTime(F f, const QString& message) -> std::invoke_result_t<F>
     return f();
 }
 
-int64_t sequenceIdFromFilePath(const QString& filePath)
+static int64_t sequenceIdFromFilePath(const QnAbstractStorageResource::FileInfo& fileInfo)
 {
-    const auto baseName = QFileInfo(filePath).baseName();
-    if (!baseName.contains(kSeparator))
+    if (!fileInfo.baseName().contains(kSeparator))
         return 1;
 
-    return baseName.split(kSeparator)[1].toLongLong();
+    return fileInfo.baseName().split(kSeparator)[1].toLongLong();
 }
 
 } // namespace
@@ -230,19 +229,26 @@ bool QnStorageDb::readDbHeader() const
 
     if (!fileHeader.deserialize(&reader) || fileHeader.getDbVersion() != nx::media_db::kDbVersion)
     {
-        NX_WARNING(this, "Failed to read a DB header from (%1)", m_dbFileName);
+        NX_WARNING(
+            this, "QnStorageDb::readDbHeader: Failed to read a DB header from (%1)", m_dbFileInfo);
         return false;
     }
 
+    NX_DEBUG(this, "QnStorageDb::readDbHeader: DB header was has been successfully read");
     return true;
 }
 
-void QnStorageDb::removeFiles(const QStringList& toRemove, const QString& except)
+void QnStorageDb::removeFiles(
+    const QnAbstractStorageResource::FileInfoList& toRemove,
+    const QnAbstractStorageResource::FileInfo& except)
 {
-    for (const auto& path: toRemove)
+    NX_DEBUG(
+        this, "QnStorageDb::removeFiles: To remove: %1, exception: %2", containerString(toRemove),
+        except);
+    for (const auto& fileInfo: toRemove)
     {
-        if (path != except)
-            m_storage->removeFile(path);
+        if (fileInfo != except)
+            m_storage->removeFile(fileInfo.absoluteFilePath());
     }
 }
 
@@ -253,41 +259,43 @@ bool QnStorageDb::open(const QString& basePath)
     {
         NX_DEBUG(
             this,
-            "Opening storage DB. Folder: %1. No previous DB files found. Starting with a new one",
+            "QnStorageDB::open: Folder: %1. No previous DB files found. Starting with a new one",
             basePath);
 
         return startDbFile(basePath, /*incVersion*/ false);
     }
 
     NX_ASSERT(dbFiles.size() == 1 || dbFiles.size() == 2);
-    m_dbFileName = dbFiles[0];
-    removeFiles(dbFiles, m_dbFileName);
+    m_dbFileInfo = dbFiles[0];
+    removeFiles(dbFiles, m_dbFileInfo);
 
     if (!openDbFile() || !readDbHeader())
     {
         NX_DEBUG(
-            this, "Opening storage DB. File: (%1). Failed to open a DB file or read a header",
-            m_dbFileName);
+            this, "QnStorageDB::open: File: (%1). Failed to open a DB file or read a header",
+            m_dbFileInfo);
 
         return startDbFile(basePath, /*incVersion*/ false);
     }
 
+    NX_DEBUG(this, "QnStorageDB::open: File %1 was successfully opened", m_dbFileInfo);
     return true;
 }
 
 bool QnStorageDb::openDbFile()
 {
-    m_ioDevice.reset(m_storage->open(m_dbFileName, QIODevice::ReadWrite | QIODevice::Unbuffered));
+    m_ioDevice.reset(m_storage->open(
+        m_dbFileInfo.absoluteFilePath(), QIODevice::ReadWrite | QIODevice::Unbuffered));
     if (!m_ioDevice)
     {
-        NX_WARNING(this, "DB file (%1) open failed", m_dbFileName);
+        NX_WARNING(this, "DB file (%1) open failed", m_dbFileInfo);
         return false;
     }
 
     return true;
 }
 
-QStringList QnStorageDb::allDbFiles(const QString& basePath) const
+QnAbstractStorageResource::FileInfoList QnStorageDb::allDbFiles(const QString& basePath) const
 {
     const auto moduleGuid = moduleGUID().toSimpleString();
     QStringList filters = {moduleGuid + "_media\\.nxdb", moduleGuid + "--\\d+\\.nxdb"};
@@ -310,17 +318,13 @@ QStringList QnStorageDb::allDbFiles(const QString& basePath) const
             }),
         candidates.end());
 
-    QStringList result;
-    std::transform(
-        candidates.begin(), candidates.end(), std::back_inserter(result),
-        [](const auto& fileInfo) { return fileInfo.absoluteFilePath(); });
-
-    NX_DEBUG(this, "Gathering DB files. Candidates are: %1", result);
     std::sort(
-        result.begin(), result.end(),
-        [](const auto& path1, const auto& path2)
+        candidates.begin(), candidates.end(),
+        [](const auto& fileInfo1, const auto& fileInfo2)
         {
-            NX_ASSERT(!(!path1.contains(kSeparator) && !path2.contains(kSeparator)));
+            const auto path1 = fileInfo1.absoluteFilePath();
+            const auto path2 = fileInfo2.absoluteFilePath();
+            NX_ASSERT(path1.contains(kSeparator) || path2.contains(kSeparator));
 
             if (!path1.contains(kSeparator))
                 return true;
@@ -331,8 +335,8 @@ QStringList QnStorageDb::allDbFiles(const QString& basePath) const
             return path1 < path2;
         });
 
-    NX_DEBUG(this, "Gathering DB files. The tesult is: %1", result);
-    return result;
+    NX_DEBUG(this, "DB files found: %1", containerString(candidates));
+    return candidates;
 }
 
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog()
@@ -358,29 +362,26 @@ bool isCatalogExistInResult(
     return false;
 }
 
-void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix,
-                                            QnServer::ChunksCatalog catalog,
-                                            QVector<DeviceFileCatalogPtr>& result)
+void QnStorageDb::addCatalogFromMediaFolder(
+    const QString& postfix,
+    QnServer::ChunksCatalog catalog,
+    QVector<DeviceFileCatalogPtr>& result)
 {
-    QString root = closeDirPath(QFileInfo(m_dbFileName).absoluteDir().path()) + postfix;
-
-    QnAbstractStorageResource::FileInfoList files;
-    if (m_storage)
-        files = m_storage->getFileList(root);
-    else
-        files = QnAbstractStorageResource::FIListFromQFIList(
-            QDir(root).entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot,
-                                     QDir::Name));
-
-    for (const QnAbstractStorageResource::FileInfo& fi: files)
+    QString root = closeDirPath(m_dbFileInfo.absoluteDirPath()) + postfix;
+    const auto fileInfos = m_storage->getFileList(root);
+    NX_DEBUG(
+        this, "QnStorageDb::addCatalogFromMediaFolder: root: %1, files: %2", root,
+        containerString(fileInfos));
+    for (const QnAbstractStorageResource::FileInfo& fi: fileInfos)
     {
-        QString uniqueId = fi.baseName();
-        if (!isCatalogExistInResult(result, catalog, uniqueId))
+        if (fi.isDir())
         {
-            result << DeviceFileCatalogPtr(new DeviceFileCatalog(
-                serverModule(),
-                uniqueId, catalog,
-                QnServer::StoragePool::None));
+            QString uniqueId = fi.baseName();
+            if (!isCatalogExistInResult(result, catalog, uniqueId))
+            {
+                result << DeviceFileCatalogPtr(new DeviceFileCatalog(
+                    serverModule(), uniqueId, catalog, QnServer::StoragePool::None));
+            }
         }
     }
 }
@@ -401,7 +402,7 @@ bool QnStorageDb::startDbFile(const QString& basePath, bool incVersion)
 
     if (!incVersion)
     {
-        removeFiles(dbFiles, "");
+        removeFiles(dbFiles, QnAbstractStorageResource::FileInfo());
     }
     else if (!dbFiles.isEmpty())
     {
@@ -410,8 +411,9 @@ bool QnStorageDb::startDbFile(const QString& basePath, bool incVersion)
         newSeqId = prevSeqId + 1;
         if (prevSeqId == std::numeric_limits<int64_t>::max())
         {
-            const auto newPrevFileName = QDir(basePath).absoluteFilePath(baseFileName(/*seqId*/ 1));
-            if (!m_storage->renameFile(dbFiles[dbFiles.size() - 1], newPrevFileName))
+            const auto newPrevFileName = closeDirPath(basePath) + baseFileName(/*seqId*/ 1);
+            if (!m_storage->renameFile(
+                    dbFiles[dbFiles.size() - 1].absoluteFilePath(), newPrevFileName))
             {
                 NX_WARNING(
                     this, "Failed to rename the DB file with max sequence id (%1)",
@@ -423,8 +425,10 @@ bool QnStorageDb::startDbFile(const QString& basePath, bool incVersion)
         }
     }
 
-    m_dbFileName = QDir(basePath).absoluteFilePath(baseFileName(newSeqId));
-    NX_DEBUG(this, "Creating a new DB file (%1)", m_dbFileName);
+    m_dbFileInfo = QnAbstractStorageResource::FileInfo(
+        closeDirPath(basePath) + baseFileName(newSeqId), /*size*/ 0, /*isDir*/ false);
+
+    NX_DEBUG(this, "Creating a new DB file (%1)", m_dbFileInfo);
     if (!openDbFile())
         return false;
 
@@ -440,9 +444,8 @@ bool QnStorageDb::startDbFile(const QString& basePath, bool incVersion)
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
 {
     QVector<DeviceFileCatalogPtr> result;
-    NX_INFO(this, lit("Loading chunks from DB. storage: %1, file: %2")
-            .arg(m_storage->getUrl())
-            .arg(m_dbFileName));
+    NX_INFO(
+        this, "Loading chunks from DB. storage: %1, file: %2", m_storage->getUrl(), m_dbFileInfo);
 
     nx::utils::promise<void> readyPromise;
     auto readyFuture = readyPromise.get_future();
@@ -453,18 +456,14 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
             if (success)
             {
                 NX_INFO(
-                    this,
-                    lit("finished loading chunks from DB. storage: %1, file: %2")
-                    .arg(m_storage->getUrl())
-                    .arg(m_dbFileName));
+                    this, "finished loading chunks from DB. storage: %1, file: %2",
+                    m_storage->getUrl(), m_dbFileInfo);
             }
             else
             {
                 NX_WARNING(
-                    this,
-                    lit("loading chunks from DB failed. storage: %1, file: %2")
-                    .arg(m_storage->getUrl())
-                    .arg(m_dbFileName));
+                    this, "loading chunks from DB failed. storage: %1, file: %2",
+                    m_storage->getUrl(), m_dbFileInfo);
             }
 
             readyPromise.set_value();
@@ -478,10 +477,11 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
 
 QByteArray QnStorageDb::dbFileContent()
 {
-    std::unique_ptr<QIODevice> file(m_storage->open(m_dbFileName, QIODevice::ReadOnly));
+    std::unique_ptr<QIODevice> file(
+        m_storage->open(m_dbFileInfo.absoluteFilePath(), QIODevice::ReadOnly));
     if (!file)
     {
-        NX_DEBUG(this, lm("Failed to open DB file %1").args(m_dbFileName));
+        NX_DEBUG(this, "Failed to open DB file %1", m_dbFileInfo);
         return QByteArray();
     }
 
@@ -502,8 +502,8 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
             },
             QString("Vacuum: Parse DB:")))
     {
-        NX_WARNING(this, lm("Failed to parse DB file %1").args(m_dbFileName));
-        startDbFile(QFileInfo(m_dbFileName).absolutePath(), /*incVersion*/ false);
+        NX_WARNING(this, "Failed to parse DB file %1", m_dbFileInfo);
+        startDbFile(m_dbFileInfo.absoluteDirPath(), /*incVersion*/ false);
         return false;
     }
 
@@ -511,8 +511,8 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
             [this, &parsedData, data]() { return writeVacuumedData(std::move(parsedData), data); },
             QString("Vacuum: writeVacuumedData:")))
     {
-        NX_WARNING(this, lm("Failed to write vacuumed data. DB file %1").args(m_dbFileName));
-        startDbFile(QFileInfo(m_dbFileName).absolutePath(), /*incVersion*/ false);
+        NX_WARNING(this, "Failed to write vacuumed data. DB file %1", m_dbFileInfo);
+        startDbFile(m_dbFileInfo.absoluteDirPath(), /*incVersion*/ false);
         return false;
     }
 
@@ -548,10 +548,10 @@ bool QnStorageDb::writeVacuumedData(
         this,
         "QnStorageDb::serializedData() completed successfully. time = %1 ms", timer.elapsedMs());
 
-    if (!startDbFile(QFileInfo(m_dbFileName).absolutePath(), /*incVersion*/ true))
+    if (!startDbFile(m_dbFileInfo.absoluteDirPath(), /*incVersion*/ true))
         return false;
 
-    const auto dbFiles = allDbFiles(QFileInfo(m_dbFileName).absolutePath());
+    const auto dbFiles = allDbFiles(m_dbFileInfo.absoluteDirPath());
     NX_ASSERT(dbFiles.size() == 2);
 
     m_ioDevice->write(writer.data());
@@ -559,7 +559,7 @@ bool QnStorageDb::writeVacuumedData(
         this, "QnStorageDb::writeVacuumedData write to disk finished. time = %1 ms",
         timer.elapsedMs());
 
-    removeFiles(dbFiles, m_dbFileName);
+    removeFiles(dbFiles, m_dbFileInfo);
     return true;
 }
 
