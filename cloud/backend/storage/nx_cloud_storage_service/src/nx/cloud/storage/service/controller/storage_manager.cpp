@@ -23,8 +23,6 @@ using namespace nx::cloud::storage::service::api;
 
 namespace {
 
-// TODO should this be a setting? It is the aws global sts endpoint, but there are regional ones...
-static constexpr char kStsUrl[] = "https://sts.amazonaws.com";
 static constexpr char kStorageType[] = "awss3";
 
 static const std::map<std::string, nx::geo_ip::Geopoint> kAwsGeopoints = {
@@ -53,7 +51,8 @@ static const std::map<std::string, nx::geo_ip::Geopoint> kAwsGeopoints = {
 };
 
 // TODO attempt to format this string properly when sts::ApiClient works
-// %1 is an array of arns with the form: "arn:aws:s3:::examplebucket/folder".
+// %1 (S3ReadWriteAccess%1) uniquely identifies the inline session.
+// %2 is an array of arns with the form: "arn:aws:s3:::examplebucket/folder".
 // NOTE: Because storages can be merged, access must be granted to multiple buckets/folders.
 // There is no way know the specific bucket/folder will be be written to, access must be granted
 // to all of them.
@@ -130,7 +129,7 @@ StorageManager::StorageManager(
     m_stsClient(
         std::make_unique<aws::sts::ApiClient>(
             utils::kDefaultBucketRegion,
-            kStsUrl, //<TODO decide how to handle url, global or regional
+            m_settings.aws().stsUrl,
             m_settings.aws().credentials))
 {
 }

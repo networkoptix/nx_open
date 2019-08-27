@@ -38,6 +38,8 @@ static constexpr char kDefaultUrl[] = "";
 namespace aws {
 
 static constexpr char kGroupName[] = "aws";
+static constexpr char kStsUrl[] = "stsUrl";
+static constexpr char kDefaultStsUrl[] = "https://sts.amazonaws.com";
 static constexpr char kAccessKeyId[] = "accessKeyId";
 static constexpr char kSecretAccessKey[] = "secretAccessKey";
 static constexpr char kAssumeRoleArn[] = "assumeRoleArn";
@@ -124,6 +126,9 @@ void Settings::loadAws()
     network::http::Ha1AuthToken secretAccessKey(
         settings().value(lm("%1/%2").args(kGroupName, kSecretAccessKey)).toByteArray());
     m_aws.credentials = network::http::Credentials(accessKeyId, secretAccessKey);
+
+    m_aws.stsUrl = settings().value(
+        lm("%1/%2").args(kGroupName, kStsUrl), kDefaultStsUrl).toString().toStdString();
 
     m_aws.assumeRoleArn = settings().value(
         lm("%1/%2").args(kGroupName, kAssumeRoleArn)).toString().toStdString();

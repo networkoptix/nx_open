@@ -31,6 +31,7 @@ struct CloudDb
 struct Aws
 {
     nx::network::http::Credentials credentials;
+    nx::utils::Url stsUrl;
     std::string assumeRoleArn;
     // Corresponds to aws default value
     std::chrono::seconds storageCredentialsDuration = std::chrono::seconds(3600);
