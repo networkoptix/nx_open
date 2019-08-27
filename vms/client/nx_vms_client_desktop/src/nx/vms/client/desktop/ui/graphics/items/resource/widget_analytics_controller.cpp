@@ -448,7 +448,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         }
     }
 
-    NX_VERBOSE(this, "%1 objects are currently visible", d->objectInfoById.size());
+    NX_DEBUG(this, "%1 objects are currently visible", d->objectInfoById.size());
 
     d->lastTimestamp = timestamp;
     d->updateObjectAreas(timestamp);
