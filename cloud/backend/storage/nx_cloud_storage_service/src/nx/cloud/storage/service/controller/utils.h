@@ -15,6 +15,4 @@ api::ResultCode toResultCode(aws::ResultCode resultCode);
 
 api::Result toResult(aws::Result result);
 
-api::Result badRequest(QString message);
-
 } // namespace nx::cloud::storage::service::controller::utils

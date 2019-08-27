@@ -37,9 +37,4 @@ api::Result toResult(aws::Result result)
     return api::Result(toResultCode(result.code()), result.text());
 }
 
-api::Result badRequest(QString message)
-{
-    return api::Result(api::ResultCode::badRequest, message.toStdString());
-}
-
 }

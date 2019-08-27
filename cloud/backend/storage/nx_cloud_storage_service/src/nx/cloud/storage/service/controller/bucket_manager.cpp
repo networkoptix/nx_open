@@ -16,10 +16,11 @@ namespace nx::cloud::storage::service::controller {
 
 using namespace std::placeholders;
 using namespace model::dao;
+using namespace nx::cloud::storage::service::api;
 
 namespace {
 
-QString toString(const api::Bucket& bucket)
+QString toString(const Bucket& bucket)
 {
     return QString("{name: %1, region: %2").arg(bucket.name.c_str()).arg(bucket.region.c_str());
 }
@@ -45,12 +46,12 @@ BucketManager::~BucketManager()
         permissionsTester->pleaseStopSync();
 }
 
-void BucketManager::addBucket(const api::AddBucketRequest& request, AddBucketHandler handler)
+void BucketManager::addBucket(const AddBucketRequest& request, AddBucketHandler handler)
 {
     using namespace std::placeholders;
 
     if (request.name.empty())
-        return handler(utils::badRequest("Empty bucket name"), api::Bucket());
+        return handler(Result(ResultCode::badRequest, "Empty bucket name"), Bucket());
 
     auto permissionsTester = createPermissionsTest(request.name);
 
@@ -62,11 +63,11 @@ void BucketManager::addBucket(const api::AddBucketRequest& request, AddBucketHan
         {
             removePermissionsTest(permissionsTester);
 
-            if (result.resultCode != api::ResultCode::ok)
+            if (result.resultCode != ResultCode::ok)
             {
                 NX_INFO(this, "S3 permissions test failed: %1, %2",
                     toString(result.resultCode), result.error);
-                return handler(std::move(result), api::Bucket());
+                return handler(std::move(result), Bucket());
             }
 
             addBucketToDb(std::move(region), std::move(request), std::move(handler));
@@ -74,9 +75,9 @@ void BucketManager::addBucket(const api::AddBucketRequest& request, AddBucketHan
 }
 
 void BucketManager::listBuckets(
-    nx::utils::MoveOnlyFunc<void(api::Result, api::Buckets)> handler)
+    nx::utils::MoveOnlyFunc<void(Result, Buckets)> handler)
 {
-    auto buckets = std::make_shared<api::Buckets>();
+    auto buckets = std::make_shared<Buckets>();
 
     m_bucketDao->queryExecutor().executeSelect(
         [this, guard = m_asyncCounter.getScopedIncrement(), buckets](auto queryContext)
@@ -90,21 +91,21 @@ void BucketManager::listBuckets(
         {
             if (dbResult != nx::sql::DBResult::ok)
             {
-                api::Result error(
+                Result error(
                     utils::toResultCode(dbResult),
                     lm("listBuckets failed with sql error: %1")
                         .arg(toString(dbResult)).toStdString());
                 NX_VERBOSE(this, error.error);
-                return handler(std::move(error), api::Buckets());
+                return handler(std::move(error), Buckets());
             }
 
-            handler(api::Result(), std::move(*buckets));
+            handler(Result(), std::move(*buckets));
         });
 }
 
 void BucketManager::removeBucket(
     const std::string& bucketName,
-    nx::utils::MoveOnlyFunc<void(api::Result)> handler)
+    nx::utils::MoveOnlyFunc<void(Result)> handler)
 {
     m_bucketDao->queryExecutor().executeUpdate(
         [this, guard = m_asyncCounter.getScopedIncrement(), bucketName](auto queryContext)
@@ -117,7 +118,7 @@ void BucketManager::removeBucket(
         {
             if (dbResult != nx::sql::DBResult::ok)
             {
-                api::Result error(
+                Result error(
                     utils::toResultCode(dbResult),
                     lm("removeBucket(%1) failed with sql error: %2")
                         .args(bucketName, toString(dbResult)).toStdString());
@@ -125,11 +126,11 @@ void BucketManager::removeBucket(
                 return handler(std::move(error));
             }
 
-            handler(api::Result());
+            handler(Result());
         });
 }
 
-std::vector<api::Bucket> BucketManager::fetchBuckets(
+std::vector<Bucket> BucketManager::fetchBuckets(
     nx::sql::QueryContext* queryContext)
 {
     return m_bucketDao->fetchBuckets(queryContext);
@@ -137,10 +138,10 @@ std::vector<api::Bucket> BucketManager::fetchBuckets(
 
 void BucketManager::addBucketToDb(
     std::string region,
-    api::AddBucketRequest request,
+    AddBucketRequest request,
     AddBucketHandler handler)
 {
-    auto bucket = std::make_shared<api::Bucket>();
+    auto bucket = std::make_shared<Bucket>();
     bucket->name = std::move(request.name);
     bucket->region = std::move(region);
     bucket->cloudStorageCount = 0;
@@ -157,15 +158,15 @@ void BucketManager::addBucketToDb(
         {
             if (dbResult != nx::sql::DBResult::ok)
             {
-                api::Result error(
+                Result error(
                     utils::toResultCode(dbResult),
                     std::string("addBucketToDb failed with sql error: ") + toString(dbResult));
                 NX_VERBOSE(this, error.error);
-                return handler(std::move(error), api::Bucket());
+                return handler(std::move(error), Bucket());
             }
 
             NX_VERBOSE(this, "addBucketToDb succeeded for bucket %1", toString(*bucket));
-            handler(api::Result(), std::move(*bucket));
+            handler(Result(), std::move(*bucket));
         });
 }
 
