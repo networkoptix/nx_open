@@ -8,8 +8,9 @@ namespace nx::vms::rules {
 
 using namespace std::chrono;
 
-ActionBuilder::ActionBuilder(const QnUuid& id, const ActionConstructor& ctor):
+ActionBuilder::ActionBuilder(const QnUuid& id, const QString& actionType, const ActionConstructor& ctor):
     m_id(id),
+    m_actionType(actionType),
     m_constructor(ctor)
 {
     m_timer.setSingleShot(true);
@@ -21,14 +22,31 @@ ActionBuilder::~ActionBuilder()
     qDeleteAll(m_fields);
 }
 
- bool ActionBuilder::addField(const QString& name, ActionField* field)
- {
+QnUuid ActionBuilder::id() const
+{
+    return m_id;
+}
+
+QString ActionBuilder::actionType() const
+{
+    return m_actionType;
+}
+
+bool ActionBuilder::addField(const QString& name, ActionField* field)
+{
     if (m_fields.contains(name))
         return false;
 
     m_fields[name] = field;
+    updateState();
+
     return true;
- }
+}
+
+const QHash<QString, ActionField*>& ActionBuilder::fields() const
+{
+   return m_fields;
+}
 
 void ActionBuilder::process(const EventPtr& event)
 {
@@ -58,11 +76,6 @@ void ActionBuilder::process(const EventPtr& event)
     }
 }
 
-QnUuid ActionBuilder::id() const
-{
-    return m_id;
-}
-
 void ActionBuilder::setAggregationInterval(seconds interval)
 {
     m_interval = interval;
@@ -71,6 +84,7 @@ void ActionBuilder::setAggregationInterval(seconds interval)
     m_timer.setInterval(m_interval);
     if (m_interval.count())
         m_timer.start();
+    updateState();
 }
 
 seconds ActionBuilder::aggregationInterval() const
