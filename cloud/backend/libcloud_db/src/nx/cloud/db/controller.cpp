@@ -72,6 +72,7 @@ Controller::Controller(
         &m_dbInstanceController.queryExecutor(),
         &m_accountManager,
         &m_systemManager,
+        &m_systemManager,
         m_tempPasswordManager,
         m_authDataProviders,
         &m_vmsP2pCommandBus),

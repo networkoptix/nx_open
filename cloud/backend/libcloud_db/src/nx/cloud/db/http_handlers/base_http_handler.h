@@ -164,52 +164,6 @@ protected:
         std::function<void(api::Result, Output...)> completionHandler) = 0;
 };
 
-/**
- * Contains logic common for all cloud_db HTTP request handlers.
- */
-template<typename Input, typename ... Output>
-class FiniteMsgBodyHttpHandler:
-    public AbstractFiniteMsgBodyHttpHandler<Input, Output...>
-{
-    static_assert(sizeof...(Output) <= 1, "Specify output data type or leave blank");
-
-public:
-    typedef std::function<void(
-        const AuthorizationInfo& authzInfo,
-        Input inputData,
-        std::function<void(api::Result result, Output... outData)>&& completionHandler)
-    > ExecuteRequestFunc;
-
-    FiniteMsgBodyHttpHandler(
-        EntityType entityType,
-        DataActionType actionType,
-        const SecurityManager& securityManager,
-        ExecuteRequestFunc requestFunc)
-        :
-        AbstractFiniteMsgBodyHttpHandler<Input, Output...>(
-            entityType,
-            actionType,
-            securityManager),
-        m_requestFunc(std::move(requestFunc))
-    {
-    }
-
-protected:
-    virtual void processRequest(
-        nx::network::http::RequestContext requestContext,
-        Input inputData,
-        std::function<void(api::Result, Output...)> completionHandler) override
-    {
-        m_requestFunc(
-            AuthorizationInfo(std::exchange(requestContext.authInfo, {})),
-            std::move(inputData),
-            std::move(completionHandler));
-    }
-
-private:
-    ExecuteRequestFunc m_requestFunc;
-};
-
 //-------------------------------------------------------------------------------------------------
 
 /**
@@ -263,6 +217,137 @@ protected:
     virtual void processRequest(
         nx::network::http::RequestContext requestContext,
         std::function<void(api::Result, Output...)> completionHandler) = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+template<typename Input, typename ... Output>
+class FiniteMsgBodyRestHandler:
+    public AbstractFiniteMsgBodyHttpHandler<Input, Output...>
+{
+    static_assert(sizeof...(Output) <= 1, "Specify output data type or leave blank");
+
+public:
+    typedef std::function<void(
+        nx::network::http::RequestContext requestContext,
+        Input inputData,
+        std::function<void(api::Result result, Output... outData)>&& completionHandler)
+    > ExecuteRequestFunc;
+
+    FiniteMsgBodyRestHandler(
+        EntityType entityType,
+        DataActionType actionType,
+        const SecurityManager& securityManager,
+        ExecuteRequestFunc requestFunc)
+        :
+        AbstractFiniteMsgBodyHttpHandler<Input, Output...>(
+            entityType,
+            actionType,
+            securityManager),
+        m_requestFunc(std::move(requestFunc))
+    {
+    }
+
+protected:
+    virtual void processRequest(
+        nx::network::http::RequestContext requestContext,
+        Input inputData,
+        std::function<void(api::Result, Output...)> completionHandler) override
+    {
+        m_requestFunc(
+            std::move(requestContext),
+            std::move(inputData),
+            std::move(completionHandler));
+    }
+
+private:
+    ExecuteRequestFunc m_requestFunc;
+};
+
+template<typename... Output>
+class FiniteMsgBodyRestHandler<void, Output...>:
+    public AbstractFiniteMsgBodyHttpHandler<void, Output...>
+{
+public:
+    typedef std::function<void(
+        nx::network::http::RequestContext requestContext,
+        std::function<void(api::Result /*result*/, Output... /*outData*/)> completionHandler)
+    > ExecuteRequestFunc;
+
+    FiniteMsgBodyRestHandler(
+        EntityType entityType,
+        DataActionType actionType,
+        const SecurityManager& securityManager,
+        ExecuteRequestFunc requestFunc)
+        :
+        AbstractFiniteMsgBodyHttpHandler<void, Output...>(
+            entityType,
+            actionType,
+            securityManager),
+        m_requestFunc(std::move(requestFunc))
+    {
+    }
+
+protected:
+    virtual void processRequest(
+        nx::network::http::RequestContext requestContext,
+        std::function<void(api::Result, Output...)> completionHandler) override
+    {
+        m_requestFunc(
+            std::move(requestContext),
+            std::move(completionHandler));
+    }
+
+private:
+    ExecuteRequestFunc m_requestFunc;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Contains logic common for all cloud_db HTTP request handlers.
+ */
+template<typename Input, typename ... Output>
+class FiniteMsgBodyHttpHandler:
+    public AbstractFiniteMsgBodyHttpHandler<Input, Output...>
+{
+    static_assert(sizeof...(Output) <= 1, "Specify output data type or leave blank");
+
+public:
+    typedef std::function<void(
+        const AuthorizationInfo& authzInfo,
+        Input inputData,
+        std::function<void(api::Result result, Output... outData)>&& completionHandler)
+    > ExecuteRequestFunc;
+
+    FiniteMsgBodyHttpHandler(
+        EntityType entityType,
+        DataActionType actionType,
+        const SecurityManager& securityManager,
+        ExecuteRequestFunc requestFunc)
+        :
+        AbstractFiniteMsgBodyHttpHandler<Input, Output...>(
+            entityType,
+            actionType,
+            securityManager),
+        m_requestFunc(std::move(requestFunc))
+    {
+    }
+
+protected:
+    virtual void processRequest(
+        nx::network::http::RequestContext requestContext,
+        Input inputData,
+        std::function<void(api::Result, Output...)> completionHandler) override
+    {
+        m_requestFunc(
+            AuthorizationInfo(std::exchange(requestContext.authInfo, {})),
+            std::move(inputData),
+            std::move(completionHandler));
+    }
+
+private:
+    ExecuteRequestFunc m_requestFunc;
 };
 
 template<typename... Output>

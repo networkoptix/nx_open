@@ -140,6 +140,17 @@ private:
         EntityType entityType,
         DataActionType dataActionType);
 
+    template<typename InputData, typename OutputData,
+        typename Func, typename... RestParamFetchers
+    >
+    void registerRestHttpHandler(
+        const char* httpMethod,
+        const char* path,
+        Func func,
+        EntityType entityType,
+        DataActionType dataActionType,
+        RestParamFetchers...);
+
     /**
      * @param handler is
      * void(const AuthorizationInfo& authzInfo,

@@ -57,32 +57,24 @@ protected:
 
     void whenResolveCredentials(const std::string& login, const std::string& password)
     {
-        using namespace nx::network::http;
-
-        api::UserAuthorization authorization;
-
-        header::WWWAuthenticate wwwAuthenticate;
-        wwwAuthenticate.authScheme = header::AuthScheme::digest;
-        wwwAuthenticate.params["realm"] = nx::network::AppInfo::realm().toUtf8();
-        wwwAuthenticate.params["algorithm"] = "MD5";
-        wwwAuthenticate.params["nonce"] = "nonce";
-
-        header::DigestAuthorization digestAuthorization;
-        calcDigestResponse(
-            "GET",
-            Credentials(QString::fromStdString(login), PasswordAuthToken(nx::String::fromStdString(password))),
-            "/some/uri",
-            wwwAuthenticate,
-            &digestAuthorization);
-
-        authorization.requestMethod = "GET";
-        authorization.requestAuthorization = digestAuthorization.serialized().toStdString();
-
         m_connection->authProvider()->resolveUserCredentials(
-            authorization,
+            prepareUserAuthorization(login, password),
             [this](auto&&... args)
             {
                 m_resolveUserCredentialsResults.push(std::forward<decltype(args)>(args)...);
+            });
+    }
+
+    void whenGetSystemAccessLevel(
+        const std::string& systemId,
+        const std::string& login, const std::string& password)
+    {
+        m_connection->authProvider()->getSystemAccessLevel(
+            systemId,
+            prepareUserAuthorization(login, password),
+            [this](auto&&... args)
+            {
+                m_resolveSystemAccess.push(std::forward<decltype(args)>(args)...);
             });
     }
 
@@ -112,6 +104,18 @@ protected:
         ASSERT_NE(api::ResultCode::ok, m_lastResolvedCredentials.status);
     }
 
+    void thenSystemAccessLevelIsProvided()
+    {
+        api::ResultCode resultCode = api::ResultCode::ok;
+        std::tie(resultCode, m_lastResolvedSystemAccess) = m_resolveSystemAccess.pop();
+        ASSERT_EQ(api::ResultCode::ok, resultCode);
+    }
+
+    void andAccessLevelIs(api::SystemAccessRole expected)
+    {
+        ASSERT_EQ(expected, m_lastResolvedSystemAccess.accessRole);
+    }
+
     AccountWithPassword account() const
     {
         return m_account1;
@@ -133,6 +137,40 @@ private:
     nx::utils::SyncQueue<std::tuple<api::ResultCode, api::CredentialsDescriptor>>
         m_resolveUserCredentialsResults;
     api::CredentialsDescriptor m_lastResolvedCredentials;
+
+    nx::utils::SyncQueue<std::tuple<api::ResultCode, api::SystemAccess>>
+        m_resolveSystemAccess;
+    api::SystemAccess m_lastResolvedSystemAccess;
+
+    api::UserAuthorization prepareUserAuthorization(
+        const std::string& login,
+        const std::string& password)
+    {
+        using namespace nx::network::http;
+
+        api::UserAuthorization authorization;
+
+        header::WWWAuthenticate wwwAuthenticate;
+        wwwAuthenticate.authScheme = header::AuthScheme::digest;
+        wwwAuthenticate.params["realm"] = nx::network::AppInfo::realm().toUtf8();
+        wwwAuthenticate.params["algorithm"] = "MD5";
+        wwwAuthenticate.params["nonce"] = "nonce";
+
+        header::DigestAuthorization digestAuthorization;
+        calcDigestResponse(
+            "GET",
+            Credentials(
+                QString::fromStdString(login),
+                PasswordAuthToken(nx::String::fromStdString(password))),
+            "/some/uri",
+            wwwAuthenticate,
+            &digestAuthorization);
+
+        authorization.requestMethod = "GET";
+        authorization.requestAuthorization = digestAuthorization.serialized().toStdString();
+
+        return authorization;
+    }
 };
 
 TEST_F(AuthProvider, nonce)
@@ -170,6 +208,26 @@ TEST_F(AuthProvider, resolve_bad_credentials_produces_error)
 {
     whenResolveCredentials("Steven", "Spielberg");
     thenCredentialsAreNotResolved();
+}
+
+TEST_F(AuthProvider, reports_correct_system_permissions_to_owner)
+{
+    whenGetSystemAccessLevel(
+        system().id,
+        account().email, account().password);
+
+    thenSystemAccessLevelIsProvided();
+    andAccessLevelIs(api::SystemAccessRole::owner);
+}
+
+TEST_F(AuthProvider, reports_correct_system_permissions_to_mediaserver)
+{
+    whenGetSystemAccessLevel(
+        system().id,
+        system().id, system().authKey);
+
+    thenSystemAccessLevelIsProvided();
+    andAccessLevelIs(api::SystemAccessRole::system);
 }
 
 } // namespace nx::cloud::db::test

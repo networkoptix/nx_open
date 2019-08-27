@@ -6,6 +6,7 @@
 #include <nx/cloud/db/client/cdb_request_path.h>
 #include <nx/cloud/db/api/ec2_request_paths.h>
 #include <nx/network/http/http_types.h>
+#include <nx/network/http/server/rest/base_request_handler.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
@@ -304,10 +305,20 @@ void HttpView::registerApiHandlers(
         &AuthenticationProvider::getAuthenticationResponse, authProvider,
         EntityType::account, DataActionType::fetch);
 
-    registerHttpHandler(
+    registerRestHttpHandler<api::UserAuthorization, api::CredentialsDescriptor>(
+        nx::network::http::Method::post.constData(),
         kAuthResolveUserCredentials,
-        &AuthenticationProvider::resolveUserCredentials, authProvider,
+        [authProvider](auto&&... args)
+            { authProvider->resolveUserCredentials(std::forward<decltype(args)>(args)...); },
         EntityType::account, DataActionType::fetch);
+
+    registerRestHttpHandler<api::UserAuthorization, api::SystemAccess>(
+        nx::network::http::Method::post.constData(),
+        kAuthSystemAccessLevel,
+        [authProvider](auto&&... args)
+            { authProvider->getSystemAccessLevel(std::forward<decltype(args)>(args)...); },
+        EntityType::account, DataActionType::fetch,
+        nx::network::http::server::rest::RestArgFetcher<kSystemIdParam>());
 
     //---------------------------------------------------------------------------------------------
     ec2SynchronizationEngine->registerHttpApi(
@@ -426,6 +437,43 @@ void HttpView::registerHttpHandler(
                     (manager->*managerFunc)(std::move(args)...);
                 });
         });
+}
+
+template<typename InputData, typename OutputData,
+    typename Func, typename... RestParamFetchers
+>
+void HttpView::registerRestHttpHandler(
+    const char* httpMethod,
+    const char* path,
+    Func func,
+    EntityType entityType,
+    DataActionType dataActionType,
+    RestParamFetchers...)
+{
+    using HttpHandler = FiniteMsgBodyRestHandler<InputData, OutputData>;
+
+    m_httpMessageDispatcher.registerRequestProcessor<HttpHandler>(
+        path,
+        [this, func = std::move(func), entityType, dataActionType]() mutable
+            -> std::unique_ptr<HttpHandler>
+        {
+            return std::make_unique<HttpHandler>(
+                entityType,
+                dataActionType,
+                m_controller->securityManager(),
+                [func = std::move(func)](
+                    nx::network::http::RequestContext requestContext,
+                    InputData input,
+                    auto completionHandler)
+                {
+                    func(
+                        AuthorizationInfo(std::exchange(requestContext.authInfo, {})),
+                        RestParamFetchers()(requestContext)...,
+                        std::move(input),
+                        std::move(completionHandler));
+                });
+        },
+        httpMethod);
 }
 
 namespace {

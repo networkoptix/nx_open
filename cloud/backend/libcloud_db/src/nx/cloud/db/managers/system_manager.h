@@ -67,6 +67,11 @@ class AbstractSystemManager
 public:
     virtual ~AbstractSystemManager() = default;
 
+    virtual void getSystems(
+        const AuthorizationInfo& authzInfo,
+        data::DataFilter filter,
+        std::function<void(api::Result, api::SystemDataExList)> completionHandler) = 0;
+
     virtual boost::optional<api::SystemData> findSystemById(const std::string& id) const = 0;
 
     virtual nx::sql::DBResult fetchSystemById(
@@ -137,6 +142,7 @@ public:
         const AuthorizationInfo& authzInfo,
         data::SystemId systemId,
         std::function<void(api::Result)> completionHandler);
+
     /**
      * Fetches systems satisfying specified filter.
      * @param eventReceiver Events related to returned data are reported to this functor
@@ -144,10 +150,10 @@ public:
      * @note If filter is empty, all systems authorized for authInfo are returned.
      * @note if request can be completed immediately (e.g., data is present in internal cache) completionHandler will be invoked within this call.
      */
-    void getSystems(
+    virtual void getSystems(
         const AuthorizationInfo& authzInfo,
         data::DataFilter filter,
-        std::function<void(api::Result, api::SystemDataExList)> completionHandler);
+        std::function<void(api::Result, api::SystemDataExList)> completionHandler) override;
 
     void shareSystem(
         const AuthorizationInfo& authzInfo,
