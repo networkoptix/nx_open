@@ -281,6 +281,9 @@ private:
         AioEventHandlingData* eventHandlingData,
         aio::EventType eventType);
 
+    template<typename Func>
+    void callAndReportAbnormalProcessingTime(Func func, const char* description);
+
     void reportAbnormalProcessingTime(
         std::chrono::microseconds value,
         std::chrono::microseconds average,
