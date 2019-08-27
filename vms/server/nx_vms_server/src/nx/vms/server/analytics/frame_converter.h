@@ -47,7 +47,8 @@ public:
      *     available.
      */
     nx::sdk::Ptr<nx::sdk::analytics::IDataPacket> getDataPacket(
-        std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> pixelFormat);
+        std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> pixelFormat,
+        int rotationAngle);
 
 private:
     nx::sdk::Ptr<CompressedVideoPacket> m_compressedFrame;

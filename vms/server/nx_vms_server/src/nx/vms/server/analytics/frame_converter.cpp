@@ -17,18 +17,21 @@ using PixelFormat = IUncompressedVideoFrame::PixelFormat;
 
 static nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrameFromVideoDecoderOutput(
     const CLConstVideoDecoderOutputPtr& frame,
-    PixelFormat pixelFormat)
+    PixelFormat pixelFormat,
+    int rotationAngle)
 {
     if (!NX_ASSERT(frame))
         return nullptr;
+
+    auto rotatedFrame = CLConstVideoDecoderOutputPtr(frame->rotated(rotationAngle));
 
     const auto avPixelFormat = nx::vms::server::sdk_support::sdkToAvPixelFormat(pixelFormat);
     if (avPixelFormat == AV_PIX_FMT_NONE)
         return nullptr; //< Assertion failed.
 
-    if (avPixelFormat == frame->format)
+    if (avPixelFormat == rotatedFrame->format)
     {
-        const auto uncompressedVideoFrame = nx::sdk::makePtr<UncompressedVideoFrame>(frame);
+        const auto uncompressedVideoFrame = nx::sdk::makePtr<UncompressedVideoFrame>(rotatedFrame);
 
         if (!uncompressedVideoFrame->avFrame())
             return nullptr; //< An assertion already failed.
@@ -37,10 +40,10 @@ static nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrameFromVid
     }
 
     const auto uncompressedVideoFrame = nx::sdk::makePtr<UncompressedVideoFrame>(
-        frame->width, frame->height, avPixelFormat, frame->pkt_dts);
+        rotatedFrame->width, rotatedFrame->height, avPixelFormat, rotatedFrame->pkt_dts);
 
     if (!uncompressedVideoFrame->avFrame()
-        || !frame->convertTo(uncompressedVideoFrame->avFrame()))
+        || !rotatedFrame->convertTo(uncompressedVideoFrame->avFrame()))
     {
         // An assertion already failed or an error message printed.
         return nullptr;
@@ -49,7 +52,9 @@ static nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrameFromVid
     return uncompressedVideoFrame;
 }
 
-nx::sdk::Ptr<IDataPacket> FrameConverter::getDataPacket(std::optional<PixelFormat> pixelFormat)
+nx::sdk::Ptr<IDataPacket> FrameConverter::getDataPacket(
+    std::optional<PixelFormat> pixelFormat,
+    int rotationAngle)
 {
     if (!pixelFormat) //< Compressed frame requested.
         return m_compressedFrame; //< Can be null.
@@ -74,7 +79,10 @@ nx::sdk::Ptr<IDataPacket> FrameConverter::getDataPacket(std::optional<PixelForma
         const auto insertResult = m_cachedUncompressedFrames.emplace(
             *pixelFormat,
             // Can be null if the conversion fails; cache it anyway to avoid retrying next time.
-            createUncompressedVideoFrameFromVideoDecoderOutput(m_uncompressedFrame, *pixelFormat));
+            createUncompressedVideoFrameFromVideoDecoderOutput(
+                m_uncompressedFrame,
+                *pixelFormat,
+                rotationAngle));
 
         it = insertResult.first;
     }
