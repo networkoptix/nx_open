@@ -140,7 +140,7 @@ private:
         EntityType entityType,
         DataActionType dataActionType);
 
-    template<typename InputData, typename OutputData,
+    template<typename InputData, typename... OutputData,
         typename Func, typename... RestParamFetchers
     >
     void registerRestHttpHandler(

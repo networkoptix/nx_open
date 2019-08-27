@@ -11,7 +11,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "controller.h"
-#include "http_handlers/ping.h"
+#include "http_handlers/base_http_handler.h"
 #include "settings.h"
 
 namespace nx::cloud::db {
@@ -177,13 +177,6 @@ void HttpView::registerApiHandlers(
     const CloudModuleUrlProvider& cloudModuleUrlProviderDeprecated,
     const CloudModuleUrlProvider& cloudModuleUrlProvider)
 {
-    m_httpMessageDispatcher.registerRequestProcessor<http_handler::Ping>(
-        http_handler::Ping::kHandlerPath,
-        [&securityManager]() -> std::unique_ptr<http_handler::Ping>
-        {
-            return std::make_unique<http_handler::Ping>(securityManager);
-        });
-
     //---------------------------------------------------------------------------------------------
     // AccountManager
     registerHttpHandler(
@@ -344,6 +337,11 @@ void HttpView::registerApiHandlers(
         &MaintenanceManager::getStatistics, maintenanceManager,
         EntityType::maintenance, DataActionType::fetch);
 
+    registerHttpHandler(
+        kPingPath,
+        &MaintenanceManager::processPing, maintenanceManager,
+        EntityType::maintenance, DataActionType::fetch);
+
     //---------------------------------------------------------------------------------------------
     using namespace std::placeholders;
 
@@ -386,23 +384,15 @@ void HttpView::registerHttpHandler(
     EntityType entityType,
     DataActionType dataActionType)
 {
-    typedef FiniteMsgBodyHttpHandler<
-        typename std::remove_const<typename std::remove_reference<InputData>::type>::type,
-        OutputData...
-    > HttpHandlerType;
-
-    m_httpMessageDispatcher.registerRequestProcessor<HttpHandlerType>(
+    registerRestHttpHandler<
+        std::remove_cv_t<std::remove_reference_t<InputData>>,
+        std::remove_cv_t<std::remove_reference_t<OutputData>>...
+    >(
+        nx::network::http::kAnyMethod,
         handlerPath,
-        [this, managerFunc, manager, entityType, dataActionType]()
-            -> std::unique_ptr<HttpHandlerType>
-        {
-            using namespace std::placeholders;
-            return std::make_unique<HttpHandlerType>(
-                entityType,
-                dataActionType,
-                m_controller->securityManager(),
-                std::bind(managerFunc, manager, _1, _2, _3));
-        });
+        [manager, managerFunc](auto&&... args)
+            { (manager->*managerFunc)(std::forward<decltype(args)>(args)...); },
+        entityType, dataActionType);
 }
 
 template<typename ManagerType, typename... OutputData>
@@ -415,31 +405,18 @@ void HttpView::registerHttpHandler(
     EntityType entityType,
     DataActionType dataActionType)
 {
-    using ActualOutputDataType =
-        typename nx::utils::tuple_first_element<void, std::tuple<OutputData...>>::type;
-
-    using HttpHandlerType = FiniteMsgBodyHttpHandler<
+    registerRestHttpHandler<
         void,
-        typename std::remove_const<
-            typename std::remove_reference<ActualOutputDataType>::type>::type>;
-
-    m_httpMessageDispatcher.registerRequestProcessor<HttpHandlerType>(
+        std::remove_cv_t<std::remove_reference_t<OutputData>>...
+    >(
+        nx::network::http::kAnyMethod,
         handlerPath,
-        [this, managerFunc, manager, entityType, dataActionType]()
-            -> std::unique_ptr<HttpHandlerType>
-        {
-            return std::make_unique<HttpHandlerType>(
-                entityType,
-                dataActionType,
-                m_controller->securityManager(),
-                [managerFunc, manager](auto&&... args)
-                {
-                    (manager->*managerFunc)(std::move(args)...);
-                });
-        });
+        [manager, managerFunc](auto&&... args)
+            { (manager->*managerFunc)(std::forward<decltype(args)>(args)...); },
+        entityType, dataActionType);
 }
 
-template<typename InputData, typename OutputData,
+template<typename InputData, typename... OutputData,
     typename Func, typename... RestParamFetchers
 >
 void HttpView::registerRestHttpHandler(
@@ -450,30 +427,58 @@ void HttpView::registerRestHttpHandler(
     DataActionType dataActionType,
     RestParamFetchers...)
 {
-    using HttpHandler = FiniteMsgBodyRestHandler<InputData, OutputData>;
+    using HttpHandler = FiniteMsgBodyRestHandler<InputData, OutputData...>;
 
-    m_httpMessageDispatcher.registerRequestProcessor<HttpHandler>(
-        path,
-        [this, func = std::move(func), entityType, dataActionType]() mutable
-            -> std::unique_ptr<HttpHandler>
-        {
-            return std::make_unique<HttpHandler>(
-                entityType,
-                dataActionType,
-                m_controller->securityManager(),
-                [func = std::move(func)](
-                    nx::network::http::RequestContext requestContext,
-                    InputData input,
-                    auto completionHandler)
-                {
-                    func(
-                        AuthorizationInfo(std::exchange(requestContext.authInfo, {})),
-                        RestParamFetchers()(requestContext)...,
-                        std::move(input),
-                        std::move(completionHandler));
-                });
-        },
-        httpMethod);
+    if constexpr (std::is_same_v<InputData, void>)
+    {
+        // TODO: #ak Move if constexpr inside lambda after switching to msvc2019
+        // (when there is no "if constexpr inside lambda inside a template function" bug).
+        m_httpMessageDispatcher.registerRequestProcessor<HttpHandler>(
+            path,
+            [this, func = std::move(func), entityType, dataActionType]() mutable
+                -> std::unique_ptr<HttpHandler>
+            {
+                return std::make_unique<HttpHandler>(
+                    entityType,
+                    dataActionType,
+                    m_controller->securityManager(),
+                    [func = std::move(func)](
+                        nx::network::http::RequestContext requestContext,
+                        auto completionHandler)
+                    {
+                        func(
+                            AuthorizationInfo(std::exchange(requestContext.authInfo, {})),
+                            RestParamFetchers()(requestContext)...,
+                            std::move(completionHandler));
+                    });
+            },
+            httpMethod);
+    }
+    else
+    {
+        m_httpMessageDispatcher.registerRequestProcessor<HttpHandler>(
+            path,
+            [this, func = std::move(func), entityType, dataActionType]() mutable
+                -> std::unique_ptr<HttpHandler>
+            {
+                return std::make_unique<HttpHandler>(
+                    entityType,
+                    dataActionType,
+                    m_controller->securityManager(),
+                    [func = std::move(func)](
+                        nx::network::http::RequestContext requestContext,
+                        InputData input,
+                        auto completionHandler)
+                    {
+                        func(
+                            AuthorizationInfo(std::exchange(requestContext.authInfo, {})),
+                            RestParamFetchers()(requestContext)...,
+                            std::move(input),
+                            std::move(completionHandler));
+                    });
+            },
+            httpMethod);
+    }
 }
 
 namespace {

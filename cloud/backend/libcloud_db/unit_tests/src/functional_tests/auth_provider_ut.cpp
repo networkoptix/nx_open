@@ -230,4 +230,19 @@ TEST_F(AuthProvider, reports_correct_system_permissions_to_mediaserver)
     andAccessLevelIs(api::SystemAccessRole::system);
 }
 
+#if 0
+TEST_F(AuthProvider, reports_correct_system_permissions_batch)
+{
+    whenGetSystemAccessLevel(
+        {{system().id, account().email, account().password},
+            {system().id, system().id, system().authKey}});
+
+    thenSystemAccessLevelIsProvided();
+
+    andAccessLevelIs({
+        api::SystemAccessRole::owner,
+        api::SystemAccessRole::system});
+}
+#endif
+
 } // namespace nx::cloud::db::test

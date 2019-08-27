@@ -8,7 +8,6 @@
 #include <nx/vms/api/protocol_version.h>
 
 #include "ec2/vms_command_descriptor.h"
-#include "http_handlers/ping.h"
 #include "settings.h"
 
 namespace nx::cloud::db {
@@ -215,7 +214,7 @@ void Controller::initializeSecurity()
     m_authRestrictionList->allow(kAnotherDeprecatedCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kDeprecatedCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kDiscoveryCloudModuleXmlPath, nx::network::http::AuthMethod::noAuth);
-    m_authRestrictionList->allow(http_handler::Ping::kHandlerPath, nx::network::http::AuthMethod::noAuth);
+    m_authRestrictionList->allow(kPingPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kAccountRegisterPath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kAccountActivatePath, nx::network::http::AuthMethod::noAuth);
     m_authRestrictionList->allow(kAccountReactivatePath, nx::network::http::AuthMethod::noAuth);
