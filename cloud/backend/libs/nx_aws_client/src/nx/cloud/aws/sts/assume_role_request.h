@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <QDateTime>
+#include <nx/utils/url_query.h>
 
 #include "nx/cloud/aws/xml/serialize.h"
 #include "nx/cloud/aws/xml/deserialize.h"
@@ -47,6 +47,13 @@ struct NX_AWS_CLIENT_API AssumeRoleResult
     AssumedRoleUser assumedRoleUser;
     int packedPolicySize = 0;
 };
+
+nx::utils::UrlQuery NX_AWS_CLIENT_API serialize(
+    const AssumeRoleRequest& object);
+
+bool NX_AWS_CLIENT_API deserialize(
+    const nx::utils::UrlQuery& query,
+    AssumeRoleRequest* outObject);
 
 } // namespace sts
 

@@ -1,8 +1,12 @@
 #include "assume_role_request.h"
 
-namespace nx::cloud::aws::xml {
+#include <nx/network/url/query_parse_helper.h>
+
+namespace nx::cloud::aws {
 
 namespace {
+
+using namespace nx::cloud::aws::xml;
 
 static constexpr char kCredentials[] = "Credentials";
 static constexpr char kAssumedRoleUser[] = "AssumedRoleUser";
@@ -38,19 +42,88 @@ static const Field<sts::AssumedRoleUser>::Parsers kAssumedRoleUserParsers{
 
 } // namespace
 
+
+namespace sts {
+
+nx::utils::UrlQuery serialize(const AssumeRoleRequest& object)
+{
+    nx::utils::UrlQuery query;
+    query.add("Action", "AssumeRole").add("Version", "2011-06-15");
+
+    if (!object.roleArn.empty())
+        query.add("RoleArn", object.roleArn);
+    if (!object.roleSessionName.empty())
+        query.add("RoleSessionName", object.roleSessionName);
+    int i = 0;
+    for (const auto& policyArn : object.policyArns)
+    {
+        if (!policyArn.empty())
+        {
+            query.add(
+                QString("PolicyArns.member.") + QString::number(++i),
+                policyArn);
+        }
+    }
+    if (!object.policy.empty())
+        query.add("Policy", object.policy);
+    if (object.durationSeconds > 0)
+        query.add("DurationSeconds", object.durationSeconds);
+    if (!object.externalId.empty())
+        query.add("ExternalId", object.externalId);
+    if (!object.serialNumber.empty())
+        query.add("SerialNumber", object.serialNumber);
+    if (!object.tokenCode.empty())
+        query.add("TokenCode", object.tokenCode);
+
+    return query;
+}
+
+bool deserialize(const nx::utils::UrlQuery& query, AssumeRoleRequest* outObject)
+{
+    if (!query.hasKey("Action") || !query.hasKey("Version"))
+        return false;
+
+    if (!query.valueIfExists("RoleArn", &outObject->roleArn)
+        || !query.valueIfExists("RoleSessionName", &outObject->roleSessionName))
+    {
+        return false;
+    }
+
+    int i = 1;
+    QString arn(QString("PolicyArns.member.") + QString::number(i));
+    while(query.hasKey(arn))
+    {
+        std::string value;
+        query.value(arn, &value);
+        outObject->policyArns.emplace_back(std::move(value));
+        arn = QString("PolicyArns.member.") + QString::number(++i);
+    }
+    query.value("Policy", &outObject->policy);
+    query.value("DurationSeconds", &outObject->durationSeconds);
+    query.value("ExternalId", &outObject->externalId);
+    query.value("SerialNumber", &outObject->serialNumber);
+    query.value("TokenCode", &outObject->tokenCode);
+
+    return true;
+}
+
+} // namespace sts
+
+namespace xml {
+
 template<>
 void serialize(QXmlStreamWriter* writer, const sts::AssumeRoleResult& object)
 {
     writeElement(writer, kPackedPolicySize, object.packedPolicySize);
     {
-        NestedObject<decltype(object.credentials)>(writer, object.credentials);
+        NestedObject credentials(writer, object.credentials);
         writeElement(writer, kAccessKeyId, object.credentials.accessKeyId);
         writeElement(writer, kSecretAccessKey, object.credentials.secretAccessKey);
         writeElement(writer, kSessionToken, object.credentials.sessionToken);
         writeElement(writer, kExpiration, object.credentials.expiration);
     }
     {
-        NestedObject<decltype(object.assumedRoleUser)>(writer, object.assumedRoleUser);
+        NestedObject assumedRoleUser(writer, object.assumedRoleUser);
         writeElement(writer, kAssumedRoleId, object.assumedRoleUser.assumedRoleId);
         writeElement(writer, kArn, object.assumedRoleUser.arn);
     }
@@ -80,4 +153,5 @@ bool deserialize(QXmlStreamReader* reader, sts::AssumeRoleResult* outObject)
     return true;
 }
 
-} // namespace nx::cloud::aws::xml
+} // namespace xml
+} // namespace nx::cloud::aws

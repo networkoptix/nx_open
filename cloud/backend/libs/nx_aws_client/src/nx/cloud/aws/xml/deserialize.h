@@ -37,8 +37,6 @@ bool parseNextField(
     if (reader->hasError())
         return false;
 
-    auto name = reader->name().toString();
-
     auto it = fieldFuncs.find(reader->name().toString());
     if (it == fieldFuncs.end())
     {
