@@ -129,7 +129,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
     ASSERT_EQ(chunk->size(), originalFileInfo.size);
 
     auto checksumsRequest = peerManager->requestChecksums(peer, fileName);
-    const auto checksums = checksumsRequest->future.get();
+    auto checksums = checksumsRequest->future.get();
 
     ASSERT_TRUE(checksums);
     ASSERT_EQ(checksums.value(), originalChecksums);
