@@ -71,7 +71,7 @@ void AuthenticationForwarder::authenticateWithCloudDb(
             }
 
             server::SuccessfulAuthenticationResult success;
-            success.authInfo.put(Resource::accountOwner, credentials.objectId.c_str());
+            success.authInfo.put(Resource::accountEmail, credentials.objectId.c_str());
             success.authInfo.put(Resource::httpMethod, userAuth.requestMethod.c_str());
             success.authInfo.put(Resource::authorization, userAuth.requestAuthorization.c_str());
             request.handler(std::move(success));

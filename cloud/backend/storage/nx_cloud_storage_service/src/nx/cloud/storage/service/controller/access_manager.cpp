@@ -12,13 +12,6 @@ namespace nx::cloud::storage::service::controller {
 
 namespace {
 
-static std::string getAccountOwner(const nx::utils::stree::ResourceContainer& authInfo)
-{
-    std::string accountOwner;
-    authInfo.get(cloud_db::Resource::accountOwner, &accountOwner);
-    return accountOwner;
-}
-
 QString toString(const db::api::UserAuthorization& userAuth)
 {
     return lm("{requestMethod: %1, requestAuthorization: %2}")
@@ -37,8 +30,8 @@ AccessManager::~AccessManager() = default;
 std::pair<bool, std::string> AccessManager::addStorageAllowed(
     const nx::utils::stree::ResourceContainer& authInfo) const
 {
-    auto accountOwner = getAccountOwner(authInfo);
-    return {!accountOwner.empty(), accountOwner};
+    auto accountEmail = this->getAccountEmail(authInfo);
+    return {!accountEmail.empty(), accountEmail};
 }
 
 void AccessManager::readStorageAllowed(
@@ -46,7 +39,7 @@ void AccessManager::readStorageAllowed(
     const api::Storage& storage,
     nx::utils::MoveOnlyFunc<void(bool)> handler)
 {
-    auto accountOwner = getAccountOwner(authInfo);
+    auto accountOwner = getAccountEmail(authInfo);
     if (accountOwner == storage.owner)
         return handler(true);
 
@@ -55,7 +48,7 @@ void AccessManager::readStorageAllowed(
     if (storage.systems.empty())
         return handler(false);
 
-    db::api::UserAuthorization userAuth;
+    cloud::db::api::UserAuthorization userAuth;
     authInfo.get(cloud_db::Resource::httpMethod, &userAuth.requestMethod);
     authInfo.get(cloud_db::Resource::authorization, &userAuth.requestAuthorization);
 
@@ -81,11 +74,18 @@ void AccessManager::readStorageAllowed(
         });
 }
 
+std::string AccessManager::getAccountEmail(const nx::utils::stree::ResourceContainer& authInfo) const
+{
+    std::string accountOwner;
+    authInfo.get(cloud_db::Resource::accountEmail, &accountOwner);
+    return accountOwner;
+}
+
 bool AccessManager::isStorageOwner(
     const nx::utils::stree::ResourceContainer& authInfo,
-    const api::Storage& storage)
+    const api::Storage& storage) const
 {
-    return getAccountOwner(authInfo) == storage.owner;
+    return getAccountEmail(authInfo) == storage.owner;
 }
 
 db::api::CdbClient* AccessManager::createCdbClient(

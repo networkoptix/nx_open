@@ -148,8 +148,15 @@ private:
     std::shared_ptr<s3::DataUsageCalculator> createDataUsageCalculator();
     void removeDataUsageCalculator(const std::shared_ptr<s3::DataUsageCalculator>& calculator);
 
+    api::Result prepareRemoveStorageResult(
+        nx::utils::stree::ResourceContainer& authInfo,
+        const std::string& storageId,
+        nx::sql::DBResult dbResult,
+        const std::optional<api::Storage>& storage) const;
+
     template<typename DbFunc, typename Handler>
     void modifySystemStorageRelation(
+        const char* operation,
         nx::utils::stree::ResourceContainer authInfo,
         std::string storageId,
         std::string systemId,

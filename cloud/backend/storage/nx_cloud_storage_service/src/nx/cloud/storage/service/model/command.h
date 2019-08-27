@@ -12,20 +12,20 @@ namespace nx::cloud::storage::service::model {
 
 namespace command {
 
-enum Code
+enum class Code
 {
     saveBucket = nx::clusterdb::engine::command::kUserCommand + 1,
     removeBucket,
     saveStorage,
     removeStorage,
     saveSystem,
-    removeSystem
+    removeSystem,
 };
 
 struct SaveBucket
 {
     using Data = api::Bucket;
-    static constexpr int code = Code::saveBucket;
+    static constexpr int code = (int) Code::saveBucket;
     static constexpr char name[] = "saveBucket";
 
     static nx::Buffer hash(const Data& data)
@@ -37,7 +37,7 @@ struct SaveBucket
 struct RemoveBucket
 {
     using Data = std::string;
-    static constexpr int code = Code::removeBucket;
+    static constexpr int code = (int) Code::removeBucket;
     static constexpr char name[] = "removeBucket";
 
     static nx::Buffer hash(const Data& data)
@@ -49,7 +49,7 @@ struct RemoveBucket
 struct SaveStorage
 {
     using Data = api::Storage;
-    static constexpr int code = Code::saveStorage;
+    static constexpr int code = (int) Code::saveStorage;
     static constexpr char name[] = "saveStorage";
 
     static nx::Buffer hash(const Data& data)
@@ -61,7 +61,7 @@ struct SaveStorage
 struct RemoveStorage
 {
     using Data = std::string;
-    static constexpr int code = Code::removeStorage;
+    static constexpr int code = (int) Code::removeStorage;
     static constexpr char name[] = "removeStorage";
 
     static nx::Buffer hash(const Data& data)
@@ -73,7 +73,7 @@ struct RemoveStorage
 struct SaveSystem
 {
     using Data = api::System;
-    static constexpr int code = Code::saveSystem;
+    static constexpr int code = (int) Code::saveSystem;
     static constexpr char name[] = "saveSystem";
 
     static nx::Buffer hash(const Data& data)
@@ -85,7 +85,7 @@ struct SaveSystem
 struct RemoveSystem
 {
     using Data = api::System;
-    static constexpr int code = Code::removeSystem;
+    static constexpr int code = (int) Code::removeSystem;
     static constexpr char name[] = "removeSystem";
 
     static nx::Buffer hash(const Data& data)

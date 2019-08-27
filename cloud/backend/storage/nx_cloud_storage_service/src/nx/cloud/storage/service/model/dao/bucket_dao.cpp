@@ -96,20 +96,15 @@ nx::sql::DBResult BucketDao::addBucket(
             std::bind(&BucketDao::addBucketToDb, this, _1, _2));
 }
 
-std::vector<api::Bucket> BucketDao::fetchBuckets(
-    nx::sql::QueryContext* queryContext,
-    bool withStorageCount)
+std::vector<api::Bucket> BucketDao::fetchBuckets(nx::sql::QueryContext* queryContext)
 {
     auto query = queryContext->connection()->createQuery();
     query->prepare(kListBuckets);
     query->exec();
 
     auto buckets = toVector(query.get());
-    if (withStorageCount)
-    {
-        for (auto& bucket : buckets)
-            bucket.cloudStorageCount = getStorageCount(queryContext, bucket.name);
-    }
+    for (auto& bucket : buckets)
+        bucket.cloudStorageCount = getStorageCount(queryContext, bucket.name);
 
     return buckets;
 }

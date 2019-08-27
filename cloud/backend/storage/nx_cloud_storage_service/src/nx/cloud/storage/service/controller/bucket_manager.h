@@ -44,9 +44,7 @@ public:
         const std::string& bucketName,
         nx::utils::MoveOnlyFunc<void(api::Result)> handler);
 
-    std::vector<api::Bucket> fetchBuckets(
-        nx::sql::QueryContext* queryContext,
-        bool withStorageCount = false);
+    std::vector<api::Bucket> fetchBuckets(nx::sql::QueryContext* queryContext);
 
 private:
     void addBucketToDb(

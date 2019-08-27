@@ -26,6 +26,8 @@ public:
     {
         std::string region;
         nx::utils::Url url;
+
+        std::string toString() const;
     };
 
     DataUsageCalculator(const nx::network::http::Credentials& credentials);

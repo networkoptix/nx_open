@@ -17,6 +17,15 @@ namespace nx::cloud::storage::service::controller {
 using namespace std::placeholders;
 using namespace model::dao;
 
+namespace {
+
+QString toString(const api::Bucket& bucket)
+{
+    return QString("{name: %1, region: %2").arg(bucket.name.c_str()).arg(bucket.region.c_str());
+}
+
+} // namespace
+
 BucketManager::BucketManager(const conf::Settings& settings, model::Model* model):
     m_settings(settings),
     m_clusterId(settings.database().synchronization.clusterId),
@@ -72,7 +81,7 @@ void BucketManager::listBuckets(
     m_bucketDao->queryExecutor().executeSelect(
         [this, guard = m_asyncCounter.getScopedIncrement(), buckets](auto queryContext)
         {
-            buckets->buckets = fetchBuckets(queryContext, true /*withStorageCount*/);
+            buckets->buckets = fetchBuckets(queryContext);
             return nx::sql::DBResult::ok;
         },
         [this, guard = m_asyncCounter.getScopedIncrement(),
@@ -81,9 +90,10 @@ void BucketManager::listBuckets(
         {
             if (dbResult != nx::sql::DBResult::ok)
             {
-                api::Result error(utils::toResultCode(dbResult));
-                error.error = lm("listBuckets failed with sql error: %1")
-                    .arg(toString(dbResult)).toStdString();
+                api::Result error(
+                    utils::toResultCode(dbResult),
+                    lm("listBuckets failed with sql error: %1")
+                        .arg(toString(dbResult)).toStdString());
                 NX_VERBOSE(this, error.error);
                 return handler(std::move(error), api::Buckets());
             }
@@ -107,9 +117,10 @@ void BucketManager::removeBucket(
         {
             if (dbResult != nx::sql::DBResult::ok)
             {
-                api::Result error(utils::toResultCode(dbResult));
-                error.error = lm("removeBucket(%1) failed with sql error: %2")
-                    .args(bucketName, toString(dbResult)).toStdString();
+                api::Result error(
+                    utils::toResultCode(dbResult),
+                    lm("removeBucket(%1) failed with sql error: %2")
+                        .args(bucketName, toString(dbResult)).toStdString());
                 NX_VERBOSE(this, error.error);
                 return handler(std::move(error));
             }
@@ -119,10 +130,9 @@ void BucketManager::removeBucket(
 }
 
 std::vector<api::Bucket> BucketManager::fetchBuckets(
-    nx::sql::QueryContext* queryContext,
-    bool withStorageCount)
+    nx::sql::QueryContext* queryContext)
 {
-    return m_bucketDao->fetchBuckets(queryContext, withStorageCount);
+    return m_bucketDao->fetchBuckets(queryContext);
 }
 
 void BucketManager::addBucketToDb(
@@ -138,6 +148,7 @@ void BucketManager::addBucketToDb(
     m_bucketDao->queryExecutor().executeUpdate(
         [this, guard = m_asyncCounter.getScopedIncrement(), bucket](auto queryContext)
         {
+            NX_VERBOSE(this, "addBucketToDb: adding bucket %1", toString(*bucket));
             return m_bucketDao->addBucket(queryContext, *bucket);
         },
         [this, guard = m_asyncCounter.getScopedIncrement(), handler = std::move(handler),
@@ -146,13 +157,14 @@ void BucketManager::addBucketToDb(
         {
             if (dbResult != nx::sql::DBResult::ok)
             {
-                api::Result error(utils::toResultCode(dbResult));
-                error.error =
-                    std::string("addBucket failed with sql error: ") + toString(dbResult);
+                api::Result error(
+                    utils::toResultCode(dbResult),
+                    std::string("addBucketToDb failed with sql error: ") + toString(dbResult));
                 NX_VERBOSE(this, error.error);
                 return handler(std::move(error), api::Bucket());
             }
 
+            NX_VERBOSE(this, "addBucketToDb succeeded for bucket %1", toString(*bucket));
             handler(api::Result(), std::move(*bucket));
         });
 }

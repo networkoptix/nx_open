@@ -36,7 +36,10 @@ public:
 
     bool isStorageOwner(
         const nx::utils::stree::ResourceContainer& authInfo,
-        const api::Storage& storage);
+        const api::Storage& storage) const;
+
+    std::string getAccountEmail(
+        const nx::utils::stree::ResourceContainer& authInfo) const;
 
 private:
     struct ReadStorageContext
