@@ -17,8 +17,6 @@ class Server:
             if not pids_raw:
                 return False
 
-            return True
-
             return self.pid in [int(pid) for pid in pids_raw.strip().split()]
 
         def crash_reason(self):
@@ -63,13 +61,19 @@ class Server:
                 # Directory of the VMS is not found
                 vms['dir'] = None
 
-            # TODO: this is a kostil :)
+            # TODO: this is a kostyl :)
             server_config = device.eval(f"cat {vms['dir']}/etc/mediaserver.conf")
             if server_config:
-                tf = tempfile.NamedTemporaryFile()
+                try:
+                    tmp_file_fd, tmp_file_path = tempfile.mkstemp()
+                except:
+                    import time
+                    time.sleep(100)
+
+                tf = open(tmp_file_fd, 'w+b')
                 tf.write(server_config.encode())
-                tf.flush()
-                vms['port'] = int(ConfigParser(tf.name).options.get('port', 7001))
+                tf.close()
+                vms['port'] = int(ConfigParser(tmp_file_path).options.get('port', 7001))
 
             vms['host'] = device.host
 

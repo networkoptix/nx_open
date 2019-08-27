@@ -80,7 +80,7 @@ private:
     std::vector<TimeHelperPtr> m_videoTimeHelpers;
     std::vector<TimeHelperPtr> m_audioTimeHelpers;
     std::atomic_flag m_isMediaUrlValid;
-    QString m_lastSourceUrl;
+    bool m_isServerSideUpdate = false;
     bool m_lastDualStreamingInCustomUrl = false;
     QnMutex m_sourceUrlMutex;
 
