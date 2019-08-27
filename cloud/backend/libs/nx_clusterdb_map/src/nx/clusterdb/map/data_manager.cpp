@@ -92,7 +92,7 @@ DataManager::DataManager(
 {
     m_syncEngine->incomingCommandDispatcher()
         .registerCommandHandler<command::SaveKeyValuePair>(
-            [this](auto&&... args)
+            [this](auto&& ... args) -> nx::sql::DBResult
             {
                 insertOrUpdateReceivedRecord(std::forward<decltype(args)>(args)...);
                 return nx::sql::DBResult::ok;
@@ -100,7 +100,7 @@ DataManager::DataManager(
 
     m_syncEngine->incomingCommandDispatcher()
         .registerCommandHandler<command::RemoveKeyValuePair>(
-            [this](auto&&... args)
+            [this](auto&&... args) -> nx::sql::DBResult
             {
                 removeReceivedRecord(std::forward<decltype(args)>(args)...);
                 return nx::sql::DBResult::ok;
