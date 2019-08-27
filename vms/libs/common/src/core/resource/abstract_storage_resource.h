@@ -1,7 +1,8 @@
-#ifndef __ABSTRACT_STORAGE_H__
-#define __ABSTRACT_STORAGE_H__
+#pragma once
 
 #include "resource.h"
+#include <nx/utils/url.h>
+
 #include <QtCore/QtCore>
 #include <memory>
 
@@ -122,7 +123,7 @@ public:
 
         QString toString() const
         {
-            return absoluteFilePath();
+            return nx::utils::url::hidePassword(absoluteFilePath());
         }
 
     private:
@@ -215,5 +216,3 @@ public:
      */
     virtual qint64 getFileSize(const QString& url) const = 0;
 };
-
-#endif // __ABSTRACT_STORAGE_H__
