@@ -67,4 +67,46 @@ void AuthProvider::getSystemAccessLevel(
         std::bind(completionHandler, std::placeholders::_1, api::SystemAccess()));
 }
 
+void AuthProvider::getSystemAccessLevel(
+    const std::vector<api::SystemAccessLevelRequest>& requests,
+    std::function<void(api::ResultCode, std::vector<api::SystemAccess>)> completionHandler)
+{
+    struct ResultContext
+    {
+        std::size_t responsesExpected = 0;
+        api::ResultCode resultCode = api::ResultCode::ok;
+        std::vector<api::SystemAccess> response;
+        std::function<void(api::ResultCode, std::vector<api::SystemAccess>)> completionHandler;
+    };
+
+    auto result = std::make_shared<ResultContext>();
+    result->responsesExpected = requests.size();
+    result->response.resize(requests.size());
+    result->completionHandler = std::move(completionHandler);
+
+    post(
+        [this, requests, result]()
+        {
+            for (std::size_t i = 0; i < requests.size(); ++i)
+            {
+                getSystemAccessLevel(
+                    requests[i].systemId, requests[i].authorization,
+                    [i, result](api::ResultCode resultCode, api::SystemAccess systemAccess)
+                    {
+                        if (resultCode != api::ResultCode::ok)
+                            result->resultCode = resultCode;
+                        result->response[i] = systemAccess;
+                        --result->responsesExpected;
+                        if (result->responsesExpected == 0)
+                        {
+                            nx::utils::swapAndCall(
+                                result->completionHandler,
+                                result->resultCode,
+                                std::move(result->response));
+                        }
+                    });
+            }
+        });
+}
+
 } // namespace nx::cloud::db::client

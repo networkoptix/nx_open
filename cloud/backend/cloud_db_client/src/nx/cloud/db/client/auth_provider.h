@@ -31,6 +31,10 @@ public:
         const std::string& systemId,
         const api::UserAuthorization& authorization,
         std::function<void(api::ResultCode, api::SystemAccess)> completionHandler) override;
+
+    virtual void getSystemAccessLevel(
+        const std::vector<api::SystemAccessLevelRequest>& requests,
+        std::function<void(api::ResultCode, std::vector<api::SystemAccess>)> completionHandler) override;
 };
 
 } // namespace nx::cloud::db::client

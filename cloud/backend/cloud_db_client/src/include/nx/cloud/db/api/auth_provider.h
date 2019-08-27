@@ -3,6 +3,7 @@
 #include <chrono>
 #include <functional>
 #include <string>
+#include <vector>
 
 #include "result_code.h"
 #include "system_data.h"
@@ -117,6 +118,13 @@ public:
     SystemAccessRole accessRole = SystemAccessRole::none;
 };
 
+class SystemAccessLevelRequest
+{
+public:
+    std::string systemId;
+    api::UserAuthorization authorization;
+};
+
 /**
  * Provides some temporary hashes which can be used by mediaserver
  *   to authenticate requests using cloud account credentials.
@@ -152,6 +160,13 @@ public:
         const std::string& systemId,
         const api::UserAuthorization& authorization,
         std::function<void(api::ResultCode, api::SystemAccess)> completionHandler) = 0;
+
+    /**
+     * @param completionHandler The order of system access corresponds to that of requests.
+     */
+    virtual void getSystemAccessLevel(
+        const std::vector<api::SystemAccessLevelRequest>& requests,
+        std::function<void(api::ResultCode, std::vector<api::SystemAccess>)> completionHandler) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------

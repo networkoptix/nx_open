@@ -72,9 +72,37 @@ protected:
         m_connection->authProvider()->getSystemAccessLevel(
             systemId,
             prepareUserAuthorization(login, password),
-            [this](auto&&... args)
+            [this](api::ResultCode resultCode, api::SystemAccess systemAccess)
             {
-                m_resolveSystemAccess.push(std::forward<decltype(args)>(args)...);
+                m_resolveSystemAccess.push({resultCode, {systemAccess}});
+            });
+    }
+
+    struct Request
+    {
+        std::string systemId;
+        std::string login;
+        std::string password;
+    };
+
+    void whenGetSystemAccessLevel(std::vector<Request> testRequests)
+    {
+        std::vector<api::SystemAccessLevelRequest> requests;
+        std::transform(
+            testRequests.begin(), testRequests.end(),
+            std::back_inserter(requests),
+            [this](const Request& request)
+            {
+                return api::SystemAccessLevelRequest{
+                    request.systemId,
+                    prepareUserAuthorization(request.login, request.password)};
+            });
+
+        m_connection->authProvider()->getSystemAccessLevel(
+            requests,
+            [this](api::ResultCode resultCode, std::vector<api::SystemAccess> responses)
+            {
+                m_resolveSystemAccess.push(std::make_tuple(resultCode, std::move(responses)));
             });
     }
 
@@ -113,7 +141,14 @@ protected:
 
     void andAccessLevelIs(api::SystemAccessRole expected)
     {
-        ASSERT_EQ(expected, m_lastResolvedSystemAccess.accessRole);
+        ASSERT_EQ(expected, m_lastResolvedSystemAccess.front().accessRole);
+    }
+
+    void andAccessLevelIs(std::vector<api::SystemAccessRole> expected)
+    {
+        ASSERT_EQ(expected.size(), m_lastResolvedSystemAccess.size());
+        for (std::size_t i = 0; i < expected.size(); ++i)
+            ASSERT_EQ(expected[i], m_lastResolvedSystemAccess[i].accessRole);
     }
 
     AccountWithPassword account() const
@@ -138,9 +173,9 @@ private:
         m_resolveUserCredentialsResults;
     api::CredentialsDescriptor m_lastResolvedCredentials;
 
-    nx::utils::SyncQueue<std::tuple<api::ResultCode, api::SystemAccess>>
+    nx::utils::SyncQueue<std::tuple<api::ResultCode, std::vector<api::SystemAccess>>>
         m_resolveSystemAccess;
-    api::SystemAccess m_lastResolvedSystemAccess;
+    std::vector<api::SystemAccess> m_lastResolvedSystemAccess;
 
     api::UserAuthorization prepareUserAuthorization(
         const std::string& login,
@@ -230,7 +265,6 @@ TEST_F(AuthProvider, reports_correct_system_permissions_to_mediaserver)
     andAccessLevelIs(api::SystemAccessRole::system);
 }
 
-#if 0
 TEST_F(AuthProvider, reports_correct_system_permissions_batch)
 {
     whenGetSystemAccessLevel(
@@ -243,6 +277,5 @@ TEST_F(AuthProvider, reports_correct_system_permissions_batch)
         api::SystemAccessRole::owner,
         api::SystemAccessRole::system});
 }
-#endif
 
 } // namespace nx::cloud::db::test
