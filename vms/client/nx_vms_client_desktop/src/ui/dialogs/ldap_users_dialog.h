@@ -36,8 +36,10 @@ private:
 
     void setupUsersTable(const QnLdapUsers& filteredUsers);
 
-private slots:
-    void at_testLdapSettingsFinished(int status, const QnLdapUsers &users, int handle, const QString &errorString);
+private:
+    void at_testLdapSettingsFinished(
+        bool success, int handle, const QnLdapUsers &users,
+        const QString &errorString);
 
 private:
     QScopedPointer<Ui::LdapUsersDialog> ui;
