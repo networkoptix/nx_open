@@ -512,6 +512,9 @@ void QnResourceBrowserWidget::setupAutoExpandPolicy()
 
 void QnResourceBrowserWidget::updateInstantFilter()
 {
+    if (m_resourceModel->resetInProgress())
+        return;
+
     const auto filterEdit = ui->instantFilterLineEdit;
     const auto queryText = filterEdit->text();
 

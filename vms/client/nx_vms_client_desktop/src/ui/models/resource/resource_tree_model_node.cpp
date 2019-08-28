@@ -1317,9 +1317,11 @@ void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodeP
         QModelIndex index = createIndex(Qn::NameColumn);
         int row = m_children.indexOf(child);
 
-        m_model->beginRemoveRows(index, row, row);
+        if (!m_model->resetInProgress())
+            m_model->beginRemoveRows(index, row, row);
         m_children.removeOne(child);
-        m_model->endRemoveRows();
+        if (!m_model->resetInProgress())
+            m_model->endRemoveRows();
     }
     else
     {
@@ -1348,9 +1350,11 @@ void QnResourceTreeModelNode::addChildInternal(const QnResourceTreeModelNodePtr&
         QModelIndex index = createIndex(Qn::NameColumn);
         int row = m_children.size();
 
-        m_model->beginInsertRows(index, row, row);
+        if (!m_model->resetInProgress())
+            m_model->beginInsertRows(index, row, row);
         m_children.push_back(child);
-        m_model->endInsertRows();
+        if (!m_model->resetInProgress())
+            m_model->endInsertRows();
     }
     else
     {
@@ -1371,7 +1375,8 @@ void QnResourceTreeModelNode::changeInternal()
         return;
 
     const auto index = createIndex(Qn::NameColumn);
-    emit m_model->dataChanged(index, index.sibling(index.row(), Qn::ColumnCount - 1));
+    if (!m_model->resetInProgress())
+        emit m_model->dataChanged(index, index.sibling(index.row(), Qn::ColumnCount - 1));
 }
 
 void QnResourceTreeModelNode::updateIcon()

@@ -202,6 +202,8 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel* model)
 
         connect(m_resourceProxyModel, &QAbstractItemModel::rowsInserted, this,
             &QnResourceTreeWidget::at_resourceProxyModel_rowsInserted);
+        connect(m_resourceProxyModel, &QAbstractItemModel::modelReset, this,
+            &QnResourceTreeWidget::at_resourceProxyModel_modelReset);
         connect(m_resourceProxyModel, &QnResourceSearchProxyModel::beforeRecursiveOperation, this,
             &QnResourceTreeWidget::beforeRecursiveOperation);
         connect(m_resourceProxyModel, &QnResourceSearchProxyModel::afterRecursiveOperation, this,
@@ -527,6 +529,28 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex&
 {
     for (int i = start; i <= end; i++)
         expandNodeIfNeeded(m_resourceProxyModel->index(i, 0, parent));
+}
+
+void QnResourceTreeWidget::at_resourceProxyModel_modelReset()
+{
+    std::function<QModelIndexList(const QModelIndex&)> getChildren;
+    getChildren =
+        [this, &getChildren](const QModelIndex& parent)
+        {
+            QModelIndexList result;
+            for (int row = 0; row < m_resourceProxyModel->rowCount(parent); ++row)
+            {
+                const auto childIndex = m_resourceProxyModel->index(row, 0, parent);
+                result.append(childIndex);
+                result.append(getChildren(childIndex));
+            }
+            return result;
+        };
+    for (const auto& index: getChildren(QModelIndex()))
+    {
+        if (m_autoExpandPolicy && m_autoExpandPolicy(index))
+            ui->resourcesTreeView->expand(index);
+    }
 }
 
 void QnResourceTreeWidget::expandNodeIfNeeded(const QModelIndex& index)
