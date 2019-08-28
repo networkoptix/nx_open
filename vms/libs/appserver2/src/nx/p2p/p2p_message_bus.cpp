@@ -957,6 +957,12 @@ void MessageBus::processRuntimeInfo(
     if (m_lastRuntimeInfo[peerId] == tran.params)
         return; //< Already processed. Ignore same transaction.
 
+    if (peerId.id == localPeer().id)
+    {
+        NX_DEBUG(this, "Ignore deprecated runtime information about himself");
+        return;
+    }
+
     m_lastRuntimeInfo[peerId] = tran.params;
 
     if (m_handler)
