@@ -57,16 +57,7 @@ public:
 
         /** Clean up all internal values to default state. */
         void reset();
-        // TODO: Here we can add more parsers
     };
-
-    using HttpCompletionFunc = std::function<void (
-        int handle,
-        SystemError::ErrorCode errorCode,
-        int statusCode,
-        nx::network::http::StringType contentType,
-        nx::network::http::BufferType msgBody,
-        const nx::network::http::HttpHeaders& headers)>;
 
     using Clock = std::chrono::steady_clock;
     using TimePoint = std::chrono::time_point<Clock>;
@@ -75,12 +66,16 @@ public:
      * Wraps up all the data for request, response and all intermediate routines.
      * Context exists all the time from request creation to the point response is handled.
      * Its data can be accessed from following threads:
-     *  - thread for ClientPool::sendRequest
+     *  - thread for ClientPool::sendRequest. It can be main thread, or feature thread
      *  - AioThread, at a callback at_HttpClientDone
+     *  - AioThread at final callback, if no `targetThread` is specified
+     *  - `targetThread` if it is specified
      */
     class Context
     {
     public:
+        using milliseconds = std::chrono::milliseconds;
+
         virtual ~Context() = default;
 
         enum class State
@@ -94,7 +89,6 @@ public:
             noResponse,
         };
 
-        State state = State::initial;
         Request request;
         Response response;
         /** Time when request was sent to AsyncHttpClientPtr. */
@@ -110,8 +104,6 @@ public:
         /** Callback to be called when response is received. */
         std::function<void (QSharedPointer<Context> context)> completionFunc;
 
-        mutable QnMutex mutex;
-
         QThread* getTargetThread() const;
         /** Set thread for dispatched callback. */
         void setTargetThread(QThread* thread);
@@ -124,7 +116,33 @@ public:
         /** Get request URL. */
         nx::utils::Url getUrl() const;
 
+        /**
+         * Checks if request is complete.
+         * It can mean:
+         *  - got a response
+         *  - got an error sending request
+         *  - any other error
+         */
+        bool isFinished() const;
+
+        /**
+         * Get total time for request.
+         * It measures time between sending request and receiving full response.
+         */
+        milliseconds getTimeElapsed() const;
+
+        /** Sends request using httpClient. */
+        void sendRequest(
+            AsyncHttpClientPtr httpClient,
+            milliseconds responseTimeout,
+            milliseconds messageBodyTimeout);
+
+        /** Fills in response data to Context, using response from httpClient. */
+        void readHttpResponse(AsyncHttpClientPtr httpClient);
+
     protected:
+        State state = State::initial;
+        mutable QnMutex mutex;
         std::optional<QPointer<QThread>> targetThread;
     };
     using ContextPtr = QSharedPointer<Context>;
@@ -156,26 +174,25 @@ public:
     void terminate(int handle);
     void setPoolSize(int value);
 
+    /** Internal statistics for debug output. */
     struct RequestStats
     {
-        int total = 0;
-        int sent = 0;
-        int queued = 0;
-        int connections = 0;
+        int total = 0; /**< Number of queued requests and number of active connections. */
+        int sent = 0; /**< Number of active requests. */
+        int queued = 0; /**< Number of requests in queue. */
+        int connections = 0; /**< Number of connections. */
     };
 
+    /** Read internal statistics. */
     RequestStats getRequestStats() const;
 
-    /** Returns amount of requests which are running or awaiting to be run */
+    /** Returns amount of requests which are running or awaiting to be run .*/
     int size() const;
 
     void setDefaultTimeouts(
         std::chrono::milliseconds request,
         std::chrono::milliseconds response,
         std::chrono::milliseconds messageBody);
-
-    /** Fills in response data to Context, using response from httpClient. */
-    static void readHttpResponse(Context& context, AsyncHttpClientPtr httpClient);
 
 signals:
     void requestIsDone(QSharedPointer<Context> context);
@@ -194,7 +211,7 @@ private:
 
 private:
     HttpConnection* getUnusedConnection(const nx::utils::Url &url);
-    void sendRequestUnsafe(ContextPtr context, AsyncHttpClientPtr httpClient);
+
     void sendNextRequestUnsafe();
     void cleanupDisconnectedUnsafe();
 
@@ -215,3 +232,5 @@ private:
 } // namespace nx
 } // namespace network
 } // namespace http
+
+Q_DECLARE_METATYPE(nx::network::http::ClientPool::ContextPtr);

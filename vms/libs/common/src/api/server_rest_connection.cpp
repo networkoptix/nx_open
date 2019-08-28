@@ -49,7 +49,6 @@ using namespace nx;
 
 namespace {
 
-
 void trace(const QString& serverId, int handle, const QString& message)
 {
     static const nx::utils::log::Tag kTag(typeid(rest::ServerConnection));
@@ -112,8 +111,7 @@ T parseMessageBody(
 void invoke(network::http::ClientPool::ContextPtr context,
     std::function<void ()> callback,
     bool success,
-    const QString &serverId,
-    const QElapsedTimer& elapsed
+    const QString &serverId
 )
 {
     NX_ASSERT(context);
@@ -121,14 +119,14 @@ void invoke(network::http::ClientPool::ContextPtr context,
         return;
     /*
      * TODO: It can be moved to ClientPool::context
-     * `elapsed` is calculated from `ClientPool::Context::totalTime`
      * `targetThread` is also stored there.
      * `serverId` is still missing
      */
+    auto elapsedMs = context->getTimeElapsed().count();
     if (success)
-        trace(serverId, context->handle, lit("Reply success for %1ms").arg(elapsed.elapsed()));
+        trace(serverId, context->handle, lit("Reply success for %1ms").arg(elapsedMs));
     else
-        trace(serverId, context->handle, lit("Reply failed for %1ms").arg(elapsed.elapsed()));
+        trace(serverId, context->handle, lit("Reply failed for %1ms").arg(elapsedMs));
 
     if (auto thread = context->getTargetThread())
         executeLaterInThread(callback, thread);
@@ -1270,6 +1268,51 @@ Handle ServerConnection::doCameraDiagnosticsStep(
     return executeGet("/api/doCameraDiagnosticsStep", params, callback, targetThread);
 }
 
+template<class ResultType>
+std::function<void(ServerConnection::ContextPtr context)> makeCallbackWithErrorMessage(
+    std::function<void(
+        bool success,
+        Handle requestId,
+        const ResultType& result,
+        const QString& message)> callback, QnUuid serverId)
+{
+    // TODO: Replace this timer by data from the Context
+    return [callback, serverId](ServerConnection::ContextPtr context)
+        {
+            bool success = false;
+            const auto format = Qn::serializationFormatFromHttpContentType(context->response.contentType);
+            bool goodFormat = format == Qn::JsonFormat || format == Qn::UbjsonFormat;
+
+            std::shared_ptr<ResultType> result;
+
+            QString errorString;
+            if (context->systemError != SystemError::noError
+                || context->getStatusCode() != nx::network::http::StatusCode::ok)
+            {
+                success = false;
+            }
+
+            if (success && goodFormat)
+            {
+                QnJsonRestResult restResult;
+                if (!QJson::deserialize(context->response.messageBody, &restResult))
+                    success = false;
+
+                //else
+                //    QJson::deserialize(restResult.reply, &result);
+            }
+
+            auto internal_callback =
+                [callback, success, id = context->handle, result, errorString]()
+                {
+                    if (callback)
+                        callback(success, id, result ? std::move(*result) : ResultType(), errorString);
+                };
+
+            invoke(context, internal_callback, success, serverId.toString());
+        };
+}
+
 Handle ServerConnection::testLdapSettingsAsync(const QnLdapSettings& settings,
     LdapSettingsCallback&& callback,
     QThread* targetThread)
@@ -1424,11 +1467,8 @@ Handle ServerConnection::executeRequest(
     if (callback)
     {
         const QString serverId = m_serverId.toString();
-        QElapsedTimer timer;
-        timer.start();
-
         return sendRequest(request,
-            [callback, serverId, timer](ContextPtr context)
+            [callback, serverId](ContextPtr context)
             {
                 bool success = false;
                 const auto format = Qn::serializationFormatFromHttpContentType(context->response.contentType);
@@ -1452,7 +1492,7 @@ Handle ServerConnection::executeRequest(
                             callback(success, id, std::move(*result));
                     };
 
-                invoke(context, internal_callback, success, serverId, timer);
+                invoke(context, internal_callback, success, serverId);
             }, targetThread, timeout);
     }
 
@@ -1471,12 +1511,9 @@ Handle ServerConnection::executeRequest(
     if (callback)
     {
         const QString serverId = m_serverId.toString();
-        QElapsedTimer timer;
-        timer.start();
-
         QPointer<QThread> targetThreadGuard(targetThread);
         return sendRequest(request,
-            [callback,  targetThreadGuard, serverId, timer](ContextPtr context)
+            [callback,  targetThreadGuard, serverId](ContextPtr context)
             {
                 const auto statusCode = context->getStatusCode();
                 const auto osErrorCode = context->systemError;
@@ -1491,7 +1528,7 @@ Handle ServerConnection::executeRequest(
                         callback(success, id, context->response.messageBody, context->response.headers);
                     };
 
-                invoke(context, internal_callback, success, serverId, timer);
+                invoke(context, internal_callback, success, serverId);
             }, targetThread, timeout);
     }
 
@@ -1507,11 +1544,8 @@ Handle ServerConnection::executeRequest(
     if (callback)
     {
         const QString serverId = m_serverId.toString();
-        QElapsedTimer timer;
-        timer.start();
-
         return sendRequest(request,
-            [callback, serverId, timer](ContextPtr context)
+            [callback, serverId](ContextPtr context)
             {
                 const auto statusCode = context->getStatusCode();
                 const auto osErrorCode = context->systemError;
@@ -1525,7 +1559,7 @@ Handle ServerConnection::executeRequest(
                         callback(success, id, EmptyResponseType());
                     };
 
-                invoke(context, internal_callback, success, serverId, timer);
+                invoke(context, internal_callback, success, serverId);
             }, targetThread, timeout);
     }
 
@@ -1652,6 +1686,23 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
     return request;
 }
 
+ServerConnection::ContextPtr ServerConnection::prepareContext(
+    nx::network::http::Method::ValueType method,
+    const QUrl& url) const
+{
+    ContextPtr context(new network::http::ClientPool::Context());
+    if (!m_directUrl.isEmpty())
+    {
+        setupAuthDirect(m_directUrl, context->request, method, url);
+    }
+    else if (!setupAuth(commonModule(), m_serverId, context->request, method, url))
+    {
+        // We heed a better way to handle such error.
+        return nullptr;
+    }
+    return context;
+}
+
 Handle ServerConnection::sendRequest(
     const nx::network::http::ClientPool::Request& request,
     std::function<void (ContextPtr)> callback,
@@ -1664,10 +1715,11 @@ Handle ServerConnection::sendRequest(
     context->completionFunc = callback;
     context->timeout = timeout;
     context->setTargetThread(thread);
+    // Request can be complete just inside `sendRequest`, so requestId is already invalid.
     Handle requestId = httpClientPool()->sendRequest(context);
-    // Racing: httpClientPool()->sendRequest(context) can raise callback immediately.
-    if (requestId)
-        m_runningRequests.insert(requestId);
+    if (!requestId || context->isFinished())
+        return 0;
+    m_runningRequests.insert(requestId);
     return requestId;
 }
 
@@ -1675,9 +1727,10 @@ Handle ServerConnection::sendRequest(const ContextPtr& context)
 {
     QnMutexLocker lock(&m_mutex);
     Handle requestId = httpClientPool()->sendRequest(context);
-    // Racing: httpClientPool()->sendRequest(context) can raise callback immediately.
-    if (requestId)
-        m_runningRequests.insert(requestId);
+    // Request can be complete just inside `sendRequest`, so requestId is already invalid.
+    if (!requestId || context->isFinished())
+        return 0;
+    m_runningRequests.insert(requestId);
     return requestId;
 }
 

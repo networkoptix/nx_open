@@ -16,6 +16,7 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <utils/common/ldap.h>
+#include <nx/utils/guarded_callback.h>
 
 #include <ui/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
@@ -102,10 +103,11 @@ void QnLdapSettingsDialogPrivate::testSettings()
     timeoutTimer->start();
 
     testHandle = server->restConnection()->testLdapSettingsAsync(settings,
+        nx::utils::guarded(this,
         [q](bool success, int handle, const QnLdapUsers &users, const QString &errorString)
         {
             q->at_testLdapSettingsFinished(success, handle, users, errorString);
-        }, thread());
+        }), thread());
 }
 
 void QnLdapSettingsDialogPrivate::showTestResult(const QString &text) {

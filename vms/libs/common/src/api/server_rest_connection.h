@@ -668,6 +668,8 @@ private:
         const nx::network::http::StringType& contentType = nx::network::http::StringType(),
         const nx::network::http::StringType& messageBody = nx::network::http::StringType());
 
+    /** Generates request context with prefilled authentication data. */
+    ContextPtr prepareContext(nx::network::http::Method::ValueType method, const QUrl& url) const;
 
     /** Passes request to ClientPool. */
     Handle sendRequest(

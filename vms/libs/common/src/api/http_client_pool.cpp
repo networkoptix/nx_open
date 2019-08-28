@@ -50,10 +50,90 @@ bool ClientPool::Context::hasResponse() const
     return state == State::hasResponse;
 }
 
+bool ClientPool::Context::isFinished() const
+{
+    return state == State::hasResponse || state == State::noResponse;
+}
+
 nx::utils::Url ClientPool::Context::getUrl() const
 {
     NX_MUTEX_LOCKER lock(&mutex);
     return request.url;
+}
+
+std::chrono::milliseconds ClientPool::Context::getTimeElapsed() const
+{
+    NX_MUTEX_LOCKER lock(&mutex);
+    return std::chrono::duration_cast<std::chrono::milliseconds>(stampReceived - stampSent);
+}
+
+void ClientPool::Context::sendRequest(
+    AsyncHttpClientPtr httpClient,
+    milliseconds responseTimeout,
+    milliseconds messageBodyTimeout)
+{
+    {
+        NX_MUTEX_LOCKER lock(&mutex);
+
+        if (timeout)
+        {
+            httpClient->setResponseReadTimeoutMs(httpTimeoutMs(timeout.value()));
+            httpClient->setMessageBodyReadTimeoutMs(httpTimeoutMs(timeout.value()));
+        }
+        else
+        {
+            httpClient->setResponseReadTimeoutMs(httpTimeoutMs(responseTimeout));
+            httpClient->setMessageBodyReadTimeoutMs(httpTimeoutMs(messageBodyTimeout));
+        }
+
+        httpClient->setAdditionalHeaders(request.headers);
+        httpClient->setAuthType(request.authType);
+
+        stampSent = Clock::now();
+        state = Context::State::waitingResponse;
+    }
+    // All of these methods can potentially issue immediate callback.
+    if (request.method == Method::get)
+        httpClient->doGet(request.url);
+    else if (request.method == Method::put)
+        httpClient->doPut(request.url, request.contentType, request.messageBody);
+    else if (request.method == Method::post)
+        httpClient->doPost(request.url, request.contentType, request.messageBody);
+    else if (request.method == Method::delete_)
+        httpClient->doDelete(request.url);
+    else
+        NX_ASSERT(false);
+}
+
+void ClientPool::Context::readHttpResponse(AsyncHttpClientPtr httpClient)
+{
+    NX_MUTEX_LOCKER lock(&mutex);
+    stampReceived = Clock::now();
+    response.reset();
+
+    systemError = SystemError::noError;
+
+    if (httpClient->response())
+    {
+        response.statusLine = httpClient->response()->statusLine;
+        response.headers = httpClient->response()->headers;
+    }
+    else
+    {
+        response.statusLine = nx::network::http::StatusLine();
+        state = Context::State::noResponse;
+    }
+
+    if (httpClient->failed())
+    {
+        systemError = SystemError::connectionReset;
+    }
+    else
+    {
+        response.contentType = httpClient->contentType();
+        response.messageBody = httpClient->fetchMessageBodyBuffer();
+        state = Context::State::hasResponse;
+    }
 }
 
 struct ClientPool::HttpConnection
@@ -89,6 +169,7 @@ ClientPool::ClientPool(QObject *parent):
     m_maxPoolSize(kDefaultPoolSize),
     m_requestId(0)
 {
+    qRegisterMetaType<ContextPtr>();
 }
 
 ClientPool::~ClientPool()
@@ -97,6 +178,7 @@ ClientPool::~ClientPool()
     {
         QnMutexLocker lock(&m_mutex);
         std::swap(dataCopy, m_connectionPool);
+        // TODO: Should drop queued requests from `m_awaitingRequests`.
     }
     for (auto itr = dataCopy.begin(); itr != dataCopy.end(); ++itr)
         itr->second->client->pleaseStopSync();
@@ -225,40 +307,6 @@ void ClientPool::setDefaultTimeouts(
     m_defaultMessageBodyTimeout = messageBody;
 }
 
-void ClientPool::sendRequestUnsafe(ContextPtr context, AsyncHttpClientPtr httpClient)
-{
-    NX_MUTEX_LOCKER lock(&context->mutex);
-    const Request& request = context->request;
-
-    if (context->timeout)
-    {
-        httpClient->setResponseReadTimeoutMs(httpTimeoutMs(*context->timeout));
-        httpClient->setMessageBodyReadTimeoutMs(httpTimeoutMs(*context->timeout));
-    }
-    else
-    {
-        httpClient->setResponseReadTimeoutMs(httpTimeoutMs(m_defaultResponseTimeout));
-        httpClient->setMessageBodyReadTimeoutMs(httpTimeoutMs(m_defaultMessageBodyTimeout));
-    }
-
-    httpClient->setAdditionalHeaders(request.headers);
-    httpClient->setAuthType(request.authType);
-
-    context->stampSent = Clock::now();
-    context->state = Context::State::waitingResponse;
-    // All of these methods can issue immediate callback.
-    if (request.method == Method::get)
-        httpClient->doGet(request.url);
-    else if (request.method == Method::put)
-        httpClient->doPut(request.url, request.contentType, request.messageBody);
-    else if (request.method == Method::post)
-        httpClient->doPost(request.url, request.contentType, request.messageBody);
-    else if (request.method == Method::delete_)
-        httpClient->doDelete(request.url);
-    else
-        NX_ASSERT(false);
-}
-
 void ClientPool::sendNextRequestUnsafe()
 {
     // It can be called from both main thread and AioThread
@@ -269,7 +317,10 @@ void ClientPool::sendNextRequestUnsafe()
         if (auto connection = getUnusedConnection(url))
         {
             connection->context = context;
-            sendRequestUnsafe(context, connection->client);
+            context->sendRequest(
+                connection->client,
+                m_defaultResponseTimeout,
+                m_defaultMessageBodyTimeout);
             itr = m_awaitingRequests.erase(itr);
         }
         else
@@ -354,38 +405,6 @@ AsyncHttpClientPtr ClientPool::createHttpConnection()
     return result;
 }
 
-void ClientPool::readHttpResponse(Context& context, AsyncHttpClientPtr httpClient)
-{
-    NX_MUTEX_LOCKER lock(&context.mutex);
-    context.stampReceived = Clock::now();
-    Response& response = context.response;
-    response.reset();
-
-    context.systemError = SystemError::noError;
-
-    if (httpClient->response())
-    {
-        response.statusLine = httpClient->response()->statusLine;
-        response.headers = httpClient->response()->headers;
-    }
-    else
-    {
-        response.statusLine = nx::network::http::StatusLine();
-        context.state = Context::State::noResponse;
-    }
-
-    if (httpClient->failed())
-    {
-        context.systemError = SystemError::connectionReset;
-    }
-    else
-    {
-        response.contentType = httpClient->contentType();
-        response.messageBody = httpClient->fetchMessageBodyBuffer();
-        context.state = Context::State::hasResponse;
-    }
-}
-
 void ClientPool::at_HttpClientDone(nx::network::http::AsyncHttpClientPtr clientPtr)
 {
     QSharedPointer<Context> context;
@@ -407,7 +426,7 @@ void ClientPool::at_HttpClientDone(nx::network::http::AsyncHttpClientPtr clientP
     // We have complete request. We should take Context and clean up current connection
     if (context)
     {
-        readHttpResponse(*context, clientPtr);
+        context->readHttpResponse(clientPtr);
         if (!context->targetThreadIsDead())
         {
             if (context->completionFunc)

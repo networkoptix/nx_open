@@ -23,6 +23,7 @@
 #include <ui/models/user_roles_model.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
+#include <nx/utils/guarded_callback.h>
 
 #include <utils/common/ldap.h>
 #include <common/common_module.h>
@@ -78,10 +79,11 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     m_timeoutTimer->start();
 
     server->restConnection()->testLdapSettingsAsync(settings,
+        nx::utils::guarded(this,
         [this](bool success, int handle, const QnLdapUsers &users, const QString &errorString)
         {
             at_testLdapSettingsFinished(success, handle, users, errorString);
-        }, thread());
+        }), thread());
 
     setHelpTopic(this, Qn::UserSettings_LdapFetch_Help);
 }
