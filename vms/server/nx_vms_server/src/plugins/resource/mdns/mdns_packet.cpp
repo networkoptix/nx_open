@@ -188,7 +188,7 @@ void QnMdnsPacket::parseNameInternal(
 
         nameStart++;
 
-        if (nameOffset + nameSize > (int)bufferSize)
+        if (nameOffset + 1 + labelLength > (int)bufferSize)
         {
             nameSize = -1;
             return;
