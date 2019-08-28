@@ -398,7 +398,7 @@ QnAbstractMediaDataPtr HanwhaStreamReader::createEmptyPacket()
         // Extrapolate current position if NVR doesn't send packets during some period.
         // It is needed for sync play mode.
         if (m_timeSinceLastFrame.isValid())
-            currentTimeMs += m_timeSinceLastFrame.elapsedMs() * speed;
+            currentTimeMs += m_timeSinceLastFrame.elapsed().count() * speed;
         const bool isForwardSearch = speed >= 0;
         const auto timeline = context->overlappedTimeline(m_hanwhaResource->getChannel());
         NX_ASSERT(timeline.size() <= 1, lit("There should be only one overlapped ID for NVRs"));

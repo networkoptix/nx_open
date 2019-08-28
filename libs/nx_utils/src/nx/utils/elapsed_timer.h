@@ -33,11 +33,6 @@ public:
             std::chrono::steady_clock::now() - *m_start);
     }
 
-    long long elapsedMs() const
-    {
-        return std::chrono::duration_cast<std::chrono::milliseconds>(elapsed()).count();
-    }
-
     bool hasExpired(std::chrono::milliseconds value) const
     {
         return elapsed() >= value;

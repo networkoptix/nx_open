@@ -33,7 +33,7 @@ auto measureTime(F f, const QString& message) -> std::invoke_result_t<F>
         {
             NX_DEBUG(
                 typeid(QnStorageDb),
-                lm("%1. Finished. Elapsed: %2 ms").args(message, timer.elapsedMs()));
+                lm("%1. Finished. Elapsed: %2 ms").args(message, timer.elapsed()));
         });
 
     return f();
@@ -528,7 +528,7 @@ bool QnStorageDb::writeVacuumedData(
 
     NX_DEBUG(
         this,
-        "QnStorageDb::serializedData() completed successfully. time = %1 ms", timer.elapsedMs());
+        "QnStorageDb::serializedData() completed successfully. time = %1 ms", timer.elapsed());
 
     if (!startDbFile(QFileInfo(m_dbFileName).absolutePath(), /*incVersion*/ true))
         return false;
@@ -539,7 +539,7 @@ bool QnStorageDb::writeVacuumedData(
     m_ioDevice->write(writer.data());
     NX_DEBUG(
         this, "QnStorageDb::writeVacuumedData write to disk finished. time = %1 ms",
-        timer.elapsedMs());
+        timer.elapsed());
 
     removeFiles(dbFiles, m_dbFileName);
     return true;
