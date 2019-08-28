@@ -35,7 +35,9 @@ public:
     BucketManager(const conf::Settings& settings, model::Model* model);
     ~BucketManager();
 
-   void addBucket(const api::AddBucketRequest& request, AddBucketHandler handler);
+    void stop();
+
+    void addBucket(const api::AddBucketRequest& request, AddBucketHandler handler);
 
     void listBuckets(
         nx::utils::MoveOnlyFunc<void(api::Result, api::Buckets)> handler);

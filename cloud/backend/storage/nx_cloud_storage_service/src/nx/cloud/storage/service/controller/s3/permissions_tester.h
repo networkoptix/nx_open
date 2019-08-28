@@ -24,7 +24,7 @@ public:
      * @param bucketUrl the url of the s3 bucket, e.g. "http://exampleBucket.s3.amazonaws.com"
      */
     PermissionsTester(
-        const network::http::Credentials& credentials,
+        const nx::cloud::aws::Credentials& credentials,
         const nx::utils::Url& bucketUrl);
     ~PermissionsTester();
 
@@ -53,8 +53,8 @@ private:
     void testFailed(const char* operation, const aws::Result& result);
 
 private:
-    const network::http::Credentials m_credentials;
-    nx::utils::Url m_url;
+    const nx::cloud::aws::Credentials& m_credentials;
+    const nx::utils::Url m_url;
     std::string m_bucketLocation;
     std::unique_ptr<aws::s3::ApiClient> m_s3Client;
     nx::utils::MoveOnlyFunc<void(api::Result, std::string)> m_handler;

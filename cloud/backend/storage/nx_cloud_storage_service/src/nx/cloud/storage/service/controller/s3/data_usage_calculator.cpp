@@ -25,7 +25,7 @@ std::string DataUsageCalculator::Bucket::toString() const
     return std::string("{region: ") + region + ", url: " + url.toStdString() + "}";
 }
 
-DataUsageCalculator::DataUsageCalculator(const nx::network::http::Credentials& credentials):
+DataUsageCalculator::DataUsageCalculator(const nx::cloud::aws::Credentials& credentials):
     m_credentials(credentials)
 {
 }

@@ -55,6 +55,8 @@ public:
         BucketManager* bucketManager);
     ~StorageManager();
 
+    void stop();
+
     void addStorage(
         nx::utils::stree::ResourceContainer authInfo,
         network::SocketAddress clientEndpoint,
@@ -147,6 +149,10 @@ private:
 
     std::shared_ptr<s3::DataUsageCalculator> createDataUsageCalculator();
     void removeDataUsageCalculator(const std::shared_ptr<s3::DataUsageCalculator>& calculator);
+
+    std::pair<api::Result, std::string> validateAddStorageRequest(
+        const nx::utils::stree::ResourceContainer& authInfo,
+        const api::AddStorageRequest& request) const;
 
     api::Result prepareRemoveStorageResult(
         nx::utils::stree::ResourceContainer& authInfo,

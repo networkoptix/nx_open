@@ -123,11 +123,10 @@ void Settings::loadAws()
     using namespace aws;
     using namespace std::chrono;
 
-    QString accessKeyId(
-        settings().value(lm("%1/%2").args(kGroupName, kAccessKeyId)).toString());
-    network::http::Ha1AuthToken secretAccessKey(
+    m_aws.credentials.username =
+        settings().value(lm("%1/%2").args(kGroupName, kAccessKeyId)).toString();
+    m_aws.credentials.authToken = network::http::Ha1AuthToken(
         settings().value(lm("%1/%2").args(kGroupName, kSecretAccessKey)).toByteArray());
-    m_aws.credentials = network::http::Credentials(accessKeyId, secretAccessKey);
 
     m_aws.stsUrl = settings().value(
         lm("%1/%2").args(kGroupName, kStsUrl), kDefaultStsUrl).toString().toStdString();

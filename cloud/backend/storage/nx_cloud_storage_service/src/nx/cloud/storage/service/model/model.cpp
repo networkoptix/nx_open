@@ -14,14 +14,13 @@ Model::Model(const conf::Settings& settings):
 {
 }
 
-Model::~Model()
-{
-    stop();
-}
+Model::~Model() = default;
 
 void Model::stop()
 {
+    NX_INFO(this, "Stopping Model...");
     m_db->stop();
+    NX_INFO(this, "Model stopped");
 }
 
 Database& Model::database()

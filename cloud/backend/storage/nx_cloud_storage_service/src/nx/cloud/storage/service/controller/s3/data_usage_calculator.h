@@ -4,9 +4,9 @@
 
 #include <vector>
 
-#include <nx/cloud/storage/service/api/result.h>
 #include <nx/cloud/aws/api_types.h>
-#include <nx/network/http/auth_tools.h>
+#include <nx/cloud/aws/credentials.h>
+#include <nx/cloud/storage/service/api/result.h>
 #include <nx/utils/url.h>
 #include <nx/utils/move_only_func.h>
 
@@ -30,7 +30,7 @@ public:
         std::string toString() const;
     };
 
-    DataUsageCalculator(const nx::network::http::Credentials& credentials);
+    DataUsageCalculator(const nx::cloud::aws::Credentials& credentials);
     ~DataUsageCalculator();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
@@ -59,7 +59,7 @@ private:
     void calculateFailed(const aws::Result& result);
 
 private:
-    network::http::Credentials m_credentials;
+    const nx::cloud::aws::Credentials& m_credentials;
     nx::utils::MoveOnlyFunc<void(api::Result, int /*bytesUsed*/)> m_handler;
     std::vector<Context> m_contexts;
     std::atomic_int m_responses = 0;

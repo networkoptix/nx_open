@@ -18,6 +18,8 @@ class Controller
 public:
     Controller(const conf::Settings& settings, model::Model* model);
 
+    void stop();
+
     BucketManager& bucketManager();
     StorageManager& storageManager();
 

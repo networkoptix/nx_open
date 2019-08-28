@@ -61,6 +61,7 @@ int StorageService::serviceMain(const utils::AbstractServiceSettings& settings)
     int result = runMainLoop();
 
     view.stop();
+    controller.stop();
     model.stop();
 
     NX_INFO(this, "Cloud Storage Service stopped");

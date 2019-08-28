@@ -2,8 +2,8 @@
 
 #include <nx/utils/basic_service_settings.h>
 
+#include <nx/cloud/aws/credentials.h>
 #include <nx/clusterdb/engine/p2p_sync_settings.h>
-#include <nx/network/http/auth_tools.h>
 #include <nx/network/http/server/settings.h>
 #include <nx/sql/types.h>
 #include <nx/utils/url.h>
@@ -30,7 +30,7 @@ struct CloudDb
 
 struct Aws
 {
-    nx::network::http::Credentials credentials;
+    nx::cloud::aws::Credentials credentials;
     nx::utils::Url stsUrl;
     std::string assumeRoleArn;
     // Corresponds to aws default value

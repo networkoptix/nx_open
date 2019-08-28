@@ -20,7 +20,6 @@ using namespace std::placeholders;
 using namespace model::dao;
 using namespace nx::cloud::storage::service::api;
 
-
 namespace {
 
 static constexpr char kStorageType[] = "awss3";
@@ -51,34 +50,28 @@ static const std::map<std::string, nx::geo_ip::Geopoint> kAwsGeopoints = {
 };
 
 // TODO attempt to format this string properly when sts::ApiClient works
-// %1 (S3ReadWriteAccess%1) uniquely identifies the inline session.
-// %2 is an array of arns with the form: "arn:aws:s3:::examplebucket/folder".
+// %1 is an array of arns with the form: "arn:aws:s3:::examplebucket/folder".
 // NOTE: Because storages can be merged, access must be granted to multiple buckets/folders.
 // There is no way know the specific bucket/folder will be be written to, access must be granted
 // to all of them.
+// NOTE: the entire policy is on one line because aws complains with "Signature does not match"
+// error code otherwise.
 static constexpr char kStorageAccessPolicyTemplate[] =
-    R"json({"Version":"2012-10-17","Statement":[{"Sid":"S3ReadWriteAccess%1","Effect":"Allow","Action":["s3:GetObject","s3:PutObject","s3:DeleteObject"],"Resource":[%2]}]})json";
+R"json({"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":["s3:GetObject","s3:PutObject","s3:DeleteObject"],"Resource":[%1]}]})json";
 
 static std::string buildStorageAccessPolicy(const Storage& storage)
 {
-    static constexpr char kArnTemplate[] = "arn:aws:s3:::%1/%2";
+    static constexpr char kArnTemplate[] = R"("arn:aws:s3:::%1/%2/*")";
 
-    QString arns;
-    for (const auto& ioDevice : storage.ioDevices)
+    QStringList arns;
+    for (const auto& ioDevice: storage.ioDevices)
     {
-        QString arn = lm(kArnTemplate).args(
+        arns.append(lm(kArnTemplate).args(
             service::utils::bucketName(ioDevice.dataUrl),
-            service::utils::storageFolder(ioDevice.dataUrl));
-
-        arns += "\"" + arn + "\",";        //< "arn:aws:s3:::examplebucket/folder",
-        arns += "\"" + arn + "/*" + "\","; //< "arn:aws:s3:::examplebucket/folder/*",
+            service::utils::storageFolder(ioDevice.dataUrl)));
     }
 
-    if (arns.endsWith(','))
-        arns.truncate(arns.size() - 1);
-
-    return lm(kStorageAccessPolicyTemplate)
-        .args(QnUuid::createUuid().toSimpleString(), arns).toStdString();
+    return lm(kStorageAccessPolicyTemplate).args(arns.join(',')).toStdString();
 }
 
 } // namespace
@@ -136,6 +129,11 @@ StorageManager::StorageManager(
 
 StorageManager::~StorageManager()
 {
+    stop();
+}
+
+void StorageManager::stop()
+{
     m_stsClient->pleaseStopSync();
     m_asyncCounter.wait();
 
@@ -143,7 +141,7 @@ StorageManager::~StorageManager()
     auto dataUsageCalculators = std::move(m_dataUsageCalculators);
     lock.unlock();
 
-    for (auto& calculator: m_dataUsageCalculators)
+    for (auto& calculator : dataUsageCalculators)
         calculator->pleaseStopSync();
 }
 
@@ -153,24 +151,11 @@ void StorageManager::addStorage(
     AddStorageRequest request,
     GetStorageHandler handler)
 {
-    if (request.totalSpace <= 0)
-    {
-        return handler(
-            Result(
-                ResultCode::badRequest,
-                lm("Invalid storage size: %1").arg(request.totalSpace).toStdString()),
-            Storage());
-    }
+    NX_VERBOSE(this, "addStorage, region: %1, clientEndpoint: %2", request.region, clientEndpoint);
 
-    NX_VERBOSE(this, "addStorage: request.region: %1, clientEndpoint: %2",
-        request.region, clientEndpoint);
-
-    auto [allowed, accountEmail] = m_accessManager->addStorageAllowed(authInfo);
-    if (!allowed)
-    {
-        NX_VERBOSE(this, "addStorage failed: user %1 is unauthorized", accountEmail);
-        return handler(ResultCode::unauthorized, Storage());
-    }
+    auto [validationResult, accountEmail] = validateAddStorageRequest(authInfo, request);
+    if (validationResult.resultCode != ResultCode::ok)
+        return handler(std::move(validationResult), Storage());
 
     auto addStorageContext = std::make_shared<AddStorageContext>();
 
@@ -584,6 +569,27 @@ void StorageManager::removeDataUsageCalculator(
 {
     QnMutexLocker lock(&m_mutex);
     m_dataUsageCalculators.erase(calculator);
+}
+
+std::pair<api::Result, std::string> StorageManager::validateAddStorageRequest(
+    const nx::utils::stree::ResourceContainer& authInfo,
+    const AddStorageRequest& request) const
+{
+    if (request.totalSpace <= 0)
+    {
+        return std::make_pair(Result(
+            ResultCode::badRequest,
+            lm("Invalid storage size: %1").arg(request.totalSpace).toStdString()), std::string());
+    }
+
+    auto [allowed, accountEmail] = m_accessManager->addStorageAllowed(authInfo);
+    if (!allowed)
+    {
+        NX_VERBOSE(this, "addStorage failed: user %1 is unauthorized", accountEmail);
+        return std::make_pair(ResultCode::unauthorized, std::string());
+    }
+
+    return std::make_pair(ResultCode::ok, std::move(accountEmail));
 }
 
 Result StorageManager::prepareRemoveStorageResult(

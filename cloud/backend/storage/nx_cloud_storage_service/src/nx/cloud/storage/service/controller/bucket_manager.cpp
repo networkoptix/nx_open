@@ -36,6 +36,11 @@ BucketManager::BucketManager(const conf::Settings& settings, model::Model* model
 
 BucketManager::~BucketManager()
 {
+    stop();
+}
+
+void BucketManager::stop()
+{
     m_asyncCounter.wait();
 
     QnMutexLocker lock(&m_mutex);

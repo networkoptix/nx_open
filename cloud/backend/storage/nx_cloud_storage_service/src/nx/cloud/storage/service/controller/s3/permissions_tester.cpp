@@ -14,7 +14,7 @@ static constexpr char kFileData[] = "permissionstest";
 } // namespace
 
 PermissionsTester::PermissionsTester(
-    const network::http::Credentials& credentials,
+    const nx::cloud::aws::Credentials& credentials,
     const nx::utils::Url& bucketUrl)
     :
     m_credentials(credentials),
