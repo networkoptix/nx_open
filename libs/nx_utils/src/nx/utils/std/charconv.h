@@ -301,7 +301,7 @@ inline to_chars_result to_chars(char* first, char* last, unsigned int value, int
 
 template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
 // requires std::is_integral_v<T>
-inline std::from_chars_result from_chars(
+inline from_chars_result from_chars(
     const char* first, const char* last,
     T& value, int base = 10)
 {
@@ -349,7 +349,7 @@ template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
 // requires std::is_floating_point_v<T>
 inline from_chars_result from_chars(
     const char* first, const char* last,
-    float& value,
+    T& value,
     chars_format fmt = chars_format::general)
 {
     return std::from_chars(first, last, value, fmt);
