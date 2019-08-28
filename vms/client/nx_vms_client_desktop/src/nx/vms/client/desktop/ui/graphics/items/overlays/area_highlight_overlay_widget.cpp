@@ -303,6 +303,7 @@ void AreaHighlightOverlayWidget::addOrUpdateArea(
     }
 
     d->updateArea(area);
+    NX_VERBOSE(this, "Area was added or updated, total %1", d->areaById.size());
 
     update();
 }
@@ -310,7 +311,10 @@ void AreaHighlightOverlayWidget::addOrUpdateArea(
 void AreaHighlightOverlayWidget::removeArea(const QnUuid& areaId)
 {
     if (d->areaById.remove(areaId) > 0)
+    {
+        NX_VERBOSE(this, "Area was removed, total %1 left", d->areaById.size());
         update();
+    }
 }
 
 QnUuid AreaHighlightOverlayWidget::highlightedArea() const
