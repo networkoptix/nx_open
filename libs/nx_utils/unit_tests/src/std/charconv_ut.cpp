@@ -6,7 +6,7 @@
 
 #include <nx/utils/std/charconv.h>
 
-namespace std {
+namespace nx::utils::charconv::test {
 
 class CharconvFromChars:
     public ::testing::Test
@@ -107,11 +107,11 @@ TEST_F(CharconvToChars, insufficient_buffer_space)
 #if defined(NX_CHARCONV_TO_FLOAT)
 TEST_F(CharconvToChars, float_number)
 {
-    assertConverted("3.1415926", (float) 3.1415926, std::chars_format::general, 10);
-    assertConverted("3.14", 3.1415926, std::chars_format::general, 3);
-    assertConverted("-3.1415926", (double) -3.1415926, std::chars_format::general, 10);
-    assertConverted("12", 12.0, std::chars_format::general, 10);
+    assertConverted("3.141592", (float) 3.141592, chars_format::general, 7);
+    assertConverted("3.14", 3.1415926, chars_format::general, 3);
+    assertConverted("-3.1415926", (double) -3.1415926, chars_format::general, 8);
+    assertConverted("12", 12.0, chars_format::general, 10);
 }
 #endif
 
-} // namespace std
+} // namespace nx::utils::charconv::test

@@ -632,7 +632,7 @@ void append(
     std::enable_if_t<std::is_integral_v<T>>* = nullptr)
 {
     char buf[sizeof(val) * 3];
-    const auto result = std::to_chars(buf, buf + sizeof(buf), val);
+    const auto result = charconv::to_chars(buf, buf + sizeof(buf), val);
     if (result.ec == std::errc())
         str->append(buf, result.ptr - buf);
 }
@@ -1009,7 +1009,7 @@ template<typename Value, typename Arg>
 Value ston(const std::string_view& str, std::size_t* pos, Arg arg)
 {
     auto value = Value();
-    const auto result = std::from_chars(str.data(), str.data() + str.size(), value, arg);
+    const auto result = charconv::from_chars(str.data(), str.data() + str.size(), value, arg);
     if (pos)
         *pos = result.ptr - str.data();
     return value;
@@ -1059,7 +1059,7 @@ inline double stod(
     const std::string_view& str,
     std::size_t* pos = nullptr)
 {
-    // NOTE: GCC 8.1 does not provide the corresponding std::from_chars.
+    // NOTE: GCC 8.1 does not provide the corresponding charconv::from_chars.
 
     static constexpr std::size_t kMaxStrLength = 32;
 
@@ -1082,7 +1082,7 @@ template<typename T, typename X = std::enable_if_t<std::is_integral_v<T>>>
 std::string to_string(T value, int base = 10)
 {
     std::string str(sizeof(value) * 3, '\0');
-    const auto result = std::to_chars(str.data(), str.data() + str.size(), value, base);
+    const auto result = charconv::to_chars(str.data(), str.data() + str.size(), value, base);
     str.resize(result.ptr - str.data());
     return str;
 }
