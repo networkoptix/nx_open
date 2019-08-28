@@ -1029,11 +1029,11 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr& resource
         connect(server, &QnMediaServerResource::redundancyChanged, this,
             &QnResourceTreeModel::at_server_redundancyChanged);
         connect(server, &QnMediaServerResource::primaryAddressChanged, this,
-            [this](const QnMediaServerResourcePtr& server)
+            [this](const QnResourcePtr& server)
             {
                 for (auto node: m_nodesByResource.value(server))
                     node->update();
-            }););
+            });
     }
 
     if (const auto webPage = resource.dynamicCast<QnWebPageResource>())
