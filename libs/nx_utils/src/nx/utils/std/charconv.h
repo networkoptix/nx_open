@@ -9,6 +9,12 @@
  * - only std::chars_format::general format is supported for floats
  */
 
+#if defined(__cpp_lib_to_chars)
+
+#include <charconv>
+
+#else
+
 #if !__has_include(<charconv>)
 #   define NX_CHARCONV_INTEGER
 #   define NX_CHARCONV_FROM_FLOAT
@@ -21,12 +27,6 @@
 // to implement them locally.
 // If needed, this <charconv> implementation may be moved to a new namespace.
 // #define NX_CHARCONV_TO_FLOAT
-
-#if !defined(NX_CHARCONV_INTEGER) && !defined(NX_CHARCONV_FROM_FLOAT) && !defined(NX_CHARCONV_TO_FLOAT)
-
-#include <charconv>
-
-#else
 
 #include <array>
 #include <cstdio>
