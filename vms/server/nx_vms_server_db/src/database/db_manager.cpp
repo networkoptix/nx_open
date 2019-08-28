@@ -902,8 +902,8 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         qWarning() << "failed to vacuum ecs database" << Q_FUNC_INFO;
 
     m_dbReadOnly = commonModule()->isReadOnly();
-    emit initialized();
     m_initialized = true;
+    emit initialized();
 
     return true;
 }
@@ -5397,8 +5397,8 @@ bool QnDbManager::updateId()
 
 void QnDbManager::setDbId(const QnUuid& value)
 {
+    NX_ASSERT(!m_initialized);
     m_dbInstanceId = value;
-
     const auto& runtimeInfoManager = commonModule()->runtimeInfoManager();
     QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
     localInfo.data.peer.persistentId = m_dbInstanceId;
