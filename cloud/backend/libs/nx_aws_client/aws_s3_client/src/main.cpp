@@ -117,7 +117,7 @@ protected:
         return std::make_unique<Client>(
             settings.region,
             nx::utils::Url(settings.url),
-            nx::network::http::Credentials(
+            nx::cloud::aws::Credentials(
                 settings.user.c_str(),
                 nx::network::http::PasswordAuthToken(settings.password.c_str())));
     }
