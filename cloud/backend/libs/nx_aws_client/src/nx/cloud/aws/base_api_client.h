@@ -6,6 +6,7 @@
 #include <nx/network/url/url_builder.h>
 
 #include "api_types.h"
+#include "credentials.h"
 #include "xml/deserialize.h"
 
 namespace nx::cloud::aws {
@@ -20,7 +21,7 @@ public:
         const std::string& service,
         const std::string& awsRegion,
         const nx::utils::Url& url,
-        const nx::network::http::Credentials& credentials);
+        const Credentials& credentials);
     ~BaseApiClient();
 
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
@@ -37,7 +38,7 @@ protected:
 
     virtual std::tuple<nx::String, bool> calculateAuthorizationHeader(
         const network::http::Request& request,
-        const network::http::Credentials& credentials,
+        const Credentials& credentials,
         const std::string& region,
         const std::string& service);
 
@@ -70,7 +71,7 @@ protected:
     const std::string m_service;
     const std::string m_awsRegion;
     const nx::utils::Url m_url;
-    const nx::network::http::Credentials m_credentials;
+    const Credentials m_credentials;
     RequestPool m_requestPool;
     nx::network::http::AsyncClient::Timeouts m_timeouts;
 };

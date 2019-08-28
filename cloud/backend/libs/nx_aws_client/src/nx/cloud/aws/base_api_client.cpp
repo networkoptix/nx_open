@@ -9,7 +9,7 @@ BaseApiClient::BaseApiClient(
     const std::string& service,
     const std::string& awsRegion,
     const nx::utils::Url& url,
-    const nx::network::http::Credentials& credentials)
+    const Credentials& credentials)
     :
     m_service(service),
     m_awsRegion(awsRegion),
@@ -63,6 +63,9 @@ void BaseApiClient::addAuthorizationToRequest(network::http::Request* request)
     else
         request->headers.emplace("x-amz-content-sha256", kUnsignedPayloadHash);
 
+    if (!m_credentials.sessionToken.isEmpty())
+        request->headers.emplace("x-amz-security-token", m_credentials.sessionToken.toUtf8());
+
     // x-amz-date
     auto iso8601Date = QDateTime::currentDateTime().toUTC().toString(Qt::ISODate).toUtf8();
     iso8601Date.replace("-", "");
@@ -84,7 +87,7 @@ void BaseApiClient::addAuthorizationToRequest(network::http::Request* request)
 
 std::tuple<nx::String, bool> BaseApiClient::calculateAuthorizationHeader(
     const network::http::Request& request,
-    const network::http::Credentials& credentials,
+    const Credentials& credentials,
     const std::string& region,
     const std::string& service)
 {

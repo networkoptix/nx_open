@@ -38,7 +38,7 @@ static const nx::String kAws4Request = "aws4_request";
 
 std::tuple<nx::String, bool /*result*/> SignatureCalculator::calculateAuthorizationHeader(
     const network::http::Request& request,
-    const network::http::Credentials& credentials,
+    const Credentials& credentials,
     const std::string& region,
     const std::string& service)
 {
@@ -58,7 +58,7 @@ std::tuple<nx::String, bool /*result*/> SignatureCalculator::calculateAuthorizat
 
 std::tuple<nx::String, bool /*result*/> SignatureCalculator::calculateSignature(
     const network::http::Request& request,
-    const network::http::Credentials& credentials,
+    const Credentials& credentials,
     const std::string& region,
     const std::string& service,
     IntermediateValues* intermediateValues)
@@ -106,7 +106,7 @@ std::tuple<nx::String, bool /*result*/> SignatureCalculator::calculateSignature(
 
 nx::Buffer SignatureCalculator::calculateSignKey(
     const nx::String& date,
-    const network::http::Credentials& credentials,
+    const Credentials& credentials,
     const std::string& region,
     const std::string& service)
 {

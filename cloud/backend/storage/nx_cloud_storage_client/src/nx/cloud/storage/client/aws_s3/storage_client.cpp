@@ -14,7 +14,12 @@ void StorageClient::open(
     const nx::network::http::Credentials& credentials,
     nx::utils::MoveOnlyFunc<void(ResultCode)> handler)
 {
-    m_contentClient = std::make_unique<ContentClient>(storageClientId, url, credentials);
+    m_contentClient = std::make_unique<ContentClient>(
+        storageClientId,
+        url,
+        aws::Credentials(
+            credentials.username,
+            credentials.authToken));
 
     // TODO: #ak Verify url and credentials.
     post([handler = std::move(handler)]() { handler(ResultCode::ok); });

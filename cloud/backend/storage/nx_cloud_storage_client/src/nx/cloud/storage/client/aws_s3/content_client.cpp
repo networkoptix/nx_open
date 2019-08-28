@@ -8,7 +8,7 @@ namespace nx::cloud::storage::client::aws_s3 {
 ContentClient::ContentClient(
     const std::string& /*storageClientId*/,
     const nx::utils::Url& url,
-    const nx::network::http::Credentials& credentials)
+    const nx::cloud::aws::Credentials& credentials)
     :
     m_awsClient(
         "us_east", //< TODO: #ak Take the region from somewhere.

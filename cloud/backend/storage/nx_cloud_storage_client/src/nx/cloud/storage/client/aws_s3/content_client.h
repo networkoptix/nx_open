@@ -18,7 +18,7 @@ public:
     ContentClient(
         const std::string& storageClientId,
         const nx::utils::Url& url,
-        const nx::network::http::Credentials& credentials);
+        const nx::cloud::aws::Credentials& credentials);
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 

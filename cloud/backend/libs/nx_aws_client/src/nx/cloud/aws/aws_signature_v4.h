@@ -8,6 +8,8 @@
 #include <nx/network/buffer.h>
 #include <nx/network/http/auth_tools.h>
 
+#include "credentials.h"
+
 namespace nx::utils { class QnCryptographicHash; }
 
 namespace nx::cloud::aws {
@@ -32,7 +34,7 @@ public:
      */
      std::tuple<nx::String, bool /*result*/> calculateAuthorizationHeader(
         const network::http::Request& request,
-        const network::http::Credentials& credentials,
+        const Credentials& credentials,
         const std::string& region,
         const std::string& service);
 
@@ -41,7 +43,7 @@ public:
      */
      std::tuple<nx::String, bool /*result*/> calculateSignature(
         const network::http::Request& request,
-        const network::http::Credentials& credentials,
+        const Credentials& credentials,
         const std::string& region,
         const std::string& service,
         IntermediateValues* intermediateValues = nullptr);
@@ -52,7 +54,7 @@ protected:
 private:
      nx::Buffer calculateSignKey(
         const nx::String& date,
-        const network::http::Credentials& credentials,
+        const Credentials& credentials,
         const std::string& region,
         const std::string& service);
 

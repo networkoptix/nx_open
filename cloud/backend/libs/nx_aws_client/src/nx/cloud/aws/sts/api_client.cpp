@@ -16,7 +16,7 @@ static constexpr char kService[] = "sts";
 ApiClient::ApiClient(
     const std::string& awsRegion,
     const nx::utils::Url& url,
-    const nx::network::http::Credentials& credentials)
+    const aws::Credentials& credentials)
     :
     base_type(kService, awsRegion, url, credentials)
 {

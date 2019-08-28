@@ -316,7 +316,7 @@ void AwsSignatureV4Authenticator::authenticate(
     s3::SignatureCalculator calculator;
     const auto [calculatedSignature, result] = calculator.calculateSignature(
         request,
-        network::http::Credentials(
+        Credentials(
             accessKeyId,
             network::http::PasswordAuthToken(accessKeyIter->second.c_str())),
         region.toStdString(),

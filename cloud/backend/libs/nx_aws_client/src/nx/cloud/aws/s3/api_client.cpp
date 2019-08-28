@@ -42,7 +42,7 @@ nx::utils::UrlQuery buildQuery(const ListBucketRequest& request)
 ApiClient::ApiClient(
     const std::string& awsRegion,
     const nx::utils::Url& url,
-    const nx::network::http::Credentials& credentials)
+    const Credentials& credentials)
     :
     base_type(kAwsS3ServiceName, awsRegion, url, credentials)
 {
@@ -130,7 +130,7 @@ void ApiClient::listBucket(
 
 std::tuple<nx::String, bool> ApiClient::calculateAuthorizationHeader(
     const network::http::Request& request,
-    const network::http::Credentials& credentials,
+    const Credentials& credentials,
     const std::string& region,
     const std::string& service)
 {
