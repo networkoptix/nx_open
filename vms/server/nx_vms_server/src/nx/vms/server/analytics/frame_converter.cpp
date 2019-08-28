@@ -23,7 +23,11 @@ static nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrameFromVid
     if (!NX_ASSERT(frame))
         return nullptr;
 
-    auto rotatedFrame = CLConstVideoDecoderOutputPtr(frame->rotated(rotationAngle));
+    CLConstVideoDecoderOutputPtr rotatedFrame;
+    if (rotationAngle)
+        rotatedFrame = CLConstVideoDecoderOutputPtr(frame->rotated(rotationAngle));
+    else
+        rotatedFrame = frame;
 
     const auto avPixelFormat = nx::vms::server::sdk_support::sdkToAvPixelFormat(pixelFormat);
     if (avPixelFormat == AV_PIX_FMT_NONE)
