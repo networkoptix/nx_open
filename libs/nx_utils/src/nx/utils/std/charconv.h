@@ -97,7 +97,7 @@ namespace detail {
 
 template<typename T, typename Func, typename... Args>
 // requires std::is_arithmetic_v<T>
-std::from_chars_result from_chars(
+from_chars_result from_chars(
     const char* first, const char* last,
     T& value,
     Func func,
@@ -125,7 +125,7 @@ std::from_chars_result from_chars(
 
 template<typename T, typename Func, typename X = std::enable_if_t<std::is_integral_v<T>>>
 // requires std::is_integral_v<T>
-std::from_chars_result int_from_chars(
+from_chars_result int_from_chars(
     const char* first, const char* last,
     T& value,
     Func func,
@@ -140,7 +140,7 @@ std::from_chars_result int_from_chars(
 //-------------------------------------------------------------------------------------------------
 
 template<typename T>
-std::to_chars_result to_chars(char* first, char* last, T value, const char* format)
+to_chars_result to_chars(char* first, char* last, T value, const char* format)
 {
     char buf[32];
     auto len = std::sprintf(buf, format, value);
@@ -182,7 +182,7 @@ std::array<char, 5> prepareIntFormatSpecifier(int base)
 
 template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
 // requires std::is_integral_v<T>
-std::to_chars_result int_to_chars(char* first, char* last, T value, int base)
+to_chars_result int_to_chars(char* first, char* last, T value, int base)
 {
     NX_ASSERT(base == 10 || base == 16);
 
@@ -195,7 +195,7 @@ std::to_chars_result int_to_chars(char* first, char* last, T value, int base)
 
 template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
 // requires std::is_floating_point_v<T>
-std::to_chars_result float_to_chars(
+to_chars_result float_to_chars(
     char* first, char* last,
     T value,
     chars_format fmt, int precision)
@@ -217,35 +217,35 @@ std::to_chars_result float_to_chars(
 
 #if defined(NX_CHARCONV_INTEGER)
 
-inline std::from_chars_result from_chars(
+inline from_chars_result from_chars(
     const char* first, const char* last,
     unsigned long long& value, int base = 10)
 {
     return nx::utils::charconv::detail::int_from_chars(first, last, value, &strtoull, base);
 }
 
-inline std::from_chars_result from_chars(
+inline from_chars_result from_chars(
     const char* first, const char* last,
     long long& value, int base = 10)
 {
     return nx::utils::charconv::detail::int_from_chars(first, last, value, &strtoll, base);
 }
 
-inline std::from_chars_result from_chars(
+inline from_chars_result from_chars(
     const char* first, const char* last,
     long& value, int base = 10)
 {
     return nx::utils::charconv::detail::int_from_chars(first, last, value, &strtol, base);
 }
 
-inline std::from_chars_result from_chars(
+inline from_chars_result from_chars(
     const char* first, const char* last,
     unsigned long& value, int base = 10)
 {
     return nx::utils::charconv::detail::int_from_chars(first, last, value, &strtoul, base);
 }
 
-inline std::from_chars_result from_chars(
+inline from_chars_result from_chars(
     const char* first, const char* last,
     int& value, int base = 10)
 {
@@ -255,7 +255,7 @@ inline std::from_chars_result from_chars(
     return result;
 }
 
-inline std::from_chars_result from_chars(
+inline from_chars_result from_chars(
     const char* first, const char* last,
     unsigned int& value, int base = 10)
 {
@@ -322,21 +322,21 @@ inline to_chars_result to_chars(char* first, char* last, T value, int base = 10)
 //-------------------------------------------------------------------------------------------------
 // float support.
 
-inline std::from_chars_result from_chars(
+inline from_chars_result from_chars(
     const char* first, const char* last, float& value,
     chars_format /*fmt*/ = chars_format::general)
 {
     return nx::utils::charconv::detail::from_chars(first, last, value, &strtof);
 }
 
-inline std::from_chars_result from_chars(
+inline from_chars_result from_chars(
     const char* first, const char* last, double& value,
     chars_format /*fmt*/ = chars_format::general)
 {
     return nx::utils::charconv::detail::from_chars(first, last, value, &strtod);
 }
 
-inline std::from_chars_result from_chars(
+inline from_chars_result from_chars(
     const char* first, const char* last, long double& value,
     chars_format /*fmt*/ = chars_format::general)
 {
@@ -347,7 +347,7 @@ inline std::from_chars_result from_chars(
 
 template<typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
 // requires std::is_floating_point_v<T>
-inline std::from_chars_result from_chars(
+inline from_chars_result from_chars(
     const char* first, const char* last,
     float& value,
     chars_format fmt = chars_format::general)
