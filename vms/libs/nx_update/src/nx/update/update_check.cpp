@@ -332,7 +332,7 @@ static InformationError parseAndExtractLegacyInformation(
 static InformationError fillUpdateInformation(
     nx::network::http::AsyncClient* httpClient,
     QString publicationKey,
-    nx::vms::api::SoftwareVersion currentVersion,
+    [[maybe_unused]] nx::vms::api::SoftwareVersion currentVersion,
     Information* result,
     QList<AlternativeServerData>* alternativeServers)
 {
