@@ -32,7 +32,7 @@ int QnStartUpdateRestHandler::executePost(
     {
         return nx::network::http::StatusCode::forbidden;
     }
-	
+
     if (!serverModule()->updateManager()->updatePersistentStorageServers(
         nx::update::kTargetKey).manuallySet)
     {

@@ -340,11 +340,11 @@ bool CameraAdvancedParamsWidget::isCameraAvailable() const {
 rest::QnConnectionPtr CameraAdvancedParamsWidget::getServerConnection(
     const QnNetworkResourcePtr& camera)
 {
-    if (!camera)
-        return {};
-
-    if (const auto server = m_camera->getParentServer())
-        return server->restConnection();
+    if (auto cam = camera.dynamicCast<QnSecurityCamResource>())
+    {
+        if (const auto server = cam->getParentServer())
+            return server->restConnection();
+    }
 
     return {};
 }

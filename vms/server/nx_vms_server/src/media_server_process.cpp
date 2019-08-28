@@ -1675,13 +1675,6 @@ void MediaServerProcess::registerRestHandlers(
      *     %value GetPresetsPtzCommand Read PTZ presets list.
      *     %value GetPresetsPtzCommand Read PTZ presets list.
      * %return:object JSON object with error message and error code (0 means OK).
-     *
-     **%apidoc GET /api/ptz
-     * Perform reading PTZ operation
-     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx or
-     *     /ec2/getCameras?extraFormatting) or MAC address (not supported for certain cameras).
-     * %param:enum command PTZ operation, only Get* values are supported.
-     * %return:object JSON object with error message and error code (0 means OK).
      */
     reg("api/ptz", new QnPtzRestHandler(serverModule()));
 

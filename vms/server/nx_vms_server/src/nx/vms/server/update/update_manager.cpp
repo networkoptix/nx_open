@@ -268,7 +268,8 @@ void UpdateManager::processFoundEndpoint(const discovery::ModuleEndpoint& endpoi
     if (endpoint.version != nx::utils::SoftwareVersion(m_targetUpdateInfo.version))
         return;
 
-    const auto& server = resourcePool()->getResourceById<QnMediaServerResource>(endpoint.id);
+    const auto& server = serverModule()->resourcePool()
+        ->getResourceById<QnMediaServerResource>(endpoint.id);
     if (!server)
         return;
 
@@ -302,7 +303,7 @@ void UpdateManager::detectStartedInstallation()
     const discovery::Manager* discoveryManager =
         serverModule()->commonModule()->moduleDiscoveryManager();
 
-    for (const auto& server: resourcePool()->getResources<QnMediaServerResource>())
+    for (const auto& server: serverModule()->resourcePool()->getResources<QnMediaServerResource>())
     {
         const auto& endpoint = discoveryManager->getModule(server->getId());
         if (endpoint.has_value())
@@ -802,8 +803,8 @@ void UpdateManager::checkUpdateInfo(
     const auto& processReply =
         [this, infoCategory, serverId = server->getId()](
             bool success,
-            rest::Handle handle,
-            rest::UpdateInformationData response)
+            ::rest::Handle handle,
+            ::rest::UpdateInformationData response)
         {
             if (!m_pendingUpdateInformationRequests.removeOne(handle))
                 return;
@@ -844,7 +845,7 @@ void UpdateManager::checkUpdateInfo(
 
     NX_VERBOSE(this, "Checking server %1 for started installation...", server->getId());
 
-    const rest::Handle handle = server->restConnection()->getUpdateInfo(
+    const ::rest::Handle handle = server->restConnection()->getUpdateInfo(
         toString(infoCategory), processReply, thread());
     if (handle > 0)
         m_pendingUpdateInformationRequests.append(handle);

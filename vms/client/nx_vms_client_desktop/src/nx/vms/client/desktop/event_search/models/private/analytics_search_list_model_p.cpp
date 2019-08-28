@@ -36,6 +36,7 @@
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/range_adapters.h>
+#include <ui/style/skin.h>
 
 namespace nx::vms::client::desktop {
 
