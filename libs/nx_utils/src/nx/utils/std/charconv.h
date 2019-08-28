@@ -29,7 +29,8 @@ using std::to_chars;
 
 #else
 
-#if !__has_include(<charconv>)
+// NOTE: The partial implementation available on Macosx has some weird problems.
+#if !__has_include(<charconv>) || __APPLE__
 #   define NX_CHARCONV_INTEGER
 #   define NX_CHARCONV_FROM_FLOAT
 #   define NX_CHARCONV_TO_FLOAT
