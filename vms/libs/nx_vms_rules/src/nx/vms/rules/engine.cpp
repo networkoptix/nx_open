@@ -158,16 +158,13 @@ EventFilter* Engine::buildEventFilter(const api::EventFilter& serialized) const
 {
     QScopedPointer<EventFilter> filter(new EventFilter(serialized.id, serialized.eventType));
 
-    for (const auto& block: serialized.fieldBlocks)
+    for (const auto& fieldInfo: serialized.fields)
     {
-        for (const auto& fieldInfo: block)
-        {
-            EventField* field = buildEventField(fieldInfo);
-            if (!field)
-                return nullptr;
+        EventField* field = buildEventField(fieldInfo);
+        if (!field)
+            return nullptr;
 
-            filter->addField(fieldInfo.name, field);
-        }
+        filter->addField(fieldInfo.name, field);
     }
 
     return filter.take();
@@ -180,17 +177,17 @@ api::EventFilter Engine::serialize(const EventFilter *filter) const
     api::EventFilter result;
 
     const auto fields = filter->fields();
-    result.fieldBlocks += QList<api::Field>();
     for (auto it = fields.cbegin(); it != fields.cend(); ++it)
     {
         const auto& name = it.key();
         const auto field = it.value();
+
         api::Field serialized;
         serialized.name = name;
         serialized.metatype = field->metatype();
         serialized.props = field->serializedProperties();
 
-        result.fieldBlocks[0] += serialized; // TODO: #spanasenko Split blocks
+        result.fields += serialized;
     }
     result.id = filter->id();
     result.eventType = filter->eventType();
@@ -206,16 +203,13 @@ ActionBuilder* Engine::buildActionBuilder(const api::ActionBuilder& serialized) 
 
     QScopedPointer<ActionBuilder> builder(new ActionBuilder(serialized.id, serialized.actionType, ctor));
 
-    for (const auto& block: serialized.fieldBlocks)
+    for (const auto& fieldInfo: serialized.fields)
     {
-        for (const auto& fieldInfo: block)
-        {
-            ActionField* field = buildActionField(fieldInfo);
-            if (!field)
-                return nullptr;
+        ActionField* field = buildActionField(fieldInfo);
+        if (!field)
+            return nullptr;
 
-            builder->addField(fieldInfo.name, field);
-        }
+        builder->addField(fieldInfo.name, field);
     }
 
     builder->setAggregationInterval(serialized.interval);
@@ -230,17 +224,17 @@ api::ActionBuilder Engine::serialize(const ActionBuilder *builder) const
     api::ActionBuilder result;
 
     const auto fields = builder->fields();
-    result.fieldBlocks += QList<api::Field>();
     for (auto it = fields.cbegin(); it != fields.cend(); ++it)
     {
         const auto& name = it.key();
         const auto field = it.value();
+
         api::Field serialized;
         serialized.name = name;
         serialized.metatype = field->metatype();
         serialized.props = field->serializedProperties();
 
-        result.fieldBlocks[0] += serialized; // TODO: #spanasenko Split blocks
+        result.fields += serialized;
     }
     result.id = builder->id();
     result.actionType = builder->actionType();
