@@ -436,6 +436,7 @@ void StorageManager::getCredentialsForStorage(
             StorageCredentials credentials;
             credentials.login = std::move(assumeRoleResult.credentials.accessKeyId);
             credentials.password = std::move(assumeRoleResult.credentials.secretAccessKey);
+            credentials.sessionToken = std::move(assumeRoleResult.credentials.sessionToken);
             credentials.durationSeconds =
                 (int) m_settings.aws().storageCredentialsDuration.count();
             for (const auto& ioDevice : storage.ioDevices)
