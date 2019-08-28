@@ -4,44 +4,11 @@
 #include <functional>
 #include <optional>
 
+#include <nx/utils/elapsed_timer.h>
+
 #include "average_per_period.h"
 
 namespace nx::utils::math {
-
-/**
- * Calcultes elapsed time using std::chrono::steady_clock.
- * @param Duration std::chrono duration type.
- */
-template<typename Duration = std::chrono::milliseconds>
-class ElapsedTimer
-{
-public:
-    ElapsedTimer():
-        m_start(std::chrono::steady_clock::now())
-    {
-    }
-
-    Duration elapsed() const
-    {
-        return std::chrono::duration_cast<Duration>(
-            std::chrono::steady_clock::now() - m_start);
-    }
-
-    /**
-     * @return Elapsed time.
-     */
-    Duration restart()
-    {
-        const auto now = std::chrono::steady_clock::now();
-        return std::chrono::duration_cast<Duration>(
-            std::chrono::steady_clock::now() - std::exchange(m_start, now));
-    }
-
-private:
-    std::chrono::steady_clock::time_point m_start;
-};
-
-//-------------------------------------------------------------------------------------------------
 
 /**
  * Detects abnormal numeric value in a sequence of values and invokes a functor.
@@ -88,7 +55,10 @@ public:
         else
         {
             if (!m_initialDataAccumulationTimer)
-                m_initialDataAccumulationTimer = ElapsedTimer<>();
+            {
+                m_initialDataAccumulationTimer = ElapsedTimer();
+                m_initialDataAccumulationTimer->restart();
+            }
 
             if (m_initialDataAccumulationTimer->elapsed() > m_period)
                 m_hasEnoughData = true;
@@ -109,7 +79,7 @@ private:
     ReportAnomalyFunc m_reportAnomalyFunc;
 
     bool m_hasEnoughData = false;
-    std::optional<ElapsedTimer<>> m_initialDataAccumulationTimer;
+    std::optional<ElapsedTimer> m_initialDataAccumulationTimer;
 
     template<typename... AuxArgs>
     void testValue(Value value, AuxArgs&&... args)

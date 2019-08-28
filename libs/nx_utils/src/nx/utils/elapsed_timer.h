@@ -1,26 +1,71 @@
 #pragma once
 
 #include <chrono>
-
-#include <QtCore/QElapsedTimer>
+#include <optional>
 
 namespace nx {
 namespace utils {
 
-class NX_UTILS_API ElapsedTimer
+/**
+ * Calculates elapsed time using std::chrono::steady_clock.
+ * @param Duration std::chrono duration type.
+ * NOTE: isValid() returns false just after construction. So, restart() has to be invoked.
+ */
+template<typename Duration = std::chrono::milliseconds>
+class BasicElapsedTimer
 {
 public:
-    ElapsedTimer();
+    BasicElapsedTimer() = default;
 
-    bool hasExpired(std::chrono::milliseconds value) const;
-    std::chrono::milliseconds restart();
-    void invalidate();
-    bool isValid() const;
-    std::chrono::milliseconds elapsed() const;
-    qint64 elapsedMs() const;
+    void invalidate()
+    {
+        m_start = std::nullopt;
+    }
+
+    bool isValid() const
+    {
+        return static_cast<bool>(m_start);
+    }
+
+    Duration elapsed() const
+    {
+        return std::chrono::duration_cast<Duration>(
+            std::chrono::steady_clock::now() - *m_start);
+    }
+
+    long long elapsedMs() const
+    {
+        return std::chrono::duration_cast<std::chrono::milliseconds>(elapsed()).count();
+    }
+
+    bool hasExpired(std::chrono::milliseconds value) const
+    {
+        return elapsed() >= value;
+    }
+
+    /**
+     * @return Elapsed time.
+     */
+    Duration restart()
+    {
+        const auto now = std::chrono::steady_clock::now();
+        const auto startBak = std::exchange(m_start, now);
+        if (startBak)
+        {
+            return std::chrono::duration_cast<Duration>(
+                std::chrono::steady_clock::now() - *startBak);
+        }
+        else
+        {
+            return Duration::zero();
+        }
+    }
+
 private:
-    QElapsedTimer m_timer;
+    std::optional<std::chrono::steady_clock::time_point> m_start;
 };
+
+using ElapsedTimer = BasicElapsedTimer<std::chrono::milliseconds>;
 
 } // namespace utils
 } // namespace nx
