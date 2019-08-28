@@ -120,7 +120,7 @@ private:
     };
 
     std::unique_ptr<AwsS3Emulator> m_awsS3Emulator;
-    nx::network::http::Credentials m_credentials;
+    nx::cloud::aws::Credentials m_credentials;
     std::unique_ptr<aws::s3::ApiClient> m_client;
     nx::utils::SyncQueue<Result> m_uploadResults;
     nx::utils::SyncQueue<std::tuple<Result, nx::Buffer>> m_downloadResults;

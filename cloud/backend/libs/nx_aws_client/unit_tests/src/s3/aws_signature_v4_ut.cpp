@@ -20,7 +20,7 @@ public:
     }
 
 protected:
-    network::http::Credentials credentials() const
+    Credentials credentials() const
     {
         return m_credentials;
     }
@@ -110,7 +110,7 @@ protected:
     }
 
 private:
-    network::http::Credentials m_credentials;
+    Credentials m_credentials;
 };
 
 TEST_F(AwsSignatureV4, GET_request_signature)
@@ -178,7 +178,7 @@ TEST_F(AwsSignatureV4, PUT_request_authorization_header)
 
 TEST_F(AwsSignatureV4, aws_test_suite)
 {
-    const nx::network::http::Credentials credentials(
+    const nx::cloud::aws::Credentials credentials(
         kAwsTestUser, nx::network::http::PasswordAuthToken(kAwsTestSecretKey));
 
     static constexpr std::string_view kDesiredTestName = "";
