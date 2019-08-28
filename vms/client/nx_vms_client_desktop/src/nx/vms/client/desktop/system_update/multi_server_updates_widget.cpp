@@ -741,7 +741,7 @@ bool MultiServerUpdatesWidget::checkSpaceRequirements(
 }
 
 void MultiServerUpdatesWidget::setUpdateTarget(
-    const nx::update::UpdateContents& contents, bool activeUpdate)
+    const nx::update::UpdateContents& contents, [[maybe_unused]] bool activeUpdate)
 {
     NX_VERBOSE(this, "setUpdateTarget(%1)", contents.getVersion());
     m_updateInfo = contents;
