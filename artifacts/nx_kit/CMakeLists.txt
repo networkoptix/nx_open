@@ -12,7 +12,6 @@ project(nx_kit_test)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(nxKitLibraryType "SHARED" CACHE STRING "nx_kit library type (STATIC or SHARED or empty)")
@@ -50,13 +49,14 @@ target_include_directories(nx_kit PUBLIC src)
 
 set(NX_KIT_API_IMPORT_MACRO "")
 set(NX_KIT_API_EXPORT_MACRO "")
-if(WIN32)
-    if (nxKitLibraryType STREQUAL "SHARED")
+if (nxKitLibraryType STREQUAL "SHARED")
+    if(WIN32)
         set(NX_KIT_API_IMPORT_MACRO "__declspec(dllimport)")
         set(NX_KIT_API_EXPORT_MACRO "__declspec(dllexport)")
+    else()
+        set(NX_KIT_API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
+        set_target_properties(nx_kit PROPERTIES CXX_VISIBILITY_PRESET hidden)
     endif()
-else()
-    set(NX_KIT_API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
 endif()
 
 target_compile_definitions(nx_kit
