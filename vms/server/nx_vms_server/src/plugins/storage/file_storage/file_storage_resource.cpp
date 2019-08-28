@@ -913,6 +913,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
                 m_serverModule->platform(),
                /*includeNonHdd*/ true,
                &m_serverModule->settings()),
-            localPath());
+            localPath(),
+            [](const QString& path) { return QDir(path).canonicalPath(); });
     #endif
 }
