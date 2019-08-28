@@ -26,8 +26,7 @@ bool matchAdditionData(
     {
         if (values.empty())
             return true;
-        return std::any_of(values.begin(), values.end(),
-            [&](const int64_t& data) { return data == value; });
+        return std::binary_search(values.begin(), values.end(), value);
 
     };
 
