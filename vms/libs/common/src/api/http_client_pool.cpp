@@ -77,8 +77,8 @@ void ClientPool::Context::sendRequest(
 
         if (timeout)
         {
-            httpClient->setResponseReadTimeoutMs(httpTimeoutMs(timeout.value()));
-            httpClient->setMessageBodyReadTimeoutMs(httpTimeoutMs(timeout.value()));
+            httpClient->setResponseReadTimeoutMs(httpTimeoutMs(*timeout));
+            httpClient->setMessageBodyReadTimeoutMs(httpTimeoutMs(*timeout));
         }
         else
         {
