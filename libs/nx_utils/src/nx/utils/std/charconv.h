@@ -9,10 +9,11 @@
  * - only std::chars_format::general format is supported for floats
  */
 
-#if defined(__APPLE__) || defined(ANDROID) || defined(__ANDROID__)
+#if !__has_include(<charconv>)
 #   define NX_CHARCONV_INTEGER
 #   define NX_CHARCONV_FROM_FLOAT
 #elif defined(__GNUG__)
+    // libstdc++ provides partial <charconv> implementation as of gcc 8.1.
 #   define NX_CHARCONV_FROM_FLOAT
 #endif
 
