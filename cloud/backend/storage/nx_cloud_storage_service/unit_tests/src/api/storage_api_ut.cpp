@@ -7,6 +7,8 @@
 #include <nx/cloud/storage/service/test_support/cloud_db_emulator.h>
 #include <nx/network/url/url_builder.h>
 
+#include "nx/cloud/aws/s3/api_client.h"
+
 namespace nx::cloud::storage::service::api::test {
 
 namespace{
@@ -55,6 +57,7 @@ public:
             controller::cloud_db::AuthenticationManagerFactory::instance().setCustomFunc(
                 std::move(m_cloudDBAuthenticationFactoryFuncBak));
         }
+
     }
 
 protected:
@@ -72,9 +75,10 @@ protected:
         ASSERT_TRUE(m_sts.bindAndListen());
         ASSERT_TRUE(m_cloudDb.bindAndListen());
 
-        addArg("-aws/assumeRoleArn", "arn::aws::sts::test-role");
-        addArg("-cloud_db/url", m_cloudDb.url().toStdString());
+        addArg("-aws/assumeRoleArn", "arn:aws:iam::ACCOUNTID:role/sts-assumeRole-testArn");
         addArg("-aws/stsUrl", m_sts.url().toStdString());
+
+        addArg("-cloud_db/url", m_cloudDb.url().toStdString());
 
         base_type::SetUp();
     }
@@ -258,6 +262,46 @@ protected:
 
         auto url = m_lastCredentialsGotten.urls.front().toStdString();
         ASSERT_NE(url.find(m_lastStorageAdded.id), std::string::npos);
+    }
+
+    void andS3IsAcessibleOnlyThroughStorageCredentials()
+    {
+        aws::Credentials credentials(
+            m_lastCredentialsGotten.login.c_str(),
+            network::http::PasswordAuthToken(m_lastCredentialsGotten.password.c_str()),
+            m_lastCredentialsGotten.sessionToken.c_str());
+
+        const auto doTest =
+            [&credentials](const nx::utils::Url& url, nx::cloud::aws::ResultCode expectedResultCode)
+        {
+            auto client = std::make_unique<nx::cloud::aws::s3::ApiClient>(
+                "us-west-1",
+                url,
+                credentials);
+
+            nx::utils::SyncQueue<aws::Result> done;
+            client->uploadFile(
+                "test.txt",
+                "testdata",
+                [&done, &client](auto awsResult)
+                {
+                    done.push(awsResult);
+                    client->deleteFile(
+                        "test.txt",
+                        [&done](auto awsResult) { done.push(awsResult); });
+                });
+
+            auto result = done.pop();
+            auto result2 = done.pop();
+            ASSERT_EQ(expectedResultCode, result.code());
+            ASSERT_EQ(expectedResultCode, result.code());
+        };
+
+        doTest(m_lastCredentialsGotten.urls.front(), nx::cloud::aws::ResultCode::ok);
+
+        auto url = m_lastCredentialsGotten.urls.front();
+        url.setPath("");
+        doTest(url, nx::cloud::aws::ResultCode::unauthorized);
     }
 
     void thenAddSystemResponseIs(ResultCode resultCode)
@@ -516,6 +560,26 @@ TEST_F(StorageApi, get_credentials)
 
     thenGetCredentialsSucceeds();
     andRoleIsAssumed();
+}
+
+TEST_F(StorageApi, DISABLED_get_credentials_using_actual_aws_services)
+{
+    // To use this test suite:
+    // 1. SetUp() must NOT provide "-aws/stsUrl" setting
+    // 2. SetUp() must provide a valid aws arn via "-aws/assumeRoleArn" setting
+    // 3. SetUp() must provide valid aws credentials via setCredentials() helper function
+    // 4. givenAddedBucket() below must provide a real bucket
+    //    like givenAddedBucket("us-east-1", "actual-bucket-name", false);
+    //    "actual-bucket-name" must be a valid bucket in the region given by first param
+
+    givenCloudDbAccount();
+    givenAddedBucket("some-aws-region", "actual-bucket-name", false);
+    givenAddedStorage();
+
+    whenGetCredentials();
+
+    thenGetCredentialsSucceeds();
+    andS3IsAcessibleOnlyThroughStorageCredentials();
 }
 
 TEST_F(StorageApi, add_system_storage_relation)
