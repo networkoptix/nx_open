@@ -57,9 +57,9 @@
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
             <p>当前系统 <b>{{systems.systemName}}</b> 即将被以下系统合并 <b>{{systems.joinSystemName}}</b></p>
             <p>
-                新系统将有以下系统的密码和名称：<0 />
-                <label> <2 /> {{systems.systemName}}（当前）</label> <br/>
-                <label ng-if="!systems.remoteSystemIsNew"> <4 /> {{systems.joinSystemName}}</label>
+                新系统将有以下系统的密码和名称：<br/>
+<label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/>{{systems.systemName}}（当前</label><br/>
+<label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/>{{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>

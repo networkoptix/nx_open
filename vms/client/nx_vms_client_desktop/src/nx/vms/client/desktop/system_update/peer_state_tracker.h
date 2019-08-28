@@ -222,7 +222,7 @@ public:
      * readyToInstall->installing or when we cancel current action.
      * It will reset all internal task sets.
      */
-    void setTask(const QSet<QnUuid>& targets);
+    void setTask(const QSet<QnUuid>& targets, bool reset = true);
     void setTaskError(const QSet<QnUuid>& targets, const QString& error);
     void addToTask(QnUuid id);
     void removeFromTask(QnUuid id);

@@ -189,7 +189,13 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr& resource)
         if (!item)
         {
             if (const auto resource = resourcePool()->getResourceByDescriptor(data.resource))
-                addItem(new QnWorkbenchItem(resource, data, this));
+            {
+                auto workbenchItem = new QnWorkbenchItem(resource, data, this);
+                // Each item must either be pinned or queued to be pinned.
+                if (workbenchItem->flags() == 0)
+                    workbenchItem->setFlags(Qn::ItemFlag::PendingGeometryAdjustment);
+                addItem(workbenchItem);
+            }
         }
         else
         {

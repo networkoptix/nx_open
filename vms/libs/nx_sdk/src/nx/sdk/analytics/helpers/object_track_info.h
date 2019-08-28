@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/ref_countable.h>
 
 #include <nx/sdk/analytics/i_object_track_info.h>
@@ -14,22 +14,19 @@ namespace analytics {
 class ObjectTrackInfo: public RefCountable<IObjectTrackInfo>
 {
 public:
-    virtual IList<ITimestampedObjectMetadata>* track() const override;
-
-    virtual IUncompressedVideoFrame* bestShotVideoFrame() const override;
-
-    virtual ITimestampedObjectMetadata* bestShotObjectMetadata() const override;
-
     void setTrack(IList<ITimestampedObjectMetadata>* track);
-
     void setBestShotVideoFrame(IUncompressedVideoFrame* bestShotVideoFrame);
-
     void setBestShotObjectMetadata(ITimestampedObjectMetadata* bestShotObjectMetadata);
 
+protected:
+    virtual IList<ITimestampedObjectMetadata>* getTrack() const override;
+    virtual IUncompressedVideoFrame* getBestShotVideoFrame() const override;
+    virtual ITimestampedObjectMetadata* getBestShotObjectMetadata() const override;
+
 private:
-    nx::sdk::Ptr<IList<ITimestampedObjectMetadata>> m_track;
-    nx::sdk::Ptr<IUncompressedVideoFrame> m_bestShotVideoFrame;
-    nx::sdk::Ptr<ITimestampedObjectMetadata> m_bestShotObjectMetadata;
+    Ptr<IList<ITimestampedObjectMetadata>> m_track;
+    Ptr<IUncompressedVideoFrame> m_bestShotVideoFrame;
+    Ptr<ITimestampedObjectMetadata> m_bestShotObjectMetadata;
 };
 
 } // namespace analytics

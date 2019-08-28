@@ -21,7 +21,7 @@ namespace {
 bool analyticsModeCanBeChangedForWidget(QnResourceWidget* widget)
 {
     const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
-    return mediaWidget && mediaWidget->isAnalyticsSupported();
+    return mediaWidget && mediaWidget->isAnalyticsSupported() && !mediaWidget->isZoomWindow();
 }
 
 } // namespace

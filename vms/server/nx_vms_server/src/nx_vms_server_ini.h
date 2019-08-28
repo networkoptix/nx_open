@@ -51,6 +51,10 @@ struct Ini: public nx::kit::IniConfig
         "Override the detected OS variant value (e.g. \"ubuntu\").");
     NX_INI_STRING("", currentOsVariantVersionOverride,
         "Override the detected OS variant version value (e.g. \"16.04\").");
+
+    NX_INI_INT(60000, autoUpdateInstallationDelayMs,
+        "After this delay server will start update installation automatically if detects that\n"
+        "it was supposed to install the update.");
 };
 
 inline Ini& ini()

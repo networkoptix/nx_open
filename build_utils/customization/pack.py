@@ -19,7 +19,7 @@ def find_filemap():
         sys.exit(1)
 
     with open(config_path, 'r') as f:
-        return yaml.load(f)
+        return yaml.load(f, Loader=yaml.SafeLoader)
 
 
 def iterate_over_dict(dictionary, path):

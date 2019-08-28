@@ -1,0 +1,22 @@
+{
+  "ExcludedItems": [
+    "/artifacts/",
+    "/build_environment",
+    "/build_utils",
+    "/ci/",
+    "/cloud_portal/",
+    "/dependencies/",
+    "/doc/",
+    "/func_tests_old/",
+    "/out/",
+    "/paxton_plugin/",
+    "/tests/",
+    "/translation/",
+    "/vms/translation/",
+    "/webadmin/",
+    "distribution",
+    "*.py",
+    "*.png",
+    ".hg*"
+  ]
+}

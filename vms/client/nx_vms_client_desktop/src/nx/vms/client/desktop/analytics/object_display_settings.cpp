@@ -79,13 +79,13 @@ QColor ObjectDisplaySettings::objectColor(const QString& objectTypeId)
 
 QColor ObjectDisplaySettings::objectColor(const nx::common::metadata::ObjectMetadata& object)
 {
-    return objectColor(object.objectTypeId);
+    return objectColor(object.typeId);
 }
 
 std::vector<nx::common::metadata::Attribute> ObjectDisplaySettings::briefAttributes(
     const nx::common::metadata::ObjectMetadata& object) const
 {
-    const auto& settings = d->settingsByObjectTypeId.value(object.objectTypeId);
+    const auto& settings = d->settingsByObjectTypeId.value(object.typeId);
 
     std::vector<nx::common::metadata::Attribute> result;
 
@@ -104,7 +104,7 @@ std::vector<nx::common::metadata::Attribute> ObjectDisplaySettings::briefAttribu
 std::vector<nx::common::metadata::Attribute> ObjectDisplaySettings::visibleAttributes(
     const nx::common::metadata::ObjectMetadata& object) const
 {
-    const auto& settings = d->settingsByObjectTypeId.value(object.objectTypeId);
+    const auto& settings = d->settingsByObjectTypeId.value(object.typeId);
 
     std::vector<nx::common::metadata::Attribute> result;
 

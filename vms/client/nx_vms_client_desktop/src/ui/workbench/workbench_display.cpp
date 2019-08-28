@@ -1197,6 +1197,9 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     // If we are opening the widget for the first time, show info button by default if needed.
     else if (qnSettings->showInfoByDefault())
     {
+        // Block item signals to avoid dataChanged propagation to layout synchronizer. Otherwise it
+        // will queue changes and post them to the snapshot manager, which will display '*'.
+        QSignalBlocker blocker(widget->item());
         widget->setCheckedButtons(Qn::InfoButton);
     }
 
@@ -1213,6 +1216,17 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if (frameColor.isValid())
         widget->setFrameDistinctionColor(frameColor);
 
+    if (auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget))
+    {
+        const auto motionRegions = item->data(Qn::ItemMotionSelectionRole).value<QList<QRegion>>();
+        if (!motionRegions.empty())
+            mediaWidget->setMotionSelection(motionRegions);
+
+        const auto analyticsRect = item->data(Qn::ItemAnalyticsSelectionRole).value<QRectF>();
+        if (analyticsRect.isValid())
+            mediaWidget->setAnalyticsFilterRect(analyticsRect);
+    }
+
     emit widgetAdded(widget);
 
     for (int i = 0; i < Qn::ItemRoleCount; i++)
@@ -1221,8 +1235,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
     {
-        if (startDisplay)
-            mediaWidget->display()->start();
         if (mediaWidget->display()->archiveReader())
         {
             if (item->layout()->resource() && !item->layout()->resource()->getLocalRange().isEmpty())
@@ -1249,6 +1261,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 qnClientModule->radassController()->registerConsumer(mediaWidget->display()->camDisplay());
 
         }
+        if (startDisplay)
+            mediaWidget->display()->start();
 
         integrations::registerWidget(mediaWidget);
     }

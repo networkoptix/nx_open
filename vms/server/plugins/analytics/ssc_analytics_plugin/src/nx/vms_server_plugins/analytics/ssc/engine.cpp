@@ -277,15 +277,14 @@ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/
 {
 }
 
-StringMapResult Engine::setSettings(const IStringMap* /*settings*/)
+void Engine::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
-    return nullptr;
 }
 
-SettingsResponseResult Engine::pluginSideSettings() const
+void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
 void Engine::onDataReceived(int index)
@@ -354,23 +353,22 @@ void Engine::unregisterCamera(int cameraLogicalId)
     m_cameraMap.remove(cameraLogicalId);
 }
 
-MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
     // We should invent more accurate test.
     if (isCompatible(deviceInfo))
-        return new DeviceAgent(this, deviceInfo, m_typedManifest);
-
-    return error(ErrorCode::invalidParams, "Device is not compatible with the Engine");
+        *outResult = new DeviceAgent(this, deviceInfo, m_typedManifest);
+    else
+        *outResult = error(ErrorCode::invalidParams, "Device is not compatible with the Engine");
 }
 
-StringResult Engine::manifest() const
+void Engine::getManifest(Result<const IString*>* outResult) const
 {
-    return new nx::sdk::String(m_manifest);
+    *outResult = new nx::sdk::String(m_manifest);
 }
 
-Result<void> Engine::executeAction(IAction* /*action*/)
+void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
 {
-    return {};
 }
 
 void Engine::setHandler(IHandler* /*handler*/)

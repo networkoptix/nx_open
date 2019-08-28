@@ -21,11 +21,10 @@ void checkUpdateStatusRemotely(
     QnMultiserverRequestContext<QnEmptyRequestData>* context);
 
 void getStoragesDataRemotely(
-    const IfParticipantPredicate& ifParticipantPredicate,
     QnMediaServerModule* serverModule,
     nx::update::storage::ServerToStoragesList* reply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context);
 
-IfParticipantPredicate makeIfParticipantPredicate(nx::vms::server::UpdateManager* updateManager);
+    nx::vms::server::UpdateManager* updateManager, const QList<QnUuid>& forcedParticipants = {});
 
 } // namespace detail

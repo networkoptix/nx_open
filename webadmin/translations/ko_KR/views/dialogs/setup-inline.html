@@ -20,7 +20,7 @@
 <div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
     <div class="master-icon"><span class="icon-fail"></span></div>
     <h2>시스템을 설정 할수 없습니다.</h2>
-    <p class="master-description">The System cannot be configured. <br>
+    <p class="master-description">시스템을 설정할 수 없습니다. <br>
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
@@ -29,9 +29,9 @@
 </div>
 
 <div class="panel-body text-center panel-body-big" ng-if="stepIs('start')">
-    <div ng-class="{'vertical-bottom':!settings.liteClient, 'master-description': settings.liteClient}">
+    <div>
         <h2>{{Config.productName}} 시작</h2>
-        <p>먼저 서버를 구성 하십시오. <br>옵션을 선택입니다.</p>
+        <p class="master-description">먼저 서버를 구성 하십시오. <br>옵션을 선택입니다.</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
         <button class="btn btn-primary" autofocus ng-click="next()">신규 시스템 설정</button>
 
@@ -65,13 +65,13 @@
 
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('advanced', true)">Advanced System settings</a>
+        <a href="" ng-click="next('advanced', true)">고급 시스템 설정</a>
     </p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('advanced')">
-    <h2>Advanced System settings</h2>
+    <h2>고급 시스템 설정</h2>
     <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
@@ -140,7 +140,7 @@
     </div>
     <h2>{{Config.cloud.productName}} 계정</h2>
     <p class="master-description">
-        An account is required to use the cloud System {{Config.cloud.productName}}
+        클라우드 시스템 {{Config.cloud.productName}}을 사용하려면 계정이 필요합니다
     </p>
     <p class="master-controls">
         <button class="btn btn-primary" ng-click="createAccount()" auto-focus>새 계정 만들기</button>&nbsp;&nbsp;
@@ -278,7 +278,7 @@
 </div>
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
-    <h2>Connect the server to the existing System</h2>
+    <h2>서버를 기존 시스템에 연결</h2>
     <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
 
@@ -290,7 +290,7 @@
                    uib-typeahead-show-hint="true"
                    uib-typeahead-focus-first="false"
                    uib-typeahead-focus
- placeholder="Existing System URL (https://host:port)"
+ placeholder="기존 시스템 URL (https://host:port)"
                    ng-change="clearRemoteError()"
                    required
  class="form-control">
@@ -337,13 +337,13 @@
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
     <h2>시스템 병합 중 ...</h2>
-    <p class="master-description">Trying to connect to the System</p>
+    <p class="master-description">시스템에 연결 시도 중</p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Cannot merge Systems</h2>
+    <h2>시스템을 병합할 수 없습니다.</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>

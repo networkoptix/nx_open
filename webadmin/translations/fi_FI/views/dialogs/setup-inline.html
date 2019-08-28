@@ -29,9 +29,9 @@
 </div>
 
 <div class="panel-body text-center panel-body-big" ng-if="stepIs('start')">
-    <div ng-class="{'vertical-bottom':!settings.liteClient, 'master-description': settings.liteClient}">
+    <div>
         <h2>Aloita {{Config.productName}}</h2>
-        <p>Määritä palvelin ensin. <br>
+        <p class="master-description">Määritä palvelin ensin. <br>
             Valitse vaihtoehto.</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
         <button class="btn btn-primary" autofocus ng-click="next()">Määritä uusi järjestelmä</button>
@@ -196,7 +196,7 @@
              ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.required ||
                     forms.cloudForm.cloudPassword.$touched && forms.cloudForm.cloudPassword.$error.required">
             <div class="help-block">
-                Käyttäjätunnus ja salasana ovat pakolliset.
+                Käyttäjätunnus ja salasana ovat pakolliset
             </div>
         </div>
 
@@ -414,7 +414,7 @@
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
     <h2>Liitä palvelin Internetiin</h2>
     <p class="master-description">
-        Aseta Internet-yhteys palvelimelle, jotta voit muodostaa yhteyden siihen mistä tahansa käyttämällä {{Config.cloud.productName}}.
+        Aseta Internet-yhteys palvelimelle, jotta <br> voit muodostaa yhteyden siihen mistä tahansa käyttämällä {{Config.cloud.productName}}.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()"> Yritä uudelleen </button>

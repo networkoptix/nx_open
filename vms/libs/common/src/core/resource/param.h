@@ -179,6 +179,7 @@ namespace ResourceDataKey
     static const QString kRenewIntervalForPullingAsOdm("renewIntervalForPullingAsOdm");
 
     static const QString kDisableHevc("disableHevc");
+    static const QString kIgnoreRtcpReports("ignoreRtcpReports");
 
     static const QString DO_UPDATE_PORT_IN_SUBSCRIPTION_ADDRESS = lit("doUpdatePortInSubscriptionAddress");
 

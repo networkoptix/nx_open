@@ -118,12 +118,12 @@ TEST(utils, toString_wchar)
     ASSERT_STREQ("'C'", toString(L'C'));
     ASSERT_STREQ(R"('\'')", toString(L'\''));
 
-    if (kWcharSize == 2) //< MSVC
+    if (kWcharSize == 2) //< E.g. MSVC
     {
         ASSERT_STREQ(R"('\x00FF')", toString(L'\xFF'));
         ASSERT_STREQ(R"('\xABCD')", toString(L'\xABCD'));
     }
-    else if (kWcharSize == 4) //< Linux
+    else if (kWcharSize == 4) //< E.g. GCC/Clang
     {
         ASSERT_STREQ(R"('\x000000FF')", toString(L'\xFF'));
         ASSERT_STREQ(R"('\x0000ABCD')", toString(L'\xABCD'));

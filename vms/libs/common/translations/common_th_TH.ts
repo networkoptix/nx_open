@@ -521,7 +521,7 @@
     <message numerus="yes">
       <source>%n Time Licenses</source>
       <translation>
-        <numerusform>เวลาใบอนุญาต</numerusform>
+        <numerusform>เวลาใบอนุญาต%n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -539,19 +539,19 @@
     <message numerus="yes">
       <source>%n Edge Licenses</source>
       <translation>
-        <numerusform>ใบอนุญาตทั่วไป</numerusform>
+        <numerusform>ใบอนุญาตทั่วไป%n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
       <translation>
-        <numerusform>ใบอนุญาต Vmax</numerusform>
+        <numerusform>%nใบอนุญาต Vmax</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
       <translation>
-        <numerusform>ใบอนุญาตการเข้ารหัสแบบอะนาล็อก</numerusform>
+        <numerusform>%nใบอนุญาตการเข้ารหัสแบบอะนาล็อก</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -569,19 +569,19 @@
     <message numerus="yes">
       <source>%n Start Licenses</source>
       <translation>
-        <numerusform>เริ่มต้นใบอนุญาต</numerusform>
+        <numerusform>%nเริ่มต้นใบอนุญาต</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
       <translation>
-        <numerusform>ใบอนุญาตของการเชื่อมต่อ</numerusform>
+        <numerusform>%nใบอนุญาตของการเชื่อมต่อ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
       <translation>
-        <numerusform>ใบอนุญาตไม่ถูกต้อง</numerusform>
+        <numerusform>%nใบอนุญาตไม่ถูกต้อง</numerusform>
       </translation>
     </message>
     <message>
@@ -598,63 +598,63 @@
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>ใบอนุญาตกำหนดระยะเวลา</numerusform>
+        <numerusform>%n%1ใบอนุญาตกำหนดระยะเวลา</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n ใบอนุญาตอะนาล็อก</numerusform>
+        <numerusform>%n %1ใบอนุญาตอะนาล็อก</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n ใบอนุญาตแบบมืออาชีพ</numerusform>
+        <numerusform>%n %1ใบอนุญาตแบบมืออาชีพ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>ใบอนุญาตทั่วไป</numerusform>
+        <numerusform>%n%1ใบอนุญาตทั่วไป</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>ใบอนุญาต Vmax</numerusform>
+        <numerusform>%n%1ใบอนุญาต Vmax</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>ใบอนุญาตการเข้ารหัสแบบอะนาล็อก</numerusform>
+        <numerusform>%n%1ใบอนุญาตการเข้ารหัสแบบอะนาล็อก</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n ใบอนุญาต Video Wall</numerusform>
+        <numerusform>%n%1 ใบอนุญาต Video Wall</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>ใบอนุญาตของโมดูล I / O %n</numerusform>
+        <numerusform>%n/%1 I / O สิทธิ์การใช้งานโมดูล</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>เริ่มต้นใบอนุญาต</numerusform>
+        <numerusform>%n%1เริ่มต้นใบอนุญาต</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -668,14 +668,14 @@
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>ใบอนุญาตของการเชื่อมต่อ</numerusform>
+        <numerusform>%n/%1 ฟรีใบอนุญาต</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>ใบอนุญาตไม่ถูกต้อง</numerusform>
+        <numerusform>%n/%1 สิทธิ์การใช้งานไม่ถูกต้อง</numerusform>
       </translation>
     </message>
   </context>

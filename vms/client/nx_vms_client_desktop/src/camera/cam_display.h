@@ -317,7 +317,7 @@ protected:
 
     std::chrono::microseconds m_forcedVideoBufferLength = std::chrono::microseconds::zero();
     qint64 m_lastQueuedVideoTime;
-    int m_liveBufferSize;
+    int m_liveBufferSizeMkSec;
     bool m_liveMaxLenReached;
     bool m_hasVideo;
     Qn::MediaStreamEvent m_lastMediaEvent = Qn::MediaStreamEvent::NoEvent;
@@ -326,7 +326,7 @@ protected:
     mutable QnMutex m_metadataConsumersHashMutex;
     QMultiMap<MetadataType, QWeakPointer<nx::media::AbstractMetadataConsumer>>
         m_metadataConsumerByType;
-
+    QVector<bool> m_gotKeyDataInfo;
     std::function<void()> m_streamsChangedCallback;
 };
 

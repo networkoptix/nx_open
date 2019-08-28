@@ -8,9 +8,9 @@
 
 namespace nx::usb_cam::device::audio {
 
-void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
+void selectAudioDevices(std::vector<DeviceData>& devices)
 {
-    detail::fillCameraAuxiliaryData(cameras, cameraCount);
+    detail::selectAudioDevices(devices);
 }
 
 bool pluggedIn(const std::string& devicePath)

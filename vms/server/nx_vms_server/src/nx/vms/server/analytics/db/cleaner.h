@@ -33,7 +33,6 @@ private:
 
     /** All following functions return removed record count. */
 
-    int cleanObjectSearch(nx::sql::QueryContext* queryContext);
     int cleanTrackGroupToTrack(nx::sql::QueryContext* queryContext);
     int cleanTrack(nx::sql::QueryContext* queryContext);
 

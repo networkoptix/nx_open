@@ -57,9 +57,9 @@
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
             <p>המערכת הנוכחית עומדת להיות ממוזגת <b>{{systems.systemName}}</b> עם מערכת <b>{{systems.joinSystemName}}</b></p>
             <p>
-                למערכת החדשה תהיה סיסמה ושם מהמערכת הבאה: <0 />
-                <label> <2 /> {{systems.systemName}} (נוכחי) </label> <0 />
-                <label ng-if="!systems.remoteSystemIsNew"> <4 /> {{systems.joinSystemName}}</label>
+                למערכת החדשה תהיה סיסמה ושם מהמערכת הבאה:<br/>
+                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/>{{systems.systemName}} (נוכחי) </label><br/>
+                <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>

@@ -6,7 +6,6 @@
 #include <string>
 
 #include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
-#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include <tegra_video.h> //< libtegra_video.so - analytics for Tegra; the lib is a stub on a PC.
 
@@ -24,12 +23,14 @@ class DeviceAgent: public nx::sdk::analytics::VideoFrameProcessingDeviceAgent
 {
 public:
     DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
+
     virtual ~DeviceAgent() override;
 
-    virtual nx::sdk::Result<void> setNeededMetadataTypes(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
-
 protected:
+    virtual void doSetNeededMetadataTypes(
+        nx::sdk::Result<void>* outValue,
+        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
+
     virtual std::string manifestString() const override;
 
     virtual bool pushCompressedVideoFrame(
@@ -70,6 +71,8 @@ private:
         const std::map<std::string, std::vector<std::string>>& options);
 
 private:
+    nx::sdk::analytics::Engine* const m_engine;
+
     int m_counter = 0;
     int m_counterObjects = 0;
     std::string m_eventTypeId;

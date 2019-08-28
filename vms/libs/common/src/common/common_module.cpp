@@ -39,6 +39,7 @@
 #include <utils/common/app_info.h>
 #include <nx/vms/utils/installation_info.h>
 
+#include <nx/analytics/descriptor_manager.h>
 #include <nx/network/app_info.h>
 #include <nx/network/socket_global.h>
 #include <nx/vms/discovery/manager.h>
@@ -159,8 +160,14 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_metrics = std::make_shared<nx::metrics::Storage>(); //< Depends on nothing.
     m_runtimeInfoManager = new QnRuntimeInfoManager(this); //< Depends on nothing.
 
-    // Depends on resource pool.
+    // Depend on resource pool.
     m_moduleDiscoveryManager = new nx::vms::discovery::Manager(clientMode, this);
+    m_analyticsPluginDescriptorManager = new nx::analytics::PluginDescriptorManager(this);
+    m_analyticsEventTypeDescriptorManager = new nx::analytics::EventTypeDescriptorManager(this);
+    m_analyticsEngineDescriptorManager = new nx::analytics::EngineDescriptorManager(this);
+    m_analyticsGroupDescriptorManager = new nx::analytics::GroupDescriptorManager(this);
+    m_analyticsObjectTypeDescriptorManager = new nx::analytics::ObjectTypeDescriptorManager(this);
+
     // TODO: bind m_moduleDiscoveryManager to resPool server changes
     m_router = new QnRouter(this, m_moduleDiscoveryManager);
 

@@ -55,10 +55,10 @@ bool LoggerSettings::parse(const QString& str)
     return parseSucceeded;
 }
 
-void LoggerSettings::updateDirectoryIfEmpty(const QString& dataDirectory)
+void LoggerSettings::updateDirectoryIfEmpty(const QString& logDirectory)
 {
     if (directory.isEmpty())
-        directory = dataDirectory + "/log";
+        directory = logDirectory;
 }
 
 bool LoggerSettings::operator==(const LoggerSettings& right) const
@@ -147,10 +147,10 @@ void Settings::load(const QnSettings& settings, const QString& prefix)
         loadCompatibilityLogger(settings, prefix);
 }
 
-void Settings::updateDirectoryIfEmpty(const QString& dataDirectory)
+void Settings::updateDirectoryIfEmpty(const QString& logDirectory)
 {
     for (auto& logger: loggers)
-        logger.updateDirectoryIfEmpty(dataDirectory);
+        logger.updateDirectoryIfEmpty(logDirectory);
 }
 
 void Settings::loadCompatibilityLogger(

@@ -7,6 +7,7 @@
 #include <nx/vms/api/analytics/manifest_items.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/api/analytics/manifest_error.h>
 
 namespace nx::vms::api::analytics {
 
@@ -27,5 +28,7 @@ public: //< Required for Qt MOC run.
     (id)(name)(description)(version)(vendor)(engineSettingsModel)
 
 QN_FUSION_DECLARE_FUNCTIONS(PluginManifest, (json), NX_VMS_API)
+
+NX_VMS_API std::vector<ManifestError> validate(const PluginManifest& pluginManifest);
 
 } // namespace nx::vms::api::analytics

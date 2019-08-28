@@ -7,6 +7,7 @@ LabeledItem
 {
     id: control
 
+    property alias caption: checkBox.text
     property alias value: checkBox.checked
     property bool defaultValue: false
 

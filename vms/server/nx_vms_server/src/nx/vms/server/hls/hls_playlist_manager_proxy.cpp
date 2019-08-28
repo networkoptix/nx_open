@@ -11,13 +11,13 @@ PlayListManagerWeakRefProxy::PlayListManagerWeakRefProxy(
 {
 }
 
-size_t PlayListManagerWeakRefProxy::generateChunkList(
+CameraDiagnostics::Result PlayListManagerWeakRefProxy::generateChunkList(
     std::vector<ChunkData>* const chunkList,
     bool* const endOfStreamReached) const
 {
     auto strongTargetRef = m_target.lock();
     if (!strongTargetRef)
-        return 0;
+        return CameraDiagnostics::Result(CameraDiagnostics::ErrorCode::internalServerError);
 
     return strongTargetRef->generateChunkList(chunkList, endOfStreamReached);
 }

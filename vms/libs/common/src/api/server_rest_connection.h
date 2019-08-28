@@ -460,6 +460,12 @@ public:
         Result<UpdateInformationData>::type&& callback,
         QThread* targetThread = nullptr);
 
+    /** Get information for a vertain version. */
+    Handle getUpdateInfo(
+        const QString& version,
+        Result<UpdateInformationData>::type&& callback,
+        QThread* targetThread = nullptr);
+
     /** Get information for installed update. It requests /ec2/updateInformation?version=installed. */
     Handle getInstalledUpdateInfo(
         Result<UpdateInformationData>::type&& callback,
@@ -683,13 +689,14 @@ private:
 
     QnMediaServerResourcePtr getServerWithInternetAccess() const;
 
-    void trace(int handle, const QString& message) const;
+    void trace(Handle handle, const QString& message) const;
 
 private:
     QnUuid m_serverId;
     QSet<Handle> m_runningRequests;
     mutable QnMutex m_mutex;
     nx::utils::Url m_directUrl;
+    nx::utils::log::Tag m_logTag;
 
     /**
      * Generic requests, for the types, that should not be exposed to common library.

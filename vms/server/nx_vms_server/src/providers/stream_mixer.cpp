@@ -6,15 +6,7 @@
 #include <utils/common/sleep.h>
 #include <nx/utils/log/log.h>
 
-
-namespace {
-
-static const size_t kDataQueueSize = 100;
-static const quint32 kFramesBeforeReopen = 100;
-
-} // namespace
-
-using namespace std::literals::chrono_literals;
+using namespace std::chrono;
 
 #ifdef ENABLE_DATA_PROVIDERS
 

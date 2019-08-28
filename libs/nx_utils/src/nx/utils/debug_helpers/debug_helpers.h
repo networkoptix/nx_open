@@ -5,6 +5,6 @@
 
 namespace nx::utils::debug_helpers {
 
-QString NX_UTILS_API debugFilesDirectoryPath(const QString& path);
+QString NX_UTILS_API debugFilesDirectoryPath(const QString& path, bool canCreate = true);
 
 } // namespace nx::utils::debug_helpers

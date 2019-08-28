@@ -61,8 +61,10 @@ class QnTwoWayAudioWidget;
 
 struct QnHtmlTextItemOptions;
 
+namespace nx::analytics::db { struct Filter; }
+
 /**
- * Widget to show media from a camera or disk file (from QnMediaResource). 
+ * Widget to show media from a camera or disk file (from QnMediaResource).
  */
 class QnMediaResourceWidget: public Customized<QnResourceWidget>
 {
@@ -163,7 +165,7 @@ public:
 
     bool isAnalyticsSupported() const;
     bool isAnalyticsEnabled() const;
-    void setAnalyticsEnabled(bool analyticsEnabled);
+    void setAnalyticsEnabled(bool enabled);
 
     enum class AreaType
     {
@@ -183,6 +185,8 @@ public:
     void setAnalyticsFilterRect(const QRectF& value);
 
     nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr analyticsMetadataProvider() const;
+
+    void setAnalyticsFilter(const nx::analytics::db::Filter& value);
 
 signals:
     void motionSelectionChanged();
@@ -252,6 +256,11 @@ protected:
         const QColor& penColor);
 
     void paintProgress(QPainter* painter, const QRectF& rect, int progress);
+
+    void paintAnalyticsObjectsDebugOverlay(
+        std::chrono::milliseconds timestamp,
+        QPainter* painter,
+        const QRectF& rect);
 
     void ensureMotionSensitivity() const;
     Q_SLOT void invalidateMotionSensitivity();
