@@ -1,40 +1,43 @@
 #pragma once
 
-#include <QtCore/QAbstractListModel>
-#include <QtCore/QScopedPointer>
 #include <QtCore/QDate>
 #include <QtCore/QLocale>
+#include <QtCore/QAbstractListModel>
 
-class QnCalendarModelPrivate;
+#include <nx/utils/impl_ptr.h>
+
 class QnCameraChunkProvider;
 
-class QnCalendarModel : public QAbstractListModel
+class QnCalendarModel: public QAbstractListModel
 {
     Q_OBJECT
+    using base_type = QAbstractListModel;
 
-    Q_PROPERTY(int year READ year WRITE setYear NOTIFY yearChanged)
-    Q_PROPERTY(int month READ month WRITE setMonth NOTIFY monthChanged)
-    Q_PROPERTY(QLocale locale READ locale WRITE setLocale NOTIFY localeChanged)
-    Q_PROPERTY(QnCameraChunkProvider* chunkProvider READ chunkProvider WRITE setChunkProvider NOTIFY chunkProviderChanged)
-    Q_PROPERTY(QDate currentDate READ currentDate WRITE setCurrentDate NOTIFY currentDateChanged)
+    Q_PROPERTY(int year READ year WRITE setYear
+        NOTIFY yearChanged)
+    Q_PROPERTY(int month READ month WRITE setMonth
+        NOTIFY monthChanged)
+    Q_PROPERTY(QLocale locale READ locale WRITE setLocale
+        NOTIFY localeChanged)
+    Q_PROPERTY(QnCameraChunkProvider* chunkProvider READ chunkProvider WRITE setChunkProvider
+        NOTIFY chunkProviderChanged)
+    Q_PROPERTY(qint64 currentPosition READ currentPosition WRITE setCurrentPosition
+        NOTIFY currentPositionChanged)
+    Q_PROPERTY(qint64 displayOffset READ displayOffset WRITE setDisplayOffset
+        NOTIFY displayOffsetChanged)
 
 public:
-
-    enum Roles {
-        DateRole = Qt::UserRole + 1,
-        DayRole,
+    enum Roles
+    {
+        DayStartTimeRole = Qt::UserRole + 1,
         IsCurrentRole,
         HasArchiveRole
     };
 
-    QnCalendarModel(QObject *parent = nullptr);
-    ~QnCalendarModel();
+    QnCalendarModel(QObject* parent = nullptr);
+    virtual ~QnCalendarModel() override;
 
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    virtual QVariant data(const QModelIndex &index, int role) const override;
-
-    virtual QHash<int, QByteArray> roleNames() const override;
-
+public: // Properties and invokables.
     int year() const;
     void setYear(int year);
 
@@ -42,23 +45,32 @@ public:
     void setMonth(int month);
 
     QLocale locale() const;
-    void setLocale(QLocale locale);
+    void setLocale(const QLocale& locale);
 
-    QnCameraChunkProvider *chunkProvider() const;
-    void setChunkProvider(QnCameraChunkProvider *chunkProvider);
+    QnCameraChunkProvider* chunkProvider() const;
+    void setChunkProvider(QnCameraChunkProvider* chunkProvider);
 
-    void setCurrentDate(const QDate& date);
-    QDate currentDate() const;
+    qint64 currentPosition() const;
+    void setCurrentPosition(qint64 value);
+
+    qint64 displayOffset() const;
+    void setDisplayOffset(qint64 value);
+
+public: // Overrides section.
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+    virtual QVariant data(const QModelIndex& index, int role) const override;
+
+    virtual QHash<int, QByteArray> roleNames() const override;
 
 signals:
     void yearChanged();
     void monthChanged();
-    void mondayIsFirstDayChanged();
     void chunkProviderChanged();
     void localeChanged();
-    void currentDateChanged();
+    void currentPositionChanged();
+    void displayOffsetChanged();
 
 private:
-    Q_DECLARE_PRIVATE(QnCalendarModel)
-    QScopedPointer<QnCalendarModelPrivate> d_ptr;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };

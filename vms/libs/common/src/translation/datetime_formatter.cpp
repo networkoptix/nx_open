@@ -30,6 +30,9 @@ void removeTimezone(QString& source)
 // These default values are used ONLY in emergency when proper values are not initialized.
 std::map<Format, QString> formatStrings =
 {
+    {Format::h, lit("hh")},
+    {Format::m, lit("mm")},
+    {Format::s, lit("ss")},
     {Format::mm_ss, lit("mm:ss")},
     {Format::hh, lit("hh:00")},
     {Format::hh_mm, lit("hh:mm")},
@@ -43,6 +46,7 @@ std::map<Format, QString> formatStrings =
     {Format::dd_MM, lit("dd-MM")},
     {Format::MMMM_yyyy, lit("MMMM yyyy")},
     {Format::dd_MM_yyyy, lit("dd-MM-yyyy")},
+    {Format::d_MMMM_yyyy, lit("d MMMM yyyy")},
     {Format::dd_MMMM_yyyy, lit("dd MMMM yyyy")},
     {Format::yyyy_MM_dd_hh_mm_ss, lit("yyyy-MM-dd hh:mm:ss")},
     {Format::dddd_d_MMMM_yyyy_hh_mm_ss, lit("dddd, d MMMM yyyy hh:mm:ss")},
@@ -96,9 +100,38 @@ void checkInited()
         initLocale();
 }
 
+QString getLocalizedHours(const QTime& value)
+{
+    return datetime::is24HoursTimeFormat()
+        ? value.toString(QStringLiteral("hh"))
+        : QString::number(value.hour() % 12);
+}
+
+QString getHoursTimeFormatMark(const QTime& value)
+{
+    if (datetime::is24HoursTimeFormat())
+        return QString();
+
+    // We don't localize AM/PM markers.
+    return value.hour() < 12 ? "AM" : "PM";
+}
+
 std::optional<bool> is24HoursTimeFormatValue;
 
 } // namespace
+
+qint64 systemDisplayOffset()
+{
+    static const qint64 result =
+        []()
+        {
+            const auto current = QDateTime::currentDateTime();
+            const auto utc = QDateTime(current.date(), current.time(), Qt::UTC);
+            return current.secsTo(utc) * 1000;
+        }();
+
+    return result;
+}
 
 bool is24HoursTimeFormat()
 {
@@ -120,46 +153,36 @@ void set24HoursTimeFormat(bool value)
     DateTimeFormats::setFormats();
 }
 
-QString getLocalizedHours(const QDateTime& value)
-{
-    return is24HoursTimeFormat()
-        ? value.toString(QStringLiteral("hh"))
-        : QString::number(value.time().hour() % 12);
-}
-
-QString getHoursTimeFormatMark(const QDateTime& value)
-{
-    if (is24HoursTimeFormat())
-        return QString();
-
-    // We don't localize AM/PM markers.
-    return value.time().hour() < 12
-        ? "AM"
-        : "PM";
-}
-
-QString toString(const QDateTime& time, Format format)
+QString toString(const QDateTime& value, Format format)
 {
     checkInited();
-    return time.toString(formatStrings[format]);
+    switch (format)
+    {
+        case Format::h:
+            return getLocalizedHours(value.time());
+        case Format::a:
+            return getHoursTimeFormatMark(value.time());
+        default: //< Other formats are handled by usuall way.
+            return value.toString(formatStrings[format]);
+    }
 }
 
 QString toString(const QTime& time, Format format)
 {
     checkInited();
-    return time.toString(formatStrings[format]);
+    return toString(QDateTime(QDate(), time, Qt::UTC), format);
 }
 
 QString toString(const QDate& date, Format format)
 {
     checkInited();
-    return date.toString(formatStrings[format]);
+    return toString(QDateTime(date, QTime()), format);
 }
 
 QString toString(qint64 msSinceEpoch, Format format)
 {
     checkInited();
-    return QDateTime::fromMSecsSinceEpoch(msSinceEpoch).toString(formatStrings[format]);
+    return toString(QDateTime::fromMSecsSinceEpoch(msSinceEpoch), format);
 }
 
 QString getFormatString(Format format)

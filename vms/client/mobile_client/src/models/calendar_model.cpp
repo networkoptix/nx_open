@@ -3,237 +3,111 @@
 #include <QtCore/QLocale>
 #include <QtCore/QTimeZone>
 
+#include <functional>
+
 #include "camera/camera_chunk_provider.h"
 
 namespace {
-    struct CalendarDay {
-        QDate date;
-        bool hasArchive;
 
-        CalendarDay(const QDate &date) :
-            date(date),
-            hasArchive(false)
-        {
-        }
-
-        QDateTime toDateTime() const {
-            return QDateTime(date, QTime(0, 0, 0), Qt::UTC);
-        }
-    };
-
-QDate utcDateFromMilliseconds(qint64 timeMs)
+QDate createDate(int year, int month)
 {
-    return QDateTime::fromMSecsSinceEpoch(timeMs, Qt::UTC).date();
+    return QDate(year, month, 1);
 }
 
-}
+//--------------------------------------------------------------------------------------------------
 
-class QnCalendarModelPrivate {
-    Q_DECLARE_PUBLIC(QnCalendarModel)
-public:
-    QnCalendarModelPrivate(QnCalendarModel *parent) :
-        q_ptr(parent),
-        populated(false),
-        chunkProvider(nullptr)
-    {
-        QDate date = QDate::currentDate();
-        year = date.year();
-        month = date.month();
-        populate();
-    }
+struct Day
+{
+    Day();
+    Day(const QDate& date, qint64 displayOffset);
 
-    QnCalendarModel *q_ptr;
+    qint64 endTime() const;
+    bool containsTime(qint64 value) const;
 
-    QDate currentDate;
-    bool populated;
-
-    QList<CalendarDay> days;
-    int year;
-    int month;
-
-    QLocale locale;
-
-    QnCameraChunkProvider *chunkProvider;
-
-    QDate firstDate(int year, int month) const;
-    int indexOf(const QDate &date) const;
-
-    void populate();
-    void updateArchiveInfo();
+    qint64 startTime = 0;
+    bool hasArchive = false;
+    int dayNumber = 1; //< todo: remove me
 };
 
-QnCalendarModel::QnCalendarModel(QObject *parent) :
-    QAbstractListModel(parent),
-    d_ptr(new QnCalendarModelPrivate(this))
+Day::Day() {}
+
+Day::Day(const QDate& date, qint64 displayOffset):
+    startTime(QDateTime(date, QTime(), Qt::UTC).toMSecsSinceEpoch() - displayOffset),
+    dayNumber(date.day())
 {
 }
 
-QnCalendarModel::~QnCalendarModel() {
-}
-
-int QnCalendarModel::rowCount(const QModelIndex &parent) const {
-    Q_UNUSED(parent)
-    Q_D(const QnCalendarModel);
-    return d->days.size();
-}
-
-QVariant QnCalendarModel::data(const QModelIndex &index, int role) const {
-    if (!hasIndex(index.row(), index.column(), index.parent()))
-        return QVariant();
-
-    Q_D(const QnCalendarModel);
-
-    const CalendarDay &day = d->days[index.row()];
-
-    switch (role) {
-    case Qt::DisplayRole:
-        return day.date.month() == d->month ? QString::number(day.date.day()) : QString();
-    case DayRole:
-        return day.date.day();
-    case DateRole:
-        return day.date;
-    case IsCurrentRole:
-        return day.date == d->currentDate;
-    case HasArchiveRole:
-        return day.hasArchive;
-    }
-
-    return QVariant();
-}
-
-QHash<int, QByteArray> QnCalendarModel::roleNames() const {
-    QHash<int, QByteArray> roleNames = QAbstractListModel::roleNames();
-    roleNames[DayRole] = "day";
-    roleNames[DateRole] = "date";
-    roleNames[IsCurrentRole] = "isCurrent";
-    roleNames[HasArchiveRole] = "hasArchive";
-    return roleNames;
-}
-
-int QnCalendarModel::year() const {
-    Q_D(const QnCalendarModel);
-    return d->year;
-}
-
-void QnCalendarModel::setYear(int year) {
-    Q_D(QnCalendarModel);
-
-    if (d->year == year)
-        return;
-
-    beginResetModel();
-
-    d->year = year;
-    d->populate();
-
-    endResetModel();
-
-    emit yearChanged();
-}
-
-int QnCalendarModel::month() const {
-    Q_D(const QnCalendarModel);
-    return d->month;
-}
-
-void QnCalendarModel::setMonth(int month) {
-    Q_D(QnCalendarModel);
-
-    if (d->month == month)
-        return;
-
-    beginResetModel();
-
-    d->month = month;
-    d->populate();
-
-    endResetModel();
-
-    emit monthChanged();
-}
-
-QnCameraChunkProvider *QnCalendarModel::chunkProvider() const {
-    Q_D(const QnCalendarModel);
-    return d->chunkProvider;
-}
-
-void QnCalendarModel::setCurrentDate(const QDate& date)
+qint64 Day::endTime() const
 {
-    Q_D(QnCalendarModel);
-    if (d->currentDate == date)
-        return;
-
-    d->currentDate = date;
-    emit currentDateChanged();
-
-    if (!rowCount())
-        return;
-
-    emit dataChanged(index(0, 0), index(rowCount() - 1, 0), QVector<int>() << IsCurrentRole);
+    static constexpr qint64 kMillisecondsInDay = 24 * 60 * 60 * 1000;
+    return startTime + kMillisecondsInDay - 1;
 }
 
-QDate QnCalendarModel::currentDate() const
+bool Day::containsTime(qint64 value) const
 {
-    Q_D(const QnCalendarModel);
-    return d->currentDate;
+    return startTime <= value && value <= endTime();
 }
 
-void QnCalendarModel::setChunkProvider(QnCameraChunkProvider *chunkProvider) {
-    Q_D(QnCalendarModel);
+//--------------------------------------------------------------------------------------------------
 
-    if (d->chunkProvider == chunkProvider)
-        return;
-
-    if (d->chunkProvider)
-        disconnect(d->chunkProvider, nullptr, this, nullptr);
-
-    d->chunkProvider = chunkProvider;
-
-    if (d->chunkProvider) {
-        connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated, this, [this, d](){
-            beginResetModel();
-            d->updateArchiveInfo();
-            endResetModel();
-            // emit dataChanged(index(0), index(rowCount()), QVector<int>() << HasArchiveRole);
-        });
-    }
-
-    /* For some reason QML does not react to model changes :(
-     * So we have to reset model. */
-    beginResetModel();
-    d->updateArchiveInfo();
-    endResetModel();
-    // emit dataChanged(index(0), index(rowCount()), QVector<int>() << HasArchiveRole);
-
-    emit chunkProviderChanged();
-}
-
-QLocale QnCalendarModel::locale() const
+struct Month
 {
-    Q_D(const QnCalendarModel);
-    return d->locale;
-}
+    void updateMonthTo(int year, int month, qint64 displayOffset);
+    bool containsDay(const Day& day) const;
 
-void QnCalendarModel::setLocale(QLocale locale)
+    int year = 1970;
+    int month = 1;
+    Day startDay;
+    Day endDay;
+};
+
+void Month::updateMonthTo(int yearValue, int monthValue, qint64 displayOffset)
 {
-    Q_D(QnCalendarModel);
-
-    if (d->locale == locale)
-        return;
-
-    beginResetModel();
-
-    d->locale = locale;
-
-    d->populate();
-
-    endResetModel();
-
-    emit localeChanged();
+    year = yearValue;
+    month = monthValue;
+    const auto startDate = createDate(year, month);
+    startDay = Day(startDate, displayOffset);
+    endDay = Day(QDate(year, month, startDate.daysInMonth()), displayOffset);
 }
 
-QDate QnCalendarModelPrivate::firstDate(int year, int month) const {
-    QDate date(year, month, 1);
+bool Month::containsDay(const Day& day) const
+{
+    return day.startTime <= endDay.endTime() && day.endTime() >= startDay.startTime;
+}
+
+} // namespace
+
+//--------------------------------------------------------------------------------------------------
+
+struct QnCalendarModel::Private
+{
+    Private(QnCalendarModel* owner);
+    QDate getFirstCalendarDate(int year, int month) const;
+    void resetDaysModelData();
+    void updateArchiveInfo();
+    void handleCurrentPositionChanged();
+    void clearArchiveMarks(int dayIndex = 0);
+
+    QnCalendarModel* const q;
+
+    qint64 currentPosition = 0;
+    qint64 displayOffset = 0;
+    Month currentMonth;
+    QList<Day> days;
+    QLocale locale;
+
+    QnCameraChunkProvider* chunkProvider = nullptr;
+    bool populated = false;
+};
+
+QnCalendarModel::Private::Private(QnCalendarModel* owner):
+    q(owner)
+{
+}
+
+QDate QnCalendarModel::Private::getFirstCalendarDate(int year, int month) const
+{
+    auto date = createDate(year, month);
     int dayOfWeek = date.dayOfWeek();
     if (locale.firstDayOfWeek() == Qt::Monday)
         date = date.addDays(1 - dayOfWeek);
@@ -242,71 +116,249 @@ QDate QnCalendarModelPrivate::firstDate(int year, int month) const {
     return date;
 }
 
-int QnCalendarModelPrivate::indexOf(const QDate &date) const {
-    for (int i = 0; i < days.size(); ++i) {
-        if (days[i].date == date)
-            return i;
-    }
-    return -1;
-}
+void QnCalendarModel::Private::resetDaysModelData()
+{
+    q->beginResetModel();
 
-void QnCalendarModelPrivate::populate() {
     days.clear();
 
-    QDate date = firstDate(year, month);
-
+    auto date = getFirstCalendarDate(currentMonth.year, currentMonth.month);
     if (!date.isValid())
         return;
 
-    /* first row will contain the first day of this month */
-    for (int day = 0; day < 7; ++day) {
-        days.append(CalendarDay(date));
+    // First row will contain the first day of this month.
+    static constexpr int kDaysInWeek = 7;
+    for (int i = 0; i < kDaysInWeek; ++i)
+    {
+        days.append(Day(date, displayOffset));
         date = date.addDays(1);
     }
 
-    /* add weeks till month ended */
-    while (date.month() == month) {
-        days.append(CalendarDay(date));
+    // Add weeks till month ended.
+    while (date.month() == currentMonth.month)
+    {
+        days.append(Day(date, displayOffset));
         date = date.addDays(1);
     }
 
     updateArchiveInfo();
+    q->endResetModel();
 }
 
-void QnCalendarModelPrivate::updateArchiveInfo() {
-    if (!chunkProvider) {
-        for (CalendarDay &day : days)
-            day.hasArchive = false;
-
+void QnCalendarModel::Private::updateArchiveInfo()
+{
+    if (!chunkProvider)
+    {
+        clearArchiveMarks();
         return;
     }
 
     QnTimePeriodList timePeriods = chunkProvider->timePeriods(Qn::RecordingContent);
 
-    int i = indexOf(QDate(year, month, 1));
-    while (i < days.size()) {
-        auto it = timePeriods.findNearestPeriod(days[i].toDateTime().toMSecsSinceEpoch(), true);
+    const int firstMonthDayPosition =
+        [this]() -> int
+        {
+            const auto it = std::find_if(days.begin(), days.end(),
+                [this](const Day& day) { return currentMonth.containsDay(day); });
+            return it == days.end() ? -1 : it - days.begin();
+        }();
 
-        if (it == timePeriods.constEnd()) {
-            while (i < days.size())
-                days[i++].hasArchive = false;
+    for (int i = firstMonthDayPosition; i != days.size();)
+    {
+        const auto it = timePeriods.findNearestPeriod(days[i].startTime, true);
+        if (it == timePeriods.constEnd())
+        {
+            // No chinks at the right of the first day of month.
+            clearArchiveMarks(i);
             break;
         }
 
-        const auto startDate = utcDateFromMilliseconds(it->startTimeMs);
-        const auto endDate = it->isInfinite()
-            ? QDateTime::currentDateTimeUtc().date()
-            : utcDateFromMilliseconds(it->endTimeMs());
+        const auto chunkStartTime = it->startTimeMs;
+        const auto chunkEndTime = it->isInfinite()
+            ? QDateTime::currentMSecsSinceEpoch()
+            : it->endTimeMs();
 
-        while (i < days.size() && days[i].date < startDate)
+        while (i < days.size() && days[i].endTime() < chunkStartTime)
             days[i++].hasArchive = false;
 
-        while (i < days.size() && days[i].date <= endDate)
+        while (i < days.size() && days[i].startTime <= chunkEndTime)
             days[i++].hasArchive = true;
 
-        if (it->isInfinite()) {
-            while (i < days.size())
-                days[i++].hasArchive = false;
+        if (it->isInfinite())
+        {
+            clearArchiveMarks(i);
+            break;
         }
     }
+}
+
+void QnCalendarModel::Private::handleCurrentPositionChanged()
+{
+    emit q->dataChanged(q->index(0), q->index(q->rowCount() - 1), {QnCalendarModel::IsCurrentRole});
+}
+
+void QnCalendarModel::Private::clearArchiveMarks(int dayIndex)
+{
+    for (int i = dayIndex; i != days.size(); ++i)
+        days[i].hasArchive = false;
+}
+
+//--------------------------------------------------------------------------------------------------
+
+QnCalendarModel::QnCalendarModel(QObject* parent):
+    base_type(parent),
+    d(new Private(this))
+{
+}
+
+QnCalendarModel::~QnCalendarModel()
+{
+}
+
+int QnCalendarModel::rowCount(const QModelIndex& /*parent*/) const
+{
+    return d->days.size();
+}
+
+QVariant QnCalendarModel::data(const QModelIndex& index, int role) const
+{
+    if (!hasIndex(index.row(), index.column(), index.parent()))
+        return QVariant();
+
+    const auto& day = d->days.at(index.row());
+    switch (role)
+    {
+        case Qt::DisplayRole:
+            return d->currentMonth.containsDay(day) ? QString::number(day.dayNumber) : QString();
+        case DayStartTimeRole:
+            return day.startTime;
+        case IsCurrentRole:
+            return day.containsTime(d->currentPosition);
+        case HasArchiveRole:
+            return day.hasArchive;
+    }
+
+    return QVariant();
+}
+
+QHash<int, QByteArray> QnCalendarModel::roleNames() const
+{
+    QHash<int, QByteArray> roleNames = QAbstractListModel::roleNames();
+    roleNames[DayStartTimeRole] = "dayStartTime";
+    roleNames[IsCurrentRole] = "isCurrent";
+    roleNames[HasArchiveRole] = "hasArchive";
+    return roleNames;
+}
+
+int QnCalendarModel::year() const
+{
+    return d->currentMonth.year;
+}
+
+void QnCalendarModel::setYear(int year)
+{
+    if (year == d->currentMonth.year)
+        return;
+
+    d->currentMonth.updateMonthTo(year, d->currentMonth.month, d->displayOffset);
+    emit yearChanged();
+
+    d->resetDaysModelData();
+}
+
+int QnCalendarModel::month() const
+{
+    return d->currentMonth.month;
+}
+
+void QnCalendarModel::setMonth(int month)
+{
+    if (month == d->currentMonth.month)
+        return;
+
+    d->currentMonth.updateMonthTo(d->currentMonth.year, month, d->displayOffset);
+    emit yearChanged();
+
+    d->resetDaysModelData();
+}
+
+QnCameraChunkProvider* QnCalendarModel::chunkProvider() const
+{
+    return d->chunkProvider;
+}
+
+void QnCalendarModel::setChunkProvider(QnCameraChunkProvider* chunkProvider)
+{
+    if (d->chunkProvider == chunkProvider)
+        return;
+
+    if (d->chunkProvider)
+        disconnect(d->chunkProvider, nullptr, this, nullptr);
+
+    d->chunkProvider = chunkProvider;
+
+
+    const auto updateArchiveInfoInternal =
+        [this]()
+        {
+            d->updateArchiveInfo();
+            emit dataChanged(index(0), index(rowCount() - 1), {HasArchiveRole});
+        };
+
+    if (d->chunkProvider)
+    {
+        connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated,
+            this, updateArchiveInfoInternal);
+    }
+
+    updateArchiveInfoInternal();
+    emit chunkProviderChanged();
+}
+
+qint64 QnCalendarModel::currentPosition() const
+{
+    return d->currentPosition;
+}
+
+void QnCalendarModel::setCurrentPosition(qint64 value)
+{
+    if (d->currentPosition == value)
+        return;
+
+    d->currentPosition = value;
+    emit currentPositionChanged();
+
+    d->handleCurrentPositionChanged();
+}
+
+qint64 QnCalendarModel::displayOffset() const
+{
+    return d->displayOffset;
+}
+
+void QnCalendarModel::setDisplayOffset(qint64 value)
+{
+    if (d->displayOffset == value)
+        return;
+
+    d->displayOffset = value;
+    emit displayOffsetChanged();
+
+    d->resetDaysModelData();
+}
+
+QLocale QnCalendarModel::locale() const
+{
+    return d->locale;
+}
+
+void QnCalendarModel::setLocale(const QLocale& locale)
+{
+    if (d->locale == locale)
+        return;
+
+    d->locale = locale;
+    emit localeChanged();
+
+    d->resetDaysModelData();
 }

@@ -46,7 +46,6 @@ static const nx::utils::SoftwareVersion kUserRightsRefactoredVersion(3, 0);
 
 QnContext::QnContext(QObject* parent) :
     base_type(parent),
-    m_is24HoursFormat(datetime::is24HoursTimeFormat()),
     m_audioController(new AudioController(this)),
     m_connectionManager(new QnConnectionManager(this)),
     m_settings(new QmlSettingsAdaptor(this)),
@@ -379,16 +378,6 @@ void QnContext::updateCustomMargins()
 void QnContext::makeShortVibration()
 {
     ::makeShortVibration();
-}
-
-QString QnContext::getHoursTimeFormatMark(const QDateTime& value)
-{
-    return datetime::getHoursTimeFormatMark(value);
-}
-
-QString QnContext::getLocalizedHours(const QDateTime& value)
-{
-    return datetime::getLocalizedHours(value);
 }
 
 int QnContext::leftCustomMargin() const

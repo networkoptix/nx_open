@@ -3,9 +3,15 @@ import Nx 1.0
 
 Item
 {
-    id: timeLabel
+    id: control
 
-    property date dateTime
+    readonly property int kFontSize: 24
+
+    property alias hours: hoursText.text
+    property alias minutes: minutesText.text
+    property string seconds
+    property string suffix
+
     property color color: ColorTheme.windowText
 
     implicitHeight: contentRow.implicitHeight
@@ -17,15 +23,15 @@ Item
 
         Text
         {
-            text: d.getHours(dateTime)
+            id: hoursText
 
             height: 28
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
 
-            font.pixelSize: d.fontSize
+            font.pixelSize: kFontSize
             font.weight: Font.Bold
-            color: timeLabel.color
+            color: control.color
         }
 
         Text
@@ -38,22 +44,22 @@ Item
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
 
-            font.pixelSize: d.fontSize
+            font.pixelSize: kFontSize
             font.weight: Font.Light
-            color: timeLabel.color
+            color: control.color
         }
 
         Text
         {
-            text: d.getMinutes(dateTime)
+            id: minutesText
 
             height: 28
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
 
-            font.pixelSize: d.fontSize
+            font.pixelSize: kFontSize
             font.weight: Font.Normal
-            color: timeLabel.color
+            color: control.color
         }
 
         Text
@@ -66,48 +72,24 @@ Item
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
 
-            font.pixelSize: d.fontSize
+            font.pixelSize: kFontSize
             font.weight: Font.Light
-            color: timeLabel.color
+            color: control.color
         }
 
         Text
         {
-            text: d.getSeconds(dateTime)
+            text: suffix.length
+                  ? "%1 %2".arg(control.seconds).arg(control.suffix)
+                  : control.seconds
 
             height: 28
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignHCenter
 
-            font.pixelSize: d.fontSize
+            font.pixelSize: kFontSize
             font.weight: Font.Light
-            color: timeLabel.color
-        }
-    }
-
-    Object
-    {
-        id: d
-
-        readonly property int fontSize: 24
-        readonly property var locale: Qt.locale()
-
-        function getHours(dateTime)
-        {
-            return getLocalizedHours(dateTime)
-        }
-
-        function getMinutes(dateTime)
-        {
-            return dateTime.toLocaleTimeString(locale, "mm")
-        }
-
-        function getSeconds(dateTime)
-        {
-            var seconds = dateTime.toLocaleTimeString(locale, "ss")
-            return is24HoursTimeFormat
-                ? seconds
-                : "%1 %2".arg(seconds).arg(getHoursTimeFormatMark(dateTime))
+            color: control.color
         }
     }
 }

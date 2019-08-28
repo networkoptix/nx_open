@@ -3,6 +3,7 @@ import QtGraphicalEffects 1.0
 import QtQuick.Window 2.2
 import QtQuick.Controls 2.4
 import Nx 1.0
+import Nx.Utils 1.0
 import Nx.Media 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
@@ -146,8 +147,6 @@ Item
             }
         }
         Screen.onPrimaryOrientationChanged: updateNavigatorPosition()
-
-        readonly property var locale: Qt.locale()
     }
 
     QnCameraChunkProvider
@@ -297,9 +296,10 @@ Item
 
                 property bool resumeWhenDragFinished: false
 
+                displayTimeShift: timeHelper.displayOffset
+
                 bottomOverlap: 16
                 motionSearchMode: videoNavigation.motionSearchMode
-                serverTimeZoneShift: controller.resourceHelper.serverTimeOffset;
                 enabled: d.hasArchive
                 visible: videoNavigation.canViewArchive
 
@@ -473,12 +473,7 @@ Item
                     anchors.verticalCenterOffset: buttonsPanel.childrenCenterOffset
                     icon.source: lp("/images/calendar.png")
                     enabled: d.hasArchive
-                    onClicked:
-                    {
-                        calendarPanel.chunkProvider = cameraChunkProvider
-                        calendarPanel.date = timeline.positionDate
-                        calendarPanel.open()
-                    }
+                    onClicked: calendarPanel.open()
                 }
 
                 IconButton
@@ -661,6 +656,14 @@ Item
                 anchors.bottomMargin: timeline.chunkBarHeight + 8
                 opacity: d.controlsOpacity * timelineOpactiyMask.opacity
 
+                DisplayTimeHelper
+                {
+                    id: timeHelper
+
+                    position: timeline.position
+                    displayOffset: controller.resourceHelper.displayOffset
+                }
+
                 Text
                 {
                     id: dateLabel
@@ -672,7 +675,7 @@ Item
                     font.weight: Font.Normal
                     verticalAlignment: Text.AlignVCenter
 
-                    text: timeline.positionDate.toLocaleDateString(d.locale, "d MMMM yyyy")
+                    text: timeHelper.fullDate
                     color: ColorTheme.windowText
 
                     opacity: d.liveMode ? 0.0 : 1.0
@@ -694,7 +697,12 @@ Item
                     TimeLabel
                     {
                         id: timeLabel
-                        dateTime: timeline.positionDate
+
+                        hours: timeHelper.hours
+                        minutes: timeHelper.minutes
+                        seconds: timeHelper.seconds
+                        suffix: timeHelper.noonMark
+
                         visible: !d.liveMode
                     }
 
@@ -795,15 +803,11 @@ Item
     {
         id: calendarPanel
 
-        onDatePicked:
-        {
-            close()
-            // TODO: Make refactoring and get rid of serverTimeZoneShift (etc) properties.
-            // Timeline and calendar should work in a same way.
-            var localZoneOffset = (new Date()).getTimezoneOffset() * 60 * 1000;
-            var targetTime = date.getTime() + localZoneOffset - timeline.serverTimeZoneShift
-            controller.forcePosition(targetTime, true)
-        }
+        currentPosition: timeline.position
+        displayOffset: controller.resourceHelper.displayOffset
+        chunkProvider: cameraChunkProvider
+
+        onPicked: controller.forcePosition(position, true)
     }
 
     Component.onCompleted:

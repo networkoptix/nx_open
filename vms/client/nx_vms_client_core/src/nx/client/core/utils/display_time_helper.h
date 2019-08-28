@@ -1,0 +1,54 @@
+#pragma once
+
+#include <QtCore/QObject>
+#include <QtCore/QDateTime>
+
+#include <nx/utils/impl_ptr.h>
+
+namespace nx::client::core::utils {
+
+class DisplayTimeHelper: public QObject
+{
+    Q_OBJECT
+    using base_type = QObject;
+
+    Q_PROPERTY(qint64 position READ position WRITE setPosition
+        NOTIFY positionChanged)
+    Q_PROPERTY(qint64 displayOffset READ displayOffset WRITE setDisplayOffset
+        NOTIFY displayOffsetChanged)
+
+    Q_PROPERTY(QString fullDate READ fullDate NOTIFY dateTimeChanged)
+    Q_PROPERTY(QString hours READ hours NOTIFY dateTimeChanged)
+    Q_PROPERTY(QString minutes READ minutes NOTIFY dateTimeChanged)
+    Q_PROPERTY(QString seconds READ seconds NOTIFY dateTimeChanged)
+    Q_PROPERTY(QString noonMark READ noonMark NOTIFY dateTimeChanged)
+
+public:
+    static void registerQmlType();
+
+    DisplayTimeHelper(QObject* parent = nullptr);
+    virtual ~DisplayTimeHelper() override;
+
+    void setPosition(qint64 value);
+    qint64 position() const;
+
+    void setDisplayOffset(qint64 value);
+    qint64 displayOffset() const;
+
+    QString fullDate() const;
+    QString hours() const;
+    QString minutes() const;
+    QString seconds() const;
+    QString noonMark() const;
+
+signals:
+    void positionChanged();
+    void displayOffsetChanged();
+    void dateTimeChanged();
+
+private:
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
+};
+
+} // namespace nx::client::core::utils

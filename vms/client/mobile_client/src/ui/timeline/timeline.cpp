@@ -134,7 +134,6 @@ public:
     qreal liveOpacity = 0.0;
     qreal stripesPosition = 0.0;
     bool stickToEnd = false;
-    bool autoPlay = false;
     qreal autoPlaySpeed = 1.0;
     qreal playSpeedCorrection = 1.0;
     qint64 previousCorrectionTime = -1;
@@ -173,7 +172,6 @@ public:
     QnTimePeriodList timePeriods[Qn::TimePeriodContentCount];
 
     int timeZoneShift = 0;
-    int serverTimeZoneShift = 0;
 
     QElapsedTimer animationTimer;
     qint64 prevAnimationMs = 0;
@@ -239,6 +237,8 @@ public:
         if (textTexture)
             delete textTexture;
     }
+
+    void setWindow(qint64 start, qint64 end);
 
     void updateZoomLevel()
     {
@@ -342,7 +342,7 @@ public:
 
     qint64 adjustTime(qint64 time) const
     {
-        return time + timeZoneShift + serverTimeZoneShift;
+        return time + timeZoneShift;
     }
 
     void updateTextHelper()
@@ -387,7 +387,6 @@ QnTimeline::QnTimeline(QQuickItem* parent):
     setFlag(QQuickItem::ItemHasContents);
     setAcceptedMouseButtons(Qt::LeftButton);
 
-    connect(this, &QnTimeline::positionChanged, this, &QnTimeline::positionDateChanged);
     connect(this, &QnTimeline::widthChanged, this, [this](){ d->updateZoomLevel(); });
 
     d->suffixList << "ms" << "s" << ":" << "AM" << "PM";
@@ -411,60 +410,9 @@ qint64 QnTimeline::windowStart() const
     return d->windowStart;
 }
 
-void QnTimeline::setWindowStart(qint64 windowStart)
-{
-    if (d->windowStart == windowStart)
-        return;
-
-    d->windowStart = windowStart;
-    d->updateZoomLevel();
-    update();
-    emit windowStartChanged();
-    emit positionChanged();
-    emit windowSizeChanged();
-}
-
 qint64 QnTimeline::windowEnd() const
 {
     return d->windowEnd;
-}
-
-void QnTimeline::setWindowEnd(qint64 windowEnd)
-{
-    if (d->windowEnd == windowEnd)
-        return;
-
-    d->windowEnd = windowEnd;
-    d->updateZoomLevel();
-    update();
-    emit windowEndChanged();
-    emit positionChanged();
-    emit windowSizeChanged();
-}
-
-void QnTimeline::setWindow(qint64 windowStart, qint64 windowEnd)
-{
-    if (d->windowStart == windowStart && d->windowEnd == windowEnd)
-        return;
-
-    d->zoomKineticHelper.stop();
-    d->stickyPointKineticHelper.stop();
-    d->targetPosition = -1;
-
-    const auto oldPosition = position();
-
-    d->windowStart = windowStart;
-    d->windowEnd = windowEnd;
-    d->updateZoomLevel();
-
-    emit windowStartChanged();
-    emit windowEndChanged();
-    emit windowSizeChanged();
-
-    if (oldPosition != position())
-        emit positionChanged();
-
-    update();
 }
 
 qint64 QnTimeline::windowSize() const
@@ -476,7 +424,7 @@ void QnTimeline::setWindowSize(qint64 windowSize)
 {
     const auto windowStart = position() - windowSize / 2;
     d->initialWindowStartTime = windowStart;
-    setWindow(windowStart, windowStart + windowSize);
+    d->setWindow(windowStart, windowStart + windowSize);
 }
 
 qint64 QnTimeline::position() const
@@ -529,7 +477,7 @@ void QnTimeline::setPositionImmediately(qint64 position)
 
     const auto windowSize = this->windowSize();
     const auto newWindowEnd = position + windowSize / 2;
-    setWindow(newWindowEnd - windowSize, newWindowEnd);
+    d->setWindow(newWindowEnd - windowSize, newWindowEnd);
 }
 
 bool QnTimeline::motionSearchMode() const
@@ -565,12 +513,6 @@ void QnTimeline::setChangingMotionRoi(bool value)
     emit changingMotionRoiChanged();
 
     d->updateLoadingState();
-}
-
-
-QDateTime QnTimeline::positionDate() const
-{
-    return QDateTime::fromMSecsSinceEpoch(position() + d->serverTimeZoneShift, Qt::UTC);
 }
 
 bool QnTimeline::stickToEnd() const
@@ -609,22 +551,6 @@ void QnTimeline::setStartBound(qint64 startBound)
     update();
 }
 
-bool QnTimeline::autoPlay() const
-{
-    return d->autoPlay;
-}
-
-void QnTimeline::setAutoPlay(bool autoPlay)
-{
-    if (d->autoPlay == autoPlay)
-        return;
-
-    d->autoPlay = autoPlay;
-
-    if (d->autoPlay)
-        update();
-}
-
 bool QnTimeline::isAutoReturnToBoundsEnabled() const
 {
     return d->autoReturnToBounds;
@@ -637,22 +563,6 @@ void QnTimeline::setAutoReturnToBoundsEnabled(bool enabled)
 
     d->autoReturnToBounds = enabled;
     emit autoReturnToBoundsEnabledChanged();
-}
-
-int QnTimeline::serverTimeZoneShift() const
-{
-    return d->serverTimeZoneShift;
-}
-
-void QnTimeline::setServerTimeZoneShift(int timeZoneShift)
-{
-    if (d->serverTimeZoneShift == timeZoneShift)
-        return;
-
-    d->serverTimeZoneShift = timeZoneShift;
-    emit serverTimeZoneShiftChanged();
-
-    update();
 }
 
 int QnTimeline::timeZoneShift() const
@@ -1591,7 +1501,7 @@ void QnTimelinePrivate::tryFitInBounds()
         return;
 
     const qint64 maximalEndBound = position + minimalHalfWindowSize;
-    parent->setWindow(minimalStartBound, maximalEndBound);
+    setWindow(minimalStartBound, maximalEndBound);
 }
 
 void QnTimelinePrivate::animateProperties()
@@ -1611,13 +1521,6 @@ void QnTimelinePrivate::animateProperties()
         originalWindowStart + (originalWindowEnd - originalWindowStart) / 2;
 
     bool updateRequired = false;
-
-    if (!stickToEnd && autoPlay)
-    {
-        qint64 shift = static_cast<qint64>(dt * autoPlaySpeed * playSpeedCorrection);
-        windowStart += shift;
-        windowEnd += shift;
-    }
 
     const qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
     const qint64 startBound = startBoundTimeValue();
@@ -2035,4 +1938,29 @@ int QnTimelinePrivate::placeText(
 bool QnTimelinePrivate::hasArchive() const
 {
     return startBoundTime > 0;
+}
+
+void QnTimelinePrivate::setWindow(qint64 start, qint64 end)
+{
+    if (start == windowStart && end == windowEnd)
+        return;
+
+    zoomKineticHelper.stop();
+    stickyPointKineticHelper.stop();
+    targetPosition = -1;
+
+    const auto oldPosition = parent->position();
+
+    windowStart = start;
+    windowEnd = end;
+    updateZoomLevel();
+
+    emit parent->windowStartChanged();
+    emit parent->windowEndChanged();
+    emit parent->windowSizeChanged();
+
+    if (oldPosition != parent->position())
+        emit parent->positionChanged();
+
+    parent->update();
 }

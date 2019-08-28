@@ -3,7 +3,8 @@
 #include <nx/utils/log/assert.h>
 #include <translation/datetime_formatter.h>
 
-bool QnTimelineZoomLevel::testTick(qint64 tick) const {
+bool QnTimelineZoomLevel::testTick(qint64 tick) const
+{
     if (isMonotonic())
         return tick % interval == 0;
 
@@ -132,10 +133,10 @@ int QnTimelineZoomLevel::tickCount(qint64 start, qint64 end) const {
     return 0;
 }
 
-bool QnTimelineZoomLevel::isMonotonic() const {
+bool QnTimelineZoomLevel::isMonotonic() const
+{
     return type < Days;
 }
-
 
 QString QnTimelineZoomLevel::value(qint64 tick) const
 {
@@ -147,7 +148,9 @@ QString QnTimelineZoomLevel::value(qint64 tick) const
         return dateTime.toString(QStringLiteral("s"));
     case Minutes:
     case Hours:
-        return QString("%1:%2").arg(datetime::getLocalizedHours(dateTime), dateTime.toString("mm"));
+        return QString("%1:%2").arg(
+            datetime::toString(dateTime, datetime::Format::h),
+            datetime::toString(dateTime, datetime::Format::m));
     case Days:
         return dateTime.toString(QStringLiteral("d"));
     case Months:
@@ -172,7 +175,7 @@ QString QnTimelineZoomLevel::suffix(qint64 tick) const
         return QStringLiteral("s");
     case Minutes:
     case Hours:
-        return datetime::getHoursTimeFormatMark(dateTime);
+        return datetime::toString(dateTime, datetime::Format::a);
     default:
         return QString();
     }

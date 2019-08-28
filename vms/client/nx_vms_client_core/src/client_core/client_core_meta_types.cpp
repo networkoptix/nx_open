@@ -31,6 +31,7 @@
 #include <nx/client/core/motion/items/motion_mask_item.h>
 #include <nx/client/core/ui/frame_section.h>
 #include <nx/client/core/utils/geometry.h>
+#include <nx/client/core/utils/display_time_helper.h>
 #include <nx/client/core/utils/quick_item_mouse_tracker.h>
 #include <nx/client/core/utils/operation_manager.h>
 #include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
@@ -126,6 +127,8 @@ void initializeMetaTypes()
 
     nx::vms::client::core::TwoWayAudioController::registerQmlType();
     nx::vms::client::core::OperationManager::registerQmlType();
+
+    nx::client::core::utils::DisplayTimeHelper::registerQmlType();
 }
 
 } // namespace nx::vms::client::core
