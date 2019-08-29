@@ -10,11 +10,13 @@
 
 namespace nx::cloud::storage::service::controller {
 
+using namespace nx::cloud::storage::service::api;
+
 namespace {
 
-static std::vector<nx::cloud::db::api::SystemAccessLevelRequest> prepareBatchRequest(
+static std::vector<db::api::SystemAccessLevelRequest> prepareBatchRequest(
     const std::vector<std::string> systemIds,
-    const nx::cloud::db::api::UserAuthorization& userAuth)
+    const db::api::UserAuthorization& userAuth)
 {
     std::vector<nx::cloud::db::api::SystemAccessLevelRequest> batchRequest;
     std::transform(
@@ -23,7 +25,7 @@ static std::vector<nx::cloud::db::api::SystemAccessLevelRequest> prepareBatchReq
         std::back_inserter(batchRequest),
         [&userAuth](const auto& systemId)
         {
-            return nx::cloud::db::api::SystemAccessLevelRequest{systemId, userAuth};
+            return db::api::SystemAccessLevelRequest{systemId, userAuth};
         });
     return batchRequest;
 }
@@ -34,6 +36,20 @@ static QString toString(const db::api::UserAuthorization& userAuth)
         .args(userAuth.requestMethod, userAuth.requestAuthorization);
 }
 
+static ResultCode toResultCode(db::api::ResultCode resultCode)
+{
+    switch (resultCode)
+    {
+        case db::api::ResultCode::ok:
+            return api::ResultCode::ok;
+        case db::api::ResultCode::notAuthorized:
+        case db::api::ResultCode::forbidden:
+            return api::ResultCode::unauthorized;
+        default:
+            return api::ResultCode::internalError;
+    }
+}
+
 } // namespace
 
 AccessManager::AccessManager(const conf::CloudDb& settings):
@@ -41,48 +57,64 @@ AccessManager::AccessManager(const conf::CloudDb& settings):
 {
 }
 
-AccessManager::~AccessManager() = default;
+AccessManager::~AccessManager()
+{
+    stop();
+};
 
-std::pair<bool, std::string> AccessManager::addStorageAllowed(
+void AccessManager::stop()
+{
+    QnMutexLocker lock(&m_mutex);
+    auto cdbRequests = std::move(m_cdbRequests);
+    lock.unlock();
+
+    cdbRequests.clear();
+}
+
+std::pair<Result, std::string> AccessManager::addStorageAllowed(
     const nx::utils::stree::ResourceContainer& authInfo) const
 {
     auto accountEmail = this->getAccountEmail(authInfo);
-    return {!accountEmail.empty(), accountEmail};
+    auto result = accountEmail.empty() ? ResultCode::internalError : ResultCode::ok;
+    return std::make_pair(std::move(result), std::move(accountEmail));
 }
 
 void AccessManager::readStorageAllowed(
     const nx::utils::stree::ResourceContainer& authInfo,
-    const api::Storage& storage,
-    nx::utils::MoveOnlyFunc<void(bool)> handler)
+    const Storage& storage,
+    ReadStorageAllowedHandler handler)
 {
     auto accountOwner = getAccountEmail(authInfo);
     if (accountOwner == storage.owner)
-        return handler(true);
+        return handler(ResultCode::ok);
 
     // Non-owner trying to access storage, check by user's access to a system in the storage
 
     if (storage.systems.empty())
-        return handler(false);
+        return handler(ResultCode::unauthorized);
 
-    cloud::db::api::UserAuthorization userAuth;
+    db::api::UserAuthorization userAuth;
     authInfo.get(cloud_db::Resource::httpMethod, &userAuth.requestMethod);
     authInfo.get(cloud_db::Resource::authorization, &userAuth.requestAuthorization);
 
-    auto cdbClient = createCdbClient(std::move(handler));
+    auto& readStorageContext = createReadStorageContext();
+    readStorageContext.handler = std::move(handler);
 
-    cdbClient->authProvider()->getSystemAccessLevel(
+    readStorageContext.cdbClient->authProvider()->getSystemAccessLevel(
         prepareBatchRequest(storage.systems, userAuth),
-        [this, userAuth, cdbClient](
+        [this, userAuth, cdbClient = readStorageContext.cdbClient.get()](
             auto cdbResult,
             auto systemAccessLevels)
         {
-            auto context = takeCdbClientContext(cdbClient);
+            auto context = takeReadStorageContext(cdbClient);
             if (cdbResult != db::api::ResultCode::ok)
             {
-                NX_VERBOSE(this, "cloud_db: getSystemAccessLevel: userAuth = %1"
-                    " failed with result code: %2",
-                    toString(userAuth), db::api::toString(cdbResult));
-                return context.handler(false);
+                Result error(
+                    toResultCode(cdbResult),
+                    lm("cloud_db: getSystemAccessLevel failed with result code: %1")
+                        .arg(db::api::toString(cdbResult)).toStdString());
+                NX_VERBOSE(this, "%1, userAuth was %2", error, toString(userAuth));
+                return context.handler(std::move(error));
             }
 
             auto it = std::find_if(systemAccessLevels.begin(), systemAccessLevels.end(),
@@ -91,7 +123,9 @@ void AccessManager::readStorageAllowed(
                     return systemAccess.accessRole > db::api::SystemAccessRole::disabled;
                 });
 
-            return context.handler(it != systemAccessLevels.end());
+            context.handler(it == systemAccessLevels.end()
+                ? ResultCode::unauthorized
+                : ResultCode::ok);
         });
 }
 
@@ -104,13 +138,12 @@ std::string AccessManager::getAccountEmail(const nx::utils::stree::ResourceConta
 
 bool AccessManager::isStorageOwner(
     const nx::utils::stree::ResourceContainer& authInfo,
-    const api::Storage& storage) const
+    const Storage& storage) const
 {
     return getAccountEmail(authInfo) == storage.owner;
 }
 
-db::api::CdbClient* AccessManager::createCdbClient(
-    nx::utils::MoveOnlyFunc<void(bool)> handler)
+AccessManager::ReadStorageContext& AccessManager::createReadStorageContext()
 {
     auto cdbClient = std::make_unique<db::api::CdbClient>();
     cdbClient->setCloudUrl(m_settings.url.toStdString());
@@ -118,15 +151,12 @@ db::api::CdbClient* AccessManager::createCdbClient(
 
     ReadStorageContext readStorageContext;
     readStorageContext.cdbClient = std::move(cdbClient);
-    readStorageContext.handler = std::move(handler);
 
     QnMutexLocker lock(&m_mutex);
-    m_cdbRequests.emplace(cdbClientPtr, std::move(readStorageContext));
-
-    return cdbClientPtr;
+    return m_cdbRequests.emplace(cdbClientPtr, std::move(readStorageContext)).first->second;
 }
 
-AccessManager::ReadStorageContext AccessManager::takeCdbClientContext(
+AccessManager::ReadStorageContext AccessManager::takeReadStorageContext(
     db::api::CdbClient* cdbClient)
 {
     QnMutexLocker lock(&m_mutex);

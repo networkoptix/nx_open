@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include <nx/cloud/storage/service/api/result.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -20,19 +21,23 @@ namespace api { struct Storage; }
 
 namespace controller {
 
+using ReadStorageAllowedHandler = nx::utils::MoveOnlyFunc<void(api::Result)>;
+
 class AccessManager
 {
 public:
     AccessManager(const conf::CloudDb& settings);
     ~AccessManager();
 
-    std::pair<bool, std::string/*accountOwner*/> addStorageAllowed(
+    void stop();
+
+    std::pair<api::Result, std::string/*accountOwner*/> addStorageAllowed(
         const nx::utils::stree::ResourceContainer& authInfo) const;
 
     void readStorageAllowed(
         const nx::utils::stree::ResourceContainer& authInfo,
         const api::Storage& storage,
-        nx::utils::MoveOnlyFunc<void(bool)> handler);
+        ReadStorageAllowedHandler handler);
 
     bool isStorageOwner(
         const nx::utils::stree::ResourceContainer& authInfo,
@@ -45,12 +50,11 @@ private:
     struct ReadStorageContext
     {
         std::unique_ptr<db::api::CdbClient> cdbClient;
-        nx::utils::MoveOnlyFunc<void(bool)> handler;
+        ReadStorageAllowedHandler handler;
     };
 
-    db::api::CdbClient* createCdbClient(
-        nx::utils::MoveOnlyFunc<void(bool)> handler);
-    ReadStorageContext takeCdbClientContext(db::api::CdbClient* cdbClient);
+    ReadStorageContext& createReadStorageContext();
+    ReadStorageContext takeReadStorageContext(db::api::CdbClient* cdbClient);
 
 private:
     const conf::CloudDb& m_settings;
