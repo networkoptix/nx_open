@@ -14,6 +14,9 @@ namespace nx::cloud::storage::service::api::test {
 namespace{
 
 static constexpr char kFileContents[] = "hello world";
+static constexpr char kOwner1[] = "owner1";
+static constexpr char kOwner2[] = "owner2";
+static constexpr char kSystemId[] = "system1";
 
 class CloudDBAuthenticationForwarderStub:
     public service::controller::cloud_db::AuthenticationForwarder
@@ -83,15 +86,16 @@ protected:
         base_type::SetUp();
     }
 
-    void givenCloudDbAccount()
+    service::test::CloudDbEmulator::Account& givenCloudDbAccount()
     {
         using namespace nx::network::http;
 
-        m_expectedCloudDbOwner = "owner1";
-        Credentials credentials1(
+        m_expectedCloudDbOwner = kOwner1;
+        Credentials credentials(
             m_expectedCloudDbOwner.c_str(),
             PasswordAuthToken("owner1Password"));
-        m_cloudDb.addAccount(m_expectedCloudDbOwner.c_str(), credentials1).addSystem("system1");
+        auto& account = m_cloudDb.addAccount(credentials);
+        account.addSystem(kSystemId);
 
         auto cloudStorageUrl = m_cloudStorage->httpUrl();
         cloudStorageUrl.setUserName(m_expectedCloudDbOwner.c_str());
@@ -99,11 +103,41 @@ protected:
 
         m_cloudStorageClient = std::make_unique<Client>(cloudStorageUrl);
         m_cloudStorageClient->setRequestTimeout(std::chrono::milliseconds(0));
+
+        return account;
+    }
+
+    void givenCloudDbAccountsWithSharedSystem()
+    {
+        using namespace nx::network::http;
+
+        auto& account1 = givenCloudDbAccount();
+
+        Credentials credentials(kOwner2, PasswordAuthToken("owner2password"));
+        m_cloudDb.addAccount(credentials);
+
+        account1.shareSystem(
+            kSystemId,
+            kOwner2,
+            nx::cloud::db::api::SystemAccessRole::cloudAdmin);
+        m_expectedSystem = kSystemId;
+
+        auto cloudStorageUrl = m_cloudStorage->httpUrl();
+        cloudStorageUrl.setUserName(kOwner2);
+        cloudStorageUrl.setPassword("owner2Password");
+
+        m_cloudStorageClient2 = std::make_unique<Client>(cloudStorageUrl);
+        m_cloudStorageClient2->setRequestTimeout(std::chrono::milliseconds(0));
+    }
+
+    void givenCloudDbAccounts()
+    {
+        givenCloudDbAccountsWithSharedSystem();
     }
 
     void givenMultipleAddedBuckets()
     {
-        m_expectedBucket = givenAddedBucket("us-east-1"); // <North America
+        m_expectedBucket = givenAddedBucket("us-east-1"); //< North America
         givenAddedBucket("eu-west-1"); //< Europe
     }
 
@@ -172,16 +206,19 @@ protected:
         readStorage(m_lastStorageAdded.id);
     }
 
+    void whenSecondAccountReadsStorageOwnedByFirstAccount()
+    {
+        readStorage(m_cloudStorageClient2.get(), m_lastStorageAdded.id);
+    }
+
     void whenRemoveStorage()
     {
-        m_cloudStorageClient->removeStorage(
-            m_lastStorageAdded.id,
-            [this, removedStorage = m_lastStorageAdded](auto result)
-            {
-                if (result.resultCode == ResultCode::ok)
-                    m_lastStorageRemoved = std::move(removedStorage);
-                m_removeStorageResponse.push(std::move(result));
-            });
+        removeStorage(m_cloudStorageClient.get(), m_lastStorageAdded.id);
+    }
+
+    void whenASecondUserRemovesStorageOwnedByFirstUser()
+    {
+        removeStorage(m_cloudStorageClient2.get(), m_lastStorageAdded.id);
     }
 
     void whenGetCredentials()
@@ -196,7 +233,8 @@ protected:
 
     void whenAddSystem(const std::string& systemId = std::string())
     {
-        m_expectedSystem = systemId;
+        if (!systemId.empty())
+            m_expectedSystem = systemId;
         if (m_expectedSystem.empty())
             m_expectedSystem = "some-system";
         addSystem(m_lastStorageAdded.id, {m_expectedSystem});
@@ -243,6 +281,12 @@ protected:
     {
         auto result = m_removeStorageResponse.pop();
         ASSERT_EQ(ResultCode::ok, result.resultCode);
+    }
+
+    void thenRemoveSystemResponseIs(ResultCode resultCode)
+    {
+        auto result = m_removeSystemResponse.pop();
+        ASSERT_EQ(resultCode, result.resultCode);
     }
 
     void thenGetCredentialsSucceeds()
@@ -313,7 +357,7 @@ protected:
 
     void thenRemoveStorageResponseIs(ResultCode resultCode)
     {
-        auto result = m_removeSystemResponse.pop();
+        auto result = m_removeStorageResponse.pop();
         ASSERT_EQ(resultCode, result.resultCode);
     }
 
@@ -405,14 +449,19 @@ protected:
     }
 
 private:
-    void readStorage(const std::string& storageId)
+    void readStorage(api::Client* client, const std::string& storageId)
     {
-        m_cloudStorageClient->readStorage(
+        client->readStorage(
             storageId,
             [this](auto result, auto storage)
             {
                 m_readStorageResponse.push({std::move(result), std::move(storage)});
             });
+    }
+
+    void readStorage(const std::string& storageId)
+    {
+        readStorage(m_cloudStorageClient.get(), storageId);
     }
 
     void addStorage(const AddStorageRequest& request)
@@ -422,6 +471,18 @@ private:
             [this](auto result, auto storage)
             {
                 m_addStorageResponse.push({std::move(result), std::move(storage)});
+            });
+    }
+
+    void removeStorage(api::Client* client, const std::string& storageId)
+    {
+        client->removeStorage(
+            storageId,
+            [this, removedStorage = m_lastStorageAdded](auto result)
+            {
+                if (result.ok())
+                    m_lastStorageRemoved = std::move(removedStorage);
+                m_removeStorageResponse.push(std::move(result));
             });
     }
 
@@ -455,6 +516,7 @@ private:
     std::vector<std::string> m_expectedSystems;
     System m_lastSystemAdded;
     service::test::S3Bucket* m_expectedBucket = nullptr;
+    std::unique_ptr<service::api::Client> m_cloudStorageClient2;
 
     nx::utils::SyncQueue<bool> m_cloudDbAuthenticationEvent;
     controller::cloud_db::AuthenticationManagerFactory::Function
@@ -550,6 +612,18 @@ TEST_F(StorageApi, remove_storage)
     andStorageIsNotInService();
 }
 
+TEST_F(StorageApi, only_storage_owner_can_remove_storage)
+{
+    givenCloudDbAccounts();
+    givenAddedBucket();
+    givenAddedStorage();
+
+    whenASecondUserRemovesStorageOwnedByFirstUser();
+
+    thenRequestIsForwardedToCloudDb();
+    thenRemoveStorageResponseIs(api::ResultCode::unauthorized);
+}
+
 TEST_F(StorageApi, get_credentials)
 {
     givenCloudDbAccount();
@@ -607,9 +681,22 @@ TEST_F(StorageApi, remove_system_storage_relation)
     whenRemoveSystem();
     thenRequestIsForwardedToCloudDb();
 
-    thenRemoveStorageResponseIs(ResultCode::ok);
+    thenRemoveSystemResponseIs(ResultCode::ok);
 
     andSystemIsRemovedFromStorage();
+}
+
+TEST_F(StorageApi, user_can_read_storage_if_they_have_a_system_shared_with_them)
+{
+    givenCloudDbAccountsWithSharedSystem();
+    givenAddedBucket();
+    givenAddedStorage();
+    givenAddedSystem();
+
+    whenSecondAccountReadsStorageOwnedByFirstAccount();
+
+    thenRequestIsForwardedToCloudDb();
+    thenReadStorageSucceeds();
 }
 
 TEST_F(StorageApi, read_storage_lists_multiple_systems)

@@ -16,10 +16,8 @@ using namespace nx::cloud::db::api;
 
 CloudDbEmulator::Account::Account(
     CloudDbEmulator* cloudDb,
-    const std::string& owner,
     const Credentials& credentials):
     m_cloudDb(cloudDb),
-    m_owner(owner),
     m_credentials(credentials)
 {
 }
@@ -27,7 +25,6 @@ CloudDbEmulator::Account::Account(
 CloudDbEmulator::Account& CloudDbEmulator::Account::addSystem(const std::string& systemId)
 {
     m_systems[systemId] = SystemAccessRole::owner;
-    m_cloudDb->m_accountsBySystem.emplace(systemId, *this);
     return *this;
 }
 
@@ -37,15 +34,15 @@ void CloudDbEmulator::Account::shareSystem(
     SystemAccessRole accessLevel)
 {
     {
-        auto systemIt = m_cloudDb->m_accountsBySystem.find(systemId);
-        NX_ASSERT(systemIt != m_cloudDb->m_accountsBySystem.end());
+        auto it = m_cloudDb->m_accounts.find(m_credentials.username.toStdString());
+        NX_ASSERT(it != m_cloudDb->m_accounts.end());
         NX_ASSERT(m_systems.find(systemId) != m_systems.end());
     }
 
-    auto userIt = m_cloudDb->m_accounts.find(user);
-    NX_ASSERT(userIt != m_cloudDb->m_accounts.end());
+    auto userToShareWithIter = m_cloudDb->m_accounts.find(user);
+    NX_ASSERT(userToShareWithIter != m_cloudDb->m_accounts.end());
 
-    userIt->second.m_systems[user] = accessLevel;
+    userToShareWithIter->second.m_systems[systemId] = accessLevel;
 }
 
 CloudDbEmulator::CloudDbEmulator()
@@ -66,10 +63,10 @@ nx::utils::Url CloudDbEmulator::url() const
 }
 
 CloudDbEmulator::Account& CloudDbEmulator::addAccount(
-    const std::string& owner,
     const network::http::Credentials& credentials)
 {
-    return m_accounts.emplace(owner, Account(this, owner, credentials)).first->second;
+    auto owner = credentials.username.toStdString();
+    return m_accounts.emplace(owner, Account(this, credentials)).first->second;
 }
 
 void CloudDbEmulator::registerHttpApi()
@@ -163,17 +160,15 @@ std::optional<SystemAccess> CloudDbEmulator::getSystemAccess(
     const std::string& user,
     const std::string& systemId)
 {
-    // Looking up account by system
-    auto it = m_accountsBySystem.find(systemId);
-    if (it == m_accountsBySystem.end())
+    auto userIt = m_accounts.find(user);
+    if (userIt == m_accounts.end())
         return std::nullopt;
 
-    // Checking if system has been shared with this user
-    auto userIt = it->second.m_systems.find(user);
-    if (userIt == it->second.m_systems.end())
+    auto systemIt = userIt->second.m_systems.find(systemId);
+    if (systemIt == userIt->second.m_systems.end())
         return std::nullopt;
 
-    return SystemAccess{userIt->second};
+    return SystemAccess{systemIt->second};
 }
 
 } // namespace nx::cloud::storage::service::test

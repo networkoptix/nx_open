@@ -16,7 +16,6 @@ public:
     public:
         Account(
             CloudDbEmulator* cloudDb,
-            const std::string& owner,
             const network::http::Credentials& credentials);
 
         Account& addSystem(const std::string& systemId);
@@ -28,7 +27,6 @@ public:
 
     private:
         CloudDbEmulator* m_cloudDb;
-        std::string m_owner;
         network::http::Credentials m_credentials;
         std::map<std::string, cloud::db::api::SystemAccessRole> m_systems;
     };
@@ -40,7 +38,7 @@ public:
 
     nx::utils::Url url() const;
 
-    Account& addAccount(const std::string& owner, const network::http::Credentials& credentials);
+    Account& addAccount(const network::http::Credentials& credentials);
 
 private:
     void registerHttpApi();
@@ -62,8 +60,7 @@ private:
 
 private:
     mutable QnMutex m_mutex;
-    std::map<std::string/*owner*/, Account> m_accounts;
-    std::map<std::string/*systemid*/, Account&> m_accountsBySystem;
+    std::map<std::string /*owner*/, Account> m_accounts;
     network::http::TestHttpServer m_server;
 };
 
