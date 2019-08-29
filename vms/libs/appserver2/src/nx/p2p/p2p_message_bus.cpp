@@ -957,6 +957,12 @@ void MessageBus::processRuntimeInfo(
     if (m_lastRuntimeInfo[peerId] == tran.params)
         return; //< Already processed. Ignore same transaction.
 
+    if (peerId.id == localPeer().id)
+    {
+        NX_DEBUG(this, "Ignore deprecated runtime information about himself");
+        return;
+    }
+
     m_lastRuntimeInfo[peerId] = tran.params;
 
     if (m_handler)
@@ -1158,9 +1164,9 @@ ConnectionContext* MessageBus::context(const P2pConnectionPtr& connection)
     return static_cast<ConnectionContext*> (connection->opaqueObject());
 }
 
-QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
+ConnectionInfoList MessageBus::connectionsInfo() const
 {
-    QVector<QnTransportConnectionInfo> result;
+    ConnectionInfoList result;
     QnMutexLocker lock(&m_mutex);
 
     auto remoteUrls = m_remoteUrls;
@@ -1176,6 +1182,7 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
             info.state = toString(connection->state());
             info.isIncoming = connection->direction() == Connection::Direction::incoming;
             info.remotePeerId = connection->remotePeer().id;
+            info.remotePeerDbId = connection->remotePeer().persistentId;
             info.isStarted = context->isLocalStarted;
             info.peerType = connection->remotePeer().peerType;
             info.subscribedTo = context->localSubscription;
@@ -1186,7 +1193,7 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
             // yet. It caused by optimization to do not open all connections to each other.
             info.gotPeerInfo = !context->remotePeersMessage.isEmpty();
 
-            result.push_back(info);
+            result.connections.push_back(info);
         }
 
         remoteUrls.erase(std::remove_if(remoteUrls.begin(), remoteUrls.end(),
@@ -1207,12 +1214,12 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
         info.state = "Not opened";
         info.isIncoming = false;
         info.remotePeerId = peer.peerId;
-        result.push_back(info);
+        result.connections.push_back(info);
     }
 
-    for (auto& record: result)
+    for (auto& record: result.connections)
         record.previousState = toString(m_lastConnectionState.value(record.remotePeerId));
-
+    result.idData = localPeer();
     return result;
 }
 

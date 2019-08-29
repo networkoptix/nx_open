@@ -118,7 +118,7 @@ void QnServerConnector::at_moduleChanged(nx::vms::discovery::ModuleEndpoint modu
     // Don't drop connection to a peer if it online now. Module changed can occurs because
     // merge system is in progress and this peer will change systemId too soon.
     auto connections = commonModule()->ec2Connection()->messageBus()->connectionsInfo();
-    for (const auto& data: connections)
+    for (const auto& data: connections.connections)
     {
         if (module.id == data.remotePeerId && data.state.toLower() == "connected")
             return;
