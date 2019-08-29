@@ -171,7 +171,7 @@ public:
 
     QnTimePeriodList timePeriods[Qn::TimePeriodContentCount];
 
-    int timeZoneShift = 0;
+    int displayOffset = 0;
 
     QElapsedTimer animationTimer;
     qint64 prevAnimationMs = 0;
@@ -342,7 +342,7 @@ public:
 
     qint64 adjustTime(qint64 time) const
     {
-        return time + timeZoneShift;
+        return time + displayOffset;
     }
 
     void updateTextHelper()
@@ -565,19 +565,18 @@ void QnTimeline::setAutoReturnToBoundsEnabled(bool enabled)
     emit autoReturnToBoundsEnabledChanged();
 }
 
-int QnTimeline::timeZoneShift() const
+int QnTimeline::displayOffset() const
 {
-    return d->timeZoneShift;
+    return d->displayOffset;
 }
 
-void QnTimeline::setTimeZoneShift(int timeZoneShift)
+void QnTimeline::setDisplayOffset(int value)
 {
-    if (d->timeZoneShift == timeZoneShift)
+    if (d->displayOffset == value)
         return;
 
-    d->timeZoneShift = timeZoneShift;
-
-    emit timeZoneShiftChanged();
+    d->displayOffset = value;
+    emit displayOffsetChanged();
 
     update();
 }

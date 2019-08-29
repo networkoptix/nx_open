@@ -24,8 +24,8 @@ class QnTimeline: public QQuickItem
     Q_PROPERTY(bool autoReturnToBounds
         READ isAutoReturnToBoundsEnabled WRITE setAutoReturnToBoundsEnabled
         NOTIFY autoReturnToBoundsEnabledChanged)
-    Q_PROPERTY(int timeZoneShift
-        READ timeZoneShift WRITE setTimeZoneShift NOTIFY timeZoneShiftChanged)
+    Q_PROPERTY(int displayOffset
+        READ displayOffset WRITE setDisplayOffset NOTIFY displayOffsetChanged)
 
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     Q_PROPERTY(QColor chunkBarColor
@@ -158,8 +158,8 @@ public:
     bool isAutoReturnToBoundsEnabled() const;
     void setAutoReturnToBoundsEnabled(bool enabled);
 
-    int timeZoneShift() const;
-    void setTimeZoneShift(int timeZoneShift);
+    int displayOffset() const;
+    void setDisplayOffset(int value);
 
     Q_INVOKABLE void zoomIn();
     Q_INVOKABLE void zoomOut();
@@ -190,7 +190,7 @@ signals:
     void stickToEndChanged();
     void startBoundChanged();
     void autoReturnToBoundsEnabledChanged();
-    void timeZoneShiftChanged();
+    void displayOffsetChanged();
 
     void textColorChanged();
     void chunkColorChanged();

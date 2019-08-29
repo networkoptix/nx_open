@@ -6,7 +6,7 @@ Item
 {
     id: control
 
-    property alias displayTimeShift: timeline.timeZoneShift
+    property alias displayOffset: timeline.displayOffset
     property alias defaultWindowSize: timeline.defaultWindowSize
     property alias windowSize: timeline.windowSize
     property alias position: timeline.position

@@ -93,7 +93,6 @@ Pane
             var result = {}
             result.year = year
             result.month = month
-            result.monthsCount = year * 12 + month
             return result;
         }
 

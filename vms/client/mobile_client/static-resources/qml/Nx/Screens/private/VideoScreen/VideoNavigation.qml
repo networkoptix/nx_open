@@ -296,7 +296,7 @@ Item
 
                 property bool resumeWhenDragFinished: false
 
-                displayTimeShift: timeHelper.displayOffset
+                displayOffset: timeHelper.displayOffset
 
                 bottomOverlap: 16
                 motionSearchMode: videoNavigation.motionSearchMode
