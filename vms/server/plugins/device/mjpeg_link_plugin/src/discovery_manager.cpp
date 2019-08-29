@@ -10,6 +10,9 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
+#include <QtCore/QString>
+#include <QtCore/QUrl>
+#include <QHostAddress>
 
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/multipart_content_parser.h>
@@ -20,6 +23,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/utils/log/log_main.h>
+#include <plugins/resource/mdns/mdns_packet.h>
 
 #define UrlPathReplaceRecord_Fields (fromPath)(toPath)
 
@@ -226,12 +230,64 @@ int DiscoveryManager::checkHostAddress2(
 }
 
 int DiscoveryManager::fromMDNSData(
-    const char* /*discoveredAddress*/,
-    const unsigned char* /*mdnsResponsePacket*/,
-    int /*mdnsResponsePacketSize*/,
-    nxcip::CameraInfo* /*cameraInfo*/ )
+    const char* rawAddress,
+    const unsigned char* rawPacketPtr,
+    int rawPacketSize,
+    nxcip::CameraInfo* cameraInfo )
 {
-    return 0;
+    quint16 port = 0;
+    QString path = "/";
+
+    const QByteArray rawPacket(reinterpret_cast<const char*>(rawPacketPtr), rawPacketSize);
+    QnMdnsPacket packet;
+    const bool parseSuceeded = packet.fromDatagram(rawPacket);
+    if(!parseSuceeded)
+        return 0;
+
+    for(const auto& recordSet: {packet.answerRRs, packet.additionalRRs})
+    {
+        for(const QnMdnsPacket::ResourceRecord& record: recordSet)
+        {
+            switch (record.recordType) {
+            case QnMdnsPacket::kSrvRecordType: {
+                if(!record.recordName.endsWith("_http._tcp.local."))
+                    break;
+                QnMdnsSrvData srvData;
+                srvData.decode(record.data);
+                if(srvData.target.isEmpty())  // If decode failed.
+                    break;
+                port = srvData.port;
+            }
+            case QnMdnsPacket::kTextRecordType: {
+                QnMdnsTextData textData;
+                textData.decode(record.data);
+                auto pathAttribute = textData.getAttribute("path");
+                if(pathAttribute.presence != QnMdnsTextData::Attribute::Presence::WithValue)
+                    break;
+                path = QString::fromUtf8(pathAttribute.value);
+            }
+            }
+        }
+    }
+
+    if(!(path.endsWith(".mpjpeg") || path.endsWith(".mjpeg") || path.endsWith(".mjpg")))
+        return 0;
+
+    QHostAddress address(rawAddress);
+    QUrl url;
+    url.setHost(address.toString());
+    url.setPort(port);
+    url.setPath(path);
+    url.setScheme("http");
+    const QByteArray encodedUrl = url.toEncoded();
+
+    if(encodedUrl.length() + 1 > std::min<int>(sizeof(cameraInfo->url), sizeof(cameraInfo->uid)))
+        return 0;
+    strncpy(cameraInfo->url, encodedUrl.data(), sizeof(cameraInfo->url) - 1);
+    strncpy(cameraInfo->uid, cameraInfo->url, sizeof(cameraInfo->uid) - 1);
+    strncpy(cameraInfo->modelName, cameraInfo->url, sizeof(cameraInfo->modelName) - 1);
+
+    return 1;
 }
 
 int DiscoveryManager::fromUpnpData( const char* /*upnpXMLData*/, int /*upnpXMLDataSize*/, nxcip::CameraInfo* /*cameraInfo*/ )

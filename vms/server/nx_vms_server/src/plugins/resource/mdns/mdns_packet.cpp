@@ -269,5 +269,48 @@ void QnMdnsSrvData::decode(const QByteArray& raw)
     target.append(position, targetLength);
 }
 
+void QnMdnsTextData::decode(const QByteArray& raw)
+{
+    QDataStream stream(const_cast<QByteArray*>(&raw), QIODevice::ReadOnly);
+
+    while(!stream.atEnd())
+    {
+        quint8 length;
+        stream >> length;
+        QByteArray text(length, '\0');
+        stream.readRawData(text.data(), length);
+
+        QByteArray key;
+        Attribute attribute;
+        const auto equalSignPosition = text.indexOf('=');
+        if(equalSignPosition == -1)
+        {
+            key = text;
+            attribute = {Attribute::Presence::NoValue, {}};
+        }
+        else
+        {
+            key = text.left(equalSignPosition).toLower();
+            const auto value = text.mid(equalSignPosition + 1);
+            attribute = {Attribute::Presence::WithValue, value};
+        }
+
+        if(key.isEmpty())
+            continue;
+        if(m_attributes.find(key) != m_attributes.end())
+            continue;
+
+        m_attributes[key.toLower()] = attribute;
+    }
+}
+
+QnMdnsTextData::Attribute QnMdnsTextData::getAttribute(const QByteArray& key) const
+{
+    auto attrIt = m_attributes.find(key.toLower());
+    if(attrIt == m_attributes.end())
+        return {Attribute::Presence::Absent, {}};
+    return *attrIt;
+}
+
 #endif // ENABLE_MDNS
 

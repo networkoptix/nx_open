@@ -4,4 +4,5 @@ nx_add_server_plugin(mjpeg_link_plugin NO_MOC
         nx_network
         nx_utils
         nx_sdk
+        nx_vms_server
 )

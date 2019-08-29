@@ -5,6 +5,7 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QVector>
+#include <QtCore/QMap>
 
 struct QnMdnsPacket
 {
@@ -96,6 +97,27 @@ struct QnMdnsSrvData
     QByteArray target;
 public:
     void decode(const QByteArray& data);
+};
+
+/**
+ * RFC 6763: texts are key-value, keys are case-insensitive, repeated and empty keys are dropped;
+ * spaces matter; absent keys, keys with no value (no equal sign) and with values (with an equal
+ * sign and nothing more) are all distinguished, hence the enum.
+ */
+struct QnMdnsTextData
+{
+    struct Attribute {
+        enum class Presence { Absent, NoValue, WithValue };
+        Presence presence;
+        QByteArray value;
+    };
+
+public:
+    void decode(const QByteArray& data);
+    QnMdnsTextData::Attribute getAttribute(const QByteArray& key) const;
+
+private:
+    QMap<QByteArray, QnMdnsTextData::Attribute> m_attributes;
 };
 
 #endif // ENABLE_MDNS
