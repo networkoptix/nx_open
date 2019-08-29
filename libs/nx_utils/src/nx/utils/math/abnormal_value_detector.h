@@ -55,10 +55,7 @@ public:
         else
         {
             if (!m_initialDataAccumulationTimer)
-            {
-                m_initialDataAccumulationTimer = ElapsedTimer();
-                m_initialDataAccumulationTimer->restart();
-            }
+                m_initialDataAccumulationTimer = ElapsedTimer(ElapsedTimerState::started);
 
             if (m_initialDataAccumulationTimer->elapsed() > m_period)
                 m_hasEnoughData = true;

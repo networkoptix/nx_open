@@ -590,8 +590,8 @@ void AioTaskQueue::callAndReportAbnormalProcessingTime(
     Func func,
     const char* description)
 {
-    nx::utils::BasicElapsedTimer<std::chrono::microseconds> timer;
-    timer.restart();
+    nx::utils::BasicElapsedTimer<std::chrono::microseconds> timer(
+        nx::utils::ElapsedTimerState::started);
     func();
     m_abnormalProcessingTimeDetector.add(timer.elapsed(), description);
 }

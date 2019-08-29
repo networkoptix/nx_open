@@ -6,16 +6,30 @@
 namespace nx {
 namespace utils {
 
+enum class ElapsedTimerState
+{
+    invalid,
+    started,
+};
+
 /**
  * Calculates elapsed time using std::chrono::steady_clock.
  * @param Duration std::chrono duration type.
  * NOTE: isValid() returns false just after construction. So, restart() has to be invoked.
+ * @param Duration std::chrono duration type.
  */
-template<typename Duration = std::chrono::milliseconds>
+template<typename Duration>
 class BasicElapsedTimer
 {
 public:
-    BasicElapsedTimer() = default;
+    /**
+     * @param state Defaulted to ElapsedTimerState::invalid to preserve existing behavior.
+     */
+    BasicElapsedTimer(ElapsedTimerState state = ElapsedTimerState::invalid)
+    {
+        if (state == ElapsedTimerState::started)
+            restart();
+    }
 
     void invalidate()
     {
@@ -46,14 +60,9 @@ public:
         const auto now = std::chrono::steady_clock::now();
         const auto startBak = std::exchange(m_start, now);
         if (startBak)
-        {
-            return std::chrono::duration_cast<Duration>(
-                std::chrono::steady_clock::now() - *startBak);
-        }
+            return std::chrono::duration_cast<Duration>(now - *startBak);
         else
-        {
             return Duration::zero();
-        }
     }
 
 private:
