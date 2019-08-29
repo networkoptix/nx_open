@@ -2,6 +2,8 @@
 
 #include <QXmlStreamWriter>
 
+#include <nx/utils/log/to_string.h>
+
 namespace nx::cloud::aws::xml {
 
 void writeElement(QXmlStreamWriter* writer, const QString& name, const QString& value);
@@ -19,7 +21,7 @@ void writeElement(QXmlStreamWriter* writer, const QString& name, NumericType val
 template<typename ObjectType>
 QString className(const ObjectType& object)
 {
-    QString type = typeid(object).name();
+    QString type = demangleTypeName(typeid(object).name());
     int last = type.lastIndexOf("::");
     return last == -1 ? type : type.mid(last + 2);
 }
