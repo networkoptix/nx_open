@@ -127,8 +127,9 @@ std::string MountHelper::makeCommandString(
     Q_UNUSED(ver);
     ss << "mount -t smbfs '//";
     if (!domain.empty())
-        ss << domain << ";";
-    ss << username << ":" << password << "@" << m_url.substr(2) << "' '" << m_directory << "'";
+        ss << escapeSingleQuotes(domain) << ";";
+    ss << escapeSingleQuotes(username) << ":" << escapeSingleQuotes(password)
+       << "@" << m_url.substr(2) << "' '" << m_directory << "'";
 #else // Q_OS_MAC
     ss << "mount -t cifs '" << m_url << "' '" << m_directory << "'"
        << " -o username='" << escapeSingleQuotes(username)
