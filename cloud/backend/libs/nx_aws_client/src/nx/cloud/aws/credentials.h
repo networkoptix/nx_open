@@ -13,12 +13,9 @@ public:
 
     Credentials() = default;
     Credentials(
-        const QString& accessKeyId,
-        const network::http::AuthToken& secretAccessKey);
-    Credentials(
-        const QString& accessKeyId,
-        const network::http::AuthToken& secretAccessKey,
-        const QString& sessionToken);
+        const QString& username,
+        const network::http::AuthToken& authToken,
+        const QString& sessionToken = QString());
 };
 
 } // namespace nx::cloud::aws

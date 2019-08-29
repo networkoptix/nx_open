@@ -3,19 +3,11 @@
 namespace nx::cloud::aws {
 
 Credentials::Credentials(
-    const QString& userName,
-    const network::http::AuthToken& authToken)
-    :
-    base_type(userName, authToken)
-{
-}
-
-Credentials::Credentials(
-    const QString& userName,
+    const QString& username,
     const network::http::AuthToken& authToken,
     const QString& sessionToken)
     :
-    base_type(userName, authToken),
+    base_type(username, authToken),
     sessionToken(sessionToken)
 {
 }
