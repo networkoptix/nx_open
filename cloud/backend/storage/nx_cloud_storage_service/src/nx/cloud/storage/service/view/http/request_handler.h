@@ -59,7 +59,7 @@ template<typename... OutputData>
 void RequestHandler<Input, Output, RestArgFetchers...>::processResponseInternal(
     api::Result result, OutputData... output)
 {
-    if (result.resultCode != api::ResultCode::ok)
+    if (!result.ok())
     {
         network::http::FusionRequestResult error;
         error.errorClass = detail::toFusionRequestErrorClass(result.resultCode);

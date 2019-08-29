@@ -92,7 +92,7 @@ Client::ResultCode Client::getResultCode(
         return api::ResultCode::networkError;
 
     auto result = toResultCode(response);
-    if (result.resultCode != api::ResultCode::ok)
+    if (!result.ok())
     {
         result.error = fusionRequestResult.errorText.toStdString();
         return result;

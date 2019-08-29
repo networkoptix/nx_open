@@ -127,7 +127,7 @@ void PermissionsTester::onDeleteFileDone(aws::Result result)
 
 void PermissionsTester::testFailed(const char* operation, const aws::Result& result)
 {
-    NX_DEBUG(this, "%1 failed: %2, %3",
+    NX_VERBOSE(this, "%1 failed: %2, %3",
         operation, aws::toString(result.code()), result.text());
     nx::utils::swapAndCall(m_handler, utils::toResult(result), std::string());
 }

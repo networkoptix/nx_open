@@ -97,23 +97,27 @@ public:
 private:
     struct AddStorageContext
     {
+        std::string accountEmail;
+        api::AddStorageRequest request;
         api::Result bucketLookupResult;
         api::Storage storage;
+        nx::network::SocketAddress clientEndpoint;
 
-        void initializeStorage(
-            const std::string& accountOwner,
-            const api::Bucket& bucket,
-            const api::AddStorageRequest& request);
+        void initializeStorage(const api::Bucket& bucket);
     };
 
-    struct ReadStorageContext
+    struct CommonStorageContext
     {
         std::string storageId;
         nx::utils::stree::ResourceContainer authInfo;
+        api::Result result;
+    };
+
+    struct ReadStorageContext: public CommonStorageContext
+    {
         bool withDataUsage = false;
         GetStorageHandler handler;
         api::Storage storage;
-        bool found = false;
 
         ReadStorageContext(
             std::string storageId,
@@ -154,11 +158,21 @@ private:
         const nx::utils::stree::ResourceContainer& authInfo,
         const api::AddStorageRequest& request) const;
 
+    nx::sql::DBResult addStorageToDb(
+        AddStorageContext* addStorageContext,
+        nx::sql::QueryContext* queryContext);
+
+    std::pair<api::Result, api::Storage> prepareAddStorageResult(
+        AddStorageContext* addStorageContext,
+        nx::sql::DBResult dbResult) const;
+
+    nx::sql::DBResult removeStorageFromDb(
+        CommonStorageContext* removeStorageContext,
+        nx::sql::QueryContext* queryContext);
+
     api::Result prepareRemoveStorageResult(
-        nx::utils::stree::ResourceContainer& authInfo,
-        const std::string& storageId,
-        nx::sql::DBResult dbResult,
-        const std::optional<api::Storage>& storage) const;
+        CommonStorageContext* removeStorageContext,
+        nx::sql::DBResult dbResult) const;
 
     template<typename DbFunc, typename Handler>
     void modifySystemStorageRelation(

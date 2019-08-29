@@ -68,9 +68,9 @@ void BucketManager::addBucket(const AddBucketRequest& request, AddBucketHandler 
         {
             removePermissionsTest(permissionsTester);
 
-            if (result.resultCode != ResultCode::ok)
+            if (!result.ok())
             {
-                NX_INFO(this, "S3 permissions test failed: %1, %2",
+                NX_VERBOSE(this, "S3 permissions test failed: %1, %2",
                     toString(result.resultCode), result.error);
                 return handler(std::move(result), Bucket());
             }
@@ -100,11 +100,11 @@ void BucketManager::listBuckets(
                     utils::toResultCode(dbResult),
                     lm("listBuckets failed with sql error: %1")
                         .arg(toString(dbResult)).toStdString());
-                NX_VERBOSE(this, error.error);
+                NX_VERBOSE(this, error);
                 return handler(std::move(error), Buckets());
             }
 
-            handler(Result(), std::move(*buckets));
+            handler(ResultCode::ok, std::move(*buckets));
         });
 }
 
@@ -125,13 +125,13 @@ void BucketManager::removeBucket(
             {
                 Result error(
                     utils::toResultCode(dbResult),
-                    lm("removeBucket(%1) failed with sql error: %2")
+                    lm("removeBucket %1 failed with sql error: %2")
                         .args(bucketName, toString(dbResult)).toStdString());
                 NX_VERBOSE(this, error.error);
                 return handler(std::move(error));
             }
 
-            handler(Result());
+            handler(ResultCode::ok);
         });
 }
 
@@ -154,7 +154,7 @@ void BucketManager::addBucketToDb(
     m_bucketDao->queryExecutor().executeUpdate(
         [this, guard = m_asyncCounter.getScopedIncrement(), bucket](auto queryContext)
         {
-            NX_VERBOSE(this, "addBucketToDb: adding bucket %1", toString(*bucket));
+            NX_VERBOSE(this, "addBucket %1", toString(*bucket));
             return m_bucketDao->addBucket(queryContext, *bucket);
         },
         [this, guard = m_asyncCounter.getScopedIncrement(), handler = std::move(handler),
@@ -165,13 +165,14 @@ void BucketManager::addBucketToDb(
             {
                 Result error(
                     utils::toResultCode(dbResult),
-                    std::string("addBucketToDb failed with sql error: ") + toString(dbResult));
+                    lm("addBucket %1 failed with sql error: %2")
+                        .args(bucket->name, toString(dbResult)).toStdString());
                 NX_VERBOSE(this, error.error);
                 return handler(std::move(error), Bucket());
             }
 
             NX_VERBOSE(this, "addBucketToDb succeeded for bucket %1", toString(*bucket));
-            handler(Result(), std::move(*bucket));
+            handler(ResultCode::ok, std::move(*bucket));
         });
 }
 

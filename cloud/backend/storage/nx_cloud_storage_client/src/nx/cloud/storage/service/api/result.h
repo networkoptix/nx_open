@@ -24,15 +24,21 @@ struct NX_CLOUD_STORAGE_CLIENT_API Result
     ResultCode resultCode = ResultCode::ok;
     std::string error;
 
-    Result(ResultCode resultCode = ResultCode::ok):
-        resultCode(resultCode)
-    {
-    }
-
-    Result(ResultCode resultCode, std::string error):
+    Result(ResultCode resultCode = ResultCode::ok, std::string error = std::string()):
         resultCode(resultCode),
         error(std::move(error))
     {
+    }
+
+    bool ok() const
+    {
+        return resultCode == ResultCode::ok;
+    }
+
+    std::string toString() const
+    {
+        return std::string(api::toString(resultCode)) +
+            (!error.empty() ? ":" + error : std::string());
     }
 };
 
