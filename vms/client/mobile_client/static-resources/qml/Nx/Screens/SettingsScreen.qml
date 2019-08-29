@@ -64,6 +64,14 @@ Page
 
                 }
             }
+
+            LabeledSwitch
+            {
+                width: parent.width
+                text: qsTr("Use server time mode")
+                checked: serverTimeMode
+                onCheckedChanged: serverTimeMode = checked
+            }
         }
     }
 }

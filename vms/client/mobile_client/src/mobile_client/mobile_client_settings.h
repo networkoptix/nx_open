@@ -9,8 +9,10 @@
 #include <mobile_client/mobile_client_startup_parameters.h>
 #include <client_core/local_connection_data.h>
 #include <settings/last_connection.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 using nx::client::mobile::settings::LastConnectionData;
+using nx::vms::client::core::ServerTimeWatcher;
 
 class QnMobileClientSettings : public QnPropertyStorage, public Singleton<QnMobileClientSettings>
 {
@@ -45,6 +47,7 @@ public:
         SavePasswords,
 
         AudioSettings,
+        ServerTimeMode,
 
         VariableCount
     };
@@ -110,6 +113,8 @@ private:
         QN_DECLARE_RW_PROPERTY(QVariantList,                savedSessions,              setSavedSessions,           SavedSessions,              QVariantList())
         QN_DECLARE_RW_PROPERTY(bool, savePasswords, setSavePasswords, SavePasswords, true)        
         QN_DECLARE_RW_PROPERTY(QByteArray, audioSettings, setAudioSettings, AudioSettings, QByteArray())
+
+        QN_DECLARE_RW_PROPERTY(bool, serverTimeMode, setServerTimeMode, ServerTimeMode, true)
     QN_END_PROPERTY_STORAGE()
 
 private:
