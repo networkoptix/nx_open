@@ -143,6 +143,7 @@ Client::ResultCode Client::toResultCode(const network::http::Response* response)
     switch (response->statusLine.statusCode)
     {
         case StatusCode::unauthorized:
+        case StatusCode::forbidden:
             return ResultCode(api::ResultCode::unauthorized);
         case StatusCode::badRequest:
             return ResultCode(api::ResultCode::badRequest);
