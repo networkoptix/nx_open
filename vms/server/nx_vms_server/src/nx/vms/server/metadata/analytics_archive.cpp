@@ -38,6 +38,10 @@ bool matchAdditionData(
 
 QnTimePeriodList AnalyticsArchive::matchPeriod(const AnalyticsFilter& filter)
 {
+    NX_ASSERT_HEAVY_CONDITION(
+        std::is_sorted(filter.allAttributesHash.begin(), filter.allAttributesHash.end()));
+    NX_ASSERT_HEAVY_CONDITION(
+        std::is_sorted(filter.objectTypes.begin(), filter.objectTypes.end()));
     return base_type::matchPeriodInternal(filter, matchAdditionData);
 }
 
@@ -45,6 +49,11 @@ AnalyticsArchive::MatchObjectsResult  AnalyticsArchive::matchObjects(
     const AnalyticsFilter& filter)
 {
     MatchObjectsResult result;
+
+    NX_ASSERT_HEAVY_CONDITION(
+        std::is_sorted(filter.allAttributesHash.begin(), filter.allAttributesHash.end()));
+    NX_ASSERT_HEAVY_CONDITION(
+        std::is_sorted(filter.objectTypes.begin(), filter.objectTypes.end()));
 
     auto matchExtraData =
         [&result](int64_t timestampMs,
