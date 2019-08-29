@@ -64,7 +64,7 @@ void BaseApiClient::addAuthorizationToRequest(network::http::Request* request)
         request->headers.emplace("x-amz-content-sha256", kUnsignedPayloadHash);
 
     if (!m_credentials.sessionToken.isEmpty())
-        request->headers.emplace("x-amz-security-token", m_credentials.sessionToken.toUtf8());
+        request->headers.emplace("x-amz-security-token", m_credentials.sessionToken);
 
     // x-amz-date
     auto iso8601Date = QDateTime::currentDateTime().toUTC().toString(Qt::ISODate).toUtf8();

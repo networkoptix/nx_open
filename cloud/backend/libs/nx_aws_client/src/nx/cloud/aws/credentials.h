@@ -9,13 +9,13 @@ class NX_AWS_CLIENT_API Credentials:
 {
     using base_type = nx::network::http::Credentials;
 public:
-    QString sessionToken;
+    nx::String sessionToken;
 
     Credentials() = default;
     Credentials(
         const QString& username,
         const network::http::AuthToken& authToken,
-        const QString& sessionToken = QString());
+        const nx::String& sessionToken = nx::String());
 };
 
 } // namespace nx::cloud::aws
