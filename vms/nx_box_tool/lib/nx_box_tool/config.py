@@ -1,10 +1,6 @@
 from nx_box_tool import exceptions
 
 
-class NoConfigFile(exceptions.NxBoxToolError):
-    pass
-
-
 class ConfigOptionNotFound(exceptions.NxBoxToolError):
     pass
 
@@ -15,10 +11,7 @@ class InvalidConfigOption(exceptions.NxBoxToolError):
 
 class ConfigParser:
     def __init__(self, filepath, option_descriptions=None):
-        try:
-            f = open(filepath)
-        except FileNotFoundError:
-            raise NoConfigFile(f"Config file '{filepath}' not found.")
+        f = open(filepath)
 
         self.options = dict([
             [
@@ -37,7 +30,7 @@ class ConfigParser:
         if option_descriptions:
             for name, _ in ((k, v) for (k, v) in option_descriptions.items() if v.get('optional', False) is False):
                 if name not in self.options.keys():
-                    raise ConfigOptionNotFound(f"Mandatory config option '{name}' is not defined in config {filepath}.")
+                    raise ConfigOptionNotFound(f"Mandatory config option '{name}' is not defined in config {filepath}")
 
             for name, _ in option_descriptions.items():
                 if 'default' in option_descriptions[name]:
@@ -54,7 +47,7 @@ class ConfigParser:
 
             for name, value in self.options.items():
                 if name not in option_descriptions.keys():
-                    raise InvalidConfigOption(f"Unexpected option '{name}' in config {filepath}.")
+                    raise InvalidConfigOption(f"Unexpected option '{name}' in config {filepath}")
 
     def __getitem__(self, item):
         return self.options[item]
