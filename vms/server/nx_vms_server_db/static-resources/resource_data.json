@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.109",
+    "version": "1.0.1.110",
     "data": [
         {
             "keys": [
@@ -3606,7 +3606,8 @@
                 "Geovision|GV-BX2700",
                 "GV-BX2700|Geovision"
             ],
-            "onvifIgnoreMedia2":  true
+            "onvifIgnoreMedia2":  true,
+            "trustToVideoSourceSize": false
         }
     ]
 }

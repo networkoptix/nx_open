@@ -81,6 +81,7 @@ option(withTests "Enable unit tests" ${_withTests})
 option(withCassandraTests "Enable cassandra related tests" ${_withCassandraTests})
 option(withMiniLauncher "Enable minilauncher" ${_withMiniLauncher})
 option(withVmsTools "Enable utility VMS tools" OFF)
+option(withBoxTool "Enable nx_box_tool build" ${_withBoxTool})
 nx_option(withRootTool "Enable root tool" ${_withRootTool})
 nx_option(
     withP2PConnectionTestingUtility
@@ -96,11 +97,6 @@ cmake_dependent_option(withDistributions "Enable distributions build"
 
 cmake_dependent_option(withSdk "Enable nx_*_sdk build"
     OFF "NOT withDistributions"
-    ON
-)
-
-cmake_dependent_option(withBoxTool "Enable nx_box_tool build"
-    OFF "NOT withDistributions OR NOT _withBoxTool"
     ON
 )
 

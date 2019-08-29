@@ -141,6 +141,9 @@ public:
         microseconds futureRectangleTimestamp = 0us;
 
         ObjectMetadata rawData;
+
+        /** Debug representation. */
+        QString toString() const;
     };
 
     static AreaHighlightOverlayWidget::AreaInformation areaInfoFromObject(
@@ -185,6 +188,13 @@ AreaHighlightOverlayWidget::AreaInformation WidgetAnalyticsController::Private::
     return areaInfo;
 }
 
+QString WidgetAnalyticsController::Private::ObjectInfo::toString() const
+{
+    auto singleLineDescription = basicDescription;
+    singleLineDescription.replace('\n', ' ');
+    return QString("Object [%1] %2").arg(id.toString()).arg(singleLineDescription);
+}
+
 WidgetAnalyticsController::Private::Private(WidgetAnalyticsController* parent):
     QnCommonModuleAware(parent)
 {
@@ -208,18 +218,10 @@ WidgetAnalyticsController::Private::ObjectInfo&
     objectInfo.rectangle = objectMetadata.boundingBox;
 
     QString objectTitle;
-    if (ini().showAnalitycsObjectTypeOnCamera > 0)
-    {
-        const auto descriptor = commonModule()->analyticsObjectTypeDescriptorManager()
-            ->descriptor(objectMetadata.typeId);
-        if (descriptor && !descriptor->name.isEmpty())
-        {
-            const bool showTypeKeyword = (ini().showAnalitycsObjectTypeOnCamera == 2);
-            objectTitle = showTypeKeyword
-                ? tr("Type") + '\t' + descriptor->name + '\n'
-                : descriptor->name + '\n';
-        }
-    }
+    const auto descriptor = commonModule()->analyticsObjectTypeDescriptorManager()->descriptor(
+        objectMetadata.typeId);
+    if (descriptor && !descriptor->name.isEmpty())
+        objectTitle = descriptor->name + '\n';
 
     objectInfo.basicDescription = objectTitle +
         objectDescription(settings->briefAttributes(objectMetadata));
@@ -246,6 +248,7 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
         if ((ini().applyCameraFilterToSceneItems && !relevantCamera)
             || !filter.acceptsMetadata(objectInfo.rawData, /*checkBoundingBox*/ relevantCamera))
         {
+            NX_VERBOSE(this, "Object %1 filtered out", objectInfo);
             areaHighlightWidget->removeArea(objectInfo.id);
             continue;
         }
@@ -378,7 +381,6 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         d->averageMetadataPeriod = period;
 
     NX_DEBUG(this,
-        "\n"
         "Updating analytics objects; current timestamp %1\n"
         "Size of metadata list for resource %2: %3\n"
         "Average request period %4",
@@ -409,8 +411,8 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
                 objectInfo.startTimestamp = microseconds(metadata->timestampUs);
                 objectInfo.endTimestamp = d->metadataEndTimestamp(metadata);
                 objectInfo.futureRectangleTimestamp = objectInfo.startTimestamp;
-                NX_VERBOSE(this, "\nAdded object\n%1\nat %2\nDuration: %3 - %4",
-                    objectInfo.basicDescription,
+                NX_VERBOSE(this, "Added object\n%1\nat %2\nDuration: %3 - %4",
+                    objectInfo,
                     objectInfo.rectangle,
                     approximateDebugTime(objectInfo.startTimestamp),
                     approximateDebugTime(objectInfo.endTimestamp));
@@ -434,7 +436,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
             {
                 it->endTimestamp = std::max(it->endTimestamp, d->metadataEndTimestamp(packet));
                 NX_VERBOSE(this, "Prolonged object %1 to %2 based on the future object",
-                    it->basicDescription, approximateDebugTime(it->endTimestamp));
+                    *it, approximateDebugTime(it->endTimestamp));
             }
 
             // Update geometry approximation information.
@@ -445,8 +447,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         // Cleanup areas which should not be visible right now.
         if (timestamp < it->startTimestamp || timestamp > it->endTimestamp)
         {
-            NX_VERBOSE(this, "Cleanup object %1 as it does not fit into timestamp window",
-                it->basicDescription);
+            NX_VERBOSE(this, "Cleanup object %1 as it does not fit into timestamp window", *it);
             d->removeArea(*it);
             it = d->objectInfoById.erase(it);
         }
@@ -456,7 +457,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         }
     }
 
-    NX_VERBOSE(this, "%1 objects are currently visible", d->objectInfoById.size());
+    NX_DEBUG(this, "%1 objects are currently available from RTSP stream", d->objectInfoById.size());
 
     d->lastTimestamp = timestamp;
     d->updateObjectAreas(timestamp);

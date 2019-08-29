@@ -1046,8 +1046,8 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
             if (reconnectIfAppropriate())
                 return Result::proceed;
 
-            NX_DEBUG(this, lm("Failed to read (1) response from %1. %2")
-                .arg(m_contentLocationUrl).arg(SystemError::connectionReset));
+            NX_DEBUG(this, "Failed to read (1) response from %1. %2",
+                m_contentLocationUrl, SystemError::connectionReset);
             m_state = State::sFailed;
             return emitDone();
         }
@@ -1070,9 +1070,9 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
         return emitDone();
     }
 
-    NX_VERBOSE(this, lm("Response from %1 has been successfully read: %2")
-        .arg(m_contentLocationUrl)
-        .arg(logTraffic() ? response()->toString() : response()->statusLine.toString()));
+    NX_VERBOSE(this, "Response header from %1 has been successfully read: %2",
+        m_contentLocationUrl,
+        logTraffic() ? response()->toString() : response()->statusLine.toString());
 
     if (repeatRequestIfNeeded(*m_httpStreamReader.message().response))
         return Result::proceed;
@@ -1135,7 +1135,7 @@ AsyncClient::Result AsyncClient::startReadingMessageBody(bool* const continueRec
         m_responseBuffer.resize(0);
         if (!m_socket->setRecvTimeout(m_msgBodyReadTimeout))
         {
-            NX_DEBUG(this, lm("Failed to read (1) response from %1. %2")
+            NX_DEBUG(this, lm("Failed to read (1) response body from %1. %2")
                 .arg(m_contentLocationUrl).arg(SystemError::getLastOSErrorText()));
 
             m_state = State::sFailed;
@@ -1151,6 +1151,8 @@ AsyncClient::Result AsyncClient::startReadingMessageBody(bool* const continueRec
         m_httpStreamReader.state() == HttpStreamReader::parseError);
 
     m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? State::sFailed : State::sDone;
+
+    NX_VERBOSE(this, "Finished reading body from %1", m_contentLocationUrl);
     return emitDone();
 }
 

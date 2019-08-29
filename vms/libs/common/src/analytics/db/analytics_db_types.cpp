@@ -1,16 +1,18 @@
 #include "analytics_db_types.h"
 
-#include <cmath>
-#include <sstream>
-
 #include <QtCore/QRegularExpression>
 
-#include <nx/fusion/model_functions.h>
+#include <cmath>
+#include <sstream>
 
 #include <common/common_globals.h>
 #include <utils/math/math.h>
 
+#include <nx/fusion/model_functions.h>
+#include <nx/utils/std/algorithm.h>
+
 #include "config.h"
+#include "analytics_db_utils.h"
 
 namespace nx::analytics::db {
 
@@ -66,20 +68,21 @@ bool Filter::acceptsObjectType(const QString& typeId) const
 
 bool Filter::acceptsBoundingBox(const QRectF& boundingBox) const
 {
-    return !this->boundingBox || this->boundingBox->intersects(boundingBox);
+    return !this->boundingBox ||
+        rectsIntersectToSearchPrecision(*(this->boundingBox), boundingBox);
 }
 
 bool Filter::acceptsAttributes(const std::vector<nx::common::metadata::Attribute>& attributes) const
 {
     const auto filterWords = freeText.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
-    if (filterWords.empty())
-        return true;
+    if (attributes.empty())
+        return filterWords.empty();
 
-    return std::any_of(attributes.cbegin(), attributes.cend(),
-        [&filterWords](const nx::common::metadata::Attribute& attribute) -> bool
+    return std::all_of(filterWords.cbegin(), filterWords.cend(),
+        [&attributes](const QString& filterWord) -> bool
         {
-            return std::all_of(filterWords.cbegin(), filterWords.cend(),
-                [&attribute](const QString& filterWord) -> bool
+            return std::any_of(attributes.cbegin(), attributes.cend(),
+                [&filterWord](const nx::common::metadata::Attribute& attribute) -> bool
                 {
                     return attribute.name.contains(filterWord, Qt::CaseInsensitive)
                         || attribute.value.contains(filterWord, Qt::CaseInsensitive);
@@ -93,6 +96,53 @@ bool Filter::acceptsMetadata(
     return acceptsObjectType(metadata.typeId)
         && (!checkBoundingBox || acceptsBoundingBox(metadata.boundingBox))
         && acceptsAttributes(metadata.attributes);
+}
+
+bool Filter::acceptsTrack(const ObjectTrack& track) const
+{
+     using namespace std::chrono;
+
+    if (!objectTrackId.isNull() && track.id != objectTrackId)
+    {
+        return false;
+    }
+
+    if (!(microseconds(track.lastAppearanceTimeUs) >= timePeriod.startTime() &&
+          (timePeriod.isInfinite() ||
+              microseconds(track.firstAppearanceTimeUs) < timePeriod.endTime())))
+    {
+        return false;
+    }
+
+    // Matching every device if device list is empty.
+    if (!deviceIds.empty() &&
+        !nx::utils::contains(deviceIds, track.deviceId))
+    {
+        return false;
+    }
+
+    if (!objectTypeId.empty() &&
+        !nx::utils::contains(objectTypeId, track.objectTypeId))
+    {
+        return false;
+    }
+
+    if (!acceptsAttributes(track.attributes))
+        return false;
+
+    // Checking the track.
+    if (!std::any_of(
+            track.objectPositionSequence.cbegin(),
+            track.objectPositionSequence.cend(),
+            [this](const ObjectPosition& position)
+            {
+                return acceptsBoundingBox(position.boundingBox);
+            }))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool Filter::operator==(const Filter& right) const

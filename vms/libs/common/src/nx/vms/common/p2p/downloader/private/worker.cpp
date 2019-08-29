@@ -362,11 +362,21 @@ void Worker::requestFileInformationInternal()
 
     NX_VERBOSE(m_logTag, "Trying to get %1.", requestSubjectString(m_state));
 
+    const auto& sleepOrEnterDownloadingChunks =
+        [this]()
+        {
+            if (m_state == State::requestingAvailableChunks && haveChunksToDownload())
+                setState(State::foundAvailableChunks);
+            else
+                sleep();
+        };
+
     const QSet<Peer>& peers = getPeersToCheckInfo();
     if (peers.isEmpty())
     {
-        reviveBannedPeers();
-        sleep();
+        sleepOrEnterDownloadingChunks();
+        if (m_state != State::foundAvailableChunks)
+            reviveBannedPeers();
         return;
     }
 
@@ -378,6 +388,9 @@ void Worker::requestFileInformationInternal()
     int requestCount = 0;
     for (const auto& peer: peers)
     {
+        if (needToStop())
+            break;
+
         NX_VERBOSE(m_logTag, "Requesting %1 from server %2.",
             requestSubjectString(m_state), peer);
 
@@ -398,7 +411,7 @@ void Worker::requestFileInformationInternal()
 
     if (contexts.empty())
     {
-        sleep();
+        sleepOrEnterDownloadingChunks();
         return;
     }
 
@@ -410,7 +423,7 @@ void Worker::requestFileInformationInternal()
         });
 
     if (m_state == State::requestingFileInformation || m_state == State::requestingAvailableChunks)
-        sleep();
+        sleepOrEnterDownloadingChunks();
 }
 
 void Worker::handleFileInformationReply(
@@ -501,12 +514,12 @@ void Worker::requestChecksums()
         return;
     }
 
-    while (!peers.isEmpty())
+    while (!peers.isEmpty() && !needToStop())
     {
         using Context = RequestContext<QVector<QByteArray>, Peer>;
         std::vector<Context> contexts;
 
-        while (!peers.isEmpty() && contexts.size() < kMaxPeersToCheckAtOnce)
+        while (!peers.isEmpty() && contexts.size() < kMaxPeersToCheckAtOnce && !needToStop())
         {
             const Peer& peer = peers.takeFirst();
 
@@ -613,11 +626,11 @@ void Worker::downloadChunks()
     QSet<int> downloadingChunks;
     QSet<Peer> busyPeers;
 
-    while (chunksLeft > 0)
+    while (chunksLeft > 0 && !needToStop())
     {
         for (int i = 0;
             contexts.size() < kMaxSimultaneousDownloads && i < kMaxSimultaneousDownloads
-                && chunksLeft > 0;
+                && chunksLeft > 0 && !needToStop();
             ++i)
         {
             const int chunk = selectNextChunk(downloadingChunks);
@@ -668,18 +681,25 @@ void Worker::downloadChunks()
         Context::processRequests(this, contexts,
             [&, this](const ContextData& ctx, const std::optional<QByteArray>& data)
             {
+                PeerInformation& info = m_peerInfoByPeer[ctx.peer];
+
                 if (data)
                 {
+                    info.lastSuccessfulRequestTime = ctx.requestTime;
+
                     const bool lastChunk = ctx.chunkIndex == m_availableChunks.size() - 1;
                     if (!lastChunk)
                     {
                         // Last chunk is usually smaller than others, so skip it.
-                        m_peerInfoByPeer[ctx.peer].recordChunkDownloadTime(
+                        info.recordChunkDownloadTime(
                             duration_cast<milliseconds>(steady_clock::now() - ctx.requestTime));
                     }
                 }
 
-                handleDownloadChunkReply(ctx.peer, ctx.chunkIndex, data);
+                const bool decreaseRankOnFailure =
+                    info.lastSuccessfulRequestTime < ctx.requestTime;
+
+                handleDownloadChunkReply(ctx.peer, ctx.chunkIndex, data, decreaseRankOnFailure);
 
                 busyPeers.remove(ctx.peer);
                 downloadingChunks.remove(ctx.chunkIndex);
@@ -704,7 +724,10 @@ void Worker::downloadChunks()
 }
 
 void Worker::handleDownloadChunkReply(
-    const Peer& peer, int chunkIndex, const std::optional<QByteArray>& data)
+    const Peer& peer,
+    int chunkIndex,
+    const std::optional<QByteArray>& data,
+    bool decreaseRankOnFailure)
 {
     NX_VERBOSE(m_logTag, "Got chunk %1 from %2: %3",
         chunkIndex, peer, statusString(data.has_value()));
@@ -712,7 +735,8 @@ void Worker::handleDownloadChunkReply(
     if (!data)
     {
         emit chunkDownloadFailed(m_fileName);
-        decreasePeerRank(peer);
+        if (decreaseRankOnFailure)
+            decreasePeerRank(peer);
         return;
     }
 

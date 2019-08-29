@@ -121,9 +121,9 @@ protected:
                     ss << " -o credentials=" << kCredentialsFile;
 
                 if (m_mountCommandFlags & MountCommandFlags::domain)
-                    ss << ",domain=" << kDomain;
+                    ss << ",domain='" << kDomain << "'";
                 else if (m_mountCommandFlags & MountCommandFlags::defaultDomain)
-                    ss << ",domain=" << kDefaultDomain;
+                    ss << ",domain='" << kDefaultDomain << "'";
 
                 if (m_mountCommandFlags & MountCommandFlags::ver1)
                     ss << ",vers=" << kVer1;
