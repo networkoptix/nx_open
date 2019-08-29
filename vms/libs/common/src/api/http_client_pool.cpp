@@ -169,7 +169,7 @@ ClientPool::ClientPool(QObject *parent):
     m_maxPoolSize(kDefaultPoolSize),
     m_requestId(0)
 {
-    qRegisterMetaType<ContextPtr>();
+    //qRegisterMetaType<ContextPtr>();
 }
 
 ClientPool::~ClientPool()
@@ -431,8 +431,8 @@ void ClientPool::at_HttpClientDone(nx::network::http::AsyncHttpClientPtr clientP
         {
             if (context->completionFunc)
                 context->completionFunc(context);
-            emit requestIsDone(context);
         }
+        emit requestIsDone(context);
         context.reset();
     }
 
