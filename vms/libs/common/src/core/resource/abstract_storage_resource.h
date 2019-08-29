@@ -29,7 +29,7 @@ public:
     {
     public:
         explicit FileInfo(const QString& uri, qint64 size, bool isDir = false):
-            m_fpath(uri), m_size(size), m_isDir(isDir)
+            m_fpath(QDir::toNativeSeparators(uri)), m_size(size), m_isDir(isDir)
         {
         }
 

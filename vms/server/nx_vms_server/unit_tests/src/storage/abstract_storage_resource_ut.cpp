@@ -362,37 +362,42 @@ TEST_F(AbstractStorageResourceTest, IODevice)
     }
 }
 
+struct ExpectedFileInfo
+{
+    bool isDir;
+    QString baseName;
+    QString ext;
+    QString dirPath;
+    QString fileName;
+    QString absolutePath;
+};
+
+static void assertFileInfo(
+    const QnAbstractStorageResource::FileInfo& fileInfo,
+    const ExpectedFileInfo& expected)
+{
+    ASSERT_EQ(expected.isDir, fileInfo.isDir());
+    ASSERT_EQ(QDir::toNativeSeparators(expected.baseName), fileInfo.baseName());
+    ASSERT_EQ(QDir::toNativeSeparators(expected.ext), fileInfo.extension());
+    ASSERT_EQ(QDir::toNativeSeparators(expected.dirPath), fileInfo.absoluteDirPath());
+    ASSERT_EQ(QDir::toNativeSeparators(expected.fileName), fileInfo.fileName());
+    ASSERT_EQ(QDir::toNativeSeparators(expected.absolutePath), fileInfo.absoluteFilePath());
+}
+
 TEST(FileInfo, FileInfo)
 {
-    QnAbstractStorageResource::FileInfo fileWithExt("/some/path/file.ext", 42, /*isDir*/ false);
-    ASSERT_FALSE(fileWithExt.isDir());
-    ASSERT_EQ("file", fileWithExt.baseName());
-    ASSERT_EQ(QString("ext"), fileWithExt.extension());
-    ASSERT_EQ("/some/path", fileWithExt.absoluteDirPath());
-    ASSERT_EQ("file.ext", fileWithExt.fileName());
-    ASSERT_EQ(42, fileWithExt.size());
+    const std::vector<ExpectedFileInfo> expected = {
+        {false, "file", "ext", "/some/path", "file.ext", "/some/path/file.ext"},
+        {false, "file", "ext", "smb://user:password@host:port/some/path", "file.ext",
+            "smb://user:password@host:port/some/path/file.ext"},
+        {true, "dir", "", "/some/path/dir", "dir", "/some/path/dir"},
+        {true, "dir", "", "smb://user:password@host:port/some/path/dir", "dir",
+            "smb://user:password@host:port/some/path/dir"},
+    };
 
-    QnAbstractStorageResource::FileInfo smbFile(
-        "smb://user:password@host:port/some/path/file.ext", 42, /*isDir*/ false);
-    ASSERT_FALSE(smbFile.isDir());
-    ASSERT_EQ("file", smbFile.baseName());
-    ASSERT_EQ(QString("ext"), smbFile.extension());
-    ASSERT_EQ("smb://user:password@host:port/some/path", smbFile.absoluteDirPath());
-    ASSERT_EQ("file.ext", smbFile.fileName());
-    ASSERT_EQ(42, smbFile.size());
-
-    QnAbstractStorageResource::FileInfo dir("/some/path/dir", 0, /*isDir*/ true);
-    ASSERT_TRUE(dir.isDir());
-    ASSERT_EQ("dir", dir.baseName());
-    ASSERT_EQ(QString(), dir.extension());
-    ASSERT_EQ("/some/path/dir", dir.absoluteDirPath());
-    ASSERT_EQ("dir", dir.fileName());
-
-    QnAbstractStorageResource::FileInfo smbDir(
-        "smb://user:password@host:port/some/path/dir", 0, /*isDir*/ true);
-    ASSERT_TRUE(smbDir.isDir());
-    ASSERT_EQ("dir", smbDir.baseName());
-    ASSERT_EQ(QString(), smbDir.extension());
-    ASSERT_EQ("smb://user:password@host:port/some/path/dir", smbDir.absoluteDirPath());
-    ASSERT_EQ("dir", smbDir.fileName());
+    for (const auto& e: expected)
+    {
+        QnAbstractStorageResource::FileInfo fileInfo(e.absolutePath, 42, e.isDir);
+        assertFileInfo(fileInfo, e);
+    }
 }
