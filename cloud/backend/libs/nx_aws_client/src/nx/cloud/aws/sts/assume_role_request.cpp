@@ -1,7 +1,5 @@
 #include "assume_role_request.h"
 
-#include <nx/network/url/query_parse_helper.h>
-
 namespace nx::cloud::aws {
 
 namespace {
