@@ -294,12 +294,12 @@
 #include "nx/vms/server/system/nx1/info.h"
 #include <atomic>
 
-#include <nx/vms/server/metrics/camera_provider.h>
-#include <nx/vms/server/metrics/network_provider.h>
+#include <nx/vms/server/metrics/camera_controller.h>
+#include <nx/vms/server/metrics/network_controller.h>
 #include <nx/vms/server/metrics/rest_handlers.h>
-#include <nx/vms/server/metrics/server_provider.h>
-#include <nx/vms/server/metrics/storage_provider.h>
-#include <nx/vms/server/metrics/system_provider.h>
+#include <nx/vms/server/metrics/server_controller.h>
+#include <nx/vms/server/metrics/storage_controller.h>
+#include <nx/vms/server/metrics/system_controller.h>
 
 using namespace nx::vms::server;
 
@@ -4598,79 +4598,76 @@ void MediaServerProcess::loadResourceParamsData()
     }
 }
 
+// TODO: Should be moved into a resource file.
+static const QByteArray kMetricsAlarmRules(R"json({
+    "systems": {
+        "info": {
+            "recommendedMaxServers": { "calculate": "number 100" },
+            "servers": { "alarms": [
+                {
+                    "level": "warning",
+                    "condition": "ge servers recommendedMaxServers",
+                    "text": "The maximum number of {recommendedMaxServers} servers per system is reached. Create another system to use more servers"
+                }
+            ]},
+            "recommendedMaxCameras": { "calculate": "number 10000" },
+            "cameras": { "alarms": [
+                {
+                    "level": "warning",
+                    "condition": "ge servers recommendedMaxCameras",
+                    "text": "The maximum number of {recommendedMaxCameras} camera channels per system is reached. Create another system to use more cameras"
+                }
+            ]}
+        }
+    },
+    "servers": {
+        "state": {
+            "okStatus": { "calculate": "string Online" },
+            "status": { "alarms": [
+                {
+                    "level": "error",
+                    "condition": "ne status okStatus",
+                    "text": "Status is {status}"
+                }
+            ]}
+        }
+    },
+    "cameras": {
+        "info": {
+            "warningStatus": { "calculate": "string Unauthorized" },
+            "errorStatus": { "calculate": "string Offline" },
+            "status": { "alarms": [
+                {
+                    "level": "warning",
+                    "condition": "eq status warningStatus",
+                    "text": "Status is {status}"
+                },
+                {
+                    "level": "error",
+                    "condition": "eq status errorStatus",
+                    "text": "Status is {status}"
+                }
+            ]}
+        }
+    }
+})json");
+
 void MediaServerProcess::initMetricsController()
 {
-    m_metricsController = std::make_unique<nx::vms::utils::metrics::Controller>(
-        [](){ return (uint64_t) qnSyncTime->currentMSecsSinceEpoch() / 1000; });
+    using namespace nx::vms;
+    m_metricsController = std::make_unique<nx::vms::utils::metrics::SystemController>();
 
-    m_metricsController->registerGroup(
-        "systems",
-        std::make_unique<nx::vms::server::metrics::SystemProvider>(serverModule()));
+    m_metricsController->add(std::make_unique<server::metrics::SystemResourceController>(serverModule()));
+    m_metricsController->add(std::make_unique<server::metrics::ServerController>(serverModule()));
+    m_metricsController->add(std::make_unique<server::metrics::CameraController>(serverModule()));
+    m_metricsController->add(std::make_unique<server::metrics::StorageController>(serverModule()));
+    m_metricsController->add(std::make_unique<server::metrics::NetworkController>(commonModule()->moduleGUID()));
 
-    m_metricsController->registerGroup(
-        "servers",
-        std::make_unique<nx::vms::server::metrics::ServerProvider>(serverModule()));
+    api::metrics::SystemRules rules;
+    NX_CRITICAL(QJson::deserialize(kMetricsAlarmRules, &rules));
 
-    m_metricsController->registerGroup(
-        "cameras",
-        std::make_unique<nx::vms::server::metrics::CameraProvider>(serverModule()));
-
-    m_metricsController->registerGroup(
-        "storages",
-        std::make_unique<nx::vms::server::metrics::StorageProvider>(serverModule()));
-
-    m_metricsController->registerGroup(
-        "networks",
-        std::make_unique<nx::vms::server::metrics::NetworkProvider>(commonModule()->moduleGUID()));
-
-    // TODO: Should be moved into a resource file.
-    static const QByteArray kRules(R"json({
-        "systems": {
-            "servers": { "alarms": { "warning": ">100" } },
-            "offlineServers": { "alarms": { "error": ">0" } },
-            "offlineServerEvents": { "alarms": { "warning": ">10" } }
-        },
-        "servers": {
-            "cpuUsage": { "alarms": { "warning": ">50", "error": ">70" } },
-            "misc": {
-                "group": {
-                    "encoders": { "alarms": { "error": ">2" } }
-                }
-            }
-        },
-        "cameras": {
-            "status": { "alarms": { "warning": "Unauthorized", "error": "Offline" } },
-            "statusChanges": {
-                "name": "status changes in last hour",
-                "calculate": "count status",
-                "insert": "after status",
-                "alarms": { "warning": ">0", "error": ">2" }
-            },
-            "packetLossCount": { "alarms": { "warning": ">0", "error": ">5" } },
-            "conflictCount": { "alarms": { "warning": ">0", "error": ">5" } },
-            "primaryStream": {
-                "group": {
-                    "fpsDrop": {
-                        "name": "fps drop",
-                        "calculate": "sub targetFps actualFps",
-                        "insert": "after actualFps",
-                        "alarms": { "warning": ">2", "error": ">10" }
-                    },
-                    "bitrate": { "alarms": { "warning": "<1" } }
-                }
-            }
-        },
-        "storages": {
-            "status": { "alarms": { "warning": "Unauthorized", "error": "Offline" } },
-            "issues": { "alarms": { "warning": ">0", "error": ">10" } }
-        }
-    })json");
-
-    nx::vms::api::metrics::SystemRules rules;
-    NX_CRITICAL(QJson::deserialize(kRules, &rules));
     m_metricsController->setRules(std::move(rules));
-
-    m_metricsController->startMonitoring();
+    m_metricsController->start();
 }
 
 void MediaServerProcess::updateRootPassword()

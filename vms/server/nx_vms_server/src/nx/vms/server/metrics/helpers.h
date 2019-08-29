@@ -1,9 +1,21 @@
 #pragma once
 
 #include <core/resource/resource.h>
-#include <nx/vms/utils/metrics/resource_providers.h>
+#include <nx/vms/utils/metrics/resource_provider.h>
 
 namespace nx::vms::server::metrics {
+
+template<typename ResourceType>
+class ResourceDescription: public utils::metrics::ResourceDescription<ResourceType>
+{
+public:
+    using base = utils::metrics::ResourceDescription<ResourceType>;
+    using base::base;
+
+    QString id() const override { return this->resource->getId().toSimpleString(); };
+    QString name() const override { return this->resource->getName(); }
+    QString parent() const override { return this->resource->getParentId().toSimpleString(); }
+};
 
 template<typename ResourceType>
 utils::metrics::Watch<ResourceType> staticWatch()

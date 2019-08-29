@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/utils/metrics/controller.h>
+#include <nx/vms/utils/metrics/system_controller.h>
+#include <nx/vms/utils/metrics/resource_controller_impl.h>
 
 #include "test_providers.h"
 
@@ -12,389 +13,129 @@ void PrintTo(const QJsonValue& v, ::std::ostream* s)
 
 namespace nx::vms::utils::metrics::test {
 
-static const QByteArray kRulesExample(R"json({
-    "tests": {
-        "i": { "alarms": { "warning": 7, "error": 8 } },
-        "iChanges": {
-            "name": "i changes in 1h",
-            "calculate": "count i",
-            "insert": "after i",
-            "alarms": { "error": ">=1" }
-        },
-        "g": {
-            "group": {
-                "gt": { "alarms": { "warning": "text_b1", "error": "=world" } },
-                "gtChanges": {
-                    "name": "gt changes in 1h",
-                    "calculate": "count gt",
-                    "insert": "before gt",
-                    "alarms": { "warning": 2, "error": 10 }
-                }
-            }
-        }
-    }
-})json");
-
 class MetricsControllerTest: public ::testing::Test
 {
 public:
     MetricsControllerTest()
     {
-        auto provider = std::make_unique<TestResourceProvider>();
+        auto provider = std::make_unique<TestResourceController>();
         resourceProvider = provider.get();
 
-        controller.registerGroup("tests", std::move(provider));
-        controller.startMonitoring();
+        controller.add(std::move(provider));
+        controller.start();
 
         for (int id = 0; id <= 2; ++id)
             resources.push_back(resourceProvider->makeResource(id, /*isLocal*/ id % 2 == 0));
     }
 
 protected:
-    bool setRules(bool isEnabled = true)
-    {
-        NX_INFO(this, "%1 rules", isEnabled ? "Set" : "Clear");
-
-        api::metrics::SystemRules rules;
-        if (isEnabled && !QJson::deserialize(kRulesExample, &rules))
-            return false;
-
-        controller.setRules(rules);
-        return true;
-    }
-
-    void updateSomeValues()
-    {
-        NX_INFO(this, "Update values");
-
-        resources[0]->update("i", 7);
-        resources[0]->update("t", "hello");
-
-        resources[1]->update("gi", 9);
-        resources[1]->update("gt", "world");
-    }
-
-    static void checkParameter(
-        const api::metrics::ParameterGroupManifest& manifest,
-        const QString& id, const QString& name, size_t groupSize = 0)
-    {
-        EXPECT_EQ(id, manifest.id);
-        EXPECT_EQ(name, manifest.name);
-        EXPECT_EQ(groupSize, manifest.group.size());
-    }
-
-    void expectManifest(api::metrics::SystemManifest systemManifest)
-    {
-        NX_INFO(this, __func__);
-        EXPECT_EQ(1, systemManifest.size());
-
-        auto testManifest = systemManifest["tests"];
-        EXPECT_EQ(3, testManifest.size());
-
-        checkParameter(testManifest[0], "i", "int parameter");
-        checkParameter(testManifest[1], "t", "text parameter");
-
-        checkParameter(testManifest[2], "g", "group in resource", 2);
-        checkParameter(testManifest[2].group[0], "gi", "int parameter");
-        checkParameter(testManifest[2].group[1], "gt", "text parameter");
-    }
-
-    void expectManifestWithRules(api::metrics::SystemManifest systemManifest)
-    {
-        NX_INFO(this, __func__);
-        EXPECT_EQ(1, systemManifest.size());
-
-        auto testManifest = systemManifest["tests"];
-        EXPECT_EQ(4, testManifest.size());
-
-        checkParameter(testManifest[0], "i", "int parameter");
-        checkParameter(testManifest[1], "iChanges", "i changes in 1h");
-        checkParameter(testManifest[2], "t", "text parameter");
-
-        checkParameter(testManifest[3], "g", "group in resource", 3);
-        checkParameter(testManifest[3].group[0], "gi", "int parameter");
-        checkParameter(testManifest[3].group[1], "gtChanges", "gt changes in 1h");
-        checkParameter(testManifest[3].group[2], "gt", "text parameter");
-    }
-
-    template<typename Value>
-    static void checkParameter(
-        const std::map<QString /*id*/, api::metrics::ParameterGroupValues>& values,
-        const QString& id, const Value& expectedValue, api::metrics::Status expectedStatus = {})
-    {
-        const auto item = values.find(id);
-        ASSERT_TRUE(item != values.end()) << id.toStdString();
-
-        EXPECT_EQ(api::metrics::Value(expectedValue), item->second.value) << id.toStdString();
-        EXPECT_EQ(expectedStatus, item->second.status)
-            << id.toStdString() << " = " << item->second.status.toStdString();
-    }
-
-    void expectCurrentValues(api::metrics::SystemValues systemValues, bool includeRemote)
-    {
-
-        NX_INFO(this, "%1 includeRemote=%2", __func__, includeRemote);
-        EXPECT_EQ(1, systemValues.size());
-
-        auto testValues = systemValues["tests"];
-        EXPECT_EQ(includeRemote ? 3 : 2, testValues.size());
-
-        auto test0 = testValues["test_0"];
-        {
-            EXPECT_EQ("Test 0", test0.name);
-
-            EXPECT_EQ(3, test0.values.size());
-            checkParameter(test0.values, "i", 0);
-            checkParameter(test0.values, "t", "text_a0");
-
-            auto group = test0.values["g"].group;
-            EXPECT_EQ(2, group.size());
-            checkParameter(group, "gi", 10);
-            checkParameter(group, "gt", "text_b0");
-        }
-
-        auto test1 = testValues["test_1"];
-        if (includeRemote)
-        {
-            EXPECT_EQ("Test 1", test1.name);
-
-            EXPECT_EQ(3, test1.values.size());
-            checkParameter(test1.values, "i", 1);
-            checkParameter(test1.values, "t", "text_a1");
-
-            auto group = test1.values["g"].group;
-            EXPECT_EQ(2, group.size());
-            checkParameter(group, "gi", 11);
-            checkParameter(group, "gt", "text_b1");
-        }
-        else
-        {
-            EXPECT_EQ("", test1.name);
-            EXPECT_EQ(0, test1.values.size());
-        }
-
-        auto test2 = testValues["test_2"];
-        EXPECT_EQ("Test 2", test2.name);
-    }
-
-    void expectUpdatedValues(api::metrics::SystemValues systemValues, bool includeRemote)
-    {
-        NX_INFO(this, "%1 includeRemote=%2", __func__, includeRemote);
-        EXPECT_EQ(1, systemValues.size());
-
-        auto testValues = systemValues["tests"];
-        EXPECT_EQ(includeRemote ? 3 : 2, testValues.size());
-
-        auto test0 = testValues["test_0"];
-        {
-            EXPECT_EQ("Test 0", test0.name);
-
-            EXPECT_EQ(3, test0.values.size());
-            checkParameter(test0.values, "i", 7);
-            checkParameter(test0.values, "t", "hello");
-
-            auto group = test0.values["g"].group;
-            EXPECT_EQ(2, group.size());
-            checkParameter(group, "gi", 10);
-            checkParameter(group, "gt", "text_b0");
-        }
-
-        auto test1 = testValues["test_1"];
-        if (includeRemote)
-        {
-            EXPECT_EQ("Test 1", test1.name);
-
-            EXPECT_EQ(3, test1.values.size());
-            checkParameter(test1.values, "i", 1);
-            checkParameter(test1.values, "t", "text_a1");
-
-            auto group = test1.values["g"].group;
-            EXPECT_EQ(2, group.size());
-            checkParameter(group, "gi", 9);
-            checkParameter(group, "gt", "world");
-        }
-        else
-        {
-            EXPECT_EQ("", test1.name);
-            EXPECT_EQ(0, test1.values.size());
-        }
-
-        auto test2 = testValues["test_2"];
-        EXPECT_EQ("Test 2", test2.name);
-    }
-
-    void expectUpdatedValuesWithRules(api::metrics::SystemValues systemValues, bool includeRemote)
-    {
-        NX_INFO(this, "%1 includeRemote=%2", __func__, includeRemote);
-        EXPECT_EQ(1, systemValues.size());
-
-        auto testValues = systemValues["tests"];
-        EXPECT_EQ(includeRemote ? 3 : 2, testValues.size());
-
-        auto test0 = testValues["test_0"];
-        {
-            EXPECT_EQ("Test 0", test0.name);
-
-            EXPECT_EQ(4, test0.values.size());
-            checkParameter(test0.values, "i", 7, "warning");
-            checkParameter(test0.values, "iChanges", 1, "error");
-            checkParameter(test0.values, "t", "hello");
-
-            auto group = test0.values["g"].group;
-            EXPECT_EQ(3, group.size());
-            checkParameter(group, "gi", 10);
-            checkParameter(group, "gtChanges", 0);
-            checkParameter(group, "gt", "text_b0");
-        }
-
-        auto test1 = testValues["test_1"];
-        if (includeRemote)
-        {
-            EXPECT_EQ("Test 1", test1.name);
-
-            EXPECT_EQ(4, test1.values.size());
-            checkParameter(test1.values, "i", 1);
-            checkParameter(test1.values, "iChanges", 0);
-            checkParameter(test1.values, "t", "text_a1");
-
-            auto group = test1.values["g"].group;
-            EXPECT_EQ(3, group.size());
-            checkParameter(group, "gi", 9);
-            checkParameter(group, "gtChanges", 1);
-            checkParameter(group, "gt", "world", "error");
-        }
-        else
-        {
-            EXPECT_EQ("", test1.name);
-            EXPECT_EQ(0, test1.values.size());
-        }
-
-        auto test2 = testValues["test_2"];
-        EXPECT_EQ("Test 2", test2.name);
-    }
-
-    static void checkParameterTimeline(
-        const std::map<QString /*id*/, api::metrics::ParameterGroupValues>& values,
-        const QString& id, int expectedValueCount)
-    {
-        const auto item = values.find(id);
-        ASSERT_TRUE(item != values.end()) << id.toStdString();
-
-        const auto value = item->second.value;
-        ASSERT_EQ(Value::Object, value.type()) << id.toStdString();
-        ASSERT_EQ(expectedValueCount, value.toObject().size()) << id.toStdString();
-    }
-
-    void expectTimelineValues(
-        api::metrics::SystemValues systemValues,
-        bool isUpdated, bool includeRemote)
-    {
-        NX_INFO(this, "%1 isUpdated=%2, includeRemote=%3", __func__, isUpdated, includeRemote);
-        EXPECT_EQ(1, systemValues.size());
-
-        auto testValues = systemValues["tests"];
-        EXPECT_EQ(includeRemote ? 3 : 2, testValues.size());
-
-        auto test0 = testValues["test_0"];
-        {
-            EXPECT_EQ("Test 0", test0.name);
-
-            EXPECT_EQ(3, test0.values.size());
-            checkParameterTimeline(test0.values, "i", isUpdated ? 2 : 1);
-            checkParameterTimeline(test0.values, "t", isUpdated ? 2 : 1);
-
-            auto group = test0.values["g"].group;
-            EXPECT_EQ(2, group.size());
-            checkParameterTimeline(group, "gi", 1);
-            checkParameterTimeline(group, "gt", 1);
-        }
-
-        auto test1 = testValues["test_1"];
-        if (includeRemote)
-        {
-            EXPECT_EQ("Test 1", test1.name);
-
-            EXPECT_EQ(3, test1.values.size());
-            checkParameterTimeline(test1.values, "i", 1);
-            checkParameterTimeline(test1.values, "t", 1);
-
-            auto group = test1.values["g"].group;
-            EXPECT_EQ(2, group.size());
-            checkParameterTimeline(group, "gi", isUpdated ? 2 : 1);
-            checkParameterTimeline(group, "gt", isUpdated ? 2 : 1);
-        }
-        else
-        {
-            EXPECT_EQ("", test1.name);
-            EXPECT_EQ(0, test1.values.size());
-        }
-    }
-
-protected:
-    Controller controller;
-    TestResourceProvider* resourceProvider = nullptr;
-    std::vector<std::shared_ptr<TestResource>> resources;
+    SystemController controller;
+    TestResourceController* resourceProvider = nullptr;
+    std::vector<TestResource*> resources;
 };
 
 TEST_F(MetricsControllerTest, Manifest)
 {
-    expectManifest(controller.manifest(Controller::none));
+    auto systemManifest = controller.manifest();
+    EXPECT_EQ(systemManifest.size(), 1);
 
-    ASSERT_TRUE(setRules());
+    auto testManifest = systemManifest["tests"];
+    ASSERT_EQ(testManifest.size(), 2);
 
-    expectManifestWithRules(controller.manifest(Controller::applyRules));
-    expectManifest(controller.manifest(Controller::none));
+    const auto group1 = testManifest[0];
+    EXPECT_EQ(group1.id, "g1");
+    EXPECT_EQ(group1.name, "group 1");
+    ASSERT_EQ(group1.values.size(), 2);
+
+    EXPECT_EQ(group1.values[0].id, "i");
+    EXPECT_EQ(group1.values[0].name, "int parameter");
+    EXPECT_EQ(group1.values[0].display, "table&panel");
+    EXPECT_EQ(group1.values[1].id, "t");
+    EXPECT_EQ(group1.values[1].name, "text parameter");
+    EXPECT_EQ(group1.values[1].display, "panel");
+
+    const auto group2 = testManifest[1];
+    EXPECT_EQ(group2.id, "g2");
+    EXPECT_EQ(group2.name, "group 2");
+    ASSERT_EQ(group2.values.size(), 2);
+
+    EXPECT_EQ(group2.values[0].id, "i");
+    EXPECT_EQ(group2.values[0].name, "int parameter");
+    EXPECT_EQ(group2.values[0].display, "panel");
+    EXPECT_EQ(group2.values[1].id, "t");
+    EXPECT_EQ(group2.values[1].name, "text parameter");
+    EXPECT_EQ(group2.values[1].display, "table&panel");
 }
 
-TEST_F(MetricsControllerTest, Values)
+TEST_F(MetricsControllerTest, CurrentValues)
 {
-    expectCurrentValues(
-        controller.values(Controller::none),
-        /*includeRemote*/ false);
-    expectTimelineValues(
-        controller.values(Controller::none, std::chrono::milliseconds::zero()),
-        /*isUpdated*/ false, /*includeRemote*/ false);
+    {
+        auto systemValues = controller.values();
+        EXPECT_EQ(systemValues.size(), 1);
 
-    expectCurrentValues(
-        controller.values(Controller::includeRemote),
-        /*includeRemote*/ true);
-    expectTimelineValues(
-        controller.values(Controller::includeRemote, std::chrono::milliseconds::zero()),
-        /*isUpdated*/ false, /*includeRemote*/ true);
+        auto testResources = systemValues["tests"];
+        ASSERT_EQ(testResources.size(), 3);
 
-    nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
-    timeShift.applyRelativeShift(std::chrono::minutes(10));
-    updateSomeValues();
+        auto resource1 = testResources["R0"];
+        EXPECT_EQ(resource1.name, "Resource 0");
+        EXPECT_EQ(resource1.parent, "SYSTEM_X");
+        ASSERT_EQ(resource1.values.size(), 2);
+        {
+            auto group1 = resource1.values["g1"];
+            ASSERT_EQ(group1.size(), 2);
+            EXPECT_EQ(group1["i"], 1);
+            EXPECT_EQ(group1["t"], "first of 0");
 
-    expectUpdatedValues(
-        controller.values(Controller::none),
-        /*includeRemote*/ false);
-    expectTimelineValues(
-        controller.values(Controller::none, std::chrono::milliseconds::zero()),
-        /*isUpdated*/ true, /*includeRemote*/ false);
+            auto group2 = resource1.values["g2"];
+            ASSERT_EQ(group2.size(), 2);
+            EXPECT_EQ(group2["i"], 2);
+            EXPECT_EQ(group2["t"], "second of 0");
+        }
 
-    expectUpdatedValues(
-        controller.values(Controller::includeRemote),
-        /*includeRemote*/ true);
-    expectTimelineValues(
-        controller.values(Controller::includeRemote, std::chrono::milliseconds::zero()),
-        /*isUpdated*/ true, /*includeRemote*/ true);
+        auto resource2 = testResources["R1"];
+        EXPECT_EQ(resource2.name, "Resource 1");
+        EXPECT_EQ(resource2.parent, "SYSTEM_X");
+        ASSERT_EQ(resource2.values.size(), 2);
+        {
+            auto group1 = resource2.values["g1"];
+            ASSERT_EQ(group1.size(), 2);
+            EXPECT_EQ(group1["i"], 11);
+            EXPECT_EQ(group1["t"], "first of 1");
 
-    ASSERT_TRUE(setRules());
+            auto group2 = resource2.values["g2"];
+            ASSERT_EQ(group2.size(), 2);
+            EXPECT_EQ(group2["i"], 12);
+            EXPECT_EQ(group2["t"], "second of 1");
+        }
 
-    expectUpdatedValuesWithRules(
-        controller.values(Controller::applyRules),
-        /*includeRemote*/ false);
-    expectUpdatedValues(
-        controller.values(Controller::none),
-        /*includeRemote*/ false);
+        auto resource3 = testResources["R2"];
+        EXPECT_EQ(resource3.name, "Resource 2");
+        EXPECT_EQ(resource3.parent, "SYSTEM_X");
+        ASSERT_EQ(resource3.values.size(), 2);
+    }
 
-    expectUpdatedValuesWithRules(
-        controller.values({Controller::includeRemote, Controller::applyRules}),
-        /*includeRemote*/ true);
-    expectUpdatedValues(
-        controller.values(Controller::includeRemote),
-        /*includeRemote*/ true);
+    resources[0]->update("i1", 666);
+    resources[1]->update("t2", "hello");
+
+    {
+        auto systemValues = controller.values();
+        EXPECT_EQ(systemValues.size(), 1);
+
+        auto testResources = systemValues["tests"];
+        ASSERT_EQ(testResources.size(), 3);
+
+        auto resource1 = testResources["R0"];
+        EXPECT_EQ(resource1.values["g1"]["i"], 666);
+        EXPECT_EQ(resource1.values["g1"]["t"], "first of 0");
+        EXPECT_EQ(resource1.values["g2"]["i"], 2);
+        EXPECT_EQ(resource1.values["g2"]["t"], "second of 0");
+
+        auto resource2 = testResources["R1"];
+        EXPECT_EQ(resource2.values["g1"]["i"], 11);
+        EXPECT_EQ(resource2.values["g1"]["t"], "first of 1");
+        EXPECT_EQ(resource2.values["g2"]["i"], 12);
+        EXPECT_EQ(resource2.values["g2"]["t"], "hello");
+    }
 }
 
 } // namespace nx::vms::utils::metrics::test

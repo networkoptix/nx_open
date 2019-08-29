@@ -8,7 +8,7 @@ void testUpperTemplate(const QString& template_, const QString& expectedResult)
 {
     ASSERT_EQ(
         expectedResult,
-        stringTemplate(template_, [](auto n) { return n.toString().toUpper(); }));
+        stringTemplate(template_, [](const auto& n) { return n.toUpper(); }));
 }
 
 TEST(stringTemplate, main)

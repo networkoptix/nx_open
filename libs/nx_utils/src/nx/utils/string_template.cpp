@@ -4,7 +4,7 @@ namespace nx::utils {
 
 QString stringTemplate(
     const QString& template_,
-    const std::function<QString(QStringRef name)> resolve)
+    const std::function<QString(const QString& name)> resolve)
 {
     QString result;
     result.reserve(template_.size());
@@ -21,7 +21,7 @@ QString stringTemplate(
             break; // TODO: throw exception about unpaired brace at open?
 
         result += template_.midRef(processed, open - processed);
-        result += resolve(template_.midRef(open + 1, close - open - 1));
+        result += resolve(template_.mid(open + 1, close - open - 1));
         processed = close + 1;
     }
 

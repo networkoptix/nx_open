@@ -55,7 +55,7 @@
 #include <nx/vms/server/command_line_parameters.h>
 #include <nx/vms/server/discovery/discovery_monitor.h>
 #include <system_log/system_event_log_reader.h>
-#include <nx/vms/utils/metrics/controller.h>
+#include <nx/vms/utils/metrics/system_controller.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -306,7 +306,7 @@ private:
     std::unique_ptr<RaidEventLogReader> m_raidEventLogReader;
     std::unique_ptr<nx::network::upnp::PortMapper> m_upnpPortMapper;
     std::function<void(QnMediaServerModule*)> m_setupModuleCallback;
-    std::unique_ptr<nx::vms::utils::metrics::Controller> m_metricsController;
+    std::unique_ptr<nx::vms::utils::metrics::SystemController> m_metricsController;
 
     std::atomic<bool> m_installUpdateRequestReceived{false};
     std::atomic<bool> m_storageInitializationDone{false};

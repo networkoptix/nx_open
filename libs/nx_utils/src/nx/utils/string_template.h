@@ -8,6 +8,6 @@ namespace nx::utils {
  */
 NX_UTILS_API QString stringTemplate(
     const QString& template_,
-    const std::function<QString(QStringRef name)> resolve);
+    const std::function<QString(const QString& name)> resolve);
 
 } // namespace nx::utils
