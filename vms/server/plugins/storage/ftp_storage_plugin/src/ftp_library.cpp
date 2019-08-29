@@ -12,7 +12,7 @@
 #include <ctime>
 #include <cstdlib>
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
 #   include <sys/stat.h>
 #endif
 
@@ -437,7 +437,7 @@ long long getFileSize(const char *fname)
     CloseHandle(hFile);
     return s.QuadPart;
 
-#elif defined __linux__
+#elif defined(__linux__) || defined(__APPLE__)
 
     struct stat st;
     if (stat(fname, &st) == -1)

@@ -49,9 +49,11 @@
 #endif
 
 #if defined(__APPLE__)
-#define off64_t __darwin_off_t
-#define fseeko64 fseeko
-#define fopen64 fopen
+    #ifndef off64_t
+        #define off64_t __darwin_off_t
+    #endif
+    #define fseeko64 fseeko
+    #define fopen64 fopen
 #endif
 
 #ifndef NOSSL
