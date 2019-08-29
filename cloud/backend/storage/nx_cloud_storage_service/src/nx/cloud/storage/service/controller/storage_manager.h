@@ -147,9 +147,7 @@ private:
 
     std::optional<nx::geo_ip::Location> resolveLocation(const std::string& ipAddress);
 
-    void calculateDataUsage(
-        api::Storage storage,
-        nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)> handler);
+    void calculateDataUsage(api::Storage storage, GetStorageHandler handler);
 
     std::shared_ptr<s3::DataUsageCalculator> createDataUsageCalculator();
     void removeDataUsageCalculator(const std::shared_ptr<s3::DataUsageCalculator>& calculator);

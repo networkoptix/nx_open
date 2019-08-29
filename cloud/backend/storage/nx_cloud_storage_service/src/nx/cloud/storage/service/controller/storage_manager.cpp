@@ -477,9 +477,7 @@ std::optional<nx::geo_ip::Location> StorageManager::resolveLocation(const std::s
     return std::nullopt;
 }
 
-void StorageManager::calculateDataUsage(
-    Storage storage,
-    nx::utils::MoveOnlyFunc<void(Result, Storage)> handler)
+void StorageManager::calculateDataUsage(Storage storage, GetStorageHandler handler)
 {
     auto calculator = createDataUsageCalculator();
 
