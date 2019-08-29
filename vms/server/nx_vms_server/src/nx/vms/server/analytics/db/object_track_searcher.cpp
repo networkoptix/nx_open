@@ -111,94 +111,6 @@ template void ObjectTrackSearcher::addTimePeriodToFilter<std::chrono::seconds>(
     const TimeRangeFields& timeRangeFields,
     nx::sql::Filter* sqlFilter);
 
-bool ObjectTrackSearcher::satisfiesFilter(
-    const Filter& filter, const ObjectTrack& track)
-{
-    using namespace std::chrono;
-
-    if (!filter.objectTrackId.isNull() &&
-        track.id != filter.objectTrackId)
-    {
-        return false;
-    }
-
-    // Matching every device if device list is empty.
-    if (!filter.deviceIds.empty() &&
-        !nx::utils::contains(filter.deviceIds, track.deviceId))
-    {
-        return false;
-    }
-
-    if (!(microseconds(track.lastAppearanceTimeUs) >= filter.timePeriod.startTime() &&
-          (filter.timePeriod.isInfinite() ||
-              microseconds(track.firstAppearanceTimeUs) < filter.timePeriod.endTime())))
-    {
-        return false;
-    }
-
-    if (!filter.objectTypeId.empty() &&
-        std::find(
-            filter.objectTypeId.begin(), filter.objectTypeId.end(),
-            track.objectTypeId) == filter.objectTypeId.end())
-    {
-        return false;
-    }
-
-    if (!filter.freeText.isEmpty() &&
-        !matchAttributes(track.attributes, filter.freeText))
-    {
-        return false;
-    }
-
-    // Checking the track.
-    if (filter.boundingBox)
-    {
-        bool instersects = false;
-        for (const auto& position: track.objectPositionSequence)
-        {
-            if (rectsIntersectToSearchPrecision(*filter.boundingBox, position.boundingBox))
-            {
-                instersects = true;
-                break;
-            }
-        }
-
-        if (!instersects)
-            return false;
-    }
-
-    return true;
-}
-
-bool ObjectTrackSearcher::matchAttributes(
-    const std::vector<nx::common::metadata::Attribute>& attributes,
-    const QString& filter)
-{
-    const auto filterWords = filter.split(L' ', QString::SkipEmptyParts);
-    // Attributes have to contain all words.
-    for (const auto& filterWord: filterWords)
-    {
-        // Matching given filter anywhere in the text.
-        const auto mask = "*" + filterWord + "*";
-
-        bool found = false;
-        for (const auto& attribute: attributes)
-        {
-            if (wildcardMatch(mask, attribute.name, MatchMode::caseInsensitive) ||
-                wildcardMatch(mask, attribute.value, MatchMode::caseInsensitive))
-            {
-                found = true;
-                break;
-            }
-        }
-
-        if (!found)
-            return false;
-    }
-
-    return true;
-}
-
 static constexpr char kBoxFilteredTable[] = "%boxFilteredTable%";
 static constexpr char kFromBoxFilteredTable[] = "%fromBoxFilteredTable%";
 static constexpr char kJoinBoxFilteredTable[] = "%joinBoxFilteredTable%";
@@ -384,7 +296,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::loadTracks(
     {
         auto track = loadTrack(
             query,
-            [this](const auto& track) { return satisfiesFilter(m_filter, track); });
+            [this](const auto& track) { return m_filter.acceptsTrack(track); });
 
         if (!track)
             continue;

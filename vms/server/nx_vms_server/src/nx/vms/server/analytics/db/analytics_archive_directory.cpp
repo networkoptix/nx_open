@@ -6,10 +6,10 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <analytics/db/config.h>
+#include <analytics/db/analytics_db_utils.h>
 
 #include "attributes_dao.h"
 #include "object_type_dao.h"
-#include "serializers.h"
 
 namespace nx::analytics::db {
 

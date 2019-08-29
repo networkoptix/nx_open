@@ -115,6 +115,7 @@ struct Filter
     bool acceptsAttributes(const std::vector<nx::common::metadata::Attribute>& attributes) const;
     bool acceptsMetadata(const nx::common::metadata::ObjectMetadata& metadata,
         bool checkBoundingBox = true) const;
+    bool acceptsTrack(const ObjectTrack& track) const;
 
     bool operator==(const Filter& right) const;
     bool operator!=(const Filter& right) const;
