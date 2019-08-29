@@ -50,7 +50,7 @@ private:
 
     db::api::CdbClient* createCdbClient(
         nx::utils::MoveOnlyFunc<void(bool)> handler);
-    ReadStorageContext removeCdbClient(db::api::CdbClient* cdbClient);
+    ReadStorageContext takeCdbClientContext(db::api::CdbClient* cdbClient);
 
 private:
     const conf::CloudDb& m_settings;

@@ -12,7 +12,23 @@ namespace nx::cloud::storage::service::controller {
 
 namespace {
 
-QString toString(const db::api::UserAuthorization& userAuth)
+static std::vector<nx::cloud::db::api::SystemAccessLevelRequest> prepareBatchRequest(
+    const std::vector<std::string> systemIds,
+    const nx::cloud::db::api::UserAuthorization& userAuth)
+{
+    std::vector<nx::cloud::db::api::SystemAccessLevelRequest> batchRequest;
+    std::transform(
+        systemIds.begin(),
+        systemIds.end(),
+        std::back_inserter(batchRequest),
+        [&userAuth](const auto& systemId)
+        {
+            return nx::cloud::db::api::SystemAccessLevelRequest{systemId, userAuth};
+        });
+    return batchRequest;
+}
+
+static QString toString(const db::api::UserAuthorization& userAuth)
 {
     return lm("{requestMethod: %1, requestAuthorization: %2}")
         .args(userAuth.requestMethod, userAuth.requestAuthorization);
@@ -54,23 +70,28 @@ void AccessManager::readStorageAllowed(
 
     auto cdbClient = createCdbClient(std::move(handler));
 
-    // TODO use batch request when it is implemented
     cdbClient->authProvider()->getSystemAccessLevel(
-        storage.systems.front(),
-        userAuth,
-        [this, userAuth, cdbClient, systemId = storage.systems.front()](
+        prepareBatchRequest(storage.systems, userAuth),
+        [this, userAuth, cdbClient](
             auto cdbResult,
-            auto systemAccess)
+            auto systemAccessLevels)
         {
-            auto context = removeCdbClient(cdbClient);
+            auto context = takeCdbClientContext(cdbClient);
             if (cdbResult != db::api::ResultCode::ok)
             {
-                NX_ERROR(this, "cloud_db: getSystemAccess: systemId = %1, userAuth = %2"
-                    " failed with result code: %3",
-                    systemId, toString(userAuth), db::api::toString(cdbResult));
+                NX_VERBOSE(this, "cloud_db: getSystemAccessLevel: userAuth = %1"
+                    " failed with result code: %2",
+                    toString(userAuth), db::api::toString(cdbResult));
+                return context.handler(false);
             }
 
-            return context.handler(systemAccess.accessRole > db::api::SystemAccessRole::disabled);
+            auto it = std::find_if(systemAccessLevels.begin(), systemAccessLevels.end(),
+                [](const auto& systemAccess)
+                {
+                    return systemAccess.accessRole > db::api::SystemAccessRole::disabled;
+                });
+
+            return context.handler(it != systemAccessLevels.end());
         });
 }
 
@@ -105,7 +126,7 @@ db::api::CdbClient* AccessManager::createCdbClient(
     return cdbClientPtr;
 }
 
-AccessManager::ReadStorageContext AccessManager::removeCdbClient(
+AccessManager::ReadStorageContext AccessManager::takeCdbClientContext(
     db::api::CdbClient* cdbClient)
 {
     QnMutexLocker lock(&m_mutex);
