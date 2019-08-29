@@ -366,18 +366,19 @@ void StorageManager::getCredentialsForStorage(
         QnUuid::createUuid().toSimpleString().toStdString();
     request.durationSeconds = (int) m_settings.aws().storageCredentialsDuration.count();
 
+    NX_VERBOSE(this, "getCredentials for storage %1", storage.id);
+
     m_stsClient->assumeRole(
         request,
         [this, handler = std::move(handler), storage = std::move(storage)](
             auto awsResult,
             auto assumeRoleResult)
         {
+            NX_VERBOSE(this, "sts:AssumeRole for storage %1 result: %2, %3",
+                storage.id, aws::toString(awsResult.code()), awsResult.text());
+
             if (!awsResult.ok())
-            {
-                NX_INFO(this, "sts:AssumeRole failed: %1, %2",
-                    aws::toString(awsResult.code()), awsResult.text());
                 return handler(utils::toResult(awsResult), StorageCredentials());
-            }
 
             StorageCredentials credentials;
             credentials.login = std::move(assumeRoleResult.credentials.accessKeyId);
@@ -455,7 +456,7 @@ std::pair<Result, Bucket> StorageManager::findClosestBucket(
         Result error(
             ResultCode::internalError,
             "No available buckets to use for adding storage");
-        NX_ERROR(this, error.error);
+        NX_WARNING(this, error.error);
         return std::make_pair(std::move(error), Bucket());
     }
 

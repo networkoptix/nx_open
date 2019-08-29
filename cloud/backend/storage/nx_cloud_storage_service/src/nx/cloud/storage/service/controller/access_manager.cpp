@@ -38,12 +38,15 @@ static QString toString(const db::api::UserAuthorization& userAuth)
 
 static ResultCode toResultCode(db::api::ResultCode resultCode)
 {
+    // TODO if resultCode == notfound should unauthorized be returned?
     switch (resultCode)
     {
         case db::api::ResultCode::ok:
             return api::ResultCode::ok;
         case db::api::ResultCode::notAuthorized:
         case db::api::ResultCode::forbidden:
+        case db::api::ResultCode::notFound:
+        case db::api::ResultCode::accountBlocked:
             return api::ResultCode::unauthorized;
         default:
             return api::ResultCode::internalError;
@@ -84,8 +87,8 @@ void AccessManager::readStorageAllowed(
     const Storage& storage,
     ReadStorageAllowedHandler handler)
 {
-    auto accountOwner = getAccountEmail(authInfo);
-    if (accountOwner == storage.owner)
+    auto accountEmail = getAccountEmail(authInfo);
+    if (accountEmail == storage.owner)
         return handler(ResultCode::ok);
 
     // Non-owner trying to access storage, check by user's access to a system in the storage
@@ -102,7 +105,7 @@ void AccessManager::readStorageAllowed(
 
     readStorageContext.cdbClient->authProvider()->getSystemAccessLevel(
         prepareBatchRequest(storage.systems, userAuth),
-        [this, userAuth, cdbClient = readStorageContext.cdbClient.get()](
+        [this, userAuth, cdbClient = readStorageContext.cdbClient.get(), accountEmail](
             auto cdbResult,
             auto systemAccessLevels)
         {
@@ -111,8 +114,8 @@ void AccessManager::readStorageAllowed(
             {
                 Result error(
                     toResultCode(cdbResult),
-                    lm("cloud_db: getSystemAccessLevel failed with result code: %1")
-                        .arg(db::api::toString(cdbResult)).toStdString());
+                    lm("cloud_db: getSystemAccessLevel for user %1 failed with result code: %2")
+                        .args(accountEmail, db::api::toString(cdbResult)).toStdString());
                 NX_VERBOSE(this, "%1, userAuth was %2", error, toString(userAuth));
                 return context.handler(std::move(error));
             }
