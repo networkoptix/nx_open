@@ -12,12 +12,12 @@ bool NX_UTILS_API convert(const QString& value, std::string* outObject);
 bool NX_UTILS_API convert(const QString& value, int* outObject);
 
 template<typename T>
-bool convert(const QString& value, T* outObject)
+bool convert(const QString& /*value*/, T* /*outObject*/)
 {
     return false;
 }
 
-} //namespace detail
+} // namespace detail
 
 class NX_UTILS_API UrlQuery
 {
