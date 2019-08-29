@@ -53,7 +53,8 @@ public:
     QString requestUrl() const;
 
     template<typename T>
-    boost::optional<T> parameter(const QString& parameterName, int channel = kNoChannel) const
+    boost::optional<T> parameter(
+        const QString& /*parameterName*/, int /*channel*/ = kNoChannel) const
     {
         static_assert(std::is_same<T, int>::value
             || std::is_same<T, double>::value

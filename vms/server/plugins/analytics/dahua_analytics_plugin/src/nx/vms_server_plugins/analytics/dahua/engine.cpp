@@ -90,37 +90,40 @@ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/
 {
 }
 
-StringMapResult Engine::setSettings(const IStringMap* /*settings*/)
+void Engine::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
-    return nullptr;
 }
 
-SettingsResponseResult Engine::pluginSideSettings() const
+void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
-MutableDeviceAgentResult Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
     if (!isCompatible(deviceInfo))
-        return nullptr;
+        return;
 
-    const nx::vms::api::analytics::DeviceAgentManifest deviceAgentParsedManifest
-        = fetchDeviceAgentParsedManifest(deviceInfo);
+    const nx::vms::api::analytics::DeviceAgentManifest deviceAgentParsedManifest =
+        fetchDeviceAgentParsedManifest(deviceInfo);
 
     if (deviceAgentParsedManifest.supportedEventTypeIds.isEmpty())
-        return nullptr;
+    {
+        NX_DEBUG(this, "Supported Event Type list is empty for the Device %1 (%2)",
+            deviceInfo->name(), deviceInfo->id());
+        return;
+    }
 
-    return new DeviceAgent(this, deviceInfo, deviceAgentParsedManifest);
+    *outResult = new DeviceAgent(this, deviceInfo, deviceAgentParsedManifest);
 }
 
-StringResult Engine::manifest() const
+void Engine::getManifest(Result<const IString*>* outResult) const
 {
     if (m_jsonManifest.isEmpty())
-        return error(ErrorCode::otherError, "Engine manifest is empty");
-
-    return new nx::sdk::String(m_jsonManifest);
+        *outResult = error(ErrorCode::otherError, "Engine manifest is empty");
+    else
+        *outResult = new nx::sdk::String(m_jsonManifest);
 }
 
 QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
@@ -208,9 +211,8 @@ const EngineManifest& Engine::parsedManifest() const
     return m_parsedManifest;
 }
 
-Result<void> Engine::executeAction(IAction* /*action*/)
+void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
 {
-    return {};
 }
 
 void Engine::setHandler(IHandler* /*handler*/)

@@ -140,7 +140,9 @@ private slots:
         nx::vms::api::EventReason reason);
     void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
     void at_archiveBackupFinished(qint64 backedUpToMs, nx::vms::api::EventReason code);
+    void at_checkAnalyticsUsed();
     void at_timer();
+    void writeServerStartedEvent();
     void at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module);
 
     void at_appStarted();
@@ -153,7 +155,6 @@ private slots:
     void at_serverPropertyChanged(const QnResourcePtr& resource, const QString& key);
 
 private:
-    void writeServerStartedEvent();
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraChangesIfNeeded();
     void moveHandlingCameras();
@@ -270,7 +271,9 @@ private:
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     bool m_enableMultipleInstances = false;
     QnMediaServerResourcePtr m_mediaServer;
+    std::unique_ptr<QTimer> m_checkAnalyticsTimer;
     std::unique_ptr<QTimer> m_generalTaskTimer;
+    std::unique_ptr<QTimer> m_serverStartedTimer;
     std::unique_ptr<QTimer> m_udtInternetTrafficTimer;
     std::unique_ptr<QTimer> m_createDbBackupTimer;
     QVector<QString> m_hardwareIdHlist;
@@ -306,4 +309,5 @@ private:
     std::unique_ptr<nx::vms::utils::metrics::Controller> m_metricsController;
 
     std::atomic<bool> m_installUpdateRequestReceived{false};
+    std::atomic<bool> m_storageInitializationDone{false};
 };

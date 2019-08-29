@@ -1,7 +1,4 @@
-/**********************************************************
-* 04 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "dir_contents_manager.h"
 
@@ -10,7 +7,6 @@
 #include <cstring>
 
 #include "dir_iterator.h"
-
 
 static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
 static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;

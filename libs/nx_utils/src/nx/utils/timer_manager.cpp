@@ -394,6 +394,7 @@ StandaloneTimerManager::TaskContext::TaskContext(MoveOnlyFunc<void(TimerId)> _fu
     func(std::move(_func)),
     singleShot(true)
 {
+    NX_CRITICAL(func);
 }
 
 StandaloneTimerManager::TaskContext::TaskContext(
@@ -404,6 +405,7 @@ StandaloneTimerManager::TaskContext::TaskContext(
     singleShot(false),
     repeatPeriod(_repeatPeriod)
 {
+    NX_CRITICAL(func);
 }
 
 std::chrono::milliseconds parseTimerDuration(

@@ -15,12 +15,12 @@ struct NX_VMS_API ActionBuilder
 public:
     QnUuid id;
     QString actionType;
-    QList<QList<Field>> fieldBlocks;
+    QList<Field> fields;
     std::chrono::seconds interval = std::chrono::seconds(0);
 };
 
 #define nx_vms_api_rules_ActionBuilder_Fields \
-    (id)(actionType)(fieldBlocks)(interval)
+    (id)(actionType)(fields)(interval)
 
 QN_FUSION_DECLARE_FUNCTIONS(ActionBuilder, (json), NX_VMS_API)
 

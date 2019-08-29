@@ -85,18 +85,18 @@ TEST_F(HttpClientPoolTest, GeneralTest)
     int requestsFinished = 0;
 
     QObject::connect(
-        httpPool.get(), &nx::network::http::ClientPool::done,
+        httpPool.get(), &nx::network::http::ClientPool::requestIsDone,
         httpPool.get(),
-        [&](int /*handle*/, nx::network::http::AsyncHttpClientPtr client)
+        [&](nx::network::http::ClientPool::ContextPtr context)
     {
-        ASSERT_FALSE(client->failed());
-        ASSERT_EQ(client->response()->statusLine.statusCode, nx::network::http::StatusCode::ok);
-        QByteArray msgBody = client->fetchMessageBodyBuffer();
+        ASSERT_TRUE(context->hasResponse());
+        ASSERT_EQ(context->response.statusLine.statusCode, nx::network::http::StatusCode::ok);
+        QByteArray msgBody = context->response.messageBody;
         ASSERT_TRUE(msgBody.startsWith("SimpleTest"));
         if (msgBody == "SimpleTest2")
-            ASSERT_TRUE(client->contentType() == QByteArray("application/text2"));
+            ASSERT_TRUE(context->response.contentType == QByteArray("application/text2"));
         else
-            ASSERT_TRUE(client->contentType() ==  QByteArray("application/text"));
+            ASSERT_TRUE(context->response.contentType ==  QByteArray("application/text"));
 
         QnMutexLocker lock(&mutex);
         ++requestsFinished;
@@ -137,12 +137,11 @@ TEST_F(HttpClientPoolTest, terminateTest)
     QSet<int> requests;
 
     QObject::connect(
-        httpPool.get(), &nx::network::http::ClientPool::done,
+        httpPool.get(), &nx::network::http::ClientPool::requestIsDone,
         httpPool.get(),
-        [&](int /*handle*/, nx::network::http::AsyncHttpClientPtr client)
+        [&](nx::network::http::ClientPool::ContextPtr)
     {
         QnMutexLocker lock(&mutex);
-        client->fetchMessageBodyBuffer();
         ++requestsFinished;
         waitCond.wakeAll();
     }, Qt::DirectConnection);

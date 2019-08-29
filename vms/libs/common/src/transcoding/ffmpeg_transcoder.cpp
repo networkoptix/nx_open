@@ -68,7 +68,7 @@ static QAtomicInt QnFfmpegTranscoder_count = 0;
 
 QnFfmpegTranscoder::QnFfmpegTranscoder(const Config& config, nx::metrics::Storage* metrics)
 :
-    QnTranscoder(metrics),
+    QnTranscoder(config.decoderConfig, metrics),
     m_config(config),
     m_videoEncoderCodecCtx(0),
     m_audioEncoderCodecCtx(0),

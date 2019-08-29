@@ -278,21 +278,22 @@ TEST_F(MediaPathFilter, FilterOutNonUnique)
 TEST(MediaPath, IsMounted)
 {
     media_paths::FilterConfig filter;
-    filter.dataDirectory = MediaPathFilter::kDataDirectory,
-    filter.mediaFolderName = MediaPathFilter::kMediaFolder,
+    filter.dataDirectory = MediaPathFilter::kDataDirectory;
+    filter.mediaFolderName = MediaPathFilter::kMediaFolder;
     filter.partitions = {
         QnPlatformMonitor::PartitionSpace("/", 0, 0),
         QnPlatformMonitor::PartitionSpace("/media/disk1", 0, 0),
         QnPlatformMonitor::PartitionSpace("/tmp/server-guid", 0, 0),
     };
 
-    ASSERT_TRUE(media_paths::isMounted(filter, MediaPathFilter::kDataDirectory + "/data"));
-    ASSERT_TRUE(media_paths::isMounted(filter, "/media/disk1/" + MediaPathFilter::kMediaFolder));
-    ASSERT_TRUE(media_paths::isMounted(filter, "/tmp/server-guid/"));
+    const auto toCanonical = [](const QString& path) { return path; };
+    ASSERT_TRUE(media_paths::isMounted(filter, MediaPathFilter::kDataDirectory + "/data", toCanonical));
+    ASSERT_TRUE(media_paths::isMounted(filter, "/media/disk1/" + MediaPathFilter::kMediaFolder, toCanonical));
+    ASSERT_TRUE(media_paths::isMounted(filter, "/tmp/server-guid/", toCanonical));
 
-    ASSERT_FALSE(media_paths::isMounted(filter, "/media/disk2/" + MediaPathFilter::kMediaFolder));
-    ASSERT_FALSE(media_paths::isMounted(filter, "/tmp/server-guid2/" + MediaPathFilter::kMediaFolder));
-    ASSERT_FALSE(media_paths::isMounted(filter, "/mnt/hdd2/" + MediaPathFilter::kMediaFolder));
+    ASSERT_FALSE(media_paths::isMounted(filter, "/media/disk2/" + MediaPathFilter::kMediaFolder, toCanonical));
+    ASSERT_FALSE(media_paths::isMounted(filter, "/tmp/server-guid2/" + MediaPathFilter::kMediaFolder, toCanonical));
+    ASSERT_FALSE(media_paths::isMounted(filter, "/mnt/hdd2/" + MediaPathFilter::kMediaFolder, toCanonical));
 }
 
 } // namespace test

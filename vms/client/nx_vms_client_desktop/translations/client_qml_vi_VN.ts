@@ -5,7 +5,7 @@
     <name>AnalyticsSettings</name>
     <message>
       <source>Enable</source>
-      <translation>cho phép</translation>
+      <translation>Cho phép</translation>
     </message>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>

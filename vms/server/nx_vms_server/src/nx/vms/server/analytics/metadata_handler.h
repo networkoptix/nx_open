@@ -8,7 +8,7 @@
 
 #include <nx/analytics/types.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/events/events_fwd.h>

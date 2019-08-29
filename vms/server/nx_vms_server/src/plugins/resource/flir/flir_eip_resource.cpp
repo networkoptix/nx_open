@@ -524,9 +524,9 @@ bool QnFlirEIPResource::findAlarmInputByTypeAndId(int id, const QString& type, Q
 void QnFlirEIPResource::initializeIO()
 {
     QnMutexLocker lock(&m_ioMutex);
-    auto resData = resourceData();
-    auto portList = resData.value<QnIOPortDataList>(ResourceDataKey::kIoSettings);
-    auto alarmsCount = resData.value<int>(kAlarmsCountParamName);
+    const auto resData = resourceData();
+    const auto portList = resData.value<QnIOPortDataList>(ResourceDataKey::kIoSettings);
+    const int alarmsCount = resData.value<int>(kAlarmsCountParamName);
 
     m_inputPorts.clear();
     m_outputPorts.clear();
@@ -546,7 +546,7 @@ void QnFlirEIPResource::initializeIO()
             m_outputPorts.push_back(port);
         }
 
-    for (size_t i = 0; i < alarmsCount; i++)
+    for (int i = 0; i < alarmsCount; i++)
         m_alarmStates.push_back(false);
 
     setIoPortDescriptions(std::move(portList), /*needMerge*/ true);

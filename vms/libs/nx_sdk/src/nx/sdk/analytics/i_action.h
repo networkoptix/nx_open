@@ -20,19 +20,22 @@ namespace analytics {
 class IAction: public Interface<IAction>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IAction"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IAction"); }
 
     /** Id of the action being triggered. */
     virtual const char* actionId() const = 0;
 
     /** Id of an object track for which the action has been triggered. */
-    virtual Uuid objectTrackId() const = 0;
+    protected: virtual void getObjectTrackId(Uuid* outValue) const = 0;
+    public: Uuid objectTrackId() const { Uuid value; getObjectTrackId(&value); return value; }
 
     /** Id of a device from which the action has been triggered. */
-    virtual Uuid deviceId() const = 0;
+    protected: virtual void getDeviceId(Uuid* outValue) const = 0;
+    public: Uuid deviceId() const { Uuid value; getDeviceId(&value); return value; }
 
     /** Info about an object track this action has been triggered for. */
-    virtual IObjectTrackInfo* objectTrackInfo() const = 0;
+    protected: virtual IObjectTrackInfo* getObjectTrackInfo() const = 0;
+    public: Ptr<IObjectTrackInfo> objectTrackInfo() const { return toPtr(getObjectTrackInfo()); }
 
     /** Timestamp of a video frame from which the action has been triggered. */
     virtual int64_t timestampUs() const = 0;
@@ -41,17 +44,17 @@ public:
      * If the Engine manifest defines params for this action type, contains the array of their
      * values after they are filled by the user via Client form. Otherwise, null.
      */
-    virtual const nx::sdk::IStringMap* params() const = 0;
+    protected: virtual const IStringMap* getParams() const = 0;
+    public: Ptr<const IStringMap> params() const { return toPtr(getParams()); }
 
-    /**
-     * Report action result back to Server. If the action is decided not to have any result, this
-     * method can be either called with nulls or not called at all.
-     * @param actionUrl If not null, Client will open this URL in an embedded browser.
-     * @param messageToUser If not null, Client will show this text to the user.
-     */
-    virtual void handleResult(
-        const char* actionUrl,
-        const char* messageToUser) = 0;
+    struct Result
+    {
+        /** If neither null nor empty, Client will open this URL in an embedded browser. */
+        Ptr<IString> actionUrl;
+
+        /** If neither null nor empty, Client will show this text to the user. */
+        Ptr<IString> messageToUser;
+    };
 };
 
 } // namespace analytics

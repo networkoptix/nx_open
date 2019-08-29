@@ -997,14 +997,16 @@ void QnRtspConnectionProcessor::createDataProvider()
     if (d->mediaRes) {
         camera = d->serverModule->videoCameraPool()->getVideoCamera(d->mediaRes->toResourcePtr());
         QnNetworkResourcePtr cameraRes = d->mediaRes.dynamicCast<QnNetworkResource>();
-        if (cameraRes && !cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner))
+        if (cameraRes && !cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner) &&
+            d->playbackMode == PlaybackMode::Live)
         {
             NX_DEBUG(this,
                 "Trying to initialize resource if it was not initialized for some unknown reason");
             cameraRes->initAsync(true);
 
             // Wait for camera initializing.
-            waitForResourceInitializing(cameraRes);
+            if (!d->useProprietaryFormat)
+                waitForResourceInitializing(cameraRes);
         }
     }
     if (camera && d->playbackMode == PlaybackMode::Live)
@@ -1190,17 +1192,22 @@ StreamDataFilters QnRtspConnectionProcessor::streamFilterFromHeaders(
     StreamDataFilters oldFilters) const
 {
     Q_D(const QnRtspConnectionProcessor);
-    QString deprecatedSendMotion = nx::network::http::getHeaderValue(
-        d->request.headers, kSendMotionHeaderName);
     QString dataFilterStr = nx::network::http::getHeaderValue(
         d->request.headers, Qn::RTSP_DATA_FILTER_HEADER_NAME);
 
-    StreamDataFilters filter = oldFilters ? oldFilters : StreamDataFilter::media;
+    // New filters setup format.
+    if (!dataFilterStr.isEmpty())
+        return QnLexical::deserialized<StreamDataFilters>(dataFilterStr);
+
+    // Support for the old modile clients.
+    QString deprecatedSendMotion = nx::network::http::getHeaderValue(
+        d->request.headers, kSendMotionHeaderName);
+
+    StreamDataFilters filters = oldFilters ? oldFilters : StreamDataFilter::media;
     if (deprecatedSendMotion == "1" || deprecatedSendMotion == "true")
-        filter.setFlag(StreamDataFilter::motion, true);
-    else
-        filter = QnLexical::deserialized<StreamDataFilters>(dataFilterStr);
-    return filter;
+        filters.setFlag(StreamDataFilter::motion, true);
+
+    return filters;
 }
 
 nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
@@ -1417,6 +1424,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
 
     if (!d->mediaRes)
         return nx::network::http::StatusCode::notFound;
+    if (!d->dataProcessor)
+        return nx::network::http::StatusCode::notFound; //< SetParameter without play or describe.
 
     QList<QByteArray> parameters = d->requestBody.split('\n');
     for(const QByteArray& parameter: parameters)

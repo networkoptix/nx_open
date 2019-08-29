@@ -1,7 +1,4 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "discovery_manager.h"
 
@@ -15,7 +12,6 @@
 #include "camera_manager.h"
 #include "dir_iterator.h"
 #include "plugin.h"
-
 
 DiscoveryManager::DiscoveryManager()
 :
@@ -124,12 +120,12 @@ int DiscoveryManager::fromMDNSData(
     int /*mdnsResponsePacketSize*/,
     nxcip::CameraInfo* /*cameraInfo*/ )
 {
-    return nxcip::NX_NO_ERROR;
+    return 0;
 }
 
 int DiscoveryManager::fromUpnpData( const char* /*upnpXMLData*/, int /*upnpXMLDataSize*/, nxcip::CameraInfo* /*cameraInfo*/ )
 {
-    return nxcip::NX_NO_ERROR;
+    return 0;
 }
 
 nxcip::BaseCameraManager* DiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )

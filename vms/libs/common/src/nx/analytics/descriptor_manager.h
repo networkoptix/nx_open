@@ -6,6 +6,7 @@
 
 #include <nx/analytics/types.h>
 
+// TODO: Move these includes to the actual managers instantiation / usage places.
 #include <nx/analytics/plugin_descriptor_manager.h>
 #include <nx/analytics/engine_descriptor_manager.h>
 #include <nx/analytics/group_descriptor_manager.h>
@@ -43,13 +44,6 @@ public:
 
 private:
     void commit();
-
-private:
-    PluginDescriptorManager m_pluginDescriptorManager;
-    EngineDescriptorManager m_engineDescriptorManager;
-    GroupDescriptorManager m_groupDescriptorManager;
-    EventTypeDescriptorManager m_eventTypeDescriptorManager;
-    ObjectTypeDescriptorManager m_objectTypeDescriptorManager;
 };
 
 } // namespace nx::analytics

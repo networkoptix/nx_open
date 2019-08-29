@@ -20,6 +20,7 @@
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -27,6 +28,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
 
+#include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/common/models/concatenation_list_model.h>
 #include <nx/vms/client/desktop/common/utils/custom_painted.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
@@ -129,7 +131,7 @@ AbstractSearchWidget::Private::Private(
     m_itemCounterLabel(new QLabel(q)),
     m_textFilterEdit(createSearchLineEdit(q)),
     m_dayChangeTimer(new QTimer()),
-    m_fetchMoreOperation(new utils::PendingOperation())
+    m_fetchMoreOperation(new nx::utils::PendingOperation())
 {
     NX_CRITICAL(model, "Model must be specified.");
     m_mainModel->setParent(nullptr); //< Stored as a scoped pointer.
@@ -163,7 +165,7 @@ AbstractSearchWidget::Private::Private(
 
     q->setFocusPolicy(Qt::ClickFocus);
 
-    m_fetchMoreOperation->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
+    m_fetchMoreOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
     m_fetchMoreOperation->setInterval(kQueuedFetchMoreDelay);
     m_fetchMoreOperation->setCallback([this]() { tryFetchMore(); });
 }
@@ -186,6 +188,9 @@ void AbstractSearchWidget::Private::setupModels()
 
     connect(m_mainModel.data(), &QAbstractItemModel::rowsInserted,
         this, &Private::handleItemCountChanged);
+
+    connect(m_mainModel.data(), &AbstractSearchListModel::liveAboutToBeCommitted,
+        this, &Private::updateFetchDirection);
 
     using FetchDirection = AbstractSearchListModel::FetchDirection;
     using UpdateMode = EventRibbon::UpdateMode;
@@ -382,7 +387,7 @@ void AbstractSearchWidget::Private::setupTimeSelection()
                     setSelectedPeriod(period);
 
                     if (ini().automaticFilterByTimelineSelection && period != Period::selection)
-                        navigator()->clearTimeSelection();
+                        navigator()->clearTimelineSelection();
                 });
 
             m_timeSelectionActions[period] = action;
@@ -411,9 +416,9 @@ void AbstractSearchWidget::Private::setupTimeSelection()
 
     // Setup timeline selection watcher.
 
-    auto applyTimePeriod = new utils::PendingOperation(this);
+    auto applyTimePeriod = new nx::utils::PendingOperation(this);
     applyTimePeriod->setInterval(kTimeSelectionDelay);
-    applyTimePeriod->setFlags(utils::PendingOperation::FireOnlyWhenIdle);
+    applyTimePeriod->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
     applyTimePeriod->setCallback(
         [this]()
         {
@@ -454,10 +459,15 @@ void AbstractSearchWidget::Private::setupTimeSelection()
 
     // Setup day change watcher.
 
-    m_dayChangeTimer->setInterval(1s);
+    m_dayChangeTimer->start(1s);
 
-    connect(m_dayChangeTimer.data(), &QTimer::timeout,
-        this, &Private::updateCurrentTimePeriod);
+    connect(m_dayChangeTimer.data(), &QTimer::timeout, this,
+        [this]()
+        {
+            const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
+            setCurrentDate(timeWatcher->displayTime(qnSyncTime->currentMSecsSinceEpoch()));
+            updateCurrentTimePeriod();
+        });
 }
 
 void AbstractSearchWidget::Private::setupCameraSelection()
@@ -622,7 +632,7 @@ void AbstractSearchWidget::Private::setAllowed(bool value)
 
 void AbstractSearchWidget::Private::goToLive()
 {
-    if (m_mainModel->liveSupported())
+    if (m_mainModel->effectiveLiveSupported())
         m_mainModel->setLive(true);
 
     ui->ribbon->scrollBar()->setValue(0);
@@ -661,11 +671,6 @@ void AbstractSearchWidget::Private::setSelectedPeriod(Period value)
     m_previousPeriod = m_period;
     m_period = value;
     updateCurrentTimePeriod();
-
-    if (m_period == Period::day || m_period == Period::week || m_period == Period::month)
-        m_dayChangeTimer->start();
-    else
-        m_dayChangeTimer->stop();
 }
 
 QnTimePeriod AbstractSearchWidget::Private::currentTimePeriod() const
@@ -713,9 +718,7 @@ QnTimePeriod AbstractSearchWidget::Private::effectiveTimePeriod() const
             break;
     }
 
-    auto current = qnSyncTime->currentDateTime();
-    current.setTime(QTime(0, 0, 0, 0));
-    return QnTimePeriod(current.addDays(1 - days).toMSecsSinceEpoch(),
+    return QnTimePeriod(m_currentDate.addDays(1 - days).toMSecsSinceEpoch(),
         QnTimePeriod::kInfiniteDuration);
 }
 
@@ -814,10 +817,10 @@ void AbstractSearchWidget::Private::updateCurrentCameras()
     }
 }
 
-void AbstractSearchWidget::Private::requestFetchIfNeeded()
+bool AbstractSearchWidget::Private::updateFetchDirection()
 {
-    if (!ui->ribbon->isVisible() || !model())
-        return;
+    if (!m_mainModel)
+        return false;
 
     const auto scrollBar = ui->ribbon->scrollBar();
 
@@ -826,9 +829,18 @@ void AbstractSearchWidget::Private::requestFetchIfNeeded()
     else if (scrollBar->value() == scrollBar->minimum())
         setFetchDirection(AbstractSearchListModel::FetchDirection::later);
     else
-        return; //< Scroll bar is not at the beginning nor the end.
+    {
+        setFetchDirection(AbstractSearchListModel::FetchDirection::earlier);
+        return false; //< Scroll bar is not at the beginning nor the end.
+    }
 
-    m_fetchMoreOperation->requestOperation();
+    return true;
+}
+
+void AbstractSearchWidget::Private::requestFetchIfNeeded()
+{
+    if (ui->ribbon->isVisible() && updateFetchDirection())
+        m_fetchMoreOperation->requestOperation();
 }
 
 void AbstractSearchWidget::Private::resetFilters()
@@ -944,6 +956,26 @@ void AbstractSearchWidget::Private::updatePlaceholderVisibility()
     m_placeholderOpacityAnimation->setEasingCurve(kPlaceholderFadeEasing);
     m_placeholderOpacityAnimation->setDuration(kPlaceholderFadeDuration.count() * delta);
     m_placeholderOpacityAnimation->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void AbstractSearchWidget::Private::setCurrentDate(const QDateTime& value)
+{
+    auto startOfDay = value;
+    startOfDay.setTime(QTime(0, 0));
+
+    if (m_currentDate == startOfDay)
+        return;
+
+    m_currentDate = startOfDay;
+
+    const auto model = ui->ribbon->model();
+    const auto range = ui->ribbon->visibleRange();
+
+    if (range.isEmpty() || !NX_ASSERT(model))
+        return;
+
+    emit model->dataChanged(
+        model->index(range.lower()), model->index(range.upper()), {Qn::TimestampTextRole});
 }
 
 } // namespace nx::vms::client::desktop

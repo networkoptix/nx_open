@@ -146,7 +146,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(WebPages, loadIcon("tree/webpages.png"));
     m_cache.insert(WebPage, loadIcon("tree/webpage.png"));
     m_cache.insert(WebPage | Offline, loadIcon("tree/webpage_offline.png"));
-    m_cache.insert(C2P, loadIcon("tree/c2p.png"));
+    m_cache.insert(C2P, loadIcon("tree/c2p.svg"));
 
     // Analytics.
     m_cache.insert(AnalyticsEngine, loadIcon("tree/server.png"));

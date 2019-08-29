@@ -26,6 +26,8 @@ public:
 
     virtual CameraDiagnostics::Result lastError() const override;
 
+    qint64 currentPosition() { return m_currentPos; }
+
 private:
     qint64 m_currentPos;
     qint64 m_rangeStart;

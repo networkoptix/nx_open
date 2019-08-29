@@ -3,6 +3,8 @@
 #include <cmath>
 #include <sstream>
 
+#include <QtCore/QRegularExpression>
+
 #include <nx/fusion/model_functions.h>
 
 #include <common/common_globals.h>
@@ -74,6 +76,43 @@ bool Filter::empty() const
     return *this == Filter();
 }
 
+bool Filter::acceptsObjectType(const QString& typeId) const
+{
+    return objectTypeId.empty()
+        || std::find(objectTypeId.cbegin(), objectTypeId.cend(), typeId) != objectTypeId.cend();
+}
+
+bool Filter::acceptsBoundingBox(const QRectF& boundingBox) const
+{
+    return !this->boundingBox || this->boundingBox->intersects(boundingBox);
+}
+
+bool Filter::acceptsAttributes(const std::vector<nx::common::metadata::Attribute>& attributes) const
+{
+    const auto filterWords = freeText.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
+    if (attributes.empty())
+        return filterWords.empty();
+
+    return std::all_of(filterWords.cbegin(), filterWords.cend(),
+        [&attributes](const QString& filterWord) -> bool
+        {
+            return std::any_of(attributes.cbegin(), attributes.cend(),
+                [&filterWord](const nx::common::metadata::Attribute& attribute) -> bool
+                {
+                    return attribute.name.contains(filterWord, Qt::CaseInsensitive)
+                        || attribute.value.contains(filterWord, Qt::CaseInsensitive);
+                });
+        });
+}
+
+bool Filter::acceptsMetadata(
+    const nx::common::metadata::ObjectMetadata& metadata, bool checkBoundingBox) const
+{
+    return acceptsObjectType(metadata.typeId)
+        && (!checkBoundingBox || acceptsBoundingBox(metadata.boundingBox))
+        && acceptsAttributes(metadata.attributes);
+}
+
 bool Filter::operator==(const Filter& right) const
 {
     if (boundingBox.has_value() != right.boundingBox.has_value())
@@ -90,7 +129,8 @@ bool Filter::operator==(const Filter& right) const
         && timePeriod == right.timePeriod
         && isSameItems(requiredAttributes, right.requiredAttributes)
         && freeText == right.freeText
-        && sortOrder == right.sortOrder;
+        && sortOrder == right.sortOrder
+        && deviceIds == right.deviceIds;
 }
 
 bool Filter::operator!=(const Filter& right) const

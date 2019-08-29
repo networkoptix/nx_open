@@ -5,6 +5,7 @@
 #include <rest/server/rest_connection_processor.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <common/common_module.h>
 
 using namespace nx::vms::server;
@@ -25,7 +26,7 @@ bool QnFinishUpdateRestHandler::allPeersUpdatedSuccessfully() const
     try
     {
         const auto updateInfo = serverModule()->updateManager()->updateInformation(
-            UpdateManager::InformationCategory::target);
+            UpdateManager::InformationCategory::target).value();
 
         return ifParticipantPredicate
             && std::all_of(
@@ -62,8 +63,11 @@ int QnFinishUpdateRestHandler::executePost(
     QByteArray& resultContentType,
     const QnRestConnectionProcessor* processor)
 {
-    const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
-        processor->resourcePool(), params);
+    if (!serverModule()->resourceAccessManager()->hasGlobalPermission(
+            processor->accessRights(), GlobalPermission::admin))
+    {
+        return nx::network::http::StatusCode::forbidden;
+    }
 
     if (params.contains("ignorePendingPeers") || allPeersUpdatedSuccessfully())
     {
@@ -76,6 +80,8 @@ int QnFinishUpdateRestHandler::executePost(
         return nx::network::http::StatusCode::ok;
     }
 
+    const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(
+        processor->resourcePool(), params);
     return QnFusionRestHandler::makeError(nx::network::http::StatusCode::ok,
         "Not all peers have been successfully updated", &result, &resultContentType,
         Qn::JsonFormat, request.extraFormatting, QnRestResult::CantProcessRequest);

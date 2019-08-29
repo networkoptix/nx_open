@@ -1,10 +1,6 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef ILP_ARCHIVE_READER_H
-#define ILP_ARCHIVE_READER_H
+#pragma once
 
 #include <memory>
 #include <string>
@@ -13,7 +9,6 @@
 
 #include <plugins/plugin_tools.h>
 #include "stream_reader.h"
-
 
 class DirContentsManager;
 
@@ -76,5 +71,3 @@ private:
     std::unique_ptr<StreamReader> m_streamReader;
     DirContentsManager* const m_dirContentsManager;
 };
-
-#endif  //ILP_ARCHIVE_READER_H

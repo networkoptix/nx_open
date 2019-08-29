@@ -5,7 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
-#include <nx/vms/client/desktop/analytics/analytics_events_tree.h>
+#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 
 #include <common/common_module.h>
 
@@ -24,15 +24,17 @@ AnalyticsSdkEventModel::~AnalyticsSdkEventModel()
 {
 }
 
-void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& cameras)
+void AnalyticsSdkEventModel::loadFromCameras(
+    const QnVirtualCameraResourceList& cameras,
+    const nx::vms::event::EventParameters& currentEventParameters)
 {
     auto addItem =
-        [this](QStandardItem* parent, AnalyticsEventsTreeBuilder::NodePtr node)
+        [this](QStandardItem* parent, AnalyticsEntitiesTreeBuilder::NodePtr node)
         {
-            const bool isValidEventType = !node->eventTypeId.isEmpty();
+            const bool isValidEventType = !node->entityId.isEmpty();
 
             auto item = new QStandardItem(node->text);
-            item->setData(qVariantFromValue(node->eventTypeId), EventTypeIdRole);
+            item->setData(qVariantFromValue(node->entityId), EventTypeIdRole);
             item->setData(qVariantFromValue(node->engineId), EngineIdRole);
             item->setData(qVariantFromValue(isValidEventType), ValidEventRole);
             item->setSelectable(isValidEventType);
@@ -54,8 +56,16 @@ void AnalyticsSdkEventModel::loadFromCameras(const QnVirtualCameraResourceList& 
             }
         });
 
-    AnalyticsEventsTreeBuilder eventsTreeBuilder(commonModule());
-    const auto root = eventsTreeBuilder.compatibleTreeIntersection(cameras);
+
+    const auto root = AnalyticsEntitiesTreeBuilder::eventTypesForRulesPurposes(
+        commonModule(),
+        cameras,
+        {
+            {
+                currentEventParameters.getAnalyticsEngineId(),
+                currentEventParameters.getAnalyticsEventTypeId()
+            }
+        });
 
     beginResetModel();
     clear();

@@ -11,6 +11,7 @@
 
 namespace Qn
 {
+    Q_NAMESPACE
     /**
      * Role of an item on the scene.
      *
@@ -115,6 +116,8 @@ namespace Qn
         ItemCheckedButtonsRole,                     /**< Role for buttons that are checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
+        ItemMotionSelectionRole,                    /**< Role for motion region selection. Value of type QList<QRegion>. */
+        ItemAnalyticsSelectionRole,                 /**< Role for analytics region selection. Value of type QRectF. */
 
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
@@ -259,6 +262,7 @@ namespace Qn
 
         ItemDataRoleCount
     };
+    Q_ENUM_NS(ItemDataRole)
 
     /**
      * Flags describing how viewport margins affect viewport geometry.
@@ -446,7 +450,6 @@ namespace Qn
 
 } // namespace Qn
 
-Q_DECLARE_METATYPE(Qn::ItemDataRole);
 Q_DECLARE_METATYPE(QValidator::State) //< For Qn::ValidationStateRole QVariant conversion.
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

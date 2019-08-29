@@ -41,6 +41,10 @@ public:
     Message args(const Values& ... values) const
     {
         using ::toString;
+        // Double toString() call is needed because some of toString() implementations (e.g. some
+        // SDK toString() that convert their arguments to an std::string) don't return a QString
+        // directly but something that can be converted to a QString with the second toString()
+        // call.
         return m_str.arg(toString(toString(values)) ...);
     }
 

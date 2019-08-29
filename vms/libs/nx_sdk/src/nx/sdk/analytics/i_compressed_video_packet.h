@@ -16,7 +16,7 @@ namespace analytics {
 class ICompressedVideoPacket: public Interface<ICompressedVideoPacket, ICompressedMediaPacket>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::ICompressedVideoPacket"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::ICompressedVideoPacket"); }
 
     /**
      * @return Width of video frame in pixels.

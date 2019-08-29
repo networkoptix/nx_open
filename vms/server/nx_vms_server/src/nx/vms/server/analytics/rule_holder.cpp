@@ -66,7 +66,7 @@ RuleHolder::AffectedResources RuleHolder::resetRules(const nx::vms::event::RuleL
     {
         if (isAnyResourceRule(rule))
             m_anyResourceRules.insert(rule->id());
-        else
+        else if (needToWatchRule(rule))
             m_watchedRules.insert(rule->id());
     }
 
@@ -127,7 +127,13 @@ RuleHolder::AffectedResources RuleHolder::updateRuleUnsafe(const nx::vms::event:
 
 bool RuleHolder::isAnyResourceRule(const nx::vms::event::RulePtr& rule) const
 {
+#if 0
+    // "Any resource" rules are not allowed for analytics SDK event now.
+    // If it changes - uncomment this section.
     return rule && rule->eventResources().isEmpty();
+#else
+    return false;
+#endif
 }
 
 bool RuleHolder::isRuleBeingWatched(const QnUuid& ruleId) const

@@ -275,13 +275,8 @@ void AbstractSearchListModel::setLive(bool value)
     if (value == m_live)
         return;
 
-    if (value)
-    {
-        const bool supported = effectiveLiveSupported();
-        NX_ASSERT(supported);
-        if (!supported)
-            return;
-    }
+    if (value && !(NX_ASSERT(liveSupported()) && effectiveLiveSupported()))
+        return;
 
     NX_VERBOSE(this, "Setting live mode to %1", value);
     m_live = value;

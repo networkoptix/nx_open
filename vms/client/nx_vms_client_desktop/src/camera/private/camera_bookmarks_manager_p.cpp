@@ -451,7 +451,6 @@ void QnCameraBookmarksManagerPrivate::unregisterQuery(const QUuid &queryId)
 QnCameraBookmarkList QnCameraBookmarksManagerPrivate::cachedBookmarks(const QnCameraBookmarksQueryPtr &query) const
 {
     NX_ASSERT(query, "Interface does not allow query to be null");
-    QN_LOG_TIME(Q_FUNC_INFO);
 
     /* Check if we have already cached query result. */
     if (m_queries.contains(query->id()))
@@ -522,7 +521,6 @@ void QnCameraBookmarksManagerPrivate::updateQueryAsync(const QUuid &queryId)
     if (!m_queries.contains(queryId))
         return;
 
-    QN_LOG_TIME(Q_FUNC_INFO);
     QueryInfo &info = m_queries[queryId];
     info.state = QueryInfo::QueryState::Queued;
 }
@@ -530,8 +528,6 @@ void QnCameraBookmarksManagerPrivate::updateQueryAsync(const QUuid &queryId)
 void QnCameraBookmarksManagerPrivate::updateQueryCache(
     const QUuid &queryId, const QnCameraBookmarkList &bookmarks)
 {
-    QN_LOG_TIME(Q_FUNC_INFO);
-
     NX_ASSERT(m_queries.contains(queryId), "Query must be registered");
     if (!m_queries.contains(queryId))
         return;
@@ -623,8 +619,6 @@ void QnCameraBookmarksManagerPrivate::addRemovePendingBookmark(const QnUuid &boo
 
 void QnCameraBookmarksManagerPrivate::mergeWithPendingBookmarks(const QnCameraBookmarksQueryPtr query, QnCameraBookmarkList &bookmarks)
 {
-    QN_LOG_TIME(Q_FUNC_INFO);
-
     for (const PendingInfo &info : m_pendingBookmarks)
     {
         if (info.type == PendingInfo::RemoveBookmark)
@@ -657,8 +651,6 @@ void QnCameraBookmarksManagerPrivate::mergeWithPendingBookmarks(const QnCameraBo
 
 void QnCameraBookmarksManagerPrivate::checkPendingBookmarks()
 {
-    QN_LOG_TIME(Q_FUNC_INFO);
-
     for (auto it = m_pendingBookmarks.begin(); it != m_pendingBookmarks.end(); /* no inc */)
     {
         if (it->discardTimer.isValid() && it->discardTimer.hasExpired(pendingDiscardTimeout))

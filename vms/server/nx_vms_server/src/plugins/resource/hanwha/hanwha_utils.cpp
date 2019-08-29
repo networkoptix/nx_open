@@ -575,9 +575,16 @@ bool ratioComparator(const QString& lhs, const QString& rhs)
 
 qint64 hanwhaDateTimeToMsec(const QByteArray& value, std::chrono::milliseconds timeShift)
 {
+    // A date and time string can have a "DST" suffix (e.g "2019-06-02T00:26:37Z DST").
+    // We need to get rid of it to properly parse a date.
+    const auto split = value.trimmed().split(' ');
+    if (split.isEmpty())
+        return AV_NOPTS_VALUE;
+
+    const auto& valueWithoutDst = split[0].trimmed();
     const auto dateTime =
-        QDateTime::fromString(value, Qt::ISODate)
-        .addMSecs(std::chrono::milliseconds(timeShift).count());
+        QDateTime::fromString(valueWithoutDst, Qt::ISODate)
+            .addMSecs(std::chrono::milliseconds(timeShift).count());
 
     return std::max(0LL, dateTime.toMSecsSinceEpoch());
 }

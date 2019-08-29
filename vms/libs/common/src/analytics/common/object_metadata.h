@@ -33,7 +33,7 @@ static constexpr int kCoordinateDecimalDigits = 4;
 
 struct ObjectMetadata
 {
-    QString objectTypeId;
+    QString typeId;
     QnUuid trackId;
     /**
      * Coordinates are in range [0;1].
@@ -42,7 +42,7 @@ struct ObjectMetadata
     std::vector<Attribute> attributes;
     bool bestShot = false;
 };
-#define ObjectMetadata_Fields (objectTypeId)(trackId)(boundingBox)(attributes)(bestShot)
+#define ObjectMetadata_Fields (typeId)(trackId)(boundingBox)(attributes)(bestShot)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectMetadata, (json)(ubjson));
 
 bool operator==(const ObjectMetadata& left, const ObjectMetadata& right);

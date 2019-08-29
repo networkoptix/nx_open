@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <optional>
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/update/update_information.h>
@@ -12,7 +13,11 @@
 
 #include "update_installer.h"
 
+class QTimer;
+
 struct QnAuthSession;
+
+namespace nx::vms::discovery { struct ModuleEndpoint; }
 
 namespace nx::vms::server {
 
@@ -35,19 +40,10 @@ public:
     void cancel();
     void retry(bool forceRedownload = false);
     void startUpdate(const QByteArray& content);
+    bool startUpdateInstallation(const QList<QnUuid>& participants);
     void install(const QnAuthSession& authInfo);
 
-    update::Information updateInformation(InformationCategory category) const noexcept(false);
-    update::Information updateInformation(InformationCategory category, bool* ok) const;
-
-    void setUpdateInformation(
-        InformationCategory category,
-        const update::Information& information) noexcept(false);
-
-    void setUpdateInformation(
-        InformationCategory category,
-        const update::Information& information,
-        bool* ok);
+    std::optional<update::Information> updateInformation(InformationCategory category) const;
 
     void setUpdatePersistentStorageServers(
         const QList<QnUuid>& serverList, const QString& version, bool manuallySet);
@@ -61,9 +57,12 @@ private:
     void onDownloaderFinished(const QString& fileName);
     void onDownloaderFileStatusChanged(
         const common::p2p::downloader::FileInformation& fileInformation);
+    void processFoundEndpoint(const nx::vms::discovery::ModuleEndpoint& endpoint);
     update::FindPackageResult findPackage(
         nx::update::Package* outPackage,
         QString* outMessage = nullptr) const;
+    void detectStartedInstallation();
+    void setInstallationDetected(bool detected = true);
     void extract();
     void clearDownloader(bool force);
     bool canDownloadFile(const nx::update::Package& package, update::Status* outUpdateStatus);
@@ -78,6 +77,9 @@ private:
     int64_t freeSpace(const QString& path) const;
     QnStorageSpaceDataList availableStorages() const;
 
+    void setTargetUpdateInformation(const update::Information& information);
+    void checkUpdateInfo(const QnMediaServerResourcePtr& server, InformationCategory infoCategory);
+
 private:
     enum class DownloaderFailDetail
     {
@@ -88,6 +90,10 @@ private:
     };
     std::atomic<DownloaderFailDetail> m_downloaderFailDetail = DownloaderFailDetail::noError;
     UpdateInstaller m_installer;
+    update::Information m_targetUpdateInfo;
+    QList<::rest::Handle> m_pendingUpdateInformationRequests;
+    QTimer* m_autoRetryTimer = nullptr;
+    bool m_installationDetected = false;
 };
 
 } // namespace nx::vms::server

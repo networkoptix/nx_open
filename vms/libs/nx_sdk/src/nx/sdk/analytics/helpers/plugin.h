@@ -8,9 +8,7 @@
 #include <nx/sdk/i_utility_provider.h>
 #include <nx/sdk/analytics/i_plugin.h>
 #include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/helpers/ptr.h>
-#include <nx/sdk/helpers/result_aliases.h>
-#include <nx/sdk/analytics/helpers/result_aliases.h>
+#include <nx/sdk/ptr.h>
 
 #include "engine.h"
 
@@ -28,7 +26,6 @@ public:
     using CreateEngine = std::function<IEngine*(Plugin* plugin)>;
 
     /**
-     * @param libName Name of the plugin library. It's needed for the logging.
      * @param pluginManifest Plugin manifest to be returned from the manifest method.
      * @param createEngine Functor for engine creation.
      */
@@ -43,8 +40,10 @@ public:
 
 public:
     virtual void setUtilityProvider(IUtilityProvider* utilityProvider) override;
-    virtual StringResult manifest() const override;
-    virtual MutableEngineResult createEngine() override;
+
+protected:
+    virtual void getManifest(Result<const IString*>* outResult) const override;
+    virtual void doCreateEngine(Result<IEngine*>* outResult) override;
 
 private:
     const std::string m_jsonManifest;

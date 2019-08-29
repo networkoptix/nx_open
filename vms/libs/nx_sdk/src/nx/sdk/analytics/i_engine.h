@@ -37,19 +37,16 @@ class IPlugin; //< Forward declaration for the parent object.
 class IEngine: public Interface<IEngine>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IEngine"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IEngine"); }
 
     class IHandler: public Interface<IHandler>
     {
     public:
-        static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IEngine::IHandler"); }
+        static auto interfaceId() { return makeId("nx::sdk::analytics::IEngine::IHandler"); }
 
         virtual ~IHandler() = default;
         virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) = 0;
     };
-
-    /** @return Parent Plugin. */
-    virtual IPlugin* plugin() const = 0;
 
     /**
      * Called right after the Engine creation (before all other methods) or when some
@@ -71,7 +68,14 @@ public:
      *     of some general failure that affected the procedure of applying the settings. The result
      *     should contain null if no errors occurred.
      */
-    virtual Result<const IStringMap*> setSettings(const IStringMap* settings) = 0;
+    protected: virtual void doSetSettings(
+        Result<const IStringMap*>* outResult, const IStringMap* settings) = 0;
+    public: Result<const IStringMap*> setSettings(const IStringMap* settings)
+    {
+        Result<const IStringMap*> result;
+        doSetSettings(&result, settings);
+        return result;
+    }
 
     /**
      * In addition to the settings stored in a Server database, an Engine can have some settings
@@ -81,12 +85,19 @@ public:
      * merges the received values with the ones in its database.
      *
      * @return Result containing (in case of success) information about settings that are stored on
-     *     the plugin side. Errors corresponding to particular settings should be placed in the
+     *     the plugin side. Errors corresponding to the particular settings should be placed in the
      *     ISettingsResponse object. A faulty result must be returned only in case of a general
      *     failure that affects the settings retrieval procedure. The result should contain null if
      *     the Engine has no plugin-side settings.
      */
-    virtual Result<const ISettingsResponse*> pluginSideSettings() const = 0;
+    protected: virtual void getPluginSideSettings(
+        Result<const ISettingsResponse*>* outResult) const = 0;
+    public: Result<const ISettingsResponse*> pluginSideSettings() const
+    {
+        Result<const ISettingsResponse*> result;
+        getPluginSideSettings(&result);
+        return result;
+    }
 
     /**
      * Provides a JSON manifest for this Engine instance. See the example of such manifest in
@@ -97,7 +108,13 @@ public:
      *
      * @return JSON string in UTF-8.
      */
-    virtual Result<const IString*> manifest() const = 0;
+    protected: virtual void getManifest(Result<const IString*>* outResult) const = 0;
+    public: Result<const IString*> manifest() const
+    {
+        Result<const IString*> result;
+        getManifest(&result);
+        return result;
+    }
 
     /**
      * @return True if the Engine is able to create DeviceAgents for the provided device, false
@@ -110,9 +127,18 @@ public:
      * given device.
      *
      * @param deviceInfo Information about the device for which a DeviceAgent should be created.
-     * @return Pointer to an object that implements IDeviceAgent interface.
+     * @return Pointer to an object that implements IDeviceAgent interface or null if a DeviceAgent
+     *     for this particular Device makes no sense (e.g. if the Device supports no Analytics
+     *     Events and Objects)
      */
-    virtual Result<IDeviceAgent*> obtainDeviceAgent(const IDeviceInfo* deviceInfo) = 0;
+    protected: virtual void doObtainDeviceAgent(
+        Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo) = 0;
+    public: Result<IDeviceAgent*> obtainDeviceAgent(const IDeviceInfo* deviceInfo)
+    {
+        Result<IDeviceAgent*> result;
+        doObtainDeviceAgent(&result, deviceInfo);
+        return result;
+    }
 
     /**
      * Action handler. Called when some action defined by this Engine is triggered by Server.
@@ -121,7 +147,14 @@ public:
      *     been triggered, and a means for reporting back action results to Server. This object
      *     should not be used after returning from this function.
      */
-    virtual Result<void> executeAction(IAction* action) = 0;
+    protected: virtual void doExecuteAction(
+        Result<IAction::Result>* outResult, const IAction* action) = 0;
+    public: Result<IAction::Result> executeAction(const IAction* action)
+    {
+        Result<IAction::Result> result;
+        doExecuteAction(&result, action);
+        return result;
+    }
 
     /**
      * @param handler Generic Engine-related events (errors, warning, info messages)

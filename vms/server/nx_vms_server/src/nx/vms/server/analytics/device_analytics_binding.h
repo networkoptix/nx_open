@@ -9,7 +9,7 @@
 #include <nx/streaming/abstract_data_packet.h>
 #include <nx/streaming/abstract_data_consumer.h>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/helpers/metadata_types.h>
@@ -20,8 +20,9 @@
 #include <nx/vms/server/analytics/metadata_handler.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/analytics/device_agent_handler.h>
+#include <nx/vms/server/sdk_support/types.h>
 
-#include <nx/vms/server/sdk_support/loggers.h>
+#include <nx/vms/server/analytics/wrappers/fwd.h>
 #include <nx/analytics/metadata_logger.h>
 
 namespace nx::vms::server::analytics {
@@ -42,13 +43,13 @@ public:
 
     virtual ~DeviceAnalyticsBinding() override;
 
-    bool startAnalytics(const nx::sdk::Ptr<nx::sdk::IStringMap>& settings);
+    bool startAnalytics(const QVariantMap& settings);
     void stopAnalytics();
-    bool restartAnalytics(const nx::sdk::Ptr<nx::sdk::IStringMap>& settings);
+    bool restartAnalytics(const QVariantMap& settings);
     bool updateNeededMetadataTypes();
 
     QVariantMap getSettings() const;
-    void setSettings(const nx::sdk::Ptr<nx::sdk::IStringMap>& settings);
+    void setSettings(const QVariantMap& settings);
 
     void setMetadataSink(QnAbstractDataReceptorPtr dataReceptor);
     bool isStreamConsumer() const;
@@ -60,46 +61,32 @@ protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
 private:
-    bool startAnalyticsUnsafe(const nx::sdk::Ptr<nx::sdk::IStringMap>& settings);
+    bool startAnalyticsUnsafe(const QVariantMap& settings);
     void stopAnalyticsUnsafe();
 
-    nx::sdk::Ptr<DeviceAgent> createDeviceAgent();
+    wrappers::DeviceAgentPtr createDeviceAgent();
     nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> createHandler();
-    std::optional<nx::vms::api::analytics::DeviceAgentManifest> loadDeviceAgentManifest(
-        const nx::sdk::Ptr<DeviceAgent>& deviceAgent);
 
     bool updateDeviceWithManifest(const nx::vms::api::analytics::DeviceAgentManifest& manifest);
     bool updateDescriptorsWithManifest(
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
-    nx::sdk::Ptr<nx::sdk::analytics::MetadataTypes> neededMetadataTypes() const;
-    std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger(
-        const QString& manifestTypes) const;
+    sdk_support::MetadataTypes neededMetadataTypes() const;
 
-    QVariantMap mergeWithDbAndDefaultSettings(const QVariantMap& settingsFromUser) const;
+    void setSettingsInternal(const QVariantMap& settings);
 
-    void setSettingsInternal(const nx::sdk::Ptr<nx::sdk::IStringMap>& settingsFromUser);
-
-    void logIncomingFrame(nx::sdk::analytics::IDataPacket* frame);
+    void logIncomingFrame(sdk::Ptr<sdk::analytics::IDataPacket> frame);
 
     bool updatePluginInfo() const;
 
 private:
     mutable QnMutex m_mutex;
     QnVirtualCameraResourcePtr m_device;
-
-    // TODO: #dmishin: Rename to m_engineResource.
     nx::vms::server::resource::AnalyticsEngineResourcePtr m_engine;
-
     nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> m_handler;
-
-    nx::sdk::Ptr<DeviceAgent> m_deviceAgent;
-
+    wrappers::DeviceAgentPtr m_deviceAgent;
     QnAbstractDataReceptorPtr m_metadataSink;
-
     std::atomic<bool> m_started{false};
-    std::atomic<bool>m_isStreamConsumer{false};
-
     nx::analytics::MetadataLogger m_incomingFrameLogger;
 };
 

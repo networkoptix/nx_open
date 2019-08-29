@@ -267,7 +267,7 @@ AVRational toFraction(float number, int precision)
     if (!decimal)
         return {(int) number, 1};
 
-    int numerator = decimal * precision;
+    int numerator = int(decimal * precision);
     int denominator = precision;
 
     int gcd;

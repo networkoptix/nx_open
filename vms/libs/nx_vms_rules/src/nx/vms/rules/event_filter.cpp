@@ -17,19 +17,31 @@ EventFilter::~EventFilter()
     qDeleteAll(m_fields);
 }
 
+QnUuid EventFilter::id() const
+{
+    return m_id;
+}
+
 QString EventFilter::eventType() const
 {
     return m_eventType;
 }
 
- bool EventFilter::addField(const QString& name, EventField* field)
- {
+bool EventFilter::addField(const QString& name, EventField* field)
+{
     if (m_fields.contains(name))
         return false;
 
     m_fields[name] = field;
+    updateState();
+
     return true;
- }
+}
+
+const QHash<QString, EventField*>& EventFilter::fields() const
+{
+    return m_fields;
+}
 
 bool EventFilter::match(const EventPtr& event) const
 {

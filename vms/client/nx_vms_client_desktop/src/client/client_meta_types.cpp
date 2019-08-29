@@ -9,6 +9,7 @@
 #include <client/client_globals.h>
 #include <client/client_model_types.h>
 #include <client/client_color_types.h>
+#include <recording/time_period.h>
 
 #include <camera/thumbnail.h>
 #include <camera/data/abstract_camera_data.h>
@@ -84,6 +85,8 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<QValidator::State>();
 
     qRegisterMetaTypeStreamOperators<QList<QUrl>>();
+    qRegisterMetaTypeStreamOperators<QnTimePeriod>();
+    qRegisterMetaTypeStreamOperators<QList<QRegion>>();
 
     qRegisterMetaType<ResourceTree::NodeType>();
     qRegisterMetaType<Qn::ItemRole>();
@@ -148,6 +151,7 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<QnNotificationLevel::Value>();
 
     qRegisterMetaType<nx::update::Information>();
+    qRegisterMetaType<nx::update::UpdateDeliveryInfo>();
     qRegisterMetaType<nx::update::UpdateContents>();
 
     QMetaType::registerComparators<QnUuid>();

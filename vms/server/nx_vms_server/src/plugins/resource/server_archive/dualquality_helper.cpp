@@ -204,9 +204,7 @@ void QnDualQualityHelper::findDataForTimeHelper(
 
     if (!preciseFind)
     {
-        QnServer::ChunksCatalog currentQuality  = currentCatalog->getRole();
-        QnServer::ChunksCatalog previousQuality = resultCatalog->getRole();
-
+        const QnServer::ChunksCatalog currentQuality  = currentCatalog->getRole();
         if (currentQuality == QnServer::LowQualityCatalog)
             findEps = SECOND_STREAM_FIND_EPS;
         else
