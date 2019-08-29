@@ -96,7 +96,8 @@ void Director::subscribe(nx::vms::client::desktop::ui::action::IDType action, QJ
 
             const auto actionParameters = context()->menu()->currentParameters(sender());
 
-            auto metaEnum = QMetaEnum::fromType<Qn::ItemDataRole>();
+            //auto metaEnum = QMetaEnum::fromType<Qn::ItemDataRole>();
+            QMetaEnum metaEnum;
 
             QJSValue param = m_engine->newObject();
 
@@ -124,7 +125,8 @@ void Director::subscribe(nx::vms::client::desktop::ui::action::IDType action, QJ
 
 void Director::trigger(nx::vms::client::desktop::ui::action::IDType action, QJSValue parameters)
 {
-    const auto metaEnum = QMetaEnum::fromType<Qn::ItemDataRole>();
+    //const auto metaEnum = QMetaEnum::fromType<Qn::ItemDataRole>();
+    QMetaEnum metaEnum;
 
     if (!parameters.isObject())
         return;

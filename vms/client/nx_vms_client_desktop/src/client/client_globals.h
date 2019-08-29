@@ -11,7 +11,6 @@
 
 namespace Qn
 {
-    Q_NAMESPACE
     /**
      * Role of an item on the scene.
      *
@@ -262,7 +261,6 @@ namespace Qn
 
         ItemDataRoleCount
     };
-    Q_ENUM_NS(ItemDataRole)
 
     /**
      * Flags describing how viewport margins affect viewport geometry.
@@ -450,6 +448,7 @@ namespace Qn
 
 } // namespace Qn
 
+Q_DECLARE_METATYPE(Qn::ItemDataRole);
 Q_DECLARE_METATYPE(QValidator::State) //< For Qn::ValidationStateRole QVariant conversion.
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
