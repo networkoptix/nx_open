@@ -45,6 +45,11 @@ void CloudDbEmulator::Account::shareSystem(
     userToShareWithIter->second.m_systems[systemId] = accessLevel;
 }
 
+const network::http::Credentials& CloudDbEmulator::Account::credentials() const
+{
+    return m_credentials;
+}
+
 CloudDbEmulator::CloudDbEmulator()
 {
     registerHttpApi();

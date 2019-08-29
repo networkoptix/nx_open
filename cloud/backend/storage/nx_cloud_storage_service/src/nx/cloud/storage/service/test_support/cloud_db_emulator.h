@@ -25,6 +25,8 @@ public:
             const std::string& user,
             cloud::db::api::SystemAccessRole accessLevel);
 
+        const network::http::Credentials& credentials() const;
+
     private:
         CloudDbEmulator* m_cloudDb;
         network::http::Credentials m_credentials;
