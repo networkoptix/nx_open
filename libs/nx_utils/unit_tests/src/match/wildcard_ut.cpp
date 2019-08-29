@@ -2,7 +2,7 @@
 
 #include <nx/utils/match/wildcard.h>
 
-TEST(MatchFunctionsWildcard, case_sensitive)
+TEST(MatchWildcard, case_sensitive)
 {
     ASSERT_TRUE(wildcardMatch("*hren?", "odin hrenn"));
     ASSERT_FALSE(wildcardMatch("*hren?", "odin hren"));
@@ -26,10 +26,26 @@ TEST(MatchFunctionsWildcard, case_sensitive)
     ASSERT_FALSE(wildcardMatch("/account/*/systems/", "/account/pupkin/syst"));
 }
 
-TEST(MatchFunctionsWildcard, case_insensitive)
+TEST(MatchWildcard, case_insensitive)
 {
     const auto mode = MatchMode::caseInsensitive;
 
     ASSERT_TRUE(wildcardMatch("abC*def*Hren?z??", "aBcdefhRen1Z11", mode));
     ASSERT_FALSE(wildcardMatch("/account/*/systems/", "/account/pupkin/systems", mode));
+}
+
+TEST(MatchWildcard, QString_is_supported)
+{
+    ASSERT_TRUE(wildcardMatch(
+        QString("abC*def*Hren?z??"),
+        QString("aBcdefhRen1Z11"),
+        MatchMode::caseInsensitive));
+
+    ASSERT_FALSE(wildcardMatch(
+        QString("/account/*/systems/"),
+        QString("/account/pupkin/systems"),
+        MatchMode::caseInsensitive));
+
+    ASSERT_TRUE(wildcardMatch(QString("abc*def*hren?z??"), QString("abc123456defhren1z11")));
+    ASSERT_FALSE(wildcardMatch(QString("abC*def*Hren?z??"), QString("aBcdefhRen1Z11")));
 }

@@ -91,6 +91,9 @@ bool DeviceAnalyticsBinding::restartAnalytics(const QVariantMap& settings)
 bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
 {
     QnMutexLocker lock(&m_mutex);
+    NX_DEBUG(this, "Updating needed metadata types for the Device %1 (%2) and Engine %3 (%4)",
+        m_device->getUserDefinedName(), m_device->getId(), m_engine->getName(), m_engine->getId());
+
     if (!m_deviceAgent)
     {
         NX_DEBUG(
@@ -336,6 +339,9 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
 
 sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
 {
+    NX_DEBUG(this, "Fetching needed metadata types from RuleWatcher for the Device %1 (%2)",
+        m_device->getUserDefinedName(), m_device->getId());
+
     const auto deviceAgentManifest = m_deviceAgent->manifest();
     if (!deviceAgentManifest)
         return {};
@@ -350,6 +356,9 @@ sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
     result.objectTypeIds = nx::analytics::supportedObjectTypeIdsFromManifest(*deviceAgentManifest);
 
     const auto neededEventTypes = ruleWatcher->watchedEventsForResource(m_device->getId());
+    NX_DEBUG(this, "Needed event types for the Device %1 (%2) from RuleWatcher: %3",
+        m_device->getUserDefinedName(), m_device->getId(), neededEventTypes);
+
     for (auto it = result.eventTypeIds.begin(); it != result.eventTypeIds.end();)
     {
         if (!neededEventTypes.contains(*it))
@@ -358,6 +367,23 @@ sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
             ++it;
     }
 
+    // TODO: #dmishin write a normal container toString method.
+    const auto containerToString =
+        [](const auto& container)
+        {
+            QString result("{");
+            for (auto itr = container.cbegin(); itr != container.cend(); ++itr)
+            {
+                result += *itr;
+                if (std::next(itr) != container.cend())
+                    result += ", ";
+            }
+            result += "}";
+            return result;
+        };
+
+    NX_DEBUG(this, "Filtered needed event types list for resource %1 (%2): %3",
+        m_device->getUserDefinedName(), m_device->getId(), containerToString(result.eventTypeIds));
     return result;
 }
 
