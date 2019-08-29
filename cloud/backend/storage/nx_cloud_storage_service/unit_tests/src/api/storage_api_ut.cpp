@@ -9,7 +9,9 @@
 
 #include "nx/cloud/aws/s3/api_client.h"
 
-namespace nx::cloud::storage::service::api::test {
+namespace nx::cloud::storage::service::test {
+
+using namespace nx::cloud::storage::service::api;
 
 namespace{
 
@@ -712,5 +714,5 @@ TEST_F(StorageApi, read_storage_lists_multiple_systems)
     andReadStorageContainsExpectedSystems();
 }
 
-} // namespace nx::cloud::storage::service::api::test
+} // namespace nx::cloud::storage::service::test
 

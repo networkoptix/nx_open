@@ -11,8 +11,7 @@
 
 #include "../s3_bucket.h"
 
-namespace nx::cloud::storage::service::api::test {
-
+namespace nx::cloud::storage::service::test {
 
 class BucketApi:
     public testing::Test
@@ -44,7 +43,7 @@ protected:
     void whenAddUnknownBucket();
     void whenListBuckets();
     void whenRemoveBucket(std::string bucketName = {});
-    void thenAddBucketResponseIs(ResultCode resultCode);
+    void thenAddBucketResponseIs(api::ResultCode resultCode);
     void thenListBucketsSucceeds();
     void thenRemoveBucketSucceeds();
     void andAddedBucketMatchesExpectedBucket();
@@ -56,23 +55,23 @@ private:
         std::string region = {},
         std::string name = {},
         bool local = true);
-    void addBucket(const AddBucketRequest& request);
+    void addBucket(const api::AddBucketRequest& request);
 
 protected:
     nx::geo_ip::test::MemoryResolver* m_geoIpResolver = nullptr;
-    std::unique_ptr<Client> m_cloudStorageClient;
+    std::unique_ptr<api::Client> m_cloudStorageClient;
     service::test::S3Bucket* m_lastBucketCreated = nullptr;
     std::unique_ptr<service::test::CloudStorageLauncher> m_cloudStorage;
-    Bucket m_lastBucketAdded;
-    Buckets m_lastBucketsListed;
+    api::Bucket m_lastBucketAdded;
+    api::Buckets m_lastBucketsListed;
 
 private:
     std::map<std::string, std::string>m_args;
     std::map<std::string, std::unique_ptr<service::test::S3Bucket>> m_buckets;
     nx::network::http::Credentials m_credentials;
-    nx::utils::SyncQueue<std::pair<Result, Bucket>> m_addBucketResponse;
-    nx::utils::SyncQueue<std::pair<Result, Buckets>> m_listBucketsResponse;
-    nx::utils::SyncQueue<Result> m_removeBucketResponse;
+    nx::utils::SyncQueue<std::pair<api::Result, api::Bucket>> m_addBucketResponse;
+    nx::utils::SyncQueue<std::pair<api::Result, api::Buckets>> m_listBucketsResponse;
+    nx::utils::SyncQueue<api::Result> m_removeBucketResponse;
     controller::GeoIpResolverFactory::Function m_geoIpFactoryFuncBak;
 };
 

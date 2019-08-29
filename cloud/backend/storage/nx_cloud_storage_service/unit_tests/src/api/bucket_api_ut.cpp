@@ -2,7 +2,9 @@
 
 #include <nx/cloud/storage/service/settings.h>
 
-namespace nx::cloud::storage::service::api::test {
+namespace nx::cloud::storage::service::test {
+
+using namespace nx::cloud::storage::service::api;
 
 BucketApi::~BucketApi()
 {
@@ -231,4 +233,4 @@ TEST_F(BucketApi, remove_bucket)
     andBucketIsNotInService();
 }
 
-} // namespace nx::cloud::storage::service::test::api
+} // namespace nx::cloud::storage::service::test
