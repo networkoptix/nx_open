@@ -480,8 +480,13 @@ void DeviceAnalyticsContext::at_devicePropertyChanged(
 
 void DeviceAnalyticsContext::at_rulesUpdated(const QSet<QnUuid>& affectedResources)
 {
+    NX_DEBUG(this, "Rules have been updated, affected resources %1", affectedResources);
     if (!affectedResources.contains(m_device->getId()))
+    {
+        NX_DEBUG(this, "Device %1 (%2) is not in the list of affected resources",
+            m_device->getUserDefinedName(), m_device->getId());
         return;
+    }
 
     for (auto& entry: m_bindings)
     {
