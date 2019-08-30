@@ -192,6 +192,11 @@ public:
             return &currentData;
         }
 
+        const Data* operator->() const
+        {
+            return &currentData;
+        }
+
         bool operator==(const Data& other) const
         {
             return currentData == other;

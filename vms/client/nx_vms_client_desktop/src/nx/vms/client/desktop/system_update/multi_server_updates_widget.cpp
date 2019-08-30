@@ -589,8 +589,9 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
     QString internalError = nx::update::toString(contents.error);
     // We have different error messages for each update source. So we should check
     // every combination of update source and nx::update::InformationError values.
-    if (contents.alreadyInstalled && source != SourceType::internet
-        && contents.error != Error::incompatibleVersion)
+    if (contents.alreadyInstalled
+        && ((source != SourceType::internet && contents.error != Error::incompatibleVersion)
+        || (source == SourceType::internet && contents.error == Error::incompatibleVersion)))
     {
         report.versionMode = VersionReport::VersionMode::build;
         report.statusHighlight = VersionReport::HighlightMode::regular;
@@ -2153,18 +2154,9 @@ bool MultiServerUpdatesWidget::hasActiveUpdate() const
 
 bool MultiServerUpdatesWidget::hasLatestVersion() const
 {
-    const bool hasEqualUpdateInfo = m_stateTracker->lowestInstalledVersion() >= m_updateInfo.getVersion();
-    bool hasLatestVersion = false;
-    if (m_updateInfo.isEmpty() || m_updateInfo.error == nx::update::InformationError::noNewVersion)
+    bool hasLatestVersion = m_updateReport->hasLatestVersion;
+    if (m_updateInfo.isEmpty())
         hasLatestVersion = true;
-    else if (hasEqualUpdateInfo || m_updateInfo.alreadyInstalled)
-        hasLatestVersion = true;
-
-    if (m_updateInfo.error != nx::update::InformationError::noNewVersion
-        && m_updateInfo.error != nx::update::InformationError::noError)
-    {
-        hasLatestVersion = false;
-    }
 
     if (m_widgetState != WidgetUpdateState::ready
         && m_widgetState != WidgetUpdateState::initial
