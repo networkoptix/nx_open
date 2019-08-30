@@ -13,8 +13,7 @@ namespace nx::utils {
 class NX_UTILS_API UrlQuery
 {
 public:
-    UrlQuery() = default;
-    UrlQuery(const QString& query);
+    UrlQuery(const QString& query = QString());
 
     UrlQuery& addQueryItem(const QString& key, const QString& value);
     UrlQuery& addQueryItem(const QString& key, const std::string& value);
