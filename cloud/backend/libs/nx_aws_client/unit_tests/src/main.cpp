@@ -4,15 +4,11 @@
 
 int main(int argc, char** argv)
 {
-    nx::utils::TestOptions::setModuleName("nx_aws_client_ut");
-
     QCoreApplication application(argc, argv);
 
-    const auto resultCode = nx::network::test::runTest(
+    return nx::network::test::runTest(
         argc, argv,
         nullptr,
         nx::network::InitializationFlags::disableUdt,
         nx::utils::test::GtestRunFlag::gtestThrowOnFailure);
-
-    return resultCode;
 }

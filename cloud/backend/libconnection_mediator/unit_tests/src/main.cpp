@@ -6,8 +6,6 @@
 
 int main(int argc, char** argv)
 {
-    nx::utils::TestOptions::setModuleName("nx_connection_mediator_ut");
-
     QCoreApplication app(argc, argv);
     return nx::network::test::runTest(
         argc, argv,

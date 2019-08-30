@@ -8,11 +8,9 @@
 
 int main(int argc, char** argv)
 {
-    nx::utils::TestOptions::setModuleName("nx_clusterdb_engine_ut");
-
     QCoreApplication application(argc, argv);
 
-    const auto resultCode = nx::network::test::runTest(
+    return nx::network::test::runTest(
         argc, argv,
         [](const nx::utils::ArgumentParser& args)
         {
@@ -25,6 +23,4 @@ int main(int argc, char** argv)
         },
         nx::network::InitializationFlags::disableUdt,
         nx::utils::test::GtestRunFlag::gtestThrowOnFailure);
-
-    return resultCode;
 }

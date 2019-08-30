@@ -7,8 +7,6 @@
 
 int main(int argc, char** argv)
 {
-    nx::utils::TestOptions::setModuleName("nx_network_ut");
-
     const nx::network::test::Ini ini;
 
     const int gtestRunFlags = ini.throwOnFailure

@@ -4,6 +4,5 @@
 
 int main(int argc, char** argv)
 {
-    nx::utils::TestOptions::setModuleName("nx_vms_client_desktop_ut");
     return nx::utils::test::runTest(argc, argv);
 }

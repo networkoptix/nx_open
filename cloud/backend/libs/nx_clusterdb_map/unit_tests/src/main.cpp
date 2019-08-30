@@ -4,8 +4,6 @@
 
 int main(int argc, char* argv[])
 {
-    nx::utils::TestOptions::setModuleName("nx_clusterdb_map_ut");
-
     QCoreApplication application(argc, argv);
 
     return nx::network::test::runTest(

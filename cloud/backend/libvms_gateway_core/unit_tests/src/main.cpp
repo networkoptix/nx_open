@@ -7,8 +7,6 @@
 
 int main(int argc, char** argv)
 {
-    nx::utils::TestOptions::setModuleName("nx_vms_gateway_core_ut");
-
     return nx::network::test::runTest(
         argc, argv,
         [](const nx::utils::ArgumentParser& /*args*/)
