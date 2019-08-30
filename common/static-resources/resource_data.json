@@ -2111,7 +2111,8 @@
         },
         {
             "keys": [
-                "Dahua*|*"
+                "Dahua*|*",
+                "Honewell|H4W4PER2"
             ],
             "trustToVideoSourceSize": false
         },
