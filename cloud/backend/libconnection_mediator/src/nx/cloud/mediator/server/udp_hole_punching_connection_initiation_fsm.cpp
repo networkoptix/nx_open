@@ -190,6 +190,9 @@ std::optional<State> UDPHolePunchingConnectionInitiationFsm::getDestinationState
             else if (event == Event::connectionResultWaitTimedOut)
                 return State::fini;
             break;
+
+        case State::fini:
+            break;
     }
 
     return std::nullopt;
