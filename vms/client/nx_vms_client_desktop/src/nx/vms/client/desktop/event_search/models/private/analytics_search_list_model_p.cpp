@@ -218,7 +218,8 @@ QString AnalyticsSearchListModel::Private::filterText() const
 
 void AnalyticsSearchListModel::Private::setFilterText(const QString& value)
 {
-    if (m_filterText == value)
+    // Check is user input parsed to the same filter request.
+    if (Filter::userInputToFreeText(m_filterText) == Filter::userInputToFreeText(value))
         return;
 
     q->clear();

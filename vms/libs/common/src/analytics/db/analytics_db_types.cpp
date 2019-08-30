@@ -171,13 +171,18 @@ bool Filter::acceptsTrack(const ObjectTrack& track) const
 
 void Filter::loadUserInputToFreeText(const QString& userInput)
 {
+    freeText = userInputToFreeText(userInput);
+}
+
+QString Filter::userInputToFreeText(const QString& userInput)
+{
     auto filterWords = userInput.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
     for (auto& word: filterWords)
     {
         if (!word.endsWith('*'))
             word = word + '*';
     }
-    freeText = filterWords.join(' ');
+    return filterWords.join(' ');
 }
 
 bool Filter::operator==(const Filter& right) const
