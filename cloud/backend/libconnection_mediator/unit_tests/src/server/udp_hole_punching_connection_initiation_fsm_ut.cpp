@@ -40,6 +40,26 @@ public:
         RelayInstanceSearchCompletionHandler completionHandler)
     {
         m_pendingRequestHandler = std::move(completionHandler);
+        if (!m_responseDelay)
+            return;
+
+        auto timer = std::make_unique<nx::network::aio::Timer>();
+        auto timerPtr = timer.get();
+        timerPtr->start(
+            *m_responseDelay,
+            [timer = std::move(timer),
+                handler = std::exchange(m_pendingRequestHandler, nullptr)]() mutable
+            {
+                handler(
+                    cloud::relay::api::ResultCode::ok,
+                    nx::utils::Url("https://relay.vmsproxy.com"));
+                timer.reset();
+            });
+    }
+
+    void setResponseDelay(std::chrono::milliseconds delay)
+    {
+        m_responseDelay = delay;
     }
 
     void reportFailure()
@@ -55,6 +75,7 @@ public:
 
 private:
     RelayInstanceSearchCompletionHandler m_pendingRequestHandler;
+    std::optional<std::chrono::milliseconds> m_responseDelay;
 };
 
 } // namespace
@@ -192,7 +213,12 @@ protected:
             [this](auto&&... args) { saveConnectResultResponse(std::move(args)...); });
     }
 
-    void thenConnectSessionFsmShouldBeTerminatedProperly()
+    void whenServerConnectionIsBroken()
+    {
+        m_listeningPeerConnection.reset();
+    }
+
+    void thenConnectSessionFsmIsTerminatedProperly()
     {
         m_fsmFinishedPromise.get_future().wait();
     }
@@ -252,6 +278,13 @@ protected:
         m_relayClusterClient = std::make_unique<TestRelayClusterClient>();
     }
 
+    void installRelayClusterClientWithDelay(std::chrono::milliseconds delay)
+    {
+        auto client = std::make_unique<TestRelayClusterClient>();
+        client->setResponseDelay(delay);
+        m_relayClusterClient = std::move(client);
+    }
+
     template<typename Func>
     void doInAioThread(Func func)
     {
@@ -260,6 +293,11 @@ protected:
 
         m_connectSessionFsm->executeInAioThreadSync(
             [func = std::move(func)]() { func(); });
+    }
+
+    const conf::Settings& settings() const
+    {
+        return m_settings;
     }
 
 private:
@@ -301,9 +339,12 @@ TEST_F(
     UDPHolePunchingConnectionInitiationFsm,
     client_sends_connection_result_report_before_receiving_connect_response)
 {
+    setSetting("-cloudConnect/connectionAckAwaitTimeout", std::chrono::milliseconds(10));
+    setSetting("-cloudConnect/connectionResultWaitTimeout", std::chrono::milliseconds(10));
+
     givenStartedCloudConnectSession();
     whenClientSendsResultReport();
-    thenConnectSessionFsmShouldBeTerminatedProperly();
+    thenConnectSessionFsmIsTerminatedProperly();
 }
 
 TEST_F(UDPHolePunchingConnectionInitiationFsm, remote_peer_full_name_is_reported)
@@ -364,6 +405,40 @@ TEST_F(
 
     thenConnectSessionResultResponseIsSuccess();
     andConnectSessionResultCodeIsAvailableInSessionStatistics();
+}
+
+TEST_F(UDPHolePunchingConnectionInitiationFsm, connect_to_server_with_broken_connection)
+{
+    setSetting("-cloudConnect/connectionAckAwaitTimeout", std::chrono::milliseconds(1));
+    installRelayClusterClientWithDelay(std::chrono::milliseconds(10));
+
+    whenServerConnectionIsBroken();
+    givenStartedCloudConnectSession();
+
+    std::this_thread::sleep_for(
+        settings().connectionParameters().connectionAckAwaitTimeout * 2);
+
+    whenIssueConnectRequest();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // then application does not crash.
+}
+
+TEST_F(UDPHolePunchingConnectionInitiationFsm, connection_ack_arrives_after_no_ack_timeout)
+{
+    setSetting("-cloudConnect/connectionAckAwaitTimeout", std::chrono::milliseconds(1));
+
+    installRelayClusterClientWithDelay(std::chrono::milliseconds(10));
+
+    givenStartedCloudConnectSession();
+
+    std::this_thread::sleep_for(
+        settings().connectionParameters().connectionAckAwaitTimeout * 2);
+
+    whenConnectionAckIsReceived();
+
+    thenConnectResultIsReported();
+    andConnectionResultIsSuccess();
 }
 
 } // namespace test
