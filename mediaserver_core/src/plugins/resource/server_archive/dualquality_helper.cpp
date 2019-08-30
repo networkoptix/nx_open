@@ -241,7 +241,7 @@ void QnDualQualityHelper::findDataForTimeHelper(
                 {
                     qint64 nextDistance = calcDistanceHelper(nextChunk, time, findMethod);
                     qint64 altDistance = nextDistance - altChunkDuration;
-                    canUseAltQuality = altDistance < currentDistance - findEps;
+                    canUseAltQuality = altDistance < previousDistance - findEps;
                 }
             }
         }
