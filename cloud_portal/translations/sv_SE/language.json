@@ -1,28 +1,38 @@
 {
-  "language": "sv_SE",
+  "language": "en_US",
   "language_name": "Svenska",
-  "productName": "%PRODUCT_NAME%",
+  "cloudName": "%CLOUD_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "OK",
     "cancelButton": "Avbryt",
-    "loginTitle": "Logga in på %PRODUCT_NAME%",
+    "loginTitle": "Log in to %CLOUD_NAME%",
     "loginButton": "Logga in",
     "logoutAuthorisedTitle": "Du är redan inloggad",
     "logoutAuthorisedContinueButton": "Fortsätt",
     "logoutAuthorisedLogoutButton": "Logga ut",
-    "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageFailed": "Meddelandet gick inte att skicka.",
+    "messageSent": "Meddelandet har skickats.",
+    "noClientDetectedTitle": "Installera %VMS_NAME% om du vill visa ditt System",
+    "download": "Ladda ner %VMS_NAME%"
   },
-  "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+  "messageDialog": {
+    "title": {
+      "integration": "Email for {{product}}",
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}"
+    },
+    "topic": {
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}",
+      "contact_sales": "Contact sales for {{product}}",
+      "contact_support": "Contact support for {{product}}"
+    }
   },
   "pageTitles": {
-    "template": "{{title}} %PRODUCT_NAME%",
-    "default": "%PRODUCT_NAME%",
+    "template": "{{title}} %CLOUD_NAME%",
+    "default": "%CLOUD_NAME%",
     "registerSuccess": "Välkommen till",
     "register": "Skapa konto i",
     "changePassword": "Ändra lösenord -",
@@ -46,7 +56,8 @@
   },
   "systemStatuses": {
     "activated": "aktiverad",
-    "merging": "merging",
+    "incompatible": "oförenlig",
+    "merging": "sammanslagning",
     "notActivated": "inte aktiverad",
     "online": "uppkopplad",
     "offline": "frånkopplade",
@@ -124,12 +135,12 @@
     "cantChangePasswordPrefix": "Kan inte spara lösenord",
     "cantActivatePrefix": "Kan inte aktivera ditt konto",
     "cantSendConfirmationPrefix": "Kan inte skicka bekräftelse-e-post",
-    "cloudInvalidResponse": "Cloud DB returnerade ett oväntat svar",
     "notAuthorized": "Fel lösenord",
     "brokenAccount": "Oväntat problem med kontot. <a href=\"/restore_password\">Återställ konto</a>",
     "wrongParameters": "Vissa parametrar på formuläret är felaktiga",
     "wrongCode": "Kontot är redan aktiverat eller bekräftelsekoden är felaktig",
     "wrongCodeRestore": "Bekräftelsekoden är redan använd eller felaktig",
+    "wrongAuthCode": "Code is expired or incorrect",
     "forbidden": "Du har inte behörighet att utföra denna åtgärd",
     "accountNotActivated": "Det här kontot är inte aktiverat än. <a href=\"/activate\">Skicka aktiveringslänk igen</a>",
     "accountBlocked": "Det här kontot är tillfälligt blockerat. Vänligen försök igen om några minuter.",
@@ -147,21 +158,28 @@
     "lostConnection": "Anslutning till {{systemName}} förlorad",
     "thisSystem": "systemet",
     "oldSafariNotSupported": "Versioner av Safari äldre än 10 stöds inte",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "Några server listas som befintliga i båda systemen – i den valda och i den nuvarande.<br>ta bort offline och oförenliga servrar från varje System och försök igen.",
+    "mergedSystemIsOffline": "Systemet <strong>{{failedSystem}}</strong> är offline.",
+    "INCOMPATIBLE": "Systemen har olika mjukvaruversioner. Vänligen uppdatera dem båda till <a href=\"/download\">senaste version</a>.",
+    "FAIL": "System <strong>{{failedSystem}}</strong> är för närvarande oåtkomligt.<br>Försök igen om några minuter eller kontakta <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>.",
+    "unknownMergeError": "Unknown error. You can try to refresh the page and repeat attempt. If the problem persists – please contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Systemsammanslagning misslyckades",
+    "commonText": "Misslyckades med att slå samman system <strong>{{primarySystem}}</strong> och <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
-    "good": "good",
-    "fair": "fair",
-    "minLength": "too short",
+    "good": "bra",
+    "fair": "skapligt",
+    "fairMessage": "Använd siffror, stora bokstäver och specialtecken för att göra ditt lösenord starkare",
+    "minLength": "för kort",
     "minLengthMessage": "Lösenordet måste innehålla minst 8 tecken",
-    "required": "incorrect",
+    "required": "felaktig",
     "requiredMessage": "Använd endast latinska bokstäver, siffror och tangentbordssymboler, undvik ledande och efterföljande mellanslag",
-    "weak": "weak",
+    "weak": "svagt",
     "weakMessage": "Använd siffror, stora bokstäver och specialtecken för att göra ditt lösenord starkare",
     "strongMessage": "Starkt lösenord!",
-    "common": "too common",
+    "common": "för vanligt",
     "commonMessage": "Detta lösenord är i topp populäraste lösenord i världen",
     "missingMessage": "Lösenord krävs"
   },
@@ -185,7 +203,7 @@
     "confirmRenameTitle": "Systemets namn",
     "confirmRenameAction": "Spara",
     "successRename": "Systemnamnet sparat",
-    "confirmDisconnectTitle": "Koppla bort systemet från %PRODUCT_NAME%?",
+    "confirmDisconnectTitle": "Disconnect System from %CLOUD_NAME%?",
     "confirmDisconnectAction": "Koppla från",
     "confirmUnshareFromMe": "Du håller på att koppla bort det här systemet från ditt konto. Du kommer inte längre få tillgång till det här systemet. Är du säker?",
     "confirmUnshareFromMeTitle": "Koppla ifrån systemet?",
@@ -193,11 +211,13 @@
     "confirmUnshare": "Den här användaren kan inte komma åt System. Är du säker?",
     "confirmUnshareTitle": "Radera användaren?",
     "confirmUnshareAction": "Radera",
-    "successDisconnected": "Systemet har kopplats bort från %PRODUCT_NAME%",
+    "successDisconnected": "System is successfully disconnected from %CLOUD_NAME%",
     "successDeleted": "System {{systemName}} har tagits bort från ditt konto",
-    "successMerge": "System merge completed",
+    "mergeFailed": "Systemsammanslagning misslyckades",
+    "mergeStart": "System har börjat slås samman",
+    "mergeSuccess": "Systemsammanslagning slutförd",
     "permissionsRemoved": "Rättigheterna togs bort från {{email}}",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Okänt namn för system (orsakad av molnsammanslagning)"
   },
   "account": {
     "accountSavedSuccess": "Ditt konto har sparats",
@@ -206,72 +226,6 @@
     "changePassword": "Ändra lösenord",
     "newPasswordLabel": "Nytt lösenord",
     "saveChanges": "Spara"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Installera %VMS_NAME% om du vill visa ditt System",
-    "action": "Ladda ner %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Endast klient",
-      "server": "Endast server",
-      "bundle": "Klient och Server",
-      "servertool": "Konfigurationsverktyg"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "Skicka aktiveringslänk igen",
@@ -299,12 +253,13 @@
     },
     "systemOffline": "System Offline",
     "systemHasNoCameras": "INGA KAMEROR",
+    "systemUnreachable": "SYSTEM IS UNREACHABLE",
     "cameraStates": {
-      "offline": "Frånkopplade",
+      "offline": "Offline",
       "error": "Fel",
       "unauthorized": "Autentisering krävs",
       "noData": "Data saknas",
-      "iosVideoTooLarge": "iOS stöder inte video större än fullHD (2MP: 1920x1080).",
+      "iosVideoTooLarge": "ios stöder inte video större än fullHD (2MP: 1920x1080).",
       "flashRequired": "Var god <a href='https://get.adobe.com/flashplayer/' target='_blank'>installera Adobe Flash</a> för att spela upp videor.",
       "flashOrWebmRequired": "Var god <a href='https://get.adobe.com/flashplayer/' target='_blank'>installera Adobe Flash</a> eller<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> för att spela video i Internet Explorer.",
       "noArmSupport": "Denna webbläsare eller enhet stöder inte videouppspelning från ARM-baserade servrar.",
@@ -334,5 +289,10 @@
       "stop listening": "sluta lyssna",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "Vi rekommenderar att vi konsulterar med",
+    "b_support": "support",
+    "c_proceeding": "innan fortsättning."
   }
 }

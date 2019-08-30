@@ -14,11 +14,23 @@ export class NxCloudApiService {
         this.CONFIG = config.getConfig();
     }
 
-    getAllCameras(company): Observable<any> {
-        return this.http.get(this.CONFIG.cacamerasUrl, { params: { company }});
-    }
-
     getIntegrations(): Observable<any> {
         return this.http.get(this.CONFIG.apiBase + '/integrations');
+    }
+
+    getIntegrationBy(id: number, status: string): Observable<any> {
+        let uri = this.CONFIG.apiBase + '/integration/' + id;
+        uri += (status) ? '?' + status : '' ;
+
+        return this.http.get(uri);
+    }
+
+
+    getIPVD(): Observable<any> {
+        return this.http.get(this.CONFIG.apiBase + '/ipvd');
+    }
+
+    reloadIPVD(): Observable<any> {
+        return this.http.post(this.CONFIG.apiBase + '/ipvd', {});
     }
 }

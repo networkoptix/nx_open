@@ -13,6 +13,8 @@
 
 int main(int argc, char** argv)
 {
+    nx::utils::TestOptions::setModuleName("nx_cloud_db_ut");
+
     // QCoreApplication::applicationdirPath() is used throughout code (common, appserver2, etc...)
     QCoreApplication application(argc, argv);
 

@@ -6,14 +6,18 @@
     border-color : $light4;
     
     &--header {
+        height           : rem(48px);
+        display          : flex;
+        align-items      : center;
         background-color : $additional_light1;
-        padding          : 1rem;
+        padding          : 0 1rem;
         border-bottom    : 1px solid $light3;
         
         h4 {
             margin : 0;
+            width  : 100%;
         }
-    
+        
         &-logo {
             float               : left;
             display             : flex;
@@ -31,6 +35,11 @@
         padding          : 1rem;
         overflow         : hidden;
         background-color : $light1;
+        
+        img {
+            max-width : 100%;
+            height    : auto;
+        }
     }
     
     &--footer {
@@ -55,13 +64,14 @@
     
     nx-section:first-of-type {
         .card--body {
-            border-top: none;
+            border-top : none;
         }
     }
     
     &.gray {
         background-color : $light4;
-        border           : none;
+        border           : 1px solid $light4;
+        border-bottom    : none;
         
         .card--header {
             background-color    : $light4;
@@ -72,15 +82,81 @@
             background-color : $light4;
             border-top       : 1px solid $light6;
         }
-    
+        
         .card--footer {
             background-color : $light4;
+        }
+    }
+    
+    &.menu {
+        background-color : $light5;
+        border           : 1px solid $light5;
+        border-bottom    : none;
+        
+        .card--header {
+            background-color    : $light5;
+            border-bottom-color : $light7;
+        }
+        
+        .card--body {
+            background-color : $light5;
+            border-top       : 1px solid $light7;
+        }
+        
+        .card--footer {
+            background-color : $light5;
+        }
+        
+        &.top {
+            border-radius : 2px 2px 0 0;
+            
+            .card--header {
+                border-bottom : none;
+            }
         }
     }
     
     &.fixed-height {
         height   : rem(300px);
         overflow : hidden;
+    }
+    
+    
+    &.extended-header {
+        .card--header {
+            height  : auto;
+            padding : 1rem;
+        }
+    }
+    
+    &.slim-header {
+        .card--header {
+            height  : auto;
+            padding : rem(12px);
+            
+            .title {
+                line-height : 15px;
+            }
+            
+            .second-row {
+                margin-top : 4px;
+                
+                .version {
+                    font-family : $font-family-regular;
+                    color       : $light16;
+                    float       : left;
+                    font-size   : 11px;
+                    position    : absolute;
+                    bottom      : 10px;
+                }
+                
+                .platforms {
+                    color   : $light10;
+                    float   : right;
+                    display : flex;
+                }
+            }
+        }
     }
 }
 

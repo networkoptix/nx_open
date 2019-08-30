@@ -376,7 +376,7 @@ private:
         const QnUuid& uuid,
         T* outData,
         bool* outFound,
-        const QnRestConnectionProcessor* owner,
+        const QnRestConnectionProcessor* /*owner*/,
         decltype(&T::getIdForMerging) /*enable_if_member_exists*/ = nullptr,
         typename std::enable_if<!std::is_same<nx::vms::api::IdData, T>::value>::type* = nullptr)
     {

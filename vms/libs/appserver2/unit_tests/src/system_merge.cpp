@@ -28,7 +28,6 @@ class SystemMerge:
 {
 public:
     SystemMerge():
-        nx::utils::test::TestWithTemporaryDirectory("appserver2_ut.SystemMerge", QString()),
         SystemMergeFixture(testDataDir().toStdString())
     {
     }

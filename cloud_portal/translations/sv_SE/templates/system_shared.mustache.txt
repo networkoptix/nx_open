@@ -8,4 +8,4 @@ Hej, {{message.userFullName}}
 Du har fått tillgång till videohanteringssystem "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Visa i %PRODUCT_NAME% Portal: {{config.portal_url}}/ systems /{{message.system_id}}
+View in %CLOUD_NAME% Portal: {{config.portal_url}}/systems/{{message.system_id}}

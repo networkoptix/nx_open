@@ -1,28 +1,38 @@
 {
   "language": "zh_TW",
   "language_name": "繁体中文",
-  "productName": "%PRODUCT_NAME%",
+  "cloudName": "%CLOUD_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
     "okButton": "確定",
     "cancelButton": "取消",
-    "loginTitle": "登入到 %PRODUCT_NAME%",
+    "loginTitle": "Log in to %CLOUD_NAME%",
     "loginButton": "登入",
     "logoutAuthorisedTitle": "您已經登入",
     "logoutAuthorisedContinueButton": "繼續",
     "logoutAuthorisedLogoutButton": "登出",
     "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageSent": "Message has been sent.",
+    "noClientDetectedTitle": "安裝 %VMS_NAME% 來查看您的系統",
+    "download": "下載 %VMS_NAME%"
   },
-  "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+  "messageDialog": {
+    "title": {
+      "integration": "Email for {{product}}",
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}"
+    },
+    "topic": {
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}",
+      "contact_sales": "Contact sales for {{product}}",
+      "contact_support": "Contact support for {{product}}"
+    }
   },
   "pageTitles": {
-    "template": "{{title}} %PRODUCT_NAME%",
-    "default": "%PRODUCT_NAME%",
+    "template": "{{title}} %CLOUD_NAME%",
+    "default": "%CLOUD_NAME%",
     "registerSuccess": "歡迎來到",
     "register": "新建帳號",
     "changePassword": "更改密碼 -",
@@ -46,7 +56,8 @@
   },
   "systemStatuses": {
     "activated": "啟動",
-    "merging": "merging",
+    "incompatible": "不相容",
+    "merging": "合併中",
     "notActivated": "未啟動",
     "online": "線上",
     "offline": "離線",
@@ -124,12 +135,12 @@
     "cantChangePasswordPrefix": "無法儲存密碼",
     "cantActivatePrefix": "無法啟動您的帳號",
     "cantSendConfirmationPrefix": "無法發送確認郵件",
-    "cloudInvalidResponse": "雲端 DB 回覆預期外的回應",
     "notAuthorized": "密碼不正確",
     "brokenAccount": "帳號出現意外問題. <a href=\"/restore_password\">還原帳號</a>",
     "wrongParameters": "表單上的一些參數不正確",
     "wrongCode": "帳號已經啟動或確認碼不正確",
     "wrongCodeRestore": "確認代碼已使用或不正確",
+    "wrongAuthCode": "Code is expired or incorrect",
     "forbidden": "您沒有權限執行此操作",
     "accountNotActivated": "此帳號尚未啟動. <a href=\"/activate\"> 再發送一次啟動連結</a>",
     "accountBlocked": "此帳號已被封鎖。請在幾分鐘後再試一次。",
@@ -147,13 +158,20 @@
     "lostConnection": "與 {{systemName}} 的連線斷開了",
     "thisSystem": "系統",
     "oldSafariNotSupported": "不支持10歲以上的Safari版本",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "某些伺服器列表並存於選定的和當前的兩個系統中 。<br>請從各系統中刪除並斷線不相容的伺服器，然後重連一次。",
+    "mergedSystemIsOffline": "系統 <strong>{{failedSystem}}</strong> 處於離線狀態。",
+    "INCOMPATIBLE": "系統有不同的軟體版本。請將它們更新到 <a href=\"/download\">最新版本</a>。",
+    "FAIL": "系統 <strong>{{failedSystem}}</strong> 目前無法連上。<br>請稍後再試一次, 或聯繫 <a href=\"%SUPPORT_LINK%\" target=\"_blank\">支援</a>。",
+    "unknownMergeError": "Unknown error. You can try to refresh the page and repeat attempt. If the problem persists – please contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "系統合併失敗",
+    "commonText": "無法合併系統 <strong>{{primarySystem}}</strong> 和 <strong>{{secondarySystem}}</strong>。"
   },
   "passwordRequirements": {
     "good": "好",
     "fair": "尚可",
+    "fairMessage": "使用數字, 大寫和小寫字母及特殊字元使您密碼更強",
     "minLength": "太短",
     "minLengthMessage": "密碼必須包含至少 8 個字元",
     "required": "不正確",
@@ -185,7 +203,7 @@
     "confirmRenameTitle": "系統名稱",
     "confirmRenameAction": "儲存",
     "successRename": "系統名稱已儲存",
-    "confirmDisconnectTitle": "是否從 %PRODUCT_NAME% 中斷開系統?",
+    "confirmDisconnectTitle": "Disconnect System from %CLOUD_NAME%?",
     "confirmDisconnectAction": "斷線",
     "confirmUnshareFromMe": "您正要從您的帳號斷開此系統. 您將再也無法存取此系統. 確定?",
     "confirmUnshareFromMeTitle": "斷開系統?",
@@ -193,11 +211,13 @@
     "confirmUnshare": "此使用者將無法存取系統. 確定?",
     "confirmUnshareTitle": "刪除使用者?",
     "confirmUnshareAction": "刪除",
-    "successDisconnected": "系統成功地斷開 %PRODUCT_NAME%",
+    "successDisconnected": "System is successfully disconnected from %CLOUD_NAME%",
     "successDeleted": "從您的帳號成功刪除系統 {{systemName}}",
-    "successMerge": "System merge completed",
+    "mergeFailed": "系統合併失敗",
+    "mergeStart": "系統開始合併中",
+    "mergeSuccess": "System merge completed",
     "permissionsRemoved": "權限從 {{email}} 被移除",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "未知的系統名稱（由雲合併引起）"
   },
   "account": {
     "accountSavedSuccess": "您的帳號已成功儲存",
@@ -206,72 +226,6 @@
     "changePassword": "變更密碼",
     "newPasswordLabel": "新密碼",
     "saveChanges": "儲存"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "安裝 %VMS_NAME% 來查看您的系統",
-    "action": "下載 %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "僅用戶端",
-      "server": "僅伺服器",
-      "bundle": "用戶端和伺服器",
-      "servertool": "設定工具"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "重新發送啟動連結",
@@ -299,6 +253,7 @@
     },
     "systemOffline": "系統處於離線狀態",
     "systemHasNoCameras": "無攝影機",
+    "systemUnreachable": "SYSTEM IS UNREACHABLE",
     "cameraStates": {
       "offline": "離線",
       "error": "錯誤",
@@ -334,5 +289,10 @@
       "stop listening": "停止聽取",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "建議您進行諮詢",
+    "b_support": "支援",
+    "c_proceeding": "在繼續執行之前。"
   }
 }

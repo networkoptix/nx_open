@@ -1,26 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import imaplib
-import re
-from platform import system
+import docker
 import email.header
-from email.parser import HeaderParser
+import imaplib
 import os.path
+import re
 import time
-import types
+from email.parser import HeaderParser
+from platform import system
+from random import *
 from requests import head
-from robot.utils import NormalizedDict
+from robot.libraries.BuiltIn import BuiltIn
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-
 from selenium.common.exceptions import NoSuchElementException
-from SeleniumLibrary.base import keyword, LibraryComponent
-from SeleniumLibrary.locators import WindowManager
 from SeleniumLibrary.utils import (is_falsy, is_truthy, secs_to_timestr,
                                    timestr_to_secs, SELENIUM_VERSION)
-from random import *
-from robot.libraries.BuiltIn import BuiltIn
 
 
 class NoptixLibrary(object):
@@ -148,7 +145,7 @@ class NoptixLibrary(object):
                 return
             elif re.search(url, found):
                 return
-        raise Exception(url + " was not in the email.")
+        raise Exception(found + " was not in the email.")
 
     def get_os(self):
         plat = system()
@@ -181,3 +178,39 @@ class NoptixLibrary(object):
         pat = '(<a class="btn" href="{})(.[^>]*)(target=_blank)'.format(url)
         if re.search(pat, body) == None:
             raise Exception("Button target was not 'blank'.")
+
+    def build_image(self):
+        client = docker.from_env()
+        return client.images.build(path="/home/kyle/develop/nx_vms/cloud_portal/robot_tests/Docker", 
+                            tag="mediaserver", 
+                            buildargs={"mediaserver_deb":"nxwitness-server-4.0.0.28541-linux64-beta-test.deb"})
+
+    def run_container(self, image, port, network):
+        tmp = {'/run':'', '/run/lock':''}
+        vol = {'/sys/fs/cgroup': {
+                    'bind':'/sys/fs/cgroup',
+                    'mode':'rw'}
+                }
+        prt = {7001:port}
+        client = docker.from_env()
+        cont = client.containers.run(image[0].id, detach=True, tmpfs=tmp, volumes=vol, ports=prt, network_mode=network, name=time.time())
+        return cont
+
+    def stop_containers(self, allContainers=True):
+        client = docker.from_env()
+        conts = client.containers.list()
+        if allContainers:
+            for cont in conts:
+                cont.stop()
+        else:
+            conts[0].stop()
+
+    def prune_containers(self):
+        client = docker.from_env()
+        client.containers.prune()
+
+    def remove_images(self):
+        client = docker.from_env()
+        imgs = client.images.list()
+        for img in imgs:
+            client.images.remove(img.id)

@@ -10,7 +10,7 @@ from os.path import expanduser
 
 def filter_dev_keywords(ui, repo, **kwargs):
     home = expanduser("~") + "/develop/nx_vms/"
-    keys = ["console.log", "debugger;", "fuck"]
+    keys = ["console.log", "debugger;", "fuck", "nx witness", "nx witness client", "nx platform", "nxvms", "nx cloud"]
 
     output = subprocess.check_output(["hg", "status", "-m"])
     matches_found = False

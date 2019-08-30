@@ -2,9 +2,18 @@
 @import '../../../styles/theme_variables';
 
 nx-radio {
-    label.disabled {
-        color: $dark9 !important;
-        opacity: 0.3 !important;
+    label {
+        &.disabled {
+            color: $dark9 !important;
+            opacity: 0.3 !important;
+        }
+        &:hover:not([disabled]) {
+            color : $dark1;
+        }
+
+        &:active:not([disabled]) {
+            color : $dark9 !important;
+        }
     }
 
     .disabled {

@@ -17,7 +17,7 @@ import * as angular from 'angular';
                     function System(systemId, currentUserEmail) {
                         this.id = systemId;
                         this.users = [];
-                        this.isAvailable = true;
+                        this.isAvailable = false;
                         this.isOnline = false;
                         this.isMine = false;
                         this.userRoles = [];
@@ -105,9 +105,7 @@ import * as angular from 'angular';
 
                             this.isOnline = this.info.stateOfHealth == CONFIG.systemStatuses.onlineStatus;
                             this.isMine = this.info.ownerAccountEmail == this.currentUserEmail;
-                            this.canMerge = this.isMine && (this.info.capabilities && this.info.capabilities.indexOf(CONFIG.systemCapabilities.cloudMerge) > -1
-                                    || CONFIG.allowDebugMode
-                                    || CONFIG.allowBetaMode);
+                            this.canMerge = this.isMine && (this.info.capabilities && this.info.capabilities.indexOf(CONFIG.systemCapabilities.cloudMerge) > -1);
                             this.mergeInfo = result.data[0].mergeInfo;
 
                             this.checkPermissions();
@@ -252,7 +250,10 @@ import * as angular from 'angular';
                             let predefinedRoles = result.data.reply['ec2/getPredefinedRoles'];
                             this.isAvailable = true;
                             this.updateSystemState();
-                            return processUsers(usersList, userRoles, predefinedRoles)
+                            return processUsers(usersList, userRoles, predefinedRoles);
+                        }, () => {
+                            this.isAvailable = false;
+                            this.updateSystemState();
                         });
                     };
 

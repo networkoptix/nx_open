@@ -80,7 +80,7 @@ class Statistics:
 {
 public:
     Statistics():
-        nx::sql::test::TestWithDbHelper("hpm", QString()),
+        nx::sql::test::TestWithDbHelper(QString()),
         m_testDataObject(nullptr)
     {
         init();

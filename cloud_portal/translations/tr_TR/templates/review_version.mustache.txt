@@ -1,8 +1,8 @@
-{{ message.product }} için yeni bir revizyon var
+There is a new version for {{ message.product }}({{message.product_type}}) to review.
 
 Taslak {{ message.id }} için {{ message.product }} incelemek için bağlantıyı tıklayın
 
-Gözden geçirmek için link: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
+Link to review: {{ config.portal_url }}/admin/cms/productcustomizationreview/{{ message.id }}/change/
 
 Bu sayfada şunları yapabilirsiniz
 1) En son değişiklikleri görmek için bir önizleme oluşturun.

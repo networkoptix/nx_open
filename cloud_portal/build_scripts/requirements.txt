@@ -1,4 +1,4 @@
-cssutils==1.0.1
-htmlmin==0.1.10
+cssutils==1.0.2
+htmlmin==0.1.12
 inlinestyler==0.2.1
-PyYAML==3.11
+PyYAML==5.1

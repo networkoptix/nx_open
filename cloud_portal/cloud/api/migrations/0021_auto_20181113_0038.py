@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='account',
             name='is_active',
-            field=models.BooleanField(default=True, help_text=b'If false the account is disabled. <br> If user was invited to the cloud it will switch to true on its own when the user completes registration.'),
+            field=models.BooleanField(default=True, help_text='If false the account is disabled. <br> If user was invited to the cloud it will switch to true on its own when the user completes registration.'),
         ),
         migrations.AlterField(
             model_name='account',
             name='is_staff',
-            field=models.BooleanField(default=False, help_text=b'If true then the user can view cloud admin.'),
+            field=models.BooleanField(default=False, help_text='If true then the user can view cloud admin.'),
         ),
     ]

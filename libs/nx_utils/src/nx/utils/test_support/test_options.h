@@ -22,6 +22,13 @@ public:
     static void setTemporaryDirectoryPath(const QString& path);
     static QString temporaryDirectoryPath(bool canCreate = false);
 
+    static void setModuleName(const QString& value);
+
+    /**
+     * @return Random unique string, unless set by TestOptions::setModuleName.
+     */
+    static QString moduleName();
+
     static void setLoadMode(const QString& mode);
 
     template<typename Count>
@@ -47,7 +54,9 @@ private:
         mutable QnMutex m_mutex;
         QString m_path;
     };
+
     static TemporaryDirectory s_temporaryDirectory;
+    static QString s_moduleName;
 };
 
 template<typename Count>

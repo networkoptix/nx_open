@@ -32,7 +32,7 @@ namespace nx::cloud::db {
 // CdbLauncher
 
 CdbLauncher::CdbLauncher(QString tmpDir):
-    nx::sql::test::TestWithDbHelper("cdb", tmpDir),
+    nx::sql::test::TestWithDbHelper(tmpDir),
     m_port(0),
     m_connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
 {

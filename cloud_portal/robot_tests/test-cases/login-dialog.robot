@@ -1,8 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
+Suite Setup       Open Browser and go to URL    ${url}
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Open New Browser On Failure
-Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 
 *** Variables ***
@@ -44,7 +44,6 @@ allows to log in with existing credentials and to log out
     Log In    ${email}    ${password}
     Validate Log In
     Log Out
-    Validate Log Out
 
 redirects to systems after log In
     [Tags]    Threaded
@@ -80,6 +79,7 @@ contains 'I forgot password' link that leads to Restore Password page with pre-f
     [Tags]    Threaded
     Log In    ${email}    'aderhgadehf'
     Wait Until Elements Are Visible    ${REMEMBER ME CHECKBOX VISIBLE}   ${EMAIL INPUT}    ${PASSWORD INPUT}    ${LOG IN BUTTON}    ${FORGOT PASSWORD}
+    Sleep    1
     Click Link    ${FORGOT PASSWORD}
     Wait Until Element Is Visible    ${RESTORE PASSWORD EMAIL INPUT}
     Textfield Should Contain    ${RESTORE PASSWORD EMAIL INPUT}    ${email}
@@ -142,7 +142,6 @@ logout refreshes page
     Log In    ${email}    ${password}
     Validate Log In
     Log Out
-    Validate Log Out
 
 # We don't actually allow copy of the password field at log in.
 allows copy-paste in input fields
@@ -217,7 +216,6 @@ handles two tabs, updates second tab state if logout is done on first
     Wait Until Page Does Not Contain Element    ${CONTINUE MODAL}
     Validate Log In
     Log Out
-    Validate Log Out
     ${tabs}    Get Window Handles
     Select Window    @{tabs}[1]
     Location Should Be    ${url}/systems

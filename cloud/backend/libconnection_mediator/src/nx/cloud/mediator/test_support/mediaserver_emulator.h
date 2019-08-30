@@ -39,7 +39,7 @@ public:
     */
     MediaServerEmulator(
         const network::SocketAddress& mediatorUdpEndpoint,
-        const network::SocketAddress& mediatorTcpEndpoint,
+        const nx::utils::Url& mediatorTcpUrl,
         AbstractCloudDataProvider::System systemData,
         nx::String serverName = nx::String());
     virtual ~MediaServerEmulator();

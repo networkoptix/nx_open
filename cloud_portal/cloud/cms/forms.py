@@ -2,15 +2,19 @@ import json
 from django import forms
 from django.core.validators import RegexValidator
 from django.contrib.admin.widgets import FilteredSelectMultiple
+from django.template.loader import render_to_string
 from .models import *
+from api.models import Account
 
 from dal import autocomplete
+
+from cloud import settings
 
 BYTES_TO_MEGABYTES = 1048576.0
 
 
 def convert_meta_to_description(meta):
-    meta_to_plain = {"char_limit": "Character limit is %s",
+    meta_to_plain = {"char_limit": "Character limit: %s",
                      "format": "Format:  %s",
                      "height": "Height: %spx",
                      "height_le": "Height: not greater than %spx",
@@ -22,7 +26,7 @@ def convert_meta_to_description(meta):
                      }
     converted_msg = ""
     if 'size' in meta:
-        meta['size'] = meta['size'] / BYTES_TO_MEGABYTES
+        meta['size'] = round(meta['size'] / BYTES_TO_MEGABYTES, 2)
     for k in meta:
         if k in meta_to_plain:
             value = meta[k]
@@ -46,6 +50,22 @@ def get_languages_list():
     return map(modify_default_language, customization.languages.values_list('code', 'name'))
 
 
+def generate_branding_variables(datastructure):
+    cloud_portal = Product.objects.get(customizations__name=settings.CUSTOMIZATION,
+                                       product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
+    branding_context = Context.objects.get(name='branding', product_type__type=ProductType.PRODUCT_TYPES.cloud_portal)
+
+    brands = [
+        (ds, ds.find_actual_value(product=cloud_portal))
+        for ds in branding_context.datastructure_set.all()
+        if 'shortcut' in ds.meta_settings
+    ]
+
+    return render_to_string(
+        'cms/widgets/branding_variables.html', context={'brands': brands, 'datastructure': datastructure}
+    )
+
+
 class CustomContextForm(forms.Form):
     language = forms.ChoiceField(
         widget=forms.Select, label="Language")
@@ -59,7 +79,7 @@ class CustomContextForm(forms.Form):
         self.fields.pop('language')
 
     def add_fields(self, product, context, language, user):
-        data_structures = context.datastructure_set.order_by('order').all()
+        data_structures = context.datastructure_set.all()
 
         if len(data_structures) < 1:
             return
@@ -74,9 +94,12 @@ class CustomContextForm(forms.Form):
 
             if data_structure.meta_settings:
                 ds_description += convert_meta_to_description(data_structure.meta_settings)
+                if 'brand_vars' in data_structure.meta_settings and data_structure.meta_settings['brand_vars']:
+                    ds_description += generate_branding_variables(data_structure)
 
             if data_structure.type == DataStructure.DATA_TYPES.guid:
-                ds_description += "<br>GUID format is '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}' using hexadecimal characters (0-9, a-f, A-F)"
+                ds_description += "<br>GUID format is '{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX}' using hexadecimal " \
+                                  "characters (0-9, a-f, A-F)"
 
             ds_language = language
             if not data_structure.translatable:
@@ -112,7 +135,7 @@ class CustomContextForm(forms.Form):
             elif data_structure.type in [DataStructure.DATA_TYPES.file,
                                          DataStructure.DATA_TYPES.external_file,
                                          DataStructure.DATA_TYPES.external_image]:
-                if not record_value and not DataStructure.DATA_TYPES.external_file:
+                if not record_value and not data_structure.optional:
                     record_value = data_structure.default
                 self.fields[data_structure.name] = forms.FileField(label=ds_label,
                                                                    help_text=ds_description,
@@ -133,7 +156,7 @@ class CustomContextForm(forms.Form):
                                                                                  choices=queryset,
                                                                                  required=False,
                                                                                  disabled=disabled,
-                                                                                 widget=forms.CheckboxSelectMultiple)
+                                                                                 widget=forms.CheckboxSelectMultiple(attrs={'class': 'nodots'}))
                 else:
                     self.fields[data_structure.name] = forms.ChoiceField(label=ds_label,
                                                                          help_text=ds_description,
@@ -169,8 +192,7 @@ class CustomContextForm(forms.Form):
 class ProductSettingsForm(forms.Form):
     file = forms.FileField(
         label="File",
-        help_text="Archive with static files and images for content or structure.json file. "
-                  "Archive must have top-level directories named as customizations",
+        help_text="Archive with static files and images for content or structure.json file.",
         required=True
     )
 
@@ -179,14 +201,17 @@ class ProductSettingsForm(forms.Form):
         required=True,
         choices=(
             ('generate_json', 'Generate structure template based on archive'),
+            ('merge_with_db', 'Generate structure using archive and db'),
             ('update_structure',
-             'Update CMS structure and default values based on archive with structure.json and customization template'),
-            ('update_content', 'Upload customized content files for customizations')
+             'Update CMS structure and default values based on archive with structure.json and product_type template'),
+            ('update_content', 'Upload content files for product')
         )
     )
 
 
 class ProductForm(forms.ModelForm):
+    publish_all_customizations = forms.BooleanField(required=False, label='Publish to all Customizations', initial=True)
+
     class Meta:
         model = Product
         exclude = []
@@ -202,6 +227,7 @@ class ProductForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         # Do the normal form initialisation.
         super(ProductForm, self).__init__(*args, **kwargs)
         cloud_portal = ProductType.PRODUCT_TYPES.cloud_portal
@@ -209,19 +235,45 @@ class ProductForm(forms.ModelForm):
             cloud_customization = self.instance.customizations.first()
             used_customizations = [product.customizations.first().name
                                    for product in Product.objects.filter(product_type__type=cloud_portal)
-                                   if product.customizations.exists() and product.customizations.first() != cloud_customization]
+                                   if product.customizations.exists() and
+                                   product.customizations.first() != cloud_customization]
 
-            # if the form doesnt have the customizations field create it
-            if 'customizations' not in self.fields:
-                self.fields['customizations'] = forms.MultipleChoiceField()
-            self.fields['customizations'].queryset = Customization.objects.exclude(name__in=used_customizations)
-            self.initial['customizations'] = self.instance.customizations.all()
+            # used for removing customizations that are already in use from the multiple choice field,
+            if 'customizations' in [field.name for field in self.visible_fields()]:
+                self.fields['customizations'].queryset = Customization.objects.exclude(name__in=used_customizations)
+                self.initial['customizations'] = self.instance.customizations.all()
+
+        if self.user and not self.user.is_superuser and not self.instance.pk:
+            self.fields['product_type'].queryset = ProductType.objects.exclude(type=ProductType.PRODUCT_TYPES.cloud_portal)
+            self.fields['created_by'] = forms.ModelChoiceField(
+                queryset=Account.objects.filter(id=self.user.id), empty_label=None
+            )
+            self.fields['customizations'].queryset = Customization.objects.filter(name__in=self.user.customizations)
 
     def clean_customizations(self):
-        data = self.cleaned_data['customizations']
-        if self.instance.product_type and self.instance.product_type.single_customization and len(data) > 1:
-            raise ValueError('Too many customizations selected')
-        return data
+        customizations = self.cleaned_data['customizations']
+        product_type = ProductType.objects.get(id=self.data['product_type'])
+
+        if product_type and product_type.single_customization:
+            if len(customizations) > 1:
+                raise forms.ValidationError("Too many customizations selected for product type.")
+
+            if customizations and product_type.type == ProductType.PRODUCT_TYPES.cloud_portal:
+                customization_portal_id = get_cloud_portal_product(customizations[0]).id
+                product_id = self.instance and self.instance.id
+
+                if customization_portal_id and product_id and product_id != customization_portal_id or \
+                        not product_id and customization_portal_id:
+                    raise forms.ValidationError("Customization is already used for a cloud portal product.")
+        return customizations
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if 'publish_all_customizations' in cleaned_data and cleaned_data['publish_all_customizations']:
+            cleaned_data['customizations'] = Customization.objects.all()
+
+        return cleaned_data
 
 
 class CustomizationForm(forms.ModelForm):

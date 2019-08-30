@@ -1,8 +1,8 @@
-Det finns en ny revision för {{ message.product }}
+There is a new version for {{ message.product }}({{message.product_type}}) to review.
 
 Klicka på länken för att se utkast {{ message.id }} för {{ message.product }}
 
-Länk till granskning: {{ config.portal_url }}/ admin / cms / version /{{ message.id }}
+Link to review: {{ config.portal_url }}/admin/cms/productcustomizationreview/{{ message.id }}/change/
 
 På denna sida kan du
 1) Skapa en förhandsgranskning för att se de senaste ändringarna.

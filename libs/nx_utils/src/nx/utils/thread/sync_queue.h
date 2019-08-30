@@ -44,6 +44,13 @@ public:
         QueueReaderId readerId = kInvalidQueueReaderId);
 
     void push(Result result);
+
+    /**
+     * Constructs Result in-place.
+     */
+    template<typename... Args>
+    void push(Args&&... args);
+
     bool isEmpty();
     bool empty() const;
     std::size_t size() const;
@@ -170,6 +177,13 @@ void SyncQueue<Result>::push(Result result)
     m_queue.push_back( std::move( result ) );
     if( wasEmpty )
         m_condition.wakeOne();
+}
+
+template<typename Result>
+template<typename... Args>
+void SyncQueue<Result>::push(Args&&... args)
+{
+    push(Result(std::forward<Args>(args)...));
 }
 
 template< typename Result>

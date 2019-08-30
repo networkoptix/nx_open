@@ -11,41 +11,6 @@ namespace nx {
 namespace network {
 namespace http {
 
-TestAuthenticationManager::TestAuthenticationManager(
-    nx::network::http::server::AbstractAuthenticationDataProvider* authenticationDataProvider)
-    :
-    BaseType(authenticationDataProvider),
-    m_authenticationEnabled(false)
-{
-}
-
-void TestAuthenticationManager::authenticate(
-    const nx::network::http::HttpServerConnection& connection,
-    const nx::network::http::Request& request,
-    nx::network::http::server::AuthenticationCompletionHandler completionHandler)
-{
-    if (m_authenticationEnabled)
-    {
-        BaseType::authenticate(connection, request, std::move(completionHandler));
-    }
-    else
-    {
-        completionHandler(nx::network::http::server::AuthenticationResult(
-            true,
-            nx::utils::stree::ResourceContainer(),
-            std::nullopt,
-            nx::network::http::HttpHeaders(),
-            nullptr));
-    }
-}
-
-void TestAuthenticationManager::setAuthenticationEnabled(bool value)
-{
-    m_authenticationEnabled = value;
-}
-
-//-------------------------------------------------------------------------------------------------
-
 TestHttpServer::~TestHttpServer()
 {
     m_httpServer->pleaseStopSync();
@@ -82,16 +47,16 @@ void TestHttpServer::addModRewriteRule(QString oldPrefix, QString newPrefix)
     m_httpMessageDispatcher.addModRewriteRule(std::move(oldPrefix), std::move(newPrefix));
 }
 
-void TestHttpServer::setAuthenticationEnabled(bool value)
-{
-    m_authenticationManager.setAuthenticationEnabled(value);
-}
-
 void TestHttpServer::registerUserCredentials(
     const nx::String& userName,
     const nx::String& password)
 {
     registerUserCredentials(Credentials(userName, PasswordAuthToken(password)));
+}
+
+void TestHttpServer::enableAuthentication(const std::string& path)
+{
+    m_authDispatcher.add(std::regex(path), &m_authenticationManager);
 }
 
 void TestHttpServer::registerUserCredentials(const Credentials& credentials)

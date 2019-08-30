@@ -3,20 +3,28 @@
 angular.module('cloudApp')
     .controller('SystemCtrl', [ '$scope', 'cloudApi', '$routeParams', '$location', 'urlProtocol', 'dialogs', 'process',
         'account', 'authorizationCheckService', '$q', 'system', '$poll', 'page', '$timeout', 'systemsProvider',
+        'languageService', 'nxPageService',
         function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process,
-                  account, authorizationCheckService, $q, system, $poll, page, $timeout, systemsProvider) {
-
+                  account, authorizationCheckService, $q, system, $poll, page, $timeout, systemsProvider,
+                  languageService, nxPageService) {
+        
+        
             var systemId = $routeParams.systemId;
             $scope.currentlyMerging = false;
             $scope.debugMode = Config.allowDebugMode;
-
+            $scope.betaMode = Config.allowBetaMode;
+            $scope.configCanMerge = Config.cloudMerge || false;
+    
+            nxPageService.setPageTitle(languageService.lang.pageTitles.system);
+            
             authorizationCheckService.requireLogin().then(function (account) {
                 $scope.account = account;
                 $scope.system = system(systemId, account.email);
                 $scope.gettingSystem.run();
-
+                $scope.systems = systemsProvider.systems;
+                
                 $scope.$watch('system.info.name', function (value) {
-                    page.title(value ? value + ' -' : '');
+                    nxPageService.setPageTitle(value + ' -');
                     systemsProvider.forceUpdateSystems();
                 });
                 
@@ -25,7 +33,7 @@ angular.module('cloudApp')
                         setMergeStatus(mergeInfo);
                     } else{
                         if($scope.currentlyMerging) {
-                            dialogs.notify(L.system.successMerge, 'success', true);
+                            dialogs.notify(L.system.mergeSuccess, 'success', true);
                         }
                         $scope.currentlyMerging = false;
                     }
@@ -65,7 +73,7 @@ angular.module('cloudApp')
                 },
                 errorPrefix: L.errorCodes.cantGetSystemInfoPrefix
             }).then(function () {
-                $scope.canMerge = $scope.system.isOnline;
+                $scope.canMerge = $scope.system.canMerge && $scope.system.isOnline || Config.cloudMerge;
                 if ($scope.system.mergeInfo) {
                     setMergeStatus($scope.system.mergeInfo);
                 }
@@ -82,6 +90,10 @@ angular.module('cloudApp')
             var pollingSystemUpdate = null;
 
             function delayedUpdateSystemInfo() {
+                // An extra measure to prevent more intervals from being created.
+                if (pollingSystemUpdate) {
+                    $poll.cancel(pollingSystemUpdate);
+                }
                 pollingSystemUpdate = $poll(function () {
                     return $scope.system
                         .update()
@@ -93,7 +105,6 @@ angular.module('cloudApp')
                 }, Config.updateInterval);
 
                 $scope.$on('$destroy', function (event) {
-                    // $poll.cancel(pollingSystemUpdate);
                     $poll.cancel(pollingSystemUpdate);
                 });
             }
@@ -116,14 +127,6 @@ angular.module('cloudApp')
 
             function cleanUrl() {
                 $location.path('/systems/' + systemId, false);
-            }
-
-            function reloadSystems() {
-                systemsProvider
-                    .forceUpdateSystems()
-                    .then(function () {
-                        $location.path('/systems');
-                    });
             }
 
             function updateAndGoToSystems() {
@@ -180,12 +183,29 @@ angular.module('cloudApp')
             };
 
             $scope.mergeSystems = function () {
+                var systems = systemsProvider.getMySystems($scope.account.email, $scope.system.id);
                 return dialogs
-                    .merge($scope.system)
+                    .merge($scope.system, systems, $scope.account)
                     .then(function (mergeInfo) {
                         if (mergeInfo) {
                            $scope.system.mergeInfo = mergeInfo;
                         }
+                    }, function(error) {
+                        if(!error.primarySystemName && !error.secondarySystemName){
+                            return;
+                        }
+                        var commonErrorMsg = L.merging.commonText
+                            .replace('{{primarySystem}}', error.primarySystemName)
+                            .replace('{{secondarySystem}}', error.secondarySystemName);
+                        var dialogBody = '<p>' + commonErrorMsg + '</p>';
+                        var responseError = L.errorCodes[error.errorText] || L.errorCodes[error.responseCode];
+                        if (!responseError) {
+                            responseError = L.errorCodes.unknownMergeError;
+                        } else {
+                            responseError = responseError.replace('{{failedSystem}}', error.failedSystemName);
+                        }
+                        dialogBody += '<p>' + responseError + '</p>';
+                        dialogs.confirm(dialogBody, L.merging.mergeFailedTitle, L.dialogs.okButton, 'btn-primary', null);
                     });
             };
 
@@ -246,18 +266,16 @@ angular.module('cloudApp')
                                 delayedUpdateSystemInfo();
                             }, function () {
                                 $scope.locked[ user.email ] = false;
+                                $scope.system.getUsers();
+                                delayedUpdateSystemInfo();
                             });
 
                             $scope.unsharing.run();
                         } else {
                             $scope.locked[ user.email ] = false;
-                            $scope.system.getUsers();
-                            delayedUpdateSystemInfo();
                         }
                     }, function () {
                         $scope.locked[ user.email ] = false;
-                        $scope.system.getUsers();
-                        delayedUpdateSystemInfo();
                     });
             };
 

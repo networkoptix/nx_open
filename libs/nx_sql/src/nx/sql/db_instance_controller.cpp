@@ -25,24 +25,24 @@ InstanceController::InstanceController(const ConnectionOptions& dbConnectionOpti
 
 bool InstanceController::initialize()
 {
-    NX_DEBUG(this, lm("Initializing query executor"));
+    NX_DEBUG(this, "Initializing DB %1", m_dbConnectionOptions.dbName);
     if (!m_queryExecutor->init())
     {
-        NX_ERROR(this, "Failed to open connection to DB");
+        NX_ERROR(this, "Failed to open connection to DB %1", m_dbConnectionOptions.dbName);
         return false;
     }
 
-    NX_DEBUG(this, lm("Configuring DB"));
+    NX_DEBUG(this, "Configuring DB %1", m_dbConnectionOptions.dbName);
     if (!configureDb())
     {
-        NX_ERROR(this, "Failed to tune DB");
+        NX_ERROR(this, "Failed to tune DB %1", m_dbConnectionOptions.dbName);
         return false;
     }
 
-    NX_DEBUG(this, lm("Updating DB structure"));
+    NX_DEBUG(this, "Updating DB structure %1", m_dbConnectionOptions.dbName);
     if (!updateDbStructure())
     {
-        NX_ERROR(this, "Could not update DB to current version");
+        NX_ERROR(this, "Could not update DB %1 to current version", m_dbConnectionOptions.dbName);
         return false;
     }
 

@@ -1,8 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
+Suite Setup       Open Browser and go to URL    ${url}
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
-Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 Force Tags        System
 
@@ -21,8 +21,8 @@ Log in to Auto Tests System
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${email}    ${password}    None
     Validate Log In
-    Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}    //div[@ng-if='gettingSystem.success']//h2[@class='card-title']
-    Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}    //div[@ng-if='gettingSystem.success']
+    Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}    //div[@ng-if\='gettingSystem.success']//h2[@class\='card-title']
+    Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}    //div[@ng-if\='gettingSystem.success']
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
 Share with Adminstrator
@@ -171,6 +171,39 @@ admin cannot delete or edit self
     Element Should Not Be Visible    ${DELETE USER BUTTON ADMIN}
     Element Should Not Be Visible    ${EDIT USER BUTTON ADMIN}
 
+Admin cannot edit self via share
+    [tags]    C41904    Threaded
+    Log in to Auto Tests System    ${EMAIL ADMIN}
+    Wait Until Element Is Enabled    ${OPEN IN NX BUTTON}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${SHARE BUTTON SYSTEMS}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
+    Input Text    ${SHARE EMAIL}    ${EMAIL ADMIN}
+    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
+    Click Button    ${SHARE PERMISSIONS DROPDOWN}
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${VIEWER TEXT}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${VIEWER TEXT}']/..
+    Click Button    ${SHARE BUTTON MODAL}
+    Check For Alert    ${CHANGING OWN PERMISSIONS IS NOT ALLOWED}
+    Wait Until Element Is Visible    ${SHARE CANCEL}
+    Click Button    ${SHARE CANCEL}
+
+Owner cannot edit self via share
+    [tags]    C41904    Threaded
+    Log in to Auto Tests System    ${EMAIL OWNER}
+    Wait Until Element Is Enabled    ${OPEN IN NX BUTTON}
+    Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
+    Click Button    ${SHARE BUTTON SYSTEMS}
+    Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
+    Input Text    ${SHARE EMAIL}    ${EMAIL OWNER}
+    Wait Until Element Is Visible    ${SHARE PERMISSIONS DROPDOWN}
+    Click Button    ${SHARE PERMISSIONS DROPDOWN}
+    Wait Until Element Is Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${VIEWER TEXT}']
+    Click Link    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${VIEWER TEXT}']/..
+    Click Button    ${SHARE BUTTON MODAL}
+    Click Button    ${SHARE CLOSE}
+    Check For Alert    ${CHANGING OWN PERMISSIONS IS NOT ALLOWED}
+
 admin cannot delete or edit other admins
     [tags]    C41905
     Go To    ${url}/register
@@ -180,7 +213,6 @@ admin cannot delete or edit other admins
     Log in to Auto Tests System    ${email}
     Share To    ${random email}    ${ADMIN TEXT}
     Log Out
-    Validate Log Out
     Log in to Auto Tests System    ${random email}
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
@@ -189,7 +221,6 @@ admin cannot delete or edit other admins
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='unshare(user)']/span[text()='${DELETE USER BUTTON TEXT}']
     Element Should Not Be Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]/following-sibling::td/a[@ng-click='editShare(user)']/span[contains(text(),'${EDIT USER BUTTON TEXT}')]/..
     Log Out
-    Validate Log Out
     Log in to Auto Tests System    ${email}
     Remove User Permissions    ${random email}
 
@@ -204,6 +235,8 @@ admin cannot invite another admin
     Element Should Not Be Visible    ${SHARE MODAL}//nx-permissions-select//li//span[text()='${ADMIN TEXT}']
     Click Button    ${SHARE PERMISSIONS DROPDOWN}
     Click Button    ${SHARE CANCEL}
+
+
 
 Edit permission works
     [tags]    C41900
@@ -225,12 +258,11 @@ Delete user works
     Activate    ${random email}
     Log in to Auto Tests System    ${email}
     Share To    ${random email}    ${ADMIN TEXT}
-    Check User Permissions    ${random email}    ${CUSTOM TEXT}
+    Check User Permissions    ${random email}    ${ADMIN TEXT}
     Log Out
     Validate Log Out
     Log in to Auto Tests System    ${random email}
     Log Out
-    Validate Log Out
     Log in to Auto Tests System    ${email}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${random email}')]
@@ -240,11 +272,10 @@ Delete user works
     Click Button    ${DELETE USER CANCEL BUTTON}
     Remove User Permissions    ${random email}
     Log Out
-    Validate Log Out
     Log In    ${random email}    ${password}
     Wait Until Element Is Visible    ${YOU HAVE NO SYSTEMS}
 
-Share with registered user - sends him notification
+Share with registered user works and sends him notification
     [tags]    email    C41888
     #log in as noperm to check language and change its language to the current testing language
     #otherwise it may receive the notification in another language and fail the email subject comparison
@@ -252,18 +283,22 @@ Share with registered user - sends him notification
     Validate Log In
     Sleep    1
     Log Out
-    Validate Log Out
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
     Share To    ${EMAIL NO PERM}    ${ADMIN TEXT}
     Check User Permissions    ${EMAIL NOPERM}    ${ADMIN TEXT}
     Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
     ${INVITED TO SYSTEM EMAIL SUBJECT}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT}    {{message.system_name}}    ${AUTO TESTS}
-    ${email}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120
-    Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
-    Remove User Permissions    ${EMAIL NOPERM}
+    ${emailID}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120
+    Check Email Subject    ${emailID}    ${INVITED TO SYSTEM EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Delete All Emails
     Close Mailbox
+    Log Out
+    Log in to Auto Tests System    ${EMAIL NO PERM}
+    Check User Permissions    ${EMAIL NOPERM}    ${ADMIN TEXT}
+    Log Out
+    Log in to Auto Tests System    ${email}
+    Remove User Permissions    ${EMAIL NOPERM}
 
 Share with unregistered user - brings them to registration page with code with correct email locked
     [tags]    email    C41889
@@ -271,7 +306,7 @@ Share with unregistered user - brings them to registration page with code with c
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
     Share To    ${random email}    ${ADMIN TEXT}
-    Check User Permissions    ${random email}    ${CUSTOM TEXT}
+    Check User Permissions    ${random email}    ${ADMIN TEXT}
     Log Out
     Validate Log Out
     ${link}    Get Email Link    ${random email}    register
@@ -285,9 +320,11 @@ Sharing system with a user who is already in the list updates their permissions
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
     Share To    ${random email}    ${ADMIN TEXT}
+    Open Mailbox    host=${BASE HOST}    password=${BASE EMAIL PASSWORD}    port=${BASE PORT}    user=${BASE EMAIL}    is_secure=True
+    Run Keyword And Expect Error    *    Wait For Email    recipient=${EMAIL ADMIN}    timeout=30
+    Delete All Emails
     Check User Permissions    ${random email}    ${ADMIN TEXT}
     Share To    ${random email}    ${VIEWER TEXT}
-    ${email ID}    Wait For Email    recipient=${email}    timeout=120    status=UNSEEN
     Delete All Emails
     Close Mailbox
     Check User Permissions    ${random email}    ${VIEWER TEXT}
@@ -301,7 +338,6 @@ Check share email for registered user
     Validate Log In
     Sleep    1
     Log Out
-    Validate Log Out
     Log in to Auto Tests System    ${email}
     Verify In System    Auto Tests
     Share To    ${EMAIL NO PERM}    ${ADMIN TEXT}
@@ -310,10 +346,11 @@ Check share email for registered user
     ${INVITED TO SYSTEM EMAIL SUBJECT}    Replace String    ${INVITED TO SYSTEM EMAIL SUBJECT}    {{message.system_name}}    ${AUTO TESTS}
     ${email}    Wait For Email    recipient=${EMAIL NOPERM}    timeout=120
     ${email text}    Get Email Body    ${email}
+    ${email text}    Decode Bytes To String    ${email text}    UTF-8
     Check Email Subject    ${email}    ${INVITED TO SYSTEM EMAIL SUBJECT}    ${BASE EMAIL}    ${BASE EMAIL PASSWORD}    ${BASE HOST}    ${BASE PORT}
     Check Email Button    ${email text}    ${ENV}    ${THEME COLOR}
     ${links}    Get Links From Email    ${email}
-    @{expected links}    Set Variable    ${SUPPORT URL}    ${WEBSITE URL}    ${ENV}    ${ENV}/systems/${AUTO_TESTS SYSTEM ID}    mailto:${OWNER EMAIL}
+    @{expected links}    Set Variable    ${SUPPORT URL}    ${WEBSITE URL}    ${ENV}    ${ENV}/systems/${AUTO_TESTS SYSTEM ID}    mailto:${EMAIL OWNER}
     : FOR    ${link}  IN  @{links}
     \    check in list    ${expected links}    ${link}
     Delete All Emails

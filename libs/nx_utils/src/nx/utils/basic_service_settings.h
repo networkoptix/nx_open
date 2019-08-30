@@ -3,8 +3,7 @@
 #include "abstract_service_settings.h"
 #include "deprecated_settings.h"
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
 class NX_UTILS_API BasicServiceSettings:
     public AbstractServiceSettings
@@ -18,6 +17,8 @@ public:
     virtual void load(int argc, const char **argv) override;
     virtual bool isShowHelpRequested() const override;
     virtual void printCmdLineArgsHelp() override;
+    virtual QString dataDir() const override;
+    virtual utils::log::Settings logging() const override;
 
 protected:
     virtual void loadSettings() = 0;
@@ -26,8 +27,9 @@ protected:
 
 private:
     QnSettings m_settings;
-    bool m_showHelp;
+    bool m_showHelp = false;
+    utils::log::Settings m_logging;
+    QString m_moduleName;
 };
 
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils

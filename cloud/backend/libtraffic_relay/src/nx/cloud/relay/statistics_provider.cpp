@@ -24,7 +24,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 StatisticsProvider::StatisticsProvider(
     const relaying::AbstractListeningPeerPool& listeningPeerPool,
-    const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
+    const network::http::server::AbstractHttpStatisticsProvider& httpServerStatisticsProvider,
     const controller::AbstractTrafficRelay& trafficRelay)
     :
     m_listeningPeerPool(listeningPeerPool),
@@ -37,7 +37,7 @@ Statistics StatisticsProvider::getAllStatistics() const
 {
     Statistics statistics;
     statistics.relaying = m_listeningPeerPool.statistics();
-    statistics.http = m_httpServerStatisticsProvider.statistics();
+    statistics.http = m_httpServerStatisticsProvider.httpStatistics();
     statistics.relaySessions = m_trafficRelay.statistics();
     return statistics;
 }
@@ -58,7 +58,7 @@ StatisticsProviderFactory& StatisticsProviderFactory::instance()
 
 std::unique_ptr<AbstractStatisticsProvider> StatisticsProviderFactory::defaultFactoryFunction(
     const relaying::AbstractListeningPeerPool& listeningPeerPool,
-    const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
+    const nx::network::http::server::AbstractHttpStatisticsProvider& httpServerStatisticsProvider,
     const controller::AbstractTrafficRelay& trafficRelay)
 {
     return std::make_unique<StatisticsProvider>(

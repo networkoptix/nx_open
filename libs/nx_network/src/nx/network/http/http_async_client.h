@@ -65,29 +65,38 @@ public:
     /**
      * 0 means infinity for any timeout.
      */
-    class NX_NETWORK_API Timeouts
+    class Timeouts
     {
     public:
-        constexpr static const std::chrono::milliseconds kDefaultSendTimeout =
+        static constexpr std::chrono::milliseconds kDefaultSendTimeout =
             std::chrono::milliseconds(3001);
-        constexpr static const std::chrono::milliseconds kDefaultResponseReadTimeout =
+
+        static constexpr std::chrono::milliseconds kDefaultResponseReadTimeout =
             std::chrono::milliseconds(3002);
-        constexpr static const std::chrono::milliseconds kDefaultMessageBodyReadTimeout =
+
+        static constexpr std::chrono::milliseconds kDefaultMessageBodyReadTimeout =
             std::chrono::milliseconds(10003);
 
-        std::chrono::milliseconds sendTimeout;
-        std::chrono::milliseconds responseReadTimeout;
-        std::chrono::milliseconds messageBodyReadTimeout;
+        std::chrono::milliseconds sendTimeout = kDefaultSendTimeout;
+        std::chrono::milliseconds responseReadTimeout = kDefaultResponseReadTimeout;
+        std::chrono::milliseconds messageBodyReadTimeout = kDefaultMessageBodyReadTimeout;
 
-        Timeouts(
-            std::chrono::milliseconds send = kDefaultSendTimeout,
-            std::chrono::milliseconds recv = kDefaultResponseReadTimeout,
-            std::chrono::milliseconds msgBody = kDefaultMessageBodyReadTimeout);
-
-        bool operator==(const Timeouts& rhs) const;
+        constexpr bool operator==(const Timeouts& rhs) const
+        {
+            return sendTimeout == rhs.sendTimeout
+                && responseReadTimeout == rhs.responseReadTimeout
+                && messageBodyReadTimeout == rhs.messageBodyReadTimeout;
+        }
     };
 
-    static const int UNLIMITED_RECONNECT_TRIES = -1;
+    using CustomRequestPrepareFunc = nx::utils::MoveOnlyFunc<void(Request* request)>;
+
+    static constexpr Timeouts kInfiniteTimeouts = {
+        std::chrono::milliseconds::zero(),
+        std::chrono::milliseconds::zero(),
+        std::chrono::milliseconds::zero()};
+
+    static constexpr int UNLIMITED_RECONNECT_TRIES = -1;
 
     AsyncClient();
 
@@ -117,8 +126,10 @@ public:
      */
     void setOnRequestHasBeenSent(
         nx::utils::MoveOnlyFunc<void(bool /*isRetryAfterUnauthorizedResponse*/)> handler);
+
     /** Emitted when response headers has been read. */
     void setOnResponseReceived(nx::utils::MoveOnlyFunc<void()> handler);
+
     /**
      * Message body buffer is not empty.
      * Received message body buffer is appended to internal buffer which
@@ -129,6 +140,7 @@ public:
      *   every time on receiving this signal
     */
     void setOnSomeMessageBodyAvailable(nx::utils::MoveOnlyFunc<void()> handler);
+
     /**
      * Emitted when http request is done with any result
      *   (successfully executed request and received message body,
@@ -147,6 +159,7 @@ public:
      *   To get error description use SystemError::getLastOSErrorCode().
      */
     void doGet(const nx::utils::Url& url);
+
     /**
      * This overload is same as:
      * @code{.cpp}
@@ -173,12 +186,20 @@ public:
         std::unique_ptr<AbstractMsgBodySource> body);
     void doPost(
         const nx::utils::Url& url,
+        std::unique_ptr<AbstractMsgBodySource> body,
+        nx::utils::MoveOnlyFunc<void()> completionHandler);
+    void doPost(
+        const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     void doPut(const nx::utils::Url& url);
     void doPut(
         const nx::utils::Url& url,
         std::unique_ptr<AbstractMsgBodySource> body);
+    void doPut(
+        const nx::utils::Url& url,
+        std::unique_ptr<AbstractMsgBodySource> body,
+        nx::utils::MoveOnlyFunc<void()> completionHandler);
     void doPut(
         const nx::utils::Url& url,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
@@ -241,8 +262,10 @@ public:
      * NOTE: This method is thread-safe and can be called in any thread.
      */
     BufferType fetchMessageBodyBuffer();
+
     const nx::utils::Url& url() const;
     const nx::utils::Url& contentLocationUrl() const;
+
     /**
      * Number of bytes read (including http request line and headers)
      *  via single HTTP request.
@@ -272,12 +295,14 @@ public:
 
     /** Set socket connect/send timeout. */
     void setSendTimeout(std::chrono::milliseconds sendTimeout);
+
     /**
      * @param responseReadTimeoutMs 0 means infinity.
      * By default, 3000 ms.
      * If timeout has been met, connection is closed, state set to failed and AsyncClient::done emitted.
      */
     void setResponseReadTimeout(std::chrono::milliseconds responseReadTimeout);
+
     /**
      * @param messageBodyReadTimeoutMs 0 means infinity.
      * By default there is no timeout.
@@ -285,7 +310,10 @@ public:
      */
     void setMessageBodyReadTimeout(std::chrono::milliseconds messageBodyReadTimeout);
 
+    void setTimeouts(const Timeouts& timeouts);
+
     const std::unique_ptr<AbstractStreamSocket>& socket();
+
     /**
      * Returns socket in non-blocking mode.
      * NOTE: Can be called within object's aio thread only.
@@ -296,6 +324,12 @@ public:
     void addRequestHeaders(const HttpHeaders& headers);
     void removeAdditionalHeader(const StringType& key);
     void setAdditionalHeaders(HttpHeaders additionalHeaders);
+
+    /**
+     * @param func Invoked after fully preparing request to be sent.
+     */
+    void setCustomRequestPrepareFunc(CustomRequestPrepareFunc func);
+
     void setAuthType(AuthType value);
     AuthInfoCache::AuthorizationCacheItem authCacheItem() const;
 
@@ -369,11 +403,10 @@ private:
     int m_totalRequestsSentViaCurrentConnection; //< total sent requests via single connection
     int m_totalRequestsSent; //< total sent requests
     bool m_contentEncodingUsed;
-    std::chrono::milliseconds m_sendTimeout;
-    std::chrono::milliseconds m_responseReadTimeout;
-    std::chrono::milliseconds m_msgBodyReadTimeout;
+    Timeouts m_timeouts;
     AuthType m_authType;
     HttpHeaders m_additionalHeaders;
+    CustomRequestPrepareFunc m_customRequestPrepareFunc;
     int m_awaitedMessageNumber;
     QString m_remoteEndpointWithProtocol;
     AuthInfoCache::AuthorizationCacheItem m_authCacheItem;

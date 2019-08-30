@@ -223,7 +223,7 @@ nx::utils::Subscription<std::string>& ListeningPeerPool::peerDisconnectedSubscri
 std::string ListeningPeerPool::convertHostnameToInternalFormat(
     const std::string& hostname) const
 {
-    auto reversed = utils::reverseWords(hostname, ".");
+    auto reversed = utils::reverseWords(hostname, '.');
     nx::utils::to_lower(&reversed);
     return reversed;
 }
@@ -311,7 +311,7 @@ void ListeningPeerPool::giveAwayConnection(
             completionHandler(
                 relay::api::ResultCode::ok,
                 std::move(connection),
-                nx::utils::reverseWords(peerName, "."));
+                nx::utils::reverseWords(peerName, '.'));
         });
 }
 

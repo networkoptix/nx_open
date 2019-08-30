@@ -13,6 +13,7 @@ export class NxMainComponent implements OnInit, OnDestroy {
 
     private setupDefaults() {
         this.content = {
+            base: '/main/',
             level1: [
                 {
                     id: 'servers',

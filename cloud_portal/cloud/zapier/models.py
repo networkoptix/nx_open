@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from rest_hooks.models import AbstractHook
 
+
 class ZapHook(AbstractHook):
     event = models.CharField(max_length=1024)
 

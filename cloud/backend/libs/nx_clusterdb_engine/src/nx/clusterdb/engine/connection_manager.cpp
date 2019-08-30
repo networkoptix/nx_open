@@ -88,7 +88,7 @@ void ConnectionManager::dispatchTransaction(
         ++connectionIt)
     {
         if (connectionIt->fullPeerName.peerId ==
-                transactionSerializer->header().peerID.toByteArray())
+                transactionSerializer->header().peerID.toStdString())
         {
             // Not sending transaction to peer which has generated it.
             continue;

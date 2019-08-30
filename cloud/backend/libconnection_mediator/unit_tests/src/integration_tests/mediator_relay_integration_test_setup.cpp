@@ -117,7 +117,7 @@ void MediatorRelayIntegrationTestSetup::SetUp()
 
     m_mediaServerEmulator = std::make_unique<MediaServerEmulator>(
         stunUdpEndpoint(),
-        stunTcpEndpoint(),
+        stunTcpBaseUrl(),
         system);
 
     m_mediatorUdpClient = std::make_unique<api::MediatorClientUdpConnection>(

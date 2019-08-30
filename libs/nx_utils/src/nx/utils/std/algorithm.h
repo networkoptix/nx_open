@@ -128,22 +128,6 @@ typename std::pair<
     return result;
 }
 
-/**
- * E.g., reverseWords("test.example.com", '.') returns "com.example.test".
- */
-template<typename RandomAccessContainer, typename Separator>
-RandomAccessContainer reverseWords(
-    const RandomAccessContainer& str,
-    const Separator& separator)
-{
-    std::vector<RandomAccessContainer> splitVec;
-    boost::split(splitVec, str, boost::algorithm::is_any_of(separator));
-
-    return boost::join(
-        boost::make_iterator_range(splitVec.rbegin(), splitVec.rend()),
-        separator);
-}
-
 template<typename InputIt, typename T>
 bool contains(InputIt first, InputIt last, const T& value)
 {

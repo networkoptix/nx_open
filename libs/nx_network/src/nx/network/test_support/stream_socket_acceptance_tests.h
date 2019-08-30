@@ -759,6 +759,16 @@ protected:
             });
     }
 
+    void whenCancelAccept()
+    {
+        serverSocket()->cancelIOSync();
+    }
+
+    void whenStopServerSocket()
+    {
+        serverSocket()->pleaseStopSync();
+    }
+
     void waitUntilConnectionIsAcceptedInNonBlockingMode()
     {
         ASSERT_TRUE(m_serverSocket->setNonBlockingMode(true))
@@ -846,6 +856,15 @@ protected:
         thenAcceptReported(SystemError::noError);
 
         ASSERT_NE(nullptr, std::get<1>(m_prevAcceptResult));
+    }
+
+    void thenNoConnectionCanBeAccepted()
+    {
+        auto connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
+        ASSERT_TRUE(connection->setNonBlockingMode(true));
+        connection->connect(serverEndpoint(), nx::network::kNoTimeout);
+
+        ASSERT_FALSE(m_acceptedConnections.pop(std::chrono::milliseconds(10)));
     }
 
     void thenConnectionIsEstablished()
@@ -1744,7 +1763,7 @@ TYPED_TEST_P(StreamSocketAcceptance, pollable_is_valid_after_shutdown)
 {
     this->givenSilentServer();
     this->givenConnectedSocket();
-    
+
     this->whenInvokeShutdown();
 
     this->thenPollableIsStillValid();
@@ -1855,6 +1874,20 @@ TYPED_TEST_P(StreamSocketAcceptance, server_socket_can_be_freed_in_accept_handle
     this->thenAcceptReported(SystemError::timedOut);
 }
 
+TYPED_TEST_P(StreamSocketAcceptance, accept_is_cancelled_with_cancelIo)
+{
+    this->givenAcceptingServerSocket();
+    this->whenCancelAccept();
+    this->thenNoConnectionCanBeAccepted();
+}
+
+TYPED_TEST_P(StreamSocketAcceptance, accept_is_cancelled_with_pleaseStop)
+{
+    this->givenAcceptingServerSocket();
+    this->whenStopServerSocket();
+    this->thenNoConnectionCanBeAccepted();
+}
+
 TYPED_TEST_P(StreamSocketAcceptance, reuse_addr)
 {
     auto server1 = this->createServerSocket();
@@ -1863,7 +1896,8 @@ TYPED_TEST_P(StreamSocketAcceptance, reuse_addr)
 
     auto server2 = this->createServerSocket();
     ASSERT_TRUE(server2->setReuseAddrFlag(true));
-    ASSERT_TRUE(server2->bind(SocketAddress(HostAddress::localhost, server1->getLocalAddress().port)));
+    ASSERT_TRUE(server2->bind(
+        SocketAddress(HostAddress::localhost, server1->getLocalAddress().port)));
 }
 
 TYPED_TEST_P(StreamSocketAcceptance, reuse_port)
@@ -1940,7 +1974,10 @@ REGISTER_TYPED_TEST_CASE_P(StreamSocketAcceptance,
     server_socket_accept_async_times_out,
     accept_async_on_blocking_socket_results_in_error,
     server_socket_can_be_freed_in_accept_handler,
-    
+
+    accept_is_cancelled_with_cancelIo,
+    accept_is_cancelled_with_pleaseStop,
+
     //---------------------------------------------------------------------------------------------
     // Socket options.
     reuse_addr,

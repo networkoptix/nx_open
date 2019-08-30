@@ -1,4 +1,4 @@
-(function () {
+(() => {
 
         'use strict';
 
@@ -6,21 +6,19 @@
             .module('cloudApp')
             .factory('authorizationCheckService', AuthorizationCheckService);
 
-        AuthorizationCheckService.$inject = ['$rootScope', '$q', '$localStorage', '$base64',
-            'cloudApi', 'account', 'nxConfigService', 'NxDialogsService', 'languageService', '$location'];
+        AuthorizationCheckService.$inject = ['$rootScope', '$q', '$localStorage',
+            'cloudApi', 'nxConfigService', 'NxDialogsService', 'languageService', '$location'];
 
-        function AuthorizationCheckService($rootScope, $q, $localStorage, $base64,
-                                           cloudApi, account, nxConfigService, NxDialogsService, languageService, $location) {
+        function AuthorizationCheckService($rootScope, $q, $localStorage,
+                                           cloudApi, nxConfigService, NxDialogsService, languageService, $location) {
 
             const CONFIG = nxConfigService.getConfig();
-
-            const search = $location.search();
-            let auth: any;
 
             $rootScope.session = $localStorage;
 
             const service = {
                 get,
+                checkLoginState,
                 login,
                 logout,
                 requireLogin,
@@ -36,63 +34,6 @@
             //////////////////////////////////////////////////
 
             function init() {
-                if (search.auth) {
-                    try {
-                        auth = $base64.decode(search.auth);
-                    } catch (exception) {
-                        auth = false;
-                        console.error(exception);
-                    }
-                    if (auth) {
-                        const index = auth.indexOf(':');
-                        const tempLogin = auth.substring(0, index);
-                        const tempPassword = auth.substring(index + 1);
-
-                        account.requestingLogin = login(tempLogin, tempPassword, false)
-                            .then(() => {
-                                $location.search('auth', undefined);
-                            }, () => {
-                                $location.search('auth', undefined);
-                            });
-                    }
-                }
-            }
-
-            function get() {
-                if (account.requestingLogin) {
-                    // login is requesting, so we wait
-                    return account.requestingLogin.then(() => {
-                        account.requestingLogin = undefined; // clean requestingLogin reference
-                        return get(); // Try again
-                    });
-                }
-
-                return cloudApi
-                    .account()
-                    .then((account) => {
-                        return account.data;
-                    });
-            }
-
-            function login(email, password, remember) {
-                return cloudApi
-                        .login(email, password, remember)
-                        .then((result) => {
-                            if (cloudApi.checkResponseHasError(result)) {
-                                return $q.reject(result);
-                            }
-
-                            return checkLoginState()
-                                    .then(() => {
-                                        logoutAuthorised();
-                                    })
-                                    .catch(() => {
-                                        if (result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
-                                            setEmail(result.data.email);
-                                            $rootScope.session.loginState = result.data.email; // Forcing changing loginState to reload interface
-                                        }
-                                    });
-                        });
             }
 
             function checkLoginState() {
@@ -100,6 +41,55 @@
                     return $q.resolve(true);
                 }
                 return $q.reject(false);
+            }
+
+            function get() {
+                return cloudApi
+                    .account()
+                    .then((account) => {
+                        return account.data;
+                    });
+            }
+
+            function setEmail(email) {
+                $rootScope.session.email = email;
+            }
+
+            function login(email, password, remember) {
+                setEmail(email);
+
+                return cloudApi
+                        .login(email, password, remember)
+                        .then((result) => {
+                            if (cloudApi.checkResponseHasError(result)) {
+                                return $q.reject(result);
+                            }
+
+                            if ($rootScope.session.loginState) {
+                                // If the user that logged in matches the current session there's no need to show
+                                // the logout dialog.
+                                if (result.data.email !== $rootScope.session.loginState) {
+                                    logoutAuthorised();
+                                }
+
+                                return $q.resolve(true);
+                            }
+
+                            if (result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
+                                setEmail(result.data.email);
+                                $rootScope.session.loginState = result.data.email; // Forcing changing loginState to reload interface
+                            }
+
+                            get().then(() => {
+                                     return $q.resolve(true);
+                                 })
+                                 .catch(error => {
+                                     return $q.reject(error);
+                                 });
+
+                        }, () => {
+                            NxDialogsService.notify(languageService.lang.errorCodes.wrongAuthCode, 'danger');
+                        });
             }
 
             function logout(doNotRedirect) {
@@ -114,10 +104,6 @@
                             document.location.reload();
                         });
                     });
-            }
-
-            function setEmail(email) {
-                $rootScope.session.email = email;
             }
 
             function requireLogin() {
@@ -144,7 +130,7 @@
                 get().then(() => {
                     // logoutAuthorisedLogoutButton
                     NxDialogsService
-                        .confirm(languageService.lang.dialogs.logoutAuthorisedText, languageService.lang.dialogs.logoutAuthorisedTitle,
+                        .confirm('', languageService.lang.dialogs.logoutAuthorisedTitle,
                             languageService.lang.dialogs.logoutAuthorisedContinueButton, 'btn-primary',
                             languageService.lang.dialogs.logoutAuthorisedLogoutButton
                         )
@@ -157,8 +143,6 @@
                         });
                 });
             }
-
         }
     }
-
 )();
