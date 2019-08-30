@@ -1,9 +1,9 @@
 FOR /F "tokens=*" %%i in ('type build_options.conf') do SET %%i
 
-set PATH=%DEV_PATH%\python;%DEV_PATH%\python\Scripts;%PATH%
+set PATH=%DEV_PATH%\python;%PATH%
 set PYTHONPATH=%DEV_PATH%\python\lib\python3.7\site-packages
 
-pyinstaller ^
+python3.exe -m PyInstaller ^
     -y ^
     -F --hidden-import json ^
     --distpath %BUILD_DIR%\dist ^
