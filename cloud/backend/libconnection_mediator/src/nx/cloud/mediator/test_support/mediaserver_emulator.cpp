@@ -97,7 +97,7 @@ MediaServerEmulator::MediaServerEmulator(
             mediatorUdpEndpoint,
             m_mediatorConnector.get())),
     m_action(ActionToTake::proceedWithConnection),
-    m_cloudConnectionMethodMask((int)network::cloud::ConnectType::all),
+    m_cloudConnectionMethodMask((int) network::cloud::ConnectType::udpHp),
     m_cloudSystemIdForModuleInformation(m_systemData.id),
     m_serverIdForModuleInformation(m_serverId)
 {
@@ -281,6 +281,11 @@ std::unique_ptr<hpm::api::MediatorServerTcpConnection> MediaServerEmulator::medi
     return m_mediatorConnector->systemConnection();
 }
 
+void MediaServerEmulator::setCloudConnectionMethodMask(int mask)
+{
+    m_cloudConnectionMethodMask = mask;
+}
+
 void MediaServerEmulator::onConnectionRequested(
     nx::hpm::api::ConnectionRequestedEvent connectionRequestedData)
 {
@@ -292,6 +297,8 @@ void MediaServerEmulator::onConnectionRequested(
     connectionAckData.connectSessionId = connectionRequestedData.connectSessionId;
     if ((m_cloudConnectionMethodMask & (int)network::cloud::ConnectType::udpHp) > 0)
         connectionAckData.connectionMethods = nx::hpm::api::ConnectionMethod::udpHolePunching;
+    if ((m_cloudConnectionMethodMask & (int)network::cloud::ConnectType::proxy) > 0)
+        connectionAckData.connectionMethods = nx::hpm::api::ConnectionMethod::proxy;
 
     if (m_onConnectionRequestedHandler)
     {

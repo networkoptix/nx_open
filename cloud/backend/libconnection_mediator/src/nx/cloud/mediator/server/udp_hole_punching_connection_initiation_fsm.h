@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <optional>
+#include <vector>
 
 #include <nx/network/aio/async_operation_wrapper.h>
 #include <nx/network/aio/basic_pollable.h>
@@ -22,6 +23,37 @@ namespace nx {
 namespace hpm {
 
 namespace conf { class Settings; }
+
+enum class State
+{
+    init,
+    sendingConnectionRequestedIndication,
+    /** ConnectionRequested indication has been sent to the server. */
+    waitingServerPeerUdpAddress,
+    resolvingServersRelayInstance,
+    /** Reported server's UDP address to the client, waiting for result. */
+    waitingConnectionResult,
+    fini,
+};
+
+const char* toString(State);
+
+enum class Event
+{
+    connectOverUdpRequestReceived,
+    connectOverTcpRequestReceived,
+    connectionRequestedSent,
+    connectionRequestedSendFailed,
+    connectionAckReceived,
+    connectionAckWaitTimedOut,
+    relayResolveCompleted,
+    connectionResultReceived,
+    connectionResultWaitTimedOut,
+};
+
+const char* toString(Event);
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * NOTE: Object can be safely freed while in onFsmFinishedEventHandler handler.
@@ -49,6 +81,11 @@ public:
 
     virtual ~UDPHolePunchingConnectionInitiationFsm() override;
 
+    UDPHolePunchingConnectionInitiationFsm(UDPHolePunchingConnectionInitiationFsm&&) = delete;
+
+    UDPHolePunchingConnectionInitiationFsm&
+        operator=(UDPHolePunchingConnectionInitiationFsm&&) = delete;
+
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     void onConnectRequest(
@@ -68,17 +105,6 @@ public:
     stats::ConnectSession statisticsInfo() const;
 
 private:
-    enum class State
-    {
-        init,
-        /** ConnectionReqiested indication has been sent to the server. */
-        waitingServerPeerUDPAddress,
-        resolvingServersRelayInstance,
-        /** Reported server's UDP address to the client, waiting for result. */
-        waitingConnectionResult,
-        fini,
-    };
-
     State m_state;
     nx::String m_connectionID;
     std::function<void(api::NatTraversalResultCode)> m_onFsmFinishedEventHandler;
@@ -86,49 +112,100 @@ private:
     AbstractRelayClusterClient* const m_relayClusterClient;
     nx::network::aio::Timer m_timer;
     ConnectionWeakRef m_serverConnectionWeakRef;
-    ConnectCompletionHandler m_connectResponseSender;
+
+    std::optional<RequestSourceDescriptor> m_clientEndpoint;
+    api::ConnectRequest m_connectRequest;
+    api::ConnectionAckRequest m_connectionAckRequest;
+
+    std::vector<ConnectCompletionHandler> m_connectResponseSenders;
     const std::vector<network::SocketAddress> m_serverPeerEndpoints;
     const nx::String m_serverPeerHostName;
     const api::CloudConnectVersion m_serverPeerCloudConnectVersion;
     api::ConnectionMethods m_serverPeerConnectionMethods;
     stats::ConnectSession m_sessionStatisticsInfo;
-    api::ConnectResponse m_preparedConnectResponse;
-    std::optional<std::pair<api::ResultCode, api::ConnectResponse>> m_cachedConnectResponse;
+    std::optional<nx::String> m_trafficRelayUrl;
+    std::optional<std::tuple<api::ResultCode, api::ConnectResponse>> m_cachedConnectResponse;
     nx::utils::AsyncOperationGuard m_asyncOperationGuard;
     std::function<void(api::ResultCode)> m_connectionAckCompletionHandler;
     api::CloudConnectVersion m_originatingPeerCloudConnectVersion;
     nx::network::aio::AsyncOperationWrapper<
         decltype(&AbstractRelayClusterClient::findRelayInstanceForClient)
     > m_findRelayInstanceFunc;
-    nx::network::SocketAddress m_clientEndpoint;
+    std::optional<api::ConnectionResultRequest> m_connectResultReport;
 
     virtual void stopWhileInAioThread() override;
 
-    void processConnectRequest(
+    //---------------------------------------------------------------------------------------------
+    // FSM implementation.
+
+    /**
+     * Changes state (if the transition is valid) and invokes onEnter/onExit handlers.
+     * @return true if event is valid in the current state. false otherwise
+     */
+    bool changeState(Event event);
+
+    /**
+     * @param Resulting state.
+     */
+    std::optional<State> getDestinationState(State from, Event event) const;
+
+    void invokeOnExitingStateHandler(State state);
+
+    void invokeOnEnteredStateHandler(State state);
+
+    //---------------------------------------------------------------------------------------------
+    // Events.
+
+    void connectRequestReceived(
         const RequestSourceDescriptor& requestSourceDescriptor,
         api::ConnectRequest request,
         ConnectCompletionHandler connectResponseSender);
 
-    void processUdpConnectRequest(
+    void connectionRequestedNotificationSent();
+
+    void connectionRequestedNotificationFailed();
+
+    void connectionAckReceived(
         const RequestSourceDescriptor& requestSourceDescriptor,
-        api::ConnectRequest request,
-        ConnectCompletionHandler connectResponseSender);
+        api::ConnectionAckRequest request,
+        std::function<void(api::ResultCode)> completionHandler);
 
-    void processTcpConnectRequest(
-        const RequestSourceDescriptor& requestSourceDescriptor,
-        api::ConnectRequest request,
-        ConnectCompletionHandler connectResponseSender);
+    void noConnectionAckOnTime();
 
-    bool connectResponseHasAlreadyBeenSent() const;
+    void relayInstanceResolveCompleted(
+        nx::cloud::relay::api::ResultCode resultCode,
+        nx::utils::Url relayInstanceUrl);
 
-    void repeatConnectResponse(
-        ConnectCompletionHandler connectResponseSender);
+    void connectionResultReceived(
+        api::ConnectionResultRequest request,
+        std::function<void(api::ResultCode)> completionHandler);
+
+    void connectionResultWaitTimedOut();
+
+    //---------------------------------------------------------------------------------------------
+    // Actions
+
+    void sendConnectionRequestedNotification();
+
+    void startNoConnectionAckTimer();
+
+    void stopNoConnectionAckTimer();
+
+    void sendConnectResponse();
+
+    void sendConnectionAckResponse();
+
+    void startConnectionResultWaitTimer();
+
+    void stopConnectionResultWaitTimer();
+
+    void exitFsmIfReportHasAlreadyBeenReceived();
+
+    void reportFsmCompletion();
+
+    //---------------------------------------------------------------------------------------------
 
     void updateSessionStatistics(
-        const RequestSourceDescriptor& requestSourceDescriptor,
-        const api::ConnectRequest& connectRequest);
-
-    bool notifyListeningPeerAboutConnectRequest(
         const RequestSourceDescriptor& requestSourceDescriptor,
         const api::ConnectRequest& connectRequest);
 
@@ -136,52 +213,16 @@ private:
         const RequestSourceDescriptor& requestSourceDescriptor,
         const api::ConnectRequest& connectRequest);
 
-    void noConnectionAckOnTime();
-
-    void processConnectionAckRequest(
-        const RequestSourceDescriptor& requestSourceDescriptor,
-        api::ConnectionAckRequest request,
-        std::function<void(api::ResultCode)> completionHandler);
-
-    bool initiateCloudConnect(
-        api::ConnectionAckRequest connectionAck);
-
     void initiateRelayInstanceSearch();
 
     void findRelayInstance(
         RelayInstanceSearchCompletionHandler handler);
 
-    void finishConnect();
-
-    void onRelayInstanceSearchCompletion(
-        nx::cloud::relay::api::ResultCode resultCode,
-        nx::utils::Url relayInstanceUrl);
-
-    api::ConnectResponse prepareConnectResponse(
-        const api::ConnectionAckRequest& connectionAckRequest,
-        std::vector<network::SocketAddress> tcpEndpoints,
-        std::optional<nx::utils::Url> relayInstanceUrl);
-
-    void sendConnectResponse(
-        api::ResultCode resultCode,
-        api::ConnectResponse connectResponse);
+    std::tuple<api::ResultCode, api::ConnectResponse> prepareConnectResponse();
 
     void fixConnectResponseForBuggyClient(
         api::ResultCode resultCode,
         api::ConnectResponse* const connectResponse);
-
-    void processConnectionResultRequest(
-        api::ConnectionResultRequest request,
-        std::function<void(api::ResultCode)> completionHandler);
-
-    void done(api::ResultCode result);
-
-    static const char* toString(State);
-
-    UDPHolePunchingConnectionInitiationFsm(UDPHolePunchingConnectionInitiationFsm&&) = delete;
-
-    UDPHolePunchingConnectionInitiationFsm&
-        operator=(UDPHolePunchingConnectionInitiationFsm&&) = delete;
 };
 
 } // namespace hpm
