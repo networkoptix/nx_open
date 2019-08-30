@@ -148,6 +148,7 @@ void DeviceAgent::makeDeferredSubscription()
 {
     m_httpClient.reset();
     m_tcpSocket.reset();
+    m_reconnectTimer.cancelSync();
     m_reconnectTimer.start(kReconnectTimeout, [this]() { makeSubscription(); });
 }
 

@@ -212,7 +212,7 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
 
     if have_mediaserver:
         if platform == "windows" or (platform == "linux" and arch == "x64"):
-            sync("nx_box_tool-dev", path_variable="nx_box_tool_dev_dir")
+            sync("nx_box_tool-dev")
 
         sync("sigar")
         sync("any/apidoctool-2.1", path_variable="APIDOCTOOL_PATH")
