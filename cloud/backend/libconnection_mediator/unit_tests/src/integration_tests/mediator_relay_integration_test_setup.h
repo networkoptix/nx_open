@@ -31,6 +31,7 @@ protected:
     void issueConnectRequest();
     void assertTrafficRelayUrlHasBeenReported();
     std::optional<nx::String> reportedTrafficRelayUrl();
+    MediaServerEmulator& server();
 
 private:
     void assertUrlsEquality(

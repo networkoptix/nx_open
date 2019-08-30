@@ -211,6 +211,11 @@ std::optional<nx::String> MediatorRelayIntegrationTestSetup::reportedTrafficRela
     return std::nullopt;
 }
 
+MediaServerEmulator& MediatorRelayIntegrationTestSetup::server()
+{
+    return *m_mediaServerEmulator;
+}
+
 void MediatorRelayIntegrationTestSetup::assertUrlsEquality(
     const std::vector<nx::utils::Url>& expected,
     const std::vector<nx::String>& test)
