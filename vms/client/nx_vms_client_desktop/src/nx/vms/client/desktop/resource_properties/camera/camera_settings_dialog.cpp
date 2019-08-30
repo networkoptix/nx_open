@@ -129,7 +129,12 @@ struct CameraSettingsDialog::Private: public QObject
         {
             for (const auto& camera: cameras)
             {
-                if (camera->getParentServer()->metadataStorageId().isNull())
+                const auto& server = camera->getParentServer();
+
+                if (server.isNull())
+                    continue;
+
+                if (server->metadataStorageId().isNull())
                 {
                     // We need to choose analytics storage locations.
                     q->workbench()->context()->menu()->triggerIfPossible(
