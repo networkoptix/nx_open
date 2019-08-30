@@ -9,6 +9,7 @@
 #endif
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QFileInfo>
 
 #include <nx/kit/ini_config.h>
 #include <nx/utils/log/log_initializer.h>
@@ -16,6 +17,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/rlimit.h>
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/std/filesystem.h>
 
 #include "test_options.h"
 
@@ -40,6 +42,8 @@ inline int runTest(
     InitFunction extraInit = nullptr,
     int gtestRunFlags = 0)
 {
+    nx::utils::TestOptions::setModuleName(QFileInfo(QString::fromLocal8Bit(argv[0])).baseName());
+
     nx::utils::setOnAssertHandler([&](const log::Message& m) { FAIL() << m.toStdString(); });
     nx::utils::enableQtMessageAsserts();
     nx::kit::IniConfig::setOutput(nullptr);
