@@ -1352,19 +1352,24 @@ QUrl generateUpdatePackageUrl(
     QnResourcePool* resourcePool)
 {
     bool useLatest = contents.sourceType == nx::update::UpdateSourceType::internet;
-    auto changeset = contents.info.version;
+    auto changeset = contents.changeset;
     nx::utils::SoftwareVersion targetVersion = useLatest
         ? nx::utils::SoftwareVersion()
         : contents.getVersion();
     bool noFullVersion = false;
     // Checking if version has only build number.
     contents.info.version.toInt(&noFullVersion);
+    noFullVersion |= contents.info.version.isEmpty();
 
     QUrlQuery query;
+    // Query with 'version=latest' can have no password
+    // Query with 'version=29646' should have a password
 
-    if (targetVersion.isNull())
+    if (changeset == "latest" && targetVersion.isNull())
     {
-        query.addQueryItem("version", "latest");
+        // We are here if we have failed to check update in the internet.
+        // Changeset will contain requested build number in this case, or 'latest'.
+        query.addQueryItem("version", changeset);
         query.addQueryItem("current", getCurrentVersion(engineVersion, resourcePool).toString());
     }
     else
