@@ -380,7 +380,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
     if (microseconds period = calculateAverageMetadataPeriod(objectMetadataPackets); period > 0us)
         d->averageMetadataPeriod = period;
 
-    NX_DEBUG(this,
+    NX_VERBOSE(this,
         "Updating analytics objects; current timestamp %1\n"
         "Size of metadata list for resource %2: %3\n"
         "Average request period %4",
@@ -457,7 +457,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         }
     }
 
-    NX_DEBUG(this, "%1 objects are currently available from RTSP stream", d->objectInfoById.size());
+    NX_VERBOSE(this, "%1 objects are currently available from RTSP stream", d->objectInfoById.size());
 
     d->lastTimestamp = timestamp;
     d->updateObjectAreas(timestamp);
@@ -490,6 +490,7 @@ void WidgetAnalyticsController::setFilter(const Filter& value)
     if (d->filter == value)
         return;
 
+    NX_DEBUG(this, "Update analytics filter to %1", value);
     d->filter = value;
     d->relevantCameraIds.clear();
 
