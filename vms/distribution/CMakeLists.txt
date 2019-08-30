@@ -50,7 +50,7 @@ if(WINDOWS)
     add_subdirectory(wix)
 elseif(LINUX AND (
     box STREQUAL "none" OR
-    arch STREQUAL "arm64" OR
+    (arch STREQUAL "arm64" AND NOT targetDevice STREQUAL "android_arm64") OR
     targetDevice STREQUAL "linux_arm32"
 )) #< Desktop or generic Arm Linux device.
     add_subdirectory(deb)
