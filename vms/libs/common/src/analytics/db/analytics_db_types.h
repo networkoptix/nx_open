@@ -24,7 +24,7 @@ struct ObjectPosition
     qint64 durationUs = 0;
     QRectF boundingBox;
     /** Variable object attributes. E.g., car speed. */
-    std::vector<common::metadata::Attribute> attributes;
+    nx::common::metadata::Attributes attributes;
 
     bool operator==(const ObjectPosition& right) const;
 };
@@ -55,7 +55,7 @@ struct ObjectTrack
     QnUuid id;
     QString objectTypeId;
     /** Persistent object attributes. E.g., license plate number. */
-    std::vector<common::metadata::Attribute> attributes;
+    nx::common::metadata::Attributes attributes;
     qint64 firstAppearanceTimeUs = 0;
     qint64 lastAppearanceTimeUs = 0;
     std::vector<ObjectPosition> objectPositionSequence;
@@ -90,7 +90,7 @@ struct Filter
 
     /**
      * Set of words separated by spaces, commas, etc...
-     * Search is done across all attributes (names and values).
+     * Search is done across all attributes values using wildcards.
      */
     QString freeText;
 
@@ -112,10 +112,16 @@ struct Filter
 
     bool acceptsObjectType(const QString& typeId) const;
     bool acceptsBoundingBox(const QRectF& boundingBox) const;
-    bool acceptsAttributes(const std::vector<nx::common::metadata::Attribute>& attributes) const;
+    bool acceptsAttributes(const nx::common::metadata::Attributes& attributes) const;
     bool acceptsMetadata(const nx::common::metadata::ObjectMetadata& metadata,
         bool checkBoundingBox = true) const;
     bool acceptsTrack(const ObjectTrack& track) const;
+
+    /**
+     * Search is implemented by attribute values only. SqLite fts4 syntax supports only full match
+     * or prefix match, so we append `*` to each word of the user input to enable prefix lookup.
+     */
+    void loadUserInputToFreeText(const QString& userInput);
 
     bool operator==(const Filter& right) const;
     bool operator!=(const Filter& right) const;

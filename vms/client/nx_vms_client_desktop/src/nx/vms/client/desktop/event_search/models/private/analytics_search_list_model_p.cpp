@@ -283,6 +283,9 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeri
     const auto dataReceived =
         [this](bool success, rest::Handle requestId, LookupResult&& data)
         {
+            NX_VERBOSE(this, "Received reply on request %1, result has %2 elements",
+                requestId, data.size());
+
             if (!requestId || requestId != currentRequest().id)
                 return;
 
@@ -294,6 +297,7 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeri
                 m_prefetch = std::move(data);
                 NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().objectPositionSequence.empty());
 
+                NX_VERBOSE(this, "Processing %1 loaded tracks", m_prefetch.size());
                 if (!m_prefetch.empty())
                 {
                     actuallyFetched = QnTimePeriod::fromInterval(
@@ -391,7 +395,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
 
     request.timePeriod = period;
     request.maxObjectTracksToSelect = limit;
-    request.freeText = m_filterText;
+    request.loadUserInputToFreeText(m_filterText);
 
     if (!m_selectedObjectType.isEmpty())
         request.objectTypeId = {m_selectedObjectType};
@@ -527,7 +531,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
         };
 
     nx::analytics::db::Filter filter;
-    filter.freeText = m_filterText;
+    filter.loadUserInputToFreeText(m_filterText);
     if (m_filterRect.isValid())
         filter.boundingBox = m_filterRect;
     if (!m_selectedObjectType.isEmpty())
