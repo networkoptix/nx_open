@@ -109,7 +109,7 @@ void StorageClient::initialize()
         m_credentials);
     m_contentClient->bindToAioThread(getAioThread());
 
-    // TODO: #ak Instanciate AbstractMetadataClient.
+    // TODO: #ak Instantiate AbstractMetadataClient.
 }
 
 } // namespace nx::cloud::storage::client::aws_s3
