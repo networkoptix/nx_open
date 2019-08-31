@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../base_api_client.h"
-
 #include <optional>
 #include <string>
 
@@ -12,6 +10,8 @@
 #include <nx/network/http/http_async_client.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/url.h>
+
+#include <nx/cloud/aws/base_api_client.h>
 
 #include "list_bucket_request.h"
 
@@ -53,7 +53,7 @@ public:
      * Implementation of https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
      * Get the location of the bucket specified by the url https://BucketName.s3.amazonaws.com
      */
-    void getLocation(nx::utils::MoveOnlyFunc<void(Result, std::string/*location*/)> handler);
+    void getLocation(nx::utils::MoveOnlyFunc<void(Result, std::string /*aws region*/)> handler);
 
     /**
      * Implementation of the GET Bucket(List Objects) v2 api call:

@@ -7,6 +7,7 @@ namespace nx::cloud::storage::client {
 enum class ResultCode
 {
     ok = 0,
+    unauthorized,
     ioError,
     notImplemented,
 };

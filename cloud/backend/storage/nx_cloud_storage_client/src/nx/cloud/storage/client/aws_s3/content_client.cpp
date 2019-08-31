@@ -4,15 +4,18 @@
 #include <nx/utils/string.h>
 #include <nx/utils/time.h>
 
+#include "utils.h"
+
 namespace nx::cloud::storage::client::aws_s3 {
 
 ContentClient::ContentClient(
     const std::string& /*storageClientId*/,
+    const std::string& awsRegion,
     const nx::utils::Url& url,
     const nx::cloud::aws::Credentials& credentials)
     :
     m_awsClient(
-        "us_east", //< TODO: #ak Take the region from somewhere.
+        awsRegion,
         url,
         credentials)
 {
@@ -138,11 +141,6 @@ void ContentClient::stopWhileInAioThread()
     base_type::stopWhileInAioThread();
 
     m_awsClient.pleaseStopSync();
-}
-
-ResultCode ContentClient::toResultCode(aws::Result result)
-{
-    return result.ok() ? ResultCode::ok : ResultCode::ioError;
 }
 
 } // namespace nx::cloud::storage::client::aws_s3

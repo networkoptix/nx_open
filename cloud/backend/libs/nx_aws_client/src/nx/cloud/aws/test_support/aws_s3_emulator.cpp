@@ -136,9 +136,7 @@ void AwsS3Emulator::registerHttpApi()
     m_httpServer.registerRequestProcessorFunc(
         aws::http::kRootPath,
         [this](auto&& ... args)
-        {
-            dispatchRootPathGetRequest(std::forward<decltype(args)>(args)...);
-        },
+        { dispatchRootPathGetRequest(std::forward<decltype(args)>(args)...); },
         network::http::Method::get);
 }
 
@@ -236,7 +234,7 @@ ListBucketResult AwsS3Emulator::getListBucketResult(
     QnMutexLocker lock(&m_mutex);
     auto itLow = m_pathToFileContents.begin();
     if (!prefix.empty())
-        m_pathToFileContents.lower_bound(prefix);
+        itLow = m_pathToFileContents.lower_bound(prefix);
 
     auto itHigh = m_pathToFileContents.end();
     auto upper = calculateUpperBound(prefix);

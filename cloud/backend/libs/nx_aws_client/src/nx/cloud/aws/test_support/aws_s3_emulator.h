@@ -47,6 +47,10 @@ static const std::vector<std::string> kS3Locations = {
 
 NX_AWS_CLIENT_API std::string randomS3Location();
 
+/**
+ * Emulates some AWS S3 API calls.
+ * NOTE: Bucket object operations emulate a single bucket.
+ */
 class NX_AWS_CLIENT_API AwsS3Emulator
 {
 public:
