@@ -37,6 +37,11 @@ protected:
         m_credentials.username = "hoi";
     }
 
+    void givenUploadMediaChunk()
+    {
+        whenUploadMediaChunk();
+    }
+
     void whenOpenStorageClient()
     {
         m_client.open(
@@ -81,6 +86,26 @@ protected:
             {
                 m_cameraInfoDownloadResults.push(std::forward<decltype(args)>(args)...);
             });
+    }
+
+    void whenDownloadThatChunk()
+    {
+        m_client.getContentClient()->downloadChunk(
+            m_lastUploadedChunk.deviceId,
+            m_lastUploadedChunk.streamIndex,
+            m_lastUploadedChunk.timestamp,
+            [this](auto&&... args)
+            {
+                m_chunkDownloadResults.push(std::forward<decltype(args)>(args)...);
+            });
+    }
+
+    void thenTheChunkIsDownloaded()
+    {
+        m_lastChunkDownloadResult = m_chunkDownloadResults.pop();
+
+        ASSERT_EQ(ResultCode::ok, std::get<0>(m_lastChunkDownloadResult));
+        ASSERT_EQ(m_lastUploadedChunk.data, std::get<1>(m_lastChunkDownloadResult));
     }
 
     void thenOpenFailed()
@@ -146,6 +171,8 @@ private:
     nx::utils::SyncQueue<ResultCode> m_openResults;
     nx::utils::SyncQueue<ResultCode> m_cameraInfoSaveResults;
     nx::utils::SyncQueue<std::tuple<ResultCode, DeviceDescription>> m_cameraInfoDownloadResults;
+    nx::utils::SyncQueue<std::tuple<ResultCode, nx::Buffer /*fileData*/>> m_chunkDownloadResults;
+    std::tuple<ResultCode, nx::Buffer /*fileData*/> m_lastChunkDownloadResult;
     ResultCode m_lastOpenResult = ResultCode::ok;
     nx::network::http::Credentials m_credentials;
 
@@ -222,6 +249,13 @@ TEST_F(AwsS3StorageContentClient, uploads_file)
 {
     whenUploadMediaChunk();
     thenMediaChunkIsUploadedUnderExpectedPath();
+}
+
+TEST_F(AwsS3StorageContentClient, downloads_file)
+{
+    givenUploadMediaChunk();
+    whenDownloadThatChunk();
+    thenTheChunkIsDownloaded();
 }
 
 //-------------------------------------------------------------------------------------------------

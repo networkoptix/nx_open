@@ -65,13 +65,21 @@ void ContentClient::getChunkLog(
 }
 
 void ContentClient::downloadChunk(
-    const std::string& /*deviceId*/,
-    int /*streamIndex*/,
-    std::chrono::system_clock::time_point /*timestamp*/,
+    const std::string& deviceId,
+    int streamIndex,
+    std::chrono::system_clock::time_point timestamp,
     DownloadHandler handler)
 {
-    handler(ResultCode::notImplemented, nx::Buffer());
-    // TODO
+    const auto filePath = generateChunkPath(deviceId, streamIndex, timestamp);
+
+    m_awsClient.downloadFile(
+        filePath,
+        [handler = std::move(handler)](
+            nx::cloud::aws::Result result,
+            nx::Buffer chunkData)
+        {
+            handler(toResultCode(result), std::move(chunkData));
+        });
 }
 
 void ContentClient::removeChunk(

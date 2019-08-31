@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string_view>
+#include <iostream>
 
 namespace nx::cloud::storage::client {
 
@@ -27,6 +28,11 @@ constexpr std::string_view toString(ResultCode code)
     }
 
     return "unknown";
+}
+
+inline std::ostream& operator<<(std::ostream& s, ResultCode resultCode)
+{
+    return s << toString(resultCode);
 }
 
 } // namespace nx::cloud::storage::client
