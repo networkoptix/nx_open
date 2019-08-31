@@ -64,7 +64,12 @@ protected:
 
     void whenDownloadCameraInfo()
     {
-        // TODO
+        m_client.getContentClient()->getDeviceDescription(
+            m_cameraId,
+            [this](auto&&... args)
+            {
+                m_cameraInfoDownloadResults.push(std::forward<decltype(args)>(args)...);
+            });
     }
 
     void thenMediaChunkIsUploadedUnderExpectedPath()
@@ -76,7 +81,6 @@ protected:
 
     void thenCameraInfoIsSaved()
     {
-
         ASSERT_EQ(ResultCode::ok, m_cameraInfoSaveResults.pop());
 
         const auto infoFile = m_awsS3.getFile(
@@ -86,7 +90,10 @@ protected:
 
     void thenExpectedCameraInfoIsDownloaded()
     {
-        // TODO
+        const auto [result, description] = m_cameraInfoDownloadResults.pop();
+
+        ASSERT_EQ(ResultCode::ok, result);
+        ASSERT_EQ(m_cameraInfo, description);
     }
 
 private:
@@ -104,6 +111,7 @@ private:
     Chunk m_lastUploadedChunk;
     DeviceDescription m_cameraInfo;
     nx::utils::SyncQueue<ResultCode> m_cameraInfoSaveResults;
+    nx::utils::SyncQueue<std::tuple<ResultCode, DeviceDescription>> m_cameraInfoDownloadResults;
 
     std::string generateChunkPath(const Chunk& chunk)
     {
@@ -120,9 +128,9 @@ private:
             m_cameraInfo.begin(), m_cameraInfo.end(),
             []()
             {
-                return std::make_pair(
+                return Parameter{
                     nx::utils::generateRandomName(7).toStdString(),
-                    nx::utils::generateRandomName(7).toStdString());
+                    nx::utils::generateRandomName(7).toStdString()};
             });
     }
 };
@@ -133,13 +141,13 @@ TEST_F(AwsS3StorageClient, uploads_file)
     thenMediaChunkIsUploadedUnderExpectedPath();
 }
 
-TEST_F(AwsS3StorageClient, DISABLED_saves_camera_info)
+TEST_F(AwsS3StorageClient, camera_info_is_uploaded)
 {
     whenSaveRandomCameraInfo();
     thenCameraInfoIsSaved();
 }
 
-TEST_F(AwsS3StorageClient, DISABLED_downloads_camera_info)
+TEST_F(AwsS3StorageClient, camera_info_is_downloaded)
 {
     whenSaveRandomCameraInfo();
     whenDownloadCameraInfo();
