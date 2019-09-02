@@ -20,12 +20,9 @@ void merge(SystemValues* destination, SystemValues* source)
     }
 }
 
-SystemValues merge(std::vector<SystemValues> valuesList)
+void merge(Alarms* destination, Alarms* source)
 {
-    SystemValues result;
-    for (auto values: valuesList)
-        merge(&result, &values);
-    return result;
+    destination->insert(destination->end(), source->begin(), source->end());
 }
 
 } // namespace nx::vms::api::metrics

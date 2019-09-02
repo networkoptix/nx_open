@@ -38,27 +38,57 @@ SystemRestHandler::SystemRestHandler(
 {
 }
 
+template<typename Values>
+Values queryAndMerge(
+    Values values, const QString& api,
+    const QnSharedResourcePointerList<QnMediaServerResource>& servers);
+
 JsonRestResponse SystemRestHandler::executeGet(const JsonRestRequest& request)
 {
-    if (!request.path.endsWith("/values"))
-        return LocalRestHandler::executeGet(request);
+    QnSharedResourcePointerList<QnMediaServerResource> otherServers;
+    for (auto& s: serverModule()->commonModule()->resourcePool()->getResources<QnMediaServerResource>())
+    {
+        if (s->getId() != moduleGUID())
+            otherServers.push_back(std::move(s));
+    }
 
-    auto systemValues = m_controller->values();
-    const auto servers = serverModule()->commonModule()->resourcePool()->getResources<QnMediaServerResource>();
+    if (request.path.endsWith("/values"))
+        return JsonRestResponse(queryAndMerge(m_controller->values(), "values", otherServers));
+
+    if (request.path.endsWith("/alarms"))
+        return JsonRestResponse(queryAndMerge(m_controller->alarms(), "alarms", otherServers));
+
+    return LocalRestHandler::executeGet(request);
+}
+
+static void logResponse(const nx::utils::Url& url, const api::metrics::SystemValues& serverValues)
+{
+    for (const auto& [name, values]: serverValues)
+        NX_DEBUG(typeid(SystemRestHandler), "Query [ %1 ] returned %2 %3", url, values.size(), name);
+}
+
+static void logResponse(const nx::utils::Url& url, const api::metrics::Alarms& alarms)
+{
+    NX_DEBUG(typeid(SystemRestHandler), "Query [ %1 ] returned %2 alarms", url, alarms.size());
+}
+
+template<typename Values>
+Values queryAndMerge(
+    Values values, const QString& api,
+    const QnSharedResourcePointerList<QnMediaServerResource>& servers)
+{
+    static const nx::utils::log::Tag kTag(typeid(SystemRestHandler));
     for (const auto& server: servers)
     {
-        if (server->getId() == moduleGUID())
-            continue;
-
         nx::network::http::HttpClient client;
         client.setUserName(server->getId().toString());
         client.setUserPassword(server->getAuthKey());
 
         nx::utils::Url url(server->getUrl());
-        url.setPath("/api/metrics/values");
+        url.setPath("/api/metrics/" + api);
         if (!client.doGet(url) || !client.response())
         {
-            NX_DEBUG(this, "Query [ %1 ] has failed", url);
+            NX_DEBUG(kTag, "Query [ %1 ] has failed", url);
             continue;
         }
 
@@ -68,19 +98,16 @@ JsonRestResponse SystemRestHandler::executeGet(const JsonRestRequest& request)
         if (!nx::network::http::StatusCode::isSuccessCode(httpCode)
             || result.error != QnJsonRestResult::NoError)
         {
-            NX_DEBUG(this, "Query [ %1 ] has failed %1 (%2)", url, httpCode, result.errorString);
+            NX_DEBUG(kTag, "Query [ %1 ] has failed %1 (%2)", url, httpCode, result.errorString);
             continue;
         }
 
-        auto serverValues = result.deserialized<api::metrics::SystemValues>();
-        for (const auto& [name, values]: serverValues)
-            NX_VERBOSE(this, "Query [ %1 ] returned %2 %3", url, values.size(), name);
-
-        api::metrics::merge(&systemValues, &serverValues);
+        auto serverValues = result.deserialized<Values>();
+        logResponse(url, serverValues);
+        api::metrics::merge(&values, &serverValues);
     }
 
-    // TODO: Add some system specific information.
-    return JsonRestResponse(systemValues);
+    return values;
 }
 
 } // namespace nx::vms::server::metrics

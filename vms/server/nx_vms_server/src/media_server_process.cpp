@@ -2929,12 +2929,9 @@ void MediaServerProcess::registerRestHandlers(
      * for details.
      *
      * %apidoc GET /ec2/metrics/manifest
-     * %param:string noRules Do not include parameters fron rules.
      * %return:object Metrics parameter manifest. See metrics.md for details.
      *
      * %apidoc GET /ec2/metrics/values
-     * %param:string noRules Do not include parameters fron rules.
-     * %param:string timeline Return values with timestamps instead of just values, ignores noRules.
      * %return:object Metrics parameter values according to manifest. See metrics.md for details.
      */
     reg("ec2/metrics/", new nx::vms::server::metrics::SystemRestHandler(

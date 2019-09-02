@@ -13,7 +13,7 @@ namespace nx::vms::utils::metrics {
 /**
  * Provides values for parameter group.
  */
-class ValueGroupMonitor
+class NX_VMS_UTILS_API ValueGroupMonitor
 {
 public:
     ValueGroupMonitor(ValueMonitors monitors);

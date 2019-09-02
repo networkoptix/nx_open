@@ -14,7 +14,7 @@ using Value = QJsonValue; //< TODO: std::variant<QString, int>.
 using ValueGroup
     = std::map<QString /*parameterId*/, Value>;
 
-struct NX_UTILS_API ResourceValues
+struct NX_VMS_API ResourceValues
 {
     QString name;
     QString parent;
@@ -29,18 +29,17 @@ using ResourceGroupValues =
 using SystemValues
     = std::map<QString /*resourceGroup*/, ResourceGroupValues>;
 
-NX_UTILS_API void merge(SystemValues* destination, SystemValues* source);
-NX_UTILS_API SystemValues merge(std::vector<SystemValues> valuesList);
+NX_VMS_API void merge(SystemValues* destination, SystemValues* source);
 
 // -----------------------------------------------------------------------------------------------
 
-struct NX_UTILS_API Label
+struct NX_VMS_API Label
 {
     QString id;
     QString name;
 };
 
-struct NX_UTILS_API ValueManifest: Label
+struct NX_VMS_API ValueManifest: Label
 {
     QString display; //< TODO: Optional.
     QString unit; //< TODO: Optional.
@@ -48,7 +47,7 @@ struct NX_UTILS_API ValueManifest: Label
 #define ValueManifest_Fields (id)(name)(unit)(display)
 QN_FUSION_DECLARE_FUNCTIONS(ValueManifest, (json), NX_VMS_API)
 
-struct NX_UTILS_API ValueGroupManifest: Label
+struct NX_VMS_API ValueGroupManifest: Label
 {
     ValueGroupManifest(Label label = {}): Label(std::move(label)) {}
 
@@ -65,7 +64,7 @@ using SystemManifest
 
 // -----------------------------------------------------------------------------------------------
 
-struct NX_UTILS_API AlarmRule
+struct NX_VMS_API AlarmRule
 {
     QString level;
     QString condition;
@@ -74,7 +73,7 @@ struct NX_UTILS_API AlarmRule
 #define AlarmRule_Fields (level)(condition)(text)
 QN_FUSION_DECLARE_FUNCTIONS(AlarmRule, (json), NX_VMS_API)
 
-struct NX_UTILS_API ValueRule: ValueManifest
+struct NX_VMS_API ValueRule: ValueManifest
 {
     QString calculate;
     QString insert;
@@ -94,7 +93,7 @@ using SystemRules
 
 // -----------------------------------------------------------------------------------------------
 
-struct Alarm
+struct NX_VMS_API Alarm
 {
     QString resource;
     QString parameter;
@@ -103,5 +102,9 @@ struct Alarm
 };
 #define Alarm_Fields (resource)(parameter)(level)(text)
 QN_FUSION_DECLARE_FUNCTIONS(Alarm, (json), NX_VMS_API)
+
+using Alarms = std::vector<Alarm>;
+
+NX_UTILS_API void merge(Alarms* destination, Alarms* source);
 
 } // namespace nx::vms::api::metrics

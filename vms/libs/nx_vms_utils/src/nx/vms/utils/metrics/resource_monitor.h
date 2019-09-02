@@ -7,7 +7,7 @@ namespace nx::vms::utils::metrics {
 /**
  * Provides values for entire resource.
  */
-class ResourceMonitor
+class NX_VMS_UTILS_API ResourceMonitor
 {
 public:
     class Description

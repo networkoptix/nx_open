@@ -7,7 +7,7 @@ namespace nx::vms::utils::metrics {
 /**
  * Controlls resources of a single type.
  */
-class ResourceController
+class NX_VMS_UTILS_API ResourceController
 {
 public:
     ResourceController(QString label): m_label(std::move(label)) {}

@@ -43,7 +43,7 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
     {
         const auto groupIt = std::find_if(
             manifest.begin(), manifest.end(),
-            [&](const auto& g) { return g.id == groupId; });
+            [&groupId](const auto& g) { return g.id == groupId; });
         if (!NX_ASSERT(groupIt != manifest.end(), "Group not found: %1", groupId))
             continue;
 
@@ -51,7 +51,7 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
         {
             const auto existing = std::find_if(
                 groupIt->values.begin(), groupIt->values.end(),
-                [&](const auto& m) { return m.id == valueId; });
+                [&valueId](const auto& m) { return m.id == valueId; });
             if (existing != groupIt->values.end())
             {
                 // Override existing value manifest.
@@ -61,9 +61,10 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
                 continue;
             }
 
+            // TODO: Use proper insert rules.
             const auto position = std::find_if(
                 groupIt->values.begin(), groupIt->values.end(),
-                [&](const auto& m) { return m.id == valueRule.insert; }); // TODO: Use insert rules.
+                [&valueRule](const auto& m) { return m.id == valueRule.insert; });
             groupIt->values.insert(position, api::metrics::ValueManifest{
                 valueId, valueRule.name, valueRule.display, valueRule.unit});
         }
@@ -73,7 +74,8 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
 }
 
 template<typename ResourceType>
-void ResourceControllerImpl<ResourceType>::add(std::unique_ptr<ResourceDescription<ResourceType>> resource)
+void ResourceControllerImpl<ResourceType>::add(
+    std::unique_ptr<ResourceDescription<ResourceType>> resource)
 {
     const auto id = resource->id();
     ResourceController::add(id, m_provider->monitor(std::move(resource)));

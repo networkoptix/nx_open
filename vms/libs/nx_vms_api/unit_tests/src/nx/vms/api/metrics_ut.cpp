@@ -264,7 +264,10 @@ TEST(Metrics, Values)
     serverOneValues["servers"]["SERVER_UUID_2"] = values["servers"]["SERVER_UUID_2"];
     serverOneValues["cameras"]["CAMERA_UUID_2"] = values["cameras"]["CAMERA_UUID_2"];
 
-    expectSerialization(kValuesExample, merge({serverOneValues, serverTwoValues}));
+    SystemValues mergedValues;
+    merge(&mergedValues, &serverOneValues);
+    merge(&mergedValues, &serverTwoValues);
+    expectSerialization(kValuesExample, mergedValues);
 }
 
 static const QByteArray kAlarmsExample(R"json([
