@@ -141,7 +141,7 @@ int64_t AttributesDao::insertAttributes(
     const auto id = insertContentQuery->impl().lastInsertId().toLongLong();
 
     // Full text search table stores only attribute values.
-    static const QString kSeparator = "; ";
+    static const auto kSeparator = ' ';
     QString contentForTextSearch;
     for (const auto& attribute: attributes)
     {
