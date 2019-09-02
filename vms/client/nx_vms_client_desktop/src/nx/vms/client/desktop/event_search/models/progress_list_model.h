@@ -27,6 +27,9 @@ public:
     virtual bool setData(const QModelIndex& index, const QVariant& value,
         int role = Qn::DefaultNotificationRole) override;
 
+    virtual bool removeRows(
+        int row, int count, const QModelIndex& parent = QModelIndex()) override;
+
 private:
     nx::utils::KeyList<QnUuid> m_activities;
 };
