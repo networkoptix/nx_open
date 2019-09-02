@@ -420,6 +420,7 @@ bool CameraSettingsDialog::tryClose(bool force)
 
 void CameraSettingsDialog::forcedUpdate()
 {
+    d->analyticsEnginesWatcher->update();
 }
 
 bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras, bool force)
