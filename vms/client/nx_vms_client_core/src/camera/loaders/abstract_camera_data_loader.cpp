@@ -1,5 +1,7 @@
 #include "abstract_camera_data_loader.h"
 
+#include <core/resource/resource.h>
+
 #include <camera/data/abstract_camera_data.h>
 
 #include <recording/time_period.h>
@@ -19,6 +21,12 @@ void QnAbstractCameraDataLoader::discardCachedData(const qint64 resolutionMs /* 
     Q_UNUSED(resolutionMs)
 }
 
-QnResourcePtr QnAbstractCameraDataLoader::resource() const {
+QString QnAbstractCameraDataLoader::idForToStringFromPtr() const
+{
+    return lm("%1 for %2").args(m_dataType, m_resource->getName());
+}
+
+QnResourcePtr QnAbstractCameraDataLoader::resource() const
+{
     return m_resource;
 }

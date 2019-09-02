@@ -43,6 +43,8 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookup(nx::sql::QueryContext* quer
         auto track = fetchTrackById(queryContext, m_filter.objectTrackId);
         if (!track)
             return {};
+
+        NX_ASSERT_HEAVY_CONDITION(m_filter.acceptsTrack(*track));
         return {std::move(*track)};
     }
     else
@@ -244,6 +246,8 @@ void ObjectTrackSearcher::fetchTracksFromDb(
         if (result->ids.count(track.id) > 0)
             continue;
 
+        // Filter does not accept track here cause of bounding box limitations.
+        // NX_ASSERT_HEAVY_CONDITION(m_filter.acceptsTrack(track));
         result->ids.insert(track.id);
         result->tracks.push_back(std::move(track));
     }

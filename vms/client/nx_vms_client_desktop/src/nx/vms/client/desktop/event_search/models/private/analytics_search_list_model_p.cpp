@@ -53,6 +53,12 @@ static constexpr milliseconds kUpdateWorkbenchFilterDelay = 100ms;
 
 milliseconds startTime(const ObjectTrack& track)
 {
+    if (NX_ASSERT(!track.objectPositionSequence.empty()))
+    {
+        return duration_cast<milliseconds>(microseconds(
+            track.objectPositionSequence.cbegin()->timestampUs));
+    }
+
     return duration_cast<milliseconds>(microseconds(track.firstAppearanceTimeUs));
 }
 
@@ -218,7 +224,8 @@ QString AnalyticsSearchListModel::Private::filterText() const
 
 void AnalyticsSearchListModel::Private::setFilterText(const QString& value)
 {
-    if (m_filterText == value)
+    // Check is user input parsed to the same filter request.
+    if (Filter::userInputToFreeText(m_filterText) == Filter::userInputToFreeText(value))
         return;
 
     q->clear();
@@ -283,6 +290,9 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeri
     const auto dataReceived =
         [this](bool success, rest::Handle requestId, LookupResult&& data)
         {
+            NX_VERBOSE(this, "Received reply on request %1, result has %2 elements",
+                requestId, data.size());
+
             if (!requestId || requestId != currentRequest().id)
                 return;
 
@@ -292,8 +302,15 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeri
             if (success)
             {
                 m_prefetch = std::move(data);
-                NX_ASSERT(m_prefetch.empty() || !m_prefetch.front().objectPositionSequence.empty());
+                for (auto& track: m_prefetch)
+                {
+                    if (NX_ASSERT(!track.objectPositionSequence.empty()))
+                    {
+                        track.deviceId = track.objectPositionSequence.cbegin()->deviceId;
+                    }
+                }
 
+                NX_VERBOSE(this, "Processing %1 loaded tracks", m_prefetch.size());
                 if (!m_prefetch.empty())
                 {
                     actuallyFetched = QnTimePeriod::fromInterval(
@@ -391,7 +408,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
 
     request.timePeriod = period;
     request.maxObjectTracksToSelect = limit;
-    request.freeText = m_filterText;
+    request.loadUserInputToFreeText(m_filterText);
 
     if (!m_selectedObjectType.isEmpty())
         request.objectTypeId = {m_selectedObjectType};
@@ -527,7 +544,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
         };
 
     nx::analytics::db::Filter filter;
-    filter.freeText = m_filterText;
+    filter.loadUserInputToFreeText(m_filterText);
     if (m_filterRect.isValid())
         filter.boundingBox = m_filterRect;
     if (!m_selectedObjectType.isEmpty())
@@ -581,6 +598,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
                 ObjectTrack newTrack;
                 newTrack.id = item.trackId;
+                newTrack.deviceId = objectMetadata->deviceId;
                 newTrack.objectTypeId = item.typeId;
                 newTrack.attributes = item.attributes;
                 newTrack.objectPositionSequence.push_back(pos);
@@ -788,11 +806,17 @@ AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Priva
 QnVirtualCameraResourcePtr AnalyticsSearchListModel::Private::camera(
     const analytics::db::ObjectTrack& track) const
 {
+    const auto& deviceId = track.deviceId;
+    if (NX_ASSERT(!deviceId.isNull()))
+        return q->resourcePool()->getResourceById<QnVirtualCameraResource>(deviceId);
+
+    // Fallback mechanism, just in case.
     NX_ASSERT(!track.objectPositionSequence.empty());
     if (track.objectPositionSequence.empty())
         return {};
 
-    return q->resourcePool()->getResourceById<QnVirtualCameraResource>(track.objectPositionSequence[0].deviceId);
+    return q->resourcePool()->getResourceById<QnVirtualCameraResource>(
+        track.objectPositionSequence[0].deviceId);
 }
 
 } // namespace nx::vms::client::desktop

@@ -91,8 +91,10 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsFiltered(
 
     nx::utils::ElapsedTimer timer;
     timer.restart();
+    NX_DEBUG(this, "Time periods lookup started, filter is %1", filter);
     const auto timePeriods = m_analyticsArchive->matchPeriods(filter.deviceIds, *archiveFilter);
-    NX_DEBUG(this, "Time periods lookup completed in %1", timer.elapsed());
+    NX_DEBUG(this, "Time periods lookup completed in %1, %2 periods found by filter %3",
+        timer.elapsed(), timePeriods.size(), filter);
     return timePeriods;
 }
 

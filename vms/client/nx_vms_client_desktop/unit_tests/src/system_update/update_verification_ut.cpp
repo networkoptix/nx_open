@@ -140,6 +140,23 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
         EXPECT_TRUE(report.hasLatestVersion);
     }
     removeAllServers();
+
+    // According to VMS-15430, VMS-15250, we should show 'Latest version installed'
+    // Update to 4.0.0.28524
+    // client = 4.0.0.28526
+    // server = 4.0.0.28526
+    // Showing page 'This version is already installed'
+    contents.sourceType = nx::update::UpdateSourceType::internet;
+    makeServer(Version("4.0.0.28524"));
+    makeServer(Version("4.0.0.28523"), /*online=*/false);
+    clientData = makeClientData(Version("4.0.0.28524"));
+    verifyUpdateContents(contents, getAllServers(), clientData, options);
+    EXPECT_EQ(contents.alreadyInstalled, true);
+    {
+        const auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(contents, clientData.clientId);
+        EXPECT_TRUE(report.hasLatestVersion);
+    }
+    removeAllServers();
 }
 
 TEST_F(ClientUpdateTestEnvironment, testForkedVersion)
@@ -182,6 +199,7 @@ TEST_F(ClientUpdateTestEnvironment, testForkedVersion)
     // Both servers and a client are newer.
     // According to VMS-14814, we should show 'downgrade is not possible'
     clientData = makeClientData(Version("4.0.0.28525"));
+    // Update to 4.0.0.28524
     makeServer(Version("4.0.0.28525"));
     makeServer(Version("4.0.0.28525"));
     verifyUpdateContents(contents, getAllServers(), clientData, options);
