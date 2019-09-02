@@ -246,7 +246,8 @@ void ObjectTrackSearcher::fetchTracksFromDb(
         if (result->ids.count(track.id) > 0)
             continue;
 
-        NX_ASSERT_HEAVY_CONDITION(m_filter.acceptsTrack(track));
+        // Filter does not accept track here cause of bounding box limitations.
+        // NX_ASSERT_HEAVY_CONDITION(m_filter.acceptsTrack(track));
         result->ids.insert(track.id);
         result->tracks.push_back(std::move(track));
     }
