@@ -17,10 +17,16 @@ public:
 
     QnUuid id() const;
 
+    // Takes ownership.
     void addEventFilter(EventFilter* filter);
+
+    // Takes ownership.
     void addActionBuilder(ActionBuilder* builder);
 
+    // Takes ownership.
     void insertEventFilter(int index, EventFilter* filter);
+
+    // Takes ownership.
     void insertActionBuilder(int index, ActionBuilder* builder);
 
     EventFilter* takeEventFilter(int idx);

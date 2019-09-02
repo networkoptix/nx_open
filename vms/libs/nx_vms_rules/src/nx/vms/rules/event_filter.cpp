@@ -27,15 +27,12 @@ QString EventFilter::eventType() const
     return m_eventType;
 }
 
-bool EventFilter::addField(const QString& name, EventField* field)
+void EventFilter::addField(const QString& name, EventField* field)
 {
-    if (m_fields.contains(name))
-        return false;
-
+    // TODO: assert?
+    delete m_fields.value(name, nullptr);
     m_fields[name] = field;
     updateState();
-
-    return true;
 }
 
 const QHash<QString, EventField*>& EventFilter::fields() const

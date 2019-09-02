@@ -26,7 +26,8 @@ public:
     QnUuid id() const;
     QString actionType() const;
 
-    bool addField(const QString& name, ActionField* field);
+    // Takes ownership.
+    void addField(const QString& name, ActionField* field);
 
     const QHash<QString, ActionField*>& fields() const;
 

@@ -19,7 +19,8 @@ public:
     QnUuid id() const;
     QString eventType() const;
 
-    bool addField(const QString& name, EventField* field);
+    // Takes ownership.
+    void addField(const QString& name, EventField* field);
 
     const QHash<QString, EventField*>& fields() const;
 

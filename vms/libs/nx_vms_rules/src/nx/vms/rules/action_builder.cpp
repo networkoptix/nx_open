@@ -32,15 +32,12 @@ QString ActionBuilder::actionType() const
     return m_actionType;
 }
 
-bool ActionBuilder::addField(const QString& name, ActionField* field)
+void ActionBuilder::addField(const QString& name, ActionField* field)
 {
-    if (m_fields.contains(name))
-        return false;
-
+    // TODO: assert?
+    delete m_fields.value(name, nullptr);
     m_fields[name] = field;
     updateState();
-
-    return true;
 }
 
 const QHash<QString, ActionField*>& ActionBuilder::fields() const
