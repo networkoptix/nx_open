@@ -40,7 +40,9 @@ public:
 
     /**
      * Cancels timer waiting for timerFunc to complete.
-     * Can be safely called within any thread.
+     * Can be safely called within timer's aio thread.
+     * Can be safely called within non aio thread, only if called not under the same mutex, that is used
+     * in callback function.
      */
     void cancelSync();
 
