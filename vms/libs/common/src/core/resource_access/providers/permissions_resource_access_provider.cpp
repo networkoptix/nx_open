@@ -66,7 +66,7 @@ bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccess
     else if (isLayout(resource) && subject.user() && resource->getParentId() == subject.id())
         requiredPermission = {};
 
-    return globalPermissions.testFlag(requiredPermission);
+    return QnGlobalPermissionsManager::containsPermission(globalPermissions, requiredPermission);
 }
 
 void QnPermissionsResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
