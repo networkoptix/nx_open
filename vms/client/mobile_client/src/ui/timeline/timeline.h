@@ -8,7 +8,8 @@
 
 class QnTimelinePrivate;
 class QSGGeometryNode;
-class QnCameraChunkProvider;
+
+namespace nx::client::core { class ChunkProvider; }
 
 class QnTimeline: public QQuickItem
 {
@@ -66,7 +67,7 @@ class QnTimeline: public QQuickItem
         READ chunkBarHeight WRITE setChunkBarHeight NOTIFY chunkBarHeightChanged)
     Q_PROPERTY(int textY READ textY WRITE setTextY NOTIFY textYChanged)
 
-    Q_PROPERTY(QnCameraChunkProvider* chunkProvider
+    Q_PROPERTY(nx::client::core::ChunkProvider* chunkProvider
         READ chunkProvider WRITE setChunkProvider NOTIFY chunkProviderChanged)
 
     Q_PROPERTY(bool motionSearchMode
@@ -177,8 +178,8 @@ public:
 
     Q_INVOKABLE qint64 positionAtX(qreal x) const;
 
-    QnCameraChunkProvider* chunkProvider() const;
-    void setChunkProvider(QnCameraChunkProvider* chunkProvider);
+    nx::client::core::ChunkProvider* chunkProvider() const;
+    void setChunkProvider(nx::client::core::ChunkProvider* chunkProvider);
 
 signals:
     void zoomLevelChanged();

@@ -6,30 +6,27 @@
 
 #include <common/common_globals.h>
 #include <recording/time_period_list.h>
+#include <nx/client/core/media/time_periods_store.h>
 
-class QnFlatCameraDataLoader;
+namespace nx::client::core {
 
-class QnCameraChunkProvider: public QObject, public QnConnectionContextAware
+class ChunkProvider: public TimePeriodsStore, public QnConnectionContextAware
 {
     Q_OBJECT
-    using base_type = QObject;
+    using base_type = TimePeriodsStore;
 
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
-    Q_PROPERTY(QDateTime bottomBoundDate READ bottomBoundDate NOTIFY bottomBoundDateChanged)
     Q_PROPERTY(qint64 bottomBound READ bottomBound NOTIFY bottomBoundChanged)
     Q_PROPERTY(bool loading READ isLoading NOTIFY loadingChanged)
     Q_PROPERTY(bool loadingMotion READ isLoadingMotion NOTIFY loadingMotionChanged)
     Q_PROPERTY(QString motionFilter READ motionFilter WRITE setMotionFilter NOTIFY motionFilterChanged)
 
 public:
-    QnCameraChunkProvider(QObject* parent = nullptr);
-
-    QnTimePeriodList timePeriods(Qn::TimePeriodContent contentType) const;
+    ChunkProvider(QObject* parent = nullptr);
 
     QString resourceId() const;
     void setResourceId(const QString& id);
 
-    QDateTime bottomBoundDate() const;
     qint64 bottomBound() const;
 
     QString motionFilter() const;
@@ -44,10 +41,8 @@ public:
     Q_INVOKABLE bool hasMotionChunks() const;
 
 signals:
-    void timePeriodsUpdated();
     void resourceIdChanged();
     void bottomBoundChanged();
-    void bottomBoundDateChanged();
     void loadingChanged();
     void loadingMotionChanged();
     void motionFilterChanged();
@@ -61,3 +56,5 @@ private:
     using ProvidersHash = QHash<Qn::TimePeriodContent, ChunkProviderPtr>;
     const ProvidersHash m_providers;
 };
+
+} // namespace nx::client::core

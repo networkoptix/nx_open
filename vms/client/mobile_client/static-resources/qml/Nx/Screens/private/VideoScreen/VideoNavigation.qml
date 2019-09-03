@@ -149,7 +149,7 @@ Item
         Screen.onPrimaryOrientationChanged: updateNavigatorPosition()
     }
 
-    QnCameraChunkProvider
+    ChunkProvider
     {
         id: cameraChunkProvider
 

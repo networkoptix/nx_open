@@ -11,7 +11,7 @@ Item
     property alias locale: calendarModel.locale
     property alias year: calendarModel.year
     property alias month: calendarModel.month
-    property alias chunkProvider: calendarModel.chunkProvider
+    property alias periodsStore: calendarModel.periodsStore
 
     signal picked(real position)
 
@@ -29,7 +29,7 @@ Item
         {
             id: repeater
 
-            model: QnCalendarModel
+            model: CalendarModel
             {
                 id: calendarModel
             }
