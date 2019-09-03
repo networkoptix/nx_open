@@ -261,7 +261,7 @@ int DiscoveryManager::fromMDNSData(
             case QnMdnsPacket::kTextRecordType: {
                 QnMdnsTextData textData;
                 textData.decode(record.data);
-                auto pathAttribute = textData.getAttribute("path");
+                const auto pathAttribute = textData.getAttribute("path");
                 if(pathAttribute.presence != QnMdnsTextData::Attribute::Presence::withValue)
                     break;
                 path = QString::fromUtf8(pathAttribute.value);
@@ -273,7 +273,7 @@ int DiscoveryManager::fromMDNSData(
     if(!(path.endsWith(".mpjpeg") || path.endsWith(".mjpeg") || path.endsWith(".mjpg")))
         return 0;
 
-    QHostAddress address(rawAddress);
+    const QHostAddress address(rawAddress);
     QUrl url;
     url.setHost(address.toString());
     url.setPort(port);
