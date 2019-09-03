@@ -240,8 +240,8 @@ int DiscoveryManager::fromMDNSData(
 
     const QByteArray rawPacket(reinterpret_cast<const char*>(rawPacketPtr), rawPacketSize);
     QnMdnsPacket packet;
-    const bool parseSuceeded = packet.fromDatagram(rawPacket);
-    if(!parseSuceeded)
+    const bool parseSucceeded = packet.fromDatagram(rawPacket);
+    if(!parseSucceeded)
         return 0;
 
     for(const auto& recordSet: {packet.answerRRs, packet.additionalRRs})
@@ -254,7 +254,7 @@ int DiscoveryManager::fromMDNSData(
                     break;
                 QnMdnsSrvData srvData;
                 srvData.decode(record.data);
-                if(srvData.target.isEmpty())  // If decode failed.
+                if(srvData.target.isEmpty())  // If the decoding failed.
                     break;
                 port = srvData.port;
             }
