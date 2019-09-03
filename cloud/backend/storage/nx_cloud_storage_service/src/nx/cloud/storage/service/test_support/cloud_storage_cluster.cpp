@@ -1,6 +1,5 @@
 #include "cloud_storage_cluster.h"
 
-
 namespace nx::cloud::storage::service::test {
 
 namespace {

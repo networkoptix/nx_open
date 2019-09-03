@@ -1,0 +1,1 @@
+Test integration between cloud storage service and other services: cloud db, vms, etc.
