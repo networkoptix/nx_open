@@ -5,6 +5,8 @@
 #include <QtCore/QDataStream>
 #include <QtCore/QIODevice>
 
+#include <nx/utils/log/log.h>
+
 
 void QnMdnsPacket::toDatagram(QByteArray& datagram)
 {
@@ -297,10 +299,15 @@ void QnMdnsTextData::decode(const QByteArray& raw)
 
         if (key.isEmpty())
             continue;
-        if (m_attributes.find(key) != m_attributes.end())
-            continue;
 
-        m_attributes[key.toLower()] = attribute;
+        const auto [it, isInserted] = m_attributes.emplace(key, attribute);
+        if (!isInserted)
+        {
+            NX_WARNING(this,
+               lm("Duplicate key %1: the old value %2 is preferred over the new value %3")
+               .args(key, it->second, attribute));
+            continue;
+        }
     }
 }
 
@@ -309,7 +316,7 @@ QnMdnsTextData::Attribute QnMdnsTextData::getAttribute(const QByteArray& key) co
     auto attrIt = m_attributes.find(key.toLower());
     if (attrIt == m_attributes.end())
         return {Attribute::Presence::absent, {}};
-    return *attrIt;
+    return attrIt->second;
 }
 
 #endif // ENABLE_MDNS

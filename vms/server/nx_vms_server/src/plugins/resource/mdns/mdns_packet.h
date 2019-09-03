@@ -3,6 +3,8 @@
 
 #ifdef ENABLE_MDNS
 
+#include <map>
+
 #include <QtCore/QByteArray>
 #include <QtCore/QVector>
 #include <QtCore/QMap>
@@ -111,6 +113,14 @@ struct QnMdnsTextData
         enum class Presence { absent, noValue, withValue };
         Presence presence = Presence::absent;
         QByteArray value = {};
+
+        QString toString() const {
+            switch (presence) {
+                case Presence::absent: return "<absent>";
+                case Presence::noValue: return "<noValue>";
+                case Presence::withValue: return value.isEmpty() ? "<emptyValue>" : value;
+            }
+        }
     };
 
 public:
@@ -118,7 +128,14 @@ public:
     QnMdnsTextData::Attribute getAttribute(const QByteArray& key) const;
 
 private:
-    QMap<QByteArray, QnMdnsTextData::Attribute> m_attributes;
+    struct Comparator
+    {
+        bool operator()(const QByteArray& left, const QByteArray& right) const
+        {
+            return left.toLower() < right.toLower();
+        }
+    };
+    std::map<QByteArray, Attribute, Comparator> m_attributes;
 };
 
 #endif // ENABLE_MDNS
