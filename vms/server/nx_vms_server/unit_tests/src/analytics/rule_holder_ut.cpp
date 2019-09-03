@@ -292,7 +292,7 @@ private:
     QSet<QnUuid> addAnalyticsRuleForResource(
         const QnResourcePtr& resource, const QString& eventTypeId)
     {
-        const auto rule = makeAnalyticsRule(resource, kEventTypeId);
+        const auto rule = makeAnalyticsRule(resource, eventTypeId);
         return addRule(rule);
     }
 
