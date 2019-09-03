@@ -171,6 +171,7 @@ public:
         dumpIconIfNeeded(sourceIconData);
     }
 
+    QByteArray makeNormalIcon() const { return makeIcon("light10", "light4", ""); }
     QByteArray makeDisabledIcon() const { return makeIcon("dark14", "dark17", "_disabled"); }
     QByteArray makeSelectedIcon() const { return makeIcon("light4", "light1", "_selected"); }
     QByteArray makeActiveIcon() const { return makeIcon("brand_core", "brand_l2", "_active"); }
@@ -348,10 +349,9 @@ QIcon QnNoptixIconLoader::loadSvgIconInternal(
     const QByteArray baseData = source.readAll();
 
     IconBuilder builder(QnSkin::isHiDpi());
-    builder.addSvg(baseData, QnIcon::Normal, QnIcon::Off);
-
     SvgIconColorer colorer(baseData, name);
 
+    builder.addSvg(colorer.makeNormalIcon(), QnIcon::Normal, QnIcon::Off);
     builder.addSvg(colorer.makeDisabledIcon(), QnIcon::Disabled, QnIcon::Off);
     builder.addSvg(colorer.makeSelectedIcon(), QnIcon::Selected, QnIcon::Off);
     builder.addSvg(colorer.makeActiveIcon(), QnIcon::Active, QnIcon::Off);

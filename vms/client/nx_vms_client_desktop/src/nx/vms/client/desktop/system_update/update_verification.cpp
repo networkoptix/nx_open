@@ -206,17 +206,17 @@ bool verifyUpdateContents(
     }
     else
     {
-        // TODO: Should get EULA file
         contents.eulaPath = contents.info.eulaLink;
     }
 
     // We will try to set it to false when we check servers and clients.
     contents.alreadyInstalled = true;
+    bool clientInstalledThis = clientData.installedVersions.count(targetVersion) != 0;
 
     if (!clientData.clientId.isNull()
         && (clientData.currentVersion < targetVersion
             || (clientData.currentVersion > targetVersion && options.compatibilityMode))
-        && clientData.installedVersions.count(targetVersion) == 0)
+        && !clientInstalledThis)
     {
         contents.alreadyInstalled = false;
         contents.needClientUpdate = true;
@@ -259,6 +259,7 @@ bool verifyUpdateContents(
     QSet<nx::update::Package*> manualPackages;
 
     QSet<QnUuid> serversWithNewerVersion;
+    QSet<QnUuid> serversWithExactVersion;
 
     // TODO: Should reverse this verification: get all platform configurations and find packages for them.
     // Checking if all servers have update packages.
@@ -283,13 +284,21 @@ bool verifyUpdateContents(
         contents.noServerWithInternet |= hasInternet;
 
         const nx::utils::SoftwareVersion serverVersion = server->getVersion();
-        // Prohibiting updates to previous version.
+
         if (serverVersion > targetVersion)
         {
-            NX_WARNING(typeid(UpdateContents), "verifyUpdateManifest(%1) Server %2 has a newer version %3",
+            NX_WARNING(typeid(UpdateContents),
+                "verifyUpdateManifest(%1) Server %2 has a newer version %3",
                 contents.info.version, id, serverVersion);
             serversWithNewerVersion.insert(id);
             continue;
+        }
+        else if (serverVersion == targetVersion)
+        {
+            NX_DEBUG(typeid(UpdateContents),
+                "verifyUpdateManifest(%1) Server %2 is already at this version",
+                contents.info.version, id);
+            serversWithExactVersion.insert(id);
         }
 
         update::Package* package = serverPackages[osInfo];
@@ -322,6 +331,7 @@ bool verifyUpdateContents(
             }
         }
 
+        // Prohibiting updates to previous version.
         if (serverVersion < targetVersion && server->isOnline())
         {
             contents.alreadyInstalled = false;
@@ -336,9 +346,17 @@ bool verifyUpdateContents(
         contents.manualPackages.push_back(*package);
 
     if (contents.peersWithUpdate.empty())
+    {
         contents.invalidVersion.unite(serversWithNewerVersion);
+    }
     else
+    {
+        // Since we have some peers with valid update, we can ignore problems for servers with
+        // exact version.
+        contents.invalidVersion -= serversWithExactVersion;
+        contents.missingUpdate -= serversWithExactVersion;
         contents.ignorePeers = serversWithNewerVersion;
+    }
 
     if (options.commonModule)
     {

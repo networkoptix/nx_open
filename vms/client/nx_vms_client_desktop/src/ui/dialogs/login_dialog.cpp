@@ -697,9 +697,9 @@ void QnLoginDialog::at_saveButton_clicked()
     qnSettings->setCustomConnections(connections);
     qnSettings->save();
 
-    const auto credentials = (savePassword
+    const auto credentials = savePassword
         ? nx::vms::common::Credentials(url)
-        : nx::vms::common::Credentials(url.userName(), QString()));
+        : nx::vms::common::Credentials(url.userName(), QString());
     storeCredentials(connectionData.localId, credentials);
     qnClientCoreSettings->save();
 
