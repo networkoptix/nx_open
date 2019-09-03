@@ -46,7 +46,6 @@ public:
     * \param requiredPermission        Global permission to check.
     * \returns                         Whether actual global permissions include required permission.
     */
-
     bool hasGlobalPermission(const QnResourceAccessSubject& subject,
         GlobalPermission requiredPermission) const;
 
