@@ -20,7 +20,6 @@
 
 class QnStoragePluginFactory;
 class QSettings;
-class QnSessionManager;
 class QnRouter;
 class QnGlobalSettings;
 class QnCommonMessageProcessor;
@@ -100,11 +99,6 @@ public:
     QnStoragePluginFactory* storagePluginFactory() const
     {
         return m_storagePluginFactory;
-    }
-
-    QnSessionManager* sessionManager() const
-    {
-        return m_sessionManager.data();
     }
 
     QnResourcePool* resourcePool() const
@@ -340,7 +334,6 @@ private:
     bool m_dirtyModuleInformation;
     std::shared_ptr<nx::metrics::Storage> m_metrics;
     QScopedPointer<nx::network::http::ClientPool> m_httpClientPool;
-    QScopedPointer<QnSessionManager> m_sessionManager;
     QnResourcePool* m_resourcePool = nullptr;
     QnResourceAccessSubjectsCache* m_resourceAccessSubjectCache = nullptr;
     QnSharedResourcesManager* m_sharedResourceManager = nullptr;

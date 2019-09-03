@@ -4,7 +4,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
 
-#include <api/session_manager.h>
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 #include <api/model/ping_reply.h>

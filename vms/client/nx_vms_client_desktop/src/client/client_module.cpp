@@ -15,7 +15,6 @@
 #include <api/global_settings.h>
 #include <api/network_proxy_factory.h>
 #include <api/runtime_info_manager.h>
-#include <api/session_manager.h>
 
 #include <common/common_module.h>
 #include <common/static_common_module.h>

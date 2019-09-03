@@ -10,7 +10,6 @@
 #include <api/common_message_processor.h>
 #include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
-#include <api/session_manager.h>
 #include <common/common_meta_types.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
@@ -146,7 +145,6 @@ QnCommonModule::QnCommonModule(bool clientMode,
 
     m_cameraDriverRestrictionList = new CameraDriverRestrictionList(this);
     m_httpClientPool.reset(new nx::network::http::ClientPool(this));
-    m_sessionManager.reset(new QnSessionManager(this));
     m_licensePool = new QnLicensePool(this);
     m_cameraUserAttributesPool = new QnCameraUserAttributePool(this);
     m_mediaServerUserAttributesPool = new QnMediaServerUserAttributesPool(this);

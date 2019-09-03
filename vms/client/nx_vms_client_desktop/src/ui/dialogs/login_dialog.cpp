@@ -11,7 +11,6 @@
 #include <QtWidgets/QApplication>
 
 #include <api/app_server_connection.h>
-#include <api/session_manager.h>
 #include <api/model/connection_info.h>
 
 #include <common/common_module.h>
