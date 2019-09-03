@@ -1,7 +1,5 @@
 #include "network_controller.h"
 
-#include <nx/utils/log/log.h>
-
 #include "helpers.h"
 
 namespace nx::vms::server::metrics {
@@ -38,10 +36,8 @@ NetworkController::NetworkController(const QnUuid& serverId):
 void NetworkController::start()
 {
     // TODO: Add monitor for add/remove.
-    auto interfaceList = nx::network::getAllIPv4Interfaces();
-    NX_INFO(this, "Add %1", containerString(interfaceList));
-    for (auto& interface: interfaceList)
-        add(std::make_unique<InterfaceDescription>(std::move(interface), m_serverId));
+    for (const QnInterfaceAndAddr& interface : nx::network::getAllIPv4Interfaces())
+        add(std::make_unique<InterfaceDescription>(interface, m_serverId));
 }
 
 utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkController::makeProviders()
