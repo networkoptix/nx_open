@@ -33,10 +33,14 @@ namespace nx {
         }                                           \
                                                     \
         R operator()( ARG_PARAM_LIST )              \
-        {                                           \
-            if( !m_funcToCallBefore || m_funcToCallBefore() )   \
-                m_targetFunc( ARG_VAR_LIST );                   \
-            if( m_funcToCallAfter )                             \
+        {                                                       \
+            bool targetHasBeenCalled = false;                   \
+            if (!m_funcToCallBefore || m_funcToCallBefore())    \
+            {                                                   \
+                m_targetFunc(ARG_VAR_LIST);                     \
+                targetHasBeenCalled = true;                     \
+            }                                                   \
+            if (targetHasBeenCalled && m_funcToCallAfter)       \
                 m_funcToCallAfter();                            \
         }                                                       \
                                                                 \
