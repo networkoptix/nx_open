@@ -247,7 +247,7 @@ void QnMdnsPacket::addQuery()
 
 void QnMdnsSrvData::decode(const QByteArray& raw)
 {
-    QDataStream stream(const_cast<QByteArray*>(&raw), QIODevice::ReadOnly);
+    QDataStream stream(raw);
     stream.setByteOrder(QDataStream::BigEndian);
 
     stream
@@ -271,7 +271,7 @@ void QnMdnsSrvData::decode(const QByteArray& raw)
 
 void QnMdnsTextData::decode(const QByteArray& raw)
 {
-    QDataStream stream(const_cast<QByteArray*>(&raw), QIODevice::ReadOnly);
+    QDataStream stream(raw);
 
     while(!stream.atEnd())
     {
