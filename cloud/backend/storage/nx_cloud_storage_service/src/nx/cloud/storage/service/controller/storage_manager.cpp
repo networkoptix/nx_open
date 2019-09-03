@@ -49,7 +49,6 @@ static const std::map<std::string, nx::geo_ip::Geopoint> kAwsGeopoints = {
     {"us-gov-east-1", {39, -78}}
 };
 
-// TODO attempt to format this string properly when sts::ApiClient works
 // %1 is an array of arns with the form: "arn:aws:s3:::examplebucket/folder".
 // NOTE: Because storages can be merged, access must be granted to multiple buckets/folders.
 // There is no way know the specific bucket/folder will be be written to, access must be granted
