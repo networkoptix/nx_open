@@ -9,7 +9,9 @@
 
 namespace nx::vms::api::metrics {
 
-using Value = QJsonValue; //< TODO: std::variant<QString, int>.
+//< TODO: std::variant<QString, int>.
+struct NX_VMS_API Value: QJsonValue { using QJsonValue::QJsonValue; };
+NX_VMS_API void PrintTo(const Value& v, ::std::ostream* s);
 
 using ValueGroup
     = std::map<QString /*parameterId*/, Value>;

@@ -8,6 +8,127 @@
 
 namespace nx::vms::utils::metrics {
 
+namespace {
+
+class FormulaBuilder
+{
+public:
+    FormulaBuilder(const QString& formula, const ValueMonitors& monitors):
+        m_formula(formula),
+        m_parts(formula.split(' ')),
+        m_monitors(monitors)
+    {
+    }
+
+    const QString& function() const { return part(0); }
+    const QString& part(int index) const
+    {
+        if (m_parts.size() <= index)
+            throw std::domain_error("Missing parameter in formula: " + m_formula.toStdString());
+        return m_parts[index];
+    }
+
+    ValueMonitor* monitor(int index) const
+    {
+        const auto id = part(index);
+        if (const auto it = m_monitors.find(id); it != m_monitors.end())
+            return it->second.get();
+        throw std::domain_error("Unknown parameter: " + id.toStdString());
+    }
+
+    std::chrono::milliseconds duration(int index) const
+    {
+        const auto value = part(index);
+        const auto parsed = nx::utils::parseTimerDuration(part(index));
+        if (parsed.count())
+            return parsed;
+        throw std::domain_error("Invalid duration: " + value.toStdString());
+    }
+
+    template<typename Operation> // api::metrics::Value(api::metrics::Value, api::metrics::Value)
+    ValueGenerator binaryOperatiron(Operation operation) const
+    {
+        return
+            [operation, m1 = monitor(1), m2 = monitor(2)]
+            {
+                auto v1 = m1->current();
+                auto v2 = m2->current();
+                return (v1.isNull() || v2.isNull())
+                    ? api::metrics::Value()
+                    : api::metrics::Value(operation(std::move(v1), std::move(v2)));
+            };
+    }
+
+    template<typename Operation> // double(double, double)
+    ValueGenerator numericOperatiron(Operation operation) const
+    {
+        return binaryOperatiron(
+            [operation](api::metrics::Value v1, api::metrics::Value v2)
+            {
+                return (!v1.isDouble() || !v2.isDouble())
+                    ? api::metrics::Value("ERROR: One of the arguments is not an integer")
+                    : api::metrics::Value(operation(v1.toDouble(), v2.toDouble()));
+            });
+    }
+
+    template<typename Operation>
+    ValueGenerator last(Operation operation) const
+    {
+        return
+            [operation, m = monitor(1), d = duration(2)]
+            {
+                const auto values = m->last(d);
+                return api::metrics::Value(operation(values));
+            };
+    }
+
+    ValueGenerator build() const
+    {
+        const auto p1 = part(1);
+        if (function() == "s" || function() == "string")
+            return [s = part(1)] { return api::metrics::Value(s); };
+
+        if (function() == "n" || function() == "number")
+            return [n = part(1).toDouble()] { return api::metrics::Value(n); };
+
+        if (function() == "+" || function() == "add")
+            return numericOperatiron([](auto v1, auto v2) { return v1 + v2; });
+
+        if (function() == "-" || function() == "sub")
+            return numericOperatiron([](auto v1, auto v2) { return v1 - v2; });
+
+        if (function() == "c" || function() == "count")
+            return last([](const auto& values) { return (double) values.size(); });
+
+        if (function() == "=" || function() == "eq")
+            return binaryOperatiron([](auto v1, auto v2) { return v1 == v2; });
+
+        if (function() == "!=" || function() == "ne")
+            return binaryOperatiron([](auto v1, auto v2) { return v1 != v2; });
+
+        if (function() == ">" || function() == "gt")
+            return numericOperatiron([](auto v1, auto v2) { return v1 > v2; });
+
+        if (function() == "<" || function() == "lt")
+            return numericOperatiron([](auto v1, auto v2) { return v1 < v2; });
+
+        if (function() == ">=" || function() == "ge")
+            return numericOperatiron([](auto v1, auto v2) { return v1 >= v2; });
+
+        if (function() == "<=" || function() == "le")
+            return numericOperatiron([](auto v1, auto v2) { return v1 <= v2; });
+
+        throw std::domain_error("Unsupported function: " + function().toStdString());
+    }
+
+private:
+    const QString& m_formula;
+    const QStringList m_parts;
+    const ValueMonitors& m_monitors;
+};
+
+} // namespace
+
 ValueGenerator parseFormula(const QString& formula, const ValueMonitors& monitors)
 {
     try
@@ -16,90 +137,14 @@ ValueGenerator parseFormula(const QString& formula, const ValueMonitors& monitor
     }
     catch (const std::domain_error& error)
     {
-        NX_DEBUG(NX_SCOPE_TAG, "Unable to parse formule '%1': %2", formula, error.what());
+        NX_DEBUG(NX_SCOPE_TAG, "Unable to parse formula '%1': %2", formula, error.what());
         return nullptr;
     }
 }
 
 ValueGenerator parseFormulaOrThrow(const QString& formula, const ValueMonitors& monitors)
 {
-    const auto parts = formula.splitRef(' ');
-    const auto part =
-        [&](int index)
-        {
-            if (parts.size() < index)
-                throw std::domain_error("Missing parameter in formula: " + formula.toStdString());
-            return parts[index].toString();
-        };
-
-    using Value = api::metrics::Value;
-    const auto monitor =
-        [&](int index)
-        {
-            const auto id = part(index);
-            if (const auto it = monitors.find(id); it != monitors.end())
-                return it->second.get();
-            throw std::domain_error("Unknown parameter: " + id.toStdString());
-        };
-
-    const auto interval =
-        [&](int index)
-        {
-            const auto value = part(index);
-            const auto parsed = nx::utils::parseTimerDuration(part(index));
-            if (parsed.count())
-                return parsed;
-            throw std::domain_error("Invalid duration: " + value.toStdString());
-        };
-
-    const auto function = part(0);
-    if (function == "n" || function == "number")
-        return [n = part(1).toDouble()] { return Value(n); };
-
-    if (function == "s" || function == "string")
-        return [n = part(1)] { return Value(n); };
-
-    if (function == "+" || function == "add")
-        return [m1 = monitor(1), m2 = monitor(2)] { return Value(m1->currentN() + m2->currentN()); };
-
-    if (function == "-" || function == "sub")
-        return [m1 = monitor(1), m2 = monitor(2)] { return Value(m1->currentN() - m2->currentN()); };
-
-    if (function == "c" || function == "count")
-        return [m = monitor(1), i = interval(2)] { return Value((double) m->last(i).size()); };
-
-    if (function == "a" || function == "average")
-    {
-        return
-            [m = monitor(1), i = interval(2)]
-            {
-                const auto values = m->last(i);
-                double sum = 0;
-                for (const auto& v: values)
-                    sum += v.value.toDouble(); //< Take account of interval length.
-                return sum ? (sum / double(values.size())) : 0;
-            };
-    }
-
-    if (function == "=" || function == "eq")
-        return [m1 = monitor(1), m2 = monitor(2)] { return Value(m1->current() == m2->current()); };
-
-    if (function == "!=" || function == "ne")
-        return [m1 = monitor(1), m2 = monitor(2)] { return Value(m1->current() != m2->current()); };
-
-    if (function == ">" || function == "gt")
-        return [m1 = monitor(1), m2 = monitor(2)] { return Value(m1->currentN() > m2->currentN()); };
-
-    if (function == "<" || function == "lt")
-        return [m1 = monitor(1), m2 = monitor(2)] { return Value(m1->currentN() < m2->currentN()); };
-
-    if (function == ">=" || function == "ge")
-        return [m1 = monitor(1), m2 = monitor(2)] { return Value(m1->currentN() >= m2->currentN()); };
-
-    if (function == "<=" || function == "le")
-        return [m1 = monitor(1), m2 = monitor(2)] { return Value(m1->currentN() <= m2->currentN()); };
-
-    throw std::domain_error("Unsupported function: " + function.toStdString());
+    return FormulaBuilder(formula, monitors).build();
 }
 
 TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors)

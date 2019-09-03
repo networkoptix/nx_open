@@ -43,7 +43,7 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
     {
         const auto groupIt = std::find_if(
             manifest.begin(), manifest.end(),
-            [&groupId](const auto& g) { return g.id == groupId; });
+            [id = &groupId](const auto& g) { return g.id == *id; });
         if (!NX_ASSERT(groupIt != manifest.end(), "Group not found: %1", groupId))
             continue;
 
@@ -51,7 +51,7 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
         {
             const auto existing = std::find_if(
                 groupIt->values.begin(), groupIt->values.end(),
-                [&valueId](const auto& m) { return m.id == valueId; });
+                [id = &valueId](const auto& m) { return m.id == *id; });
             if (existing != groupIt->values.end())
             {
                 // Override existing value manifest.
@@ -64,7 +64,7 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
             // TODO: Use proper insert rules.
             const auto position = std::find_if(
                 groupIt->values.begin(), groupIt->values.end(),
-                [&valueRule](const auto& m) { return m.id == valueRule.insert; });
+                [r = &valueRule](const auto& m) { return m.id == r->insert; });
             groupIt->values.insert(position, api::metrics::ValueManifest{
                 valueId, valueRule.name, valueRule.display, valueRule.unit});
         }

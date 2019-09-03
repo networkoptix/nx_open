@@ -6,11 +6,6 @@
 
 #include "test_providers.h"
 
-void PrintTo(const QJsonValue& v, ::std::ostream* s)
-{
-    *s << QJson::serialized(v).toStdString();
-}
-
 namespace nx::vms::utils::metrics::test {
 
 class MetricsControllerTest: public ::testing::Test

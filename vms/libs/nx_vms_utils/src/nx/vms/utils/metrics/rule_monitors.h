@@ -15,7 +15,6 @@ NX_VMS_UTILS_API TextGenerator parseTemplate(QString template_, const ValueMonit
 
 /**
  * Calculates value for monitoring.
- * TODO: Consider to inherit ValueMonitor, so ExtraValueMonitor could use itself.
  */
 class NX_VMS_UTILS_API ExtraValueMonitor: public ValueMonitor
 {
@@ -26,8 +25,6 @@ public:
 private:
     const ValueGenerator m_formula;
 };
-
-using ExtraValueMonitors = class std::map<QString, std::unique_ptr<ExtraValueMonitor>>;
 
 /**
  * Generates alarm of condition is triggered.

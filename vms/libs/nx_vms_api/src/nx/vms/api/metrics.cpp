@@ -4,6 +4,11 @@
 
 namespace nx::vms::api::metrics {
 
+void PrintTo(const Value& v, ::std::ostream* s)
+{
+    *s << QJson::serialized(v).toStdString();
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (ValueManifest)(ValueGroupManifest)
     (AlarmRule)(ValueRule)
