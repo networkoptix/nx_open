@@ -61,7 +61,7 @@ bool QnMdnsPacket::fromDatagram(const QByteArray& message)
 
         auto nameLength = parseName(message, currentOffset, query.queryName);
 
-        if(nameLength == -1)
+        if (nameLength == -1)
             return false;
 
         currentOffset += nameLength;
@@ -98,7 +98,7 @@ bool QnMdnsPacket::fromDatagram(const QByteArray& message)
 
         auto nameLength = parseName(message, currentOffset, record.recordName);
 
-        if(nameLength == -1)
+        if (nameLength == -1)
             return false;
 
         currentOffset += nameLength;
@@ -123,7 +123,7 @@ bool QnMdnsPacket::fromDatagram(const QByteArray& message)
 
         currentOffset += fixedSizeFieldSize;
 
-        if(currentOffset + record.dataLength > bufferSize)
+        if (currentOffset + record.dataLength > bufferSize)
             return false;
 
         record.data.append(bufferStart + currentOffset, record.dataLength);
@@ -273,7 +273,7 @@ void QnMdnsTextData::decode(const QByteArray& raw)
 {
     QDataStream stream(raw);
 
-    while(!stream.atEnd())
+    while (!stream.atEnd())
     {
         quint8 length;
         stream >> length;
@@ -283,7 +283,7 @@ void QnMdnsTextData::decode(const QByteArray& raw)
         QByteArray key;
         Attribute attribute;
         const auto equalSignPosition = text.indexOf('=');
-        if(equalSignPosition == -1)
+        if (equalSignPosition == -1)
         {
             key = text;
             attribute = {Attribute::Presence::NoValue, {}};
@@ -295,9 +295,9 @@ void QnMdnsTextData::decode(const QByteArray& raw)
             attribute = {Attribute::Presence::WithValue, value};
         }
 
-        if(key.isEmpty())
+        if (key.isEmpty())
             continue;
-        if(m_attributes.find(key) != m_attributes.end())
+        if (m_attributes.find(key) != m_attributes.end())
             continue;
 
         m_attributes[key.toLower()] = attribute;
@@ -307,7 +307,7 @@ void QnMdnsTextData::decode(const QByteArray& raw)
 QnMdnsTextData::Attribute QnMdnsTextData::getAttribute(const QByteArray& key) const
 {
     auto attrIt = m_attributes.find(key.toLower());
-    if(attrIt == m_attributes.end())
+    if (attrIt == m_attributes.end())
         return {Attribute::Presence::Absent, {}};
     return *attrIt;
 }
