@@ -249,23 +249,23 @@ int DiscoveryManager::fromMDNSData(
         for(const QnMdnsPacket::ResourceRecord& record: recordSet)
         {
             switch (record.recordType) {
-            case QnMdnsPacket::kSrvRecordType: {
-                if(!record.recordName.endsWith("_http._tcp.local."))
-                    break;
-                QnMdnsSrvData srvData;
-                srvData.decode(record.data);
-                if(srvData.target.isEmpty()) //< If the decoding failed.
-                    break;
-                port = srvData.port;
-            }
-            case QnMdnsPacket::kTextRecordType: {
-                QnMdnsTextData textData;
-                textData.decode(record.data);
-                const auto pathAttribute = textData.getAttribute("path");
-                if(pathAttribute.presence != QnMdnsTextData::Attribute::Presence::withValue)
-                    break;
-                path = QString::fromUtf8(pathAttribute.value);
-            }
+                case QnMdnsPacket::kSrvRecordType: {
+                    if(!record.recordName.endsWith("_http._tcp.local."))
+                        break;
+                    QnMdnsSrvData srvData;
+                    srvData.decode(record.data);
+                    if(srvData.target.isEmpty()) //< If the decoding failed.
+                        break;
+                    port = srvData.port;
+                }
+                case QnMdnsPacket::kTextRecordType: {
+                    QnMdnsTextData textData;
+                    textData.decode(record.data);
+                    const auto pathAttribute = textData.getAttribute("path");
+                    if(pathAttribute.presence != QnMdnsTextData::Attribute::Presence::withValue)
+                        break;
+                    path = QString::fromUtf8(pathAttribute.value);
+                }
             }
         }
     }
