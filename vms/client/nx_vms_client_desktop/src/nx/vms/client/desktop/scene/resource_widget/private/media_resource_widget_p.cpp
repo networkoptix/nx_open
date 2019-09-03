@@ -245,6 +245,7 @@ void MediaResourceWidgetPrivate::setAnalyticsFilter(const nx::analytics::db::Fil
     if (m_forceDisabledAnalytics)
         analyticsController->clearAreas();
 
+    NX_VERBOSE(this, "Update analytics filter to %1", value);
     analyticsController->setFilter(value);
 }
 
@@ -353,8 +354,12 @@ void MediaResourceWidgetPrivate::requestAnalyticsObjectsExistence()
                 updateIsAnalyticsSupported();
 
             if (!success)
+            {
+                NX_VERBOSE(this, "Analytics request failed, try again");
                 requestAnalyticsObjectsExistence();
+            }
         });
+    NX_VERBOSE(this, "Request analytics objects existance for camera %1", camera);
     connection->lookupObjectTracks(filter, /*isLocal*/ false, callback, this->thread());
 }
 

@@ -14,7 +14,37 @@
 #include "config.h"
 #include "analytics_db_utils.h"
 
+using namespace nx::common::metadata;
+
 namespace nx::analytics::db {
+
+namespace {
+
+bool wordMatchAnyOfAttributes(const QString& word, const Attributes& attributes)
+{
+    std::function<bool(const Attribute&)> wordMatchesAttribute;
+    if (word.endsWith('*'))
+    {
+        const QStringRef prefix = word.leftRef(word.length() - 1);
+        wordMatchesAttribute =
+            [prefix](const Attribute& attribute)
+            {
+                return attribute.value.startsWith(prefix, Qt::CaseInsensitive);
+            };
+    }
+    else
+    {
+        wordMatchesAttribute =
+            [&word](const Attribute& attribute)
+            {
+                return QString::compare(word, attribute.value, Qt::CaseInsensitive) == 0;
+            };
+    }
+    return std::any_of(attributes.cbegin(), attributes.cend(), wordMatchesAttribute);
+}
+
+} // namespace
+
 
 bool ObjectPosition::operator==(const ObjectPosition& right) const
 {
@@ -72,26 +102,20 @@ bool Filter::acceptsBoundingBox(const QRectF& boundingBox) const
         rectsIntersectToSearchPrecision(*(this->boundingBox), boundingBox);
 }
 
-bool Filter::acceptsAttributes(const std::vector<nx::common::metadata::Attribute>& attributes) const
+bool Filter::acceptsAttributes(const std::vector<Attribute>& attributes) const
 {
     const auto filterWords = freeText.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
     if (attributes.empty())
         return filterWords.empty();
 
     return std::all_of(filterWords.cbegin(), filterWords.cend(),
-        [&attributes](const QString& filterWord) -> bool
+        [&attributes](const QString& filterWord)
         {
-            return std::any_of(attributes.cbegin(), attributes.cend(),
-                [&filterWord](const nx::common::metadata::Attribute& attribute) -> bool
-                {
-                    return attribute.name.contains(filterWord, Qt::CaseInsensitive)
-                        || attribute.value.contains(filterWord, Qt::CaseInsensitive);
-                });
+            return wordMatchAnyOfAttributes(filterWord, attributes);
         });
 }
 
-bool Filter::acceptsMetadata(
-    const nx::common::metadata::ObjectMetadata& metadata, bool checkBoundingBox) const
+bool Filter::acceptsMetadata(const ObjectMetadata& metadata, bool checkBoundingBox) const
 {
     return acceptsObjectType(metadata.typeId)
         && (!checkBoundingBox || acceptsBoundingBox(metadata.boundingBox))
@@ -143,6 +167,22 @@ bool Filter::acceptsTrack(const ObjectTrack& track) const
     }
 
     return true;
+}
+
+void Filter::loadUserInputToFreeText(const QString& userInput)
+{
+    freeText = userInputToFreeText(userInput);
+}
+
+QString Filter::userInputToFreeText(const QString& userInput)
+{
+    auto filterWords = userInput.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
+    for (auto& word: filterWords)
+    {
+        if (!word.endsWith('*'))
+            word = word + '*';
+    }
+    return filterWords.join(' ');
 }
 
 bool Filter::operator==(const Filter& right) const

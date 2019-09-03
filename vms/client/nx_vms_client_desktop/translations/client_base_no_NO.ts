@@ -1826,15 +1826,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event rule changed</source>
-      <translation type="unfinished">Event rule changed</translation>
+      <translation>Hendelsesregel endret</translation>
     </message>
     <message>
       <source>Event rule removed</source>
-      <translation type="unfinished">Event rule removed</translation>
+      <translation>Hendelsesregel fjernet</translation>
     </message>
     <message>
       <source>Event rules reset to default</source>
-      <translation type="unfinished">Event rules reset to default</translation>
+      <translation>Hendelsesregler tilbakestilles til standard</translation>
     </message>
   </context>
   <context>

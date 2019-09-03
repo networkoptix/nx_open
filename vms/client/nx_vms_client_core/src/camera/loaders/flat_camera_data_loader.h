@@ -48,8 +48,6 @@ private:
     int sendRequest(qint64 startTimeMs, qint64 resolutionMs);
     void handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requestHandle);
 
-    void trace(const QString& message);
-
 private:
     struct LoadingInfo
     {

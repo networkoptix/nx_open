@@ -771,8 +771,8 @@ void QnVirtualCameraResource::setDeviceAgentManifest(
 bool QnVirtualCameraResource::hasDualStreamingInternal() const
 {
     // Calculate secondary stream capability for manually added based on the custom streams.
-    const auto supportsUsedDefinedStreams = hasCameraCapabilities(Qn::CustomMediaUrlCapability);
-    if (supportsUsedDefinedStreams)
+    const auto supportsUserDefinedStreams = hasCameraCapabilities(Qn::CustomMediaUrlCapability);
+    if (supportsUserDefinedStreams)
     {
         const auto primaryStream = sourceUrl(Qn::CR_LiveVideo);
         const auto secondaryStream = sourceUrl(Qn::CR_SecondaryLiveVideo);
