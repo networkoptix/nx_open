@@ -178,7 +178,11 @@ QString DiscoveryManager::getGroupName(const nx::utils::Url& url) const
     return QString(); //< Not a multi channel camera.
 }
 
-int DiscoveryManager::checkHostAddress(nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password)
+int DiscoveryManager::checkHostAddress(
+    nxcip::CameraInfo* /*cameras*/,
+    const char* /*address*/,
+    const char* /*login*/,
+    const char* /*password*/)
 {
     return 0;
 }
