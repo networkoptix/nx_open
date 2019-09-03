@@ -91,20 +91,20 @@ bool deserialize(const nx::utils::UrlQuery& query, AssumeRoleRequest* outObject)
         return false;
     }
 
-    outObject->roleArn = query.queryItemValue(kRoleArn).toStdString();
-    outObject->roleSessionName = query.queryItemValue(kRoleSessionName).toStdString();
+    outObject->roleArn = query.queryItemValue<std::string>(kRoleArn);
+    outObject->roleSessionName = query.queryItemValue<std::string>(kRoleSessionName);
 
     int i = 1;
     QString arn = kPolicyArns + QString::number(i);
     while(query.hasQueryItem(arn))
     {
-        outObject->policyArns.emplace_back(query.queryItemValue(arn).toStdString());
+        outObject->policyArns.emplace_back(query.queryItemValue<std::string>(arn));
         arn = kPolicyArns + QString::number(++i);
     }
-    outObject->policy = query.queryItemValue(kPolicy).toStdString();
-    outObject->durationSeconds = query.queryItemValue(kDurationSeconds).toInt();
-    outObject->externalId = query.queryItemValue(kExternalId).toStdString();
-    outObject->tokenCode = query.queryItemValue(kTokenCode).toStdString();
+    outObject->policy = query.queryItemValue<std::string>(kPolicy);
+    outObject->durationSeconds = query.queryItemValue<int>(kDurationSeconds);
+    outObject->externalId = query.queryItemValue<std::string>(kExternalId);
+    outObject->tokenCode = query.queryItemValue<std::string>(kTokenCode);
 
     return true;
 }

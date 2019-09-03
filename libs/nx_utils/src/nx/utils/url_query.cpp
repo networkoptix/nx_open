@@ -2,6 +2,20 @@
 
 namespace nx::utils {
 
+namespace detail {
+
+void convert(const QString& value, std::string* outValue)
+{
+    *outValue = value.toStdString();
+}
+
+void convert(const QString& value, QString* outValue)
+{
+    *outValue = value;
+}
+
+} // namespace detail
+
 UrlQuery::UrlQuery(const QString& query):
     m_query(query)
 {
@@ -26,23 +40,6 @@ UrlQuery& UrlQuery::addQueryItem(const char* key, const char* value)
 bool UrlQuery::hasQueryItem(const QString& key) const
 {
     return m_query.hasQueryItem(key);
-}
-
-QString UrlQuery::queryItemValue(
-    const QString& key,
-    QUrl::ComponentFormattingOptions encoding) const
-{
-    return m_query.queryItemValue(key, encoding);
-}
-
-QString UrlQuery::queryItemValue(const std::string& key, QUrl::ComponentFormattingOptions encoding) const
-{
-    return queryItemValue(QString::fromStdString(key), encoding);
-}
-
-QString UrlQuery::queryItemValue(const char* key, QUrl::ComponentFormattingOptions encoding) const
-{
-    return queryItemValue(QString(key), encoding);
 }
 
 QString UrlQuery::toString(QUrl::ComponentFormattingOptions encoding) const
