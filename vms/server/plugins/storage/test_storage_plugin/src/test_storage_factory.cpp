@@ -17,6 +17,8 @@
 #elif defined (__linux__)
 #   include <unistd.h>
 #   include <sys/types.h>
+#elif defined (__APPLE__)
+#   include <mach-o/dyld.h>
 #endif
 
 namespace {
@@ -43,6 +45,13 @@ std::string getAppDir()
     if (bytes <= 0)
         return result;
     char separator = '/';
+
+#elif defined (__APPLE__)
+
+    uint32_t lenActualPath = sizeof(buf);
+    if (_NSGetExecutablePath(buf, &lenActualPath) != 0)
+        return result;
+    const char separator = '/';
 
 #endif
 

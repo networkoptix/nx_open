@@ -6,7 +6,7 @@
 
 #if defined (TEST_PLUGIN_LOG)
 
-    #if defined (__linux__) 
+    #if defined (__linux__)
         #include <sys/time.h>
         #include <stdio.h>
         #include <pthread.h>
@@ -23,7 +23,7 @@
                 fprintf(stdout, "%s\n", ___buf); \
                 fflush(stdout); \
             } while (0)
-    #elif defined (_WIN32)
+    #elif defined (_WIN32) || defined(__APPLE__)
         #define LOG(...)
     #endif
 

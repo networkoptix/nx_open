@@ -1,33 +1,40 @@
 #include "system_commands.h"
-#include "system_commands/domain_socket/send_linux.h"
 #include "system_commands/detail/mount_helper.h"
+
+#include <set>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <stdio.h>
+#include <fcntl.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <sys/statvfs.h>
+#include <sys/mount.h>
+
+#include <QtGlobal> // For platform defines.
+
+#ifdef Q_OS_LINUX
+#include "system_commands/domain_socket/send_linux.h"
 
 #include <algorithm>
 #include <assert.h>
-#include <dirent.h>
-#include <fcntl.h>
-#include <fstream>
 #include <grp.h>
 #include <iomanip>
-#include <iostream>
 #include <iterator>
 #include <functional>
 #include <pwd.h>
-#include <set>
 #include <signal.h>
-#include <sstream>
 #include <string>
 #include <string.h>
-#include <sys/mount.h>
 #include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/statvfs.h>
 #include <sys/syscall.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#endif // Q_OS_LINUX
 
 namespace nx {
 
@@ -40,6 +47,16 @@ namespace nx {
     #undef STRINGIFY2
 #else
     const char* const SystemCommands::kDomainSocket = "/tmp/syscmd_socket3f64fa";
+#endif
+
+#ifdef Q_OS_MAC
+    #define stat64 stat
+    #define statvfs64 statvfs
+    #define unmount_path_syscall(path) ::unmount((path), 0)
+#elif defined(Q_OS_LINUX)
+    #define unmount_path_syscall(path) ::umount(path)
+#else
+    #error Unsupported OS
 #endif
 
 namespace {
@@ -100,6 +117,7 @@ std::string format(const std::string& formatString, Args&&... args)
     return formatImpl(pstr, out, std::forward<Args>(args)...);
 }
 
+#ifdef Q_OS_LINUX
 static std::string makeCredentialsFile(
     const std::string& userName, const std::string& password, std::string* outError)
 {
@@ -115,6 +133,7 @@ static std::string makeCredentialsFile(
 
     return "";
 }
+#endif // Q_OS_LINUX
 
 } // namespace
 
@@ -138,6 +157,9 @@ bool SystemCommands::checkOwnerPermissions(const std::string& path)
 {
     static const std::set<std::string> kForbiddenOwnershipPaths = {"/"};
     static const std::set<std::string> kForbiddenOwnershipPrefixes = {
+#ifdef Q_OS_MAC
+        "/private/var/vm", "/Volumes/Recovery",
+#endif // Q_OS_MAC
         "/bin", "/boot", "/cdrom", "/dev", "/etc", "/lib", "/lib64", "/proc", "/root", "/run",
         "/sbin", "/snap", "/srv", "/sys", "/usr", "/var"};
 
@@ -204,7 +226,9 @@ SystemCommands::MountCode SystemCommands::mount(
     delegates.credentialsFileName =
         [this, &credentialsFile](const std::string& username, const std::string& password)
         {
+#ifdef Q_OS_LINUX
             credentialsFile = makeCredentialsFile(username, password, &m_lastError);
+#endif // Q_OS_LINUX
             return credentialsFile;
         };
     delegates.isPathAllowed =
@@ -235,7 +259,7 @@ SystemCommands::UnmountCode SystemCommands::unmount(const std::string& directory
     {
         result = UnmountCode::noPermissions;
     }
-    else if (umount(directory.c_str()) == 0)
+    else if (unmount_path_syscall(directory.c_str()) == 0)
     {
         result = UnmountCode::ok;
     }
@@ -413,6 +437,7 @@ int64_t SystemCommands::fileSize(const std::string& path)
 
 std::string SystemCommands::devicePath(const std::string& path)
 {
+#ifdef Q_OS_LINUX
     struct stat64 statBuf;
     std::string result;
     if (::stat64(path.c_str(), &statBuf) == 0)
@@ -446,10 +471,14 @@ std::string SystemCommands::devicePath(const std::string& path)
     }
 
     return result;
+#else // Q_OS_LINUX
+    return path;
+#endif // Q_OS_LINUX
 }
 
 std::string SystemCommands::serializedDmiInfo()
 {
+#ifdef Q_OS_LINUX
     constexpr std::array<const char*, 2> prefixes = {
        "Part Number: ",
        "Serial Number: ",
@@ -509,6 +538,9 @@ std::string SystemCommands::serializedDmiInfo()
     }
 
     return result;
+#else // Q_OS_LINUX
+    return "";
+#endif // Q_OS_LINUX
 }
 
 std::string SystemCommands::lastError() const

@@ -55,12 +55,6 @@
     const QString QnFileStorageResource::TO_SEP = lit("\\");
 #endif
 
-#ifdef __APPLE__
-static const auto MS_NODEV = MNT_NODEV;
-static const auto MS_NOSUID = MNT_NOSUID;
-static const auto MS_NOEXEC = MNT_NOEXEC;
-#endif
-
 
 namespace {
 
@@ -90,7 +84,7 @@ static QString sysDrivePath(QnMediaServerModule* /*serverModule*/)
     return deviceString;
 }
 
-#elif defined(Q_OS_LINUX)
+#elif defined(Q_OS_LINUX) || defined(Q_OS_MAC)
 
 static QString getDevicePath(QnMediaServerModule* serverModule, const QString& path)
 {
@@ -604,15 +598,13 @@ QnFileStorageResource::~QnFileStorageResource()
 #ifndef _WIN32
     if (!m_localPath.isEmpty())
     {
-#if __linux__
+#ifdef Q_OS_UNIX
         auto result = rootTool()->unmount(m_localPath);
         NX_VERBOSE(
             this,
             lm("[mount] unmounting folder %1 while destructing object result: %2")
                 .args(m_localPath, nx::SystemCommands::unmountCodeToString(result)));
-#elif __APPLE__
-        unmount(m_localPath.toLatin1().constData(), 0);
-#endif
+#endif // Q_OS_UNIX
         rmdir(m_localPath.toLatin1().constData());
     }
 #endif
