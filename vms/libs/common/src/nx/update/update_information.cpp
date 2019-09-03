@@ -156,11 +156,6 @@ bool UpdateContents::preferOtherUpdate(const UpdateContents& other) const
     {
         return true;
     }
-    else if (sourceType != UpdateSourceType::mediaservers
-        && other.sourceType == UpdateSourceType::mediaservers)
-    {
-        return false;
-    }
 
     return other.getVersion() > getVersion();
 }

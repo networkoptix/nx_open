@@ -138,6 +138,19 @@ QByteArray extractXmlBody(const QByteArray& body, const QByteArray& tagName, int
 }
 #endif // 0
 
+QString toString(RequestObject object)
+{
+    return QnLexical::serialized(object);
+}
+
+QString toString(QnRequestParamList params)
+{
+    QStringList query;
+    for (const auto& pair: params)
+        query.push_back(pair.first + '=' + pair.second);
+    return query.join('&');
+}
+
 void trace(const QString& serverId, int handle, int obj, const QString& message = QString())
 {
     static const nx::utils::log::Tag kTag(typeid(QnMediaServerConnection));
@@ -394,8 +407,11 @@ int QnMediaServerConnection::sendAsyncGetRequestLogged(
 {
     int handle = sendAsyncGetRequest(object, params, replyTypeName, target, slot, timeout);
 
-    trace(handle, object, lm("GET %1 with timeout %2").args(
-        replyTypeName, timeout ? *timeout : std::chrono::milliseconds{0}));
+    NX_VERBOSE(this, "GET <%1> %2?%3 with timeout %4",
+        handle,
+        static_cast<RequestObject>(object),
+        toString(params),
+        timeout ? *timeout : std::chrono::milliseconds{0});
 
     return handle;
 }
@@ -413,8 +429,11 @@ int QnMediaServerConnection::sendAsyncPostRequestLogged(
     int handle = sendAsyncPostRequest(
         object, std::move(headers), params, data, replyTypeName, target, slot, timeout);
 
-    trace(handle, object, lm("POST %1 with timeout %2").args(
-        replyTypeName, timeout ? *timeout : std::chrono::milliseconds{0}));
+    NX_VERBOSE(this, "POST <%1> %2?%3 with timeout %4",
+        handle,
+        static_cast<RequestObject>(object),
+        toString(params),
+        timeout ? *timeout : std::chrono::milliseconds{0});
 
     return handle;
 }

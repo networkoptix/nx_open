@@ -176,7 +176,7 @@ public:
 
     QList<UpdateItemPtr> allItems() const;
     QSet<QnUuid> allPeers() const;
-    QSet<QnUuid> peersInState(StatusCode state) const;
+    QSet<QnUuid> peersInState(StatusCode state, bool withClient = true) const;
     QSet<QnUuid> legacyServers() const;
     QSet<QnUuid> offlineServers() const;
     QSet<QnUuid> offlineAndInState(StatusCode state) const;
