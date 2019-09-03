@@ -794,3 +794,6 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzDataFields)(Qn::TTHeaderFlags)(Qn::ResourceInfoLevel),
     (metatype)(numeric)
 )
+
+/** Debug representation. */
+QString toString(Qn::TimePeriodContent value);

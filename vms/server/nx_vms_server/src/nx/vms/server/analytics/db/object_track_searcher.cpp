@@ -1,8 +1,7 @@
 #include "object_track_searcher.h"
 
-#include <QtCore/QRegExp>
-
 #include <nx/fusion/serialization/sql_functions.h>
+#include <nx/utils/match/wildcard.h>
 #include <nx/utils/std/algorithm.h>
 
 #include <analytics/db/config.h>
@@ -44,6 +43,8 @@ std::vector<ObjectTrack> ObjectTrackSearcher::lookup(nx::sql::QueryContext* quer
         auto track = fetchTrackById(queryContext, m_filter.objectTrackId);
         if (!track)
             return {};
+
+        NX_ASSERT_HEAVY_CONDITION(m_filter.acceptsTrack(*track));
         return {std::move(*track)};
     }
     else
@@ -64,35 +65,6 @@ void ObjectTrackSearcher::loadCurrentRecord(
     *object = *loadTrack(query, [](auto&&...) { return true; });
 }
 
-void ObjectTrackSearcher::addTrackFilterConditions(
-    const Filter& filter,
-    const DeviceDao& deviceDao,
-    const ObjectTypeDao& objectTypeDao,
-    const ObjectFields& fieldNames,
-    nx::sql::Filter* sqlFilter)
-{
-    if (!filter.deviceIds.empty())
-        addDeviceFilterCondition(filter.deviceIds, deviceDao, sqlFilter);
-
-    if (!filter.objectTrackId.isNull())
-    {
-        sqlFilter->addCondition(std::make_unique<nx::sql::SqlFilterFieldEqual>(
-            fieldNames.trackId, ":trackId",
-            QnSql::serialized_field(filter.objectTrackId)));
-    }
-
-    if (!filter.objectTypeId.empty())
-        addObjectTypeIdToFilter(filter.objectTypeId, objectTypeDao, sqlFilter);
-
-    if (!filter.timePeriod.isNull())
-    {
-        addTimePeriodToFilter<std::chrono::milliseconds>(
-            filter.timePeriod,
-            fieldNames.timeRange,
-            sqlFilter);
-    }
-}
-
 void ObjectTrackSearcher::addDeviceFilterCondition(
     const std::vector<QnUuid>& deviceIds,
     const DeviceDao& deviceDao,
@@ -103,35 +75,6 @@ void ObjectTrackSearcher::addDeviceFilterCondition(
     for (const auto& deviceGuid: deviceIds)
         condition->addValue(deviceDao.deviceIdFromGuid(deviceGuid));
     sqlFilter->addCondition(std::move(condition));
-}
-
-void ObjectTrackSearcher::addBoundingBoxToFilter(
-    const QRect& boundingBox,
-    nx::sql::Filter* sqlFilter)
-{
-    auto topLeftXFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
-        "box_top_left_x",
-        ":boxBottomRightX",
-        QnSql::serialized_field(boundingBox.bottomRight().x()));
-    sqlFilter->addCondition(std::move(topLeftXFilter));
-
-    auto bottomRightXFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
-        "box_bottom_right_x",
-        ":boxTopLeftX",
-        QnSql::serialized_field(boundingBox.topLeft().x()));
-    sqlFilter->addCondition(std::move(bottomRightXFilter));
-
-    auto topLeftYFilter = std::make_unique<nx::sql::SqlFilterFieldLessOrEqual>(
-        "box_top_left_y",
-        ":boxBottomRightY",
-        QnSql::serialized_field(boundingBox.bottomRight().y()));
-    sqlFilter->addCondition(std::move(topLeftYFilter));
-
-    auto bottomRightYFilter = std::make_unique<nx::sql::SqlFilterFieldGreaterOrEqual>(
-        "box_bottom_right_y",
-        ":boxTopLeftY",
-        QnSql::serialized_field(boundingBox.topLeft().y()));
-    sqlFilter->addCondition(std::move(bottomRightYFilter));
 }
 
 template<typename FieldType>
@@ -169,92 +112,6 @@ template void ObjectTrackSearcher::addTimePeriodToFilter<std::chrono::seconds>(
     const QnTimePeriod& timePeriod,
     const TimeRangeFields& timeRangeFields,
     nx::sql::Filter* sqlFilter);
-
-bool ObjectTrackSearcher::satisfiesFilter(
-    const Filter& filter, const ObjectTrack& track)
-{
-    using namespace std::chrono;
-
-    if (!filter.objectTrackId.isNull() &&
-        track.id != filter.objectTrackId)
-    {
-        return false;
-    }
-
-    // Matching every device if device list is empty.
-    if (!filter.deviceIds.empty() &&
-        !nx::utils::contains(filter.deviceIds, track.deviceId))
-    {
-        return false;
-    }
-
-    if (!(microseconds(track.lastAppearanceTimeUs) >= filter.timePeriod.startTime() &&
-          (filter.timePeriod.isInfinite() ||
-              microseconds(track.firstAppearanceTimeUs) < filter.timePeriod.endTime())))
-    {
-        return false;
-    }
-
-    if (!filter.objectTypeId.empty() &&
-        std::find(
-            filter.objectTypeId.begin(), filter.objectTypeId.end(),
-            track.objectTypeId) == filter.objectTypeId.end())
-    {
-        return false;
-    }
-
-    if (!filter.freeText.isEmpty() &&
-        !matchAttributes(track.attributes, filter.freeText))
-    {
-        return false;
-    }
-
-    // Checking the track.
-    if (filter.boundingBox)
-    {
-        bool instersects = false;
-        for (const auto& position: track.objectPositionSequence)
-        {
-            if (rectsIntersectToSearchPrecision(*filter.boundingBox, position.boundingBox))
-            {
-                instersects = true;
-                break;
-            }
-        }
-
-        if (!instersects)
-            return false;
-    }
-
-    return true;
-}
-
-bool ObjectTrackSearcher::matchAttributes(
-    const std::vector<nx::common::metadata::Attribute>& attributes,
-    const QString& filter)
-{
-    const auto filterWords = filter.split(L' ');
-    // Attributes have to contain all words.
-    for (const auto& filterWord: filterWords)
-    {
-        QRegExp expr(filterWord, Qt::CaseInsensitive, QRegExp::PatternSyntax::Wildcard);
-
-        bool found = false;
-        for (const auto& attribute: attributes)
-        {
-            if (expr.indexIn(attribute.name) != -1 || expr.indexIn(attribute.value) != -1)
-            {
-                found = true;
-                break;
-            }
-        }
-
-        if (!found)
-            return false;
-    }
-
-    return true;
-}
 
 static constexpr char kBoxFilteredTable[] = "%boxFilteredTable%";
 static constexpr char kFromBoxFilteredTable[] = "%fromBoxFilteredTable%";
@@ -389,6 +246,8 @@ void ObjectTrackSearcher::fetchTracksFromDb(
         if (result->ids.count(track.id) > 0)
             continue;
 
+        // Filter does not accept track here cause of bounding box limitations.
+        // NX_ASSERT_HEAVY_CONDITION(m_filter.acceptsTrack(track));
         result->ids.insert(track.id);
         result->tracks.push_back(std::move(track));
     }
@@ -433,59 +292,6 @@ void ObjectTrackSearcher::prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* quer
     sqlFilter.bindFields(&query->impl());
 }
 
-std::tuple<QString /*query text*/, nx::sql::Filter> ObjectTrackSearcher::prepareBoxFilterSubQuery()
-{
-    using namespace std::chrono;
-
-    NX_ASSERT(m_filter.boundingBox);
-
-    nx::sql::Filter sqlFilter;
-    addBoundingBoxToFilter(
-        translateToSearchGrid(*m_filter.boundingBox),
-        &sqlFilter);
-
-    if (!m_filter.timePeriod.isEmpty())
-    {
-        // Making time period's right boundary inclusive to take into account
-        // "to seconds" conversion error.
-        auto localTimePeriod = m_filter.timePeriod;
-        if (!localTimePeriod.isInfinite())
-        {
-            localTimePeriod.setEndTime(
-                duration_cast<seconds>(localTimePeriod.endTime()) + seconds(1));
-        }
-
-        addTimePeriodToFilter<std::chrono::seconds>(
-            localTimePeriod,
-            {"timestamp_seconds_utc", "timestamp_seconds_utc"},
-            &sqlFilter);
-    }
-
-    QString queryText = lm(R"sql(
-        SELECT DISTINCT og.object_id
-          FROM object_group og, object_search os
-          WHERE
-            %1 AND
-            og.group_id = os.object_group_id
-    )sql").args(sqlFilter.toString());
-
-    return std::make_tuple(std::move(queryText), std::move(sqlFilter));
-}
-
-nx::sql::Filter ObjectTrackSearcher::prepareTrackFilterSqlExpression()
-{
-    nx::sql::Filter sqlFilter;
-
-    addTrackFilterConditions(
-        m_filter,
-        m_deviceDao,
-        m_objectTypeDao,
-        {"guid", {"track_start_ms", "track_end_ms"}},
-        &sqlFilter);
-
-    return sqlFilter;
-}
-
 std::vector<ObjectTrack> ObjectTrackSearcher::loadTracks(
     nx::sql::AbstractSqlQuery* query, int limit)
 {
@@ -494,7 +300,7 @@ std::vector<ObjectTrack> ObjectTrackSearcher::loadTracks(
     {
         auto track = loadTrack(
             query,
-            [this](const auto& track) { return satisfiesFilter(m_filter, track); });
+            [this](const auto& track) { return m_filter.acceptsTrack(track); });
 
         if (!track)
             continue;
