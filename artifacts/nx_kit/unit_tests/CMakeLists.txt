@@ -38,7 +38,6 @@ if(WIN32)
 else()
     set(DISABLED_INI_CONFIG_UT_API_IMPORT_MACRO "")
     set(DISABLED_INI_CONFIG_UT_API_EXPORT_MACRO "__attribute__((visibility(\"default\")))")
-    set_target_properties(disabled_ini_config_ut PROPERTIES CXX_VISIBILITY_PRESET hidden)
 endif()
 
 target_compile_definitions(disabled_ini_config_ut
