@@ -248,16 +248,15 @@ void CommandLog::fetchTransactionState(nx::sql::QueryContext* queryContext)
     nx::sql::SqlQuery selectTransactionStateQuery(queryContext->connection());
     selectTransactionStateQuery.setForwardOnly(true);
     selectTransactionStateQuery.prepare(R"sql(
-        SELECT tl.system_id as system_id,
+        SELECT system_id,
                peer_guid,
                db_guid,
                sequence,
                tran_hash,
-               tl.timestamp_hi as timestamp_hi,
+               timestamp_hi,
                timestamp
-        FROM transaction_log tl
-        LEFT JOIN transaction_source_settings tss ON tl.system_id = tss.system_id
-        ORDER BY tl.system_id, timestamp_hi, timestamp DESC
+        FROM transaction_log
+        ORDER BY system_id, timestamp_hi, timestamp DESC
         )sql");
 
     selectTransactionStateQuery.exec();
