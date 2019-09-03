@@ -254,7 +254,7 @@ int DiscoveryManager::fromMDNSData(
                     break;
                 QnMdnsSrvData srvData;
                 srvData.decode(record.data);
-                if(srvData.target.isEmpty())  // If the decoding failed.
+                if(srvData.target.isEmpty()) //< If the decoding failed.
                     break;
                 port = srvData.port;
             }
