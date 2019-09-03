@@ -86,10 +86,11 @@ bool SafeDirectConnectionGlobalHelper::beforeSlotInvoked(
 {
     QnMutexLocker lk(&m_mutex);
     auto it = m_receivers.find(receiver);
-    if (it == m_receivers.end() || it->second.terminated)
+    if (it == m_receivers.end())
         return false;
+
     ++it->second.slotsInvokedCounter;
-    return true;
+    return !it->second.terminated;
 }
 
 void SafeDirectConnectionGlobalHelper::afterSlotInvoked(
