@@ -286,13 +286,13 @@ void QnMdnsTextData::decode(const QByteArray& raw)
         if (equalSignPosition == -1)
         {
             key = text;
-            attribute = {Attribute::Presence::NoValue, {}};
+            attribute = {Attribute::Presence::noValue, {}};
         }
         else
         {
             key = text.left(equalSignPosition).toLower();
             const auto value = text.mid(equalSignPosition + 1);
-            attribute = {Attribute::Presence::WithValue, value};
+            attribute = {Attribute::Presence::withValue, value};
         }
 
         if (key.isEmpty())
@@ -308,7 +308,7 @@ QnMdnsTextData::Attribute QnMdnsTextData::getAttribute(const QByteArray& key) co
 {
     auto attrIt = m_attributes.find(key.toLower());
     if (attrIt == m_attributes.end())
-        return {Attribute::Presence::Absent, {}};
+        return {Attribute::Presence::absent, {}};
     return *attrIt;
 }
 

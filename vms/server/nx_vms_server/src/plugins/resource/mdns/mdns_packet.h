@@ -106,10 +106,11 @@ public:
  */
 struct QnMdnsTextData
 {
-    struct Attribute {
-        enum class Presence { Absent, NoValue, WithValue };
-        Presence presence;
-        QByteArray value;
+    struct Attribute
+    {
+        enum class Presence { absent, noValue, withValue };
+        Presence presence = Presence::absent;
+        QByteArray value = {};
     };
 
 public:

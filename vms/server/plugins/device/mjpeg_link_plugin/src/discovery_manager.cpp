@@ -262,7 +262,7 @@ int DiscoveryManager::fromMDNSData(
                 QnMdnsTextData textData;
                 textData.decode(record.data);
                 auto pathAttribute = textData.getAttribute("path");
-                if(pathAttribute.presence != QnMdnsTextData::Attribute::Presence::WithValue)
+                if(pathAttribute.presence != QnMdnsTextData::Attribute::Presence::withValue)
                     break;
                 path = QString::fromUtf8(pathAttribute.value);
             }
