@@ -50,7 +50,6 @@ public:
         LAST_SCREENSHOT_DIR,
         LAST_RECORDING_DIR,
         LAST_EXPORT_DIR,
-        LAST_DOWNLOAD_DIR,
 
         LAST_USED_CONNECTION,
         CUSTOM_CONNECTIONS,
@@ -209,7 +208,6 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     lastScreenshotDir,      setLastScreenshotDir,       LAST_SCREENSHOT_DIR,        QString())
         QN_DECLARE_RW_PROPERTY(QString,                     lastRecordingDir,       setLastRecordingDir,        LAST_RECORDING_DIR,         QString())
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportDir,          setLastExportDir,           LAST_EXPORT_DIR,            QString())
-        QN_DECLARE_RW_PROPERTY(QString,                     lastDownloadDir,        setLastDownloadDir,         LAST_DOWNLOAD_DIR,          QString())
         QN_DECLARE_RW_PROPERTY(QnWorkbenchStateList,        workbenchStates,        setWorkbenchStates,         WORKBENCH_STATES,           QnWorkbenchStateList())
         QN_DECLARE_RW_PROPERTY(QnLicenseWarningStateHash,   licenseWarningStates,   setLicenseWarningStates,    LICENSE_WARNING_STATES,     QnLicenseWarningStateHash())
         QN_DECLARE_RW_PROPERTY(QnConnectionData,            lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData())
