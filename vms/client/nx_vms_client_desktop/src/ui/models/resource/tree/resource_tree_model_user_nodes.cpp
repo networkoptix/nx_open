@@ -588,6 +588,7 @@ void QnResourceTreeModelUserNodes::handleResourceAdded(const QnResourcePtr& reso
             {
                 handleAccessChanged(owner, layout);
             });
+        ensureLayoutNode(owner, layout);
     }
 }
 
