@@ -5396,7 +5396,6 @@ bool QnDbManager::updateId()
 
 void QnDbManager::setDbId(const QnUuid& value)
 {
-    NX_ASSERT(!m_initialized);
     m_dbInstanceId = value;
     const auto& runtimeInfoManager = commonModule()->runtimeInfoManager();
     QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();

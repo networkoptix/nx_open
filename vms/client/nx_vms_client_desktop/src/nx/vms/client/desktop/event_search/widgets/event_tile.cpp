@@ -125,7 +125,7 @@ struct EventTile::Private
 
     void handleHoverChanged(bool hovered)
     {
-        const auto showCloseButton = hovered && closeable;
+        const auto showCloseButton = (hovered || q->progressBarVisible()) && closeable;
         q->ui->timestampLabel->setHidden(showCloseButton || q->ui->timestampLabel->text().isEmpty());
         closeButton->setVisible(showCloseButton);
         updateBackgroundRole(hovered);
@@ -421,6 +421,14 @@ void EventTile::setCloseable(bool value)
         return;
 
     d->closeable = value;
+
+    if (progressBarVisible())
+    {
+        QMargins parentMargins = ui->progressBar->parentWidget()->contentsMargins();
+        parentMargins.setRight(d->closeable ? d->closeButton->width() : kMarginsWithHeader.right());
+        ui->progressBar->parentWidget()->setContentsMargins(parentMargins);
+    }
+
     d->handleHoverChanged(underMouse());
 }
 

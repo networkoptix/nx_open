@@ -40,6 +40,11 @@ public:
      */
     Q_SLOT virtual void discardCachedData(const qint64 resolutionMs = 0);
 
+    /**
+     * Debug log representation. Used by toString(const T*).
+     */
+    virtual QString idForToStringFromPtr() const;
+
 signals:
     /**
      * This signal is emitted whenever motion periods were successfully loaded.

@@ -2,6 +2,8 @@
 
 #include <api/helpers/chunks_request_data.h>
 
+#include <analytics/db/analytics_db_types.h>
+
 #include <common/common_module.h>
 
 #include <camera/data/abstract_camera_data.h>
@@ -15,6 +17,8 @@
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
 
+#include <nx/fusion/model_functions.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/datetime.h>
 
@@ -26,12 +30,19 @@ QAtomicInt qn_fakeHandle(INT_MAX / 2);
 /** Minimum time (in milliseconds) for overlapping time periods requests.  */
 const int minOverlapDuration = 120 * 1000;
 
-QString dt(qint64 time)
+QString filterRepresentation(const QString& filter, Qn::TimePeriodContent dataType)
 {
-    return QDateTime::fromMSecsSinceEpoch(time).toString(lit("MMM/dd/yyyy hh:mm:ss"));
+    switch (dataType)
+    {
+        case Qn::AnalyticsContent:
+            return toString(QJson::deserialized<nx::analytics::db::Filter>(filter.toUtf8()));
+        default:
+            break;
+    }
+    return filter;
 }
 
-}
+} // namespace
 
 QnFlatCameraDataLoader::QnFlatCameraDataLoader(
     const QnVirtualCameraResourcePtr& camera,
@@ -42,21 +53,19 @@ QnFlatCameraDataLoader::QnFlatCameraDataLoader(
     QnAbstractCameraDataLoader(camera, dataType, parent),
     m_server(server)
 {
-    trace(lit("Creating loader"));
-    if(!camera)
-        qnNullWarning(camera);
+    NX_ASSERT(camera);
+    NX_VERBOSE(this, "Creating loader");
 }
 
 QnFlatCameraDataLoader::~QnFlatCameraDataLoader()
 {
-    trace(lit("Deleting loader"));
 }
 
 int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionMs)
 {
     if (filter != m_filter)
     {
-        trace(lit("Updating filter from %1 to %2").arg(m_filter).arg(filter));
+        NX_VERBOSE(this, "Updating filter to %1", filterRepresentation(filter, m_dataType));
         discardCachedData();
     }
     m_filter = filter;
@@ -64,7 +73,7 @@ int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionM
     /* Check whether data is currently being loaded. */
     if (m_loading.handle > 0)
     {
-        trace(lit("Data is already being loaded"));
+        NX_VERBOSE(this, "Data is already being loaded");
         auto handle = qn_fakeHandle.fetchAndAddAcquire(1);
         m_loading.waitingHandles << handle;
         return handle;
@@ -89,14 +98,17 @@ int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionM
     m_loading.clear(); /* Just in case. */
     m_loading.startTimeMs = startTimeMs;
     m_loading.handle = sendRequest(startTimeMs, resolutionMs);
-    trace(lit("Loading period since %1 (%2), request %3").arg(startTimeMs).arg(dt(startTimeMs)).arg(m_loading.handle));
+    NX_VERBOSE(this, "Loading period since %1 (%2), request %3, filter %4",
+        startTimeMs,
+        nx::utils::timestampToDebugString(startTimeMs),
+        m_loading.handle,
+        filterRepresentation(m_filter, m_dataType));
     return m_loading.handle;
 }
 
-void QnFlatCameraDataLoader::discardCachedData(const qint64 resolutionMs)
+void QnFlatCameraDataLoader::discardCachedData(const qint64 /*resolutionMs*/)
 {
-    trace(lit("Discarding cached data"));
-    Q_UNUSED(resolutionMs);
+    NX_VERBOSE(this, "Discarding cached data");
     m_loading.clear();
     m_loadedData.clear();
 }
@@ -113,14 +125,13 @@ int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs, qint64 resolutionMs)
 {
     if (!m_server)
     {
-        trace(lit("There is no current server, cannot send request"));
+        NX_VERBOSE(this, "There is no current server, cannot send request");
         return 0;   // TODO: #GDM #bookmarks make sure invalid value is handled
     }
 
     auto connection = m_server->apiConnection();
-    if (!connection)
+    if (!NX_ASSERT(connection))
     {
-        trace(lit("There is no server api connection, cannot send request"));
         return 0;   // TODO: #GDM #bookmarks make sure invalid value is handled
     }
 
@@ -137,7 +148,7 @@ int QnFlatCameraDataLoader::sendRequest(qint64 startTimeMs, qint64 resolutionMs)
 
 void QnFlatCameraDataLoader::at_timePeriodsReceived(int status, const MultiServerPeriodDataList &timePeriods, int requestHandle)
 {
-    trace(lit("Received answer for req %1").arg(requestHandle));
+    NX_VERBOSE(this, "Received answer for req %1", requestHandle);
 
     std::vector<QnTimePeriodList> rawPeriods;
 
@@ -153,11 +164,14 @@ void QnFlatCameraDataLoader::handleDataLoaded(int status, const QnAbstractCamera
     if (m_loading.handle != requestHandle)
         return;
 
-    trace(lit("Loaded data for %1 (%2)").arg(m_loading.startTimeMs).arg(dt(m_loading.startTimeMs)));
+    NX_VERBOSE(this, "Loaded data for %1 (%2), actual filter %3",
+        m_loading.startTimeMs,
+        nx::utils::timestampToDebugString(m_loading.startTimeMs),
+        filterRepresentation(m_filter, m_dataType));
 
     if (status != 0)
     {
-        trace(lit("Load Failed"));
+        NX_VERBOSE(this, "Load Failed");
         for(auto handle: m_loading.waitingHandles)
             emit failed(status, handle);
         emit failed(status, requestHandle);
@@ -172,37 +186,26 @@ void QnFlatCameraDataLoader::handleDataLoaded(int status, const QnAbstractCamera
         if (!m_loadedData)
         {
             m_loadedData = data;
-            trace(lit("First dataset received, size %1").arg(data->dataSource().size()));
+            NX_VERBOSE(this, "First dataset received, size %1", data->dataSource().size());
         }
         else if (!data->isEmpty())
         {
-            trace(lit("New dataset received (size %1), merging with existing (size %2).")
-                .arg(data->dataSource().size())
-                .arg(m_loadedData->dataSource().size()));
+            NX_VERBOSE(this, "New dataset received (size %1), merging with existing (size %2).",
+                data->dataSource().size(),
+                m_loadedData->dataSource().size());
             m_loadedData->update(data, loadedPeriod);
-            trace(lit("Merging finished, size %1.").arg(m_loadedData->dataSource().size()));
+            NX_VERBOSE(this, "Merging finished, size %1.", m_loadedData->dataSource().size());
         }
     }
     else
     {
-        trace(lit("Empty data received"));
+        NX_VERBOSE(this, "Empty data received");
     }
 
     for(auto handle: m_loading.waitingHandles)
         emit ready(m_loadedData, loadedPeriod, handle);
     emit ready(m_loadedData, loadedPeriod, requestHandle);
     m_loading.clear();
-}
-
-void QnFlatCameraDataLoader::trace(const QString& message)
-{
-    if (m_resource)
-    {
-        NX_VERBOSE(this, lm("Chunks %1: (%2) %3")
-            .arg(m_dataType == Qn::RecordingContent ? lit("rec") : lit("mot"))
-            .arg(m_resource->getName())
-            .arg(message));
-    }
 }
 
 QnFlatCameraDataLoader::LoadingInfo::LoadingInfo():
