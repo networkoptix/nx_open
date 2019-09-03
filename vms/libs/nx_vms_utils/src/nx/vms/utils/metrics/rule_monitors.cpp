@@ -10,6 +10,8 @@ namespace nx::vms::utils::metrics {
 
 namespace {
 
+static const QString kVariableMark("%");
+
 class FormulaBuilder
 {
 public:
@@ -28,41 +30,45 @@ public:
         return m_parts[index];
     }
 
-    ValueMonitor* monitor(int index) const
+    ValueMonitor* monitor(int index) const { return monitor(part(index)); }
+    ValueMonitor* monitor(const QString& id) const
     {
-        const auto id = part(index);
         if (const auto it = m_monitors.find(id); it != m_monitors.end())
             return it->second.get();
         throw std::domain_error("Unknown parameter: " + id.toStdString());
     }
 
-    std::chrono::milliseconds duration(int index) const
+    ValueGenerator value(int index) const { return value(part(index)); }
+    ValueGenerator value(const QString& id) const
     {
-        const auto value = part(index);
-        const auto parsed = nx::utils::parseTimerDuration(part(index));
-        if (parsed.count())
-            return parsed;
-        throw std::domain_error("Invalid duration: " + value.toStdString());
+        if (id.startsWith(kVariableMark))
+            return [m = monitor(id.mid(kVariableMark.size()))] { return m->current(); };
+
+        bool isNumber = false;
+        if (const auto n = id.toDouble(&isNumber); isNumber)
+            return [n] { return api::metrics::Value(n); };
+
+        return [id] { return api::metrics::Value(id); };
     }
 
-    template<typename Operation> // api::metrics::Value(api::metrics::Value, api::metrics::Value)
-    ValueGenerator binaryOperatiron(Operation operation) const
+    template<typename Operation> //< Value(Value, Value)
+    ValueGenerator binaryOperation(Operation operation) const
     {
         return
-            [operation, m1 = monitor(1), m2 = monitor(2)]
+            [operation, getter1 = value(1), getter2 = value(2)]
             {
-                auto v1 = m1->current();
-                auto v2 = m2->current();
+                auto v1 = getter1();
+                auto v2 = getter2();
                 return (v1.isNull() || v2.isNull())
-                    ? api::metrics::Value()
+                    ? api::metrics::Value() //< No value if 1 of arguments is missing.
                     : api::metrics::Value(operation(std::move(v1), std::move(v2)));
             };
     }
 
-    template<typename Operation> // double(double, double)
-    ValueGenerator numericOperatiron(Operation operation) const
+    template<typename Operation> //< Value(double, double)
+    ValueGenerator numericOperation(Operation operation) const
     {
-        return binaryOperatiron(
+        return binaryOperation(
             [operation](api::metrics::Value v1, api::metrics::Value v2)
             {
                 return (!v1.isDouble() || !v2.isDouble())
@@ -71,52 +77,57 @@ public:
             });
     }
 
-    template<typename Operation>
-    ValueGenerator last(Operation operation) const
+    template<typename Operation> //< Value(std::vector<TimedValue<Value>>)
+    ValueGenerator durationOperation(Operation operation) const
     {
         return
-            [operation, m = monitor(1), d = duration(2)]
+            [operation, monitor = monitor(1), getDuration = value(2)]
             {
-                const auto values = m->last(d);
-                return api::metrics::Value(operation(values));
+                const auto durationStr = getDuration().toVariant().toString();
+                const auto duration = nx::utils::parseTimerDuration(durationStr);
+                if (duration.count() <= 0)
+                    return api::metrics::Value("ERROR: Wrong duration: " + durationStr);
+
+                auto values = monitor->last(duration);
+                if (values.empty())
+                    return api::metrics::Value(); // No value if duration does not contain any data.
+
+                return api::metrics::Value(operation(std::move(values)));
             };
     }
 
     ValueGenerator build() const
     {
         const auto p1 = part(1);
-        if (function() == "s" || function() == "string")
-            return [s = part(1)] { return api::metrics::Value(s); };
-
-        if (function() == "n" || function() == "number")
-            return [n = part(1).toDouble()] { return api::metrics::Value(n); };
+        if (function() == "c" || function() == "const")
+            return value(1);
 
         if (function() == "+" || function() == "add")
-            return numericOperatiron([](auto v1, auto v2) { return v1 + v2; });
+            return numericOperation([](auto v1, auto v2) { return v1 + v2; });
 
         if (function() == "-" || function() == "sub")
-            return numericOperatiron([](auto v1, auto v2) { return v1 - v2; });
+            return numericOperation([](auto v1, auto v2) { return v1 - v2; });
 
         if (function() == "c" || function() == "count")
-            return last([](const auto& values) { return (double) values.size(); });
+            return durationOperation([](auto values) { return (double) values.size(); });
 
         if (function() == "=" || function() == "eq")
-            return binaryOperatiron([](auto v1, auto v2) { return v1 == v2; });
+            return binaryOperation([](auto v1, auto v2) { return v1 == v2; });
 
         if (function() == "!=" || function() == "ne")
-            return binaryOperatiron([](auto v1, auto v2) { return v1 != v2; });
+            return binaryOperation([](auto v1, auto v2) { return v1 != v2; });
 
         if (function() == ">" || function() == "gt")
-            return numericOperatiron([](auto v1, auto v2) { return v1 > v2; });
+            return numericOperation([](auto v1, auto v2) { return v1 > v2; });
 
         if (function() == "<" || function() == "lt")
-            return numericOperatiron([](auto v1, auto v2) { return v1 < v2; });
+            return numericOperation([](auto v1, auto v2) { return v1 < v2; });
 
         if (function() == ">=" || function() == "ge")
-            return numericOperatiron([](auto v1, auto v2) { return v1 >= v2; });
+            return numericOperation([](auto v1, auto v2) { return v1 >= v2; });
 
         if (function() == "<=" || function() == "le")
-            return numericOperatiron([](auto v1, auto v2) { return v1 <= v2; });
+            return numericOperation([](auto v1, auto v2) { return v1 <= v2; });
 
         throw std::domain_error("Unsupported function: " + function().toStdString());
     }
@@ -161,7 +172,11 @@ TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors)
             return nx::utils::log::makeMessage("{%1 IS NOT FOUND}", name);
         };
 
-    return [t = std::move(template_), value]() { return nx::utils::stringTemplate(t, value); };
+    return
+        [template_ = std::move(template_), value]()
+        {
+            return nx::utils::stringTemplate(template_, kVariableMark, value);
+        };
 }
 
 ExtraValueMonitor::ExtraValueMonitor(ValueGenerator formula):

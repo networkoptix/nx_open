@@ -6,16 +6,16 @@ namespace nx::utils::test {
 
 void testUpperTemplate(const QString& template_, const QString& expectedResult)
 {
-    ASSERT_EQ(
-        expectedResult,
-        stringTemplate(template_, [](const auto& n) { return n.toUpper(); }));
+    static const auto resolve = [](const auto& n) { return n.toUpper(); };
+    ASSERT_EQ(expectedResult, stringTemplate(template_, "$", resolve));
 }
 
-TEST(stringTemplate, main)
+TEST(StringTemplate, main)
 {
     testUpperTemplate("Just text", "Just text");
-    testUpperTemplate("Some value is {value}", "Some value is VALUE");
-    testUpperTemplate("v1={v1}, v2={v2}", "v1=V1, v2=V2");
+    testUpperTemplate("Some value is $value", "Some value is VALUE");
+    testUpperTemplate("v1=$v1, v2=$v2", "v1=V1, v2=V2");
+    testUpperTemplate("$sPrefix$sValue is ok", "SPREFIXSVALUE is ok");
 }
 
 } // namespace nx::utils::test

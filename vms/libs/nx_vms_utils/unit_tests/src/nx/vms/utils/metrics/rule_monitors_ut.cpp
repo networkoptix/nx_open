@@ -26,21 +26,21 @@ protected:
 TEST_F(MetricsRules, ValueGenerator)
 {
     ASSERT_THROW(parseFormulaOrThrow("str hello", monitors), std::domain_error);
-    ASSERT_THROW(parseFormulaOrThrow("string", monitors), std::domain_error);
-    ASSERT_THROW(parseFormulaOrThrow("= a", monitors), std::domain_error);
-    ASSERT_THROW(parseFormulaOrThrow("= a x", monitors), std::domain_error);
+    ASSERT_THROW(parseFormulaOrThrow("const", monitors), std::domain_error);
+    ASSERT_THROW(parseFormulaOrThrow("= %a", monitors), std::domain_error);
+    ASSERT_THROW(parseFormulaOrThrow("= %a %x", monitors), std::domain_error);
 
-    const auto helloWorld = parseFormulaOrThrow("string HelloWorld", monitors);
+    const auto helloWorld = parseFormulaOrThrow("const HelloWorld", monitors);
     EXPECT_EQ(helloWorld(), api::metrics::Value("HelloWorld"));
 
-    const auto number7 = parseFormulaOrThrow("number 7", monitors);
+    const auto number7 = parseFormulaOrThrow("const 7", monitors);
     EXPECT_EQ(number7(), api::metrics::Value(7));
 
-    const auto plusAB = parseFormulaOrThrow("+ a b", monitors);
-    const auto minusAB = parseFormulaOrThrow("- a b", monitors);
-    const auto equalAB = parseFormulaOrThrow("eq a b", monitors);
-    const auto notEqualAB = parseFormulaOrThrow("!= a b", monitors);
-    const auto greaterAB = parseFormulaOrThrow("> a b", monitors);
+    const auto plusAB = parseFormulaOrThrow("+ %a %b", monitors);
+    const auto minusAB = parseFormulaOrThrow("- %a %b", monitors);
+    const auto equalAB = parseFormulaOrThrow("= %a %b", monitors);
+    const auto notEqualAB = parseFormulaOrThrow("!= %a %b", monitors);
+    const auto greaterAB = parseFormulaOrThrow("> %a %b", monitors);
 
     a = b = api::metrics::Value();
     EXPECT_EQ(plusAB(), api::metrics::Value());
@@ -62,6 +62,14 @@ TEST_F(MetricsRules, ValueGenerator)
     EXPECT_EQ(equalAB(), api::metrics::Value(false));
     EXPECT_EQ(notEqualAB(), api::metrics::Value(true));
     EXPECT_EQ(greaterAB(), api::metrics::Value(false));
+
+    a = 7;
+    EXPECT_EQ(parseFormulaOrThrow("ge %a 7", monitors)(), api::metrics::Value(true));
+    EXPECT_EQ(parseFormulaOrThrow("ge %a 10", monitors)(), api::metrics::Value(false));
+
+    a = "hello";
+    EXPECT_EQ(parseFormulaOrThrow("eq %a hello", monitors)(), api::metrics::Value(true));
+    EXPECT_EQ(parseFormulaOrThrow("ne %a hello", monitors)(), api::metrics::Value(false));
 }
 
 } // namespace nx::vms::utils::metrics::test

@@ -59,26 +59,26 @@ Example:
       "recommendedServers": { "calculate": "const 100" },
       "servers": { "alarms": [{
         "level": "warning",
-        "condition": "gt servers recommendedServers",
-        "text": "The maximum number of {recommendedServers} servers per system is reached. Create another system to use more servers"
+        "condition": "gt %servers %recommendedServers",
+        "text": "The maximum number of %recommendedServers servers per system is reached. Create another system to use more servers"
       }]},
       "recommendedCameraChannels": { "calculate": "const 1000" },
       "cameraChannels": { "alarms": [{
         "level": "warning",
-        "condition": "gt cameraChannels recommendedCameraChannels",
-        "text": "The maximum number of {recommendedCameraChannels} cameras per system is reached. Create another system to use more cameras"
+        "condition": "gt %cameraChannels %recommendedCameraChannels",
+        "text": "The maximum number of %recommendedCameraChannels cameras per system is reached. Create another system to use more cameras"
       }]}
     },
     "licenses": {
       "professional": { "alarms": [
         {
           "level": "danger",
-          "condition": "gt requiredProfessional 0",
-          "text": "{requiredProfessional} Professional License Channels are required"
+          "condition": "gt %requiredProfessional 0",
+          "text": "%requiredProfessional Professional License Channels are required"
         }, {
           "level": "warning",
-          "condition": "gt expiringProfessional 0",
-          "text": "{expiringProfessional} Professional License Channels expiring within ??? days"
+          "condition": "gt %expiringProfessional 0",
+          "text": "expiringProfessional Professional License Channels expiring within 30 days"
         }
       ]},
       ...
@@ -86,14 +86,15 @@ Example:
   },
   "servers": {
     "availability": {
-      "status": { "alarms": [{ "level": "danger", "condition": "ne status 'Online'" }]},
-      "offlineEvents": { "alarms": [{ "level": "warning", "condition": "gt offlineEvents 0" }]},
+      "status": { "alarms": [{ "level": "danger", "condition": "ne %status Online" }]},
+      "offlineEvents": { "alarms": [{ "level": "warning", "condition": "gt %offlineEvents 0" }]},
     },
     "load": {
       "recommendedCpuUsageP": { "calculate": "const 95" },
       "totalCpuUsageP": { "alarms": [{
         "level": "warning",
-        "condition": "gt totalCpuUsageP recommendedCpuUsageP"
+        "condition": "gt %totalCpuUsageP %recommendedCpuUsageP",
+        "text": "CPU usage is %totalCpuUsageP"
       }]},
       ...
     },

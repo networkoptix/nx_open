@@ -4599,49 +4599,46 @@ void MediaServerProcess::loadResourceParamsData()
 static const QByteArray kMetricsAlarmRules(R"json({
     "systems": {
         "info": {
-            "recommendedMaxServers": { "calculate": "number 100" },
+            "recommendedMaxServers": { "calculate": "const 100" },
             "servers": { "alarms": [
                 {
                     "level": "warning",
-                    "condition": "ge servers recommendedMaxServers",
-                    "text": "The maximum number of {recommendedMaxServers} servers per system is reached. Create another system to use more servers"
+                    "condition": "ge %servers %recommendedMaxServers",
+                    "text": "The maximum number of %recommendedMaxServers servers per system is reached. Create another system to use more servers"
                 }
             ]},
-            "recommendedMaxCameras": { "calculate": "number 10000" },
+            "recommendedMaxCameras": { "calculate": "const 10000" },
             "cameras": { "alarms": [
                 {
                     "level": "warning",
-                    "condition": "ge servers recommendedMaxCameras",
-                    "text": "The maximum number of {recommendedMaxCameras} camera channels per system is reached. Create another system to use more cameras"
+                    "condition": "ge %servers %recommendedMaxCameras",
+                    "text": "The maximum number of %recommendedMaxCameras camera channels per system is reached. Create another system to use more cameras"
                 }
             ]}
         }
     },
     "servers": {
         "state": {
-            "okStatus": { "calculate": "string Online" },
             "status": { "alarms": [
                 {
                     "level": "error",
-                    "condition": "ne status okStatus",
-                    "text": "Status is {status}"
+                    "condition": "ne %status Online",
+                    "text": "Status is %status"
                 }
             ]}
         }
     },
     "cameras": {
         "info": {
-            "warningStatus": { "calculate": "string Unauthorized" },
-            "errorStatus": { "calculate": "string Offline" },
             "status": { "alarms": [
                 {
                     "level": "warning",
-                    "condition": "eq status warningStatus",
+                    "condition": "eq %status Unauthorized",
                     "text": "Status is {status}"
                 },
                 {
                     "level": "error",
-                    "condition": "eq status errorStatus",
+                    "condition": "eq %status Offline",
                     "text": "Status is {status}"
                 }
             ]}

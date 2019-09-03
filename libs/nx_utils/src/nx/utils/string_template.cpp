@@ -1,9 +1,12 @@
 #include "string_template.h"
 
+#include <QtCore/QRegExp>
+
 namespace nx::utils {
 
 QString stringTemplate(
     const QString& template_,
+    const QString& variableMark,
     const std::function<QString(const QString& name)> resolve)
 {
     QString result;
@@ -12,17 +15,22 @@ QString stringTemplate(
     int processed = 0;
     while (processed < template_.size())
     {
-        const auto open = template_.indexOf('{', processed);
-        if (open == -1)
+        const auto begin = template_.indexOf(variableMark, processed);
+        if (begin == -1)
             break;
 
-        const auto close = template_.indexOf('}', open + 1);
-        if (close == -1)
-            break; // TODO: throw exception about unpaired brace at open?
+        auto end = begin + 1;
+        while (end < template_.size() && template_[end].isLetter())
+            end++;
 
-        result += template_.midRef(processed, open - processed);
-        result += resolve(template_.mid(open + 1, close - open - 1));
-        processed = close + 1;
+        result += template_.midRef(processed, begin - processed);
+        if (begin != end)
+        {
+            const auto name = template_.mid(begin + variableMark.size(), end - begin - 1);
+            result += resolve(name);
+        }
+
+        processed = end;
     }
 
     result += template_.midRef(processed);
