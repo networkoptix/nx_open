@@ -20,6 +20,8 @@
 #include <ui/workbench/workbench_display.h>
 #include <nx/vms/client/desktop/debug_utils/instruments/debug_info_instrument.h>
 
+#include <nx/fusion/serialization/lexical.h>
+
 namespace nx::vmx::client::desktop {
 
 using namespace vms::client::desktop::ui;
@@ -45,6 +47,16 @@ Director::Director(QObject* parent):
     QnWorkbenchContextAware(parent)
 {
     QMetaType::registerConverter<QString, LogonParameters>(stringToLogonParameters);
+    NX_ASSERT_HEAVY_CONDITION(
+        []
+        {
+            for (int i = Qn::FirstItemDataRole; i < Qn::ItemDataRoleCount; ++i)
+            {
+                if (QnLexical::serialized(static_cast<Qn::ItemDataRole>(i)).isEmpty())
+                    return false;
+            }
+            return true;
+        }(), "Missing lexical serialization for Qn::ItemDataRole");
 }
 
 Director::~Director()
@@ -96,9 +108,6 @@ void Director::subscribe(nx::vms::client::desktop::ui::action::IDType action, QJ
 
             const auto actionParameters = context()->menu()->currentParameters(sender());
 
-            //auto metaEnum = QMetaEnum::fromType<Qn::ItemDataRole>();
-            QMetaEnum metaEnum;
-
             QJSValue param = m_engine->newObject();
 
             // Convert each action parameter to a named property of js object.
@@ -109,7 +118,7 @@ void Director::subscribe(nx::vms::client::desktop::ui::action::IDType action, QJ
                 // -1 is a special case for action items
                 const QString name = (i.key() == -1)
                     ? kItemsProperty
-                    : QString::fromUtf8(metaEnum.valueToKey(i.key()));
+                    : QnLexical::serialized(static_cast<Qn::ItemDataRole>(i.key()));
                 param.setProperty(name, m_engine->toScriptValue<QVariant>(i.value()));
             }
 
@@ -125,9 +134,6 @@ void Director::subscribe(nx::vms::client::desktop::ui::action::IDType action, QJ
 
 void Director::trigger(nx::vms::client::desktop::ui::action::IDType action, QJSValue parameters)
 {
-    //const auto metaEnum = QMetaEnum::fromType<Qn::ItemDataRole>();
-    QMetaEnum metaEnum;
-
     if (!parameters.isObject())
         return;
 
@@ -145,8 +151,8 @@ void Director::trigger(nx::vms::client::desktop::ui::action::IDType action, QJSV
             continue;
         }
         bool ok = false;
-        const auto role = metaEnum.keyToValue(it.name().toUtf8().constData(), &ok);
-        if (!ok)
+        const auto role = QnLexical::deserialized<Qn::ItemDataRole>(it.name(), Qn::ItemDataRoleCount, &ok);
+        if (!ok || role == Qn::ItemDataRoleCount)
             continue;
         actionParameters.setArgument(role, it.value().toVariant());
     }
