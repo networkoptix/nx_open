@@ -31,6 +31,8 @@
 
 #include <nx/utils/math/fuzzy.h>
 
+#include "workbench_layout_synchronizer.h"
+
 using namespace nx::vms::client::desktop;
 using namespace ui;
 using namespace workbench;
@@ -233,6 +235,8 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout)
                 return;
             }
             layout::reloadFromFile(resource, password);
+            if (auto synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource))
+                synchronizer->update();
             snapshotManager()->store(resource);
         }
     }

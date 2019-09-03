@@ -2687,12 +2687,9 @@ void ActionHandler::confirmAnalyticsStorageLocation()
                 // User hasn't choose analytics location, so we have to use the best option.
                 if (best->getStorageType() == "local" && best->isWritable())
                 {
-                    // It's better to save existing database if user hasn't explicitly deleted it.
-                    qnGlobalSettings->setMetadataStorageChangePolicy(
-                        nx::vms::api::MetadataStorageChangePolicy::keep);
-                    qnGlobalSettings->synchronizeNow();
-
+                    // todo: It is better to do next calls after this call is finished
                     server->setMetadataStorageId(best->getId());
+                    server->savePropertiesAsync();
                 }
             }
         }

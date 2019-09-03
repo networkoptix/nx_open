@@ -135,6 +135,32 @@ QnResourceTreeModel::QnResourceTreeModel(
     if (ini().developerMode)
         nx::utils::ModelTransactionChecker::install(this);
 
+    connect(this, &QnResourceTreeModel::modelAboutToBeReset, this,
+        [this] { m_resetInProgress = true; });
+
+    connect(this, &QnResourceTreeModel::modelReset, this,
+        [this] { m_resetInProgress = false; });
+
+    if (ini().resetResourceTreeModelOnUserChange)
+    {
+        connect(context(), &QnWorkbenchContext::userChanged, this,
+            [this]
+            {
+                if (m_userChangedDepth == 0)
+                    beginResetModel();
+                m_userChangedDepth++;
+
+                // Assuming that all model rebuild operations are called directly.
+                QMetaObject::invokeMethod(this,
+                    [this]
+                    {
+                        m_userChangedDepth--;
+                        if (m_userChangedDepth == 0)
+                            endResetModel();
+                    }, Qt::QueuedConnection);
+            });
+    }
+
     /* Create top-level nodes. */
     for (NodeType nodeType: rootNodeTypes())
         m_rootNodes[nodeType] =
@@ -1028,6 +1054,12 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr& resource
     {
         connect(server, &QnMediaServerResource::redundancyChanged, this,
             &QnResourceTreeModel::at_server_redundancyChanged);
+        connect(server, &QnMediaServerResource::primaryAddressChanged, this,
+            [this](const QnResourcePtr& server)
+            {
+                for (auto node: m_nodesByResource.value(server))
+                    node->update();
+            });
     }
 
     if (const auto webPage = resource.dynamicCast<QnWebPageResource>())
@@ -1373,4 +1405,9 @@ QnResourceTreeModelNodeManager* QnResourceTreeModel::nodeManager() const
 QnResourceTreeModelLayoutNodeManager* QnResourceTreeModel::layoutNodeManager() const
 {
     return m_layoutNodeManager;
+}
+
+bool QnResourceTreeModel::resetInProgress() const
+{
+    return m_resetInProgress;
 }

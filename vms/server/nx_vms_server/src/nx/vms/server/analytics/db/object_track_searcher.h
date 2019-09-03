@@ -67,13 +67,6 @@ public:
         const TimeRangeFields& timeRangeFields,
         nx::sql::Filter* sqlFilter);
 
-    static bool satisfiesFilter(
-        const Filter& filter, const ObjectTrack& track);
-
-    static bool matchAttributes(
-        const std::vector<nx::common::metadata::Attribute>& attributes,
-        const QString& filter);
-
 private:
     struct TrackQueryResult
     {

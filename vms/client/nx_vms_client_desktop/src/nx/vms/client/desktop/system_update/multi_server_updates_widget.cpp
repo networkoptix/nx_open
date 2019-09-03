@@ -124,6 +124,21 @@ QTableView* injectResourceList(
     return resourceList;
 }
 
+void toDebugString(QStringList& lines, const QString& caption, const QSet<QnUuid>& uids)
+{
+    QStringList report;
+    for (auto id: uids)
+        report << id.toString();
+
+    if (!report.empty())
+    {
+        if (report.length() < 10)
+            lines << QString("%1=%2").arg(caption, report.join(", "));
+        else
+            lines << QString("%1=%2 peers").arg(caption, QString::number(report.length()));
+    }
+}
+
 } // anonymous namespace
 
 namespace nx::vms::client::desktop
@@ -574,8 +589,9 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
     QString internalError = nx::update::toString(contents.error);
     // We have different error messages for each update source. So we should check
     // every combination of update source and nx::update::InformationError values.
-    if (contents.alreadyInstalled && source != SourceType::internet
-        && contents.error != Error::incompatibleVersion)
+    if (contents.alreadyInstalled
+        && ((source != SourceType::internet && contents.error != Error::incompatibleVersion)
+        || (source == SourceType::internet && contents.error == Error::incompatibleVersion)))
     {
         report.versionMode = VersionReport::VersionMode::build;
         report.statusHighlight = VersionReport::HighlightMode::regular;
@@ -726,7 +742,7 @@ bool MultiServerUpdatesWidget::checkSpaceRequirements(
 }
 
 void MultiServerUpdatesWidget::setUpdateTarget(
-    const nx::update::UpdateContents& contents, bool activeUpdate)
+    const nx::update::UpdateContents& contents, [[maybe_unused]] bool activeUpdate)
 {
     NX_VERBOSE(this, "setUpdateTarget(%1)", contents.getVersion());
     m_updateInfo = contents;
@@ -2138,18 +2154,9 @@ bool MultiServerUpdatesWidget::hasActiveUpdate() const
 
 bool MultiServerUpdatesWidget::hasLatestVersion() const
 {
-    const bool hasEqualUpdateInfo = m_stateTracker->lowestInstalledVersion() >= m_updateInfo.getVersion();
-    bool hasLatestVersion = false;
-    if (m_updateInfo.isEmpty() || m_updateInfo.error == nx::update::InformationError::noNewVersion)
+    bool hasLatestVersion = m_updateReport->hasLatestVersion;
+    if (m_updateInfo.isEmpty())
         hasLatestVersion = true;
-    else if (hasEqualUpdateInfo || m_updateInfo.alreadyInstalled)
-        hasLatestVersion = true;
-
-    if (m_updateInfo.error != nx::update::InformationError::noNewVersion
-        && m_updateInfo.error != nx::update::InformationError::noError)
-    {
-        hasLatestVersion = false;
-    }
 
     if (m_widgetState != WidgetUpdateState::ready
         && m_widgetState != WidgetUpdateState::initial
@@ -2579,23 +2586,9 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
 
         debugState << QString("lowestVersion=%1").arg(m_stateTracker->lowestInstalledVersion().toString());
 
-        QStringList report;
-        for (auto server: m_serverUpdateTool->getServersInstalling())
-            report << server.toString();
-        if (!report.empty())
-            debugState << QString("installing=%1").arg(report.join(","));
-
-        report.clear();
-        for (auto peer: m_stateTracker->peersIssued())
-            report << peer.toString();
-        if (!report.empty())
-            debugState << QString("issued=%1").arg(report.join(","));
-
-        report.clear();
-        for (auto peer: m_stateTracker->peersFailed())
-            report << peer.toString();
-        if (!report.empty())
-            debugState << QString("failed=%1").arg(report.join(","));
+        toDebugString(debugState, "installing", m_serverUpdateTool->getServersInstalling());
+        toDebugString(debugState, "issued", m_stateTracker->peersIssued());
+        toDebugString(debugState, "failed", m_stateTracker->peersFailed());
 
         if (m_updateInfo.error != nx::update::InformationError::noError)
         {

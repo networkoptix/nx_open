@@ -1,36 +1,43 @@
-#!/usr/bin/python3 -b
+#!/usr/bin/env python3
 
 import platform
 import signal
 import sys
-from io import StringIO
+import time
+import logging
+import traceback
+from sys import exit
+
+logging.basicConfig(filename='nx_box_tool.log', filemode='w', level=logging.DEBUG)
 
 # This block ensures that ^C interrupts are handled quietly.
 try:
-    def exithandler(signum, _frame):
+    def exit_handler(signum, _frame):
         signal.signal(signal.SIGINT, signal.SIG_IGN)
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
         sys.exit(128 + signum)
 
-    signal.signal(signal.SIGINT, exithandler)
-    signal.signal(signal.SIGTERM, exithandler)
-    # Prevent "[Errno 32] Broken pipe" exceptions when
-    # writing to a pipe.
-    signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+    signal.signal(signal.SIGINT, exit_handler)
+    signal.signal(signal.SIGTERM, exit_handler)
+    if platform.system() == 'Linux':
+        # Prevent "[Errno 32] Broken pipe" exceptions when
+        # writing to a pipe.
+        signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
 except KeyboardInterrupt:
     sys.exit(128 + signal.SIGINT)
 
-def debug_signal(_signum, _frame):
-    import pdb
-    pdb.set_trace()
+if platform.system() == 'Linux':
+    def debug_signal(_signum, _frame):
+        import pdb
+        pdb.set_trace()
 
-if platform.python_implementation() == 'Jython':
-    debug_signum = signal.SIGUSR2 # bug #424259
-else:
-    debug_signum = signal.SIGUSR1
+    if platform.python_implementation() == 'Jython':
+        debug_signum = signal.SIGUSR2 # bug #424259
+    else:
+        debug_signum = signal.SIGUSR1
 
-signal.signal(debug_signum, debug_signal)
+    signal.signal(debug_signum, debug_signal)
 
 from os import path as osp
 
@@ -38,26 +45,344 @@ project_root = osp.dirname(osp.dirname(osp.realpath(__file__)))
 if osp.isfile(osp.join(project_root, ".not_installed")):
     sys.path.insert(0, osp.join(project_root, "lib"))
 
-from nx_box_tool.server_connection import ServerConnection
+from nx_box_tool.config import ConfigParser
+from nx_box_tool.device_connection import DeviceConnection
+from nx_box_tool.platform import Platform
+from nx_box_tool.server import Server
+from nx_box_tool.server_api import ServerApi
+from nx_box_tool.test_camera_runner import TestCameraRunner
+from nx_box_tool import exceptions
 
-server = ServerConnection(
-    #ip='10.0.1.26',
-    ip='192.168.0.143', login="nvidia", password="nvidia",
-    port=22
-)
+import click
+import cv2
+import os
 
-stdout = StringIO("")
-stderr = StringIO("")
-res = server.sh('ifconfig; echo fffff>&2', stdout=stdout, stderr=stderr)
 
-if not res:
-    print(f'Failed to execute command on Server: {res.message}', file=sys.stderr)
-    exit(1)
+@click.command()
+def main():
+    """Program for test device to ability of run Nx VMS on it."""
+    if platform.system() == 'Linux' and os.system('sshpass -h >/dev/null 2>&1') != 0:
+        print("ERROR: sshpass not found.", file=sys.stderr)
+        return 1
 
-print(
-    f"Command successfuly executed, return code={res.return_code}\n" +
-    "stdout:\n" +
-    stdout.getvalue() +
-    "stderr:\n" +
-    stderr.getvalue()
-)
+    option_descriptions = {
+        "deviceHost": {
+            "type": 'string'
+        },
+        "deviceLogin": {
+            "optional": True,
+            "type": 'string'
+        },
+        "devicePassword": {
+            "optional": True,
+            "type": 'string'
+        },
+        "deviceSshPort": {
+            "optional": True,
+            "type": 'integer',
+            "range": [0, 31768],
+            "default": 22
+        },
+        "vmsUser": {
+            "type": "string"
+        },
+        "vmsPassword": {
+            "type": "string"
+        },
+        "testCamerasTestSequence": {
+            "optional": True,
+            "type": "integers"
+        }
+    }
+
+    config = ConfigParser('nx_box_tool.conf', option_descriptions)
+
+    sys_option_descriptions = {
+        "testCameraBin": {
+            "optional": True,
+            "type": 'string'
+        },
+        "testFileHighResolution": {
+            "optional": True,
+            "type": 'string'
+        },
+        "testFileLowResolution": {
+            "optional": True,
+            "type": 'string'
+        },
+        "streamTestDurationSecs": {
+            "optional": True,
+            "type": 'integer',
+            "default": 60
+        },
+        "testFileFps": {
+            "optional": True,
+            "type": 'integer',
+            "default": 30
+        },
+        "testStreamFpsHigh": {
+            "type": 'integer',
+        },
+        "testStreamFpsLow": {
+            "type": 'integer',
+        },
+        "testCameraDebug": {
+            "optional": True,
+            "type": 'boolean',
+            "default": False
+        },
+    }
+
+    sys_config = ConfigParser('.nx_box_tool.ini', sys_option_descriptions)
+
+    if sys_config['testCameraBin']:
+        TestCameraRunner.binary_file = sys_config['testCameraBin']
+    if sys_config['testFileHighResolution']:
+        TestCameraRunner.test_file_high_resolution = sys_config['testFileHighResolution']
+    if sys_config['testFileLowResolution']:
+        TestCameraRunner.test_file_low_resolution = sys_config['testFileLowResolution']
+    TestCameraRunner.debug = sys_config['testCameraDebug']
+
+    device = DeviceConnection(
+        host=config['deviceHost'],
+        login=config.get('deviceLogin', None),
+        password=config.get('devicePassword', None),
+        port=config['deviceSshPort']
+    )
+
+    print(f"Device IP: {device.ip}")
+
+    dev_platform = Platform.gather(device)
+
+    print(f"Arch: {dev_platform.arch}")
+    print(f"Number of CPUs: {dev_platform.cpu_number}")
+    print(f"CPU features: {', '.join(dev_platform.cpu_features) if len(dev_platform.cpu_features) > 0 else '-'}")
+    print(f"RAM: {dev_platform.ram} ({dev_platform.ram_free()} free)")
+    print("Volumes:")
+    [
+        print(f"    {storage['fs']} on {storage['point']}: free {storage['space_free']} of {storage['space_total']}")
+        for (point, storage) in
+        dev_platform.storages_list.items()
+    ]
+
+    server = Server.detect(device)
+
+    if server.has_vms():
+        print(f"Detected VMS installations:")
+        for vms in server.vmses:
+            print(f"    {vms.customization} in {vms.dir} (port {vms.port}, PID {vms.pid})")
+    else:
+        print("There is no VMSes found on the device.")
+        print("Nothing to do.")
+        return 0
+
+    if len(server.vmses) > 1:
+        raise exceptions.DeviceStateError("More than one customizations found.")
+
+    vms = server.vmses[0]
+
+    if not vms.is_up():
+        raise exceptions.DeviceStateError("VMS is not running currently.")
+
+    print('Restarting server...')
+    res = device.sh(f"sudo service {vms.customization}-mediaserver restart", timeout=30)
+
+    if not res or res.return_code != 0:
+        raise exceptions.ServerError("Unable to restart Server: restart command had failed.")
+
+    def wait_for_server_up(timeout=30):
+        started_at = time.time()
+
+        while True:
+            res = Server.detect(device)
+
+            if res.has_vms() and res.vmses[0].is_up():
+                break
+
+            if time.time() - started_at > timeout:
+                return False
+
+            time.sleep(0.5)
+
+        time.sleep(5)
+        return res
+
+    server = wait_for_server_up()
+
+    if not server:
+        raise exceptions.ServerError("Unable to restart Server: Server was not upped.")
+
+    vms = server.vmses[0]
+    print('Server restarted successfully.')
+    print(f"Free space of RAM: {round(dev_platform.ram_free()/1024/1024)}M of {round(dev_platform.ram/1024/1024)}M")
+
+    api = ServerApi(device.ip, vms.port, user=config['vmsUser'], password=config['vmsPassword'])
+
+    def wait_for_api(timeout=60):
+        started_at = time.time()
+
+        while True:
+            resp = api.ping()
+
+            if resp and resp.code == 200 and resp.payload.get('error', None) == '0':
+                break
+
+            if time.time() - started_at > timeout:
+                return False
+
+            time.sleep(0.5)
+
+        time.sleep(5)
+        return True
+
+    if not wait_for_api():
+        raise exceptions.ServerApiError("API of Server is not working: ping request was not successful.")
+
+    print('API test is OK.')
+
+    # TODO: Move this to internal config.
+    memory_per_camera_by_arch = {
+        "armv7l": 100,
+        "aarch64": 200,
+        "x86_64": 200
+    }
+
+    for test_cameras_count in config.get('testCamerasTestSequence', [1, 2, 3, 4, 6, 8, 10, 15, 20, 40, 80, 160, 256]):
+        if dev_platform.ram_available() < (
+                test_cameras_count * memory_per_camera_by_arch.get(dev_platform.arch, 200)*1024*1024
+        ):
+            raise exceptions.InsuficientResourcesError(
+                f"{test_cameras_count} is too many test cameras for that box, because the RAM is too small."
+            )
+
+        print(f"Try to serve {test_cameras_count} cameras.")
+        print("")
+
+        try:
+            _test_cameras_runner = TestCameraRunner.spawn(
+                local_ip=device.local_ip,
+                count=test_cameras_count,
+                lowStreamFps=sys_config['testStreamFpsLow']
+            )
+            print(f"    Spawned {test_cameras_count} test cameras.")
+        except Exception as exception:
+            logging.error(traceback.format_exc())
+            raise exceptions.TestCameraError(f"Unexpected error during spawning cameras: {str(exception)}")
+
+        def wait_test_cameras_discovered(timeout, duration):
+            started_at = time.time()
+            detection_started_at = None
+            while time.time() - started_at < timeout:
+                cameras = api.get_test_cameras()
+
+                if len(cameras) >= test_cameras_count:
+                    if detection_started_at is None:
+                        detection_started_at = time.time()
+                    elif time.time() - detection_started_at >= duration:
+                        return True
+                else:
+                    detection_started_at = None
+            return False
+
+        try:
+            discovering_timeout = 120
+
+            print(f"    Waiting for test cameras discovering... (timeout is {discovering_timeout} seconds)")
+            if not wait_test_cameras_discovered(discovering_timeout, 3):
+                raise exceptions.TestCameraError(f"Failed to discover {test_cameras_count} test cameras: timeout ended")
+
+            print("    All test cameras had been discovered successfully.")
+
+            time.sleep(test_cameras_count*2)
+            cameras = api.get_test_cameras()
+
+            for camera in cameras:
+                if camera.enable_recording(highStreamFps=sys_config['testStreamFpsHigh']):
+                    print(f"    Recording on camera {camera.id} enabled.")
+                else:
+                    raise exceptions.TestCameraError(f"Error enabling recording on camera {camera.id}: request failed.")
+
+            camera_id = cameras[0].id
+        except Exception:
+            logging.error(traceback.format_exc())
+            raise exceptions.TestCameraError(f"Cameras are not discovered due to undefined reasons.")
+
+        try:
+            stream_opening_started_at = time.time()
+            stream_duration = sys_config['streamTestDurationSecs']
+
+            while time.time() - stream_opening_started_at < 25:
+                stream_url = f"rtsp://{config['vmsUser']}:{config['vmsPassword']}@{device.ip}:{vms.port}/{camera_id}"
+                stream = cv2.VideoCapture(stream_url)
+
+                if stream.isOpened():
+                    print(f"    RTSP stream opened. Test duration: {stream_duration} seconds.")
+                    break
+
+            if not stream.isOpened():
+                raise exceptions.TestCameraStreamingError(f"Can't open RTSP stream {stream_url}: timeout ended")
+
+            streaming_started_at = time.time()
+
+            last_pts = None
+            last_ts = None
+            first_ts = None
+            frames = 0
+
+            frame_drops = 0
+            dummy_frames_count = 0
+
+            while stream.isOpened():
+                _ret, _frame = stream.read()
+                frames += 1
+                pts = stream.get(cv2.CAP_PROP_POS_MSEC)
+
+                if first_ts is None:
+                    first_ts = time.time()
+                else:
+                    lag = time.time() - (first_ts + frames * (1.0/float(sys_config['testFileFps'])))
+                    if lag > 5:
+                        raise exceptions.TestCameraStreamingError('Stream is too slow.')
+
+                ts = time.time()
+
+                if last_ts is not None and ts - last_ts < 0.01:
+                    dummy_frames_count += 1
+
+                    if dummy_frames_count > 50:
+                        raise exceptions.TestCameraStreamingError('Stream is unexpectedly broken.')
+
+                pts_diff_max = (1000./float(sys_config['testFileFps']))*1.05
+
+                if last_pts is not None and pts - last_pts > pts_diff_max:
+                    frame_drops += 1
+                if time.time() - streaming_started_at > stream_duration:
+                    print(f"    Serving {test_cameras_count} cameras is OK.")
+                    break
+                last_pts = pts
+                last_ts = time.time()
+            print(f"    Frame drops: {frame_drops}")
+            print(f"    CPU usage: {device.eval('cat /proc/loadavg').split()[1]}")
+            print(f"    Free RAM: {round(dev_platform.ram_available()/1024/1024)}M")
+        except exceptions.TestCameraStreamingError as exception:
+            print(f"\nISSUE: {str(exception)}")
+            logging.error(traceback.format_exc())
+            return
+        finally:
+            stream.release()
+
+    print('\nAll tests are successfully finished.')
+    return 0
+
+
+if __name__ == '__main__':
+    try:
+        try:
+            sys.exit(main())
+        except exceptions.NxBoxToolError as e:
+            print(f"ERROR: {str(e)}", file=sys.stderr)
+    except Exception as e:
+        print('ERROR: Unexpected error occurred.', file=sys.stderr)
+        logging.error(traceback.format_exc())
+    finally:
+        sys.exit(1)

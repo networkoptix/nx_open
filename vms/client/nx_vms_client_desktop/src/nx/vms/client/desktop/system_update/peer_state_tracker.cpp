@@ -308,6 +308,18 @@ bool PeerStateTracker::getErrorReport(ErrorReport& report) const
 
 int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll)
 {
+    auto getComponentName =
+        [this](const UpdateItemPtr& item) -> QString
+        {
+            if (item->component == UpdateItem::Component::client)
+                return "client";
+
+            const auto server = getServer(item);
+            return server
+                ? server->getName()
+                : "<Unknown server>";
+        };
+
     QList<UpdateItemPtr> itemsChanged;
     {
         NX_MUTEX_LOCKER locker(&m_dataLock);
@@ -322,18 +334,18 @@ int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>
                 if (status.second.code == StatusCode::offline)
                     continue;
 
-                QString name = item->component == UpdateItem::Component::client
-                    ? QString("client")
-                    : getServer(item)->getName();
-
                 if (item->state != status.second.code)
                 {
                     auto newState = status.second.code;
                     if (status.second.code == nx::update::Status::Code::error)
                     {
                         QString error = errorString(status.second.errorCode);
-                        NX_INFO(this, "setUpdateStatus() - changing status %1->error:\"%2\" for peer %3: %4",
-                            toString(item->state), error, name, item->id);
+                        NX_INFO(this,
+                            "setUpdateStatus() - changing status %1->error:\"%2\" for peer %3: %4",
+                            toString(item->state),
+                            error,
+                            getComponentName(item),
+                            item->id);
                     }
                     else if (item->state == nx::update::Status::Code::offline
                         && item->incompatible
@@ -347,8 +359,12 @@ int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>
                     }
                     else
                     {
-                        NX_INFO(this, "setUpdateStatus() - changing status %1->%2 for peer %3: %4",
-                            toString(item->state), toString(status.second.code), name, item->id);
+                        NX_INFO(this,
+                            "setUpdateStatus() - changing status %1->%2 for peer %3: %4",
+                            toString(item->state),
+                            toString(status.second.code),
+                            getComponentName(item),
+                            item->id);
                     }
 
                     item->state = status.second.code;
@@ -364,8 +380,8 @@ int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>
                     NX_ASSERT(status.second.errorCode != nx::update::Status::ErrorCode::noError);
                     // Fix for the cases when server does not report error code properly.
                     if (item->errorCode == nx::update::Status::ErrorCode::noError)
-                        item->errorCode = nx::update::Status::ErrorCode::unknownError;
-                    item->statusMessage = errorString(status.second.errorCode);
+                        changed |= compareAndSet(nx::update::Status::ErrorCode::unknownError, item->errorCode);
+                    changed |= compareAndSet(errorString(status.second.errorCode), item->statusMessage);
                 }
 
                 if (item->state == StatusCode::latestUpdateInstalled && item->installing)
@@ -382,6 +398,7 @@ int PeerStateTracker::setUpdateStatus(const std::map<QnUuid, nx::update::Status>
                         "setUpdateStatus() - clearing unknown status for peer %1, status=%2",
                         item->id, toString(item->state));
                     item->statusUnknown = false;
+                    changed = true;
                 }
 
                 if (changed)
@@ -1329,7 +1346,8 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
             if (item->state == StatusCode::readyToInstall)
             {
                 NX_VERBOSE(this,
-                    "updateServerData() - peer %1 gone offline from state readyInstall.");
+                    "updateServerData() - peer %1 gone offline from state readyInstall.",
+                    item->id);
                 item->state = StatusCode::preparing;
             }
             // We need to get /ec2/updateStatus to get a proper status.
@@ -1354,8 +1372,19 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
     bool installed = (version == m_targetVersion) || item->state == StatusCode::latestUpdateInstalled;
     if (installed != item->installed)
     {
-        item->installed = true;
+        if (installed && item->installing)
+        {
+            // According to VMS-15379 we can wait for quite long time until server will respond
+            // with a proper /ec2/updateStatus during install stage. Servers will hang in
+            // 'statusUnknown' state for this period. Here we try to clean up 'statusUnknown'
+            // flag before current server goes online and responds to /ec2/updateStatus.
+            item->installing = false;
+            item->statusUnknown = false;
+            item->lastStatusTime = UpdateItem::Clock::now();
+        }
+        item->installed = installed;
         NX_INFO(this, "updateServerData() - peer %1 changed installed=%2", item->id, item->installed);
+
         changed = true;
     }
 

@@ -154,6 +154,8 @@ public:
         const QnUuid& engineId,
         const nx::vms::api::analytics::DeviceAgentManifest& manifest);
 
+    virtual bool hasDualStreamingInternal() const override;
+
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
     void userEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);

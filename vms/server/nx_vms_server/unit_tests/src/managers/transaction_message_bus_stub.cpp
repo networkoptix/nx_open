@@ -112,10 +112,10 @@ void TransactionMessageBusStub::dropConnections()
     // TODO
 }
 
-QVector<QnTransportConnectionInfo> TransactionMessageBusStub::connectionsInfo() const
+ConnectionInfoList TransactionMessageBusStub::connectionsInfo() const
 {
     // TODO
-    return QVector<QnTransportConnectionInfo>();
+    return ConnectionInfoList();
 }
 
 void TransactionMessageBusStub::setHandler(

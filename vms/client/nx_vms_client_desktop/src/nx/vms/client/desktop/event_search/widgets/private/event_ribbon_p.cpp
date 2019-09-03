@@ -566,7 +566,10 @@ void EventRibbon::Private::showContextMenu(EventTile* tile, const QPoint& posRel
     auto menu = index.data(Qn::ContextMenuRole).value<QSharedPointer<QMenu>>();
 
     const auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>();
-    if (!resourceList.empty())
+    // Maintain consistency with tile interactions handler.
+    const auto mediaResources = resourceList.filtered(
+        [](const auto& resource) { return resource->hasFlags(Qn::media); });
+    if (!mediaResources.empty())
     {
         if (!menu || !NX_ASSERT(!menu->isEmpty()))
             menu.reset(new QMenu());

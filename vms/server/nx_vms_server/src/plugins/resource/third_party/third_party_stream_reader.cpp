@@ -57,13 +57,15 @@ bool isIFrame(const QnAbstractMediaDataPtr& packet)
 
 using namespace nx::sdk;
 
+
 ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnThirdPartyResourcePtr res,
     nxcip::BaseCameraManager* camManager )
 :
     CLServerPushStreamReader(res),
     m_thirdPartyRes(res),
-    m_camManager(camManager)
+    m_camManager(camManager),
+    m_sourceUrlMutex(QnMutex::Recursive)
 {
     NX_ASSERT( m_thirdPartyRes );
 
@@ -78,8 +80,8 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
             if (propertyName == ResourcePropertyKey::kStreamUrls)
             {
                 {
-                    QnMutexLocker lock(&m_streamReaderMutex);
-                    if (m_thirdPartyRes->sourceUrl(getRole()) == m_lastSourceUrl)
+                    QnMutexLocker lock(&m_sourceUrlMutex);
+                    if (m_isServerSideUpdate)
                         return;
                 }
 
@@ -568,11 +570,10 @@ nx::utils::TimeHelper* ThirdPartyStreamReader::timeHelper(const QnAbstractMediaD
 
 void ThirdPartyStreamReader::updateSourceUrl(const QString& urlString)
 {
-    {
-        QnMutexLocker lock(&m_streamReaderMutex);
-        m_lastSourceUrl = urlString;
-    }
+    QnMutexLocker lock(&m_sourceUrlMutex);
+    m_isServerSideUpdate = true;
     m_thirdPartyRes->updateSourceUrl(urlString, getRole());
+    m_isServerSideUpdate = false;
 }
 
 QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const

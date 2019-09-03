@@ -232,10 +232,7 @@ Result<void> Monitor::startMonitoring(const IMetadataTypes* metadataTypes)
             m_eventsToCatch.emplace_back(*eventType);
     }
 
-    const int kSchemePrefixLength = sizeof("http://") - 1;
-    QString str = m_url.toString().remove(0, kSchemePrefixLength);
-
-    nx::network::SocketAddress cameraAddress(str);
+    nx::network::SocketAddress cameraAddress(nx::network::HostAddress(m_url.host()), m_url.port());
     nx::network::HostAddress localIp = this->getLocalIp(cameraAddress);
 
     if (localIp == nx::network::HostAddress())
