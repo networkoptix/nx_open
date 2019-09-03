@@ -3,7 +3,6 @@
 #include <nx/sql/query.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/time.h>
-#include <nx/utils/elapsed_timer.h>
 
 #include "outgoing_command_dispatcher.h"
 

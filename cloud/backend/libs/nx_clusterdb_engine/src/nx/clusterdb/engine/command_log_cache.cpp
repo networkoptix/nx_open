@@ -180,7 +180,7 @@ int CommandLogCache::generateTransactionSequence(
     const NodeStateKey& tranStateKey)
 {
     QnMutexLocker lock(&m_mutex);
-    auto& currentSequence = rawData().nodeState.nodeSequence[tranStateKey];
+    auto& currentSequence = rawState().nodeState.nodeSequence[tranStateKey];
     ++currentSequence;
     return currentSequence;
 }
@@ -189,7 +189,7 @@ int CommandLogCache::lastTransactionSequence(
     const NodeStateKey& tranStateKey)
 {
     QnMutexLocker lock(&m_mutex);
-    return rawData().nodeState.sequence(tranStateKey);
+    return rawState().nodeState.sequence(tranStateKey);
 }
 
 void CommandLogCache::shiftTransactionSequenceTo(
@@ -198,7 +198,7 @@ void CommandLogCache::shiftTransactionSequenceTo(
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto& currentSequence = rawData().nodeState.nodeSequence[tranStateKey];
+    auto& currentSequence = rawState().nodeState.nodeSequence[tranStateKey];
     currentSequence = std::max<long long>(currentSequence, value);
 
     m_committedData.nodeState.nodeSequence[tranStateKey] = currentSequence;
@@ -215,7 +215,7 @@ void CommandLogCache::shiftTransactionSequence(
     auto& currentSequence = m_committedData.nodeState.nodeSequence[tranStateKey];
     currentSequence += delta;
 
-    rawData() = m_committedData;
+    rawState() = m_committedData;
 }
 
 NodeState CommandLogCache::committedTransactionState() const
@@ -277,12 +277,12 @@ const CommandLogCache::TranContext* CommandLogCache::findTranContext(
     return it != m_tranIdToContext.end() ? &it->second : nullptr;
 }
 
-CommandLogCache::RawData& CommandLogCache::rawData()
+CommandLogCache::RawState& CommandLogCache::rawState()
 {
-    if (!m_rawData)
-        m_rawData = m_committedData;
+    if (!m_rawState)
+        m_rawState = m_committedData;
 
-    return *m_rawData;
+    return *m_rawState;
 }
 
 } // namespace nx::clusterdb::engine

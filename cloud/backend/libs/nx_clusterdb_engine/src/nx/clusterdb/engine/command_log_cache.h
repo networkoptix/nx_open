@@ -94,16 +94,16 @@ private:
         VmsDataState data;
     };
 
-    struct RawData
+    struct RawState
     {
         NodeState nodeState;
 
-        RawData(const VmsDataState& right):
+        RawState(const VmsDataState& right):
             nodeState(right.nodeState)
         {
         }
 
-        RawData& operator=(const VmsDataState& right)
+        RawState& operator=(const VmsDataState& right)
         {
             nodeState = right.nodeState;
             return *this;
@@ -116,7 +116,7 @@ private:
     TranId m_tranIdSequence;
     CommandTimestampCalculator m_timestampCalculator;
     VmsDataState m_committedData;
-    std::optional<RawData> m_rawData;
+    std::optional<RawState> m_rawState;
 
     std::uint64_t timestampSequence(const QnMutexLockerBase& /*lock*/, TranId tranId) const;
 
@@ -127,7 +127,7 @@ private:
         const QnMutexLockerBase& lock,
         TranId tranId) const;
 
-    RawData& rawData();
+    RawState& rawState();
 };
 
 } // namespace nx::clusterdb::engine
