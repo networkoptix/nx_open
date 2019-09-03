@@ -94,13 +94,29 @@ private:
         VmsDataState data;
     };
 
+    struct RawData
+    {
+        NodeState nodeState;
+
+        RawData(const VmsDataState& right):
+            nodeState(right.nodeState)
+        {
+        }
+
+        RawData& operator=(const VmsDataState& right)
+        {
+            nodeState = right.nodeState;
+            return *this;
+        }
+    };
+
     Timestamp m_maxTimestamp;
     std::map<TranId, TranContext> m_tranIdToContext;
     mutable QnMutex m_mutex;
     TranId m_tranIdSequence;
     CommandTimestampCalculator m_timestampCalculator;
     VmsDataState m_committedData;
-    VmsDataState m_rawData;
+    std::optional<RawData> m_rawData;
 
     std::uint64_t timestampSequence(const QnMutexLockerBase& /*lock*/, TranId tranId) const;
 
@@ -110,6 +126,8 @@ private:
     const TranContext* findTranContext(
         const QnMutexLockerBase& lock,
         TranId tranId) const;
+
+    RawData& rawData();
 };
 
 } // namespace nx::clusterdb::engine

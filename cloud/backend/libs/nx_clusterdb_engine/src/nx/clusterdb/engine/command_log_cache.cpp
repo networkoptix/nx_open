@@ -9,7 +9,6 @@ CommandLogCache::CommandLogCache():
     m_tranIdSequence(0)
 {
     m_committedData.timestampSequence = 0;
-    m_rawData.timestampSequence = 0;
 }
 
 bool CommandLogCache::isShouldBeIgnored(
@@ -81,7 +80,6 @@ void CommandLogCache::restoreTransaction(
     }
 
     NX_ASSERT(m_tranIdToContext.empty());
-    m_rawData = m_committedData;
 }
 
 CommandLogCache::TranId CommandLogCache::beginTran()
@@ -182,7 +180,7 @@ int CommandLogCache::generateTransactionSequence(
     const NodeStateKey& tranStateKey)
 {
     QnMutexLocker lock(&m_mutex);
-    auto& currentSequence = m_rawData.nodeState.nodeSequence[tranStateKey];
+    auto& currentSequence = rawData().nodeState.nodeSequence[tranStateKey];
     ++currentSequence;
     return currentSequence;
 }
@@ -191,7 +189,7 @@ int CommandLogCache::lastTransactionSequence(
     const NodeStateKey& tranStateKey)
 {
     QnMutexLocker lock(&m_mutex);
-    return m_rawData.nodeState.sequence(tranStateKey);
+    return rawData().nodeState.sequence(tranStateKey);
 }
 
 void CommandLogCache::shiftTransactionSequenceTo(
@@ -200,7 +198,7 @@ void CommandLogCache::shiftTransactionSequenceTo(
 {
     QnMutexLocker lock(&m_mutex);
 
-    auto& currentSequence = m_rawData.nodeState.nodeSequence[tranStateKey];
+    auto& currentSequence = rawData().nodeState.nodeSequence[tranStateKey];
     currentSequence = std::max<long long>(currentSequence, value);
 
     m_committedData.nodeState.nodeSequence[tranStateKey] = currentSequence;
@@ -217,7 +215,7 @@ void CommandLogCache::shiftTransactionSequence(
     auto& currentSequence = m_committedData.nodeState.nodeSequence[tranStateKey];
     currentSequence += delta;
 
-    m_rawData = m_committedData;
+    rawData() = m_committedData;
 }
 
 NodeState CommandLogCache::committedTransactionState() const
@@ -277,6 +275,14 @@ const CommandLogCache::TranContext* CommandLogCache::findTranContext(
 {
     auto it = m_tranIdToContext.find(tranId);
     return it != m_tranIdToContext.end() ? &it->second : nullptr;
+}
+
+CommandLogCache::RawData& CommandLogCache::rawData()
+{
+    if (!m_rawData)
+        m_rawData = m_committedData;
+
+    return *m_rawData;
 }
 
 } // namespace nx::clusterdb::engine

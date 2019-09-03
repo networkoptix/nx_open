@@ -3,6 +3,7 @@
 #include <nx/sql/query.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/time.h>
+#include <nx/utils/elapsed_timer.h>
 
 #include "outgoing_command_dispatcher.h"
 
@@ -249,7 +250,6 @@ void CommandLog::fetchTransactionState(nx::sql::QueryContext* queryContext)
     selectTransactionStateQuery.setForwardOnly(true);
     selectTransactionStateQuery.prepare(R"sql(
         SELECT tl.system_id as system_id,
-               tss.timestamp_hi as settings_timestamp_hi,
                peer_guid,
                db_guid,
                sequence,
@@ -265,34 +265,28 @@ void CommandLog::fetchTransactionState(nx::sql::QueryContext* queryContext)
 
     NX_DEBUG(this, lm("Fetched transactions"));
 
-    std::string prevSystemId;
     int count = 0;
     while (selectTransactionStateQuery.next())
     {
-        const auto systemId = selectTransactionStateQuery.value("system_id").toString().toStdString();
-        const auto peerGuid = selectTransactionStateQuery.value("peer_guid").toString().toStdString();
-        const auto dbGuid = selectTransactionStateQuery.value("db_guid").toString().toStdString();
-        const int sequence = selectTransactionStateQuery.value("sequence").toInt();
-        const nx::Buffer tranHash = selectTransactionStateQuery.value("tran_hash").toString().toLatin1();
+        const auto systemId = selectTransactionStateQuery.value(0).toString().toStdString();
+        const auto peerGuid = selectTransactionStateQuery.value(1).toString();
+        const auto dbGuid = selectTransactionStateQuery.value(2).toString();
+        const int sequence = selectTransactionStateQuery.value(3).toInt();
+        const nx::Buffer tranHash = selectTransactionStateQuery.value(4).toString().toLatin1();
+
         Timestamp timestamp;
-        timestamp.sequence = selectTransactionStateQuery.value("timestamp_hi").toLongLong();
-        timestamp.ticks = selectTransactionStateQuery.value("timestamp").toLongLong();
+        timestamp.sequence = selectTransactionStateQuery.value(5).toLongLong();
+        timestamp.ticks = selectTransactionStateQuery.value(6).toLongLong();
 
         NodeStateKey tranStateKey{
             QnUuid::fromStringSafe(peerGuid),
             QnUuid::fromStringSafe(dbGuid)};
 
         QnMutexLocker lock(&m_mutex);
-        TransactionLogContext* vmsTranLog = getTransactionLogContext(lock, systemId);
 
+        TransactionLogContext* vmsTranLog = getTransactionLogContext(lock, systemId);
         vmsTranLog->cache.restoreTransaction(
             std::move(tranStateKey), sequence, tranHash, timestamp);
-
-        if (systemId != prevSystemId)
-        {
-            // Switched to another system.
-            prevSystemId = systemId;
-        }
 
         ++count;
     }
@@ -495,15 +489,15 @@ CommandLog::TransactionLogContext* CommandLog::getTransactionLogContext(
     const QnMutexLockerBase& /*lock*/,
     const std::string& systemId)
 {
-    auto insertionPair = m_systemIdToTransactionLog.emplace(systemId, nullptr);
-    if (insertionPair.second)
+    auto& ctx = m_systemIdToTransactionLog[systemId];
+    if (!ctx)
     {
-        insertionPair.first->second = std::make_unique<TransactionLogContext>(
+        ctx = std::make_unique<TransactionLogContext>(
             systemId,
             m_outgoingTransactionDispatcher);
     }
 
-    return insertionPair.first->second.get();
+    return ctx.get();
 }
 
 std::tuple</*command sequence*/ int, Timestamp> CommandLog::generateNewTransactionAttributes(
