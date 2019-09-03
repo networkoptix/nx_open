@@ -12,7 +12,7 @@ void writeElement(QXmlStreamWriter* writer, const QString& name, bool value);
 
 template<
     typename NumericType,
-    typename = typename std::enable_if_t<std::is_arithmetic_v<NumericType>, NumericType>>
+    typename = std::enable_if_t<std::is_arithmetic_v<NumericType>, NumericType>>
 void writeElement(QXmlStreamWriter* writer, const QString& name, NumericType value)
 {
     return writeElement(writer, name, QString::number(value));

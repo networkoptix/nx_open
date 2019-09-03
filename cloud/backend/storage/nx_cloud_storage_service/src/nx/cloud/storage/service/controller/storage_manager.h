@@ -18,7 +18,6 @@
 
 namespace nx {
 
-namespace clusterdb::engine { class Synchroni; }
 namespace utils::stree { class ResourceContainer; }
 
 namespace network { class SocketAddress; }
