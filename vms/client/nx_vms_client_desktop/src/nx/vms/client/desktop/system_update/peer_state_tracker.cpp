@@ -563,12 +563,14 @@ QSet<QnUuid> PeerStateTracker::allPeers() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::peersInState(StatusCode state) const
+QSet<QnUuid> PeerStateTracker::peersInState(StatusCode state, bool withClient) const
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
     {
+        if (!withClient && item->component == UpdateItem::Component::client)
+            continue;
         if (item->state == state)
             result.insert(item->id);
     }
