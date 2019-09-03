@@ -279,7 +279,6 @@ void EventRibbon::Private::updateTile(int index)
         widget->setProgressTitle(modelIndex.data(Qt::DisplayRole).toString());
         widget->setDescription(modelIndex.data(Qn::DescriptionTextRole).toString());
         widget->setToolTip(modelIndex.data(Qn::DescriptionTextRole).toString());
-        widget->setCloseable(modelIndex.data(Qn::RemovableRole).toBool());
         return;
     }
 
@@ -289,7 +288,6 @@ void EventRibbon::Private::updateTile(int index)
         return;
 
     // Tile is a normal information tile.
-    widget->setProgressBarVisible(false);
     widget->setTitle(title);
     widget->setIcon(modelIndex.data(Qt::DecorationRole).value<QPixmap>());
     widget->setTimestamp(modelIndex.data(Qn::TimestampTextRole).toString());
