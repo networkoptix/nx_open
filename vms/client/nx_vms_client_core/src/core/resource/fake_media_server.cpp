@@ -2,7 +2,6 @@
 
 #include <nx/network/http/http_types.h>
 #include <nx/network/url/url_builder.h>
-#include <api/media_server_connection.h>
 
 QnFakeMediaServerResource::QnFakeMediaServerResource(QnCommonModule* commonModule):
     QnMediaServerResource(commonModule)

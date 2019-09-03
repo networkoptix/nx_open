@@ -25,6 +25,7 @@
 #include <api/model/audit/audit_record.h>
 #include <api/model/camera_diagnostics_reply.h>
 #include <api/model/camera_list_reply.h>
+#include <api/model/getnonce_reply.h>
 #include <api/model/manual_camera_seach_reply.h>
 #include <api/model/test_email_settings_reply.h>
 #include <api/model/time_reply.h>
@@ -374,6 +375,15 @@ public:
         const nx::utils::Url& url, const QString& getKey, const QString& postKey,
         bool ownSettings, bool oneServer, bool ignoreIncompatible,
         GetCallback callback, QThread* targetThread = nullptr);
+
+    Handle pingSystemAsync(
+        const nx::utils::Url& url, const QString& getKey,
+        Result<RestResultWithData<nx::vms::api::ModuleInformation>>::type callback,
+        QThread* targetThread = nullptr);
+
+    Handle getNonceAsync(const nx::utils::Url& url,
+        Result<RestResultWithData<QnGetNonceReply>>::type callback,
+        QThread* targetThread = nullptr);
 
     /**
      * Makes the server consume a media file as a footage for a wearable camera.

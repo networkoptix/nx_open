@@ -1,7 +1,6 @@
 #include "camera_bookmarks_manager_p.h"
 
 #include <api/helpers/bookmark_request_data.h>
-#include <api/media_server_connection.h>
 #include <api/server_rest_connection.h>
 
 #include <camera/camera_bookmarks_manager.h>

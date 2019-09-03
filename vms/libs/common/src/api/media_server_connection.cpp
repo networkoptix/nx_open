@@ -89,12 +89,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
     trace(m_serverId, handle, object(), lit("Received reply (%1ms)").arg(timer.elapsed()));
     switch (object())
     {
-        case PingSystemObject:
-            processJsonReply<nx::vms::api::ModuleInformation>(this, response, handle);
-            break;
-        case GetNonceObject:
-            processJsonReply<QnGetNonceReply>(this, response, handle);
-            break;
         default:
             NX_ASSERT(false);
             break;
@@ -214,24 +208,3 @@ void QnMediaServerConnection::trace(int handle, int obj, const QString& message 
 {
     ::trace(m_serverId, handle, obj, message);
 }
-
-int QnMediaServerConnection::pingSystemAsync(
-    const nx::utils::Url& url, const QString& getKey, QObject* target, const char* slot)
-{
-    QnRequestParamList params;
-    params.insert("url", url.toString());
-    params.insert("getKey", getKey);
-
-    return sendAsyncGetRequestLogged(PingSystemObject,
-        params, QN_STRINGIZE_TYPE(nx::vms::api::ModuleInformation), target, slot);
-}
-
-int QnMediaServerConnection::getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot)
-{
-    QnRequestParamList params;
-    params.insert("url", url.toString());
-
-    return sendAsyncGetRequest(GetNonceObject,
-        params, QN_STRINGIZE_TYPE(QnGetNonceReply), target, slot);
-}
-

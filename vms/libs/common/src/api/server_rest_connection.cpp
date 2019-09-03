@@ -728,6 +728,26 @@ Handle ServerConnection::mergeSystemAsync(
     return executePost("/api/mergeSystems", std::move(params), callback, targetThread);
 }
 
+Handle ServerConnection::pingSystemAsync(
+    const nx::utils::Url& url, const QString& getKey,
+    Result<RestResultWithData<nx::vms::api::ModuleInformation>>::type callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params;
+    params.insert("url", url.toString());
+    params.insert("getKey", getKey);
+    return executeGet("/api/pingSystem", params, callback, targetThread);
+}
+
+Handle ServerConnection::getNonceAsync(const nx::utils::Url& url,
+    Result<RestResultWithData<QnGetNonceReply>>::type callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params;
+    params.insert("url", url.toString());
+    return executeGet("/api/getRemoteNonce", params, callback, targetThread);
+}
+
 Handle ServerConnection::addWearableCamera(
     const QString& name,
     GetCallback callback,
@@ -1284,7 +1304,6 @@ std::function<void(ServerConnection::ContextPtr context)> makeCallbackWithErrorM
         const ResultType& result,
         const QString& message)> callback, QnUuid serverId)
 {
-    // TODO: Replace this timer by data from the Context
     return [callback, serverId](ServerConnection::ContextPtr context)
         {
             bool success = false;
@@ -1730,13 +1749,13 @@ Handle ServerConnection::sendRequest(
     QThread* thread,
     std::chrono::milliseconds timeout)
 {
-    QnMutexLocker lock(&m_mutex);
     ContextPtr context(new nx::network::http::ClientPool::Context());
     context->request = request;
     context->completionFunc = callback;
     context->timeout = timeout;
     context->setTargetThread(thread);
     // Request can be complete just inside `sendRequest`, so requestId is already invalid.
+    QnMutexLocker lock(&m_mutex);
     Handle requestId = httpClientPool()->sendRequest(context);
     if (!requestId || context->isFinished())
         return 0;
@@ -1746,9 +1765,9 @@ Handle ServerConnection::sendRequest(
 
 Handle ServerConnection::sendRequest(const ContextPtr& context)
 {
-    QnMutexLocker lock(&m_mutex);
     Handle requestId = httpClientPool()->sendRequest(context);
     // Request can be complete just inside `sendRequest`, so requestId is already invalid.
+    QnMutexLocker lock(&m_mutex);
     if (!requestId || context->isFinished())
         return 0;
     m_runningRequests.insert(requestId);

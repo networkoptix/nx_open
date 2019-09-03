@@ -36,9 +36,6 @@ public:
         const QnUuid& videowallGuid = QnUuid(),
         bool enableOfflineRequests = false);
 
-    int pingSystemAsync(const nx::utils::Url& url, const QString& getKey, QObject* target, const char* slot);
-    int getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot);
-
 protected:
     virtual nx::utils::Url url() const override;
     virtual QnAbstractReplyProcessor* newReplyProcessor(int object, const QString& serverId) override;

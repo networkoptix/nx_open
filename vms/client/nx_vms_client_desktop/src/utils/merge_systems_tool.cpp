@@ -9,11 +9,11 @@
 #include "core/resource/user_resource.h"
 #include "api/app_server_connection.h"
 #include "api/server_rest_connection.h"
-#include "api/media_server_connection.h"
 #include "nx_ec/dummy_handler.h"
 #include "common/common_module.h"
 #include "nx/vms/discovery/manager.h"
 #include <nx/utils/log/log.h>
+#include <nx/utils/guarded_callback.h>
 #include "client/client_settings.h"
 #include <network/authutil.h>
 #include <nx/network/deprecated/asynchttpclient.h>
@@ -42,10 +42,14 @@ void QnMergeSystemsTool::pingSystem(const nx::utils::Url &url, const QAuthentica
 
         NX_DEBUG(this, lm("pingSystem(): Request nonce from %1").arg(ctx.peerString()));
 
-        ctx.nonceRequestHandle = server->apiConnection()->getNonceAsync(
-            ctx.url,
-            this,
-            SLOT(at_getNonceForPingFinished(int, QnGetNonceReply, int, QString)));
+        auto callback = [this](
+                bool success, int handle,
+                rest::RestResultWithData<QnGetNonceReply> reply)
+            {
+                at_getNonceForPingFinished(success, handle, reply.data, reply.errorString);
+            };
+        ctx.nonceRequestHandle = server->restConnection()->getNonceAsync(ctx.url,
+            nx::utils::guarded(this, callback), thread());
         m_twoStepRequests[ctx.nonceRequestHandle] = ctx;
     }
 }
@@ -60,17 +64,21 @@ int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const
 
     NX_DEBUG(this, lm("mergeSystem(): Request nonce from %1").arg(ctx.peerString()));
 
-    ctx.nonceRequestHandle = proxy->apiConnection()->getNonceAsync(
-        url, this, SLOT(at_getNonceForMergeFinished(int, QnGetNonceReply, int, QString)));
+    auto callback = [this](bool success, int handle, rest::RestResultWithData<QnGetNonceReply> reply)
+        {
+            at_getNonceForMergeFinished(success, handle, reply.data, reply.errorString);
+        };
+    ctx.nonceRequestHandle = proxy->restConnection()->getNonceAsync(
+        url, nx::utils::guarded(this, callback), thread());
     m_twoStepRequests[ctx.nonceRequestHandle] = ctx;
     return ctx.nonceRequestHandle;
 }
 
 void QnMergeSystemsTool::at_getNonceForMergeFinished(
-    int /*status*/,
-    const QnGetNonceReply& nonceReply,
+    [[maybe_unused]]bool success,
     int handle,
-    const QString& /*errorString*/)
+    const QnGetNonceReply& nonceReply,
+    [[maybe_unused]]const QString& errorString)
 {
     if (!m_twoStepRequests.contains(handle))
         return;
@@ -98,7 +106,7 @@ void QnMergeSystemsTool::at_getNonceForMergeFinished(
         {
             QString error = response.errorString;
             const auto moduleInfo = response.deserialized<nx::vms::api::ModuleInformation>();
-            at_mergeSystem_finished(success, moduleInfo, handle, error);
+            at_mergeSystem_finished(success, handle, moduleInfo, error);
         };
 
     if (auto connection = ctx.proxy->restConnection())
@@ -111,10 +119,10 @@ void QnMergeSystemsTool::at_getNonceForMergeFinished(
 }
 
 void QnMergeSystemsTool::at_getNonceForPingFinished(
-    int /*status*/,
-    const QnGetNonceReply& nonceReply,
+    [[maybe_unused]] bool success,
     int handle,
-    const QString& /*errorString*/)
+    const QnGetNonceReply& nonceReply,
+    [[maybe_unused]]const QString& errorString)
 {
     if (!m_twoStepRequests.contains(handle))
         return;
@@ -130,11 +138,17 @@ void QnMergeSystemsTool::at_getNonceForPingFinished(
 
     NX_DEBUG(this, lm("Send ping request to %1").arg(ctx.peerString()));
 
-    ctx.mainRequestHandle = ctx.proxy->apiConnection()->pingSystemAsync(
+    auto callback =
+        [this](bool success, rest::Handle handle,
+            rest::RestResultWithData<nx::vms::api::ModuleInformation> response)
+        {
+            at_pingSystem_finished(success, handle, response.data, response.errorString);
+        };
+
+    ctx.mainRequestHandle = ctx.proxy->restConnection()->pingSystemAsync(
         ctx.url,
         QString::fromLatin1(getKey),
-        this,
-        SLOT(at_pingSystem_finished(int, nx::vms::api::ModuleInformation, int, QString)));
+        nx::utils::guarded(this, callback), thread());
 }
 
 int QnMergeSystemsTool::configureIncompatibleServer(
@@ -153,16 +167,21 @@ int QnMergeSystemsTool::configureIncompatibleServer(
     NX_DEBUG(this,
         lm("configureIncompatibleServer(): Request nonce from %1").arg(ctx.peerString()));
 
-    ctx.nonceRequestHandle = proxy->apiConnection()->getNonceAsync(
-        url, this, SLOT(at_getNonceForMergeFinished(int, QnGetNonceReply, int, QString)));
+    auto callback = [this](bool success, int handle,
+            rest::RestResultWithData<QnGetNonceReply> reply)
+        {
+            at_getNonceForMergeFinished(success, handle, reply.data, reply.errorString);
+        };
+    ctx.nonceRequestHandle = proxy->restConnection()->getNonceAsync(
+        url, nx::utils::guarded(this, callback), thread());
     m_twoStepRequests[ctx.nonceRequestHandle] = ctx;
     return ctx.nonceRequestHandle;
 }
 
 void QnMergeSystemsTool::at_pingSystem_finished(
-    int status,
-    const nx::vms::api::ModuleInformation& moduleInformation,
+    bool success,
     int handle,
+    const nx::vms::api::ModuleInformation& moduleInformation,
     const QString& errorString)
 {
     bool ctxFound = false;
@@ -182,11 +201,11 @@ void QnMergeSystemsTool::at_pingSystem_finished(
         return;
 
     NX_DEBUG(this, lm("Ping response from %1: %2 %3").args(
-        ctx.peerString(), status, errorString));
+        ctx.peerString(), success, errorString));
 
-    auto errorCode = (status == 0)
-        ? utils::MergeSystemsStatus::fromString(errorString)
-        : utils::MergeSystemsStatus::unknownError;
+    auto errorCode = success
+        ? utils::MergeSystemsStatus::unknownError
+        : utils::MergeSystemsStatus::fromString(errorString);
 
     auto isOk = [](utils::MergeSystemsStatus::Value errorCode)
         {
@@ -216,8 +235,8 @@ void QnMergeSystemsTool::at_pingSystem_finished(
 
 void QnMergeSystemsTool::at_mergeSystem_finished(
     bool success,
-    const nx::vms::api::ModuleInformation& moduleInformation,
     int handle,
+    const nx::vms::api::ModuleInformation& moduleInformation,
     const QString& errorString)
 {
     bool ctxFound = false;
