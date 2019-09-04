@@ -25,16 +25,27 @@ public:
     const QString& function() const { return part(0); }
     const QString& part(int index) const
     {
-        if (m_parts.size() <= index)
-            throw std::domain_error("Missing parameter in formula: " + m_formula.toStdString());
-        return m_parts[index];
+        if (m_parts.size() > index)
+            return m_parts[index];
+
+        throw std::domain_error("Missing parameter in formula: " + m_formula.toStdString());
     }
 
-    ValueMonitor* monitor(int index) const { return monitor(part(index)); }
+    ValueMonitor* monitor(int index) const
+    {
+        const auto id = part(index);
+        if (id.startsWith(kVariableMark))
+            return monitor(id.mid(kVariableMark.size()));
+
+        throw std::domain_error("Expected parameter instead of value in formula: "
+            + m_formula.toStdString());
+    }
+
     ValueMonitor* monitor(const QString& id) const
     {
         if (const auto it = m_monitors.find(id); it != m_monitors.end())
             return it->second.get();
+
         throw std::domain_error("Unknown parameter: " + id.toStdString());
     }
 
@@ -99,19 +110,16 @@ public:
 
     ValueGenerator buildArithmetic() const
     {
-        if (function() == "c" || function() == "const") // value
-            return value(1);
-
         if (function() == "+" || function() == "add") // first second
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 + v2; });
 
         if (function() == "-" || function() == "sub") // first second
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 - v2; });
 
-        if (function() == "c" || function() == "count") // value duration
+        if (function() == "count") // value duration
             return durationOperation(1, 2, [](auto values) { return (double) values.size(); });
 
-        if (function() == "cif" || function() == "countIf") // value duration expected
+        if (function() == "countValues") // value duration expected
         {
             return durationOperation(
                 1, 2,
@@ -129,22 +137,22 @@ public:
 
     ValueGenerator buildConditional() const
     {
-        if (function() == "=" || function() == "eq")
+        if (function() == "=" || function() == "equal")
             return binaryOperation(1, 2, [](auto v1, auto v2) { return v1 == v2; });
 
-        if (function() == "!=" || function() == "ne")
+        if (function() == "!=" || function() == "notEqual")
             return binaryOperation(1, 2, [](auto v1, auto v2) { return v1 != v2; });
 
-        if (function() == ">" || function() == "gt")
+        if (function() == ">" || function() == "greaterThen")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 > v2; });
 
-        if (function() == "<" || function() == "lt")
+        if (function() == "<" || function() == "lessThen")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 < v2; });
 
-        if (function() == ">=" || function() == "ge")
+        if (function() == ">=" || function() == "greaterOrEqual")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 >= v2; });
 
-        if (function() == "<=" || function() == "le")
+        if (function() == "<=" || function() == "lessOrEqual")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 <= v2; });
 
         return nullptr;
@@ -152,6 +160,9 @@ public:
 
     ValueGenerator build() const
     {
+        if (function() == "const")
+            return value(1);
+
         if (auto generator = buildArithmetic())
             return generator;
 

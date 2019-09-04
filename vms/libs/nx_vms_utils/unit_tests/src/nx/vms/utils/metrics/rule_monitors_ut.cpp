@@ -64,12 +64,12 @@ TEST_F(MetricsRules, ValueGenerator)
     EXPECT_EQ(greaterAB(), api::metrics::Value(false));
 
     a = 7;
-    EXPECT_EQ(parseFormulaOrThrow("ge %a 7", monitors)(), api::metrics::Value(true));
-    EXPECT_EQ(parseFormulaOrThrow("ge %a 10", monitors)(), api::metrics::Value(false));
+    EXPECT_EQ(parseFormulaOrThrow("greaterOrEqual %a 7", monitors)(), api::metrics::Value(true));
+    EXPECT_EQ(parseFormulaOrThrow("greaterOrEqual %a 10", monitors)(), api::metrics::Value(false));
 
     a = "hello";
-    EXPECT_EQ(parseFormulaOrThrow("eq %a hello", monitors)(), api::metrics::Value(true));
-    EXPECT_EQ(parseFormulaOrThrow("ne %a hello", monitors)(), api::metrics::Value(false));
+    EXPECT_EQ(parseFormulaOrThrow("equal %a hello", monitors)(), api::metrics::Value(true));
+    EXPECT_EQ(parseFormulaOrThrow("notEqual %a hello", monitors)(), api::metrics::Value(false));
 }
 
 } // namespace nx::vms::utils::metrics::test

@@ -4599,49 +4599,73 @@ void MediaServerProcess::loadResourceParamsData()
 static const QByteArray kMetricsAlarmRules(R"json({
     "systems": {
         "info": {
-            "recommendedMaxServers": { "calculate": "const 100" },
-            "servers": { "alarms": [
-                {
+            "recommendedMaxServers": {
+                "calculate": "const 100"
+            },
+            "servers": {
+                "alarms": [{
                     "level": "warning",
-                    "condition": "ge %servers %recommendedMaxServers",
+                    "condition": "greaterThen %servers %recommendedMaxServers",
                     "text": "The maximum number of %recommendedMaxServers servers per system is reached. Create another system to use more servers"
-                }
-            ]},
-            "recommendedMaxCameras": { "calculate": "const 10000" },
-            "cameras": { "alarms": [
-                {
+                }]
+            },
+            "recommendedMaxCameras": {
+                "calculate": "const 10000"
+            },
+            "cameras": {
+                "alarms": [{
                     "level": "warning",
-                    "condition": "ge %servers %recommendedMaxCameras",
+                    "condition": "greaterThen %servers %recommendedMaxCameras",
                     "text": "The maximum number of %recommendedMaxCameras camera channels per system is reached. Create another system to use more cameras"
-                }
-            ]}
+                }]
+            }
         }
     },
     "servers": {
         "state": {
-            "status": { "alarms": [
-                {
+            "status": {
+                "alarms": [{
                     "level": "error",
-                    "condition": "ne %status Online",
+                    "condition": "notEqual %status Online",
                     "text": "Status is %status"
-                }
-            ]}
+                }]
+            },
+            "offlineEvents": {
+                "name": "Server Offline events (24h)",
+                "display": "table&panel",
+                "calculate": "countValues %status 24h Offline",
+                "insert": "uptime",
+                "alarms": [{
+                    "level": "warning",
+                    "condition": "greaterThen %offlineEvents 1",
+                    "text": "went Offline %offlineEvents times in last 24 hours"
+                }]
+            }
         }
     },
     "cameras": {
         "info": {
-            "status": { "alarms": [
-                {
+            "status": {
+                "alarms": [{
                     "level": "warning",
-                    "condition": "eq %status Unauthorized",
-                    "text": "Status is {status}"
-                },
-                {
+                    "condition": "equal %status Unauthorized",
+                    "text": "Status is %status"
+                }, {
                     "level": "error",
-                    "condition": "eq %status Offline",
-                    "text": "Status is {status}"
-                }
-            ]}
+                    "condition": "equal %status Offline",
+                    "text": "Status is %status"
+                }]
+            },
+            "offlineEvents": {
+                "name": "Server Offline events (24h)",
+                "display": "table&panel",
+                "calculate": "countValues %status 24h Offline",
+                "alarms": [{
+                    "level": "warning",
+                    "condition": "greaterThen %offlineEvents 1",
+                    "text": "went Offline %offlineEvents times in last 24 hours"
+                }]
+            }
         }
     }
 })json");

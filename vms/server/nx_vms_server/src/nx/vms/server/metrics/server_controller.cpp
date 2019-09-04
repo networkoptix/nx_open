@@ -73,12 +73,6 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
                 api::metrics::ValueManifest{
-                    "offlineEvents", "Server Offline events (24h)", "table&panel", ""
-                },
-                [](const auto&) { return Value(); } // TODO: Implement.
-            ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest{
                     "uptime", "Uptime", "table&panel", "s"
                 },
                 localGetter(
