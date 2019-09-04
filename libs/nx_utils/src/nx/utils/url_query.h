@@ -71,7 +71,7 @@ public:
         int base = 10) const
     {
         T value;
-        const auto str = m_query.queryItemValue(key).toStdString();
+        const auto str = m_query.queryItemValue(key, encoding).toStdString();
         const auto result =
             charconv::from_chars(&str.front(), &str.front() + str.size(), value, base);
         if (ok)
