@@ -20,12 +20,14 @@ StatisticsProvider::StatisticsProvider(
     const relaying::AbstractListeningPeerPool& listeningPeerPool,
     const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
     const controller::AbstractTrafficRelay& trafficRelay,
-    const nx::clusterdb::engine::statistics::Provider* peerDbStatisticsProvider)
+    const nx::clusterdb::engine::statistics::Provider* peerDbStatisticsProvider,
+    const nx::sql::StatisticsCollector* sqlStatisticsProvider)
     :
     m_listeningPeerPool(listeningPeerPool),
     m_httpServerStatisticsProvider(httpServerStatisticsProvider),
     m_trafficRelay(trafficRelay),
-    m_peerDbStatisticsProvider(peerDbStatisticsProvider)
+    m_peerDbStatisticsProvider(peerDbStatisticsProvider),
+    m_sqlStatisticsProvider(sqlStatisticsProvider)
 {
 }
 
@@ -37,6 +39,8 @@ Statistics StatisticsProvider::getAllStatistics() const
     statistics.relaySessions = m_trafficRelay.statistics();
     if (m_peerDbStatisticsProvider)
         statistics.peerDb = m_peerDbStatisticsProvider->statistics();
+    if (m_sqlStatisticsProvider)
+        statistics.sql = m_sqlStatisticsProvider->getQueryStatistics();
     return statistics;
 }
 
@@ -61,13 +65,15 @@ std::unique_ptr<AbstractStatisticsProvider> StatisticsProviderFactory::defaultFa
     const relaying::AbstractListeningPeerPool& listeningPeerPool,
     const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
     const controller::AbstractTrafficRelay& trafficRelay,
-    const nx::clusterdb::engine::statistics::Provider* peerDbStatisticsProvider)
+    const nx::clusterdb::engine::statistics::Provider* peerDbStatisticsProvider,
+    const nx::sql::StatisticsCollector* sqlStatistics)
 {
     return std::make_unique<StatisticsProvider>(
         listeningPeerPool,
         httpServerStatisticsProvider,
         trafficRelay,
-        peerDbStatisticsProvider);
+        peerDbStatisticsProvider,
+        sqlStatistics);
 }
 
 } // namespace relay

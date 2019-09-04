@@ -63,6 +63,7 @@ public:
 
     virtual void pleaseStopSync() override;
 
+    const nx::sql::AsyncSqlQueryExecutor* sqlQueryExecutor() const;
     const nx::clusterdb::map::EmbeddedDatabase* peerDb() const;
 
 private:

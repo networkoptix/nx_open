@@ -213,6 +213,11 @@ void RemoteRelayPeerPool::pleaseStopSync()
         m_map->synchronizationEngine().pleaseStopSync();
 }
 
+const nx::sql::AsyncSqlQueryExecutor* RemoteRelayPeerPool::sqlQueryExecutor() const
+{
+    return m_queryExecutor.get();
+}
+
 const nx::clusterdb::map::EmbeddedDatabase* RemoteRelayPeerPool::peerDb() const
 {
     return m_map.get();

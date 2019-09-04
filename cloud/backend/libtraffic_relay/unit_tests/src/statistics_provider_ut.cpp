@@ -129,6 +129,7 @@ public:
             m_listeningPeerPool,
             m_httpServerStatisticsProvider,
             m_trafficRelay,
+            nullptr,
             nullptr)
     {
     }

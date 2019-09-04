@@ -72,6 +72,9 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
         controller.trafficRelay(),
         remoteRelayPeerPool && remoteRelayPeerPool->peerDb()
             ? &remoteRelayPeerPool->peerDb()->synchronizationEngine().statisticsProvider()
+            : nullptr,
+        remoteRelayPeerPool && remoteRelayPeerPool->sqlQueryExecutor()
+            ? &remoteRelayPeerPool->sqlQueryExecutor()->statisticsCollector()
             : nullptr);
     view.registerStatisticsApiHandlers(*statisticsProvider);
 
