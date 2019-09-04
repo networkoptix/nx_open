@@ -161,6 +161,7 @@ Example:
       "id": "info",
       "name": "Info",
       "values": [
+        { "id": "name", "name": "Name", "display": "panel" },
         { "id": "servers", "name": "Servers", "display": "panel" },
         { "id": "offlineServers", "name": "Offline Servers", "display": "panel" },
         { "id": "users", "name": "Users", "display": "panel" },
@@ -184,6 +185,7 @@ Example:
       "id": "availability",
       "name": "Availability",
       "values": [
+        { "id": "name", "name": "Name", "display": "table&panel" },
         { "id": "status", "name": "Status", "display": "table&panel" },
         { "id": "offlineEvents", "name": "Offline Events", "display": "table&panel" },
         { "id": "uptime", "name": "Uptime", "unit": "s", "display": "table&panel" },
@@ -208,9 +210,11 @@ Example:
       "id": "info",
       "name": "Info",
       "values": [
-      { "id": "type", "name": "Type", "display": "table&panel" },
-      { "id": "ip", "name": "IP", "display": "table&panel" },
-      { "id": "status", "name": "Status", "display": "table&panel" },
+        { "id": "name", "name": "Name", "display": "table&panel" },
+        { "id": "server", "name": "Server", "display": "table&panel" },
+        { "id": "type", "name": "Type", "display": "table&panel" },
+        { "id": "ip", "name": "IP", "display": "table&panel" },
+        { "id": "status", "name": "Status", "display": "table&panel" },
       ...
     }, {
       "id": "issues",
@@ -248,9 +252,9 @@ Format:
 {
   "<resource_type_section>": {
     "<resource_uuid>": {
-      "name": "<resourceName>",
-      "parent": "<resourceId>",
-      "values": { "<groupId>": { "<parameterId>": "<parameterValue>" } }
+      "<groupId>": {
+        "<parameterId>": "<parameterValue>"
+      }
     }
   }
 }
@@ -261,79 +265,69 @@ Example:
 {
   "systems": {
     "SYSTEM_UUID_1" : {
-      "name": "System 1",
-      "values": {
+      "info": {
+        "name": "System 1",
         "servers": 105,
         "offlineServers": 0,
         "users": 10,
         "cameraChannels": 100,
-        "licenses": {
-          "professional": 20,
-          "requiredProfessional": 5, //< May be omitted by compact option.
-          "expiringProfessional": 10, //< May be omitted by compact option.
-          ...
-        },
         ...
         "recommendedServers": 100, //< May be omitted by compact option.
         "recommendedCameraChannels": 1000, //< May be omitted by compact option.
-      }
+      },
+      "licenses": {
+        "professional": 20,
+        "requiredProfessional": 5, //< May be omitted by compact option.
+        "expiringProfessional": 10, //< May be omitted by compact option.
+        ...
+      },
+      ...
     }
   },
   "servers": {
     "SERVER_UUID_1": {
-      "name": "Server 1",
-      "parent": "SYSTEM_UUID_1",
-      "values": {
-        "availability": { "status": "Online", "offlineEvents": 0, "uptime": 111111 },
-        "load": {
-          "totalCpuUsageP": 95,
-          "serverCpuUsageP": 90,
-          "ramUsageB": 2222222222,
-          "ramUsageP": 55,
-          "recommendedCpuUsageP": 90, //< May be omitted by compact option.
-          ...
-        },
+      "availability": { "name": "Server 1", "status": "Online", "offlineEvents": 0, "uptime": 111111 },
+      "load": {
+        "totalCpuUsageP": 95,
+        "serverCpuUsageP": 90,
+        "ramUsageB": 2222222222,
+        "ramUsageP": 55,
+        "recommendedCpuUsageP": 90, //< May be omitted by compact option.
         ...
-      }
+      },
+      ...
     },
     "SERVER_UUID_2": {
-      "name": "Server 2",
-      "parent": "SYSTEM_UUID_1",
-      "values": {
-        "availability": { "status": "Offline" }
-        // Most of the values are not present because we can not pull them from the offline server.
-      }
+      "availability": { "name": "Server 2", "status": "Offline" }
+      // Most of the values are not present because we can not pull them from the offline server.
     },
     ...
   },
   "cameras": {
     "CAMERA_UUID_1": {
-      "name": "DWC-112233",
-      "parent": "SERVER_UUID_1",
-      "values": {
-        "info": { "type": "camera", "ip": "192.168.0.101", "status": "Online", ... },
-        "issues": { "offlineEvents": 0, "streamIssues": 0, "ipConflicts": 0, ... },
-        "primaryStream": { "bitrate": 2555555, "targetFps": 30, "actualFps": 25, "fpsDrops": 5, ... },
-        ...
-      }
+      "info": {
+        "name": "DWC-112233", "server": "Server 1",
+        "type": "camera", "ip": "192.168.0.101", "status": "Online", ...
+      },
+      "issues": { "offlineEvents": 0, "streamIssues": 0, "ipConflicts": 0, ... },
+      "primaryStream": { "bitrate": 2555555, "targetFps": 30, "actualFps": 25, "fpsDrops": 5, ... },
+      ...
     },
     "CAMERA_UUID_2": {
-      "name": "ACTi-456",
-      "parent": "SERVER_UUID_1",
-      "values": {
-        "info": { "type": "camera", "ip": "192.168.0.102", "status": "Unauthorized", ... },
-        "issues": { "offlineEvents": 2, "streamIssues": 0, "ipConflicts": 0, ... },
-        "primaryStream": { "bitrate": 1333333, "targetFps": 15, "actualFps": 15, "fpsDrops": 5, ...},
-        ...
-      }
+      "info": {
+        "name": "ACTi-456", "server": "Server 1",
+        "type": "camera", "ip": "192.168.0.102", "status": "Unauthorized", ...
+      },
+      "issues": { "offlineEvents": 2, "streamIssues": 0, "ipConflicts": 0, ... },
+      "primaryStream": { "bitrate": 1333333, "targetFps": 15, "actualFps": 15, "fpsDrops": 5, ...},
+      ...
     },
     "CAMERA_UUID_3": {
-      "name": "iqEve-666",
-      "parent": "SERVER_UUID_2",
-      "values": {
-        "info": { "type": "camera", "ip": "192.168.0.103", "status": "Offline", ... },
-        ...
-      }
+      "info": {
+        "name": "iqEve-666", "server": "Server 2",
+        "type": "camera", "ip": "192.168.0.103", "status": "Offline", ...
+      },
+      ...
     },
     ...
   },

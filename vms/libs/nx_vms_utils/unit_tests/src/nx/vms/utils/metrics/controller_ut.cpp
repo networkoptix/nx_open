@@ -20,7 +20,7 @@ public:
         controller.start();
 
         for (int id = 0; id <= 2; ++id)
-            resources.push_back(resourceProvider->makeResource(id, /*isLocal*/ id % 2 == 0));
+            resources.push_back(resourceProvider->makeResource(id));
     }
 
 protected:
@@ -72,41 +72,35 @@ TEST_F(MetricsControllerTest, CurrentValues)
         ASSERT_EQ(testResources.size(), 3);
 
         auto resource1 = testResources["R0"];
-        EXPECT_EQ(resource1.name, "Resource 0");
-        EXPECT_EQ(resource1.parent, "SYSTEM_X");
-        ASSERT_EQ(resource1.values.size(), 2);
+        ASSERT_EQ(resource1.size(), 2);
         {
-            auto group1 = resource1.values["g1"];
+            auto group1 = resource1["g1"];
             ASSERT_EQ(group1.size(), 2);
             EXPECT_EQ(group1["i"], 1);
             EXPECT_EQ(group1["t"], "first of 0");
 
-            auto group2 = resource1.values["g2"];
+            auto group2 = resource1["g2"];
             ASSERT_EQ(group2.size(), 2);
             EXPECT_EQ(group2["i"], 2);
             EXPECT_EQ(group2["t"], "second of 0");
         }
 
         auto resource2 = testResources["R1"];
-        EXPECT_EQ(resource2.name, "Resource 1");
-        EXPECT_EQ(resource2.parent, "SYSTEM_X");
-        ASSERT_EQ(resource2.values.size(), 2);
+        ASSERT_EQ(resource2.size(), 2);
         {
-            auto group1 = resource2.values["g1"];
+            auto group1 = resource2["g1"];
             ASSERT_EQ(group1.size(), 2);
             EXPECT_EQ(group1["i"], 11);
             EXPECT_EQ(group1["t"], "first of 1");
 
-            auto group2 = resource2.values["g2"];
+            auto group2 = resource2["g2"];
             ASSERT_EQ(group2.size(), 2);
             EXPECT_EQ(group2["i"], 12);
             EXPECT_EQ(group2["t"], "second of 1");
         }
 
         auto resource3 = testResources["R2"];
-        EXPECT_EQ(resource3.name, "Resource 2");
-        EXPECT_EQ(resource3.parent, "SYSTEM_X");
-        ASSERT_EQ(resource3.values.size(), 2);
+        ASSERT_EQ(resource3.size(), 2);
     }
 
     resources[0]->update("i1", 666);
@@ -120,16 +114,16 @@ TEST_F(MetricsControllerTest, CurrentValues)
         ASSERT_EQ(testResources.size(), 3);
 
         auto resource1 = testResources["R0"];
-        EXPECT_EQ(resource1.values["g1"]["i"], 666);
-        EXPECT_EQ(resource1.values["g1"]["t"], "first of 0");
-        EXPECT_EQ(resource1.values["g2"]["i"], 2);
-        EXPECT_EQ(resource1.values["g2"]["t"], "second of 0");
+        EXPECT_EQ(resource1["g1"]["i"], 666);
+        EXPECT_EQ(resource1["g1"]["t"], "first of 0");
+        EXPECT_EQ(resource1["g2"]["i"], 2);
+        EXPECT_EQ(resource1["g2"]["t"], "second of 0");
 
         auto resource2 = testResources["R1"];
-        EXPECT_EQ(resource2.values["g1"]["i"], 11);
-        EXPECT_EQ(resource2.values["g1"]["t"], "first of 1");
-        EXPECT_EQ(resource2.values["g2"]["i"], 12);
-        EXPECT_EQ(resource2.values["g2"]["t"], "hello");
+        EXPECT_EQ(resource2["g1"]["i"], 11);
+        EXPECT_EQ(resource2["g1"]["t"], "first of 1");
+        EXPECT_EQ(resource2["g2"]["i"], 12);
+        EXPECT_EQ(resource2["g2"]["t"], "hello");
     }
 }
 

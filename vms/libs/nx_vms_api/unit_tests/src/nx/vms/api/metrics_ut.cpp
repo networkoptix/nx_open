@@ -82,6 +82,7 @@ static const QByteArray kManifestExample(R"json({
         "id": "availability",
         "name": "Availability",
         "values": [
+            { "id": "name", "name": "Name", "display": "table&panel" },
             { "id": "status", "name": "Status", "display": "table&panel" },
             { "id": "offlineEvents", "name": "Offline Events", "display": "table&panel" }
         ]
@@ -99,6 +100,8 @@ static const QByteArray kManifestExample(R"json({
         "id": "info",
         "name": "Info",
         "values": [
+            { "id": "name", "name": "Name", "display": "table&panel" },
+            { "id": "server", "name": "Server", "display": "table&panel" },
             { "id": "type", "name": "Type", "display": "table&panel" },
             { "id": "ip", "name": "IP", "display": "table&panel" }
         ]
@@ -125,14 +128,19 @@ TEST(Metrics, Manifest)
         const auto availability = servers[0];
         EXPECT_EQ(availability.id, "availability");
         EXPECT_EQ(availability.name, "Availability");
-        ASSERT_EQ(availability.values.size(), 2);
+        ASSERT_EQ(availability.values.size(), 3);
 
-        const auto status = availability.values[0];
+        const auto name = availability.values[0];
+        EXPECT_EQ(name.id, "name");
+        EXPECT_EQ(name.name, "Name");
+        EXPECT_EQ(name.display, "table&panel");
+
+        const auto status = availability.values[1];
         EXPECT_EQ(status.id, "status");
         EXPECT_EQ(status.name, "Status");
         EXPECT_EQ(status.display, "table&panel");
 
-        const auto events = availability.values[1];
+        const auto events = availability.values[2];
         EXPECT_EQ(events.id, "offlineEvents");
         EXPECT_EQ(events.name, "Offline Events");
         EXPECT_EQ(events.display, "table&panel");
@@ -155,9 +163,14 @@ TEST(Metrics, Manifest)
         const auto info = cameras[0];
         EXPECT_EQ(info.id, "info");
         EXPECT_EQ(info.name, "Info");
-        ASSERT_EQ(info.values.size(), 2);
+        ASSERT_EQ(info.values.size(), 4);
 
-        const auto type = info.values[0];
+        const auto server = info.values[1];
+        EXPECT_EQ(server.id, "server");
+        EXPECT_EQ(server.name, "Server");
+        EXPECT_EQ(server.display, "table&panel");
+
+        const auto type = info.values[2];
         EXPECT_EQ(type.id, "type");
         EXPECT_EQ(type.name, "Type");
         EXPECT_EQ(type.display, "table&panel");
@@ -169,37 +182,27 @@ TEST(Metrics, Manifest)
 static const QByteArray kValuesExample(R"json({
     "servers": {
         "SERVER_UUID_1": {
-            "name": "Server 1",
-            "parent": "SYSTEM_UUID_1",
-            "values": {
-                "availability": { "status": "Online", "offlineEvents": 0 },
-                "load": { "totalCpuUsageP": 95 }
-            }
+            "availability": { "name": "Server 1", "status": "Online", "offlineEvents": 0 },
+            "load": { "totalCpuUsageP": 95 }
         },
         "SERVER_UUID_2": {
-            "name": "Server 2",
-            "parent": "SYSTEM_UUID_1",
-            "values": {
-                "availability": { "status": "Offline" }
-            }
+            "availability": {"name": "Server 2", "status": "Offline" }
         }
     },
     "cameras": {
         "CAMERA_UUID_1": {
-            "name": "DWC-112233",
-            "parent": "SERVER_UUID_1",
-            "values": {
-                "info": { "type": "camera", "ip": "192.168.0.101", "status": "Online" },
-                "issues": { "offlineEvents": 1, "streamIssues": 2, "ipConflicts": 3 }
-            }
+            "info": {
+                "name": "DWC-112233", "server": "Server 1",
+                "type": "camera", "ip": "192.168.0.101", "status": "Online"
+            },
+            "issues": { "offlineEvents": 1, "streamIssues": 2, "ipConflicts": 3 }
         },
         "CAMERA_UUID_2": {
-            "name": "iqEve-666",
-            "parent": "SERVER_UUID_2",
-            "values": {
-                "info": { "type": "camera", "ip": "192.168.0.103", "status": "Offline" },
-                "issues": { "offlineEvents": 5, "streamIssues": 0, "ipConflicts": 0 }
-            }
+            "info": {
+                "name": "iqEve-666", "server": "Server 2",
+                "type": "camera", "ip": "192.168.0.103", "status": "Offline"
+            },
+            "issues": { "offlineEvents": 5, "streamIssues": 0, "ipConflicts": 0 }
         }
     }
 })json");
@@ -214,46 +217,49 @@ TEST(Metrics, Values)
     EXPECT_EQ(servers.size(), 2);
     {
         auto s1 = servers["SERVER_UUID_1"];
-        EXPECT_EQ(s1.name, "Server 1");
-        EXPECT_EQ(s1.parent, "SYSTEM_UUID_1");
-        EXPECT_EQ(s1.values.size(), 2);
+        EXPECT_EQ(s1.size(), 2);
+        EXPECT_EQ(s1["availability"].size(), 3);
+        EXPECT_EQ(s1["load"].size(), 1);
 
-        EXPECT_EQ(s1.values["availability"]["status"], "Online");
-        EXPECT_EQ(s1.values["availability"]["offlineEvents"], 0);
-        EXPECT_EQ(s1.values["load"]["totalCpuUsageP"], 95);
+        EXPECT_EQ(s1["availability"]["name"], "Server 1");
+        EXPECT_EQ(s1["availability"]["status"], "Online");
+        EXPECT_EQ(s1["availability"]["offlineEvents"], 0);
+        EXPECT_EQ(s1["load"]["totalCpuUsageP"], 95);
 
         auto s2 = servers["SERVER_UUID_2"];
-        EXPECT_EQ(s2.name, "Server 2");
-        EXPECT_EQ(s2.parent, "SYSTEM_UUID_1");
-        EXPECT_EQ(s2.values.size(), 1);
+        EXPECT_EQ(s2.size(), 1);
+        EXPECT_EQ(s2["availability"].size(), 2);
 
-        EXPECT_EQ(s2.values["availability"]["status"], "Offline");
+        EXPECT_EQ(s2["availability"]["name"], "Server 2");
+        EXPECT_EQ(s2["availability"]["status"], "Offline");
     }
 
     auto cameras = values["cameras"];
     EXPECT_EQ(cameras.size(), 2);
     {
         auto c1 = cameras["CAMERA_UUID_1"];
-        EXPECT_EQ(c1.name, "DWC-112233");
-        EXPECT_EQ(c1.parent, "SERVER_UUID_1");
-        EXPECT_EQ(c1.values.size(), 2);
+        EXPECT_EQ(c1.size(), 2);
+        EXPECT_EQ(c1["info"].size(), 5);
+        EXPECT_EQ(c1["issues"].size(), 3);
 
-        EXPECT_EQ(c1.values["info"]["type"], "camera");
-        EXPECT_EQ(c1.values["info"]["ip"], "192.168.0.101");
-        EXPECT_EQ(c1.values["info"]["status"], "Online");
+        EXPECT_EQ(c1["info"]["name"], "DWC-112233");
+        EXPECT_EQ(c1["info"]["server"], "Server 1");
+        EXPECT_EQ(c1["info"]["type"], "camera");
+        EXPECT_EQ(c1["info"]["ip"], "192.168.0.101");
+        EXPECT_EQ(c1["info"]["status"], "Online");
 
-        EXPECT_EQ(c1.values["issues"]["offlineEvents"], 1);
-        EXPECT_EQ(c1.values["issues"]["streamIssues"], 2);
-        EXPECT_EQ(c1.values["issues"]["ipConflicts"], 3);
+        EXPECT_EQ(c1["issues"]["offlineEvents"], 1);
+        EXPECT_EQ(c1["issues"]["streamIssues"], 2);
+        EXPECT_EQ(c1["issues"]["ipConflicts"], 3);
 
         auto c2 = cameras["CAMERA_UUID_2"];
-        EXPECT_EQ(c2.name, "iqEve-666");
-        EXPECT_EQ(c2.parent, "SERVER_UUID_2");
-        EXPECT_EQ(c2.values.size(), 2);
+        EXPECT_EQ(c2.size(), 2);
 
-        EXPECT_EQ(c2.values["info"]["type"], "camera");
-        EXPECT_EQ(c2.values["info"]["ip"], "192.168.0.103");
-        EXPECT_EQ(c2.values["info"]["status"], "Offline");
+        EXPECT_EQ(c2["info"]["name"], "iqEve-666");
+        EXPECT_EQ(c2["info"]["server"], "Server 2");
+        EXPECT_EQ(c2["info"]["type"], "camera");
+        EXPECT_EQ(c2["info"]["ip"], "192.168.0.103");
+        EXPECT_EQ(c2["info"]["status"], "Offline");
     }
 
     SystemValues serverOneValues;

@@ -17,7 +17,7 @@ public:
     void start() override;
 
 private:
-    static utils::metrics::ValueGroupProviders<Resource> makeProviders();
+    utils::metrics::ValueGroupProviders<Resource> makeProviders();
 
 private:
     const QString m_serverId;

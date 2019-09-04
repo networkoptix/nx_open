@@ -10,9 +10,7 @@ void PrintTo(const Value& v, ::std::ostream* s)
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ValueManifest)(ValueGroupManifest)
-    (AlarmRule)(ValueRule)
-    (ResourceValues)(Alarm),
+    (ValueManifest)(ValueGroupManifest)(AlarmRule)(ValueRule)(Alarm),
     (json), _Fields, (optional, true))
 
 void merge(SystemValues* destination, SystemValues* source)

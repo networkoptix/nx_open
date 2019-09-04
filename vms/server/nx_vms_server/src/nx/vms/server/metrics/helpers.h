@@ -11,10 +11,7 @@ class ResourceDescription: public utils::metrics::ResourceDescription<ResourceTy
 public:
     using base = utils::metrics::ResourceDescription<ResourceType>;
     using base::base;
-
     QString id() const override { return this->resource->getId().toSimpleString(); };
-    QString name() const override { return this->resource->getName(); }
-    QString parent() const override { return this->resource->getParentId().toSimpleString(); }
 };
 
 template<typename ResourceType>

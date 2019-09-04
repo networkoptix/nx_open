@@ -17,8 +17,6 @@ public:
     }
 
     QString id() const override { return m_serverId + "_" + this->resource.name; };
-    QString name() const override { return this->resource.name; }
-    QString parent() const override { return m_serverId; }
 
 private:
     const QString m_serverId;
@@ -47,6 +45,14 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
             api::metrics::Label{
                 "info", "Info"
             },
+            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+                api::metrics::ValueManifest{"name", "Name", "table&panel", ""},
+                [](const auto& r) { return Value(r.name); }
+            ),
+            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+                api::metrics::ValueManifest{"server", "Server", "table&panel", ""},
+                [this](const auto&) { return Value(m_serverId); }
+            ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
                 api::metrics::ValueManifest{"ip", "IP", "table&panel", ""},
                 [](const auto& r) { return Value(r.address.toString()); }

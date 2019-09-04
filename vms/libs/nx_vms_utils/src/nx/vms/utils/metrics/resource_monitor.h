@@ -15,8 +15,6 @@ public:
     public:
         virtual ~Description() = default;
         virtual QString id() const = 0;
-        virtual QString parent() const = 0;
-        virtual QString name() const = 0;
     };
 
     ResourceMonitor(std::unique_ptr<Description> resource, ValueGroupMonitors monitors);

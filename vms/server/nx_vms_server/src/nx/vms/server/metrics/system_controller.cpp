@@ -21,9 +21,6 @@ public:
         return (!id.isNull() ? id : m_settings->localSystemId().toSimpleString());
     }
 
-    QString name() const override { return m_settings->systemName(); }
-    QString parent() const override { return id(); }
-
 private:
     QnGlobalSettings* m_settings;
 };
@@ -45,12 +42,17 @@ utils::metrics::ValueGroupProviders<SystemResourceController::Resource>
     SystemResourceController::makeProviders()
 {
     const auto pool = serverModule()->commonModule()->resourcePool();
+    const auto settings = globalSettings();
 
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
             api::metrics::Label{
                 "info", "Info"
             },
+            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+                api::metrics::ValueManifest{"name", "Name", "panel", ""},
+                [settings](const auto&) { return Value(settings->systemName()); }
+            ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
                 api::metrics::ValueManifest{"servers", "Servers", "panel", ""},
                 [pool](const auto&) { return Value(pool->getAllServers(Qn::AnyStatus).size()); }

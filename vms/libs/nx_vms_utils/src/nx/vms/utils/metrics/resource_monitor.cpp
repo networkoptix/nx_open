@@ -10,14 +10,14 @@ ResourceMonitor::ResourceMonitor(std::unique_ptr<Description> resource, ValueGro
 
 api::metrics::ResourceValues ResourceMonitor::current() const
 {
-    std::map<QString, api::metrics::ValueGroup> values;
+    api::metrics::ResourceValues values;
     for (const auto& [id, monitor]: m_monitors)
     {
         if (auto v = monitor->current(); !v.empty())
             values[id] = std::move(v);
     }
 
-    return {m_resource->name(), m_resource->parent(), std::move(values)};
+    return values;
 }
 
 std::vector<api::metrics::Alarm> ResourceMonitor::alarms() const

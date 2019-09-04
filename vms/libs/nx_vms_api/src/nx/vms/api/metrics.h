@@ -16,14 +16,8 @@ NX_VMS_API void PrintTo(const Value& v, ::std::ostream* s);
 using ValueGroup
     = std::map<QString /*parameterId*/, Value>;
 
-struct NX_VMS_API ResourceValues
-{
-    QString name;
-    QString parent;
-    std::map<QString /*groupId*/, ValueGroup> values;
-};
-#define ResourceValues_Fields (name)(parent)(values)
-QN_FUSION_DECLARE_FUNCTIONS(ResourceValues, (json), NX_VMS_API)
+using ResourceValues =
+    std::map<QString /*groupId*/, ValueGroup>;
 
 using ResourceGroupValues =
     std::map<QString /*resourceId*/, ResourceValues>;

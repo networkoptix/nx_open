@@ -8,14 +8,8 @@ namespace {
 class TestResource
 {
 public:
-    TestResource(int id, bool isLocal):
-        m_id(id),
-        m_isLocal(isLocal)
-    {
-    }
-
+    TestResource(int id): m_id(id) {}
     int id() const { return m_id; }
-    bool isLocal() const { return m_isLocal; }
 
     void update(const QString& name, api::metrics::Value value)
     {
@@ -60,10 +54,7 @@ private:
 struct TestResourceDescription: ResourceDescription<TestResource>
 {
     using ResourceDescription::ResourceDescription;
-
     QString id() const override { return "R" + QString::number(resource.id()); }
-    QString name() const override { return "Resource " + QString::number(resource.id()); }
-    QString parent() const override { return "SYSTEM_X"; }
 };
 
 class TestResourceController: public ResourceControllerImpl<TestResource>
@@ -74,9 +65,9 @@ public:
     {
     }
 
-    TestResource* makeResource(int id, bool isLocal)
+    TestResource* makeResource(int id)
     {
-        std::unique_ptr<TestResourceDescription> description = std::make_unique<TestResourceDescription>(id, isLocal);
+        std::unique_ptr<TestResourceDescription> description = std::make_unique<TestResourceDescription>(id);
         auto resource = &description->resource;
 
         resource->update("i1", id * 10 + 1);

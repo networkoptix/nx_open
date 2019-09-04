@@ -45,6 +45,14 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
                 "info", "Info"
             },
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
+                api::metrics::ValueManifest{"name", "Name", "table&panel", ""},
+                [](const auto& r) { return Value(r->getName()); }
+            ),
+            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+                api::metrics::ValueManifest{"server", "Server", "table&panel", ""},
+                [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
+            ),
+            std::make_unique<utils::metrics::ValueProvider<Resource>>(
                 api::metrics::ValueManifest{"type", "Type", "table&panel", ""},
                 [](const auto& r) { return Value(r->getStorageType()); }
             )
