@@ -4,7 +4,7 @@
 
 #include <translation/datetime_formatter.h>
 
-namespace nx::client::core::utils {
+namespace nx::client::core::time {
 
 struct DisplayTimeHelper::Private
 {
@@ -110,4 +110,4 @@ QString DisplayTimeHelper::noonMark() const
     return datetime::toString(d->positionDateTime, datetime::Format::a);
 }
 
-} // namespace nx::client::core::utils
+} // namespace nx::client::core::time
