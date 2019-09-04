@@ -73,7 +73,7 @@ public:
         T value;
         const auto str = m_query.queryItemValue(key).toStdString();
         const auto result =
-            nx::utils::charconv::from_chars(&str.front(), &str.front() + str.size(), value, base);
+            charconv::from_chars(&str.front(), &str.front() + str.size(), value, base);
         if (ok)
             *ok = result.ec == std::errc();
         return value;
@@ -107,12 +107,12 @@ public:
         const QString& key,
         QUrl::ComponentFormattingOptions encoding = QUrl::PrettyDecoded,
         bool* ok = nullptr,
-        std::chars_format format = std::chars_format::general) const
+        charconv::chars_format format = charconv::chars_format::general) const
     {
         T value;
         const auto str = value.toStdString();
         const auto result =
-            nx::utils::charconv::from_chars(&str.front(), &str.front() + str.size(), value, format);
+            charconv::from_chars(&str.front(), &str.front() + str.size(), value, format);
         if (ok)
             *ok = result.ec == std::errc();
         return value;
@@ -124,7 +124,7 @@ public:
         const std::string& key,
         QUrl::ComponentFormattingOptions encoding = QUrl::PrettyDecoded,
         bool* ok = nullptr,
-        std::chars_format format = std::chars_format::general) const
+        charconv::chars_format format = charconv::chars_format::general) const
     {
         return queryItemValue<T>(QString::fromStdString(key), encoding, ok, format);
     }
@@ -135,7 +135,7 @@ public:
         const char* key,
         QUrl::ComponentFormattingOptions encoding = QUrl::PrettyDecoded,
         bool* ok = nullptr,
-        std::chars_format format = std::chars_format::general) const
+        charconv::chars_format format = charconv::chars_format::general) const
     {
         return queryItemValue<T>(QString(key), encoding, ok, format);
     }
