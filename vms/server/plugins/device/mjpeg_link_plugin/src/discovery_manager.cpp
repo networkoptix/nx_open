@@ -35,8 +35,8 @@ namespace nx::vms_server_plugins::mjpeg_link {
 DiscoveryManager::DiscoveryManager(nxpt::CommonRefManager* const refManager,
                                    nxpl::TimeProvider *const timeProvider)
 :
-    m_refManager( refManager ),
-    m_timeProvider( timeProvider )
+    m_refManager(refManager),
+    m_timeProvider(timeProvider)
 {
     QByteArray data;
     QFile file(":/mjpeg_link_plugin/manifest.json");
@@ -53,9 +53,9 @@ DiscoveryManager::DiscoveryManager(nxpt::CommonRefManager* const refManager,
     }
 }
 
-void* DiscoveryManager::queryInterface( const nxpl::NX_GUID& interfaceID )
+void* DiscoveryManager::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
-    if( memcmp( &interfaceID, &nxcip::IID_CameraDiscoveryManager, sizeof(nxcip::IID_CameraDiscoveryManager) ) == 0 )
+    if (memcmp(&interfaceID, &nxcip::IID_CameraDiscoveryManager, sizeof(nxcip::IID_CameraDiscoveryManager)) == 0)
     {
         addRef();
         return this;
@@ -65,7 +65,7 @@ void* DiscoveryManager::queryInterface( const nxpl::NX_GUID& interfaceID )
         addRef();
         return this;
     }
-    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    if (memcmp(&interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface)) == 0)
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
@@ -85,12 +85,12 @@ int DiscoveryManager::releaseRef() const
 
 static const char* VENDOR_NAME = "HTTP_URL_PLUGIN";
 
-void DiscoveryManager::getVendorName( char* buf ) const
+void DiscoveryManager::getVendorName(char* buf) const
 {
-    strcpy( buf, VENDOR_NAME );
+    strcpy(buf, VENDOR_NAME);
 }
 
-int DiscoveryManager::findCameras( nxcip::CameraInfo* /*cameras*/, const char* /*localInterfaceIPAddr*/ )
+int DiscoveryManager::findCameras(nxcip::CameraInfo* /*cameras*/, const char* /*localInterfaceIPAddr*/)
 {
     return nxcip::NX_NOT_IMPLEMENTED;
 }
@@ -100,8 +100,8 @@ int DiscoveryManager::findCameras2(nxcip::CameraInfo2* /*cameras*/, const char* 
     return nxcip::NX_NOT_IMPLEMENTED;
 }
 
-static const QString HTTP_PROTO_NAME( QString::fromLatin1("http") );
-static const QString HTTPS_PROTO_NAME( QString::fromLatin1("https") );
+static const QString HTTP_PROTO_NAME(QString::fromLatin1("http"));
+static const QString HTTPS_PROTO_NAME(QString::fromLatin1("https"));
 
 bool DiscoveryManager::validateUrl(const nx::utils::Url& url)
 {
@@ -190,7 +190,7 @@ int DiscoveryManager::checkHostAddress(
 int DiscoveryManager::checkHostAddress2(
     nxcip::CameraInfo2* cameras, const char* address, const char* login, const char* password)
 {
-    nx::utils::Url url( QString::fromUtf8(address) );
+    nx::utils::Url url(QString::fromUtf8(address));
     if (url.scheme() != HTTP_PROTO_NAME && url.scheme() != HTTPS_PROTO_NAME)
         return 0;
 
@@ -237,7 +237,7 @@ int DiscoveryManager::fromMDNSData(
     const char* rawAddress,
     const unsigned char* rawPacketPtr,
     int rawPacketSize,
-    nxcip::CameraInfo* cameraInfo )
+    nxcip::CameraInfo* cameraInfo)
 {
     quint16 port = 0;
     QString path = "/";
@@ -245,20 +245,20 @@ int DiscoveryManager::fromMDNSData(
     const QByteArray rawPacket(reinterpret_cast<const char*>(rawPacketPtr), rawPacketSize);
     QnMdnsPacket packet;
     const bool parseSucceeded = packet.fromDatagram(rawPacket);
-    if(!parseSucceeded)
+    if (!parseSucceeded)
         return 0;
 
-    for(const auto& recordSet: {packet.answerRRs, packet.additionalRRs})
+    for (const auto& recordSet: {packet.answerRRs, packet.additionalRRs})
     {
-        for(const QnMdnsPacket::ResourceRecord& record: recordSet)
+        for (const QnMdnsPacket::ResourceRecord& record: recordSet)
         {
             switch (record.recordType) {
                 case QnMdnsPacket::kSrvRecordType: {
-                    if(!record.recordName.endsWith("_http._tcp.local."))
+                    if (!record.recordName.endsWith("_http._tcp.local."))
                         break;
                     QnMdnsSrvData srvData;
                     srvData.decode(record.data);
-                    if(srvData.target.isEmpty()) //< If the decoding failed.
+                    if (srvData.target.isEmpty()) //< If the decoding failed.
                         break;
                     port = srvData.port;
                 }
@@ -266,7 +266,7 @@ int DiscoveryManager::fromMDNSData(
                     QnMdnsTextData textData;
                     textData.decode(record.data);
                     const auto pathAttribute = textData.getAttribute("path");
-                    if(pathAttribute.presence != QnMdnsTextData::Attribute::Presence::withValue)
+                    if (pathAttribute.presence != QnMdnsTextData::Attribute::Presence::withValue)
                         break;
                     path = QString::fromUtf8(pathAttribute.value);
                 }
@@ -274,7 +274,7 @@ int DiscoveryManager::fromMDNSData(
         }
     }
 
-    if(!(path.endsWith(".mpjpeg") || path.endsWith(".mjpeg") || path.endsWith(".mjpg")))
+    if (!(path.endsWith(".mpjpeg") || path.endsWith(".mjpeg") || path.endsWith(".mjpg")))
         return 0;
 
     const QHostAddress address(rawAddress);
@@ -285,7 +285,7 @@ int DiscoveryManager::fromMDNSData(
     url.setScheme("http");
     const QByteArray encodedUrl = url.toEncoded();
 
-    if(encodedUrl.length() + 1 > std::min<int>(sizeof(cameraInfo->url), sizeof(cameraInfo->uid)))
+    if (encodedUrl.length() + 1 > std::min<int>(sizeof(cameraInfo->url), sizeof(cameraInfo->uid)))
         return 0;
     strncpy(cameraInfo->url, encodedUrl.data(), sizeof(cameraInfo->url) - 1);
     strncpy(cameraInfo->uid, cameraInfo->url, sizeof(cameraInfo->uid) - 1);
@@ -294,17 +294,20 @@ int DiscoveryManager::fromMDNSData(
     return 1;
 }
 
-int DiscoveryManager::fromUpnpData( const char* /*upnpXMLData*/, int /*upnpXMLDataSize*/, nxcip::CameraInfo* /*cameraInfo*/ )
+int DiscoveryManager::fromUpnpData(
+    const char* /*upnpXMLData*/,
+    int /*upnpXMLDataSize*/,
+    nxcip::CameraInfo* /*cameraInfo*/)
 {
     return 0;
 }
 
-nxcip::BaseCameraManager* DiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )
+nxcip::BaseCameraManager* DiscoveryManager::createCameraManager(const nxcip::CameraInfo& info)
 {
     return new CameraManager(info, m_timeProvider);
 }
 
-int DiscoveryManager::getReservedModelList( char** /*modelList*/, int* count )
+int DiscoveryManager::getReservedModelList(char** /*modelList*/, int* count)
 {
     *count = 0;
     return nxcip::NX_NO_ERROR;
