@@ -10,6 +10,7 @@ static constexpr char kSystem[] = "/storage/{storageId}/system/{systemId}";
 
 static constexpr char kCameras[] = "/storage/{storageId}/cameras";
 
+static constexpr char kAwsBucketsPrefix[] = "/aws_buckets";
 static constexpr char kAwsBuckets[] = "/aws_buckets/";
 static constexpr char kAwsBucket[] = "/aws_buckets/{bucketName}";
 

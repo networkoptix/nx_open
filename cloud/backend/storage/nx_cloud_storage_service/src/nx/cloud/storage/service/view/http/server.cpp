@@ -31,10 +31,15 @@ Server::Server(const conf::Settings& settings, controller::Controller* controlle
         &m_authenticationDispatcher,
         &m_messageDispatcher)
 {
-    // Adding "/storages/" and "/storage/{id}" to cloud db authentication forwarding.
+    initializeHtdigestAuthenticator();
+
+    // Adding "/storages/" and "/storage/{storageId}" to cloud db authentication forwarding.
     registerAuthenticationManager(
         std::string(api::kStoragePrefix) + ".*",
         m_cloudDbAuthenticationForwarder.get());
+
+    // Adding "/aws_buckets/" and "/aws_buckets/{bucketName}" to htdigest authentication
+    registerHtdigestAuthenticationPath(std::string(api::kAwsBucketsPrefix) + ".*");
 
     registerBucketApiHandlers();
     registerStorageApiHandlers();
@@ -78,12 +83,35 @@ std::vector<network::SocketAddress> Server::httpsEndpoints() const
     return m_multiAddressServer.sslEndpoints();
 }
 
+void Server::initializeHtdigestAuthenticator()
+{
+    if (m_settings.http().htdigestPath.empty())
+        return;
+
+    NX_INFO(this, "Initializing htdigest authenticator, htdigest file path is %1",
+        m_settings.http().htdigestPath);
+
+    m_htdigestAuthenticator =
+        std::make_unique<HtdigestAuthenticator>(m_settings.http().htdigestPath);
+}
+
+void Server::registerHtdigestAuthenticationPath(const std::string& regex)
+{
+    if (!m_htdigestAuthenticator)
+        return;
+
+    NX_INFO(this, "Registering path %1 for htdigest authentication", api::kAwsBucketsPrefix);
+
+    registerAuthenticationManager(regex, &m_htdigestAuthenticator->manager);
+}
+
 void Server::registerAuthenticationManager(
     const std::string& regex,
     network::http::server::AbstractAuthenticationManager* authenticationManager)
 {
     m_authenticationDispatcher.add(std::regex(regex), authenticationManager);
-    NX_VERBOSE(this, "Registered path regex: %1 for HTTP authentication", regex);
+    NX_INFO(this, "Registered path regex: %1 for HTTP authentication, authenticationManager: %2",
+        regex, authenticationManager);
 }
 
 void Server::registerStorageApiHandlers()
