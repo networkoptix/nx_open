@@ -52,10 +52,10 @@ public:
     }
 
     template<typename Operation> //< Value(Value, Value)
-    ValueGenerator binaryOperation(Operation operation) const
+    ValueGenerator binaryOperation(int firstI, int secondI, Operation operation) const
     {
         return
-            [operation, getter1 = value(1), getter2 = value(2)]
+            [operation, getter1 = value(firstI), getter2 = value(secondI)]
             {
                 auto v1 = getter1();
                 auto v2 = getter2();
@@ -66,9 +66,10 @@ public:
     }
 
     template<typename Operation> //< Value(double, double)
-    ValueGenerator numericOperation(Operation operation) const
+    ValueGenerator numericOperation(int firstI, int secondI, Operation operation) const
     {
         return binaryOperation(
+            firstI, secondI,
             [operation](api::metrics::Value v1, api::metrics::Value v2)
             {
                 return (!v1.isDouble() || !v2.isDouble())
@@ -78,10 +79,10 @@ public:
     }
 
     template<typename Operation> //< Value(std::vector<TimedValue<Value>>)
-    ValueGenerator durationOperation(Operation operation) const
+    ValueGenerator durationOperation(int valueI, int durationI, Operation operation) const
     {
         return
-            [operation, monitor = monitor(1), getDuration = value(2)]
+            [operation, monitor = monitor(valueI), getDuration = value(durationI)]
             {
                 const auto durationStr = getDuration().toVariant().toString();
                 const auto duration = nx::utils::parseTimerDuration(durationStr);
@@ -96,38 +97,66 @@ public:
             };
     }
 
-    ValueGenerator build() const
+    ValueGenerator buildArithmetic() const
     {
-        const auto p1 = part(1);
-        if (function() == "c" || function() == "const")
+        if (function() == "c" || function() == "const") // value
             return value(1);
 
-        if (function() == "+" || function() == "add")
-            return numericOperation([](auto v1, auto v2) { return v1 + v2; });
+        if (function() == "+" || function() == "add") // first second
+            return numericOperation(1, 2, [](auto v1, auto v2) { return v1 + v2; });
 
-        if (function() == "-" || function() == "sub")
-            return numericOperation([](auto v1, auto v2) { return v1 - v2; });
+        if (function() == "-" || function() == "sub") // first second
+            return numericOperation(1, 2, [](auto v1, auto v2) { return v1 - v2; });
 
-        if (function() == "c" || function() == "count")
-            return durationOperation([](auto values) { return (double) values.size(); });
+        if (function() == "c" || function() == "count") // value duration
+            return durationOperation(1, 2, [](auto values) { return (double) values.size(); });
 
+        if (function() == "cif" || function() == "countIf") // value duration expected
+        {
+            return durationOperation(
+                1, 2,
+                [condition = value(3)](auto values)
+                {
+                    const auto expected = condition();
+                    size_t count = 0;
+                    for (const auto& v: values) if (v.value == expected) count++;
+                    return (double) values.size();
+                });
+        }
+
+        return nullptr;
+    }
+
+    ValueGenerator buildConditional() const
+    {
         if (function() == "=" || function() == "eq")
-            return binaryOperation([](auto v1, auto v2) { return v1 == v2; });
+            return binaryOperation(1, 2, [](auto v1, auto v2) { return v1 == v2; });
 
         if (function() == "!=" || function() == "ne")
-            return binaryOperation([](auto v1, auto v2) { return v1 != v2; });
+            return binaryOperation(1, 2, [](auto v1, auto v2) { return v1 != v2; });
 
         if (function() == ">" || function() == "gt")
-            return numericOperation([](auto v1, auto v2) { return v1 > v2; });
+            return numericOperation(1, 2, [](auto v1, auto v2) { return v1 > v2; });
 
         if (function() == "<" || function() == "lt")
-            return numericOperation([](auto v1, auto v2) { return v1 < v2; });
+            return numericOperation(1, 2, [](auto v1, auto v2) { return v1 < v2; });
 
         if (function() == ">=" || function() == "ge")
-            return numericOperation([](auto v1, auto v2) { return v1 >= v2; });
+            return numericOperation(1, 2, [](auto v1, auto v2) { return v1 >= v2; });
 
         if (function() == "<=" || function() == "le")
-            return numericOperation([](auto v1, auto v2) { return v1 <= v2; });
+            return numericOperation(1, 2, [](auto v1, auto v2) { return v1 <= v2; });
+
+        return nullptr;
+    }
+
+    ValueGenerator build() const
+    {
+        if (auto generator = buildArithmetic())
+            return generator;
+
+        if (auto generator = buildConditional())
+            return generator;
 
         throw std::domain_error("Unsupported function: " + function().toStdString());
     }

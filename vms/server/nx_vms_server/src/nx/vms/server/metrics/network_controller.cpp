@@ -36,8 +36,8 @@ NetworkController::NetworkController(const QnUuid& serverId):
 void NetworkController::start()
 {
     // TODO: Add monitor for add/remove.
-    for (const ::nx::network::QnInterfaceAndAddr& interface : ::nx::network::getAllIPv4Interfaces())
-        add(std::make_unique<InterfaceDescription>(interface, m_serverId));
+    for (auto iface: nx::network::getAllIPv4Interfaces())
+        add(std::make_unique<InterfaceDescription>(std::move(iface), m_serverId));
 }
 
 utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkController::makeProviders()
