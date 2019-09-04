@@ -687,8 +687,9 @@ void DeviceAdditionDialog::updateResultsWidgetState()
 
     if (!m_currentSearch)
     {
-        const auto icon = qnSkin->icon("placeholders/adding_device_placeholder.png");
-        ui->placeholderLabel->setPixmap(qnSkin->maximumSizePixmap(icon));
+        const auto pixmap = qnSkin->pixmap(
+            "placeholders/adding_devices_placeholder.svg", true, QSize(128, 128));
+        ui->placeholderLabel->setPixmap(qnSkin->maximumSizePixmap(pixmap));
     }
     else
     {

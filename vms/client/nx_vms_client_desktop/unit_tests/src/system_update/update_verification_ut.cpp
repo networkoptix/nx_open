@@ -248,6 +248,37 @@ TEST_F(UpdateVerificationTest, testForkedVersion)
     contents.resetVerification();
 }
 
+TEST_F(UpdateVerificationTest, testFailedUpdateChechk)
+{
+    // This test checks how `calculateUpdateVersionReport` reacts to different errors
+    using VersionReport = MultiServerUpdatesWidget::VersionReport;
+    nx::update::UpdateContents contents;
+    contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
+    contents.changeset = "29681";
+    auto clientData = makeClientData(Version("4.0.0.29679"));
+
+    // "Unable to check updates on the internet"
+    contents.error = nx::update::InformationError::networkError;
+    auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
+        contents, clientData.clientId);
+    EXPECT_FALSE(report.hasLatestVersion);
+    EXPECT_TRUE(report.versionMode == VersionReport::VersionMode::empty);
+
+    // "Build not found"
+    contents.error = nx::update::InformationError::httpError;
+    report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
+        contents, clientData.clientId);
+    EXPECT_FALSE(report.hasLatestVersion);
+    EXPECT_TRUE(report.versionMode == VersionReport::VersionMode::build);
+
+    // "Unable to check updates on the internet"
+    contents.sourceType = nx::update::UpdateSourceType::internet;
+    report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
+        contents, clientData.clientId);
+    EXPECT_FALSE(report.hasLatestVersion);
+    EXPECT_TRUE(report.versionMode == VersionReport::VersionMode::empty);
+}
+
 TEST_F(UpdateVerificationTest, packagesForSystemSupportTest)
 {
     nx::update::UpdateContents contents;
