@@ -5,6 +5,7 @@
 
 #include <functional>
 
+#include <nx/client/core/time/time_constants.h>
 #include <nx/client/core/media/chunk_provider.h>
 #include <nx/client/core/media/time_periods_store.h>
 
@@ -260,8 +261,10 @@ int CalendarModel::year() const
 
 void CalendarModel::setYear(int year)
 {
+    year = std::clamp(year, TimeConstants::kMinYear, TimeConstants::kMaxYear);
     if (year == d->currentMonth.year)
         return;
+
 
     d->currentMonth.updateMonthTo(year, d->currentMonth.month, d->displayOffset);
     emit yearChanged();
@@ -276,6 +279,7 @@ int CalendarModel::month() const
 
 void CalendarModel::setMonth(int month)
 {
+    month = std::clamp(month, TimeConstants::kMinMonth, TimeConstants::kMaxMonth);
     if (month == d->currentMonth.month)
         return;
 
@@ -327,6 +331,7 @@ qint64 CalendarModel::currentPosition() const
 
 void CalendarModel::setCurrentPosition(qint64 value)
 {
+    value = std::clamp<qint64>(value, 0, std::numeric_limits<qint64>().max());
     if (d->currentPosition == value)
         return;
 
@@ -343,6 +348,9 @@ qint64 CalendarModel::displayOffset() const
 
 void CalendarModel::setDisplayOffset(qint64 value)
 {
+    value = std::clamp<qint64>(
+        value, TimeConstants::kMinDisplayOffset, TimeConstants::kMaxDisplayOffset);
+
     if (d->displayOffset == value)
         return;
 
