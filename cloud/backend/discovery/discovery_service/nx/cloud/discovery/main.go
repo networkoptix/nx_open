@@ -18,6 +18,7 @@ func getCountryCode(apiFunc string, request *http.Request) string {
 			`%s: Warning, http request missing "%s" header. Geolocation will not work\n`,
 			apiFunc, kHeader)
 	}
+	log.Printf(`getCountryCode returning "%s" \n`, countryCode)
 	return countryCode
 }
 
@@ -144,13 +145,19 @@ func getCloudModulesXml(writer http.ResponseWriter, request *http.Request, param
 	writer.Write([]byte(xml))
 }
 
+func getVersion(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+	writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	json.NewEncoder(writer).Encode(GetVersion()) //< GetVersion is generated from version.go.in by cmake
+}
+
 func main() {
-	log.Println("start lambda")
+	log.Println("start lambda, version: ", GetVersion())
 	router := httprouter.New()
 	router.GET("/cluster/:clusterId/nodes", getOnlineNodes)
 	router.POST("/cluster/:clusterId/nodes", postNode)
 	for key := range CloudModulesXmlFunctions {
 		router.GET(key, getCloudModulesXml)
 	}
+	router.GET("/version", getVersion)
 	algnhsa.ListenAndServe(router, nil)
 }

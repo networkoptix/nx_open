@@ -1,0 +1,15 @@
+package main
+
+// Version the build revision
+type Version struct {
+	Version   string   `json:"version"`
+	Revision  string   `json:"revision"`
+}
+
+func GetVersion() Version {
+    return Version{
+        Version:  "${cloudVersion}",
+        Revision: "${changeSet}",
+    }
+}
+
