@@ -33,11 +33,11 @@ public:
     ~Connector();
 
     void addNodeUrl(
-        const std::string& systemId,
+        const std::string& clusterId,
         const nx::utils::Url& url);
 
     void removeNodeUrl(
-        const::std::string& systemId,
+        const::std::string& clusterId,
         const nx::utils::Url& url);
 
 protected:
@@ -46,7 +46,7 @@ protected:
 private:
     struct NodeContext
     {
-        std::string systemId;
+        std::string clusterId;
         std::string connectionId;
         std::unique_ptr<transport::AbstractTransactionTransportConnector> connector;
         std::unique_ptr<nx::network::aio::Timer> retryTimer;

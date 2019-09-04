@@ -18,7 +18,7 @@ public:
     std::string clusterId;
     /** If empty, it is assigned to auto-generated guid. */
     std::string nodeId;
-    unsigned int maxConcurrentConnectionsFromSystem;
+    unsigned int maxConcurrentConnectionsFromCluster;
     std::chrono::milliseconds nodeConnectRetryTimeout;
     nx::cloud::discovery::Settings discovery;
     bool groupCommandsUnderDbTransaction = false;

@@ -29,14 +29,14 @@ Connector::~Connector()
 }
 
 void Connector::addNodeUrl(
-    const std::string& systemId,
+    const std::string& clusterId,
     const nx::utils::Url& url)
 {
     post(
-        [this, systemId, url]()
+        [this, clusterId, url]()
         {
             NodeContext nodeContext;
-            nodeContext.systemId = systemId;
+            nodeContext.clusterId = clusterId;
             nodeContext.retryTimer = std::make_unique<nx::network::aio::Timer>();
             m_nodes.emplace(url, std::move(nodeContext));
             connectToNodeAsync(url);
@@ -44,13 +44,13 @@ void Connector::addNodeUrl(
 }
 
 void Connector::removeNodeUrl(
-    const::std::string& systemId,
+    const::std::string& clusterId,
     const nx::utils::Url& url)
 {
-    post([this, systemId, url]()
+    post([this, clusterId, url]()
     {
         auto it = m_nodes.find(url);
-        if (it != m_nodes.end() && it->second.systemId == systemId)
+        if (it != m_nodes.end() && it->second.clusterId == clusterId)
         {
             if (it->second.connection)
             {
@@ -89,7 +89,7 @@ void Connector::connectToNodeAsync(const nx::utils::Url& url)
     NX_DEBUG(this, "Initiating connection %1 to %2", nodeContext.connectionId, url);
 
     nodeContext.connector = m_transportManager->createConnector(
-        nodeContext.systemId,
+        nodeContext.clusterId,
         nodeContext.connectionId,
         url);
     nodeContext.connector->connect(
@@ -138,7 +138,7 @@ void Connector::registerConnection(
     ConnectionManager::ConnectionContext connectionContext;
     connectionContext.originatingNodeId = m_nodeId;
     connectionContext.connectionId = nodeContext->connectionId;
-    connectionContext.fullPeerName.systemId = nodeContext->systemId;
+    connectionContext.fullPeerName.clusterId = nodeContext->clusterId;
     connectionContext.fullPeerName.peerId =
         connection->commonTransportHeaderOfRemoteTransaction().peerId;
     //connectionContext.userAgent = ;

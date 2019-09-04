@@ -43,7 +43,7 @@ void MaintenanceManager::getVmsConnections(
             for (const auto& connection: ec2Connections)
             {
                 result.connections.push_back(
-                    {connection.systemId, connection.peerEndpoint.toStdString()});
+                    {connection.clusterId, connection.peerEndpoint.toStdString()});
             }
 
             completionHandler(api::ResultCode::ok, std::move(result));
