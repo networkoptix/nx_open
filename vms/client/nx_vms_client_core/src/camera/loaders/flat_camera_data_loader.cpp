@@ -83,8 +83,10 @@ int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionM
     qint64 startTimeMs = 0;
     if (m_loadedData && !m_loadedData->dataSource().isEmpty())
     {
+        // Server-side chunks aggregation may not be stable, so we will overwrite the whole chunk in
+        // the case of ambiguity. TODO: #GDM 4.2 Remove analytics type check backup.
         const auto last = (m_loadedData->dataSource().cend() - 1);
-        if (last->isInfinite())
+        if (last->isInfinite() || resolutionMs > 1 || m_dataType == Qn::AnalyticsContent)
             startTimeMs = last->startTimeMs;
         else
             startTimeMs = last->endTimeMs() - minOverlapDuration;
