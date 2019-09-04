@@ -120,6 +120,7 @@ struct QnMdnsTextData
                 case Presence::noValue: return "<noValue>";
                 case Presence::withValue: return value.isEmpty() ? "<emptyValue>" : value;
             }
+            return "<unknown>";
         }
     };
 
