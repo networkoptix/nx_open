@@ -81,7 +81,10 @@ void QnSubjectTargetActionWidget::selectSubjects()
             params.additionalResources.clear();
 
             for (const auto& id: dialog.checkedSubjects())
+            {
+                NX_ASSERT(!id.isNull());
                 params.additionalResources.push_back(id);
+            }
         }
 
         model()->setActionParams(params);
