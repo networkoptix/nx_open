@@ -43,7 +43,6 @@ if("${platform}" MATCHES "android|ios")
 endif()
 
 if("${platform}" STREQUAL "macosx")
-    set(_withMediaServer OFF)
     set(_withClouds ON)
 endif()
 
