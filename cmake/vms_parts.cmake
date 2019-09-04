@@ -95,8 +95,8 @@ cmake_dependent_option(withDistributions "Enable distributions build"
 )
 
 cmake_dependent_option(withSdk "Enable nx_*_sdk build"
-    OFF "NOT withDistributions"
-    ON
+    ON "withDistributions;NOT MACOSX"
+    OFF
 )
 
 cmake_dependent_option(withUnitTestsArchive "Enable unit tests archive generation"
