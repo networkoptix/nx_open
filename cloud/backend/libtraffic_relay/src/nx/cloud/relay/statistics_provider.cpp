@@ -9,12 +9,6 @@ namespace nx {
 namespace cloud {
 namespace relay {
 
-bool Statistics::operator==(const Statistics& right) const
-{
-    return relaying == right.relaying
-        && http == right.http;
-}
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (Statistics),
     (json),
@@ -25,11 +19,13 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 StatisticsProvider::StatisticsProvider(
     const relaying::AbstractListeningPeerPool& listeningPeerPool,
     const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
-    const controller::AbstractTrafficRelay& trafficRelay)
+    const controller::AbstractTrafficRelay& trafficRelay,
+    const nx::clusterdb::engine::statistics::Provider* peerDbStatisticsProvider)
     :
     m_listeningPeerPool(listeningPeerPool),
     m_httpServerStatisticsProvider(httpServerStatisticsProvider),
-    m_trafficRelay(trafficRelay)
+    m_trafficRelay(trafficRelay),
+    m_peerDbStatisticsProvider(peerDbStatisticsProvider)
 {
 }
 
@@ -39,14 +35,19 @@ Statistics StatisticsProvider::getAllStatistics() const
     statistics.relaying = m_listeningPeerPool.statistics();
     statistics.http = m_httpServerStatisticsProvider.statistics();
     statistics.relaySessions = m_trafficRelay.statistics();
+    if (m_peerDbStatisticsProvider)
+        statistics.peerDb = m_peerDbStatisticsProvider->statistics();
     return statistics;
 }
 
 //-------------------------------------------------------------------------------------------------
 
 StatisticsProviderFactory::StatisticsProviderFactory():
-    base_type(std::bind(&StatisticsProviderFactory::defaultFactoryFunction, this,
-        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3))
+    base_type(
+        [this](auto&&... args)
+        {
+            return defaultFactoryFunction(std::forward<decltype(args)>(args)...);
+        })
 {
 }
 
@@ -59,12 +60,14 @@ StatisticsProviderFactory& StatisticsProviderFactory::instance()
 std::unique_ptr<AbstractStatisticsProvider> StatisticsProviderFactory::defaultFactoryFunction(
     const relaying::AbstractListeningPeerPool& listeningPeerPool,
     const nx::network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
-    const controller::AbstractTrafficRelay& trafficRelay)
+    const controller::AbstractTrafficRelay& trafficRelay,
+    const nx::clusterdb::engine::statistics::Provider* peerDbStatisticsProvider)
 {
     return std::make_unique<StatisticsProvider>(
         listeningPeerPool,
         httpServerStatisticsProvider,
-        trafficRelay);
+        trafficRelay,
+        peerDbStatisticsProvider);
 }
 
 } // namespace relay

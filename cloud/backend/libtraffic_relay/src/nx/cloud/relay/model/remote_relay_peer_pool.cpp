@@ -213,6 +213,11 @@ void RemoteRelayPeerPool::pleaseStopSync()
         m_map->synchronizationEngine().pleaseStopSync();
 }
 
+const nx::clusterdb::map::EmbeddedDatabase* RemoteRelayPeerPool::peerDb() const
+{
+    return m_map.get();
+}
+
 void RemoteRelayPeerPool::startDiscovery()
 {
     if (m_map && !m_syncEngineUrl.isEmpty())

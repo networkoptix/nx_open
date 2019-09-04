@@ -28,7 +28,12 @@ Database& EmbeddedDatabase::database()
     return m_database;
 }
 
-nx::clusterdb::engine::SynchronizationEngine & EmbeddedDatabase::synchronizationEngine()
+nx::clusterdb::engine::SynchronizationEngine& EmbeddedDatabase::synchronizationEngine()
+{
+    return m_syncEngine;
+}
+
+const nx::clusterdb::engine::SynchronizationEngine& EmbeddedDatabase::synchronizationEngine() const
 {
     return m_syncEngine;
 }
