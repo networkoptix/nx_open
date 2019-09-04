@@ -597,6 +597,12 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
         report.versionMode = VersionReport::VersionMode::build;
         report.statusHighlight = VersionReport::HighlightMode::regular;
         report.statusMessages << tr("You have already installed this version.");
+
+        if (source == UpdateSourceType::internet)
+            report.alreadyInstalledMessage = tr("The latest version is already installed");
+        else
+            report.alreadyInstalledMessage = tr("This version is already installed");
+
         report.hasLatestVersion = true;
     }
     else if (contents.error == Error::noError)
@@ -1646,7 +1652,6 @@ void MultiServerUpdatesWidget::processInitialCheckState()
         // TODO: We should invent a method for testing this.
         auto updateInfo = m_serverUpdateCheck.get();
         auto serverStatus = m_serverStatusCheck.get();
-        bool serverHadActiveUpdate = !updateInfo.isEmpty();
 
         // Update info for offline update package is already verified.
         if (m_offlineUpdateCheck.valid())
@@ -2149,6 +2154,8 @@ void MultiServerUpdatesWidget::syncVersionReport(const VersionReport& report)
 
     setHighlightMode(ui->targetVersionLabel, report.versionHighlight);
     setHighlightMode(ui->errorLabel, report.statusHighlight);
+
+    ui->latestVersionBannerLabel->setText(m_updateReport->alreadyInstalledMessage);
 }
 
 bool MultiServerUpdatesWidget::isChecking() const
@@ -2170,8 +2177,6 @@ bool MultiServerUpdatesWidget::hasActiveUpdate() const
 bool MultiServerUpdatesWidget::hasLatestVersion() const
 {
     bool hasLatestVersion = m_updateReport->hasLatestVersion;
-    if (m_updateInfo.isEmpty())
-        hasLatestVersion = true;
 
     if (m_widgetState != WidgetUpdateState::ready
         && m_widgetState != WidgetUpdateState::initial
@@ -2226,10 +2231,6 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
 
         if (latestVersion)
         {
-            if (m_updateInfo.sourceType == UpdateSourceType::internet)
-                ui->latestVersionBannerLabel->setText(tr("The latest version is already installed"));
-            else
-                ui->latestVersionBannerLabel->setText(tr("This version is already installed"));
             ui->versionStackedWidget->setCurrentWidget(ui->latestVersionPage);
         }
         else

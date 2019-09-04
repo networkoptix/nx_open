@@ -440,11 +440,13 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
             {
                 const quint32 relativeStartTime = msStartTime - indexHeader.startTime;
                 startItr = std::lower_bound(index.begin(), index.end(), relativeStartTime);
-                if (startItr != index.end() && startItr != index.begin())
+                while (startItr != index.end() && startItr != index.begin())
                 {
-                    auto prevItr = startItr - 1;
+                    const auto prevItr = startItr - 1;
                     if (qBetween(prevItr->start, relativeStartTime, prevItr->start + prevItr->duration))
                         startItr = prevItr;
+                    else
+                        break;
                 }
             }
             if (msEndTime <= maxTime)
