@@ -110,7 +110,7 @@ public:
         charconv::chars_format format = charconv::chars_format::general) const
     {
         T value;
-        const auto str = value.toStdString();
+        const auto str = m_query.queryItemValue(key, encoding).toStdString();
         const auto result =
             charconv::from_chars(&str.front(), &str.front() + str.size(), value, format);
         if (ok)
