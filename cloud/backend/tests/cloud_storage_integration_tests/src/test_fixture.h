@@ -35,7 +35,7 @@ protected:
     /**
      * Does the following:
      * - Launches an S3 bucket
-     * - Adds an activated account to CloudDb
+     * - Adds an activated account and system to CloudDb
      * - Launches a Cloud Storage Service instance
      * - Prepares a Cloud Storage Service api client with CloudDb credentials
      * - Adds the S3 bucket to the Cloud Storage Service
