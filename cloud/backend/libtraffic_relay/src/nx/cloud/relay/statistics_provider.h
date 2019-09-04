@@ -28,7 +28,7 @@ struct Statistics
     std::optional<nx::sql::QueryStatistics> sql;
 };
 
-#define Statistics_relay_controller_Fields (relaying)(http)(relaySessions)(peerDb)
+#define Statistics_relay_controller_Fields (relaying)(http)(relaySessions)(peerDb)(sql)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Statistics),
