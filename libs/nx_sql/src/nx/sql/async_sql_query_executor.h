@@ -63,6 +63,73 @@ public:
 
     virtual int pendingQueryCount() const = 0;
 
+    /**
+     * Convenience overload for executeUpdate where DbFunc returns void or throws an exception
+     * @param queryAggregationKey Queries with same non-empty value of this parameter
+     * can be executed together under single transaction.
+     */
+    template<
+        typename DbFunc,
+        typename =
+            std::enable_if_t<std::is_same_v<std::invoke_result_t<DbFunc, QueryContext*>, void>>>
+    void executeUpdate(
+        DbFunc dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+        const std::string& queryAggregationKey = std::string())
+    {
+        executeUpdate(
+            [this, dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) -> DBResult
+            {
+                dbUpdateFunc(queryContext);
+                return DBResult::ok;
+            },
+            std::move(completionHandler),
+            queryAggregationKey);
+    }
+
+    /**
+     * Convenience overload for executeUpdateWithoutTran where DbFunc returns void or throws an
+     * exception.
+     */
+    template<
+        typename DbFunc,
+        typename =
+            std::enable_if_t<std::is_same_v<std::invoke_result_t<DbFunc, QueryContext*>, void>>>
+    void executeUpdateWithoutTran(
+        nx::utils::MoveOnlyFunc<void(nx::sql::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
+    {
+        executeUpdateWithoutTran(
+            [this, dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) -> DBResult
+            {
+                dbUpdateFunc(queryContext);
+                return DBResult::ok;
+            },
+            std::move(completionHandler));
+    }
+
+    /**
+     * Convenience overload for executeSelect where DbFunc returns void or throws an exception.
+     */
+    template<
+        typename DbFunc,
+        typename =
+            std::enable_if_t<std::is_same_v<std::invoke_result_t<DbFunc, QueryContext*>, void>>>
+    void executeSelect(
+        DbFunc dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
+        const std::string& queryAggregationKey = std::string())
+    {
+        executeSelect(
+            [this, dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) -> DBResult
+            {
+                dbUpdateFunc(queryContext);
+                return DBResult::ok;
+            },
+            std::move(completionHandler),
+            queryAggregationKey);
+    }
+
     //---------------------------------------------------------------------------------------------
     // Synchronous operations.
 

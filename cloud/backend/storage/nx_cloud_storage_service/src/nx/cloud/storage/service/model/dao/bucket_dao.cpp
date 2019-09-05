@@ -85,11 +85,11 @@ nx::sql::AbstractAsyncSqlQueryExecutor& BucketDao::queryExecutor()
     return m_db->queryExecutor();
 }
 
-nx::sql::DBResult BucketDao::addBucket(
+void BucketDao::addBucket(
     nx::sql::QueryContext* queryContext,
     const api::Bucket& bucket)
 {
-    return m_db->syncEngine().transactionLog().saveDbOperationToLog<command::SaveBucket>(
+    m_db->syncEngine().transactionLog().saveDbOperationToLog<command::SaveBucket>(
             queryContext,
             m_clusterId,
             bucket,
@@ -109,11 +109,11 @@ std::vector<api::Bucket> BucketDao::fetchBuckets(nx::sql::QueryContext* queryCon
     return buckets;
 }
 
-nx::sql::DBResult BucketDao::removeBucket(
+void BucketDao::removeBucket(
     nx::sql::QueryContext* queryContext,
     const std::string& bucketName)
 {
-    return m_db->syncEngine().transactionLog()
+    m_db->syncEngine().transactionLog()
         .saveDbOperationToLog<command::RemoveBucket>(
             queryContext,
             m_clusterId,
@@ -129,7 +129,7 @@ int BucketDao::getStorageCount(
     query->prepare(kCountStorages);
     query->bindValue(kBucketNameBinding, bucketName);
     query->exec();
-    return  query->next() ? query->value(kStorageCount).toInt() : -1;
+    return query->next() ? query->value(kStorageCount).toInt() : -1;
 }
 
 void BucketDao::addBucketToDb(nx::sql::QueryContext* queryContext, const api::Bucket& bucket)

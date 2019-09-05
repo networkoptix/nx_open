@@ -162,7 +162,7 @@ void StorageManager::addStorage(
     m_storageDao->queryExecutor().executeUpdate(
         [this, guard = m_asyncCounter.getScopedIncrement(), addStorageContext](auto queryContext)
         {
-            return addStorageToDb(addStorageContext.get(), queryContext);
+            addStorageToDb(addStorageContext.get(), queryContext);
         },
         [this, guard = m_asyncCounter.getScopedIncrement(), handler = std::move(handler),
             addStorageContext](
@@ -553,7 +553,7 @@ std::pair<api::Result, std::string> StorageManager::validateAddStorageRequest(
     return std::make_pair(ResultCode::ok, std::move(accountEmail));
 }
 
-nx::sql::DBResult StorageManager::addStorageToDb(
+void StorageManager::addStorageToDb(
     AddStorageContext* addStorageContext,
     nx::sql::QueryContext* queryContext)
 {
@@ -565,11 +565,11 @@ nx::sql::DBResult StorageManager::addStorageToDb(
 
     addStorageContext->bucketLookupResult = std::move(result);
     if (addStorageContext->bucketLookupResult.resultCode != ResultCode::ok)
-        return nx::sql::DBResult::ok;
+        return;
 
     addStorageContext->initializeStorage(bucket);
 
-    return m_storageDao->addStorage(queryContext, addStorageContext->storage);
+    m_storageDao->addStorage(queryContext, addStorageContext->storage);
 }
 
 std::pair<api::Result, api::Storage> StorageManager::prepareAddStorageResult(
@@ -595,7 +595,7 @@ std::pair<api::Result, api::Storage> StorageManager::prepareAddStorageResult(
     return std::make_pair(ResultCode::ok, std::move(addStorageContext->storage));
 }
 
-nx::sql::DBResult StorageManager::removeStorageFromDb(
+void StorageManager::removeStorageFromDb(
     CommonStorageContext* removeStorageContext,
     nx::sql::QueryContext* queryContext)
 {
@@ -605,7 +605,7 @@ nx::sql::DBResult StorageManager::removeStorageFromDb(
     if (!storage)
     {
         removeStorageContext->result = ResultCode::notFound;
-        return nx::sql::DBResult::ok;
+        return;
     }
 
     // NOTE: storage can't be removed if there are already systems associated with it.
@@ -614,16 +614,16 @@ nx::sql::DBResult StorageManager::removeStorageFromDb(
         removeStorageContext->result = Result(
             ResultCode::unauthorized,
             "Storage has at least one system associated with it.");
-        return nx::sql::DBResult::ok;
+        return;
     }
 
     if (!m_accessManager->isStorageOwner(removeStorageContext->authInfo, *storage))
     {
         removeStorageContext->result = ResultCode::unauthorized;
-        return nx::sql::DBResult::ok;
+        return;
     }
 
-    return m_storageDao->removeStorage(queryContext, removeStorageContext->storageId);
+    m_storageDao->removeStorage(queryContext, removeStorageContext->storageId);
 }
 
 Result StorageManager::prepareRemoveStorageResult(
@@ -678,9 +678,9 @@ void StorageManager::modifySystemStorageRelation(
                 operation, system->storageId, system->id);
             *storage = m_storageDao->readStorage(queryContext, system->storageId);
             if (!*storage)
-                return nx::sql::DBResult::ok;
+                return;
 
-            return dbFunc(queryContext, *system);
+            dbFunc(queryContext, *system);
         },
         [this, guard = m_asyncCounter.getScopedIncrement(), authInfo = std::move(authInfo),
             storage, system, operation, handler = std::move(handler)](

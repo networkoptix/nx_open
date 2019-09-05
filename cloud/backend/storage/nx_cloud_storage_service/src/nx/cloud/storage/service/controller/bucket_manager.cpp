@@ -155,7 +155,7 @@ void BucketManager::addBucketToDb(
         [this, guard = m_asyncCounter.getScopedIncrement(), bucket](auto queryContext)
         {
             NX_VERBOSE(this, "addBucket %1", toString(*bucket));
-            return m_bucketDao->addBucket(queryContext, *bucket);
+            m_bucketDao->addBucket(queryContext, *bucket);
         },
         [this, guard = m_asyncCounter.getScopedIncrement(), handler = std::move(handler),
             bucket](

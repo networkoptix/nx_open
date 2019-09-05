@@ -129,11 +129,11 @@ nx::sql::AbstractAsyncSqlQueryExecutor& StorageDao::queryExecutor()
     return m_db->queryExecutor();
 }
 
-nx::sql::DBResult StorageDao::addStorage(
+void StorageDao::addStorage(
     nx::sql::QueryContext* queryContext,
     const api::Storage& storage)
 {
-    return m_db->syncEngine().transactionLog()
+    m_db->syncEngine().transactionLog()
         .saveDbOperationToLog<command::SaveStorage>(
             queryContext,
             m_clusterId,
@@ -164,7 +164,7 @@ std::optional<api::Storage> StorageDao::readStorage(
     return storage;
 }
 
-nx::sql::DBResult StorageDao::removeStorage(
+void StorageDao::removeStorage(
     nx::sql::QueryContext* queryContext,
     const std::string& storageId)
 {
@@ -176,11 +176,11 @@ nx::sql::DBResult StorageDao::removeStorage(
             std::bind(&StorageDao::removeStorageFromDb, this, _1, _2));
 }
 
-nx::sql::DBResult StorageDao::addSystem(
+void StorageDao::addSystem(
     nx::sql::QueryContext* queryContext,
     const api::System& system)
 {
-    return m_db->syncEngine().transactionLog()
+    m_db->syncEngine().transactionLog()
         .saveDbOperationToLog<command::SaveSystem>(
             queryContext,
             m_clusterId,
@@ -188,11 +188,11 @@ nx::sql::DBResult StorageDao::addSystem(
             std::bind(&StorageDao::addSystemStorageRelation, this, _1, _2));
 }
 
-nx::sql::DBResult StorageDao::removeSystem(
+void StorageDao::removeSystem(
     nx::sql::QueryContext* queryContext,
     const api::System& system)
 {
-    return m_db->syncEngine().transactionLog()
+    m_db->syncEngine().transactionLog()
         .saveDbOperationToLog<command::RemoveSystem>(
             queryContext,
             m_clusterId,

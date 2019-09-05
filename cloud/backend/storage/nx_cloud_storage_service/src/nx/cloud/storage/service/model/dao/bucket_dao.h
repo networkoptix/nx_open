@@ -21,13 +21,13 @@ public:
 
     virtual nx::sql::AbstractAsyncSqlQueryExecutor& queryExecutor() = 0;
 
-    virtual nx::sql::DBResult addBucket(
+    virtual void addBucket(
         nx::sql::QueryContext* queryContext,
         const api::Bucket& bucket) = 0;
 
     virtual std::vector<api::Bucket> fetchBuckets(nx::sql::QueryContext* queryContext) = 0;
 
-    virtual nx::sql::DBResult removeBucket(
+    virtual void removeBucket(
         nx::sql::QueryContext* queryContext,
         const std::string& bucketName) = 0;
 };
@@ -44,13 +44,13 @@ public:
 
     virtual nx::sql::AbstractAsyncSqlQueryExecutor& queryExecutor() override;
 
-    virtual nx::sql::DBResult addBucket(
+    virtual void addBucket(
         nx::sql::QueryContext* queryContext,
         const api::Bucket& bucket) override;
 
     virtual std::vector<api::Bucket> fetchBuckets(nx::sql::QueryContext* queryContext) override;
 
-    virtual nx::sql::DBResult removeBucket(
+    virtual void removeBucket(
         nx::sql::QueryContext* queryContext,
         const std::string& bucketName) override;
 

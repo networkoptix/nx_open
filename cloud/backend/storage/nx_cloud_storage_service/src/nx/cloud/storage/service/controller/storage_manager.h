@@ -155,7 +155,7 @@ private:
         const nx::utils::stree::ResourceContainer& authInfo,
         const api::AddStorageRequest& request) const;
 
-    nx::sql::DBResult addStorageToDb(
+    void addStorageToDb(
         AddStorageContext* addStorageContext,
         nx::sql::QueryContext* queryContext);
 
@@ -163,7 +163,7 @@ private:
         AddStorageContext* addStorageContext,
         nx::sql::DBResult dbResult) const;
 
-    nx::sql::DBResult removeStorageFromDb(
+    void removeStorageFromDb(
         CommonStorageContext* removeStorageContext,
         nx::sql::QueryContext* queryContext);
 
