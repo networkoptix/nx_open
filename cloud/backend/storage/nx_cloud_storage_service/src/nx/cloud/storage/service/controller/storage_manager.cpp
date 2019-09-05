@@ -24,8 +24,6 @@ using namespace nx::cloud::storage::service::api;
 namespace {
 
 static constexpr char kStorageType[] = "awss3";
-static constexpr char kAddSystem[] = "Add System";
-static constexpr char kRemoveSystem[] = "Remove System";
 
 static const std::map<std::string, nx::geo_ip::Geopoint> kAwsGeopoints = {
     {"us-east-1", {39, -78}},
@@ -250,7 +248,8 @@ void StorageManager::addSystem(
     AddSystemRequest request,
     nx::utils::MoveOnlyFunc<void(Result, System)> handler)
 {
-    modifySystemStorageRelation<kAddSystem>(
+    modifySystemStorageRelation(
+        "Add System",
         authInfo,
         storageId,
         request.id,
@@ -264,7 +263,8 @@ void StorageManager::removeSystem(
     std::string systemId,
     nx::utils::MoveOnlyFunc<void(Result)> handler)
 {
-    modifySystemStorageRelation<kRemoveSystem>(
+    modifySystemStorageRelation(
+        "Remove System",
         authInfo,
         storageId,
         systemId,
@@ -325,7 +325,7 @@ void StorageManager::getStorage(
 void StorageManager::checkReadStorageAllowed(
     std::shared_ptr<StorageManager::ReadStorageContext> readStorageContext)
 {
-    m_accessManager->readStorageAllowed(
+    m_accessManager->authorizeReadingStorage(
         readStorageContext->authInfo,
         readStorageContext->storage,
         [this, readStorageContext](auto result)
@@ -542,7 +542,7 @@ std::pair<api::Result, std::string> StorageManager::validateAddStorageRequest(
             std::string());
     }
 
-    auto [result, accountEmail] = m_accessManager->addStorageAllowed(authInfo);
+    auto [result, accountEmail] = m_accessManager->authorizeAddingStorage(authInfo);
     if (!result.ok())
     {
         NX_VERBOSE(this, "addStorage failed for user %1: %2", accountEmail, result);
@@ -649,8 +649,9 @@ Result StorageManager::prepareRemoveStorageResult(
     return ResultCode::ok;
 }
 
-template<const char * operation, typename DbFunc, typename Handler>
+template<typename DbFunc, typename Handler>
 void StorageManager::modifySystemStorageRelation(
+    const char* operation,
     const nx::utils::stree::ResourceContainer& authInfo,
     const std::string& storageId,
     const std::string& systemId,
@@ -688,8 +689,9 @@ void StorageManager::modifySystemStorageRelation(
             {
                 Result error(
                     utils::toResultCode(dbResult),
-                    lm("%1 System request with storageId: %2, systemId: %3 failed with sql error: %4")
-                    .args(operation, system->storageId, system->id, toString(dbResult)).toStdString());
+                    lm("%1 request with storageId: %2, systemId: %3 failed with sql error: %4")
+                        .args(operation, system->storageId, system->id, toString(dbResult))
+                        .toStdString());
                 NX_ERROR(this, error.error);
                 return handler(std::move(error), System());
             }

@@ -171,8 +171,9 @@ private:
         CommonStorageContext* removeStorageContext,
         nx::sql::DBResult dbResult) const;
 
-    template<const char* operation, typename DbFunc, typename Handler>
+    template<typename DbFunc, typename Handler>
     void modifySystemStorageRelation(
+        const char* operation,
         const nx::utils::stree::ResourceContainer& authInfo,
         const std::string& storageId,
         const std::string& systemId,
