@@ -698,14 +698,14 @@ void StorageManager::modifySystemStorageRelation(
 
             if (!*storage)
             {
-                NX_VERBOSE(this, "%1 System request: storageId %2 not found",
+                NX_VERBOSE(this, "%1 request: storageId %2 not found",
                     operation, system->storageId);
                 return handler(ResultCode::notFound, System());
             }
 
             if (!m_accessManager->isStorageOwner(authInfo, **storage))
             {
-                NX_VERBOSE(this, "%1 System request with storageId: %2, systemId: %3 rejected:"
+                NX_VERBOSE(this, "%1 request with storageId: %2, systemId: %3 rejected:"
                     "unauthorized user %4 attempted to access storage",
                          operation, system->storageId, system->id,
                          m_accessManager->getAccountEmail(authInfo));
