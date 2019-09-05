@@ -68,7 +68,7 @@ Page
             LabeledSwitch
             {
                 width: parent.width
-                text: qsTr("Use server time mode")
+                text: qsTr("Use server time")
                 checked: serverTimeMode
                 onCheckedChanged: serverTimeMode = checked
             }
