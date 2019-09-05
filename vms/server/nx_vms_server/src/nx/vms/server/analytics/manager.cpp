@@ -62,8 +62,7 @@ void Manager::stop()
 
 void Manager::init()
 {
-    NX_DEBUG(this, "Initializing");
-
+    NX_INFO(this, "Initializing");
     connect(
         resourcePool(), &QnResourcePool::resourceAdded,
         this, &Manager::at_resourceAdded);
@@ -77,15 +76,39 @@ void Manager::init()
 
 void Manager::initExistingResources()
 {
+    NX_INFO(this, "Initializing existing resources");
     const auto mediaServer = resourcePool()->getResourceById<QnMediaServerResource>(moduleGUID());
-    const auto devices = resourcePool()->getAllCameras(mediaServer, /*ignoreDesktopCamera*/ true);
-    for (const auto& device: devices)
-        at_deviceAdded(device);
+    const auto devices = resourcePool()->getAllCameras(
+        /*any server*/QnResourcePtr(),
+        /*ignoreDesktopCamera*/ true);
 
-    const auto engines =
-        resourcePool()->getResources<AnalyticsEngineResource>();
+    for (const auto& device: devices)
+    {
+        if (!device)
+        {
+            NX_WARNING(this, "Device is null");
+            continue;
+        }
+
+        NX_DEBUG(this, "Initializing existing device on the server startup: %1 (%2)",
+            device->getUserDefinedName(), device->getId());
+        at_deviceAdded(device);
+    }
+
+    const auto engines = resourcePool()->getResources<AnalyticsEngineResource>();
     for (const auto& engine: engines)
+    {
+        if (!engine)
+        {
+            NX_WARNING(this, "Engine is null");
+            continue;
+        }
+
+        NX_DEBUG(this, "Initializing existing engine on the server startup: %1 (%2)",
+            engine->getName(), engine->getId());
+
         at_engineAdded(engine);
+    }
 }
 
 QSharedPointer<DeviceAnalyticsContext> Manager::context(const QnUuid& deviceId) const
@@ -108,7 +131,7 @@ void Manager::at_resourceAdded(const QnResourcePtr& resource)
     const auto analyticsEngine = resource.dynamicCast<AnalyticsEngineResource>();
     if (analyticsEngine)
     {
-        NX_VERBOSE(
+        NX_DEBUG(
             this,
             lm("The Analytics Engine %1 (%2) has been added.")
                .args(analyticsEngine->getName(), analyticsEngine->getId()));
@@ -118,12 +141,11 @@ void Manager::at_resourceAdded(const QnResourcePtr& resource)
     }
 
     auto device = resource.dynamicCast<QnVirtualCameraResource>();
-    if (device)
+    if (device && !device->hasFlags(Qn::desktop_camera))
     {
-        NX_VERBOSE(
+        NX_DEBUG(
             this,
-            lm("The Device %1 (%2) has been added.")
-            .args(resource->getName(), resource->getId()));
+            lm("The Device %1 (%2) has been added.").args(resource->getName(), resource->getId()));
 
         at_deviceAdded(device);
     }
@@ -133,11 +155,11 @@ void Manager::at_resourceRemoved(const QnResourcePtr& resource)
 {
     if (!resource)
     {
-        NX_VERBOSE(this, "Receieved a null Resource.");
+        NX_DEBUG(this, "Receieved a null Resource.");
         return;
     }
 
-    NX_VERBOSE(this, "The Resource %1 (%2) has been removed.",
+    NX_DEBUG(this, "The Resource %1 (%2) has been removed.",
         resource->getName(), resource->getId());
 
     resource->disconnect(this);
@@ -145,7 +167,7 @@ void Manager::at_resourceRemoved(const QnResourcePtr& resource)
     const auto device = resource.dynamicCast<QnVirtualCameraResource>();
     if (device)
     {
-        NX_VERBOSE(this, "The Device %1 (%2) has been removed",
+        NX_DEBUG(this, "The Device %1 (%2) has been removed",
             device->getUserDefinedName(), device->getId());
         at_deviceRemoved(device);
         return;
@@ -154,13 +176,13 @@ void Manager::at_resourceRemoved(const QnResourcePtr& resource)
     const auto engine = resource.dynamicCast<AnalyticsEngineResource>();
     if (!engine)
     {
-        NX_VERBOSE(this,
+        NX_DEBUG(this,
             "The resource %1 (%2) is neither an Analytics Engine nor a Device. Skipping",
             resource->getName(), resource->getId());
         return;
     }
 
-    NX_VERBOSE(this, "Engine %1 (%2) has been removed", engine->getName(), engine->getId());
+    NX_DEBUG(this, "Engine %1 (%2) has been removed", engine->getName(), engine->getId());
     at_engineRemoved(engine);
 }
 
@@ -186,6 +208,7 @@ void Manager::at_resourcePropertyChanged(
 
 void Manager::at_deviceAdded(const QnVirtualCameraResourcePtr& device)
 {
+    NX_DEBUG(this, "Handling new device, %1 (%2)", device->getUserDefinedName(), device->getId());
     connect(
         device, &QnResource::parentIdChanged,
         this, &Manager::at_resourceParentIdChanged);
@@ -200,6 +223,9 @@ void Manager::at_deviceAdded(const QnVirtualCameraResourcePtr& device)
 
 void Manager::at_deviceRemoved(const QnVirtualCameraResourcePtr& device)
 {
+    NX_DEBUG(this, "Handling device removal, %1 (%2)",
+        device->getUserDefinedName(), device->getId());
+
     handleDeviceRemovalFromServer(device);
 }
 
@@ -207,14 +233,14 @@ void Manager::at_deviceParentIdChanged(const QnVirtualCameraResourcePtr& device)
 {
     if (isLocalDevice(device))
     {
-        NX_VERBOSE(this, "The Device %1 (%2) has been moved to the current Server",
+        NX_DEBUG(this, "The Device %1 (%2) has been moved to the current Server",
             device->getUserDefinedName(), device->getId());
         updateCompatibilityWithEngines(device);
         handleDeviceArrivalToServer(device);
     }
     else
     {
-        NX_VERBOSE(this, "The Device %1 (%2) has been moved to another Server",
+        NX_DEBUG(this, "The Device %1 (%2) has been moved to another Server",
             device->getUserDefinedName(), device->getId());
         handleDeviceRemovalFromServer(device);
     }
