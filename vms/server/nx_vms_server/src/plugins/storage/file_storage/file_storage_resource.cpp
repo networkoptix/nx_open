@@ -150,7 +150,7 @@ QIODevice* QnFileStorageResource::open(
 #ifdef Q_OS_WIN
         if ((openMode & QIODevice::ReadWrite) == QIODevice::ReadWrite)
             systemFlags = 0;
-        else if (m_serverModule->settings().disableDirectIO())
+        else if (!m_serverModule->settings().disableDirectIO())
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
