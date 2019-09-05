@@ -114,7 +114,11 @@ ClientUpdateTool::~ClientUpdateTool()
 void ClientUpdateTool::setState(State newState)
 {
     if (m_state == newState)
+    {
+        if (m_state != State::downloading && m_state != State::installing)
+            emit updateStateChanged((int)m_state, 0, {});
         return;
+    }
 
     m_state = newState;
     m_stateChanged = true;
