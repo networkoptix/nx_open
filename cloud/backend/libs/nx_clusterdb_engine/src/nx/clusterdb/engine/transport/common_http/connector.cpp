@@ -120,7 +120,7 @@ void HttpCommandPipelineConnector::processSuccessfulConnect()
 
     nx::utils::swapAndCall(
         m_completionHandler,
-        ConnectResultDescriptor(),
+        ConnectResult(),
         std::move(commandPipeline));
 }
 
@@ -130,7 +130,7 @@ void HttpCommandPipelineConnector::processConnectFailure()
 
     nx::utils::swapAndCall(
         m_completionHandler,
-        ConnectResultDescriptor(SystemError::connectionRefused),
+        ConnectResult(SystemError::connectionRefused),
         nullptr);
 }
 
@@ -181,7 +181,7 @@ void HttpTransportConnector::stopWhileInAioThread()
 }
 
 void HttpTransportConnector::onPipelineConnectCompleted(
-    ConnectResultDescriptor connectResultDescriptor,
+    ConnectResult connectResultDescriptor,
     std::unique_ptr<AbstractCommandPipeline> connection)
 {
     if (!connection)
@@ -213,7 +213,7 @@ void HttpTransportConnector::onPipelineConnectCompleted(
 
     nx::utils::swapAndCall(
         m_completionHandler,
-        ConnectResultDescriptor(),
+        ConnectResult(),
         std::move(newTransport));
 }
 

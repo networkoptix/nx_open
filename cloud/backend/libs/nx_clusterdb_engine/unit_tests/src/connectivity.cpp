@@ -20,29 +20,23 @@ public:
     }
 
 protected:
-    virtual void SetUp() override
-    {
-        for (int i = 0; i < 2; ++i)
-        {
-            auto& peer = addPeer();
-
-            nx::utils::SubscriptionId subscriptionId = nx::utils::kInvalidSubscriptionId;
-            peer.process().moduleInstance()->synchronizationEngine()
-                .connectionManager().nodeStatusChangedSubscription().subscribe(
-                    [this](auto&&... args) { saveEvent(std::forward<decltype(args)>(args)...); },
-                    &subscriptionId);
-            m_nodeSubscriptions.push_back({&peer, subscriptionId});
-        }
-    }
-
     virtual void TearDown() override
     {
-        for (auto& [peer, subscriptionId]: m_nodeSubscriptions)
+        for (auto& [peer, subscriptions]: m_nodeSubscriptions)
         {
             peer->process().moduleInstance()->synchronizationEngine()
                 .connectionManager().nodeStatusChangedSubscription().removeSubscription(
-                    subscriptionId);
+                    subscriptions.onStatusChanged);
+
+            peer->process().moduleInstance()->synchronizationEngine()
+                .connector().onConnectCompletedSubscription().removeSubscription(
+                    subscriptions.onConnectCompletion);
         }
+    }
+
+    void addArg(std::string arg)
+    {
+        m_args.push_back(std::move(arg));
     }
 
     void givenConnectedNodes()
@@ -51,8 +45,19 @@ protected:
         thenPeerConnectedEventIsDelivered({peer(0).nodeId(), peer(1).nodeId()});
     }
 
+    void givenNodesConnectedToEachOther()
+    {
+        whenConnectNodesToEachOther();
+
+        thenPeerConnectedEventIsDelivered({peer(0).nodeId(), peer(1).nodeId()});
+        andPeersAreConnected();
+    }
+
     void whenConnectNodes()
     {
+        if (peerCount() == 0)
+            initializePeers();
+
         peer(0).connectTo(peer(1));
     }
 
@@ -75,6 +80,9 @@ protected:
 
     void whenConnectNodesToEachOther()
     {
+        if (peerCount() == 0)
+            initializePeers();
+
         for (int i = 0; i < peerCount(); ++i)
         {
             for (int j = 0; j < peerCount(); ++j)
@@ -132,15 +140,59 @@ protected:
         andPeersAreConnected();
     }
 
+    void thenConnectAttemptsAreStoppedEventually(std::chrono::milliseconds silentPeriod)
+    {
+        while (m_connectCompletionEvents.pop(silentPeriod)) {}
+    }
+
 private:
     using ConnectResult = std::tuple<
-        transport::ConnectResultDescriptor,
+        transport::ConnectResult,
         std::unique_ptr<transport::AbstractConnection>>;
 
-    std::vector<std::tuple<Peer*, nx::utils::SubscriptionId>> m_nodeSubscriptions;
+    using ConnectCompletionEvent =
+        std::tuple<nx::utils::Url, transport::ConnectResult>;
+
+    struct NodeScriptions
+    {
+        nx::utils::SubscriptionId onStatusChanged = nx::utils::kInvalidSubscriptionId;
+        nx::utils::SubscriptionId onConnectCompletion = nx::utils::kInvalidSubscriptionId;
+    };
+
+    std::vector<std::tuple<Peer*, NodeScriptions>> m_nodeSubscriptions;
     nx::utils::SyncQueue<std::tuple<NodeDescriptor, NodeStatusDescriptor>> m_events;
     std::unique_ptr<transport::AbstractTransactionTransportConnector> m_connector;
     nx::utils::SyncQueue<ConnectResult> m_connectResults;
+    nx::utils::SyncQueue<ConnectCompletionEvent> m_connectCompletionEvents;
+    std::vector<std::string> m_args;
+
+    void initializePeers()
+    {
+        std::vector<std::pair<const char*, const char*>> args;
+        std::transform(
+            m_args.begin(), m_args.end(),
+            std::back_inserter(args),
+            [](const std::string& arg) { return std::make_pair(arg.c_str(), ""); });
+
+        for (int i = 0; i < 2; ++i)
+        {
+            auto& peer = addPeer(args);
+
+            nx::utils::SubscriptionId onStatusChanged = nx::utils::kInvalidSubscriptionId;
+            peer.process().moduleInstance()->synchronizationEngine()
+                .connectionManager().nodeStatusChangedSubscription().subscribe(
+                    [this](auto&&... args) { saveEvent(std::forward<decltype(args)>(args)...); },
+                    &onStatusChanged);
+
+            nx::utils::SubscriptionId onConnectCompletion = nx::utils::kInvalidSubscriptionId;
+            peer.process().moduleInstance()->synchronizationEngine()
+                .connector().onConnectCompletedSubscription().subscribe(
+                    [this](auto&&... args) { saveConnectCompletionEvent(std::forward<decltype(args)>(args)...); },
+                    &onConnectCompletion);
+
+            m_nodeSubscriptions.push_back({&peer, {onStatusChanged, onConnectCompletion}});
+        }
+    }
 
     void saveEvent(const NodeDescriptor& node, const NodeStatusDescriptor& nodeStatus)
     {
@@ -170,12 +222,18 @@ private:
     }
 
     void saveConnectResult(
-        transport::ConnectResultDescriptor connectResultDescriptor,
+        transport::ConnectResult connectResultDescriptor,
         std::unique_ptr<transport::AbstractConnection> connection)
     {
         m_connectResults.push({
             std::move(connectResultDescriptor),
             std::move(connection)});
+    }
+
+    void saveConnectCompletionEvent(
+        const nx::utils::Url& remoteNodeUrl, const transport::ConnectResult& result)
+    {
+        m_connectCompletionEvents.push({remoteNodeUrl, result});
     }
 };
 
@@ -206,6 +264,14 @@ TEST_F(Connectivity, nodes_can_be_connected_to_each_other_simultaneously)
     thenPeerConnectedEventIsDelivered({peer(0).nodeId(), peer(1).nodeId()});
     andPeersAreConnected();
     andConnectivityIsReliable();
+}
+
+TEST_F(Connectivity, already_connected_nodes_do_not_try_to_establish_another_connection)
+{
+    addArg("--p2pDb/nodeConnectRetryTimeout=100ms");
+
+    givenNodesConnectedToEachOther();
+    thenConnectAttemptsAreStoppedEventually(std::chrono::milliseconds(300));
 }
 
 } // namespace nx::clusterdb::engine::test

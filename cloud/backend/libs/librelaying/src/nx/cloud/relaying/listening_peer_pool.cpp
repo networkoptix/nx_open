@@ -288,7 +288,7 @@ void ListeningPeerPool::giveAwayConnection(
 {
     auto connectionWatcherPtr = connectionContext->connectionWatcher.get();
 
-    connectionWatcherPtr->startTunnel(
+    connectionWatcherPtr->openTunnel(
         clientInfo,
         [this,
             clientInfo,
@@ -319,7 +319,7 @@ void ListeningPeerPool::monitoringConnectionForClosure(
     const std::string& peerName,
     ConnectionContext* connectionContext)
 {
-    connectionContext->connectionWatcher->start(
+    connectionContext->connectionWatcher->startMonitoringConnection(
         [this, peerName, connectionContext](SystemError::ErrorCode errorCode)
         {
             return closeConnection(peerName, connectionContext, errorCode);

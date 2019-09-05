@@ -21,7 +21,7 @@ GenericTransport::GenericTransport(
     :
     m_protocolVersionRange(protocolVersionRange),
     m_outgoingCommandFilter(outgoingCommandFilter),
-    m_systemId(systemId),
+    m_clusterId(systemId),
     m_localPeer(localPeer),
     m_remotePeer(connectionRequestAttributes.remotePeer),
     m_commandPipeline(std::move(commandPipeline)),
@@ -36,7 +36,7 @@ GenericTransport::GenericTransport(
 
     m_commonTransportHeaderOfRemoteTransaction.connectionId =
         connectionRequestAttributes.connectionId;
-    m_commonTransportHeaderOfRemoteTransaction.systemId = systemId;
+    m_commonTransportHeaderOfRemoteTransaction.clusterId = systemId;
     m_commonTransportHeaderOfRemoteTransaction.peerId =
         connectionRequestAttributes.remotePeer.id.toSimpleByteArray().toStdString();
     m_commonTransportHeaderOfRemoteTransaction.endpoint =
@@ -56,8 +56,8 @@ GenericTransport::GenericTransport(
 GenericTransport::~GenericTransport()
 {
     NX_DEBUG(this, lm("systemId %1. Closing connection to %2")
-        .args(m_systemId, m_commonTransportHeaderOfRemoteTransaction));
-        
+        .args(m_clusterId, m_commonTransportHeaderOfRemoteTransaction));
+
     if (isInSelfAioThread())
         stopWhileInAioThread();
 }
@@ -113,7 +113,7 @@ void GenericTransport::sendTransaction(
                     m_commonTransportHeaderOfRemoteTransaction);
                 return;
             }
-        
+
             if (peerAlreadyHasCommand(transactionSerializer->header()))
             {
                 NX_VERBOSE(this,
@@ -197,13 +197,13 @@ void GenericTransport::processCommandData(
     if (!commandData)
     {
         NX_DEBUG(this, "Failed to deserialize %1 command received from (%2, %3)",
-            dataFormat, transportHeader.systemId, transportHeader.endpoint.toString());
+            dataFormat, transportHeader.clusterId, transportHeader.endpoint.toString());
         m_commandPipeline->closeConnection();
         return;
     }
 
     NX_VERBOSE(this, "Received command %1 from (%2, %3)",
-        commandData->header(), transportHeader.systemId, transportHeader.endpoint.toString());
+        commandData->header(), transportHeader.clusterId, transportHeader.endpoint.toString());
 
     if (m_remotePeer.persistentId.isNull() &&
         !commandData->header().persistentInfo.dbID.isNull())
@@ -299,15 +299,15 @@ void GenericTransport::onTransactionsReadFromLog(
     if ((resultCode != ResultCode::ok) && (resultCode != ResultCode::partialContent))
     {
         NX_DEBUG(this,
-            "systemId %1. Error reading transaction log (%2). Closing connection to the peer %3", 
-                m_systemId, toString(resultCode), m_commonTransportHeaderOfRemoteTransaction);
+            "systemId %1. Error reading transaction log (%2). Closing connection to the peer %3",
+                m_clusterId, toString(resultCode), m_commonTransportHeaderOfRemoteTransaction);
         m_commandPipeline->closeConnection();
         return;
     }
 
     NX_DEBUG(this, "systemId %1. Read %2 transactions from transaction log (result %3). "
         "Posting them to the send queue to %4",
-        m_systemId, serializedTransactions.size(), toString(resultCode),
+        m_clusterId, serializedTransactions.size(), toString(resultCode),
             m_commonTransportHeaderOfRemoteTransaction);
 
     if (m_closed)
@@ -328,7 +328,7 @@ void GenericTransport::onTransactionsReadFromLog(
         m_tranStateToSynchronizeTo.containsDataMissingIn(m_remotePeerTranState))
     {
         NX_DEBUG(this, "systemId %1. Synchronize to (%2), already synchronized to (%3)",
-            m_systemId, m_tranStateToSynchronizeTo, m_remotePeerTranState);
+            m_clusterId, m_tranStateToSynchronizeTo, m_remotePeerTranState);
 
         // Asserting that something new has been read.
         NX_ASSERT(!m_prevReadResult || readedUpTo.containsDataMissingIn(*m_prevReadResult));
@@ -348,7 +348,7 @@ void GenericTransport::onTransactionsReadFromLog(
     else
     {
         NX_DEBUG(this, "systemId %1. Done initial synchronization to (%2)",
-            m_systemId, m_remotePeerTranState);
+            m_clusterId, m_remotePeerTranState);
     }
 
     // Sending transactions to remote peer is allowed now.
@@ -361,7 +361,7 @@ void GenericTransport::sendTransactions(
     for (auto& tranData: serializedTransactions)
     {
         CommandTransportHeader transportHeader(m_protocolVersionRange.currentVersion());
-        transportHeader.systemId = m_systemId;
+        transportHeader.clusterId = m_clusterId;
         transportHeader.vmsTransportHeader.distance = 1;
         transportHeader.vmsTransportHeader.processedPeers.insert(
             m_localPeer.id);
@@ -375,7 +375,7 @@ void GenericTransport::sendTransactions(
 void GenericTransport::enableOutputChannel()
 {
     NX_DEBUG(this, "systemId %1. Enabled output channel to the peer %2",
-        m_systemId, m_commonTransportHeaderOfRemoteTransaction);
+        m_clusterId, m_commonTransportHeaderOfRemoteTransaction);
 
     m_canSendCommands = true;
 

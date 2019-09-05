@@ -39,7 +39,7 @@ Connection::Connection(
 {
     bindToAioThread(p2pTransport().getAioThread());
 
-    m_commonTransactionHeader.systemId = systemId;
+    m_commonTransactionHeader.clusterId = systemId;
     m_commonTransactionHeader.peerId = remotePeerData.id.toSimpleByteArray().toStdString();
     m_commonTransactionHeader.endpoint = remotePeerEndpoint();
     m_commonTransactionHeader.connectionId = connectionId;
@@ -135,7 +135,7 @@ void Connection::reportCommandReceived(
 {
     CommandTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
     cdbTransportHeader.endpoint = remotePeerEndpoint();
-    cdbTransportHeader.systemId = m_transactionLogReader->systemId();
+    cdbTransportHeader.clusterId = m_transactionLogReader->systemId();
     cdbTransportHeader.connectionId = connectionGuid();
     //cdbTransportHeader.vmsTransportHeader //< Empty vms transport header
     cdbTransportHeader.transactionFormatVersion = highestProtocolVersionCompatibleWithRemotePeer();

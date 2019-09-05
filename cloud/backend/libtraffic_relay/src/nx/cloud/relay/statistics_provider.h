@@ -2,8 +2,10 @@
 
 #include <memory>
 
+#include <nx/clusterdb/engine/statistics/provider.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/http/server/http_statistics.h>
+#include <nx/sql/db_statistics_collector.h>
 #include <nx/utils/basic_factory.h>
 
 #include <nx/cloud/relaying/statistics.h>
@@ -22,11 +24,11 @@ struct Statistics
     relaying::Statistics relaying;
     nx::network::http::server::HttpStatistics http;
     controller::RelaySessionStatistics relaySessions;
-
-    bool operator==(const Statistics& right) const;
+    std::optional<nx::clusterdb::engine::statistics::Statistics> peerDb;
+    std::optional<nx::sql::QueryStatistics> sql;
 };
 
-#define Statistics_relay_controller_Fields (relaying)(http)(relaySessions)
+#define Statistics_relay_controller_Fields (relaying)(http)(relaySessions)(peerDb)(sql)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Statistics),
@@ -49,7 +51,9 @@ public:
     StatisticsProvider(
         const relaying::AbstractListeningPeerPool& listeningPeerPool,
         const network::http::server::AbstractHttpStatisticsProvider& httpServerStatisticsProvider,
-        const controller::AbstractTrafficRelay& trafficRelay);
+        const controller::AbstractTrafficRelay& trafficRelay,
+        const nx::clusterdb::engine::statistics::Provider* peerDbStatisticsProvider,
+        const nx::sql::StatisticsCollector* sqlStatisticsProvider);
     virtual ~StatisticsProvider() = default;
 
     virtual Statistics getAllStatistics() const override;
@@ -58,6 +62,8 @@ private:
     const relaying::AbstractListeningPeerPool& m_listeningPeerPool;
     const network::http::server::AbstractHttpStatisticsProvider& m_httpServerStatisticsProvider;
     const controller::AbstractTrafficRelay& m_trafficRelay;
+    const nx::clusterdb::engine::statistics::Provider* m_peerDbStatisticsProvider = nullptr;
+    const nx::sql::StatisticsCollector* m_sqlStatisticsProvider = nullptr;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -66,7 +72,9 @@ using StatisticsProviderFactoryFunc =
     std::unique_ptr<AbstractStatisticsProvider>(
         const relaying::AbstractListeningPeerPool&,
         const nx::network::http::server::AbstractHttpStatisticsProvider&,
-        const controller::AbstractTrafficRelay&);
+        const controller::AbstractTrafficRelay&,
+        const nx::clusterdb::engine::statistics::Provider*,
+        const nx::sql::StatisticsCollector*);
 
 class StatisticsProviderFactory:
     public nx::utils::BasicFactory<StatisticsProviderFactoryFunc>
@@ -82,7 +90,9 @@ private:
     std::unique_ptr<AbstractStatisticsProvider> defaultFactoryFunction(
         const relaying::AbstractListeningPeerPool& listeningPeerPool,
         const network::http::server::AbstractHttpStatisticsProvider& httpServerStatisticsProvider,
-        const controller::AbstractTrafficRelay& trafficRelay);
+        const controller::AbstractTrafficRelay& trafficRelay,
+        const nx::clusterdb::engine::statistics::Provider* peerDbStatisticsProvider,
+        const nx::sql::StatisticsCollector* sqlStatistics);
 };
 
 } // namespace relay

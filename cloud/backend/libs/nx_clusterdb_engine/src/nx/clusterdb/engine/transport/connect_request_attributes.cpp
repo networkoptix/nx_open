@@ -41,6 +41,10 @@ static bool readCommonAttrs(
             value->contentEncoding = "gzip";
     }
 
+    value->nodeName = nx::network::http::getHeaderValue(headers, "User-Agent").toStdString();
+    if (value->nodeName.empty())
+        value->nodeName = nx::network::http::getHeaderValue(headers, "Server").toStdString();
+
     return true;
 }
 

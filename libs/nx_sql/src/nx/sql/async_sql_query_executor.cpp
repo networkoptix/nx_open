@@ -24,6 +24,7 @@ void AbstractAsyncSqlQueryExecutor::executeSqlSync(QByteArray sqlStatement)
 //-------------------------------------------------------------------------------------------------
 
 static const size_t kDesiredMaxQueuedQueriesPerConnection = 5;
+static constexpr std::chrono::minutes kDefaultStatisticsAggregationPeriod = std::chrono::minutes(1);
 
 const int AsyncSqlQueryExecutor::kDefaultQueryPriority = detail::QueryQueue::kDefaultPriority;
 
@@ -32,7 +33,7 @@ AsyncSqlQueryExecutor::AsyncSqlQueryExecutor(
     :
     m_connectionOptions(connectionOptions),
     m_terminated(false),
-    m_statisticsCollector(nullptr)
+    m_statisticsCollector(kDefaultStatisticsAggregationPeriod)
 {
     m_dropConnectionThread = nx::utils::thread(
             std::bind(&AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc, this));
@@ -131,7 +132,7 @@ bool AsyncSqlQueryExecutor::init()
     // Opening a single connection thread and waiting for its initialization result.
     auto executorThread = createNewConnectionThread(m_connectionOptions, &m_queryQueue);
     executorThread->start();
-    
+
     // Waiting for connection to change state.
     for (;;)
     {
@@ -157,10 +158,9 @@ bool AsyncSqlQueryExecutor::init()
     }
 }
 
-void AsyncSqlQueryExecutor::setStatisticsCollector(
-    StatisticsCollector* statisticsCollector)
+const StatisticsCollector& AsyncSqlQueryExecutor::statisticsCollector() const
 {
-    m_statisticsCollector = statisticsCollector;
+    return m_statisticsCollector;
 }
 
 void AsyncSqlQueryExecutor::reserveConnections(int count)
