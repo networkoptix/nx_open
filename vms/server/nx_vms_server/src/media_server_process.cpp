@@ -4632,7 +4632,7 @@ static const QByteArray kMetricsAlarmRules(R"json({
             },
             "offlineEvents": {
                 "name": "Server Offline events (24h)",
-                "display": "table&panel",
+                "display": "table|panel",
                 "calculate": "countValues %status 24h Offline",
                 "insert": "uptime",
                 "alarms": [{
@@ -4658,7 +4658,7 @@ static const QByteArray kMetricsAlarmRules(R"json({
             },
             "offlineEvents": {
                 "name": "Server Offline events (24h)",
-                "display": "table&panel",
+                "display": "table|panel",
                 "calculate": "countValues %status 24h Offline",
                 "alarms": [{
                     "level": "warning",

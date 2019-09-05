@@ -61,28 +61,25 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
 
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
-            api::metrics::Label{
-                "state", "State"
-            },
+            api::metrics::Label(
+                "state"
+            ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest{"name", "Name", "table&panel", ""},
+                api::metrics::ValueManifest({"name"}, api::metrics::Display::both),
                 [](const auto& r) { return Value(r->getName()); }
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest{
-                    "status", "Status", "table&panel", ""
-                },
+                api::metrics::ValueManifest({"status"}, api::metrics::Display::both),
                 [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
                 qtSignalWatch<Resource>(&QnStorageResource::statusChanged)
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest{
-                    "uptime", "Uptime", "table&panel", "s"
-                },
+                api::metrics::ValueManifest({"uptime"}, api::metrics::Display::both, "s"),
                 localGetter(
                     [start = steady_clock::now()](const auto&)
                     {
-                        return Value((double) duration_cast<seconds>(steady_clock::now() - start).count());
+                        return Value((double) duration_cast<seconds>(
+                            steady_clock::now() - start).count());
                     }
                 )
             )

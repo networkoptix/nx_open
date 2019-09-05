@@ -55,9 +55,12 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
             if (existing != groupIt->values.end())
             {
                 // Override existing value manifest.
-                if (!valueRule.name.isEmpty()) existing->name = valueRule.name;
-                if (!valueRule.display.isEmpty()) existing->display = valueRule.display;
-                if (!valueRule.unit.isEmpty()) existing->unit = valueRule.unit;
+                if (!valueRule.name.isEmpty())
+                    existing->name = valueRule.name;
+                if (valueRule.display != api::metrics::Displays(api::metrics::Display::none))
+                    existing->display = valueRule.display;
+                if (!valueRule.unit.isEmpty())
+                    existing->unit = valueRule.unit;
                 continue;
             }
 
@@ -66,7 +69,7 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
                 groupIt->values.begin(), groupIt->values.end(),
                 [r = &valueRule](const auto& m) { return m.id == r->insert; });
             groupIt->values.insert(position, api::metrics::ValueManifest{
-                valueId, valueRule.name, valueRule.display, valueRule.unit});
+                {valueId, valueRule.name}, valueRule.display, valueRule.unit});
         }
     }
 

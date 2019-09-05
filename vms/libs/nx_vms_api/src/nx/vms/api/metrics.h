@@ -33,21 +33,34 @@ struct NX_VMS_API Label
 {
     QString id;
     QString name;
+
+    Label(QString id = {}, QString name = {});
 };
+
+enum class Display
+{
+    none = 0,
+    table = (1 << 0),
+    panel = (1 << 1),
+    both = table|panel,
+};
+Q_DECLARE_FLAGS(Displays, Display)
 
 struct NX_VMS_API ValueManifest: Label
 {
-    QString display; //< TODO: Optional.
-    QString unit; //< TODO: Optional.
+    Displays display;
+    QString unit;
+
+    ValueManifest(Label label = {}, Displays display = Display::none, QString unit = {});
 };
 #define ValueManifest_Fields (id)(name)(unit)(display)
 QN_FUSION_DECLARE_FUNCTIONS(ValueManifest, (json), NX_VMS_API)
 
 struct NX_VMS_API ValueGroupManifest: Label
 {
-    ValueGroupManifest(Label label = {}): Label(std::move(label)) {}
-
     std::vector<ValueManifest> values;
+
+    ValueGroupManifest(Label label = {});
 };
 #define ValueGroupManifest_Fields (id)(name)(values)
 QN_FUSION_DECLARE_FUNCTIONS(ValueGroupManifest, (json), NX_VMS_API)
@@ -60,9 +73,11 @@ using SystemManifest
 
 // -----------------------------------------------------------------------------------------------
 
+enum class AlarmLevel { warning, danger };
+
 struct NX_VMS_API AlarmRule
 {
-    QString level;
+    AlarmLevel level;
     QString condition;
     QString text; //< TODO: Optional.
 };
@@ -93,7 +108,7 @@ struct NX_VMS_API Alarm
 {
     QString resource;
     QString parameter;
-    QString level;
+    AlarmLevel level;
     QString text;
 };
 #define Alarm_Fields (resource)(parameter)(level)(text)
@@ -104,3 +119,7 @@ using Alarms = std::vector<Alarm>;
 NX_UTILS_API void merge(Alarms* destination, Alarms* source);
 
 } // namespace nx::vms::api::metrics
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::metrics::Display, (lexical), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::metrics::Displays, (lexical), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::metrics::AlarmLevel, (lexical), NX_VMS_API)

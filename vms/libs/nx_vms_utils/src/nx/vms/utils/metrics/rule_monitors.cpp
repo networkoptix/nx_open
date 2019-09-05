@@ -230,7 +230,7 @@ api::metrics::Value ExtraValueMonitor::current() const
 }
 
 AlarmMonitor::AlarmMonitor(
-    QString parameter, QString level, ValueGenerator condition, TextGenerator text)
+    QString parameter, api::metrics::AlarmLevel level, ValueGenerator condition, TextGenerator text)
 :
     m_parameter(std::move(parameter)),
     m_level(std::move(level)),

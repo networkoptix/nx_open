@@ -41,34 +41,34 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
 {
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
-            api::metrics::Label{
-                "info", "Info"
-            },
+            api::metrics::Label(
+                "info"
+            ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest{"name", "Name", "table&panel", ""},
+                api::metrics::ValueManifest({"name"}, api::metrics::Display::both),
                 [](const auto& r) { return Value(r->getName()); }
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest{"server", "Server", "table&panel", ""},
+                api::metrics::ValueManifest({"server"}, api::metrics::Display::both),
                 [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest{"type", "Type", "table&panel", ""},
+                api::metrics::ValueManifest({"type"}, api::metrics::Display::both),
                 [](const auto& r) { return Value(r->getStorageType()); }
             )
         ),
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
-            api::metrics::Label{
+            api::metrics::Label(
                 "state", "State"
-            },
+            ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest{"status", "Status", "table&panel", ""},
+                api::metrics::ValueManifest({"status"}, api::metrics::Display::both),
                 // FIXME: Impl does not fallow spec so far.
                 [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
                 qtSignalWatch<Resource>(&QnStorageResource::statusChanged)
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest{"issues", "Issues (24h)", "table&panel", ""},
+                api::metrics::ValueManifest({"issues", "Issues (24h)"}, api::metrics::Display::both),
                 [](const auto&) { return Value(); } // TODO: Implement.
             )
         )
