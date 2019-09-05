@@ -297,8 +297,6 @@ void StorageManager::getStorage(
             // TODO where to get information about storage type?
             for (auto& device : readStorageContext->storage.ioDevices)
                 device.type = kStorageType;
-
-            return nx::sql::DBResult::ok;
         },
         [this, guard = m_asyncCounter.getScopedIncrement(), readStorageContext](
             auto dbResult) mutable

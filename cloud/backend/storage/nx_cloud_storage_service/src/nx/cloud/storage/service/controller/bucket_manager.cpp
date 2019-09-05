@@ -88,7 +88,6 @@ void BucketManager::listBuckets(
         [this, guard = m_asyncCounter.getScopedIncrement(), buckets](auto queryContext)
         {
             buckets->buckets = fetchBuckets(queryContext);
-            return nx::sql::DBResult::ok;
         },
         [this, guard = m_asyncCounter.getScopedIncrement(),
             handler = std::move(handler), buckets](

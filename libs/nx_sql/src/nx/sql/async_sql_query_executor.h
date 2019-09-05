@@ -117,8 +117,7 @@ public:
             std::enable_if_t<std::is_same_v<std::invoke_result_t<DbFunc, QueryContext*>, void>>>
     void executeSelect(
         DbFunc dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler,
-        const std::string& queryAggregationKey = std::string())
+        nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
     {
         executeSelect(
             [dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) -> DBResult
@@ -126,8 +125,7 @@ public:
                 dbUpdateFunc(queryContext);
                 return DBResult::ok;
             },
-            std::move(completionHandler),
-            queryAggregationKey);
+            std::move(completionHandler));
     }
 
     //---------------------------------------------------------------------------------------------
