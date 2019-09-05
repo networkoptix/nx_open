@@ -12,15 +12,6 @@ namespace datetime {
 
 namespace {
 
-// This class is to define context for Qt Linguist only.
-class DateTimeFormats
-{
-    Q_DECLARE_TR_FUNCTIONS(DateTimeFormats)
-
-public:
-    static void setFormats();
-};
-
 void removeTimezone(QString& source)
 {
     source.remove(lit(" t"));
@@ -50,7 +41,7 @@ std::map<Format, QString> formatStrings =
     {Format::filename_time, lit("hh_mm_ss")},
 };
 
-void DateTimeFormats::setFormats()
+void setFormats()
 {
     QLocale locale = QLocale::system(); //< We now use OS locale for time instead of client locale.
     const bool amPm = locale.timeFormat().contains(lit("AP"), Qt::CaseInsensitive);
@@ -64,8 +55,8 @@ void DateTimeFormats::setFormats()
 
     formatStrings[Format::hh_mm_ss_zzz] = formatStrings[Format::hh_mm_ss] + lit(".zzz");
 
-    formatStrings[Format::dd_MM] = tr("MM/dd"); //< Localizable
-    formatStrings[Format::MMMM_yyyy] = tr("MMMM yyyy"); //< Localizable
+    formatStrings[Format::dd_MM] = "MM/dd";
+    formatStrings[Format::MMMM_yyyy] = "MMMM yyyy";
     formatStrings[Format::dd_MM_yyyy] = locale.dateFormat(QLocale::ShortFormat);
 
     auto shortFormat = locale.dateTimeFormat(QLocale::ShortFormat);
@@ -131,7 +122,7 @@ QString getFormatString(Format format)
 
 void initLocale()
 {
-    DateTimeFormats::setFormats();
+    setFormats();
     localeEverInited = true;
 }
 
