@@ -17,6 +17,7 @@ void removeTimezone(QString& source)
 }
 
 //--------------------------------------------------------------------------------------------------
+
 using FormatsHash = QHash<datetime::Format, QString>;
 using Formatter = datetime::Formatter;
 using FormatterPtr = datetime::FormatterPtr;
