@@ -78,7 +78,7 @@ public:
         const std::string& queryAggregationKey = std::string())
     {
         executeUpdate(
-            [this, dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) -> DBResult
+            [dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) -> DBResult
             {
                 dbUpdateFunc(queryContext);
                 return DBResult::ok;
@@ -100,7 +100,7 @@ public:
         nx::utils::MoveOnlyFunc<void(DBResult)> completionHandler)
     {
         executeUpdateWithoutTran(
-            [this, dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) -> DBResult
+            [dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) -> DBResult
             {
                 dbUpdateFunc(queryContext);
                 return DBResult::ok;
@@ -121,7 +121,7 @@ public:
         const std::string& queryAggregationKey = std::string())
     {
         executeSelect(
-            [this, dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) -> DBResult
+            [dbUpdateFunc = std::move(dbUpdateFunc)](auto queryContext) -> DBResult
             {
                 dbUpdateFunc(queryContext);
                 return DBResult::ok;
