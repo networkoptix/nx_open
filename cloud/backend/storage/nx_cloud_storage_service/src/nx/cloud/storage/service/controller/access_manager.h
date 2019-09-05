@@ -21,7 +21,7 @@ namespace api { struct Storage; }
 
 namespace controller {
 
-using ReadStorageAllowedHandler = nx::utils::MoveOnlyFunc<void(api::Result)>;
+using AuthorizeReadingStorageHandler = nx::utils::MoveOnlyFunc<void(api::Result)>;
 
 class AccessManager
 {
@@ -31,13 +31,13 @@ public:
 
     void stop();
 
-    std::pair<api::Result, std::string/*accountOwner*/> addStorageAllowed(
+    std::pair<api::Result, std::string/*accountOwner*/> authorizeAddingStorage(
         const nx::utils::stree::ResourceContainer& authInfo) const;
 
-    void readStorageAllowed(
+    void authorizeReadingStorage(
         const nx::utils::stree::ResourceContainer& authInfo,
         const api::Storage& storage,
-        ReadStorageAllowedHandler handler);
+        AuthorizeReadingStorageHandler handler);
 
     bool isStorageOwner(
         const nx::utils::stree::ResourceContainer& authInfo,
@@ -50,7 +50,7 @@ private:
     struct ReadStorageContext
     {
         std::unique_ptr<db::api::CdbClient> cdbClient;
-        ReadStorageAllowedHandler handler;
+        AuthorizeReadingStorageHandler handler;
     };
 
     ReadStorageContext& createReadStorageContext();

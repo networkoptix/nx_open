@@ -74,7 +74,7 @@ void AccessManager::stop()
     cdbRequests.clear();
 }
 
-std::pair<Result, std::string> AccessManager::addStorageAllowed(
+std::pair<Result, std::string> AccessManager::authorizeAddingStorage(
     const nx::utils::stree::ResourceContainer& authInfo) const
 {
     auto accountEmail = this->getAccountEmail(authInfo);
@@ -82,10 +82,10 @@ std::pair<Result, std::string> AccessManager::addStorageAllowed(
     return std::make_pair(std::move(result), std::move(accountEmail));
 }
 
-void AccessManager::readStorageAllowed(
+void AccessManager::authorizeReadingStorage(
     const nx::utils::stree::ResourceContainer& authInfo,
     const Storage& storage,
-    ReadStorageAllowedHandler handler)
+    AuthorizeReadingStorageHandler handler)
 {
     auto accountEmail = getAccountEmail(authInfo);
     if (accountEmail == storage.owner)
