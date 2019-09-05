@@ -1,51 +1,28 @@
+## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 cmake_minimum_required(VERSION 3.1)
 
-set(IMAGE_LIB_TARGET image_library_plugin)
+project(image_library_plugin)
 
-project(${IMAGE_LIB_TARGET})
+# Define nx_kit lib, static.
+set(nxKitLibraryType "STATIC" CACHE STRING "" FORCE)
+set(nxKitWithTests "NO" CACHE STRING "" FORCE)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../../nx_kit ${CMAKE_CURRENT_BINARY_DIR}/nx_kit)
 
-include_directories("../../../include")
+file(GLOB_RECURSE source_files ${CMAKE_CURRENT_SOURCE_DIR}/*)
+add_library(image_library_plugin SHARED ${source_files})
 
-if(WINDOWS)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+target_link_libraries(image_library_plugin PRIVATE nx_kit)
+
+target_include_directories(image_library_plugin PRIVATE ../../../src) #< SDK headers.
+
+if(WIN32)
+    target_compile_definitions(image_library_plugin PRIVATE _CRT_SECURE_NO_WARNINGS)
+else()
+    target_compile_options(image_library_plugin PRIVATE -Wno-deprecated-declarations)
 endif()
 
-add_library(${IMAGE_LIB_TARGET} SHARED
-        "archive_reader.cpp"
-		"archive_reader.h"
-		"camera_manager.cpp"
-		"camera_manager.h"
-		"dir_contents_manager.cpp"
-		"dir_contents_manager.h"
-		"dir_iterator.cpp"
-		"dir_iterator.h"
-		"discovery_manager.cpp"
-		"discovery_manager.h"
-		"ilp_empty_packet.cpp"
-		"ilp_empty_packet.h"
-		"ilp_video_packet.cpp"
-		"ilp_video_packet.h"
-		"media_encoder.cpp"
-		"media_encoder.h"
-		"motion_data_picture.cpp"
-		"motion_data_picture.h"
-		"mutex.cpp"
-		"mutex.h"
-		"plugin.cpp"
-		"plugin.h"
-		"stream_reader.cpp"
-		"stream_reader.h"
-		"time_periods.cpp"
-		"time_periods.h"
-		"wildcard_match.cpp"
-		"wildcard_match.h"
-)
-
-if(WINDOWS)
-    target_link_libraries(${IMAGE_LIB_TARGET} ws2_32)
-endif()
-
-set_target_properties(${IMAGE_LIB_TARGET} PROPERTIES
+set_target_properties(image_library_plugin PROPERTIES
     CXX_STANDARD 11
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO

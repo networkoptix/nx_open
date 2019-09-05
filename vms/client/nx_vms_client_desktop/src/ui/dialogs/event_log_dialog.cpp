@@ -1,6 +1,8 @@
 #include "event_log_dialog.h"
 #include "ui_event_log_dialog.h"
 
+#include <chrono>
+
 #include <QtCore/QMimeData>
 #include <QtGui/QClipboard>
 #include <QtWidgets/QMenu>
@@ -26,7 +28,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
-#include <nx/vms/client/desktop/analytics/analytics_events_tree.h>
+#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
@@ -51,15 +53,16 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
 
-#include <nx/analytics/properties.h>
-
 #include <nx/utils/log/log.h>
+#include <nx/utils/pending_operation.h>
 #include <nx/utils/std/algorithm.h>
 
 using namespace nx;
 using namespace nx::vms::event;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
+
+using namespace std::chrono;
 
 namespace {
 
@@ -238,12 +241,12 @@ QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem,
 void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
 {
     auto addItem =
-        [this](QStandardItem* parent, AnalyticsEventsTreeBuilder::NodePtr node)
+        [this](QStandardItem* parent, AnalyticsEntitiesTreeBuilder::NodePtr node)
         {
             auto item = new QStandardItem(node->text);
             item->setData(EventType::analyticsSdkEvent, EventTypeRole);
-            item->setData(qVariantFromValue(node->eventTypeId), AnalyticsEventTypeIdRole);
-            item->setSelectable(node->nodeType == AnalyticsEventsTreeBuilder::NodeType::eventType);
+            item->setData(qVariantFromValue(node->entityId), AnalyticsEventTypeIdRole);
+            item->setSelectable(node->nodeType == AnalyticsEntitiesTreeBuilder::NodeType::eventType);
 
             if (NX_ASSERT(parent))
                 parent->appendRow(item);
@@ -262,9 +265,9 @@ void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
                 parent->sortChildren(0);
         });
 
-    AnalyticsEventsTreeBuilder eventsTreeBuilder(commonModule());
-    const auto root = eventsTreeBuilder.compatibleTreeUnion(
-        resourcePool()->getAllCameras({}, /*ignoreDesktopCameras*/ true));
+    auto analyticsEventsSearchTreeBuilder =
+        commonModule()->instance<AnalyticsEventsSearchTreeBuilder>();
+    const auto root = analyticsEventsSearchTreeBuilder->eventTypesTree();
     addItemRecursive(rootItem, root);
 }
 
@@ -333,31 +336,17 @@ void QnEventLogDialog::initEventsModel()
     m_eventTypesModel->appendRow(rootItem);
     ui->eventComboBox->setModel(m_eventTypesModel);
 
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (!resource->hasFlags(Qn::server) || resource->hasFlags(Qn::fake))
-                return;
+    auto updateAnalyticsSubmenuOperation = new nx::utils::PendingOperation(
+        [this] { updateAnalyticsEvents(); },
+        100ms,
+        this);
+    updateAnalyticsSubmenuOperation->fire();
+    updateAnalyticsSubmenuOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
 
-            connect(resource, &QnResource::propertyChanged, this,
-                [this](const QnResourcePtr& /*res*/, const QString& key)
-                {
-                    if (key == nx::analytics::kEventTypeDescriptorsProperty)
-                        updateAnalyticsEvents();
-                });
-
-            updateAnalyticsEvents();
-        });
-
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (!resource->hasFlags(Qn::server) || resource->hasFlags(Qn::fake))
-                return;
-
-            resource->disconnect(this);
-            updateAnalyticsEvents();
-        });
+    connect(commonModule()->instance<AnalyticsEventsSearchTreeBuilder>(),
+        &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
+        updateAnalyticsSubmenuOperation,
+        &nx::utils::PendingOperation::requestOperation);
 }
 
 void QnEventLogDialog::reset()

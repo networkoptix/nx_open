@@ -10,7 +10,7 @@
                 <label for="otherSystemUrl" class="control-label">Hệ thống URL khác</label>
                 <div class="">
                     <div class="input-group" uib-dropdown>
-                        <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="máy chủ: cổng" required />
+                        <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="host:port" required />
 
                         <ul uib-dropdown class="dropdown-menu" role="menu" id="discoveredUrls">
                             <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>Không tìm thấy Hệ thống</a></li>
@@ -57,9 +57,9 @@
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
             <p>Hệ thống hiện tại sắp được sáp nhập <b>{{systems.systemName}}</b> với Hệ thống <b>{{systems.joinSystemName}}</b></p>
             <p>
-                Hệ thống mới sẽ có mật khẩu và tên từ Hệ thống sau: <0 />
-                <label> <2 /> {{systems.systemName}} (hiện tại) </label> <0 />
-                <label ng-if="!systems.remoteSystemIsNew"> <4 /> {{systems.joinSystemName}}</label>
+                Hệ thống mới sẽ có mật khẩu và tên từ Hệ thống sau:<br/>
+                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/>{{systems.systemName}} (hiện tại)</label><br/>
+                <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/>{{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>

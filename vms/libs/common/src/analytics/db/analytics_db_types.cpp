@@ -1,16 +1,50 @@
 #include "analytics_db_types.h"
 
+#include <QtCore/QRegularExpression>
+
 #include <cmath>
 #include <sstream>
-
-#include <nx/fusion/model_functions.h>
 
 #include <common/common_globals.h>
 #include <utils/math/math.h>
 
+#include <nx/fusion/model_functions.h>
+#include <nx/utils/std/algorithm.h>
+
 #include "config.h"
+#include "analytics_db_utils.h"
+
+using namespace nx::common::metadata;
 
 namespace nx::analytics::db {
+
+namespace {
+
+bool wordMatchAnyOfAttributes(const QString& word, const Attributes& attributes)
+{
+    std::function<bool(const Attribute&)> wordMatchesAttribute;
+    if (word.endsWith('*'))
+    {
+        const QStringRef prefix = word.leftRef(word.length() - 1);
+        wordMatchesAttribute =
+            [prefix](const Attribute& attribute)
+            {
+                return attribute.value.startsWith(prefix, Qt::CaseInsensitive);
+            };
+    }
+    else
+    {
+        wordMatchesAttribute =
+            [&word](const Attribute& attribute)
+            {
+                return QString::compare(word, attribute.value, Qt::CaseInsensitive) == 0;
+            };
+    }
+    return std::any_of(attributes.cbegin(), attributes.cend(), wordMatchesAttribute);
+}
+
+} // namespace
+
 
 bool ObjectPosition::operator==(const ObjectPosition& right) const
 {
@@ -56,6 +90,101 @@ bool Filter::empty() const
     return *this == Filter();
 }
 
+bool Filter::acceptsObjectType(const QString& typeId) const
+{
+    return objectTypeId.empty()
+        || std::find(objectTypeId.cbegin(), objectTypeId.cend(), typeId) != objectTypeId.cend();
+}
+
+bool Filter::acceptsBoundingBox(const QRectF& boundingBox) const
+{
+    return !this->boundingBox ||
+        rectsIntersectToSearchPrecision(*(this->boundingBox), boundingBox);
+}
+
+bool Filter::acceptsAttributes(const std::vector<Attribute>& attributes) const
+{
+    const auto filterWords = freeText.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
+    if (attributes.empty())
+        return filterWords.empty();
+
+    return std::all_of(filterWords.cbegin(), filterWords.cend(),
+        [&attributes](const QString& filterWord)
+        {
+            return wordMatchAnyOfAttributes(filterWord, attributes);
+        });
+}
+
+bool Filter::acceptsMetadata(const ObjectMetadata& metadata, bool checkBoundingBox) const
+{
+    return acceptsObjectType(metadata.typeId)
+        && (!checkBoundingBox || acceptsBoundingBox(metadata.boundingBox))
+        && acceptsAttributes(metadata.attributes);
+}
+
+bool Filter::acceptsTrack(const ObjectTrack& track) const
+{
+     using namespace std::chrono;
+
+    if (!objectTrackId.isNull() && track.id != objectTrackId)
+    {
+        return false;
+    }
+
+    if (!(microseconds(track.lastAppearanceTimeUs) >= timePeriod.startTime() &&
+          (timePeriod.isInfinite() ||
+              microseconds(track.firstAppearanceTimeUs) < timePeriod.endTime())))
+    {
+        return false;
+    }
+
+    // Matching every device if device list is empty.
+    if (!deviceIds.empty() &&
+        !nx::utils::contains(deviceIds, track.deviceId))
+    {
+        return false;
+    }
+
+    if (!objectTypeId.empty() &&
+        !nx::utils::contains(objectTypeId, track.objectTypeId))
+    {
+        return false;
+    }
+
+    if (!acceptsAttributes(track.attributes))
+        return false;
+
+    // Checking the track.
+    if (!std::any_of(
+            track.objectPositionSequence.cbegin(),
+            track.objectPositionSequence.cend(),
+            [this](const ObjectPosition& position)
+            {
+                return acceptsBoundingBox(position.boundingBox);
+            }))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void Filter::loadUserInputToFreeText(const QString& userInput)
+{
+    freeText = userInputToFreeText(userInput);
+}
+
+QString Filter::userInputToFreeText(const QString& userInput)
+{
+    auto filterWords = userInput.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
+    for (auto& word: filterWords)
+    {
+        if (!word.endsWith('*'))
+            word = word + '*';
+    }
+    return filterWords.join(' ');
+}
+
 bool Filter::operator==(const Filter& right) const
 {
     if (boundingBox.has_value() != right.boundingBox.has_value())
@@ -71,7 +200,8 @@ bool Filter::operator==(const Filter& right) const
         && objectTrackId == right.objectTrackId
         && timePeriod == right.timePeriod
         && freeText == right.freeText
-        && sortOrder == right.sortOrder;
+        && sortOrder == right.sortOrder
+        && deviceIds == right.deviceIds;
 }
 
 bool Filter::operator!=(const Filter& right) const

@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <translation>MMMM yyyy</translation>
+      <translation type="unfinished">MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -1028,7 +1028,7 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation>ZIP-Datei ist beschädigt.</translation>
+      <translation>Zip-datei ist beschädigt.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>

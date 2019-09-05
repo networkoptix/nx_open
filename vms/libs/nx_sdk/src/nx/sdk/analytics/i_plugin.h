@@ -20,21 +20,31 @@ namespace analytics {
 class IPlugin: public Interface<IPlugin, nx::sdk::IPlugin>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::IPlugin"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IPlugin"); }
 
     /**
      * Provides plugin manifest in JSON format.
-     *
      * @return JSON string in UTF-8.
      */
-    virtual Result<const IString*> manifest() const = 0;
+    protected: virtual void getManifest(Result<const IString*>* outResult) const = 0;
+    public: Result<const IString*> manifest() const
+    {
+        Result<const IString*> result;
+        getManifest(&result);
+        return result;
+    }
 
     /**
      * Creates a new instance of Analytics Engine.
-     *
      * @return Pointer to an object that implements the IEngine interface.
      */
-    virtual Result<IEngine*> createEngine() = 0;
+    protected: virtual void doCreateEngine(Result<IEngine*>* outResult) = 0;
+    public: Result<IEngine*> createEngine()
+    {
+        Result<IEngine*> result;
+        doCreateEngine(&result);
+        return result;
+    }
 };
 
 } // namespace analytics

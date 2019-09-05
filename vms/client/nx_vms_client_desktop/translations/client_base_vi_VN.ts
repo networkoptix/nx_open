@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Bất kỳ loại nào</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Chọn khu vực</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Chọn một số khu vực trên video...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Trong khu vực được chọn</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Không thể thực thi plugin</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Nhập tham số</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Hành động yêu cầu một số tham số được điền.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -877,7 +908,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation>thumbnail Display</translation>
+      <translation>Thumbnail Display</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
@@ -945,7 +976,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Pin Calendar</source>
-      <translation>pin Lịch</translation>
+      <translation>Pin Lịch</translation>
     </message>
     <message>
       <source>Unpin Calendar</source>
@@ -1012,6 +1043,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Vui lòng nhập lại mật khẩu cho bố cục %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Sự kiện máy chủ</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Sự kiện phân tích</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Bất kỳ sự kiện nào</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Bất kỳ sự cố thiết bị</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Bất kỳ vấn đề camera</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Bất kỳ sự kiện máy chủ</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Sự cố thiết bị</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Sự cố camera</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Bất kỳ sự kiện phân tích</translation>
     </message>
   </context>
   <context>
@@ -1635,24 +1705,12 @@ to view more bookmarks</source>
       <translation>Máy chủ cập nhật</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Quy tắc kinh doanh cập nhật</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Quy tắc kinh doanh cập nhật</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Quy luật kinh doanh bỏ</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Người dùng xóa</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Quy luật kinh doanh bỏ</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1747,6 +1805,18 @@ to view more bookmarks</source>
       <translation>
         <numerusform>%n hành động</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation type="unfinished">Event rule changed</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation type="unfinished">Event rule removed</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation type="unfinished">Event rules reset to default</translation>
     </message>
   </context>
   <context>
@@ -2021,8 +2091,8 @@ to view more bookmarks</source>
       <translation>Bất kỳ camera nào</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Buộc công nhận chỉ hoạt động với các sự kiện chung với các điều chỉnh camera trên URL sự kiện chung</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Buộc công nhận sẽ chỉ hoạt động cho các sự kiện chung nếu số nhận dạng camera được sử dụng trong URL sự kiện chung</translation>
     </message>
   </context>
   <context>
@@ -5545,8 +5615,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Dữ liệu phân tích hiện tại sẽ không được tự động chuyển đến vị trí khác và sẽ không thể truy cập được. Bạn có thể giữ nó và di chuyển thủ công sau đó, hoặc xóa vĩnh viễn.
+Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị trí lưu trữ khác, vui lòng liên hệ với bộ phận hỗ trợ trước khi tiếp tục.</translation>
     </message>
   </context>
   <context>
@@ -5869,10 +5939,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Không bao gồm bất kỳ thông tin cá nhân nào và hoàn toàn ẩn danh.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Các biện pháp máy chủ chuyển đổi dự phòng vẫn có thể yêu cầu cập nhật trạng thái camera bất kể cài đặt này.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Cho phép tự động phát hiện thiết bị và máy chủ và kiểm tra trạng thái thiết bị tự động</translation>
     </message>
@@ -5883,6 +5949,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Khi được bật, hệ thống liên tục phát hiện các camera và máy chủ mới và gửi yêu cầu khám phá tới các camera để cập nhật trạng thái.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Nếu Failover được bật, máy chủ vẫn có thể yêu cầu cập nhật trạng thái camera bất kể cài đặt này.</translation>
     </message>
   </context>
   <context>
@@ -5902,44 +5972,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Tệp (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Máy chủ</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Bù lại</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Ngày tháng</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Múi giờ</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Thời gian</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Máy chủ không có truy cập Internet. Thời gian không được đồng bộ hóa.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>Thời gian VMS được đồng bộ hóa với Internet và không phụ thuộc vào giờ địa phương trên các máy chủ.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>Thời gian VMS được đồng bộ hóa với giờ địa phương trên máy chủ được chọn và không phụ thuộc vào giờ địa phương trên các máy chủ khác.</translation>
     </message>
   </context>
   <context>
@@ -7038,6 +7070,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Chọn khu vực trên video để lọc kết quả</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Trong khu vực được chọn</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Camera đã chọn</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Thiết bị được chọn</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Chọn phương tiện</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>không xác định</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7257,7 +7317,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Theo dõi không xác định</translation>
     </message>
   </context>
   <context>
@@ -7275,38 +7335,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>
         <numerusform>%n đối tượng</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Any type</source>
-      <translation>Bất kỳ loại nào</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Chọn khu vực</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Chọn một số khu vực trên video...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Trong khu vực được chọn</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>công cụ phân tích không tên</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Không thể thực thi plugin</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Nhập tham số</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Hành động yêu cầu một số tham số được điền.</translation>
     </message>
   </context>
   <context>
@@ -7349,17 +7377,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>Áp dụng những thay đổi...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Module I/O này đã không có cài đặt nâng cao</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Camera này không có cài đặt nâng cao</translation>
     </message>
   </context>
   <context>
@@ -7905,42 +7922,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>Sự kiện máy chủ</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Sự kiện phân tích</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Bất kỳ sự cố thiết bị</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Bất kỳ vấn đề camera</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Bất kỳ sự kiện máy chủ</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Sự cố thiết bị</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Sự cố camera</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Bất kỳ sự kiện nào</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Bất kỳ sự kiện phân tích</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>Không có sự kiện</translation>
@@ -8493,11 +8474,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Một số máy chủ chưa hoàn thành quá trình cập nhật. Kết thúc nó bằng cách nào?</translation>
     </message>
     <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 sẽ được khởi động lại để cập nhật phiên bản.</translation>
-    </message>
-    <message>
       <source>Failed to download update packages to some components</source>
       <translation>Không thể tải xuống các gói cập nhật cho một số thành phần</translation>
     </message>
@@ -8687,7 +8663,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Generic Event</source>
-      <translation>sự kiện chung</translation>
+      <translation>Sự kiện chung</translation>
     </message>
     <message>
       <source>Device was disconnected</source>
@@ -8703,7 +8679,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Sự kiện chẩn đoán plugin không xác định</translation>
     </message>
   </context>
   <context>
@@ -9126,14 +9102,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Chọn khu vực trên video để lọc kết quả</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Trong khu vực được chọn</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Không có chuyển động</translation>
     </message>
@@ -9146,23 +9114,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>
         <numerusform>%n sự kiện chuyển động</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Camera đã chọn</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Thiết bị được chọn</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Chọn phương tiện</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>không xác định</translation>
     </message>
   </context>
   <context>
@@ -9297,11 +9248,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>Tệp từ xa &quot;%1&quot; bị hỏng</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>Máy chủ đã có tệp này &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9824,21 +9775,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>Xác nhận vị trí lưu trữ cho dữ liệu phân tích trên &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>phân vùng có sẵn lớn nhất</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>Cơ sở dữ liệu phân tích chỉ nên được lưu trữ trên một ổ đĩa cục bộ và có thể chiếm dung lượng lớn.
+Khi một vị trí để lưu trữ dữ liệu phân tích được chọn, nó không thể dễ dàng thay đổi mà không làm mất dữ liệu hiện có. Chúng tôi khuyên bạn nên chọn vị trí cẩn thận và tránh sử dụng phân vùng hệ thống vì nó có thể gây ra sự cố hệ thống nghiêm trọng.
+Theo mặc định, dữ liệu phân tích sẽ được lưu trữ trên %1.
+Bạn có thể chọn một vị trí lưu trữ khác trong tab &quot;Quản lý lưu trữ&quot; của hộp thoại Cài đặt máy chủ.</translation>
     </message>
   </context>
   <context>

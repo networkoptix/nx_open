@@ -10,7 +10,6 @@
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/i_engine.h>
-#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <plugins/resource/hanwha/hanwha_response.h>
@@ -29,20 +28,7 @@ class Engine: public nx::sdk::RefCountable<nx::sdk::analytics::IEngine>
 public:
     Engine(nx::sdk::analytics::Plugin* plugin);
 
-    virtual nx::sdk::analytics::Plugin* plugin() const override { return m_plugin; }
-
     virtual void setEngineInfo(const nx::sdk::analytics::IEngineInfo* engineInfo) override;
-
-    virtual nx::sdk::StringMapResult setSettings(const nx::sdk::IStringMap* settings) override;
-
-    virtual nx::sdk::SettingsResponseResult pluginSideSettings() const override;
-
-    virtual nx::sdk::analytics::MutableDeviceAgentResult obtainDeviceAgent(
-        const nx::sdk::IDeviceInfo* deviceInfo) override;
-
-    virtual nx::sdk::StringResult manifest() const override;
-
-    virtual nx::sdk::Result<void> executeAction(nx::sdk::analytics::IAction* action) override;
 
     const Hanwha::EngineManifest& engineManifest() const;
 
@@ -58,6 +44,20 @@ public:
     virtual void setHandler(nx::sdk::analytics::IEngine::IHandler* handler) override;
 
     virtual bool isCompatible(const nx::sdk::IDeviceInfo* deviceInfo) const override;
+
+protected:
+    virtual void doSetSettings(
+        nx::sdk::Result<const nx::sdk::IStringMap*>* outResult,
+        const nx::sdk::IStringMap* settings) override;
+    virtual void getPluginSideSettings(
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
+    virtual void getManifest(nx::sdk::Result<const nx::sdk::IString*>* outResult) const override;
+    virtual void doObtainDeviceAgent(
+        nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*>* outResult,
+        const nx::sdk::IDeviceInfo* deviceInfo) override;
+    virtual void doExecuteAction(
+        nx::sdk::Result<nx::sdk::analytics::IAction::Result>* outResult,
+        const nx::sdk::analytics::IAction* action) override;
 
 private:
     struct SharedResources

@@ -17,25 +17,24 @@ namespace analytics {
 class IObjectTrackBestShotPacket: public Interface<IObjectTrackBestShotPacket, IMetadataPacket>
 {
 public:
-    static auto interfaceId()
-    {
-        return InterfaceId("nx::sdk::analytics::IObjectTrackBestShotPacket");
-    }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectTrackBestShotPacket"); }
 
     /**
      * Timestamp of the frame (in microseconds) the best shot belongs to. Should be a non-negative
      * number.
      */
-    virtual int64_t timestampUs() const = 0;
+    virtual int64_t timestampUs() const override = 0;
 
     /** Id of the track the best shot belongs to. */
-    virtual nx::sdk::Uuid trackId() const = 0;
+    protected: virtual void getTrackId(Uuid* outValue) const = 0;
+    public: Uuid trackId() const { Uuid value; getTrackId(&value); return value; }
 
     /**
      * Bounding box of the best shot. If the rectangle returned by this method is invalid then
      * a bounding box from the frame with the timestamp equal to the timestampUs() will be used.
      */
-    virtual Rect boundingBox() const = 0;
+    protected: virtual void getBoundingBox(Rect* outValue) const = 0;
+    public: Rect boundingBox() const { Rect value; getBoundingBox(&value); return value; }
 };
 
 } // namespace analytics

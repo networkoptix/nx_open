@@ -32,15 +32,15 @@ DeviceAgent::~DeviceAgent()
     stopFetchingMetadata();
 }
 
-StringMapResult DeviceAgent::setSettings(const IStringMap* /*settings*/)
+void DeviceAgent::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
-    return nullptr;
 }
 
-SettingsResponseResult DeviceAgent::pluginSideSettings() const
+void DeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
 void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
@@ -49,12 +49,21 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     m_handler.reset(handler);
 }
 
-Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
-    if (metadataTypes->isEmpty())
-        stopFetchingMetadata();
+    const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
+    if (const char* const kMessage = "Event type id list is null";
+        !NX_ASSERT(eventTypeIds, kMessage))
+    {
+        *outResult = error(ErrorCode::internalError, kMessage);
+        return;
+    }
 
-    return startFetchingMetadata(metadataTypes);
+    stopFetchingMetadata();
+
+    if (eventTypeIds->count() != 0)
+        *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
 Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
@@ -96,8 +105,8 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
     NX_ASSERT(m_engine);
     std::vector<QString> eventTypes;
 
-    const auto eventTypeIdList = toPtr(metadataTypes->eventTypeIds());
-    if (const char* const  kMessage = "Event type id list is nullptr";
+    const auto eventTypeIdList = metadataTypes->eventTypeIds();
+    if (const char* const kMessage = "Event type id list is null";
         !NX_ASSERT(eventTypeIdList, kMessage))
     {
         return error(ErrorCode::internalError, kMessage);
@@ -131,12 +140,12 @@ void DeviceAgent::stopFetchingMetadata()
     m_monitor = nullptr;
 }
 
-StringResult DeviceAgent::manifest() const
+void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
     if (m_deviceAgentManifest.isEmpty())
-        return error(ErrorCode::otherError, "DeviceAgent manifest is empty");
-
-    return new nx::sdk::String(m_deviceAgentManifest);
+        *outResult = error(ErrorCode::otherError, "DeviceAgent manifest is empty");
+    else
+        *outResult = new nx::sdk::String(m_deviceAgentManifest);
 }
 
 void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)

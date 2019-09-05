@@ -525,7 +525,7 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
         {
             m_metadataLogger->pushData(
                 metadata,
-                lm("Queue size: %1").args(m_metadataReceptor->metadataQueue.size()));
+                lm("Queue size %1").args(m_metadataReceptor->metadataQueue.size()));
         }
 
         return metadata;
@@ -638,7 +638,7 @@ void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded(const QnCompressedVideo
 }
 
 void QnLiveStreamProvider::saveBitrateIfNeeded(
-    const QnCompressedVideoDataPtr& videoData,
+    const QnCompressedVideoDataPtr& /*videoData*/,
     const QnLiveStreamParams& liveParams,
     bool isCameraConfigured)
 {

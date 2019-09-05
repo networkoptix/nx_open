@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="es-ES" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Cualquier tipo</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Seleccionar area</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Seleccione un área en el video...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>En area seleccionada</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>No se pudo ejecutar plugin de acción</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Introducir parametros</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>La acción requiere que algunos parámetros sean llenados.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1015,6 +1046,45 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Eventos del servidor</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Eventos analíticos</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Cualquier evento</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Cualquier problema del dispositivo</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Cualquier problema con la cámara</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Cualquier evento del servidor</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Problemas con el dispositivo</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Problemas con la cámara</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Cualquier evento analítico</translation>
+    </message>
+  </context>
+  <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
@@ -1651,24 +1721,12 @@ to view more bookmarks</source>
       <translation>Servidor actualizado</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Regla de negocio actualizada</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Servidor eliminado</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Regla de negocio eliminada</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Usuario eliminado</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Regla de Negocios se restablecieron</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1764,6 +1822,18 @@ to view more bookmarks</source>
         <numerusform>%n acciones</numerusform>
         <numerusform>%n acciones</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>Regla de evento cambiada</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>Regla de evento eliminada</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>Reglas de eventos restablecidas a las predeterminadas</translation>
     </message>
   </context>
   <context>
@@ -2044,8 +2114,8 @@ to view more bookmarks</source>
       <translation>Cualquier cámara</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Forzar acuse de recibo solo funcionará para eventos genéricos si se usan modificadores de cámara en la URL de evento genérico</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Forzar el reconocimiento sólo funcionará para eventos genéricos si los identificadores de cámara se utilizan en la URL del evento genérico</translation>
     </message>
   </context>
   <context>
@@ -5610,8 +5680,8 @@ a %1</translation>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Los datos analíticos actuales no se moverán automáticamente a otra ubicación y serán inaccesibles. Puede conservarlo y moverlo manualmente más tarde, o eliminarlo permanentemente.
+Si tenía la intención de mover los datos analíticos a otra ubicación de almacenamiento, póngase en contacto con el soporte antes de continuar.</translation>
     </message>
   </context>
   <context>
@@ -5934,10 +6004,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>No incluye información personal y es completamente anónimo.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Las medidas del servidor Failover pueden solicitar actualizaciones de estado de la cámara independientemente de esta configuración.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Habilitar el autodescubrimiento de dispositivos y servidores y la comprobación automática del estado del dispositivo</translation>
     </message>
@@ -5948,6 +6014,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Cuando está habilitado, el sistema descubre continuamente nuevas cámaras y servidores, y envía peticiones de descubrimiento a cámaras para actualizar el estado.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Si Failover está activado, el servidor puede solicitar actualizaciones de estado de la cámara independientemente de esta configuración.</translation>
     </message>
   </context>
   <context>
@@ -5967,44 +6037,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Archivo de hoja de cálculo (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Servidor</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Compensación</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Fecha</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Zona Horaria</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Tiempo</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Ningún servidor tiene acceso a Internet. El tiempo no esta siendo sincronizado.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>La hora VMS está sincronizada con Internet y no depende de la hora local en los servidores.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>La hora de VMS se sincroniza con la hora local en el servidor seleccionado y no depende de la hora local de otros servidores.</translation>
     </message>
   </context>
   <context>
@@ -7139,6 +7171,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Seleccione el área en el video para filtrar los resultados</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>En area seleccionada</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Cámara seleccionada</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Dispositivo seleccionado</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Medios seleccionados</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ninguna</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7379,38 +7439,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n objetos</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Cualquier tipo</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Seleccionar area</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Seleccione un área en el video...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>En area seleccionada</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>motor analítico sin nombre</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>No se pudo ejecutar plugin de acción</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Introducir parametros</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>La acción requiere que algunos parámetros sean llenados.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7453,17 +7481,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>Aplicando los cambios...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Este módulo no tiene ninguna configuración avanzada</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Esta cámara no tiene ninguna configuración avanzada</translation>
     </message>
   </context>
   <context>
@@ -8021,42 +8038,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation>Eventos del servidor</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Eventos analíticos</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Cualquier problema del dispositivo</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Cualquier problema con la cámara</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Cualquier evento del servidor</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Problemas con el dispositivo</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Problemas con la cámara</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Cualquier evento</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Cualquier evento analítico</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>No hay eventos</translation>
     </message>
@@ -8611,11 +8592,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>Algunos servidores no han completado el proceso de actualización. ¿Terminar de todos modos?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 se reiniciará a la versión actualizada.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -9248,14 +9224,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Seleccione el área en el video para filtrar los resultados</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>En area seleccionada</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Sin movimiento</translation>
     </message>
@@ -9269,23 +9237,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n eventos de movimiento</numerusform>
         <numerusform>%n eventos de movimiento</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Cámara seleccionada</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Dispositivo seleccionado</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Medios seleccionados</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ninguna</translation>
     </message>
   </context>
   <context>
@@ -9423,11 +9374,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>El archivo remoto &quot;%1&quot; está dañado</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>El servidor ya tiene este archivo &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9959,21 +9910,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>Confirme la ubicación de almacenamiento para los datos analíticos en &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>la partición más grande disponible</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>La base de datos de analíticossólo debe almacenarse en una unidad local y puede tomar grandes cantidades de espacio.
+Una vez que se selecciona una ubicación para almacenar datos analíticos, no se puede cambiar fácilmente sin perder datos existentes. Recomendamos elegir la ubicación cuidadosamente y evitar usar la partición del sistema ya que puede causar una mala función del sistema.
+Por defecto los datos analíticos se almacenarán en %1.
+Puede seleccionar otra ubicación de almacenamiento en la pestaña &quot;Administración de Almacenamiento&quot; de la ventana de Configuración del servidor.</translation>
     </message>
   </context>
   <context>

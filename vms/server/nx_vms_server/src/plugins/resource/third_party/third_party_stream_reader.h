@@ -13,6 +13,7 @@
 
 #include "third_party_resource.h"
 #include <nx/utils/time_helper.h>
+#include <nx/sdk/ptr.h>
 
 //!Stream reader for resource, implemented in external plugin
 class ThirdPartyStreamReader: public CLServerPushStreamReader
@@ -66,12 +67,11 @@ private:
     mutable QnMutex m_streamReaderMutex;
     QnThirdPartyResourcePtr m_thirdPartyRes;
     nxcip_qt::BaseCameraManager m_camManager;
-    // TODO: Migrate to nx::sdk::Ptr.
-    std::shared_ptr<nxcip::StreamReader> m_liveStreamReader;
+    nx::sdk::Ptr<nxcip::StreamReader> m_liveStreamReader;
     QnAbstractMediaDataPtr m_savedMediaPacket;
     QSize m_videoResolution;
     QnConstMediaContextPtr m_audioContext;
-    std::shared_ptr<nxcip::CameraMediaEncoder2> m_mediaEncoder2;
+    nx::sdk::Ptr<nxcip::CameraMediaEncoder2> m_mediaEncoder2;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     unsigned int m_cameraCapabilities = 0;
 
@@ -80,7 +80,8 @@ private:
     std::vector<TimeHelperPtr> m_videoTimeHelpers;
     std::vector<TimeHelperPtr> m_audioTimeHelpers;
     std::atomic_flag m_isMediaUrlValid;
-    QString m_lastSourceUrl;
+    bool m_isServerSideUpdate = false;
+    QnMutex m_sourceUrlMutex;
 
     void initializeAudioContext( const nxcip::AudioFormat& audioFormat, const Extras& extras );
 };

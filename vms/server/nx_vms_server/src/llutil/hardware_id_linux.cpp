@@ -34,19 +34,6 @@ namespace {
 const QString kEmptyMac = lit("");
 const static nx::utils::log::Tag kLogTag(lit("HardwareId"));
 
-QByteArray fromString(const std::string& s) {
-    return QByteArray(s.data(), s.size());
-}
-
-std::string trim(const std::string& str) {
-    std::string result = str;
-
-    result.erase(0, result.find_first_not_of(" \t\n"));
-    result.erase(result.find_last_not_of(" \t\n") + 1);
-
-    return result;
-}
-
 QString readFile(nx::vms::server::RootFileSystem* rootTool, const char* path)
 {
     int fd = rootTool->open(path, QIODevice::ReadOnly);

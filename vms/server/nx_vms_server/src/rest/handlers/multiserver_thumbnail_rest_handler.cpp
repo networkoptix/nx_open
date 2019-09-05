@@ -24,6 +24,7 @@
 
 #include <utils/media/frame_info.h>
 #include <nx/utils/log/log_main.h>
+#include <nx/utils/scope_guard.h>
 
 namespace {
 
@@ -45,6 +46,14 @@ int QnMultiserverThumbnailRestHandler::executeGet(
     QByteArray& result, QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
 {
+    QThread::currentThread()->setPriority(QThread::LowPriority);
+    auto threadPriorityGuard = nx::utils::makeScopeGuard(
+        []()
+        {
+            QThread::currentThread()->setPriority(QThread::NormalPriority);
+        });
+
+
     auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(
         processor->commonModule()->resourcePool(), params);
     const auto& imageRequest = request.request;

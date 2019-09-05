@@ -591,22 +591,9 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
 
         query.addBindValue(DB_INSTANCE_KEY);
         if (!m_resyncFlags.testFlag(ResyncLog) && query.exec() && query.next())
-        {
-            m_dbInstanceId = QnUuid::fromRfc4122(query.value(0).toByteArray());
-        }
-        else
-        {
-            m_dbInstanceId = QnUuid::createUuid();
-            QSqlQuery insQuery(m_sdb);
-            insQuery.prepare("INSERT OR REPLACE INTO misc_data (key, data) values (?,?)");
-            insQuery.addBindValue(DB_INSTANCE_KEY);
-            insQuery.addBindValue(m_dbInstanceId.toRfc4122());
-            if (!insQuery.exec())
-            {
-                qWarning() << "can't initialize sqlLite database!";
-                return false;
-            }
-        }
+            setDbId(QnUuid::fromRfc4122(query.value(0).toByteArray()));
+        else if (!updateId())
+            return false;
 
         if (m_tranLog)
             if (!m_tranLog->init())
@@ -907,8 +894,6 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
         if (localInfo.data.prematureLicenseExperationDate != licenseOverflowTime)
             localInfo.data.prematureLicenseExperationDate = licenseOverflowTime;
-
-        localInfo.data.peer.persistentId = m_dbInstanceId;
         runtimeInfoManager->updateLocalItem(localInfo);
     } // end of DB update
 
@@ -917,8 +902,8 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         qWarning() << "failed to vacuum ecs database" << Q_FUNC_INFO;
 
     m_dbReadOnly = commonModule()->isReadOnly();
-    emit initialized();
     m_initialized = true;
+    emit initialized();
 
     return true;
 }
@@ -964,7 +949,6 @@ bool QnDbManager::syncLicensesBetweenDB()
         if (saveLicense(license, m_sdbStatic) != ErrorCode::ok)
             return false;
     }
-    commonModule()->setDbId(m_dbInstanceId);
     return true;
 }
 
@@ -2061,6 +2045,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20190704_encrypt_action_parameters.sql")))
         return encryptBusinessRules() && resyncIfNeeded({ResyncRules});
+
+    if (updateName.endsWith(lit("/99_20190821_fix_analytics_engine_guids.sql")))
+        return resyncIfNeeded(ResyncRules);
 
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;
@@ -5404,8 +5391,18 @@ bool QnDbManager::updateId()
         return false;
     }
 
-    m_dbInstanceId = newDbInstanceId;
+    setDbId(newDbInstanceId);
     return true;
+}
+
+void QnDbManager::setDbId(const QnUuid& value)
+{
+    m_dbInstanceId = value;
+    const auto& runtimeInfoManager = commonModule()->runtimeInfoManager();
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
+    localInfo.data.peer.persistentId = m_dbInstanceId;
+    runtimeInfoManager->updateLocalItem(localInfo);
+    commonModule()->setDbId(m_dbInstanceId);
 }
 
 QnDbManager::QnDbTransactionExt* QnDbManager::getTransaction()

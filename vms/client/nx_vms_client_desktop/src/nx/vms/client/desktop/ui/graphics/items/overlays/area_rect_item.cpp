@@ -8,7 +8,7 @@ AreaRectItem::AreaRectItem(QGraphicsItem* parentItem, QObject* parentObject):
     QObject(parentObject),
     GraphicsRectItem(parentItem)
 {
-    setAcceptedMouseButtons(Qt::LeftButton);
+    setAcceptedMouseButtons(Qt::NoButton);
     setAcceptHoverEvents(true);
 }
 

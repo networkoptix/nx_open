@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>全てのタイプ</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>エリア選択</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>ビデオ上のエリアを選択してください</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>選択されたエリア</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>プラグインアクションの実行に失敗しました</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>パラメータを入力</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>アクションにはいくつかのパラメータ入力が必要です</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1015,6 +1046,45 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>サーバーイベント</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>分析イベント</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>全イベント</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>全デバイス障害</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>全カメラ障害</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>全サーバーイベント</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>デバイスの問題</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>カメラの問題</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>全分析イベント</translation>
+    </message>
+  </context>
+  <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
@@ -1635,24 +1705,12 @@ to view more bookmarks</source>
       <translation>サーバー更新</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>ビジネスルールの更新</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>サーバー削除</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>ビジネスルール削除</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>ユーザー削除</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>ビジネスルールリセット</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1747,6 +1805,18 @@ to view more bookmarks</source>
       <translation>
         <numerusform>%n アクション</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>イベントルールが変更されました</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>イベントルールが削除されました</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>イベントルールをデフォルトにリセット</translation>
     </message>
   </context>
   <context>
@@ -2021,8 +2091,8 @@ to view more bookmarks</source>
       <translation>全カメラ</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>カメライベントが一般イベントで使用されている場合、強制承認は一般的イベントに対してのみ機能します</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>カメラ識別子が汎用イベントURLで使用されている場合、強制承認は汎用イベントに対してのみ機能します</translation>
     </message>
   </context>
   <context>
@@ -5546,8 +5616,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>現在の分析データは自動的に別の場所に移動されず、アクセスできなくなります。保持して後で手動で移動するか、完全に削除できます。
+分析データを別の保管場所に移動する場合は、移動作業を進める前にサポートに連絡してください。</translation>
     </message>
   </context>
   <context>
@@ -5870,10 +5940,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>いかなる個人情報も含まず、完全に匿名です。</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>フェイルオーバーサーバーの対策では、この設定に関係なくカメラステータスの更新を要求することがあります。</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>デバイスとサーバーの自動検出と自動デバイスステータスチェックを有効にする</translation>
     </message>
@@ -5884,6 +5950,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>有効にすると、システムは新しいカメラとサーバーを継続的に検出し、状態更新のために検出リクエストをカメラに送信します。</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>フェールオーバーが有効になっている場合、サーバーはこの設定に関係なくカメラステータスの更新を要求する場合があります。</translation>
     </message>
   </context>
   <context>
@@ -5903,44 +5973,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>スプレッドシート（CSV）ファイル</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>サーバー</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>オフセット</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>日付</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>タイムゾーン</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>時間</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>インターネットにアクセスできるサーバーはありません　時間は同期されていません</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>VMSの時間はインターネットと同期しており、サーバーの現地時間には依存しません。</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>VMSの時間は選択したサーバーの現地時間と同期され、他のサーバーの現地時間には依存しません。</translation>
     </message>
   </context>
   <context>
@@ -7039,6 +7071,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>結果をフィルター処理するためにビデオのエリアを選択します</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>選択されたエリア</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>選択したカメラ</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>選択したデバイス</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>選択したメディア</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>なし</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7277,38 +7337,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n オブジェクト</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>全てのタイプ</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>エリア選択</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>ビデオ上のエリアを選択してください</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>選択されたエリア</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>無名の分析エンジン</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>プラグインアクションの実行に失敗しました</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>パラメータを入力</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>アクションにはいくつかのパラメータ入力が必要です</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7350,17 +7378,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>変更の適応中...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>この I/O モジュールは、アドバンス設定がありません</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>この I/O モジュールは、アドバンス設定がありません</translation>
     </message>
   </context>
   <context>
@@ -7906,42 +7923,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>サーバーイベント</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>分析イベント</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>全デバイス障害</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>全カメラ障害</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>全サーバーイベント</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>デバイスの問題</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>カメラの問題</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>全イベント</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>全分析イベント</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>イベントなし</translation>
@@ -8492,11 +8473,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>一部のサーバーでは更新プロセスが完了しませんでした。終了しますか？</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 は、更新されたバージョンで再起動します</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -9127,14 +9103,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>結果をフィルター処理するためにビデオのエリアを選択します</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>選択されたエリア</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>モーションなし</translation>
     </message>
@@ -9147,23 +9115,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>
         <numerusform>%n モーションイベント</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>選択したカメラ</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>選択したデバイス</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>選択したメディア</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>なし</translation>
     </message>
   </context>
   <context>
@@ -9298,11 +9249,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>リモートファイル &quot;%1&quot; が破損しています</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>サーバーにはすでにこのファイル &quot;%1&quot; があります</translation>
     </message>
   </context>
   <context>
@@ -9825,21 +9776,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>&quot;%1&quot; で分析データの保管場所を確認してください</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>利用可能な最大のパーティション</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>分析データベースはローカルドライブにのみ保存する必要があり、大量のスペースを占有する可能性があります。
+分析データの保存場所を選択すると、既存のデータを失わずに簡単に変更することはできません。深刻なシステムの誤動作を引き起こす可能性があるため、場所を慎重に選択し、システムパーティションの使用を避けることをお勧めします。
+デフォルトでは、分析データは %1に保存されます。
+サーバー設定ダイアログの &quot;ストレージ管理&quot; タブで別のストレージの場所を選択できます。</translation>
     </message>
   </context>
   <context>

@@ -20,8 +20,10 @@ namespace utils {
 QString NX_UTILS_API timestampToRfc2822(qint64 timestampMs);
 QString NX_UTILS_API timestampToRfc2822(std::chrono::milliseconds timestamp);
 
-QString NX_UTILS_API timestampToDebugString(qint64 timestampMs);
-QString NX_UTILS_API timestampToDebugString(std::chrono::milliseconds timestamp);
+QString NX_UTILS_API timestampToDebugString(qint64 timestampMs,
+    const QString& format = QString());
+QString NX_UTILS_API timestampToDebugString(std::chrono::milliseconds timestamp,
+    const QString& format = QString());
 
 } // namespace utils
 } // namespace nx

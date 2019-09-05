@@ -148,6 +148,7 @@ void DeviceAgent::makeDeferredSubscription()
 {
     m_httpClient.reset();
     m_tcpSocket.reset();
+    m_reconnectTimer.cancelSync();
     m_reconnectTimer.start(kReconnectTimeout, [this]() { makeSubscription(); });
 }
 
@@ -399,19 +400,21 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     m_handler.reset(handler);
 }
 
-Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
-    const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
-    if (const char* const kMessage = "Event type id list is nullptr";
+    const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
+    if (const char* const kMessage = "Event type id list is null";
         !NX_ASSERT(eventTypeIds, kMessage))
     {
-        return error(ErrorCode::internalError, kMessage);
+        *outResult = error(ErrorCode::internalError, kMessage);
+        return;
     }
 
-    if (eventTypeIds->count() == 0)
-        stopFetchingMetadata();
+    stopFetchingMetadata();
 
-    return startFetchingMetadata(metadataTypes);
+    if (eventTypeIds->count() != 0)
+        *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
 Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
@@ -423,7 +426,7 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
     m_cameraController.setCredentials(m_auth.user().toLatin1(), m_auth.password().toLatin1());
 
     // Assuming that the list contains only events, since this plugin does not produce objects.
-    const auto eventTypeIdList = toPtr(metadataTypes->eventTypeIds());
+    const auto eventTypeIdList = metadataTypes->eventTypeIds();
     if (const char* const message = "Event type id list is nullptr";
         !NX_ASSERT(eventTypeIdList, message))
     {
@@ -486,20 +489,20 @@ void DeviceAgent::stopFetchingMetadata()
     promise.get_future().wait();
 }
 
-StringResult DeviceAgent::manifest() const
+void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
-    return new nx::sdk::String(m_cameraManifest);
+    *outResult = new nx::sdk::String(m_cameraManifest);
 }
 
-StringMapResult DeviceAgent::setSettings(const IStringMap* /*settings*/)
+void DeviceAgent::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
-    return nullptr;
 }
 
-SettingsResponseResult DeviceAgent::pluginSideSettings() const
+void DeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
 } // namespace dw_mtt

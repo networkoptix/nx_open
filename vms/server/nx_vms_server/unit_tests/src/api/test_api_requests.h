@@ -14,6 +14,8 @@
 
 #include <test_support/mediaserver_launcher.h>
 
+#include <boost/variant.hpp>
+
 namespace nx {
 namespace test {
 
@@ -28,6 +30,20 @@ PreprocessRequestFunc removeJsonFields(const QSet<QString>& fields);
 
 /** Perform Rest API GET request synchronously. See args in the function definition. */
 #define NX_TEST_API_GET(...) ASSERT_NO_FATAL_FAILURE(api_requests_detail::executeGet(__VA_ARGS__))
+
+struct Equals
+{
+    Equals(nx::network::http::StatusCode::Value code): code(code) {}
+    nx::network::http::StatusCode::Value code;
+};
+
+struct NotEquals
+{
+    NotEquals(nx::network::http::StatusCode::Value code): code(code) {}
+    nx::network::http::StatusCode::Value code;
+};
+
+using StatusCodeExpectation = boost::variant<Equals, NotEquals>;
 
 //-------------------------------------------------------------------------------------------------
 // Implementation
@@ -44,7 +60,7 @@ void doExecutePost(
     const QString& urlStr,
     const QByteArray& request,
     PreprocessRequestFunc preprocessRequestFunc,
-    int httpStatus,
+    StatusCodeExpectation httpStatus,
     const QString& authName,
     const QString& authPassword,
     QByteArray* responseBody);
@@ -58,7 +74,7 @@ void executePost(
     const QString& urlStr,
     const RequestData& requestData,
     PreprocessRequestFunc preprocessRequestFunc = nullptr,
-    int httpStatus = nx::network::http::StatusCode::ok,
+    StatusCodeExpectation httpStatus = Equals(nx::network::http::StatusCode::ok),
     const QString& authName = "admin",
     const QString& authPassword = "admin",
     QByteArray* responseBody = nullptr)

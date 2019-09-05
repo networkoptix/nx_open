@@ -69,7 +69,7 @@ namespace nx::vms::server {
     class RootFileSystem;
     class Settings;
     class ServerTimeSyncManager;
-    class ServerUpdateManager;
+    class UpdateManager;
 }
 
 namespace nx::vms::server::resource { class SharedContextPool; }
@@ -117,7 +117,7 @@ public:
     nx::vms::server::resource::SharedContextPool* sharedContextPool() const;
     AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher() const;
     nx::analytics::db::AbstractEventsStorage* analyticsEventsStorage() const;
-    nx::vms::server::ServerUpdateManager* updateManager() const;
+    nx::vms::server::UpdateManager* updateManager() const;
     QnDataProviderFactory* dataProviderFactory() const;
     QnResourceCommandProcessor* resourceCommandProcessor() const;
 
@@ -198,7 +198,7 @@ private:
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
     std::unique_ptr<nx::analytics::db::AbstractEventsStorage> m_analyticsEventsStorage;
     std::unique_ptr<nx::vms::server::RootFileSystem> m_rootFileSystem;
-    nx::vms::server::ServerUpdateManager* m_updateManager = nullptr;
+    nx::vms::server::UpdateManager* m_updateManager = nullptr;
     QnDataProviderFactory* m_resourceDataProviderFactory = nullptr;
     QScopedPointer<QnResourceCommandProcessor> m_resourceCommandProcessor;
     QnMotionHelper* m_motionHelper = nullptr;

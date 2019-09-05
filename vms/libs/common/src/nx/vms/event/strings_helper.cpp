@@ -744,17 +744,14 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
 {
     NX_ASSERT(params.eventType == EventType::analyticsSdkEvent);
 
-    const QnUuid engineId = params.getAnalyticsEngineId();
-    NX_ASSERT(!engineId.isNull());
-
     const QString eventTypeId = params.getAnalyticsEventTypeId();
     NX_ASSERT(!eventTypeId.isEmpty());
 
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    nx::analytics::EventTypeDescriptorManager descriptorManager(camera->commonModule());
-    const auto eventTypeDescriptor = descriptorManager.descriptor(eventTypeId);
+    const auto eventTypeDescriptor = camera->commonModule()->analyticsEventTypeDescriptorManager()
+        ->descriptor(eventTypeId);
     return eventTypeDescriptor ? eventTypeDescriptor->name : tr("Analytics Event");
 }
 

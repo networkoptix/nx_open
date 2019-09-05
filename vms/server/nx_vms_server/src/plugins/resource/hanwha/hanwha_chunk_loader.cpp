@@ -106,13 +106,15 @@ qint64 HanwhaChunkLoader::startTimeUsec(int channelNumber) const
 
     for (const auto& entry: m_chunks)
     {
-        const auto overlappedId = entry.first;
         const auto& chunksByChannel = entry.second;
-        if (chunksByChannel.size() <= channelNumber || chunksByChannel[channelNumber].isEmpty())
+        if (chunksByChannel.size() <= (size_t) channelNumber
+            || chunksByChannel[(size_t) channelNumber].isEmpty())
+        {
             continue;
+        }
 
         const auto earliestChunkStartTimeUs =
-            chunksByChannel[channelNumber].front().startTimeMs * 1000;
+            chunksByChannel[(size_t) channelNumber].front().startTimeMs * 1000;
 
         if (earliestChunkStartTimeUs < startTimeUs)
             startTimeUs = earliestChunkStartTimeUs;

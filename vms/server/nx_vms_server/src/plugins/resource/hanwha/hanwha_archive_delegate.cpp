@@ -257,7 +257,8 @@ void HanwhaArchiveDelegate::setSpeed(qint64 displayTime, double value)
         open(m_streamReader->m_resource, /*archiveIntegrityWatcher*/ nullptr);
 }
 
-void HanwhaArchiveDelegate::setRange(qint64 startTimeUsec, qint64 endTimeUsec, qint64 /*frameStepUsec*/)
+void HanwhaArchiveDelegate::setRange(
+    qint64 startTimeUsec, qint64 endTimeUsec, qint64 /*frameStepUsec*/)
 {
     if (m_playbackMode == PlaybackMode::Edge)
         startTimeUsec -= duration_cast<microseconds>(kEdgeStartTimeCorrection).count();
@@ -294,7 +295,7 @@ void HanwhaArchiveDelegate::setPlaybackMode(PlaybackMode mode)
             break;
         case PlaybackMode::Edge:
             m_isSeekAlignedByChunkBorder = false;
-            //< break is intentionally missing.
+            [[fallthrough]];
         case PlaybackMode::Export:
             rtspClient.addRequestHeader(QnRtspClient::kPlayCommand, nx::network::http::HttpHeader("Rate-Control", "no"));
             m_streamReader->setSessionType(HanwhaSessionType::fileExport);
@@ -311,7 +312,7 @@ void HanwhaArchiveDelegate::setGroupId(const QByteArray& id)
 
 void HanwhaArchiveDelegate::beforeSeek(qint64 /*time*/)
 {
-    // TODO: implement me
+    // TODO: implement
 }
 
 void HanwhaArchiveDelegate::setRateControlEnabled(bool enabled)

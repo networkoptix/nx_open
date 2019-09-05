@@ -7,7 +7,6 @@
 #include <client_core/connection_context_aware.h>
 #include <core/resource/resource_fwd.h>
 
-#include <nx/update/common_update_manager.h>
 #include <nx/update/update_check.h>
 #include <nx/update/update_information.h>
 
@@ -58,6 +57,8 @@ public:
     bool hasRemoteChanges() const;
     bool hasOfflineUpdateChanges() const;
     void resumeTasks();
+
+    bool hasInitiatedThisUpdate() const;
 
     /**
      * Sends GET https://localhost:7001/ec2/updateInformation and stores response in an internal
@@ -285,6 +286,8 @@ private:
     void atDownloaderStatusChanged(const FileInformation& fileInformation);
     void atChunkDownloadFailed(const QString& fileName);
     void atDownloadFailed(const QString& fileName);
+    void atDownloadFinished(const QString& fileName);
+    void atDownloadStalled(const QString& fileName, bool stalled);
 
     const nx::update::Package* findPackageForFile(const QString& fileName) const;
 
@@ -292,7 +295,9 @@ private:
 
 private:
     OfflineUpdateState m_offlineUpdaterState = OfflineUpdateState::initial;
+    bool m_wasPushingManualPackages = false;
     bool m_offlineUpdateStateChanged = false;
+    bool m_initiatedUpdate = false;
 
     QString m_offlineUpdateFile;
     std::promise<UpdateContents> m_offlineUpdateCheckResult;
@@ -310,9 +315,9 @@ private:
     std::set<QString> m_activeUploads;
     std::set<QString> m_completedUploads;
 
+    // It helps to track downloading progress for files.
     std::map<QString, int> m_activeDownloads;
     std::set<QString> m_completeDownloads;
-    std::set<QString> m_failedDownloads;
     std::set<QString> m_issuedDownloads;
 
     std::map<QString, nx::vms::client::desktop::UploadState> m_uploadStateById;
@@ -339,7 +344,6 @@ private:
 
     // Time at which install command was issued.
     qint64 m_timeStartedInstall = 0;
-    bool m_protoProblemDetected = false;
     QSet<rest::Handle> m_requestingInstall;
 
     /** We use this downloader when client downloads updates for server without internet. */

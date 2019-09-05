@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pt-PT" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Qualquer tipo</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation type="unfinished">Select area</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation type="unfinished">Select some area on the video...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Na área selecionada</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Falha ao executar a acção do plug-in</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation type="unfinished">Enter parameters</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1016,6 +1047,45 @@ para ver mais favoritos</translation>
     </message>
   </context>
   <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation type="unfinished">Server events</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Evento de Analytics</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation type="unfinished">Any event</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation type="unfinished">Any device issue</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation type="unfinished">Any camera issue</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation type="unfinished">Any server event</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation type="unfinished">Device issues</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation type="unfinished">Camera issues</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation type="unfinished">Any analytics event</translation>
+    </message>
+  </context>
+  <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
@@ -1172,7 +1242,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation>O arquivo &quot;%1&quot; já existe. Por favor, tente outro nome.</translation>
+      <translation>Arquivo &quot;%1&quot; já existe. Por favor, tente outro nome.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
@@ -1473,7 +1543,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation>Ajuste para o menor valor que não degrade a visualização ao vivo. Um buffer maior torna a reprodução mais suave, mas aumenta o atraso entre o tempo real e a visualização ao vivo; Um buffer menor diminui o atraso, mas pode causar &quot;soluços&quot;.</translation>
+      <translation>Ajuste para o menor valor que não degrade a visualização ao vivo. Um buffer maior torna a reprodução mais suave, mas aumenta o atraso entre o tempo real e a visualização ao vivo; Um buffer menor diminui o atraso, mas pode causar soluços.</translation>
     </message>
   </context>
   <context>
@@ -1652,24 +1722,12 @@ para ver mais favoritos</translation>
       <translation>Servidor Actualizado</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Regra "Business" actualizada</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Servidor Removido</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Regra "Business" removida</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Utilizador Removido</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Regra "Business" restabelecida</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1765,6 +1823,18 @@ para ver mais favoritos</translation>
         <numerusform>%n actions</numerusform>
         <numerusform>%n actions</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation type="unfinished">Event rule changed</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation type="unfinished">Event rule removed</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation type="unfinished">Event rules reset to default</translation>
     </message>
   </context>
   <context>
@@ -2045,8 +2115,8 @@ para ver mais favoritos</translation>
       <translation>Qualquer câmera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
     </message>
   </context>
   <context>
@@ -2330,7 +2400,7 @@ para ver mais favoritos</translation>
     </message>
     <message>
       <source>Firmware</source>
-      <translation>Firmware:</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <source>IP/Name</source>
@@ -2777,15 +2847,15 @@ a %1</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo &quot;source&quot; com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo "source" com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo &quot;caption&quot; com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo "caption" com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo &quot;descrição&quot; com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo "descrição" com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>Server API</source>
@@ -4509,7 +4579,7 @@ a %1</translation>
     </message>
     <message>
       <source>Hotkey used by preset &quot;%1&quot;</source>
-      <translation>Hotkey usada por predefinição &quot;%1&quot;</translation>
+      <translation>Hotkey usado por predefinição &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
@@ -5158,7 +5228,7 @@ a %1</translation>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>Servidores com failover activado irão automaticamente &quot;capturar&quot; câmaras de servidores que estejam offline.</translation>
+      <translation>Servidores com failover activado irão automaticamente "capturar" câmaras de servidores que estejam offline.</translation>
     </message>
   </context>
   <context>
@@ -5180,7 +5250,7 @@ a %1</translation>
       <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
 &apos; sequence</comment>
       <translation>Tags Html podem ser usadas no texto personalizado:
-&lt;h4&gt;Cabeçalhos (h1-h6)&lt;/h4&gt;também diferentes &lt;font color=&quot;red&quot;&gt;cores&lt;/font&gt; e &lt;font size=&quot;18&quot;&gt;tamanhos&lt;/font&gt; podem ser aplicados. O texto pode ser &lt;s&gt;atingido&lt;/s&gt;, &lt;u&gt;sublinhado&lt;/u&gt;, &lt;b&gt;negro&lt;/b&gt; ou &lt;i&gt;&lt;/i&gt;</translation>
+&lt;h4&gt;Cabeçalhos (h1-h6)&lt;/h4&gt;Também diferentes &lt;font color=&quot;red&quot;&gt;cores&lt;/font&gt; e &lt;font size=&quot;18&quot;&gt;tamanhos&lt;/font&gt; podem ser aplicados. O texto pode ser &lt;s&gt;em&lt;/s&gt;, &lt;u&gt;sublinhado&lt;/u&gt;, &lt;b&gt;negrito&lt;/b&gt; ou &lt;i&gt;em&lt;/i&gt;</translation>
     </message>
   </context>
   <context>
@@ -5937,10 +6007,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Não inclui nenhuma informação pessoal e é completamente anónimo.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
     </message>
@@ -5951,6 +6017,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
     </message>
   </context>
   <context>
@@ -5970,44 +6040,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation type="unfinished">Spread Sheet (CSV) File</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Servidor</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Offset</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Data</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Fuso horário</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Hora</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Nenhum servidor tem acesso à Internet. O tempo não está sendo sincronizado.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
     </message>
   </context>
   <context>
@@ -6523,7 +6555,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Não pode ser feito o &quot;merge&quot; dos Sistemas %1</translation>
+      <translation>Não pode ser feito o "merge" dos Sistemas %1</translation>
     </message>
     <message>
       <source>%1 has been successfully configured.</source>
@@ -7142,6 +7174,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation type="unfinished">Select area on the video to filter results</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Na área selecionada</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Câmara seleccionada</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation type="unfinished">Selected device</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation type="unfinished">Selected media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>nenhum</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7382,38 +7442,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n objects</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Qualquer tipo</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Na área selecionada</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Falha ao executar a acção do plug-in</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7456,17 +7484,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>A aplicar alterações...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Este módulo de E / S não possui configurações avançadas</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Esta câmera não possui configurações avançadas</translation>
     </message>
   </context>
   <context>
@@ -8024,42 +8041,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Evento de Analytics</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Sem eventos</translation>
     </message>
@@ -8614,11 +8595,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 será reiniciado para a versão atualizada.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -9251,14 +9227,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Na área selecionada</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Sem movimento</translation>
     </message>
@@ -9272,23 +9240,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n evento de movimento</numerusform>
         <numerusform>%n eventos de movimento</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Câmara seleccionada</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>nenhum</translation>
     </message>
   </context>
   <context>
@@ -9612,7 +9563,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo &quot;caption&quot; com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo "caption" com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
@@ -9645,7 +9596,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo &quot;caption&quot; com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo caption com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
@@ -9798,26 +9749,26 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server &quot;%1&quot; is not responding.</source>
-      <translation>O servidor &quot;%1&quot; não está respondendo.</translation>
+      <translation>Servidor &quot;%1&quot; não está respondendo.</translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
       <translation>
-        <numerusform>Servidor &quot;%1&quot; não pode acessar %n dispositivos. Mova-os mesmo assim?</numerusform>
-        <numerusform>Servidor &quot;%1&quot; não pode acessar %n dispositivos. Mova-os mesmo assim?</numerusform>
+        <numerusform>Servidor &quot;%1&quot; não pode acessar %n dispositivos. Mover-os mesmo assim?</numerusform>
+        <numerusform>Servidor &quot;%1&quot; não pode acessar %n dispositivos. Mover-os mesmo assim?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
       <translation>
-        <numerusform>Servidor &quot;%1&quot; não pode acessar %n câmeras. Mova-as mesmo assim?</numerusform>
+        <numerusform>Servidor &quot;%1&quot; não pode acessar %n câmera. Mova-as mesmo assim?</numerusform>
         <numerusform>Servidor &quot;%1&quot; não pode acessar %n câmeras. Mova-as mesmo assim?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
       <translation>
-        <numerusform>O servidor &quot;%1&quot; não pode acessar %n módulos de E/S. Mova-os assim mesmo?</numerusform>
+        <numerusform>O servidor &quot;%1&quot; não pode acessar %n módulo de E/S. Mova-os assim mesmo?</numerusform>
         <numerusform>O servidor &quot;%1&quot; não pode acessar %n módulos de E/S. Mova-os assim mesmo?</numerusform>
       </translation>
     </message>

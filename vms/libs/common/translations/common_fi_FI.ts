@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <translation>KKKK vvvv</translation>
+      <translation type="unfinished">MMMM yyyy</translation>
     </message>
   </context>
   <context>

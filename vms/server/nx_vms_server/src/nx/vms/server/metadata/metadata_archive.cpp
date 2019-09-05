@@ -342,7 +342,6 @@ void MetadataArchive::loadDataFromIndexDesc(
     while (totalSteps > 0)
     {
         metadataFile.seek(recordNumberToSeek * recordSize());
-        recordNumberToSeek = std::max(0, recordNumberToSeek - kRecordsPerIteration);
         int readed = metadataFile.read(
             (char*)buffer, recordSize() * qMin(totalSteps, kRecordsPerIteration));
         if (readed <= 0)
@@ -385,6 +384,8 @@ void MetadataArchive::loadDataFromIndexDesc(
             --i;
         }
         totalSteps -= readed / recordSize();
+        recordNumberToSeek = std::max(0, recordNumberToSeek - qMin(totalSteps, kRecordsPerIteration));
+
     }
 }
 
@@ -400,7 +401,7 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
         msStartTime = qMax(minTime(), msStartTime);
     msEndTime = qMin(msEndTime, m_maxMetadataTime.load());
 
-    quint8* buffer = (quint8*)qMallocAligned(recordSize() * 1024, 32);
+    quint8* buffer = (quint8*)qMallocAligned(recordSize() * kRecordsPerIteration, 32);
     auto scopedGuard = nx::utils::makeScopeGuard(
         [buffer]()
     {

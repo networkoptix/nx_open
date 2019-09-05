@@ -22,8 +22,9 @@ using ActionTypeId = QString;
 using DeviceId = QnUuid;
 using ManifestItemId = QString;
 
-// Client and web api uses group ids in the same filter scenarios as event type ids.
+// Client and web api uses group ids in the same filter scenarios as event and object type ids.
 static_assert(std::is_same<GroupId, EventTypeId>::value);
+static_assert(std::is_same<GroupId, ObjectTypeId>::value);
 
 using PluginDescriptorMap = std::map<PluginId, nx::vms::api::analytics::PluginDescriptor>;
 using EngineDescriptorMap = std::map<EngineId, nx::vms::api::analytics::EngineDescriptor>;
@@ -35,6 +36,7 @@ using ObjectTypeDescriptorMap = std::map<
 
 using ScopedEventTypeIds = std::map<EngineId, std::map<GroupId, std::set<EventTypeId>>>;
 using ScopedObjectTypeIds = std::map<EngineId, std::map<GroupId, std::set<ObjectTypeId>>>;
+using ScopedEntityTypeIds = std::map<EngineId, std::map<GroupId, std::set<QString>>>;
 
 using ActionTypeDescriptorMap = std::map<
     EngineId,

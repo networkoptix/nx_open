@@ -15,19 +15,6 @@ TransactionMessageBusAdapter::TransactionMessageBusAdapter(
     m_jsonTranSerializer(jsonTranSerializer),
     m_ubjsonTranSerializer(ubjsonTranSerializer)
 {
-    QTimer::singleShot(std::chrono::seconds(4), commonModule,
-        [this]()
-        {
-            DelayedTransactions delayed;
-            {
-                QnMutexLocker lock(&m_delayMutex);
-                delayed = std::move(*m_delayedTransactions);
-                m_delayedTransactions = std::nullopt;
-            }
-
-            for (const auto& tran: delayed)
-                tran();
-        });
 }
 
 void TransactionMessageBusAdapter::reset()
@@ -98,7 +85,7 @@ void TransactionMessageBusAdapter::dropConnections()
     m_bus->dropConnections();
 }
 
-QVector<QnTransportConnectionInfo> TransactionMessageBusAdapter::connectionsInfo() const
+ConnectionInfoList TransactionMessageBusAdapter::connectionsInfo() const
 {
     return m_bus->connectionsInfo();
 }

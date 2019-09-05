@@ -27,10 +27,10 @@ static const std::string kRuleNamePrefix("NX_RULE_");
 
 static const std::chrono::milliseconds kMinTimeBetweenEvents = std::chrono::seconds(3);
 
-nx::sdk::analytics::EventMetadata* createCommonEvent(
+Ptr<EventMetadata> createCommonEvent(
     const EventType& eventType, bool active)
 {
-    auto eventMetadata = new EventMetadata();
+    const auto eventMetadata = makePtr<EventMetadata>();
     eventMetadata->setTypeId(eventType.id.toStdString());
     eventMetadata->setDescription(eventType.name.toStdString());
     eventMetadata->setIsActive(active);
@@ -38,12 +38,12 @@ nx::sdk::analytics::EventMetadata* createCommonEvent(
     return eventMetadata;
 }
 
-EventMetadataPacket* createCommonEventsMetadataPacket(
+Ptr<EventMetadataPacket> createCommonEventsMetadataPacket(
     const EventType& event, bool active)
 {
     using namespace std::chrono;
-    auto commonEvent = toPtr(createCommonEvent(event, active));
-    auto packet = new EventMetadataPacket();
+    const auto commonEvent = createCommonEvent(event, active);
+    const auto packet = makePtr<EventMetadataPacket>();
     packet->addItem(commonEvent.get());
     packet->setTimestampUs(
         duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
@@ -215,7 +215,7 @@ nx::network::HostAddress Monitor::getLocalIp(const nx::network::SocketAddress& c
 Result<void> Monitor::startMonitoring(const IMetadataTypes* metadataTypes)
 {
     // Assume that the list contains events only, since this plugin produces no objects.
-    const auto eventTypeList = toPtr(metadataTypes->eventTypeIds());
+    const auto eventTypeList = metadataTypes->eventTypeIds();
     if (const char* const kMessage = "Event type id list is empty";
         !NX_ASSERT(eventTypeList, kMessage))
     {
@@ -232,10 +232,7 @@ Result<void> Monitor::startMonitoring(const IMetadataTypes* metadataTypes)
             m_eventsToCatch.emplace_back(*eventType);
     }
 
-    const int kSchemePrefixLength = sizeof("http://") - 1;
-    QString str = m_url.toString().remove(0, kSchemePrefixLength);
-
-    nx::network::SocketAddress cameraAddress(str);
+    nx::network::SocketAddress cameraAddress(nx::network::HostAddress(m_url.host()), m_url.port());
     nx::network::HostAddress localIp = this->getLocalIp(cameraAddress);
 
     if (localIp == nx::network::HostAddress())
@@ -285,8 +282,8 @@ std::chrono::milliseconds Monitor::timeTillCheck() const
 
 void Monitor::sendEventStartedPacket(const EventType& event) const
 {
-    auto packet = createCommonEventsMetadataPacket(event, /*active*/ true);
-    m_handler->handleMetadata(packet);
+    const auto packet = createCommonEventsMetadataPacket(event, /*active*/ true);
+    m_handler->handleMetadata(packet.get());
     NX_PRINT
         << (event.isStateful() ? "Event [start] " : "Event [pulse] ")
         << event.fullName().toStdString() << " sent to server";
@@ -294,8 +291,8 @@ void Monitor::sendEventStartedPacket(const EventType& event) const
 
 void Monitor::sendEventStoppedPacket(const EventType& event) const
 {
-    auto packet = createCommonEventsMetadataPacket(event, /*active*/ false);
-    m_handler->handleMetadata(packet);
+    const auto packet = createCommonEventsMetadataPacket(event, /*active*/ false);
+    m_handler->handleMetadata(packet.get());
     NX_PRINT << "Event [stop] " << event.fullName().toUtf8().constData()
         << " sent to server";
 }

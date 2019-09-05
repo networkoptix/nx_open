@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>ฝ่ายสนับสนุนลูกค้า</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>นโยบายการสนับสนุน ARM</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -2049,7 +2044,7 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation>ใหม่กล้องเสมือนจริง ...</translation>
+      <translation>ใหม่กล้องเสมือนจริง...</translation>
     </message>
   </context>
   <context>
@@ -3079,7 +3074,7 @@
     <message>
       <location/>
       <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>ข้อมูล Analytics อาจใช้พื้นที่จำนวนมาก เราขอแนะนำให้เลือกตำแหน่งอื่นแทนพาร์ติชันระบบ</translation>
     </message>
   </context>
   <context>
@@ -3185,19 +3180,6 @@
       <location/>
       <source>Area Width</source>
       <translation>ความกว้างของพื้นที่</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeServerSelectionWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>Sync time with the Internet</source>
-      <translation>เวลาการซิงค์กับอินเทอร์เน็ต</translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS Time</source>
-      <translation>เวลา VMS</translation>
     </message>
   </context>
   <context>

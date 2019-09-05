@@ -1,7 +1,4 @@
-/**********************************************************
-* 04 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "stream_reader.h"
 
@@ -30,7 +27,6 @@
 #ifdef GENERATE_RANDOM_MOTION
 static const unsigned int MOTION_PRESENCE_CHANCE_PERCENT = 70;
 #endif
-
 
 static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
 static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
@@ -268,7 +264,7 @@ void StreamReader::doLiveDelay()
     if( m_nextFrameDeployTime > curTimeUsec )
     {
 #ifdef _WIN32
-        ::Sleep( (m_nextFrameDeployTime - curTimeUsec) / USEC_IN_MS );
+        ::Sleep( (DWORD) ((m_nextFrameDeployTime - curTimeUsec) / USEC_IN_MS) );
 #elif _POSIX_C_SOURCE >= 199309L
         struct timespec delay;
         memset( &delay, 0, sizeof(delay) );

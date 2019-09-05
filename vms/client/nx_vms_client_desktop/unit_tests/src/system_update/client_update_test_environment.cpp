@@ -8,16 +8,15 @@
 #include <core/resource_management/resource_runtime_data.h>
 #include <core/resource/media_server_resource.h>
 
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
 namespace os
 {
-    const nx::utils::OsInfo ubuntu("linux_x64", "ubuntu");
-    const nx::utils::OsInfo ubuntu14("linux_x64", "ubuntu", "14.04");
-    const nx::utils::OsInfo ubuntu16("linux_x64", "ubuntu", "16.04");
-    const nx::utils::OsInfo ubuntu18("linux_x64", "ubuntu", "18.04");
-    const nx::utils::OsInfo windows("windows_x64");
+const nx::utils::OsInfo ubuntu("linux_x64", "ubuntu");
+const nx::utils::OsInfo ubuntu14("linux_x64", "ubuntu", "14.04");
+const nx::utils::OsInfo ubuntu16("linux_x64", "ubuntu", "16.04");
+const nx::utils::OsInfo ubuntu18("linux_x64", "ubuntu", "18.04");
+const nx::utils::OsInfo windows("windows_x64");
 } // namespace os;
 
 namespace nx::vms::client::desktop {
@@ -29,14 +28,14 @@ void ClientUpdateTestEnvironment::SetUp()
     m_staticCommon.reset(new QnStaticCommonModule());
     m_module.reset(new QnClientCoreModule());
     m_resourceRuntime.reset(new QnResourceRuntimeDataManager(m_module->commonModule()));
-    m_accessController.reset(new QnWorkbenchAccessController(m_module->commonModule()));
+    //m_accessController.reset(new QnWorkbenchAccessController(m_module->commonModule()));
 }
 
 // virtual void TearDown() will be called after each test is run.
 void ClientUpdateTestEnvironment::TearDown()
 {
-    m_currentUser.clear();
-    m_accessController.clear();
+    //m_currentUser.clear();
+    //m_accessController.clear();
     m_resourceRuntime.clear();
     m_module.clear();
     m_staticCommon.reset();

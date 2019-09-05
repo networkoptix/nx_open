@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Customer Support</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -3185,19 +3180,6 @@
       <location/>
       <source>Area Width</source>
       <translation type="unfinished">Area Width</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeServerSelectionWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>Sync time with the Internet</source>
-      <translation>Sync time with the Internet</translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
     </message>
   </context>
   <context>

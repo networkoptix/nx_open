@@ -54,8 +54,8 @@ void ClientTimeSyncManager::updateTime()
     {
         if (!m_lastSyncTimeInterval.hasExpired(networkTimeSyncInterval))
             return;
-        auto result = loadTimeFromServer(route);
-        switch(result)
+        const auto result = loadTimeFromServer(route);
+        switch (result)
         {
             case Result::ok:
                 m_lastSyncTimeInterval.restart();

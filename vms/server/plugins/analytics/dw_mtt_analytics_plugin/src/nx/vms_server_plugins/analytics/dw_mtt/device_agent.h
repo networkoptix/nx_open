@@ -16,7 +16,6 @@
 
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_device_agent.h>
-#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include "nx/dw_mtt/camera_controller.h"
 #include "common.h"
@@ -52,8 +51,6 @@ public:
 
     virtual ~DeviceAgent();
 
-    virtual Engine* engine() const override { return m_engine; }
-
     void treatAlarmPairs(const QList<AlarmPair>& alarmPairs);
 
     void sendEventStartedPacket(const EventType& event) const;
@@ -64,15 +61,6 @@ public:
     void onReceive(SystemError::ErrorCode, size_t);
 
     virtual void setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
-
-    virtual nx::sdk::Result<void> setNeededMetadataTypes(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
-
-    virtual nx::sdk::StringResult manifest() const override;
-
-    virtual nx::sdk::StringMapResult setSettings(const nx::sdk::IStringMap* settings) override;
-
-    virtual nx::sdk::SettingsResponseResult pluginSideSettings() const override;
 
     QDomDocument createDomFromRequest(const QByteArray& request);
 
@@ -85,6 +73,17 @@ public:
 
     QByteArray extractRequestFromBuffer();
 
+protected:
+    virtual void doSetSettings(
+        nx::sdk::Result<const nx::sdk::IStringMap*>* outResult,
+        const nx::sdk::IStringMap* settings) override;
+    virtual void getPluginSideSettings(
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
+    virtual void getManifest(nx::sdk::Result<const nx::sdk::IString*>* outResult) const override;
+    virtual void doSetNeededMetadataTypes(
+        nx::sdk::Result<void>* outValue,
+        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
+        
 private:
     nx::sdk::Result<void> startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);

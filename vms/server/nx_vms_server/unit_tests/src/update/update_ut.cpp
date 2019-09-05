@@ -8,6 +8,8 @@
 #include <api/global_settings.h>
 #include <nx/update/update_information.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/app_info.h>
+#include <nx/utils/test_support/utils.h>
 #include <nx/vms/api/data/system_information.h>
 #include <quazip/quazipfile.h>
 #include <rest/server/json_rest_handler.h>
@@ -15,9 +17,22 @@
 
 namespace nx::vms::server::test {
 
+namespace {
+
 static const QString kUpdateFilesPathPostfix = "/test_update_files/";
+static bool forbidden(bool value) { return value; }
+
+struct UserDataWithExpectedForbiddenStatus
+{
+    nx::vms::api::UserDataEx userData;
+    bool shouldBeForbidden = false;
+};
+
+} // namespace
 
 using namespace nx::test;
+
+
 
 class FtUpdates: public ::testing::Test
 {
@@ -223,6 +238,52 @@ protected:
         m_peers[peerIndex]->stop();
     }
 
+    vms::api::UserDataEx createUser(GlobalPermission permissions, const QString& name)
+    {
+        vms::api::UserDataEx userData;
+        userData.permissions = permissions;
+        userData.name = name;
+        userData.password = "password";
+
+        NX_GTEST_WRAP(NX_TEST_API_POST(peer(0), "/ec2/saveUser", userData));
+
+        return userData;
+    }
+
+    vms::api::UserDataEx getOwner()
+    {
+        vms::api::UserDataList userDataList;
+        NX_GTEST_WRAP(NX_TEST_API_GET(peer(0), "/ec2/getUsers", &userDataList));
+
+        const auto ownerIt = std::find_if(userDataList.cbegin(), userDataList.cend(),
+            [](const auto& userData) { return userData.name == "admin"; });
+
+        NX_GTEST_ASSERT_NE(userDataList.cend(), ownerIt);
+        vms::api::UserDataEx result;
+        result.name = "admin";
+        result.password = "admin";
+
+        return result;
+    }
+
+    void assertForbiddenStatus(
+        const std::vector<QString>& requestsToCheck,
+        const UserDataWithExpectedForbiddenStatus& userDataWithHttpCode)
+    {
+        for (const auto& request: requestsToCheck)
+        {
+            NX_TEST_API_POST(
+                peer(0), request, "{}", nullptr,
+                userDataWithHttpCode.shouldBeForbidden
+                    ? StatusCodeExpectation(Equals(nx::network::http::StatusCode::forbidden))
+                    : StatusCodeExpectation(NotEquals(nx::network::http::StatusCode::forbidden)),
+                userDataWithHttpCode.userData.name,
+                userDataWithHttpCode.userData.password);
+        }
+    }
+
+    MediaServerLauncher* peer(size_t index) { return m_peers[index].get(); }
+
 private:
     struct ZipContext
     {
@@ -312,8 +373,9 @@ private:
 
         while (true)
         {
-            NX_TEST_API_POST(m_peers[0].get(), path, "", nullptr,
-                nx::network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
+            NX_TEST_API_POST(
+                m_peers[0].get(), path, "", nullptr,
+                Equals(nx::network::http::StatusCode::ok), "admin", "admin", &responseBuffer);
             QnRestResult installResponse;
             QJson::deserialize(responseBuffer, &installResponse);
             if (expectedRestResult != installResponse.error)
@@ -338,8 +400,9 @@ private:
             path += "?ignorePendingPeers";
 
         QByteArray responseBuffer;
-        NX_TEST_API_POST(m_peers[0].get(), path, "", nullptr,
-            nx::network::http::StatusCode::ok, "admin", "admin", &responseBuffer);
+        NX_TEST_API_POST(
+            m_peers[0].get(), path, "", nullptr,
+            Equals(nx::network::http::StatusCode::ok), "admin", "admin", &responseBuffer);
 
         QnRestResult installResponse;
         QJson::deserialize(responseBuffer, &installResponse);
@@ -835,6 +898,28 @@ TEST_F(FtUpdates, finishUpdate_success_installedUpdateInformationSetCorrectly)
     thenInstalledtUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ false);
     thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true, QString());
     thenTargetUpdateInformationShouldBeRetrievable(/*shouldBeEmpty*/ true, "target");
+}
+
+TEST_F(FtUpdates, UpdateRequestsAreRestrictedToAdminOnly)
+{
+    givenConnectedPeers(1);
+    const std::vector<QString> requestsToCheck = {
+        "/ec2/startUpdate",
+        "/ec2/cancelUpdate",
+        "/ec2/finishUpdate",
+        "/ec2/retryUpdate",
+        "/api/installUpdate?peers="
+    };
+
+    const std::vector<UserDataWithExpectedForbiddenStatus> userDataWithExpectedResults = {
+        { createUser(GlobalPermission::advancedViewerPermissions, "viewer"), forbidden(true) },
+        { createUser(GlobalPermission::accessAllMedia, "access"), forbidden(true) },
+        { createUser(GlobalPermission::admin, "administrator"), forbidden(false) },
+        { getOwner(), forbidden(false) }
+    };
+
+    for (const auto& userDataToCheck: userDataWithExpectedResults)
+        assertForbiddenStatus(requestsToCheck, userDataToCheck);
 }
 
 } // namespace nx::vms::server::test

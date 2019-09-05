@@ -1,10 +1,6 @@
-/**********************************************************
-* 10 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "time_periods.h"
-
 
 TimePeriods::TimePeriods()
 :

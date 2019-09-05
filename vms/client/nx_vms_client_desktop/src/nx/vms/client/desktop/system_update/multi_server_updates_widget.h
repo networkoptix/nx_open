@@ -14,7 +14,6 @@
 
 #include <utils/common/id.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
-#include <nx/update/common_update_manager.h>
 
 #include "server_update_tool.h"
 #include "client_update_tool.h"
@@ -193,6 +192,11 @@ public:
             return &currentData;
         }
 
+        const Data* operator->() const
+        {
+            return &currentData;
+        }
+
         bool operator==(const Data& other) const
         {
             return currentData == other;
@@ -203,7 +207,7 @@ public:
             return currentData != other;
         }
 
-        Data& operator= (const Data& other)
+        Data& operator=(const Data& other)
         {
             if (currentData == other)
                 return currentData;
@@ -312,8 +316,6 @@ private:
         startingDownload,
         /** Mediaservers have started downloading update packages. */
         downloading,
-        /** Pushing local update package to the servers. */
-        //pushing,
         /**
          * Waiting server to respond to /ec2/cancelUpdate from 'downloading' or 'pushing'
          * state.
@@ -337,7 +339,6 @@ private:
 
     static QString toString(nx::update::UpdateSourceType mode);
     static QString toString(WidgetUpdateState state);
-    static QString toString(LocalStatusCode stage);
     static QString toString(ServerUpdateTool::OfflineUpdateState state);
 
     /**
@@ -392,7 +393,7 @@ private:
     /** Advances UI FSM towards selected state. */
     void setTargetState(WidgetUpdateState state, const QSet<QnUuid>& targets = {},
         bool runCommands = true);
-    void completeInstallation(bool clientUpdated);
+    void completeClientInstallation(bool clientUpdated);
     static bool stateHasProgress(WidgetUpdateState state);
     void syncDebugInfoToUi();
     /**
@@ -414,8 +415,6 @@ private:
     /** UI control flags. We run loadDataToUI periodically and check for this flags. */
     bool m_forceUiStateUpdate = true;
     bool m_updateRemoteStateChanged = true;
-    /** Flag shows that we have an update. */
-    bool m_haveValidUpdate = false;
     bool m_autoCheckUpdate = false;
     bool m_showStorageSettings = false;
 
@@ -425,7 +424,7 @@ private:
      */
     bool m_showDebugData = false;
 
-    std::shared_ptr<ServerUpdateTool> m_serverUpdateTool;
+    QPointer<ServerUpdateTool> m_serverUpdateTool;
     std::unique_ptr<ClientUpdateTool> m_clientUpdateTool;
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;
     std::shared_ptr<PeerStateTracker> m_stateTracker;

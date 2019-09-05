@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fi" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Minkä tahansa tyyppinen</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Valitse alue</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Valitse jokin alue videosta...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Valitulla alueella</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Plugin-toiminnon suorittaminen epäonnistui</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Anna parametrit</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Toimenpide vaatii joitakin parametreja.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -946,11 +977,11 @@ nähdäksesi lisää kirjanmerkkejä</translation>
     </message>
     <message>
       <source>Pin Calendar</source>
-      <translation type="unfinished">Pin Calendar</translation>
+      <translation>Kiinnitä kalenteri</translation>
     </message>
     <message>
       <source>Unpin Calendar</source>
-      <translation type="unfinished">Unpin Calendar</translation>
+      <translation>Poista kalenteri</translation>
     </message>
   </context>
   <context>
@@ -1013,6 +1044,45 @@ nähdäksesi lisää kirjanmerkkejä</translation>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Anna salasana uudelleen asettelulle %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Palvelimen tapahtumat</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Analytiikka-tapahtumat</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Mikä tahansa tapahtuma</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Kaikki laitteen ongelmat</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Kaikki kameran ongelmat</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Mikä tahansa palvelintapahtuma</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Laitteen ongelmat</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Kameran ongelmat</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Kaikki analyytiikan tapahtumat</translation>
     </message>
   </context>
   <context>
@@ -1270,7 +1340,7 @@ nähdäksesi lisää kirjanmerkkejä</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>Vain latinalaiset kirjaimet, numerot ja näppäimistösymbolit ovat sallittuja.</translation>
+      <translation>Vain latinalaiset kirjaimet, numerot ja näppäimistösymbolit %1 ovat sallittuja.</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
@@ -1652,24 +1722,12 @@ nähdäksesi lisää kirjanmerkkejä</translation>
       <translation>Palvelin päivitetty</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Liiketoimintasääntö päivitetty</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Palvelin poistettu</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Liiketoimintasääntö poistettu</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Käyttäjä poistettu</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Liiketoimintasääntö palautettu</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1765,6 +1823,18 @@ nähdäksesi lisää kirjanmerkkejä</translation>
         <numerusform>%n toimintoa</numerusform>
         <numerusform>%n toimintoa</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation type="unfinished">Event rule changed</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation type="unfinished">Event rule removed</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation type="unfinished">Event rules reset to default</translation>
     </message>
   </context>
   <context>
@@ -2045,8 +2115,8 @@ nähdäksesi lisää kirjanmerkkejä</translation>
       <translation>Mikä tahansa kamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Pakotettu kuittaus toimii vain yleisissä tapahtumissa, jos kameran modifikaattoreita käytetään yleisessä tapahtuman URL-osoitteessa</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
     </message>
   </context>
   <context>
@@ -2711,7 +2781,7 @@ to %1</source>
     </message>
     <message>
       <source>Client version: %1.</source>
-      <translation>Client-sovelluksen versio.</translation>
+      <translation>Client-sovelluksen versio: %1.</translation>
     </message>
     <message>
       <source>Server version: %1.</source>
@@ -5610,8 +5680,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Nykyisiä analyysitietoja ei siirretä automaattisesti toiseen paikkaan ja ne eivät ole käytettävissä. Voit säilyttää sen ja siirtää sen manuaalisesti myöhemmin tai poistaa pysyvästi.
+Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä tukeen ennen jatkamista.</translation>
     </message>
   </context>
   <context>
@@ -5934,10 +6004,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Ei sisällä henkilökohtaisia tietoja ja on täysin nimetöntä.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Failover-palvelimen toimenpiteet saattavat silti pyytää kameran tilapäivityksiä tästä asetuksesta riippumatta.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Ota käyttöön laitteiden ja palvelinten automaattinen havaitseminen ja automaattinen laitteen tilan tarkistus</translation>
     </message>
@@ -5948,6 +6014,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Kun se on käytössä, järjestelmä havaitsee jatkuvasti uusia kameroita ja palvelimia ja lähettää etsintäpyynnöt kameroille tilapäivitykseen.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
     </message>
   </context>
   <context>
@@ -5967,44 +6037,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Taulukon (CSV) tiedosto</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Palvelin</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Siirtymä</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Päivämäärä</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Aikavyöhyke</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Aika</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Palvelimella ei ole Internet-yhteyttä. Aikaa ei synkronoida.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>Järjestelmäaika synkronoidaan Internetin kanssa, eikä se riipu palvelimien paikallisesta ajasta.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>Järjestelmäaika synkronoidaan paikallisen ajan kanssa valitulta palvelimelta eikä se ole riippuvainen paikallisesta ajasta muissa palvelimissa.</translation>
     </message>
   </context>
   <context>
@@ -7139,6 +7171,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Valitse videosta alue suodattamaan tuloksia</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Valitulla alueella</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Valittu kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Valitut laitteet</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Valittu media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ei mitään</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7359,7 +7419,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Tuntematon jälki</translation>
     </message>
   </context>
   <context>
@@ -7378,38 +7438,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n kohdetta</numerusform>
         <numerusform>%n kohdetta</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Any type</source>
-      <translation>Minkä tahansa tyyppinen</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Valitse alue</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Valitse jokin alue videosta...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Valitulla alueella</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>nimettömän analytiikan alusta</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Plugin-toiminnon suorittaminen epäonnistui</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Anna parametrit</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Toimenpide vaatii joitakin parametreja.</translation>
     </message>
   </context>
   <context>
@@ -7453,17 +7481,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>Toteutaan muutoksia...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Tässä I/O-moduulissa ei ole lisäasetuksia</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Tässä kamerassa ei ole lisäasetuksia</translation>
     </message>
   </context>
   <context>
@@ -7594,7 +7611,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>Liikkeen tunnistusvirta on poistettu käytöstä</translation>
     </message>
   </context>
   <context>
@@ -7735,11 +7752,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <translation>Liiketunnistus on poistettu käytöstä, kaikki aikataulutietueet &quot;Motion&quot; ja &quot;Motion + Lo-Res&quot; vaihdetaan arvoon &quot;Always&quot;</translation>
     </message>
     <message>
       <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <translation>Monisuoratoisto on poistettu käytöstä, kaikki aikataulutietueet &quot;Motion + Lo-Res&quot; vaihdetaan arvoon &quot;Always&quot;</translation>
     </message>
   </context>
   <context>
@@ -8020,42 +8037,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation>Palvelimen tapahtumat</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Analytiikka-tapahtumat</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Kaikki laitteen ongelmat</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Kaikki kameran ongelmat</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Mikä tahansa palvelintapahtuma</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Laitteen ongelmat</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Kameran ongelmat</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Mikä tahansa tapahtuma</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Kaikki analyytiikan tapahtumat</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>Ei tapahtumia</translation>
@@ -8456,7 +8437,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>Hakuprosessia ei voida käynnistää</translation>
     </message>
   </context>
   <context>
@@ -8610,12 +8591,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 käynnistetään uudelleen päivitettyyn versioon.</translation>
+      <translation>Joidenkin palvelintent päivitykset eivät ole valmiit. Viimeistele ne joka tapauksessa?</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -8743,11 +8719,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
+      <translation>Joillakin palvelimilla ei ole saatavana päivityspaketteja.</translation>
     </message>
     <message>
       <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+      <translation>Jotkut palvelimet ovat havainneet sisäisen virheen.</translation>
     </message>
     <message>
       <source>Please contact Customer Support.</source>
@@ -8858,7 +8834,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>Joillakin käyttäjillä ei ole pääsyä valittuun asetteluun. Toiminto ei toimi heillä.</translation>
     </message>
   </context>
   <context>
@@ -9065,11 +9041,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>Liikkeentunnistus on poistettu käytöstä tai sitä ei tueta</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>Monisuoratoisto on poistettu käytöstä tai sitä ei tueta</translation>
     </message>
   </context>
   <context>
@@ -9196,7 +9172,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>Ei yhteyttä palvelimeen.</translation>
     </message>
     <message>
       <source>Network error.</source>
@@ -9204,7 +9180,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Palvelinvirhe.</translation>
     </message>
   </context>
   <context>
@@ -9248,14 +9224,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Valitse videosta alue suodattamaan tuloksia</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Valitulla alueella</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Ei liikettä</translation>
     </message>
@@ -9270,23 +9238,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n liiketapahtumaa</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Valittu kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Valittu laite</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Valittu media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ei mitään</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
@@ -9300,8 +9251,8 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
       <translation>
-        <numerusform>Sähköpostiosoitetta ei ole asetettu käyttäjälle %1</numerusform>
-        <numerusform>Sähköpostiosoitetta ei ole asetettu käyttäjälle %1</numerusform>
+        <numerusform>Sähköpostiosoitetta ei ole asetettu %n käyttäjälle</numerusform>
+        <numerusform>Sähköpostiosoitetta ei ole asetettu %n käyttäjälle</numerusform>
       </translation>
     </message>
     <message>
@@ -9423,11 +9374,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>Etä tiedosto &quot;%1&quot; on vioittunut</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>Palvelimella on jo tämä tiedosto &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9836,7 +9787,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Kaikki tuettu</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9940,14 +9891,14 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Salasanan vaihtaminen epäonnistui %n kamerassa, joissa on %1</numerusform>
+        <numerusform>Salasanan vaihtaminen epäonnistui %n kamerassa, joissa on %1</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Varoitus! Tämä versio on tarkoitettu vain testaustarkoituksiin.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>

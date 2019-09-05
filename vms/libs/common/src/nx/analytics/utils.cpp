@@ -35,7 +35,6 @@ bool hasActiveObjectEngines(QnCommonModule* commonModule, const QnUuid& serverId
     if (!server)
         return false;
 
-    bool hasAnalyticsEngine = false;
     auto cameras = commonModule->resourcePool()->getAllCameras(server);
     for (const auto& camera : cameras)
     {

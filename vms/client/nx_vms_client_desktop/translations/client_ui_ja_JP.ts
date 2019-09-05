@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>カスタマーサポート</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>ARMサポートポリシー</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -3079,7 +3074,7 @@
     <message>
       <location/>
       <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>分析データは大量のスペースを占有する可能性があります。システムパーティションではなく、別の場所を選択することをお勧めします。</translation>
     </message>
   </context>
   <context>
@@ -3185,19 +3180,6 @@
       <location/>
       <source>Area Width</source>
       <translation>エリア幅</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeServerSelectionWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>Sync time with the Internet</source>
-      <translation>インターネットで時刻同期</translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS Time</source>
-      <translation>VMS時間</translation>
     </message>
   </context>
   <context>

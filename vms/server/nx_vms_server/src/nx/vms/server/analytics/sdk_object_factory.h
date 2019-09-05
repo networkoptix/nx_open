@@ -7,7 +7,6 @@
 #include <nx/vms/api/data/analytics_data.h>
 
 #include <nx/vms/server/server_module_aware.h>
-#include <nx/vms/server/sdk_support/loggers.h>
 
 namespace nx::sdk::analytics { class IPlugin; }
 
@@ -29,17 +28,14 @@ private:
     bool initPluginResources();
     bool initEngineResources();
 
+    bool createEngine(
+        const resource::AnalyticsEngineResourcePtr& engineResource) const;
+
     void updateActiveEngines(QSet<QnUuid> activeEngines);
 
     nx::vms::api::AnalyticsEngineData createEngineData(
         const resource::AnalyticsPluginResourcePtr& plugin,
         const QnUuid& engineId) const;
-
-    std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger(
-        resource::AnalyticsPluginResourcePtr pluginResource) const;
-
-    std::unique_ptr<sdk_support::AbstractManifestLogger> makeLogger(
-        const nx::sdk::analytics::IPlugin* plugin) const;
 };
 
 } // namespace nx::vms::server::analytics

@@ -2,6 +2,7 @@
 
 #include <nx/analytics/properties.h>
 #include <nx/analytics/utils.h>
+#include <nx/analytics/helpers.h>
 
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
@@ -14,70 +15,31 @@ namespace nx::analytics {
 using namespace nx::vms::api::analytics;
 using namespace nx::utils::data_structures;
 
-namespace {
+static const QString kObjectTypeDescriptorTypeName("ObjectType");
 
-const QString kObjectTypeDescriptorTypeName("ObjectType");
-
-std::optional<std::set<ObjectTypeId>> mergeObjectTypeIds(
-    const std::set<ObjectTypeId>* first, const std::set<ObjectTypeId>* second)
-{
-    if (!first && !second)
-        return std::nullopt;
-
-    if (!first)
-        return *second;
-
-    if (!second)
-        return *first;
-
-    std::set<ObjectTypeId> result = *first;
-    result.insert(second->begin(), second->end());
-    return result;
-}
-
-std::optional<std::set<ObjectTypeId>> intersectObjectTypeIds(
-    const std::set<ObjectTypeId>* first, const std::set<ObjectTypeId>* second)
-{
-    if (!first && !second)
-        return std::nullopt;
-
-    if (!first)
-        return *second;
-
-    if (!second)
-        return *first;
-
-    std::set<ObjectTypeId> result;
-    std::set_intersection(first->begin(), first->end(), second->begin(), second->end(),
-        std::inserter(result, result.end()));
-
-    return result;
-}
-
-} // namespace
-
-ObjectTypeDescriptorManager::ObjectTypeDescriptorManager(QnCommonModule* commonModule)
-    : base_type(commonModule),
-      m_objectTypeDescriptorContainer(makeContainer<ObjectTypeDescriptorContainer>(
-          commonModule, kObjectTypeDescriptorsProperty)),
-      m_engineDescriptorContainer(
-          makeContainer<EngineDescriptorContainer>(commonModule, kEngineDescriptorsProperty)),
-      m_groupDescriptorContainer(
-          makeContainer<GroupDescriptorContainer>(commonModule, kGroupDescriptorsProperty))
+ObjectTypeDescriptorManager::ObjectTypeDescriptorManager(QObject* parent) :
+    base_type(parent),
+    QnCommonModuleAware(parent),
+    m_objectTypeDescriptorContainer(makeContainer<ObjectTypeDescriptorContainer>(
+        commonModule(), kObjectTypeDescriptorsProperty)),
+    m_engineDescriptorContainer(
+        makeContainer<EngineDescriptorContainer>(commonModule(), kEngineDescriptorsProperty)),
+    m_groupDescriptorContainer(
+        makeContainer<GroupDescriptorContainer>(commonModule(), kGroupDescriptorsProperty))
 {
 }
 
 std::optional<ObjectTypeDescriptor> ObjectTypeDescriptorManager::descriptor(
     const ObjectTypeId& id) const
 {
-    return fetchDescriptor(m_objectTypeDescriptorContainer, id);
+    return fetchDescriptor(m_objectTypeDescriptorContainer.get(), id);
 }
 
 ObjectTypeDescriptorMap ObjectTypeDescriptorManager::descriptors(
     const std::set<ObjectTypeId>& objectTypeIds) const
 {
     return fetchDescriptors(
-        m_objectTypeDescriptorContainer, objectTypeIds, kObjectTypeDescriptorTypeName);
+        m_objectTypeDescriptorContainer.get(), objectTypeIds, kObjectTypeDescriptorTypeName);
 }
 
 ScopedObjectTypeIds ObjectTypeDescriptorManager::supportedObjectTypeIds(
@@ -105,7 +67,7 @@ ScopedObjectTypeIds ObjectTypeDescriptorManager::supportedObjectTypeIdsUnion(
     for (const auto& device: devices)
     {
         auto deviceObjectTypeIds = supportedObjectTypeIds(device);
-        MapHelper::merge(&result, deviceObjectTypeIds, mergeObjectTypeIds);
+        MapHelper::merge(&result, deviceObjectTypeIds, mergeEntityIds);
     }
 
     return result;
@@ -121,7 +83,7 @@ ScopedObjectTypeIds ObjectTypeDescriptorManager::supportedObjectTypeIdsIntersect
     for (auto i = 0; i < devices.size(); ++i)
     {
         const auto deviceObjectTypeIds = supportedObjectTypeIds(devices[i]);
-        MapHelper::intersected(&result, deviceObjectTypeIds, intersectObjectTypeIds);
+        MapHelper::intersected(&result, deviceObjectTypeIds, intersectEntityIds);
     }
 
     return result;
@@ -143,7 +105,7 @@ ScopedObjectTypeIds ObjectTypeDescriptorManager::compatibleObjectTypeIds(
         if (engineIsEnabled || engine->isDeviceDependent())
         {
             auto supported = supportedObjectTypeIds(device);
-            MapHelper::merge(&result, supported, mergeObjectTypeIds);
+            MapHelper::merge(&result, supported, mergeEntityIds);
         }
         else
         {
@@ -166,7 +128,7 @@ ScopedObjectTypeIds ObjectTypeDescriptorManager::compatibleObjectTypeIdsUnion(
     for (const auto& device : devices)
     {
         auto deviceObjectTypeIds = compatibleObjectTypeIds(device);
-        MapHelper::merge(&result, deviceObjectTypeIds, mergeObjectTypeIds);
+        MapHelper::merge(&result, deviceObjectTypeIds, mergeEntityIds);
     }
 
     return result;
@@ -182,7 +144,7 @@ ScopedObjectTypeIds ObjectTypeDescriptorManager::compatibleObjectTypeIdsIntersec
     for (auto i = 0; i < devices.size(); ++i)
     {
         const auto deviceObjectTypeIds = compatibleObjectTypeIds(devices[i]);
-        MapHelper::intersected(&result, deviceObjectTypeIds, intersectObjectTypeIds);
+        MapHelper::intersected(&result, deviceObjectTypeIds, intersectEntityIds);
     }
 
     return result;
@@ -194,7 +156,7 @@ void ObjectTypeDescriptorManager::updateFromEngineManifest(
     const QString& engineName,
     const EngineManifest& manifest)
 {
-    m_objectTypeDescriptorContainer.mergeWithDescriptors(
+    m_objectTypeDescriptorContainer->mergeWithDescriptors(
         fromManifestItemListToDescriptorMap<ObjectTypeDescriptor>(engineId, manifest.objectTypes));
 }
 
@@ -203,7 +165,7 @@ void ObjectTypeDescriptorManager::updateFromDeviceAgentManifest(
     const EngineId& engineId,
     const DeviceAgentManifest& manifest)
 {
-    m_objectTypeDescriptorContainer.mergeWithDescriptors(
+    m_objectTypeDescriptorContainer->mergeWithDescriptors(
         fromManifestItemListToDescriptorMap<ObjectTypeDescriptor>(engineId, manifest.objectTypes));
 }
 
@@ -211,7 +173,7 @@ GroupId ObjectTypeDescriptorManager::objectTypeGroupForEngine(
     const EngineId& engineId,
     const ObjectTypeId& objectTypeId) const
 {
-    const auto descriptor = m_objectTypeDescriptorContainer.mergedDescriptors(objectTypeId);
+    const auto descriptor = m_objectTypeDescriptorContainer->mergedDescriptors(objectTypeId);
     if (!descriptor)
         return GroupId();
 

@@ -1,10 +1,6 @@
-/**********************************************************
-* 17 apr 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef AXIS_CAMERA_PLUGIN_H
-#define AXIS_CAMERA_PLUGIN_H
+#pragma once
 
 #include <plugins/plugin_tools.h>
 
@@ -86,5 +82,3 @@ private:
     QThread m_networkEventLoopThread;
     QNetworkAccessManager m_networkAccessManager;
 };
-
-#endif  //AXIS_CAMERA_PLUGIN_H

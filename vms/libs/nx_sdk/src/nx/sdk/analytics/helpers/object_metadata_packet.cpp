@@ -23,7 +23,7 @@ int ObjectMetadataPacket::count() const
     return (int) m_objects.size();
 }
 
-const IObjectMetadata* ObjectMetadataPacket::at(int index) const
+const IObjectMetadata* ObjectMetadataPacket::getAt(int index) const
 {
     if (index < 0 || index >= (int) m_objects.size())
         return nullptr;

@@ -21,6 +21,7 @@ namespace nx::vms::client::desktop {
 
 class SimpleMotionSearchWidget::Private: public QObject
 {
+    Q_DECLARE_TR_FUNCTIONS(SimpleMotionSearchWidget::Private)
     SimpleMotionSearchWidget* const q;
 
 public:
@@ -46,8 +47,16 @@ public:
         connect(m_areaButton, &SelectableTextButton::stateChanged, this,
             [this](SelectableTextButton::State state)
             {
-                if (state == SelectableTextButton::State::deactivated)
-                    setFilterRegions({});
+                if (state != SelectableTextButton::State::deactivated)
+                    return;
+
+                // Clear filter regions. Must keep channel count.
+                // TODO: VMS-15107
+                auto regions = filterRegions();
+                for (auto& region: regions)
+                    region = QRegion();
+
+                setFilterRegions(regions);
             });
 
         connect(q->navigator(), &QnWorkbenchNavigator::currentResourceChanged, this,

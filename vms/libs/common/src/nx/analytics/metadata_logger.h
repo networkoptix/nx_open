@@ -20,29 +20,47 @@ public:
         QnUuid engineId,
         nx::vms::api::StreamIndex = nx::vms::api::StreamIndex::undefined);
 
+    ~MetadataLogger();
+
     void pushData(
-        const QnConstAbstractMediaDataPtr& data,
+        const QnConstAbstractMediaDataPtr& abstractMediaData,
         const QString& additionalInfo = QString());
 
     void pushFrameInfo(
         const FrameInfo& frameInfo,
-        const QString& additionalFrameInfo = QString());
+        const QString& additionalInfo = QString());
 
     void pushObjectMetadata(
         const nx::common::metadata::ObjectMetadataPacket& metadataPacket,
-        const QString& additionalObjectMetadataInfo = QString());
+        const QString& additionalInfo = QString());
 
 private:
-    void log(QString logLine);
+    void logLine(QString lineStr);
 
-    QString buildFrameLogString(const FrameInfo& frameInfo, const QString& additionalInfo);
+    QString buildFrameLogString(const FrameInfo& frameInfo, const QString& additionalInfo) const;
+
     QString buildObjectMetadataLogString(
+        const nx::common::metadata::ObjectMetadataPacket& metadataPacket,
+        const QString& additionalInfo) const;
+
+    void doPushObjectMetadata(
+        const char* func,
         const nx::common::metadata::ObjectMetadataPacket& metadataPacket,
         const QString& additionalInfo);
 
+public: //< Intended for unit tests.
+    MetadataLogger(const QString& filename): m_isAlwaysEnabled(true)
+
+    {
+        NX_CRITICAL(!filename.isEmpty());
+        m_outputFile.setFileName(filename);
+        const bool result = m_outputFile.open(QIODevice::WriteOnly);
+        NX_CRITICAL(result);
+    }
+
 private:
+    bool m_isAlwaysEnabled = false;
     QFile m_outputFile;
-    nx::vms::api::StreamIndex m_streamIndex;
 
     bool m_isLoggingBestShot = false;
 

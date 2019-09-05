@@ -62,8 +62,6 @@ using namespace nx::vms::client::desktop::ui;
 
 namespace {
 
-static const QnUuid kCustomConnectionLocalId;
-
 static const QString kLocalHost("127.0.0.1");
 
 constexpr int kMinIntroWidth = 550;
@@ -453,7 +451,7 @@ void QnLoginDialog::resetSavedSessionsModel()
         url.setHost(kLocalHost);
         url.setUserName(helpers::kFactorySystemUser);
 
-        customConnections.append(QnConnectionData(lit("default"), url, kCustomConnectionLocalId));
+        customConnections.append(QnConnectionData(lit("default"), url, QnUuid()));
     }
 
     m_savedSessionsItem->removeRows(0, m_savedSessionsItem->rowCount());
@@ -464,7 +462,7 @@ void QnLoginDialog::resetSavedSessionsModel()
             return QString::compare(left.name, right.name, Qt::CaseInsensitive) < 0;
         });
 
-    for (const auto& connection : customConnections)
+    for (const auto& connection: customConnections)
     {
         NX_ASSERT(!connection.name.isEmpty());
         if (connection.name == deprecatedLastUsedConnectionName())
@@ -624,19 +622,28 @@ void QnLoginDialog::at_testButton_clicked()
 
 QStandardItem* QnLoginDialog::newConnectionItem(const QnConnectionData& connection)
 {
+    using namespace nx::vms::client::core::helpers;
+
     if (connection == QnConnectionData())
         return nullptr;
 
     const auto text = (!connection.name.isEmpty() ? connection.name
         : tr("%1 at %2").arg(connection.url.userName(), connection.url.host()));
 
-    auto result = ::newConnectionItem(text, connection.url);
+    auto url = connection.url;
+    const auto savedCredentials = getCredentials(connection.localId, url.userName());
+    if (savedCredentials.isValid())
+        url.setPassword(savedCredentials.password);
+
+    auto result = ::newConnectionItem(text, url);
     result->setData(QVariant::fromValue(connection), Qn::ConnectionInfoRole);
     return result;
 }
 
 void QnLoginDialog::at_saveButton_clicked()
 {
+    using namespace nx::vms::client::core::helpers;
+
     NX_ASSERT(isValid());
     if (!isValid())
         return;
@@ -673,17 +680,28 @@ void QnLoginDialog::at_saveButton_clicked()
         if (dialog.exec() == QDialogButtonBox::Cancel)
             return;
 
+        const auto existingConnection = connections.getByName(name);
+        if (!existingConnection.localId.isNull())
+            removeCredentials(existingConnection.localId, existingConnection.url.userName());
+
         connections.removeOne(name);
     }
 
+    // Generate custom uuid to securely store credentials.
     const nx::utils::Url url = currentUrl();
-    auto connectionData = QnConnectionData(name, url, kCustomConnectionLocalId);
+    auto connectionData = QnConnectionData(name, url, QnUuid::createUuid());
 
     if (!savePassword)
         connectionData.url.setPassword(QString());
     connections.prepend(connectionData);
     qnSettings->setCustomConnections(connections);
     qnSettings->save();
+
+    const auto credentials = savePassword
+        ? nx::vms::common::Credentials(url)
+        : nx::vms::common::Credentials(url.userName(), QString());
+    storeCredentials(connectionData.localId, credentials);
+    qnClientCoreSettings->save();
 
     resetSavedSessionsModel();
 

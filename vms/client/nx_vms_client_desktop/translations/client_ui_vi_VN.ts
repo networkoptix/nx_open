@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Hỗ trợ khách hàng</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>Chính sách hỗ trợ của ARM</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -3079,7 +3074,7 @@
     <message>
       <location/>
       <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>Dữ liệu phân tích có thể chiếm một lượng lớn không gian. Chúng tôi khuyên bạn nên chọn một vị trí khác cho nó thay vì phân vùng hệ thống.</translation>
     </message>
   </context>
   <context>
@@ -3185,19 +3180,6 @@
       <location/>
       <source>Area Width</source>
       <translation>Kích thước hình ảnh</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeServerSelectionWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>Sync time with the Internet</source>
-      <translation>Đồng bộ hóa thời gian với Internet</translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS Time</source>
-      <translation>Thời gian VMS</translation>
     </message>
   </context>
   <context>

@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="de" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Jeder Typ</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Bereich auswählen</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Wählen Sie einen Bereich im Video aus...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Im ausgewählten Bereich</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Pluginaktion konnte nicht ausgeführt werden</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Parameter eingeben</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Die Aktion erfordert, dass einige Parameter ausgefüllt werden.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1015,6 +1046,45 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Serverereignisse</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Analytik-Ereignisse</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Jedes Ereignis</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Jedes Geräteproblem</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Jedes Kameraproblem</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Jedes Serverereignis</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Geräteprobleme</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Kameraprobleme</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Jedes Analytikereignis</translation>
+    </message>
+  </context>
+  <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
@@ -1651,24 +1721,12 @@ to view more bookmarks</source>
       <translation>Server wurde aktualisiert</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Geschäftsregel wurde aktualisiert</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Server wurde entfernt</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Geschäftsregel wurde entfernt</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Benutzer wurde entfernt</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Geschäftsregel wurde zurückgesetzt</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1764,6 +1822,18 @@ to view more bookmarks</source>
         <numerusform>%n Aktion</numerusform>
         <numerusform>%n Aktionen</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>Ereignisregel geändert</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>Ereignisregel entfernt</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>Ereignisregeln auf Standard zurückgesetzt</translation>
     </message>
   </context>
   <context>
@@ -2044,8 +2114,8 @@ to view more bookmarks</source>
       <translation>Jede Kamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Bestätigung erzwingen funktioniert nur für generische Ereignisse, wenn in der URL für generische Ereignisse Kameramodifizierer verwendet werden</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Bestätigung erzwingen funktioniert nur für generische Ereignisse, wenn Kamerakennungen in der URL für generische Ereignisse verwendet werden</translation>
     </message>
   </context>
   <context>
@@ -5932,10 +6002,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Enthält keine persönlichen Daten und ist völlig anonym.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Failover-Servermaßnahmen können unabhängig von dieser Einstellung weiterhin Kamerastatusupdates anfordern.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Aktivieren Sie die automatische Erkennung von Geräten und Servern und die automatische Überprüfung des Gerätestatus</translation>
     </message>
@@ -5946,6 +6012,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Wenn aktiviert, erkennt das System kontinuierlich neue Kameras und Server und sendet Erkennungsanforderungen an die Kameras zur Statusaktualisierung.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Wenn Failover aktiviert ist, fordert der Server unabhängig von dieser Einstellung möglicherweise weiterhin Kamerastatusaktualisierungen an.</translation>
     </message>
   </context>
   <context>
@@ -5965,44 +6035,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Tabellenkalkulationsdatei (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Versatz</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Datum</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Zeitzone</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Zeit</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Kein Server hat Internetzugang. Die Zeit wird nicht synchronisiert.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>Die VMS-Zeit wird mit dem Internet synchronisiert und ist unabhängig von der lokalen Zeit auf den Servern.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>Die VMS-Zeit wird mit der lokalen Zeit auf dem ausgewählten Server synchronisiert und hängt nicht von der lokalen Zeit auf anderen Servern ab.</translation>
     </message>
   </context>
   <context>
@@ -7137,6 +7169,34 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Wählen Sie einen Bereich im Video aus, um die Ergebnisse zu filtern</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Im ausgewählten Bereich</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Ausgewählte Kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Ausgewähltes Gerät</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Ausgewählte Medien</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>keine</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7377,38 +7437,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
         <numerusform>%n Objekte</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Jeder Typ</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Bereich auswählen</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Wählen Sie einen Bereich im Video aus...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Im ausgewählten Bereich</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>unbenannte Analytik-Engine</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Pluginaktion konnte nicht ausgeführt werden</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Parameter eingeben</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Die Aktion erfordert, dass einige Parameter ausgefüllt werden.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7451,17 +7479,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Applying changes...</source>
       <translation>Änderungen werden übernommen...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Dieses I/O-Modul hat keine erweiterten Einstellungen</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Diese Kamera verfügt über keine erweiterten Einstellungen</translation>
     </message>
   </context>
   <context>
@@ -8019,42 +8036,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation>Serverereignisse</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Analytik-Ereignisse</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Jedes Geräteproblem</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Jedes Kameraproblem</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Jedes Serverereignis</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Geräteprobleme</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Kameraprobleme</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Jedes Ereignis</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Jedes Analytikereignis</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Keine Ereignisse</translation>
     </message>
@@ -8611,11 +8592,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Einige Server haben den Aktualisierungsvorgang nicht abgeschlossen. Trotzdem beenden?</translation>
     </message>
     <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 wird auf die aktualisierte Version neu gestartet werden.</translation>
-    </message>
-    <message>
       <source>Failed to download update packages to some components</source>
       <translation>Aktualisierungspakete für einige Komponenten konnten nicht heruntergeladen werden</translation>
     </message>
@@ -9120,7 +9096,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation>Bibliotheksdatei kann nicht geladen werden</translation>
+      <translation>bibliotheksdatei kann nicht geladen werden</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
@@ -9128,15 +9104,15 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation>Plugin-Bibliothek konnte nicht initialisiert werden</translation>
+      <translation>plugin-bibliothek konnte nicht initialisiert werden</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation>Das Plugin hat ein schlechtes Manifest zurückgegeben</translation>
+      <translation>das plugin hat ein schlechtes manifest zurückgegeben</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation>Plugin-API-Version wird nicht mehr unterstützt</translation>
+      <translation>plugin-API-version wird nicht mehr unterstützt</translation>
     </message>
     <message>
       <source>unknown error</source>
@@ -9152,7 +9128,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation>Plugin ist auf der Blacklist</translation>
+      <translation>plugin ist auf der blacklist</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9160,7 +9136,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation>Plugin ist optional und nicht in der Whitelist</translation>
+      <translation>plugin ist optional und nicht in der whitelist</translation>
     </message>
     <message>
       <source>internal error</source>
@@ -9246,14 +9222,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Wählen Sie einen Bereich im Video aus, um die Ergebnisse zu filtern</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Im ausgewählten Bereich</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Keine Bewegung</translation>
     </message>
@@ -9267,23 +9235,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
         <numerusform>%n Bewegungsereignis</numerusform>
         <numerusform>%n Bewegungsereignisse</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Ausgewählte Kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Ausgewähltes Gerät</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Ausgewählte Medien</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>keine</translation>
     </message>
   </context>
   <context>

@@ -112,6 +112,12 @@ void LocalResourcesDirectoryModel::addWatchedDirectory(const QString& path)
     for (const auto& childDirectory: childDirectories)
         addWatchedDirectory(dir.absoluteFilePath(childDirectory));
 
+    for (auto& childFile: childFiles)
+        childFile = dir.absoluteFilePath(childFile);
+
+    NX_ASSERT_HEAVY_CONDITION(std::all_of(childFiles.cbegin(), childFiles.cend(),
+        [](const QString& filePath) { return QFileInfo::exists(filePath); }));
+
     if (!childFiles.empty())
         emit filesAdded(childFiles);
 }
@@ -172,6 +178,12 @@ void LocalResourcesDirectoryModel::processPendingDirectoryChanges()
 
         for (const auto& newChildDirectory: newChildDirectories)
             addWatchedDirectory(dir.absoluteFilePath(newChildDirectory));
+
+        for (auto& newChildFile: newChildFiles)
+            newChildFile = dir.absoluteFilePath(newChildFile);
+
+        NX_ASSERT_HEAVY_CONDITION(std::all_of(newChildFiles.cbegin(), newChildFiles.cend(),
+            [](const QString& filePath) { return QFileInfo::exists(filePath); }));
 
         if (!newChildFiles.empty())
             emit filesAdded(newChildFiles);

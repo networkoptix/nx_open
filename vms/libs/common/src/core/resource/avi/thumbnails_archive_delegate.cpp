@@ -98,6 +98,7 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
         qint64 seekRez = m_baseDelegate->seek(m_currentPos, true);
         if (seekRez == DATETIME_NOW)
             return QnAbstractMediaDataPtr(); //< End of archive reached.
+
         while (seekRez == -1 && m_currentPos < m_rangeEnd && m_rangeEnd != qint64(AV_NOPTS_VALUE)) {
             m_currentPos += m_frameStep;
             seekRez = m_baseDelegate->seek(m_currentPos, true);
@@ -120,9 +121,9 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
     while (1)
     {
         result = m_baseDelegate->getNextData();
-        if (!result
-            || result->dataType == QnAbstractMediaData::EMPTY_DATA
-            || result->dataType == QnAbstractMediaData::GENERIC_METADATA)
+        if (!result ||
+            result->dataType == QnAbstractMediaData::EMPTY_DATA ||
+            result->dataType == QnAbstractMediaData::GENERIC_METADATA)
         {
             break;
         }
@@ -133,7 +134,6 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
             m_nextChannelNum = (m_nextChannelNum + 1) % m_channelCount;
             break;
         }
-
     }
 
     if (result) {

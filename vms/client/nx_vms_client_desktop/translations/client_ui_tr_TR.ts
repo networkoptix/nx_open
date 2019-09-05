@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Müşteri Hizmetleri</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>ARM destek politikası</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -3185,19 +3180,6 @@
       <location/>
       <source>Area Width</source>
       <translation>Alan Genişliği</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeServerSelectionWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>Sync time with the Internet</source>
-      <translation>Internet üzerinden tarihi eşitle</translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS Time</source>
-      <translation>VMS Zamanı</translation>
     </message>
   </context>
   <context>

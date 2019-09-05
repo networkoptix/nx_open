@@ -353,7 +353,13 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
         return true;
     }
 
-    if (md->dataType == QnAbstractMediaData::META_V1)
+    if (md->dataType == QnAbstractMediaData::GENERIC_METADATA)
+    {
+        //< It is saved by separate dataConsumer now to sql and binary databases.
+        // In 4.2 we are going to save it to the separate metadata track as well.
+        VERBOSE("GENERIC_METADATA");
+    }
+    else if (md->dataType == QnAbstractMediaData::META_V1)
     {
         VERBOSE("META_V1");
         if (needSaveData(md))

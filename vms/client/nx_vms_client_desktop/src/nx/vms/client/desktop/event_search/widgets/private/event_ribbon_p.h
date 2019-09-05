@@ -14,9 +14,11 @@
 #include <QtCore/QTimer>
 #include <QtCore/QVariantAnimation>
 #include <QtCore/QHash>
+#include <QtCore/QSharedPointer>
 
 #include <ui/common/notification_levels.h>
 #include <ui/style/helper.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/interval.h>
@@ -30,7 +32,9 @@ class QVariantAnimation;
 
 namespace nx::vms::client::desktop {
 
-class EventRibbon::Private: public QObject
+class EventRibbon::Private:
+    public QObject,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
     using PrivateSignal = EventRibbon::QPrivateSignal;
@@ -119,7 +123,10 @@ private:
 
     void closeExpiredTiles();
 
+    ResourceThumbnailProvider* createPreviewProvider(const nx::api::ResourceImageRequest& request);
     void loadNextPreview();
+    bool isNextPreviewLoadAllowed(const ResourceThumbnailProvider* provider) const;
+    void handleLoadingEnded(ResourceThumbnailProvider* provider); //< Provider may be destroying.
 
     int scrollValue() const;
     int totalTopMargin() const; //< Top margin and viewport header.
@@ -213,6 +220,21 @@ private:
 
     nx::utils::ImplPtr<nx::utils::PendingOperation> m_previewLoad;
     nx::utils::ElapsedTimer m_sinceLastPreviewRequest;
+
+    struct PreviewLoadData
+    {
+        QnMediaServerResourcePtr server;
+        QSharedPointer<QTimer> timeout;
+    };
+
+    struct ServerLoadData
+    {
+        int loadingCounter = 0;
+    };
+
+    QHash<ResourceThumbnailProvider*, PreviewLoadData> m_loadingByProvider;
+    QHash<QnMediaServerResourcePtr, ServerLoadData> m_loadingByServer;
+    ResourceThumbnailProvider* m_providerLoadingFromCache = nullptr;
 };
 
 } // namespace nx::vms::client::desktop

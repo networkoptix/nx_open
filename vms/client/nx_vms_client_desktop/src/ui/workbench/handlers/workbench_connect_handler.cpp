@@ -102,6 +102,8 @@
 
 #include <nx/vms/client/desktop/ini.h>
 
+#include <nx/analytics/utils.h>
+
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
@@ -203,8 +205,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     m_crashReporter(commonModule())
 {
     // This will work on its own.
-    if (ini().enableSessionTimeout)
-        const auto sessionTimeoutWatcher = new WorkbenchSessionTimeoutWatcher(this);
+    const auto sessionTimeoutWatcher = new WorkbenchSessionTimeoutWatcher(this);
 
     connect(this, &QnWorkbenchConnectHandler::stateChanged, this,
         &QnWorkbenchConnectHandler::handleStateChanged);
@@ -650,9 +651,20 @@ void QnWorkbenchConnectHandler::showWarnMessagesOnce()
 
     menu()->triggerIfPossible(action::AllowStatisticsReportMessageAction);
     menu()->triggerIfPossible(action::VersionMismatchMessageAction);
-    menu()->triggerIfPossible(action::ConfirmAnalyticsStorageAction);
 
     context()->instance<QnWorkbenchLicenseNotifier>()->checkLicenses();
+
+    // Ask user for analytics storage locations (e.g. in the case of migration).
+    const auto& servers = context()->resourcePool()->getAllServers(Qn::AnyStatus);
+    if (std::any_of(servers.begin(), servers.end(),
+        [this](const auto& server)
+        {
+            return server->metadataStorageId().isNull()
+                && nx::analytics::hasActiveObjectEngines(commonModule(), server->getId());
+        }))
+    {
+        menu()->triggerIfPossible(action::ConfirmAnalyticsStorageAction);
+    }
 }
 
 void QnWorkbenchConnectHandler::stopReconnecting()
@@ -701,7 +713,7 @@ void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
 {
     const auto resourceModeAction = action(action::ResourcesModeAction);
 
-    NX_DEBUG(this) << "State changed" << logicalValue << physicalValue;
+    NX_DEBUG(this, "State changed logical=%1, physical=%2", logicalValue, physicalValue);
     switch (logicalValue)
     {
         case LogicalState::disconnected:

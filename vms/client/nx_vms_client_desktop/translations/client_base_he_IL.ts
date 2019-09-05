@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="he" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>כל סוג</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>בחר אזור</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>בחר אזור כלשהו בווידאו...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>באזור שנבחר</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>ביצוע פעולת תוסף נכשלה</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>הזן נתונים</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>הפעולה דורשת להזין מספר נתונים.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1015,6 +1046,45 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>אירועי שרת</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>ארוע אנליטיקה</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>כל אירוע</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>כל בעיה בהתקן</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>כל בעיה במצלמה</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>כל אירוע שרת</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>בעיות בהתקן</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>בעיות במצלמה</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>כל אירוע אנליטיקה</translation>
+    </message>
+  </context>
+  <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
@@ -1683,24 +1753,12 @@ to view more bookmarks</source>
       <translation>השרת עודכן</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>כלל העסק עודכן</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>השרת הוסר</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>כלל העסק הוסר</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>המשתמש הוסר</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>כלל העסק אותחל</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1798,6 +1856,18 @@ to view more bookmarks</source>
         <numerusform>%n פעולות</numerusform>
         <numerusform>%n פעולות</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation type="unfinished">Event rule changed</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation type="unfinished">Event rule removed</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation type="unfinished">Event rules reset to default</translation>
     </message>
   </context>
   <context>
@@ -2090,7 +2160,7 @@ to view more bookmarks</source>
       <translation>כל מצלמה</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
       <translation>כפיית אישור תעבוד רק לאירועים גנריים אם במשתני המצלמה נעשה שימוש ב-URL של האירוע הגנרי</translation>
     </message>
   </context>
@@ -5733,8 +5803,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>נתוני האנליטיקה הנוכחיים לא יועברו אוטומטית למיקום אחר ויהפכו לבלתי ניתנים לגישה. אתה יכול להשאיר אותם ולהעביר אותם ידנית, או למחוק אותם לצמיתות.
+אם התכוונת להעביר נתוני האנליטיקה למיקום אחסון אחר, צור קשר עם התמיכה לפני שתמשיך.</translation>
     </message>
   </context>
   <context>
@@ -6057,10 +6127,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>אינו כולל מידע אישי והוא אנונימי לחלוטין.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>אמצעי שרת Failover עשויים לבקש עדכוני סטטוס של המצלמה ללא קשר להגדרה זו.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>אפשר גילוי אוטומטי של מכשירים ושרתים ובדיקת סטטוס התקנים</translation>
     </message>
@@ -6071,6 +6137,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>כאשר מאופשר, המערכת מגלה מצלמות חדשות ושרתים חדשים, ושולחת בקשות לעדכון סטטוס מצלמות.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>אמצעי שרת Failover עשויים לבקש עדכוני סטטוס של המצלמה ללא קשר להגדרה זו.</translation>
     </message>
   </context>
   <context>
@@ -6090,44 +6160,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>קובץ גיליון אלקטרוני (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>שרת</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>היסט</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>תאריך</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>אזור זמן</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>שעה</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>אין אף שרת עם גישה לאינטרנט. הזמן אינו מסונכרן.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>זמן המערכת מסונכרן עם האינטרנט ואינו תלוי בזמן המקומי בשרתים.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>זמן המערכת מסונכרן עם הזמן המקומי בשרתים שנבחרו ואינו תלוי בזמן המקומי בשרתים אחרים.</translation>
     </message>
   </context>
   <context>
@@ -7334,6 +7366,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>בחר אזור בסרטון כדי לסנן את התוצאות</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>באזור שנבחר</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>מצלמה שנבחרה</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>התקן נבחר</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>מדיה נבחרת</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ללא</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7578,38 +7638,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n אובייקטים</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>כל סוג</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>בחר אזור</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>בחר אזור כלשהו בווידאו...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>באזור שנבחר</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>מנוע אנליטיקה ללא שם</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>ביצוע פעולת תוסף נכשלה</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>הזן נתונים</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>הפעולה דורשת להזין מספר נתונים.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7654,17 +7682,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>מחיל שינויים...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>אין הגדרות מתקדמות למודול קלט/פלט זה</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>למצלמה זו אין הגדרות מתקדמות</translation>
     </message>
   </context>
   <context>
@@ -8244,42 +8261,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation>אירועי שרת</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>ארוע אנליטיקה</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>כל בעיה בהתקן</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>כל בעיה במצלמה</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>כל אירוע שרת</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>בעיות בהתקן</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>בעיות במצלמה</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>כל אירוע</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>כל אירוע אנליטיקה</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>אין אירועים</translation>
     </message>
@@ -8844,11 +8825,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers have not completed the update process. Finish it anyway?</source>
       <translation>חלק מהשרתים לא השלימו את העדכון, לסיים בכל מקרה?</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <comment>Application name will be substituted</comment>
-      <translation>%1 יופעל מחדש לגרסה המעודכנת.</translation>
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
@@ -9485,14 +9461,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>בחר אזור בסרטון כדי לסנן את התוצאות</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>באזור שנבחר</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>אין תנועה</translation>
     </message>
@@ -9508,23 +9476,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n אירועי תנועה</numerusform>
         <numerusform>%n אירועי תנועה</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>מצלמה שנבחרה</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>התקן נבחר</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>מדיה נבחרת</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ללא</translation>
     </message>
   </context>
   <context>
@@ -9668,11 +9619,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote file &quot;%1&quot; is corrupted</source>
-      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+      <translation>הקובץ המרוחק &quot;%1&quot; פגום</translation>
     </message>
     <message>
       <source>Server already has this file &quot;%1&quot;</source>
-      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
+      <translation>לשרת כבר יש קובץ זה &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -10222,21 +10173,21 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>אשר את מיקום האחסון כדי לאחסן נתוני אנליטיקה ב- %1</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>המחיצה הזמינה הגדולה ביותר</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
-Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
-By default analytics data will be stored on %1.
-You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
+      <translation>נתוני אנליטיקה אמורים להיות מאוחסנים מקומית ועשויים לצרוך מאות ג'יגבייטים.
+כשאשר מיקום האחסון נבחר, החלפת מיקום זה אינה פשוטה ותהיה כרוכה לרוב באיבוד הנתונים הקיימים. אנו ממליצים לבחור בקפידה את מקום האחסון ושיהיה במחיצה שונה משל מערכת ההפעלה על מנת להימנע מכשלי מערכת פוטנציאלים.
+כברירת מחדל נתונים אנליטיים יאוחסנו ב- %1.
+אתה יכול לשנות את זה דרך תווית "ניהול אחסון" תחת "הגדרות שרת".</translation>
     </message>
   </context>
   <context>

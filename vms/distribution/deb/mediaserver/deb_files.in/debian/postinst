@@ -249,7 +249,11 @@ case "$1" in
         then
             chown "root:${SYSTEM_USER}" "${BIN_DIR}/root-tool-bin"
             chmod u+s "${BIN_DIR}/root-tool-bin"
+
             setcap CAP_NET_BIND_SERVICE=+eip "$BIN_DIR/mediaserver-bin"
+
+            mkdir -p "${BASE_DIR}/var/log"
+            chown -R "${SYSTEM_USER}:${SYSTEM_USER}" "${BASE_DIR}/var/log"
         fi
 
         touch "$RUNTIME_CONFIG_FILE"
@@ -295,8 +299,29 @@ fi
 
 systemctl enable $COMPANY_NAME-mediaserver || exit $?
 
+# [out] SERVER_PID
+# [out] SERVER_UID
+getServerProcessInfo()
+{
+    if ! SERVER_PID=$(pidof mediaserver-bin)
+    then
+        return 1
+    fi
+
+    # Get UID of proccess with $SERVER_PID.
+    if ! SERVER_UID=$(ps -h -eo uid -q $SERVER_PID | grep -o '[[:digit:]]\+')
+    then
+        return 1
+    fi
+
+    return 0
+}
+
 startServer()
 {
+    local SERVER_PID
+    local SERVER_UID
+
     if [[ $WITH_ROOT_TOOL == 'true' ]]
     then
         systemctl start $COMPANY_NAME-root-tool || return $?
@@ -305,13 +330,14 @@ startServer()
     systemctl start $COMPANY_NAME-mediaserver
 
     sleep 1
-    if ! PID=$(pidof mediaserver-bin)
+    if ! getServerProcessInfo
     then
-        echo "ERROR: Server process not found though 'systemd ... start' reported success." >&2
+        echo "ERROR: Server process not found \
+            despite 'systemd ... start' returned zero exit status." >&2
         exit 1
     fi
 
-    echo "Started service with PID $PID."
+    echo "Started service with PID=$SERVER_PID, UID=$SERVER_UID."
 }
 
 if [[ $RUNTIME != "docker" ]]

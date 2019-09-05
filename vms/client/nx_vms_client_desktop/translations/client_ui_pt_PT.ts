@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Suporte ao cliente</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -733,7 +728,7 @@
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>Firmware:</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <location/>
@@ -2596,7 +2591,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>Um computador poderoso é recomendado para &quot;Melhor&quot; qualidade e resolução.</translation>
+      <translation>Um computador potente é recomendado para a "Melhor" qualidade e resolução.</translation>
     </message>
     <message>
       <location/>
@@ -2756,12 +2751,12 @@
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation>Exibir marca d&apos;água com nome do utilizador sobre o vídeo</translation>
+      <translation>Exibir marca d'água com nome do utilizador sobre o vídeo</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation>Visualização de marca d&apos;água</translation>
+      <translation>Visualização de marca d'água</translation>
     </message>
     <message>
       <location/>
@@ -3188,19 +3183,6 @@
     </message>
   </context>
   <context>
-    <name>TimeServerSelectionWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>Sync time with the Internet</source>
-      <translation>Sincronizar tempo com a Internet</translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
-    </message>
-  </context>
-  <context>
     <name>TimeSynchronizationWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
@@ -3390,7 +3372,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation>Pré-visualização da marca d&apos;água</translation>
+      <translation>Pré-visualização da marca d'água</translation>
     </message>
     <message>
       <location/>

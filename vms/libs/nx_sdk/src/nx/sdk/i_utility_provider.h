@@ -22,7 +22,7 @@ namespace sdk {
 class IUtilityProvider: public Interface<IUtilityProvider>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::IUtilityProvider"); }
+    static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider"); }
 
     /**
      * VMT #4.
@@ -33,7 +33,8 @@ public:
     /**
      * @return Absolute path to the plugin's home directory, or an empty string if it is absent.
      */
-    virtual const IString* homeDir() const = 0;
+    protected: virtual const IString* getHomeDir() const = 0;
+    public: std::string homeDir() const { return toPtr(getHomeDir())->str(); }
 };
 
 } // namespace sdk

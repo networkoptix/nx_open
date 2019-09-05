@@ -32,7 +32,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
@@ -1149,16 +1148,21 @@ QnResourceTreeModel* QnResourceTreeModelNode::model() const
 
 bool QnResourceTreeModelNode::isVisible() const
 {
-    if (!isValid())
+    if (!isValid() || !m_model)
         return false;
+
+    const auto root = m_model->rootNode(m_model->rootNodeTypeForScope());
 
     for (auto node = this; node != nullptr; node = node->parent().get())
     {
         if (node->isBastard())
             return false;
+
+        if (node == root)
+            return true;
     }
 
-    return true;
+    return false; //< The node isn't under current scope root.
 }
 
 void QnResourceTreeModelNode::handlePermissionsChanged()
@@ -1308,14 +1312,16 @@ void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodeP
     NX_ASSERT(child->parent() == this);
     NX_ASSERT(m_children.contains(child));
 
-    if (m_model && isVisible())
+    if (isVisible())
     {
         QModelIndex index = createIndex(Qn::NameColumn);
         int row = m_children.indexOf(child);
 
-        m_model->beginRemoveRows(index, row, row);
+        if (!m_model->resetInProgress())
+            m_model->beginRemoveRows(index, row, row);
         m_children.removeOne(child);
-        m_model->endRemoveRows();
+        if (!m_model->resetInProgress())
+            m_model->endRemoveRows();
     }
     else
     {
@@ -1339,14 +1345,16 @@ void QnResourceTreeModelNode::addChildInternal(const QnResourceTreeModelNodePtr&
 {
     NX_ASSERT(child->parent() == this);
 
-    if (m_model && isVisible())
+    if (isVisible())
     {
         QModelIndex index = createIndex(Qn::NameColumn);
         int row = m_children.size();
 
-        m_model->beginInsertRows(index, row, row);
+        if (!m_model->resetInProgress())
+            m_model->beginInsertRows(index, row, row);
         m_children.push_back(child);
-        m_model->endInsertRows();
+        if (!m_model->resetInProgress())
+            m_model->endInsertRows();
     }
     else
     {
@@ -1363,11 +1371,12 @@ void QnResourceTreeModelNode::addChildInternal(const QnResourceTreeModelNodePtr&
 
 void QnResourceTreeModelNode::changeInternal()
 {
-    if (!m_model || !isVisible())
+    if (!isVisible())
         return;
 
     const auto index = createIndex(Qn::NameColumn);
-    emit m_model->dataChanged(index, index.sibling(index.row(), Qn::ColumnCount - 1));
+    if (!m_model->resetInProgress())
+        emit m_model->dataChanged(index, index.sibling(index.row(), Qn::ColumnCount - 1));
 }
 
 void QnResourceTreeModelNode::updateIcon()

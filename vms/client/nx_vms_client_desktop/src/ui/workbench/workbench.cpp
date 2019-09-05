@@ -31,17 +31,24 @@
 
 #include <nx/utils/math/fuzzy.h>
 
+#include "workbench_layout_synchronizer.h"
+
 using namespace nx::vms::client::desktop;
 using namespace ui;
 using namespace workbench;
 
 namespace {
 
-QnWorkbenchItem *bestItemForRole(QnWorkbenchItem **itemByRole, Qn::ItemRole role) {
-    for(int i = 0; i != role ; i++)
-        if(itemByRole[i])
+QnWorkbenchItem* bestItemForRole(QnWorkbenchItem** itemByRole, Qn::ItemRole role,
+    const QnWorkbenchItem* ignoredItem = nullptr)
+{
+    for (int i = 0; i != role; i++)
+    {
+        if (itemByRole[i] && itemByRole[i] != ignoredItem)
             return itemByRole[i];
-    return NULL;
+    }
+
+    return nullptr;
 }
 
 void addLayoutCreators(LayoutsFactory* factory)
@@ -228,6 +235,8 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout)
                 return;
             }
             layout::reloadFromFile(resource, password);
+            if (auto synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource))
+                synchronizer->update();
             snapshotManager()->store(resource);
         }
     }
@@ -351,17 +360,31 @@ void QnWorkbench::updateSingleRoleItem() {
     }
 }
 
-void QnWorkbench::updateActiveRoleItem() {
-    QnWorkbenchItem *activeItem = bestItemForRole(m_itemByRole, Qn::ActiveRole);
-    if(activeItem) {
+void QnWorkbench::updateActiveRoleItem(const QnWorkbenchItem* removedItem)
+{
+    auto activeItem = bestItemForRole(m_itemByRole, Qn::ActiveRole, removedItem);
+    if (activeItem)
+    {
         setItem(Qn::ActiveRole, activeItem);
         return;
     }
 
-    if(m_itemByRole[Qn::ActiveRole])
+    if (m_itemByRole[Qn::ActiveRole] && m_itemByRole[Qn::ActiveRole] != removedItem)
         return;
 
-    setItem(Qn::ActiveRole, m_currentLayout->items().isEmpty() ? NULL : *m_currentLayout->items().begin());
+    // Try to select the same camera as just removed (if any left).
+    QSet<QnWorkbenchItem*> sameResourceItems;
+    if (removedItem)
+        sameResourceItems = m_currentLayout->items(removedItem->resource());
+
+    const auto& itemsToSelectFrom = sameResourceItems.empty()
+        ? m_currentLayout->items()
+        : sameResourceItems;
+
+    if (!itemsToSelectFrom.isEmpty())
+        activeItem = *itemsToSelectFrom.begin();
+
+    setItem(Qn::ActiveRole, activeItem);
 }
 
 void QnWorkbench::updateCentralRoleItem() {
@@ -465,13 +488,17 @@ void QnWorkbench::at_layout_itemAdded(QnWorkbenchItem *item) {
     emit currentLayoutItemsChanged();
 }
 
-void QnWorkbench::at_layout_itemRemoved(QnWorkbenchItem *item) {
-    for(int i = 0; i < Qn::ItemRoleCount; i++)
-        if(item == m_itemByRole[i])
-            setItem(static_cast<Qn::ItemRole>(i), NULL);
-
+void QnWorkbench::at_layout_itemRemoved(QnWorkbenchItem* item)
+{
     updateSingleRoleItem();
-    updateActiveRoleItem();
+    updateActiveRoleItem(item);
+
+    for (int i = 0; i < Qn::ItemRoleCount; i++)
+    {
+        if (item == m_itemByRole[i])
+            setItem(static_cast<Qn::ItemRole>(i), nullptr);
+    }
+
     emit currentLayoutItemsChanged();
 }
 

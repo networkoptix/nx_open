@@ -8,7 +8,6 @@
 #include <nx/sdk/helpers/ref_countable.h>
 
 #include <nx/sdk/analytics/i_device_agent.h>
-#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include "common.h"
 #include "engine.h"
@@ -28,23 +27,24 @@ public:
 
     virtual ~DeviceAgent();
 
-    virtual Engine* engine() const override { return m_engine; }
-
     void sendEventPacket(const EventType& event) const;
-
-    virtual nx::sdk::StringResult manifest() const override;
 
     virtual void setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
 
-    virtual nx::sdk::Result<void> setNeededMetadataTypes(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
-
-    virtual nx::sdk::StringMapResult setSettings(const nx::sdk::IStringMap* settings) override;
-
-    virtual nx::sdk::SettingsResponseResult pluginSideSettings() const override;
+protected:
+    virtual void doSetSettings(
+        nx::sdk::Result<const nx::sdk::IStringMap*>* outResult,
+        const nx::sdk::IStringMap* settings) override;
+    virtual void getPluginSideSettings(
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
+    virtual void getManifest(nx::sdk::Result<const nx::sdk::IString*>* outResult) const override;
+    virtual void doSetNeededMetadataTypes(
+        nx::sdk::Result<void>* outValue,
+        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
 private:
-    void startFetchingMetadata(const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+    nx::sdk::Result<void> startFetchingMetadata(
+        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
     void stopFetchingMetadata();
 
 private:

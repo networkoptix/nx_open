@@ -433,7 +433,7 @@ int Helper::handleDownloadChunkFromInternet(const QString& fileName, int chunkIn
     }
 
     NX_VERBOSE(handler, "Successfully downloaded chunk %1 of %2 in %3",
-        chunkIndex, fileName, steady_clock::now() - requestStartTime);
+        chunkIndex, fileName, duration_cast<milliseconds>(steady_clock::now() - requestStartTime));
 
     resultContentType = kOctetStreamContentType;
 

@@ -11,8 +11,6 @@ public:
     DeviceMock(QnCommonModule* commonModule = nullptr): base_type(commonModule) {};
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-
-    virtual bool saveProperties() override;
 };
 
 } // namespace nx::core::resource

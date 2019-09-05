@@ -77,7 +77,7 @@ MessageBus::MessageBus(
 
     m_thread->setObjectName("P2pMessageBus");
     connect(m_thread, &QThread::started,
-        [this, peerType]()
+        [this]()
         {
             if (!m_timer)
             {
@@ -103,6 +103,8 @@ void MessageBus::dropConnections()
 
 void MessageBus::dropConnectionsThreadUnsafe()
 {
+    NX_VERBOSE(this, "dropConnectionsThreadUnsafe() with %1 active and %2 outgoing connections",
+        m_connections.size(), m_outgoingConnections.size());
     while (!m_connections.empty())
         removeConnectionUnsafe(m_connections.first());
     while(!m_outgoingConnections.empty())
@@ -189,13 +191,14 @@ void MessageBus::addOutgoingConnectionToPeer(
 
     int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());
     m_remoteUrls.insert(m_remoteUrls.begin() + pos, RemoteConnection(peer, url));
-
+    NX_VERBOSE(this, "addOutgoingConnectionToPeer() to peer %1 type %2 using url \"%3\"",
+        peer, peerType, _url);
     executeInThread(m_thread, [this]() {doPeriodicTasks();});
 }
 
 void MessageBus::deleteRemoveUrlById(const QnUuid& id)
 {
-    for (int i = 0; i < m_remoteUrls.size(); ++i)
+    for (decltype(m_remoteUrls.size()) i = 0; i < m_remoteUrls.size(); ++i)
     {
         if (m_remoteUrls[i].peerId == id)
         {
@@ -214,7 +217,15 @@ void MessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
     m_lastConnectionState.remove(id);
     auto itr = m_connections.find(id);
     if (itr != m_connections.end() && itr.value()->direction() == Connection::Direction::outgoing)
+    {
+        NX_VERBOSE(this,
+            "removeOutgoingConnectionFromPeer() from peer %1 with outgoing connection", id);
         removeConnectionUnsafe(itr.value());
+    }
+    else
+    {
+        NX_VERBOSE(this, "removeOutgoingConnectionFromPeer() from peer %1", id);
+    }
 }
 
 void MessageBus::connectSignals(const P2pConnectionPtr& connection)
@@ -240,9 +251,7 @@ void MessageBus::createOutgoingConnections(
         return;
     m_outConnectionsTimer.restart();
 
-    auto itr = m_remoteUrls.begin();
-
-    for (int i = 0; i < m_remoteUrls.size(); ++i)
+    for (decltype(m_remoteUrls.size()) i = 0; i < m_remoteUrls.size(); ++i)
     {
         if (m_outgoingConnections.size() >= m_miscData.newConnectionsAtOnce)
             return; //< wait a bit
@@ -456,32 +465,33 @@ void MessageBus::removeConnectionUnsafe(QWeakPointer<ConnectionBase> weakRef)
     if (!connection)
         return;
 
-    const auto& remoteId = connection->remotePeer().id;
-    NX_DEBUG(
-        this,
-        lit("Peer %1 has closed connection to %2")
-        .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
-        .arg(qnStaticCommon->moduleDisplayName(connection->remotePeer().id)));
+    const auto& remotePeer = connection->remotePeer();
+    NX_DEBUG(this,
+        "Peer %1:%2 has closed connection to %3:%4",
+        localPeer().peerType,
+        qnStaticCommon->moduleDisplayName(localPeer().id),
+        remotePeer.peerType,
+        qnStaticCommon->moduleDisplayName(remotePeer.id));
 
     if (auto callback = context(connection)->onConnectionClosedCallback)
         callback();
-    auto outgoingConnection = m_outgoingConnections.value(remoteId);
+    auto outgoingConnection = m_outgoingConnections.value(remotePeer.id);
     if (outgoingConnection == connection)
     {
-        m_outgoingConnections.remove(remoteId);
+        m_outgoingConnections.remove(remotePeer.id);
     }
     else
     {
-        auto connectedConnection = m_connections.value(remoteId);
+        auto connectedConnection = m_connections.value(remotePeer.id);
         if (connectedConnection == connection)
         {
             m_peers->removePeer(connection->remotePeer());
-            m_connections.remove(remoteId);
+            m_connections.remove(remotePeer.id);
         }
     }
     emitPeerFoundLostSignals();
     if (connection->state() == Connection::State::Unauthorized)
-        emit remotePeerUnauthorized(connection->remotePeer().id);
+        emit remotePeerUnauthorized(remotePeer.id);
 }
 
 void MessageBus::at_stateChanged(
@@ -553,6 +563,7 @@ bool MessageBus::selectAndSendTransactions(
     vms::api::TranState newSubscription,
     bool addImplicitData)
 {
+    nx::utils::unused(addImplicitData);
     context(connection)->sendDataInProgress = false;
     context(connection)->remoteSubscription = newSubscription;
     return true;
@@ -924,6 +935,7 @@ void MessageBus::gotTransaction(
     const P2pConnectionPtr& connection,
     const TransportHeader& transportHeader)
 {
+    nx::utils::unused(transportHeader);
     PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
 
     if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
@@ -944,6 +956,12 @@ void MessageBus::processRuntimeInfo(
 
     if (m_lastRuntimeInfo[peerId] == tran.params)
         return; //< Already processed. Ignore same transaction.
+
+    if (peerId.id == localPeer().id)
+    {
+        NX_DEBUG(this, "Ignore deprecated runtime information about himself");
+        return;
+    }
 
     m_lastRuntimeInfo[peerId] = tran.params;
 
@@ -1146,9 +1164,9 @@ ConnectionContext* MessageBus::context(const P2pConnectionPtr& connection)
     return static_cast<ConnectionContext*> (connection->opaqueObject());
 }
 
-QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
+ConnectionInfoList MessageBus::connectionsInfo() const
 {
-    QVector<QnTransportConnectionInfo> result;
+    ConnectionInfoList result;
     QnMutexLocker lock(&m_mutex);
 
     auto remoteUrls = m_remoteUrls;
@@ -1164,6 +1182,7 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
             info.state = toString(connection->state());
             info.isIncoming = connection->direction() == Connection::Direction::incoming;
             info.remotePeerId = connection->remotePeer().id;
+            info.remotePeerDbId = connection->remotePeer().persistentId;
             info.isStarted = context->isLocalStarted;
             info.peerType = connection->remotePeer().peerType;
             info.subscribedTo = context->localSubscription;
@@ -1174,7 +1193,7 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
             // yet. It caused by optimization to do not open all connections to each other.
             info.gotPeerInfo = !context->remotePeersMessage.isEmpty();
 
-            result.push_back(info);
+            result.connections.push_back(info);
         }
 
         remoteUrls.erase(std::remove_if(remoteUrls.begin(), remoteUrls.end(),
@@ -1195,12 +1214,12 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
         info.state = "Not opened";
         info.isIncoming = false;
         info.remotePeerId = peer.peerId;
-        result.push_back(info);
+        result.connections.push_back(info);
     }
 
-    for (auto& record: result)
+    for (auto& record: result.connections)
         record.previousState = toString(m_lastConnectionState.value(record.remotePeerId));
-
+    result.idData = localPeer();
     return result;
 }
 
@@ -1301,6 +1320,7 @@ QMap<PersistentIdData, RuntimeData> MessageBus::runtimeInfo() const
 
 void MessageBus::sendInitialDataToCloud(const P2pConnectionPtr& connection)
 {
+    nx::utils::unused(connection);
     NX_ASSERT(0, "Not implemented");
 }
 

@@ -5,6 +5,7 @@
 #include <optional>
 #include <vector>
 
+#include <QtCore/QDate>
 #include <QtCore/QList>
 #include <QtCore/QHash>
 #include <QtCore/QPointer>
@@ -68,6 +69,7 @@ public:
     void setPlaceholderPixmap(const QPixmap& value);
     SelectableTextButton* createCustomFilterButton();
 
+    bool updateFetchDirection(); //< Returns true if new data fetch is required.
     void requestFetchIfNeeded();
     void resetFilters();
 
@@ -100,6 +102,8 @@ private:
     void updatePlaceholderVisibility();
 
     QString currentDeviceText() const;
+
+    void setCurrentDate(const QDateTime& value);
 
 private:
     const QScopedPointer<AbstractSearchListModel> m_mainModel;
@@ -142,6 +146,8 @@ private:
     std::vector<DeviceDependentAction> m_deviceDependentActions;
 
     std::optional<bool> m_isAllowed; //< std::optional for lazy initialization.
+
+    QDateTime m_currentDate; //< Either client or server time, depending on the local settings.
 };
 
 inline uint qHash(AbstractSearchWidget::Period source)

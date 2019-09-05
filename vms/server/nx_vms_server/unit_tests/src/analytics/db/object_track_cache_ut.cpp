@@ -6,7 +6,7 @@
 
 #include <nx/vms/server/analytics/db/object_track_cache.h>
 
-#include "analytics_storage_types.h"
+#include "attribute_dictionary.h"
 
 namespace nx::analytics::db::test {
 
@@ -80,8 +80,8 @@ protected:
             packet->deviceId = m_analyticsDataPackets.back()->deviceId;
             packet->objectMetadataList.front().trackId =
                 m_analyticsDataPackets.back()->objectMetadataList.front().trackId;
-            packet->objectMetadataList.front().objectTypeId =
-                m_analyticsDataPackets.back()->objectMetadataList.front().objectTypeId;
+            packet->objectMetadataList.front().typeId =
+                m_analyticsDataPackets.back()->objectMetadataList.front().typeId;
         }
 
         m_analyticsDataPackets.push_back(std::move(packet));

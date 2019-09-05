@@ -10,7 +10,7 @@ namespace sdk {
 class IAttribute: public Interface<IAttribute>
 {
 public:
-    enum class Type
+    enum class Type: int
     {
         undefined,
         number,
@@ -19,7 +19,7 @@ public:
         // TODO: Consider adding other specific types like DateTime, Coordinates, Temperature.
     };
 
-    static auto interfaceId() { return InterfaceId("nx::sdk::IAttribute"); }
+    static auto interfaceId() { return makeId("nx::sdk::IAttribute"); }
 
     virtual Type type() const = 0;
     virtual const char* name() const = 0;

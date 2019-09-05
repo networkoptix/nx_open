@@ -5,7 +5,6 @@
 #include "abstract_transaction_message_bus.h"
 #include <transaction/transaction_message_bus.h>
 #include <nx/p2p/p2p_message_bus.h>
-#include <nx/utils/move_only_func.h>
 
 namespace ec2 {
 
@@ -59,7 +58,7 @@ namespace ec2 {
 
         virtual void dropConnections() override;
 
-        virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
+        virtual ConnectionInfoList connectionsInfo() const override;
 
         virtual void setHandler(ECConnectionNotificationManager* handler) override;
         virtual void removeHandler(ECConnectionNotificationManager* handler) override;
@@ -75,16 +74,6 @@ namespace ec2 {
         void sendTransaction(
             const QnTransaction<T>& tran)
         {
-            // Give a chance to establish connections before sending first updates/notifications.
-            {
-                QnMutexLocker lock(&m_delayMutex);
-                if (m_delayedTransactions)
-                {
-                    m_delayedTransactions->emplace_back([this, tran]() { sendTransaction(tran); });
-                    return;
-                }
-            }
-
             if (auto p2pBus = dynamicCast<nx::p2p::MessageBus*>())
                 p2pBus->sendTransaction(tran);
             else if (auto msgBus = dynamicCast<QnTransactionMessageBus*>())
@@ -119,11 +108,8 @@ namespace ec2 {
         void initInternal();
 
     private:
-        using DelayedTransactions = std::vector<nx::utils::MoveOnlyFunc<void()>>;
-
         std::unique_ptr<AbstractTransactionMessageBus> m_bus;
-        QnMutex m_delayMutex;
-        std::optional<DelayedTransactions> m_delayedTransactions = DelayedTransactions();
+
         QnJsonTransactionSerializer* m_jsonTranSerializer;
         QnUbjsonTransactionSerializer* m_ubjsonTranSerializer;
     };

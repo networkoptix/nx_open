@@ -31,6 +31,7 @@ function(set_distribution_names)
     if(beta)
         set(beta_suffix "-beta")
         set(suffix "${distribution_platform}${beta_suffix}-${cloudGroup}")
+        set(boxToolSuffix "${distribution_platform}${beta_suffix}")
         set(sdkSuffix "universal${beta_suffix}")
         if(targetDevice STREQUAL "linux_arm32")
             set(suffix_rpi "rpi${beta_suffix}-${cloudGroup}")
@@ -39,6 +40,7 @@ function(set_distribution_names)
     else()
         set(beta_suffix)
         set(suffix "${distribution_platform}")
+        set(boxToolSuffix "${distribution_platform}")
         set(sdkSuffix "universal")
         if(targetDevice STREQUAL "linux_arm32")
             set(suffix_rpi "rpi")
@@ -88,8 +90,14 @@ function(set_distribution_names)
         "${prefix}-unit_tests-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(mobile_client_distribution_name
         "${prefix}-client-${mobileClientVersion.full}-${suffix}" PARENT_SCOPE)
-    set(analytics_sdk_distribution_name
-        "${prefix}-analytics_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
+    set(metadata_sdk_distribution_name
+        "${prefix}-metadata_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
+    set(camera_sdk_distribution_name
+        "${prefix}-camera_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
+    set(storage_sdk_distribution_name
+        "${prefix}-storage_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
+    set(box_tool_distribution_name
+        "${prefix}-box_tool-${releaseVersion.full}-${boxToolSuffix}" PARENT_SCOPE)
     set(ssc_analytics_plugin_distribution_name
         "${prefix}-ssc_analytics_plugin-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(product_distribution_name

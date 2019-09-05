@@ -84,7 +84,6 @@
 #include <core/storage/file_storage/qtfile_storage_resource.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 
-#include <nx/vms/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 
 #include <server/server_storage_manager.h>
@@ -218,8 +217,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     QObject(parent),
     m_startupParameters(startupParams)
 {
-    ini().reload();
-
 #if defined(Q_OS_WIN)
     // Enable full crash dumps if needed. Do not disable here as it can be enabled elsewhere.
     if (ini().profilerMode)
@@ -446,7 +443,6 @@ void QnClientModule::initSingletons()
     commonModule->store(new QnGlobals());
 
     m_radassController = commonModule->store(new RadassController());
-    commonModule->store(new MetadataAnalyticsController());
 
     commonModule->store(new QnPlatformAbstraction());
 
@@ -584,7 +580,7 @@ void QnClientModule::initLog()
         ? ("client_log" + logFileNameSuffix)
         : logFile;
     logSettings.updateDirectoryIfEmpty(
-        QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/log");
 
     setMainLogger(
         buildLogger(logSettings, qApp->applicationName(), qApp->applicationFilePath()));
@@ -603,7 +599,7 @@ bool QnClientModule::initLogFromFile(const QString& filename, const QString& suf
 
     return nx::utils::log::initializeFromConfigFile(
         logConfigFile,
-        QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/log",
         qApp->applicationName(),
         qApp->applicationFilePath(),
         suffix);
@@ -701,11 +697,12 @@ void QnClientModule::initLocalResources()
     commonModule->store(new QnLocalResourceStatusWatcher());
     if (!m_startupParameters.skipMediaFolderScan && !m_startupParameters.acsMode)
     {
-        auto localFilesSearcher = commonModule->store(new ResourceDirectoryBrowser());
         QStringList paths;
         paths.append(qnSettings->mediaFolder());
         paths.append(qnSettings->extraMediaFolders());
-        localFilesSearcher->setLocalResourcesDirectories(paths);
+
+        m_resourceDirectoryBrowser.reset(new ResourceDirectoryBrowser());
+        m_resourceDirectoryBrowser->setLocalResourcesDirectories(paths);
     }
 }
 
@@ -747,6 +744,12 @@ WearableManager* QnClientModule::wearableManager() const
 VideoCache* QnClientModule::videoCache() const
 {
     return m_videoCache;
+}
+
+nx::vms::client::desktop::ResourceDirectoryBrowser*
+    QnClientModule::resourceDirectoryBrowser() const
+{
+    return m_resourceDirectoryBrowser.data();
 }
 
 void QnClientModule::initLocalInfo()

@@ -140,8 +140,7 @@ bool hasToggleState(
         if (runtimeParams.getAnalyticsEventTypeId().isNull())
             return true;
 
-        nx::analytics::EventTypeDescriptorManager descriptorManager(commonModule);
-        const auto descriptor = descriptorManager.descriptor(
+        const auto descriptor = commonModule->analyticsEventTypeDescriptorManager()->descriptor(
             runtimeParams.getAnalyticsEventTypeId());
 
         if (!descriptor)

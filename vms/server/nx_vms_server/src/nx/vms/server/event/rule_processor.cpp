@@ -67,20 +67,48 @@ RuleProcessor::RuleProcessor(QnMediaServerModule* serverModule):
         this, [this](const QnResourcePtr& r) { at_resourceMonitor(r, /*isAdded*/ false); },
         Qt::QueuedConnection);
 
-    connect(eventRuleManager(), &vms::event::RuleManager::ruleAddedOrUpdated, this,
-        &RuleProcessor::at_ruleAddedOrUpdated, Qt::QueuedConnection);
-    connect(eventRuleManager(), &vms::event::RuleManager::ruleRemoved, this,
-        &RuleProcessor::at_ruleRemoved, Qt::QueuedConnection);
-    connect(eventRuleManager(), &vms::event::RuleManager::rulesReset, this,
-        &RuleProcessor::at_rulesReset, Qt::QueuedConnection);
+    const auto connectRuleUpdate =
+        [this](auto signal, auto slot)
+        {
+            // Make sure event processing is stopped until rule change is complete.
+            connect(eventRuleManager(), signal, [this]() {++m_updatingRulesCount; });
+            connect(eventRuleManager(), signal, this,
+                [this, slot](auto arg)
+                {
+                    (this->*slot)(arg);
+
+                    QnMutexLocker lock(&m_mutex);
+                    const auto currentValue = --m_updatingRulesCount;
+                    NX_ASSERT(currentValue >= 0, currentValue);
+                    if (currentValue == 0)
+                    {
+                        processDelayedEvents();
+                        m_ruleUpdateCondition.wakeAll();
+                    }
+                },
+                Qt::QueuedConnection);
+        };
+
+    connectRuleUpdate(&vms::event::RuleManager::ruleAddedOrUpdated, &RuleProcessor::at_ruleAddedOrUpdated);
+    connectRuleUpdate(&vms::event::RuleManager::ruleRemoved, &RuleProcessor::at_ruleRemoved);
+    connectRuleUpdate(&vms::event::RuleManager::rulesReset, &RuleProcessor::at_rulesReset);
 
     connect(&m_timer, &QTimer::timeout, this, &RuleProcessor::at_timer, Qt::QueuedConnection);
     m_timer.start(1000);
     start();
 }
 
+void RuleProcessor::waitForRulesUpdate()
+{
+    QnMutexLocker lock(&m_mutex);
+    while(m_updatingRulesCount > 0)
+        m_ruleUpdateCondition.wait(&m_mutex);
+}
+
 RuleProcessor::~RuleProcessor()
 {
+    NX_ASSERT(m_updatingRulesCount == 0, m_updatingRulesCount);
+    m_updatingRulesCount = 0;
 }
 
 QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
@@ -406,28 +434,26 @@ void RuleProcessor::processEvent(const vms::event::AbstractEventPtr& event)
     NX_VERBOSE(this, "Processing event [%1]", event->getEventType());
 
     QnMutexLocker lock(&m_mutex);
-    if (rulesHaveNotBeenLoadedYet())
+    if (m_updatingRulesCount > 0)
         m_delayedEvents.append(event);
     else
         processEventInternal(event);
 }
 
-QList<vms::event::RulePtr> RuleProcessor::rules() const
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_rules;
-}
-
-bool RuleProcessor::rulesHaveNotBeenLoadedYet() const
-{
-    return m_rules.isEmpty();
-}
-
 void RuleProcessor::processEventInternal(const vms::event::AbstractEventPtr& event)
 {
+    // Get pairs of {rule, action} for event.
     const auto actions = matchActions(event);
     for (const auto& action: actions)
         executeAction(action);
+}
+
+void RuleProcessor::processDelayedEvents()
+{
+    for (const auto& event: m_delayedEvents)
+        processEventInternal(event);
+
+    m_delayedEvents.clear();
 }
 
 bool RuleProcessor::containsResource(const QnResourceList& resList, const QnUuid& resId) const
@@ -713,14 +739,6 @@ void RuleProcessor::at_ruleAddedOrUpdated(const vms::event::RulePtr& rule)
     at_ruleAddedOrUpdated_impl(rule);
 }
 
-void RuleProcessor::processDelayedEvents()
-{
-    for (const auto& event: m_delayedEvents)
-        processEventInternal(event);
-
-    m_delayedEvents.clear();
-}
-
 void RuleProcessor::at_rulesReset(const vms::event::RuleList& rules)
 {
     QnMutexLocker lock(&m_mutex);
@@ -736,8 +754,6 @@ void RuleProcessor::at_rulesReset(const vms::event::RuleList& rules)
 
     for (const auto& rule: rules)
         at_ruleAddedOrUpdated_impl(rule);
-
-    processDelayedEvents();
 }
 
 void RuleProcessor::at_resourceMonitor(const QnResourcePtr& resource,  bool isAdded)

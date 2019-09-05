@@ -93,7 +93,7 @@ static void handleQtMessage(
             break;
 
         default: // QtCriticalMsg, QtFatalMsg and all unknown.
-            // Skip some known messages.
+            // WebEngine thinks it's critical.
             if (message.contains("Refused to prefetch"))
             {
                 NX_WARNING(&context, message);
