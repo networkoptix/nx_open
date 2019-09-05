@@ -102,9 +102,11 @@ void checkInited()
 
 QString getLocalizedHours(const QTime& value)
 {
-    return datetime::is24HoursTimeFormat()
-        ? value.toString(QStringLiteral("hh"))
-        : QString::number(value.hour() % 12);
+    if (datetime::is24HoursTimeFormat())
+        return value.toString(QStringLiteral("hh"));
+
+    const auto hours = value.hour() % 12;
+    return QString::number(hours ? hours : 12);
 }
 
 QString getHoursTimeFormatMark(const QTime& value)
