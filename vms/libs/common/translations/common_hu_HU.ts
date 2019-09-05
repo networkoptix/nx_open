@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="hu" sourcelanguage="en">
   <context>
-    <name>DateTimeFormats</name>
-    <message>
-      <source>MM/dd</source>
-      <translation>HH/nn</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <translation>HHHH éééé</translation>
-    </message>
-  </context>
-  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
