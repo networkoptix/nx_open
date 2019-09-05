@@ -163,6 +163,21 @@ bool ConnectionManager::isClusterConnected(const std::string& clusterId) const
         clusterIter->fullPeerName.clusterId == clusterId;
 }
 
+bool ConnectionManager::isNodeConnected(
+    const std::string& clusterId,
+    const std::string& nodeId) const
+{
+    QnMutexLocker lk(&m_mutex);
+
+    const auto& connectionByClusterIdAndPeerIdIndex =
+        m_connections.get<kConnectionByFullPeerNameIndex>();
+
+    const auto clusterIter = connectionByClusterIdAndPeerIdIndex.find(
+        FullPeerName{clusterId, nodeId});
+
+    return clusterIter != connectionByClusterIdAndPeerIdIndex.end();
+}
+
 unsigned int ConnectionManager::getConnectionCountByClusterId(
     const std::string& clusterId) const
 {

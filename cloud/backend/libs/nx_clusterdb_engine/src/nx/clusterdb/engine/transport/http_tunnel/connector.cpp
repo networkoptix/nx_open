@@ -56,7 +56,7 @@ void Connector::connect(Handler completionHandler)
     connectionRequestAttributes.connectionId = m_connectionId;
     connectionRequestAttributes.remotePeer = m_localPeer;
     connectionRequestAttributes.remotePeerProtocolVersion = m_localPeer.protoVersion;
-    
+
     network::http::HttpHeaders requestHeaders;
     connectionRequestAttributes.write(&requestHeaders);
     m_client->setCustomHeaders(std::move(requestHeaders));
@@ -81,7 +81,7 @@ void Connector::processOpenTunnelResult(
                 nx::network::http::StatusCode::toString(result.httpStatus));
         return nx::utils::swapAndCall(
             m_completionHandler,
-            ConnectResultDescriptor(result.sysError, result.httpStatus),
+            ConnectResult(result.sysError, result.httpStatus),
             nullptr);
     }
 
@@ -92,7 +92,7 @@ void Connector::processOpenTunnelResult(
             m_targetUrl);
         return nx::utils::swapAndCall(
             m_completionHandler,
-            ConnectResultDescriptor(SystemError::noError, network::http::StatusCode::badRequest),
+            ConnectResult(SystemError::noError, network::http::StatusCode::badRequest),
             nullptr);
     }
     remotePeerAttributes.connectionId = m_connectionId;
@@ -116,7 +116,7 @@ void Connector::processOpenTunnelResult(
 
     nx::utils::swapAndCall(
         m_completionHandler,
-        ConnectResultDescriptor(SystemError::noError),
+        ConnectResult(SystemError::noError),
         std::move(connection));
 }
 

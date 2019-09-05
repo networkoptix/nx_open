@@ -133,6 +133,10 @@ public:
     std::size_t getConnectionCount() const;
     bool isClusterConnected(const std::string& clusterId) const;
 
+    bool isNodeConnected(
+        const std::string& clusterId,
+        const std::string& nodeId) const;
+
     unsigned int getConnectionCountByClusterId(const std::string& clusterId) const;
 
     void closeConnectionsToCluster(

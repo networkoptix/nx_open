@@ -15,6 +15,8 @@ namespace nx::clusterdb::engine {
 class NX_DATA_SYNC_ENGINE_API SynchronizationSettings
 {
 public:
+    static constexpr char kDefaultGroupName[] = "p2pDb";
+
     std::string clusterId;
     /** If empty, it is assigned to auto-generated guid. */
     std::string nodeId;
@@ -25,7 +27,7 @@ public:
 
     SynchronizationSettings();
 
-    void load(const QnSettings& settings, std::string groupId = "p2pDb");
+    void load(const QnSettings& settings, std::string groupId = kDefaultGroupName);
 };
 
 } // namespace nx::clusterdb::engine
