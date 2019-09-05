@@ -23,7 +23,6 @@
 #include <core/resource/fake_media_server.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
-#include <network/system_helpers.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/app_info.h>
@@ -107,7 +106,6 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
 
     connect(this, &ServerUpdateTool::moduleInformationReceived,
         m_stateTracker.get(), &PeerStateTracker::setVersionInformation);
-    m_updatesModel.reset(new ServerUpdatesModel(m_stateTracker, this));
 
     m_downloader.reset(new Downloader(
         m_outputDir, commonModule(), {new InternetOnlyPeerManager()}));
@@ -139,10 +137,11 @@ ServerUpdateTool::~ServerUpdateTool()
     NX_VERBOSE(this) << "~ServerUpdateTool() done";
 }
 
-void ServerUpdateTool::resumeTasks()
+void ServerUpdateTool::onConnectToSystem(QnUuid systemId)
 {
-    m_downloader->startDownloads();
+    m_systemId = systemId;
     loadInternalState();
+    m_downloader->startDownloads();
 }
 
 // We serialize state of the uploader using this struct.
@@ -163,33 +162,41 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(StoredState, (json), StoredState_Fields)
 
 void ServerUpdateTool::loadInternalState()
 {
-    if (m_offlineUpdaterState != OfflineUpdateState::initial)
-        return;
+    // The following assert causes a lot of problems
+    //NX_ASSERT(m_offlineUpdaterState == OfflineUpdateState::initial);
+    NX_ASSERT(!m_systemId.isNull());
 
     QString raw = qnSettings->systemUpdaterState();
     StoredState stored;
     if (QJson::deserialize(raw, &stored))
     {
-        auto state = (OfflineUpdateState)stored.state;
-        switch(state)
+        m_initiatedUpdate = stored.systemId == m_systemId;
+        if (m_initiatedUpdate)
         {
-            case OfflineUpdateState::done:
-            case OfflineUpdateState::push:
-                // We have no idea whether update files are still good on server.
-                // The most simple solution - to restart upload process.
-                // TODO: Check if we really need more robust state restoration.
-                NX_DEBUG(this, "loadInternalState() - restoring offline update from %1", stored.file);
-                m_checkFileUpdate = checkUpdateFromFile(stored.file);
-                break;
-            default:
-                NX_DEBUG(this, "loadInternalState() - got state %1, going to 'initial'", state);
-                m_offlineUpdaterState = OfflineUpdateState::initial;
-        }
-
-        auto systemId = helpers::currentSystemLocalId(resourcePool()->commonModule());
-        m_initiatedUpdate = stored.systemId == systemId;
-        if (m_initiatedUpdate && m_offlineUpdaterState != OfflineUpdateState::initial)
             NX_VERBOSE(this, "loadInternalState() we have initiated update to this system.");
+            auto state = (OfflineUpdateState)stored.state;
+            switch(state)
+            {
+                case OfflineUpdateState::ready:
+                case OfflineUpdateState::done:
+                case OfflineUpdateState::push:
+                    // We have no idea whether update files are still good on server.
+                    // The most simple solution - to restart upload process.
+                    // TODO: Check if we really need more robust state restoration.
+                    NX_DEBUG(this, "loadInternalState() - restoring offline update from %1", stored.file);
+                    m_checkFileUpdate = checkUpdateFromFile(stored.file);
+                    break;
+                default:
+                    NX_DEBUG(this, "loadInternalState() - got state %1, going to 'initial'", state);
+                    m_offlineUpdaterState = OfflineUpdateState::initial;
+            }
+        }
+        else
+        {
+            NX_DEBUG(this,
+                "loadInternalState() - stored systemID=%1 is different from current systemID=%2",
+                stored.systemId, m_systemId);
+        }
     }
     else
     {
@@ -206,7 +213,7 @@ void ServerUpdateTool::saveInternalState()
     stored.wasPushingManualPackages = m_wasPushingManualPackages;
     if (m_initiatedUpdate)
     {
-        stored.systemId = helpers::currentSystemLocalId(resourcePool()->commonModule());
+        stored.systemId = m_systemId;
         stored.version = m_remoteUpdateManifest.version;
     }
     else
@@ -222,6 +229,11 @@ void ServerUpdateTool::saveInternalState()
 bool ServerUpdateTool::hasInitiatedThisUpdate() const
 {
     return m_initiatedUpdate;
+}
+
+void ServerUpdateTool::onDisconnectFromSystem()
+{
+    saveInternalState();
 }
 
 std::future<nx::update::UpdateContents> ServerUpdateTool::checkUpdateFromFile(const QString& file)
@@ -774,9 +786,17 @@ bool ServerUpdateTool::requestStopAction()
             {
                 NX_VERBOSE(this, "requestStopAction() - success=%1", success);
                 if (success)
+                {
                     m_remoteUpdateManifest = nx::update::Information();
+                    if (m_offlineUpdaterState == OfflineUpdateState::push
+                        || m_offlineUpdaterState == OfflineUpdateState::done)
+                    {
+                        changeUploadState(OfflineUpdateState::ready);
+                    }
+                }
                 m_requestingStop = false;
                 auto error = success ? InternalError::noError : InternalError::networkError;
+
                 emit cancelUpdateComplete(success, toString(error));
             }), thread());
 
@@ -1132,11 +1152,6 @@ QString ServerUpdateTool::getServerAuthString() const
     return QnStartupParameters::createAuthenticationString(serverUrl, connectionInfo.version);
 }
 
-std::shared_ptr<ServerUpdatesModel> ServerUpdateTool::getModel()
-{
-    return m_updatesModel;
-}
-
 std::shared_ptr<PeerStateTracker> ServerUpdateTool::getStateTracker()
 {
     return m_stateTracker;
@@ -1352,19 +1367,24 @@ QUrl generateUpdatePackageUrl(
     QnResourcePool* resourcePool)
 {
     bool useLatest = contents.sourceType == nx::update::UpdateSourceType::internet;
-    auto changeset = contents.info.version;
+    auto changeset = contents.changeset;
     nx::utils::SoftwareVersion targetVersion = useLatest
         ? nx::utils::SoftwareVersion()
         : contents.getVersion();
     bool noFullVersion = false;
     // Checking if version has only build number.
     contents.info.version.toInt(&noFullVersion);
+    noFullVersion |= contents.info.version.isEmpty();
 
     QUrlQuery query;
+    // Query with 'version=latest' can have no password
+    // Query with 'version=29646' should have a password
 
-    if (targetVersion.isNull())
+    if (changeset == "latest" && targetVersion.isNull())
     {
-        query.addQueryItem("version", "latest");
+        // We are here if we have failed to check update in the internet.
+        // Changeset will contain requested build number in this case, or 'latest'.
+        query.addQueryItem("version", changeset);
         query.addQueryItem("current", getCurrentVersion(engineVersion, resourcePool).toString());
     }
     else

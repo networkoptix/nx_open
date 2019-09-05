@@ -283,7 +283,7 @@ Handle ServerConnection::getStatisticsSettingsAsync(
     nx::network::http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     nx::network::http::insertOrReplaceHeader(&request.headers, header);
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
-    trace(handle, path);
+    NX_VERBOSE(m_logTag, "<%1> %2", handle, request.url);
     return handle;
 }
 
@@ -310,7 +310,7 @@ Handle ServerConnection::sendStatisticsAsync(
     nx::network::http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     nx::network::http::insertOrReplaceHeader(&request.headers, header);
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
-    trace(handle, path);
+    NX_VERBOSE(m_logTag, "<%1> %2", handle, request.url);
     return handle;
 }
 
@@ -905,7 +905,7 @@ Handle ServerConnection::changeCameraPassword(
         nx::network::http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, camera->getParentId().toByteArray()));
 
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
-    trace(handle, request.url.toString());
+    NX_VERBOSE(m_logTag, "<%1> %2", handle, request.url);
     return handle;
 }
 
@@ -1411,7 +1411,7 @@ Handle ServerConnection::executeGet(
         ? this->executeRequest(request, callback, targetThread)
         : Handle();
 
-    trace(handle, path);
+    NX_VERBOSE(m_logTag, "<%1> %2", handle, request.url);
     return handle;
 }
 
@@ -1445,7 +1445,7 @@ Handle ServerConnection::executePost(
         ? this->executeRequest(request, callback, targetThread, timeout)
         : Handle();
 
-    trace(handle, path);
+    NX_VERBOSE(m_logTag, "<%1> %2", handle, request.url);
     return handle;
 }
 
@@ -1464,7 +1464,7 @@ Handle ServerConnection::executePut(
         ? executeRequest(request, callback, targetThread)
         : Handle();
 
-    trace(handle, path);
+    NX_VERBOSE(m_logTag, "<%1> %2", handle, request.url);
     return handle;
 }
 
@@ -1480,7 +1480,7 @@ Handle ServerConnection::executeDelete(
         ? executeRequest(request, callback, targetThread)
         : Handle();
 
-    trace(handle, path);
+    NX_VERBOSE(m_logTag, "<%1> %2", handle, request.url);
     return handle;
 }
 

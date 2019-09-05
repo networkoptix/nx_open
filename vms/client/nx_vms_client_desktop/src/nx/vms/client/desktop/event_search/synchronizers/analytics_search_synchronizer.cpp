@@ -235,7 +235,7 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
     if (!selectedObjectType.isEmpty())
         m_filter.objectTypeId.push_back(selectedObjectType);
 
-    m_filter.freeText = m_analyticsSearchWidget->textFilter();
+    m_filter.loadUserInputToFreeText(m_analyticsSearchWidget->textFilter());
 
     for (const auto widget: display()->widgets())
     {
@@ -253,6 +253,7 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
 
     auto filter = m_filter;
     filter.deviceIds = {camera->getId()};
+    NX_VERBOSE(this, "Load analytics chunks by filter %1", filter);
     navigator()->setAnalyticsFilter(filter);
 
     navigator()->setSelectedExtraContent(Qn::AnalyticsContent);

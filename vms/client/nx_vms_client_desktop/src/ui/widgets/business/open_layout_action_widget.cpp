@@ -211,6 +211,9 @@ std::pair<QnUserResourceList, QList<QnUuid>> OpenLayoutActionWidget::getSelected
     if (model())
     {
         const auto params = model()->actionParams();
+        if (params.allUsers)
+            return {users, roles};
+
         userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
 
         for (const auto& roleId: roles)

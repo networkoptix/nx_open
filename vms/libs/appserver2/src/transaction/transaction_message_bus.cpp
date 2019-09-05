@@ -953,18 +953,18 @@ void QnTransactionMessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
     }
 }
 
-QVector<QnTransportConnectionInfo> QnTransactionMessageBus::connectionsInfo() const
+ConnectionInfoList QnTransactionMessageBus::connectionsInfo() const
 {
-    QVector<QnTransportConnectionInfo> connections;
+    ConnectionInfoList result;
 
-    auto storeTransport = [&connections](const QnTransactionTransport *transport)
+    auto storeTransport = [&result](const QnTransactionTransport *transport)
     {
         QnTransportConnectionInfo info;
         info.url = transport->remoteAddr();
         info.state = QnTransactionTransport::toString(transport->getState());
         info.isIncoming = transport->isIncoming();
         info.remotePeerId = transport->remotePeer().id;
-        connections.append(info);
+        result.connections.append(info);
     };
 
     QnMutexLocker lock(&m_mutex);
@@ -973,8 +973,8 @@ QVector<QnTransportConnectionInfo> QnTransactionMessageBus::connectionsInfo() co
         storeTransport(transport);
     for (const QnTransactionTransport *transport : m_connectingConnections)
         storeTransport(transport);
-
-    return connections;
+    result.idData = localPeer();
+    return result;
 }
 
 void QnTransactionMessageBus::waitForNewTransactionsReady(

@@ -8,6 +8,7 @@
 #include <condition_variable>
 #include <vector>
 #include <string>
+#include <deque>
 
 #include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
@@ -76,6 +77,8 @@ private:
 
     void setObjectCount(int objectCount);
 
+    void cleanUpTimestampQueue();
+
     void parseSettings();
 
     template<typename ObjectType>
@@ -113,6 +116,8 @@ private:
 
     int m_frameCounter = 0;
     std::string m_eventTypeId;
+
+    std::deque<int64_t> m_frameTimestampQueue;
     int64_t m_lastVideoFrameTimestampUs = 0;
 
     struct DeviceAgentSettings
@@ -141,7 +146,11 @@ private:
 
         std::atomic<bool> throwPluginDiagnosticEvents{false};
         std::atomic<bool> leakFrames{false};
+
         std::atomic<std::chrono::milliseconds> additionalFrameProcessingDelay{
+            std::chrono::milliseconds::zero()};
+
+        std::atomic<std::chrono::milliseconds> overallMetadataDelay{
             std::chrono::milliseconds::zero()};
 
         std::atomic<int> numberOfFramesBeforePreviewGeneration{30};

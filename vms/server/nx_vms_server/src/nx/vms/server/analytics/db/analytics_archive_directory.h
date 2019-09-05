@@ -79,7 +79,7 @@ private:
 
     AnalyticsArchiveImpl* openOrGetArchive(const QnUuid& deviceId);
 
-    void fixFilterRegion(ArchiveFilter* filter);
+    void fixFilter(ArchiveFilter* filter);
 
     nx::vms::server::metadata::AnalyticsArchive::MatchObjectsResult matchObjects(
         const QnUuid& deviceId,

@@ -786,6 +786,7 @@ QnStorageSpaceDataList UpdateManager::availableStorages() const
 
 void UpdateManager::setTargetUpdateInformation(const update::Information& information)
 {
+    NX_VERBOSE(this, "setTargetUpdateInformation(%1)", information.version);
     QByteArray data;
     if (information.isValid())
         data = QJson::serialized(information);

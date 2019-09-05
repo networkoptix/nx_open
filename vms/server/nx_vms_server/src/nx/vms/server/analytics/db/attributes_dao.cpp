@@ -101,19 +101,11 @@ std::set<int64_t> AttributesDao::lookupCombinedAttributes(
     query->prepare(R"sql(
         SELECT distinct combination_id
         FROM combined_attributes
-        WHERE attributes_id IN
-	        (SELECT docid FROM attributes_text_index WHERE content MATCH ?)
+        JOIN attributes_text_index on docid = attributes_id
+        WHERE content MATCH ?
     )sql");
 
-    // Adding * to every word.
-    auto words = text.split(L' ', QString::SkipEmptyParts);
-    for (auto& word: words)
-    {
-        if (!word.endsWith("*"))
-            word += "*";
-    }
-
-    query->addBindValue(words.join(L' '));
+    query->addBindValue(text);
     query->exec();
 
     std::set<int64_t> attributesIds;
@@ -141,17 +133,22 @@ int64_t AttributesDao::insertAttributes(
     const std::vector<common::metadata::Attribute>& attributes,
     const QByteArray& serializedAttributes)
 {
+    // This table contain full attributes info, which then used to build track.
     auto insertContentQuery = queryContext->connection()->createQuery();
     insertContentQuery->prepare("INSERT INTO unique_attributes(content) VALUES (:content)");
     insertContentQuery->bindValue(":content", serializedAttributes);
     insertContentQuery->exec();
     const auto id = insertContentQuery->impl().lastInsertId().toLongLong();
 
-    // NOTE: Following string is in non-reversable format. So, cannot use it to store attributes.
-    // But, cannot use JSON for full text search since it contains additional information.
-    const auto contentForTextSearch =
-        containerString(attributes, lit("; ") /*delimiter*/,
-            QString() /*prefix*/, QString() /*suffix*/, QString() /*empty*/);
+    // Full text search table stores only attribute values.
+    static const auto kSeparator = ' ';
+    QString contentForTextSearch;
+    for (const auto& attribute: attributes)
+    {
+        if (!contentForTextSearch.isEmpty())
+            contentForTextSearch += kSeparator;
+        contentForTextSearch += attribute.value;
+    }
 
     insertContentQuery = queryContext->connection()->createQuery();
     insertContentQuery->prepare(

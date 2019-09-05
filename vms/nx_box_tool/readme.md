@@ -6,7 +6,7 @@
 ## Introduction
 
 Nx Box Tool is a command-line tool which allows a partner/customer to assess the ability to run VMS
-on a certain device. The tool runs on a host PC, connects to the device, collects system
+on a Linux-based device. The tool runs on a host PC, connects to the device, collects system
 information such as CPU type and RAM size, and then starts the VMS Server, feeds it test video
 streams from virtual cameras, and creates a detailed report about potential performance issues.
 

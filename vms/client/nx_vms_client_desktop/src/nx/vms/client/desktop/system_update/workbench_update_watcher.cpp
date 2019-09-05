@@ -15,7 +15,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <client/client_settings.h>
-
+#include <network/system_helpers.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/common/message_box.h>
@@ -101,7 +101,17 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
             m_userLoggedIn = user != nullptr;
             syncState();
             if (m_private && m_private->serverUpdateTool)
-                m_private->serverUpdateTool->resumeTasks();
+            {
+                if (m_userLoggedIn)
+                {
+                    auto systemId = helpers::currentSystemLocalId(commonModule());
+                    m_private->serverUpdateTool->onConnectToSystem(systemId);
+                }
+                else
+                {
+                    m_private->serverUpdateTool->onDisconnectFromSystem();
+                }
+            }
         });
 }
 
