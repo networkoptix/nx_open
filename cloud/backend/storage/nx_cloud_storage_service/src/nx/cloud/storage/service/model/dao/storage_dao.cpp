@@ -15,7 +15,7 @@ using namespace std::placeholders;
 
 namespace {
 
-static constexpr char kId[] = "id";
+static constexpr char kId[] = "id";,
 static constexpr char kRegion[] = "region";
 static constexpr char kTotalSpace[] = "total_space";
 static constexpr char kUrl[] = "url";
@@ -79,25 +79,21 @@ VALUES(:storage_id, :system_id)
 static constexpr char kRemoveStorageSystemRelation[] = R"sql(
 
 DELETE FROM storage_system_relation
-    WHERE
-storage_id=:storage_id AND system_id=:system_id
+WHERE storage_id=:storage_id AND system_id=:system_id
 
 )sql";
 
 static constexpr char kRemoveStorageSystemRelations[] = R"sql(
 
 DELETE FROM storage_system_relation
-    WHERE
-storage_id=:storage_id
+WHERE storage_id=:storage_id
 
 )sql";
 
 static constexpr char kFetchSystemsForStorage[] = R"sql(
 
 SELECT system_id FROM storage_system_relation
-    WHERE
-storage_id=:storage_id
-
+WHERE storage_id=:storage_id
 
 )sql";
 

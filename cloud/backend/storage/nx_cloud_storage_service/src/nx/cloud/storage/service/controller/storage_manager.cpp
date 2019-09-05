@@ -4,6 +4,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/cloud/aws/sts/api_client.h>
 #include <nx/utils/stree/resourcecontainer.h>
+#include <nx/utils/string.h>
 
 #include "nx/cloud/storage/service/settings.h"
 #include "nx/cloud/storage/service/utils.h"
@@ -23,6 +24,8 @@ using namespace nx::cloud::storage::service::api;
 namespace {
 
 static constexpr char kStorageType[] = "awss3";
+static constexpr char kAddSystem[] = "Add System";
+static constexpr char kRemoveSystem[] = "Remove System";
 
 static const std::map<std::string, nx::geo_ip::Geopoint> kAwsGeopoints = {
     {"us-east-1", {39, -78}},
@@ -49,10 +52,10 @@ static const std::map<std::string, nx::geo_ip::Geopoint> kAwsGeopoints = {
     {"us-gov-east-1", {39, -78}}
 };
 
-// %1 is an array of arns with the form: "arn:aws:s3:::examplebucket/folder".
+// %1 is an array of arns with the form: "arn:aws:s3:::examplebucket/folder/*".
 // NOTE: Because storages can be merged, access must be granted to multiple buckets/folders.
-// There is no way know the specific bucket/folder will be be written to, access must be granted
-// to all of them.
+// There is no way to know which specific bucket/folder will be be written to, access must be
+// granted to all of them.
 // NOTE: the entire policy is on one line because aws complains with "Signature does not match"
 // error code otherwise.
 static constexpr char kStorageAccessPolicyTemplate[] =
@@ -70,7 +73,7 @@ static std::string buildStorageAccessPolicy(const Storage& storage)
             service::utils::storageFolder(ioDevice.dataUrl)));
     }
 
-    return lm(kStorageAccessPolicyTemplate).args(arns.join(',')).toStdString();
+    return lm(kStorageAccessPolicyTemplate).args(arns.join(",")).toStdString();
 }
 
 } // namespace
@@ -247,9 +250,8 @@ void StorageManager::addSystem(
     AddSystemRequest request,
     nx::utils::MoveOnlyFunc<void(Result, System)> handler)
 {
-    modifySystemStorageRelation(
-        "Add",
-        std::move(authInfo),
+    modifySystemStorageRelation<kAddSystem>(
+        authInfo,
         storageId,
         request.id,
         std::bind(&AbstractStorageDao::addSystem, m_storageDao, _1, _2),
@@ -262,9 +264,8 @@ void StorageManager::removeSystem(
     std::string systemId,
     nx::utils::MoveOnlyFunc<void(Result)> handler)
 {
-    modifySystemStorageRelation(
-        "Remove",
-        std::move(authInfo),
+    modifySystemStorageRelation<kRemoveSystem>(
+        authInfo,
         storageId,
         systemId,
         std::bind(&AbstractStorageDao::removeSystem, m_storageDao, _1, _2),
@@ -650,12 +651,11 @@ Result StorageManager::prepareRemoveStorageResult(
     return ResultCode::ok;
 }
 
-template<typename DbFunc, typename Handler>
+template<const char * operation, typename DbFunc, typename Handler>
 void StorageManager::modifySystemStorageRelation(
-    const char* operation,
-    nx::utils::stree::ResourceContainer authInfo,
-    std::string storageId,
-    std::string systemId,
+    const nx::utils::stree::ResourceContainer& authInfo,
+    const std::string& storageId,
+    const std::string& systemId,
     DbFunc dbFunc,
     Handler handler)
 {
@@ -674,7 +674,7 @@ void StorageManager::modifySystemStorageRelation(
             operation, dbFunc = std::move(dbFunc)](
                 auto queryContext)
         {
-            NX_VERBOSE(this, "%1 System request: storageId: %2, systemId: %3",
+            NX_VERBOSE(this, "%1 request: storageId: %2, systemId: %3",
                 operation, system->storageId, system->id);
             *storage = m_storageDao->readStorage(queryContext, system->storageId);
             if (!*storage)

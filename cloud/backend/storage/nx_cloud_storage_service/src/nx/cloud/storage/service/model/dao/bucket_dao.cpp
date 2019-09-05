@@ -58,7 +58,7 @@ static api::Bucket toBucket(nx::sql::AbstractSqlQuery* query)
         query->value(kRegion).toByteArray().toStdString()};
 }
 
-static std::vector<api::Bucket> toVector(nx::sql::AbstractSqlQuery* query)
+static std::vector<api::Bucket> toBuckets(nx::sql::AbstractSqlQuery* query)
 {
     std::vector<api::Bucket> buckets;
     while (query->next())
@@ -102,7 +102,7 @@ std::vector<api::Bucket> BucketDao::fetchBuckets(nx::sql::QueryContext* queryCon
     query->prepare(kListBuckets);
     query->exec();
 
-    auto buckets = toVector(query.get());
+    auto buckets = toBuckets(query.get());
     for (auto& bucket : buckets)
         bucket.cloudStorageCount = getStorageCount(queryContext, bucket.name);
 
