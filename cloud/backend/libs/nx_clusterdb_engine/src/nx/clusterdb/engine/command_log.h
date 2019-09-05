@@ -190,7 +190,7 @@ public:
     {
         dbFunc(queryContext, transactionData);
         // TODO: refactor or overload this function to throw exceptions
-        auto dbResult = generateTransactionAndSaveToLog<CommandDescriptor>(
+        const auto dbResult = generateTransactionAndSaveToLog<CommandDescriptor>(
             queryContext,
             clusterId,
             std::move(transactionData));
