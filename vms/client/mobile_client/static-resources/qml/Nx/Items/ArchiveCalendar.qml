@@ -11,7 +11,7 @@ Pane
 {
     id: control
 
-    property real currentPosition: 0
+    property real position: 0
     property real displayOffset: 0
     property ChunkProvider chunkProvider: null
     property bool horizontal: mainWindow.width > 540
@@ -21,7 +21,7 @@ Pane
 
     function resetToCurrentPosition()
     {
-        d.monthData = d.createMonthDataFromPosition(control.currentPosition, control.displayOffset)
+        d.monthData = d.createMonthDataFromPosition(control.position, control.displayOffset)
         monthsModel.clear()
         monthsModel.append(d.prevMonthData(d.monthData))
         monthsModel.append(d.monthData)
@@ -198,7 +198,7 @@ Pane
         {
             id: calendarMonth
 
-            currentPosition: control.currentPosition
+            position: control.position
             displayOffset: control.displayOffset
             width: d.ui.monthsList.width
             height: d.ui.monthsList.height

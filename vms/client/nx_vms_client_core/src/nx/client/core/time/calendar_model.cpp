@@ -1,5 +1,6 @@
 #include "calendar_model.h"
 
+#include <QtQml/QtQml>
 #include <QtCore/QLocale>
 #include <QtCore/QTimeZone>
 
@@ -209,6 +210,11 @@ void CalendarModel::Private::clearArchiveMarks(int dayIndex)
 
 //--------------------------------------------------------------------------------------------------
 
+void CalendarModel::registerQmlType()
+{
+    qmlRegisterType<nx::client::core::CalendarModel>("Nx.Core", 1, 0, "CalendarModel");
+}
+
 CalendarModel::CalendarModel(QObject* parent):
     base_type(parent),
     d(new Private(this))
@@ -324,19 +330,19 @@ void CalendarModel::setPeriodsStore(TimePeriodsStore* store)
     emit periodsStoreChanged();
 }
 
-qint64 CalendarModel::currentPosition() const
+qint64 CalendarModel::position() const
 {
     return d->currentPosition;
 }
 
-void CalendarModel::setCurrentPosition(qint64 value)
+void CalendarModel::setPosition(qint64 value)
 {
     value = std::clamp<qint64>(value, 0, std::numeric_limits<qint64>().max());
     if (d->currentPosition == value)
         return;
 
     d->currentPosition = value;
-    emit currentPositionChanged();
+    emit positionChanged();
 
     d->handleCurrentPositionChanged();
 }

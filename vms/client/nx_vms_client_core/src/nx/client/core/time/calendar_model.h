@@ -23,8 +23,8 @@ class CalendarModel: public QAbstractListModel
         NOTIFY localeChanged)
     Q_PROPERTY(nx::client::core::TimePeriodsStore* periodsStore READ periodsStore WRITE setPeriodsStore
         NOTIFY periodsStoreChanged)
-    Q_PROPERTY(qint64 currentPosition READ currentPosition WRITE setCurrentPosition
-        NOTIFY currentPositionChanged)
+    Q_PROPERTY(qint64 position READ position WRITE setPosition
+        NOTIFY positionChanged)
     Q_PROPERTY(qint64 displayOffset READ displayOffset WRITE setDisplayOffset
         NOTIFY displayOffsetChanged)
 
@@ -35,6 +35,8 @@ public:
         IsCurrentRole,
         HasArchiveRole
     };
+
+    static void registerQmlType();
 
     CalendarModel(QObject* parent = nullptr);
     virtual ~CalendarModel() override;
@@ -52,8 +54,8 @@ public: // Properties and invokables.
     TimePeriodsStore* periodsStore() const;
     void setPeriodsStore(TimePeriodsStore* store);
 
-    qint64 currentPosition() const;
-    void setCurrentPosition(qint64 value);
+    qint64 position() const;
+    void setPosition(qint64 value);
 
     qint64 displayOffset() const;
     void setDisplayOffset(qint64 value);
@@ -69,7 +71,7 @@ signals:
     void monthChanged();
     void periodsStoreChanged();
     void localeChanged();
-    void currentPositionChanged();
+    void positionChanged();
     void displayOffsetChanged();
 
 private:

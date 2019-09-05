@@ -4,6 +4,7 @@
 
 #include <nx/client/core/time/time_constants.h>
 #include <nx/client/core/time/calendar_model.h>
+#include <nx/client/core/time/time_common_properties_test_helpers.h>
 
 namespace {
 
@@ -54,32 +55,10 @@ TEST(CalendarModelTest, MonthPropertyCheck)
 
 TEST(CalendarModelTest, DisplayOffsetPropertyCheck)
 {
-    const auto model = createModel();
-
-    // Display offset related checks.
-    // Checks if display offset setter/getter works correctly.
-    model->setDisplayOffset(TimeConstants::kMinDisplayOffset);
-    ASSERT_EQ(TimeConstants::kMinDisplayOffset, model->displayOffset());
-
-    // Checks if minimum display offset value is constrained.
-    model->setDisplayOffset(TimeConstants::kMinDisplayOffset - 1);
-    ASSERT_EQ(TimeConstants::kMinDisplayOffset, model->displayOffset());
-
-    // Checks if maximum display offset value is constrained.
-    model->setDisplayOffset(TimeConstants::kMaxDisplayOffset + 1);
-    ASSERT_EQ(TimeConstants::kMaxDisplayOffset, model->displayOffset());
+    checkDisplayOffsetPropertyInteractionAndRanges(createModel().get());
 }
 
 TEST(CalendarModelTest, PositionPropertyCheck)
 {
-    const auto model = createModel();
-
-    // Checks if current position setter/getter works correctly.
-    static const int kSomePosition = 1000;
-    model->setCurrentPosition(kSomePosition);
-    ASSERT_EQ(kSomePosition, model->currentPosition());
-
-    // Checks if minimum position value is constrained.
-    model->setCurrentPosition(-1);
-    ASSERT_EQ(model->currentPosition(), 0);
+    checkPositionPropertyInteractionAndRanges(createModel().get());
 }

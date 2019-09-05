@@ -5,7 +5,7 @@
 
 #include <nx/utils/impl_ptr.h>
 
-namespace nx::client::core::time {
+namespace nx::client::core {
 
 class DisplayTimeHelper: public QObject
 {
@@ -51,4 +51,4 @@ private:
     nx::utils::ImplPtr<Private> d;
 };
 
-} // namespace nx::client::core::time
+} // namespace nx::client::core

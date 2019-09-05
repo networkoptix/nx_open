@@ -803,7 +803,7 @@ Item
     {
         id: calendarPanel
 
-        currentPosition: timeline.position
+        position: timeline.position
         displayOffset: controller.resourceHelper.displayOffset
         chunkProvider: cameraChunkProvider
 

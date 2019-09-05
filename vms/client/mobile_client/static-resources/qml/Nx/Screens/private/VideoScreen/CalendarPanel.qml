@@ -8,7 +8,7 @@ Popup
     id: control
 
     property alias chunkProvider: calendar.chunkProvider
-    property alias currentPosition: calendar.currentPosition
+    property alias position: calendar.position
     property alias displayOffset: calendar.displayOffset
 
     signal picked(real position)

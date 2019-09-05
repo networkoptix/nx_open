@@ -73,7 +73,6 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
         "Nx.Settings", 1, 0, "MobileSettings", "Cannot create an instance of MobileSettings.");
 
     qmlRegisterType<QnCameraListModel>("com.networkoptix.qml", 1, 0, "QnCameraListModel");
-    qmlRegisterType<nx::client::core::CalendarModel>("com.networkoptix.qml", 1, 0, "CalendarModel");
     qmlRegisterType<QnLayoutsModel>("com.networkoptix.qml", 1, 0, "QnLayoutsModel");
     qmlRegisterType<nx::vms::client::core::resource::LayoutAccessor>("Nx.Core", 1, 0, "LayoutAccessor");
     qmlRegisterType<nx::vms::client::core::animation::KineticAnimation>("Nx.Core", 1, 0, "KineticAnimation");
@@ -110,4 +109,5 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     nx::client::mobile::ChunkPositionWatcher::registerQmlType();
     nx::client::mobile::AudioController::registerQmlType();
     nx::client::core::TimePeriodsStore::registerQmlType();
+    nx::client::core::CalendarModel::registerQmlType();
 }

@@ -128,7 +128,7 @@ void initializeMetaTypes()
     nx::vms::client::core::TwoWayAudioController::registerQmlType();
     nx::vms::client::core::OperationManager::registerQmlType();
 
-    nx::client::core::time::DisplayTimeHelper::registerQmlType();
+    nx::client::core::DisplayTimeHelper::registerQmlType();
 }
 
 } // namespace nx::vms::client::core
