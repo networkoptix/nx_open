@@ -77,6 +77,8 @@ public:
         nx::sql::AbstractAsyncSqlQueryExecutor* const dbManager,
         AbstractOutgoingCommandDispatcher* const outgoingTransactionDispatcher);
 
+    ~CommandLog();
+
     /**
      * Begins SQL DB transaction and passes that to dbOperationsFunc.
      * @note nx::sql::DBResult::retryLater can be reported to onDbUpdateCompleted if
