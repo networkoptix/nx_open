@@ -1,6 +1,6 @@
 import re
 from functools import reduce
-from nx_box_tool.utils import human_readable_size
+from vms_benchmark.utils import human_readable_size
 
 
 class Platform:

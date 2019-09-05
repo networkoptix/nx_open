@@ -4,8 +4,8 @@ from urllib.error import URLError
 import base64
 import json
 
-from nx_box_tool.camera import Camera
-from nx_box_tool.license import License
+from vms_benchmark.camera import Camera
+from vms_benchmark.license import License
 
 
 class ServerApi:

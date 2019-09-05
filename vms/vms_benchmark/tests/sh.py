@@ -11,7 +11,7 @@ project_root = osp.dirname(osp.dirname(osp.realpath(__file__)))
 if osp.isfile(osp.join(project_root, ".not_installed")):
     sys.path.insert(0, osp.join(project_root, "lib"))
 
-from nx_box_tool.device_connection import DeviceConnection
+from vms_benchmark.device_connection import DeviceConnection
 
 
 class TestStringMethods(unittest.TestCase):

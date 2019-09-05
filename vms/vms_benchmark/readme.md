@@ -1,12 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-# Nx Box Tool
+# VMS Benchmark
 
 ---------------------------------------------------------------------------------------------------
 ## Introduction
 
-Nx Box Tool is a command-line tool which allows a partner/customer to assess the ability to run VMS
-on a Linux-based device. The tool runs on a host PC, connects to the device, collects system
+VMS Benchmark is a command-line tool which allows a partner/customer to assess the ability to run
+VMS on a Linux-based device. The tool runs on a host PC, connects to the device, collects system
 information such as CPU type and RAM size, and then starts the VMS Server, feeds it test video
 streams from virtual cameras, and creates a detailed report about potential performance issues.
 
@@ -32,14 +32,14 @@ tool's zip file can be found among VMS distribution files for the respective pla
 Linux x64).
 
 All configuration options for the tool are supplied via a configuration file - a name-value text
-file called `nx_box_tool.conf` which should reside next to the tool's executable.
+file called `vms_benchmark.conf` which should reside next to the tool's executable.
 
-Do at least the following in the `nx_box_tool.conf` before running the tool:
+Do at least the following in the `vms_benchmark.conf` before running the tool:
 - Specify VMS username and password in `vmsUser`/`vmsPassword` fields.
 - If `ssh <deviceHost>` on the host machine requires to enter credentials, specify them in 
     `deviceLogin` and `devicePassword` fields.
 
-Then simply run the command `nx_box_tool` without arguments, and watch or capture its output.
+Then simply run the command `vms_benchmark` without arguments, and watch or capture its output.
 
 Currently, the tool has no command-line options besides `--help` which shows a trivial help.
 

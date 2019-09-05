@@ -1,15 +1,15 @@
-from nx_box_tool import exceptions
+from vms_benchmark import exceptions
 
 
-class NoConfigFile(exceptions.NxBoxToolError):
+class NoConfigFile(exceptions.VmsBenchmarkError):
     pass
 
 
-class ConfigOptionNotFound(exceptions.NxBoxToolError):
+class ConfigOptionNotFound(exceptions.VmsBenchmarkError):
     pass
 
 
-class InvalidConfigOption(exceptions.NxBoxToolError):
+class InvalidConfigOption(exceptions.VmsBenchmarkError):
     pass
 
 
@@ -25,10 +25,11 @@ class ConfigParser:
                 line[:line.find('=')].strip(),
                 line[line.find('=') + 1:].strip()
             ] for line in [
-                line for line in [
+                line
+                for line in [
                     line[:line.find('#')] if line.find('#') != -1 else line
                     for line in
-                    f.readlines()
+                    f.readlines()  #< TODO: Replace env vars.
                 ]
                 if '=' in line
             ]

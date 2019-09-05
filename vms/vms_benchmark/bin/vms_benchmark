@@ -8,7 +8,7 @@ import logging
 import traceback
 from sys import exit
 
-logging.basicConfig(filename='nx_box_tool.log', filemode='w', level=logging.DEBUG)
+logging.basicConfig(filename='vms_benchmark.log', filemode='w', level=logging.DEBUG)
 
 # This block ensures that ^C interrupts are handled quietly.
 try:
@@ -45,13 +45,13 @@ project_root = osp.dirname(osp.dirname(osp.realpath(__file__)))
 if osp.isfile(osp.join(project_root, ".not_installed")):
     sys.path.insert(0, osp.join(project_root, "lib"))
 
-from nx_box_tool.config import ConfigParser
-from nx_box_tool.device_connection import DeviceConnection
-from nx_box_tool.platform import Platform
-from nx_box_tool.server import Server
-from nx_box_tool.server_api import ServerApi
-from nx_box_tool.test_camera_runner import TestCameraRunner
-from nx_box_tool import exceptions
+from vms_benchmark.config import ConfigParser
+from vms_benchmark.device_connection import DeviceConnection
+from vms_benchmark.platform import Platform
+from vms_benchmark.server import Server
+from vms_benchmark.server_api import ServerApi
+from vms_benchmark.test_camera_runner import TestCameraRunner
+from vms_benchmark import exceptions
 
 import click
 import cv2
@@ -95,7 +95,7 @@ def main():
         }
     }
 
-    config = ConfigParser('nx_box_tool.conf', option_descriptions)
+    config = ConfigParser('vms_benchmark.conf', option_descriptions)
 
     sys_option_descriptions = {
         "testCameraBin": {
@@ -133,7 +133,7 @@ def main():
         },
     }
 
-    sys_config = ConfigParser('.nx_box_tool.ini', sys_option_descriptions)
+    sys_config = ConfigParser('.vms_benchmark.ini', sys_option_descriptions)
 
     if sys_config['testCameraBin']:
         TestCameraRunner.binary_file = sys_config['testCameraBin']
@@ -379,7 +379,7 @@ if __name__ == '__main__':
     try:
         try:
             sys.exit(main())
-        except exceptions.NxBoxToolError as e:
+        except exceptions.VmsBenchmarkError as e:
             print(f"ERROR: {str(e)}", file=sys.stderr)
     except Exception as e:
         print('ERROR: Unexpected error occurred.', file=sys.stderr)

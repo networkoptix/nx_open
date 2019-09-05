@@ -1,5 +1,5 @@
 import tempfile
-from nx_box_tool.config import ConfigParser
+from vms_benchmark.config import ConfigParser
 
 
 class Server:
