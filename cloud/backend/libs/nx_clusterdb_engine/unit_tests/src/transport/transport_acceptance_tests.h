@@ -89,13 +89,13 @@ protected:
     void andConnectionIsKnownOnNode()
     {
         ASSERT_TRUE(m_nodeCluster.peer(0).process().moduleInstance()->synchronizationEngine()
-            .connectionManager().isSystemConnected(m_nodeCluster.clusterId()));
+            .connectionManager().isClusterConnected(m_nodeCluster.clusterId()));
     }
 
 private:
     struct ConnectResult
     {
-        ConnectResultDescriptor result;
+        transport::ConnectResult result;
         std::unique_ptr<AbstractCommandPipeline> connection;
 
         ConnectResult(ConnectResult&&) = default;
@@ -120,7 +120,7 @@ private:
     }
 
     void processConnectResult(
-        ConnectResultDescriptor connectResultDescriptor,
+        transport::ConnectResult connectResultDescriptor,
         std::unique_ptr<AbstractCommandPipeline> connection)
     {
         m_connectResults.push({connectResultDescriptor, std::move(connection)});

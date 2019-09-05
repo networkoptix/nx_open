@@ -132,7 +132,9 @@ public:
         m_statisticsProvider(
             m_listeningPeerPool,
             m_httpServerStatisticsProvider,
-            m_trafficRelay)
+            m_trafficRelay,
+            nullptr,
+            nullptr)
     {
     }
 

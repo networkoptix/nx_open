@@ -140,8 +140,6 @@ bool UDPHolePunchingConnectionInitiationFsm::changeState(Event event)
 
     invokeOnExitingStateHandler(m_state);
 
-    // invokeOnTransition(m_state, *newState);
-
     m_state = *newState;
 
     invokeOnEnteredStateHandler(m_state);

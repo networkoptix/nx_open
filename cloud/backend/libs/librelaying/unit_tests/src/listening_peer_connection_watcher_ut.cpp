@@ -71,14 +71,14 @@ protected:
 
     void whenStartWatcher()
     {
-        m_watcher->start([this](auto errorCode) { saveConnectionClosure(errorCode); });
+        m_watcher->startMonitoringConnection([this](auto errorCode) { saveConnectionClosure(errorCode); });
     }
 
     void whenStartTunnel()
     {
         // TODO: Fill m_clientInfo.
 
-        m_watcher->startTunnel(
+        m_watcher->openTunnel(
             m_clientInfo,
             [this](auto&&... args) { saveStartTunnelResult(std::forward<decltype(args)>(args)...); });
     }

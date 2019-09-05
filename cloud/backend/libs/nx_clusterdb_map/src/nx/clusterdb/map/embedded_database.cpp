@@ -31,14 +31,19 @@ Database& EmbeddedDatabase::database()
     return m_database;
 }
 
-Cache* EmbeddedDatabase::cache()
-{
-    return m_cache.get();
-}
-
 nx::clusterdb::engine::SynchronizationEngine& EmbeddedDatabase::synchronizationEngine()
 {
     return m_syncEngine;
+}
+
+const nx::clusterdb::engine::SynchronizationEngine& EmbeddedDatabase::synchronizationEngine() const
+{
+    return m_syncEngine;
+}
+
+Cache* EmbeddedDatabase::cache()
+{
+    return m_cache.get();
 }
 
 } // namespace nx::clusterdb::map
