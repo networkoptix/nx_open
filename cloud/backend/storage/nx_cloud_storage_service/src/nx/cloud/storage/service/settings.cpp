@@ -143,10 +143,10 @@ void Settings::loadAws()
         lm("%1/%2").args(kGroupName, kAssumeRoleArn)).toString().toStdString();
 
     m_aws.storageCredentialsDuration = duration_cast<seconds>(
-            nx::utils::parseTimerDuration(
-                settings().value(lm("%1/%2").args(kGroupName, kStorageCredentialsDuration))
-                    .toString(),
-                kDefaultStorageCredentialsDuration));
+        nx::utils::parseTimerDuration(
+            settings().value(lm("%1/%2").args(kGroupName, kStorageCredentialsDuration))
+                .toString(),
+            kDefaultStorageCredentialsDuration));
 }
 
 void Settings::loadGeoIp()
