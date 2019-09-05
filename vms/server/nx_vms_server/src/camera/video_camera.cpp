@@ -313,9 +313,9 @@ QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getIframeByTimeUnsafe(
                 || roundMethod != ImageRequest::RoundMethod::iFrameBefore);
 
         if (returnLastKeyFrame)
-            return QnConstCompressedVideoDataPtr(m_lastKeyFrame[channel]->clone());
+            return m_lastKeyFrame[channel];
         else
-            return QnConstCompressedVideoDataPtr(queue.back()->clone());
+            return queue.back();
     }
 
     const bool returnIframeBeforeTime =
