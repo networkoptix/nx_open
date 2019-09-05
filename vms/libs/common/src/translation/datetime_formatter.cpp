@@ -185,9 +185,11 @@ Formatter::Private::Private(const QLocale& locale, bool is24HoursFormat):
 
 QString Formatter::Private::getLocalizedHours(const QTime& value)
 {
-    return is24HoursFormat
-        ? value.toString(QStringLiteral("hh"))
-        : QString::number(value.hour() % 12);
+    if (datetime::is24HoursTimeFormat())
+        return value.toString(QStringLiteral("hh"));
+
+    const auto hours = value.hour() % 12;
+    return QString::number(hours ? hours : 12);
 }
 
 QString Formatter::Private::getHoursTimeFormatMark(const QTime& value)
