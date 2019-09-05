@@ -75,7 +75,7 @@ void BucketManager::addBucket(const AddBucketRequest& request, AddBucketHandler 
                 return handler(std::move(result), Bucket());
             }
 
-            addBucketToDb(std::move(region), std::move(request), std::move(handler));
+            addBucketInternal(std::move(region), std::move(request), std::move(handler));
         });
 }
 
@@ -140,7 +140,7 @@ std::vector<Bucket> BucketManager::fetchBuckets(
     return m_bucketDao->fetchBuckets(queryContext);
 }
 
-void BucketManager::addBucketToDb(
+void BucketManager::addBucketInternal(
     std::string region,
     AddBucketRequest request,
     AddBucketHandler handler)
@@ -170,7 +170,7 @@ void BucketManager::addBucketToDb(
                 return handler(std::move(error), Bucket());
             }
 
-            NX_VERBOSE(this, "addBucketToDb succeeded for bucket %1", toString(*bucket));
+            NX_VERBOSE(this, "addBucket succeeded for bucket %1", toString(*bucket));
             handler(ResultCode::ok, std::move(*bucket));
         });
 }
