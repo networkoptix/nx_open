@@ -35,6 +35,11 @@ CommandLog::CommandLog(
         throw std::runtime_error("Error loading transaction log from DB");
 }
 
+CommandLog::~CommandLog()
+{
+    pleaseStopSync();
+}
+
 void CommandLog::startDbTransaction(
     const std::string& systemId,
     nx::utils::MoveOnlyFunc<nx::sql::DBResult(nx::sql::QueryContext*)> dbOperationsFunc,
