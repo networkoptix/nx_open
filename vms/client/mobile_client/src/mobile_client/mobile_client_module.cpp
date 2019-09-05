@@ -204,7 +204,7 @@ QnMobileClientModule::QnMobileClientModule(
     if (QnAppInfo::isAndroid())
     {
         // We have to use android-specific code to check if we use 24-hours time format.
-        datetime::set24HoursTimeFormat(is24HoursTimeFormat());
+        datetime::Formatter::forceSystemTimeFormat(is24HoursTimeFormat());
     }
     m_context.reset(new QnContext());
     const auto eventRulesWatcher = commonModule->store(new nx::client::mobile::EventRulesWatcher());

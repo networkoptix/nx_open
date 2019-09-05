@@ -180,9 +180,6 @@ QnTranslationManagerPtr initializeTranslations(QnClientSettings* settings)
 
     translationManager->installTranslation(translation);
 
-    // It is now safe to localize time and date formats. Mind the dot.
-    datetime::initLocale();
-
     return translationManager;
 }
 
