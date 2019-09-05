@@ -332,7 +332,7 @@
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation>Frissítse a firmware-t. A minimális támogatott verzió %1. A jelenlegi verzió %2</translation>
+      <translation>Frissítse a firmware-t. A minimálisan támogatott verzió %1. A jelenlegi verzió %2</translation>
     </message>
     <message>
       <source>Plugin error. %1</source>
@@ -542,7 +542,7 @@
     <message numerus="yes">
       <source>%n Edge Licenses</source>
       <translation>
-        <numerusform>%n Határ licencek</numerusform>
+        <numerusform>%n Végponti licencek</numerusform>
         <numerusform>%n Határ licencek</numerusform>
       </translation>
     </message>
@@ -601,9 +601,9 @@
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Szabad licensek</numerusform>
-        <numerusform>%n Free Licenses</numerusform>
+      <translation>
+        <numerusform>%n Szabad licenc</numerusform>
+        <numerusform>%n Szabad licenc</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -634,8 +634,8 @@
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Határ licencek</numerusform>
-        <numerusform>%n/%1 Határ licencek</numerusform>
+        <numerusform>%n/%1 Végponti licencek</numerusform>
+        <numerusform>%n Végponti licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -681,9 +681,9 @@
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n/%1 Szabad licencek</numerusform>
-        <numerusform>%n/%1 Free Licenses</numerusform>
+        <numerusform>%n/%1 Szabad licenc</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -766,11 +766,11 @@
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation>Rendszerenként csak egy starter licens megengedett.</translation>
+      <translation>Rendszerenként csak egy induló licenc megengedett.</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation>Már van egy aktív starter licence.</translation>
+      <translation>Már van egy aktív induló licenc.</translation>
     </message>
   </context>
   <context>
@@ -846,16 +846,16 @@
     </message>
     <message numerus="yes">
       <source>%n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I / O modulok</numerusform>
-        <numerusform>%n I/O Modules</numerusform>
+      <translation>
+        <numerusform>%n I/O modulok</numerusform>
+        <numerusform>%n I/O modul</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%n I / O modulok</numerusform>
-        <numerusform>%n I/O modules</numerusform>
+      <translation>
+        <numerusform>%n I/O modul</numerusform>
+        <numerusform>%n I/O modul</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1063,7 +1063,7 @@
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation>Sérült crypted adatfolyam fejléc.</translation>
+      <translation>Sérült titkosított adatfolyam fejléc.</translation>
     </message>
   </context>
   <context>
@@ -1332,7 +1332,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>

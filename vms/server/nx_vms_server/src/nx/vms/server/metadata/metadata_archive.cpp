@@ -342,7 +342,6 @@ void MetadataArchive::loadDataFromIndexDesc(
     while (totalSteps > 0)
     {
         metadataFile.seek(recordNumberToSeek * recordSize());
-        recordNumberToSeek = std::max(0, recordNumberToSeek - kRecordsPerIteration);
         int readed = metadataFile.read(
             (char*)buffer, recordSize() * qMin(totalSteps, kRecordsPerIteration));
         if (readed <= 0)
@@ -385,6 +384,8 @@ void MetadataArchive::loadDataFromIndexDesc(
             --i;
         }
         totalSteps -= readed / recordSize();
+        recordNumberToSeek = std::max(0, recordNumberToSeek - qMin(totalSteps, kRecordsPerIteration));
+
     }
 }
 
@@ -400,7 +401,7 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
         msStartTime = qMax(minTime(), msStartTime);
     msEndTime = qMin(msEndTime, m_maxMetadataTime.load());
 
-    quint8* buffer = (quint8*)qMallocAligned(recordSize() * 1024, 32);
+    quint8* buffer = (quint8*)qMallocAligned(recordSize() * kRecordsPerIteration, 32);
     auto scopedGuard = nx::utils::makeScopeGuard(
         [buffer]()
     {
@@ -439,11 +440,13 @@ QnTimePeriodList MetadataArchive::matchPeriodInternal(
             {
                 const quint32 relativeStartTime = msStartTime - indexHeader.startTime;
                 startItr = std::lower_bound(index.begin(), index.end(), relativeStartTime);
-                if (startItr != index.end() && startItr != index.begin())
+                while (startItr != index.end() && startItr != index.begin())
                 {
-                    auto prevItr = startItr - 1;
+                    const auto prevItr = startItr - 1;
                     if (qBetween(prevItr->start, relativeStartTime, prevItr->start + prevItr->duration))
                         startItr = prevItr;
+                    else
+                        break;
                 }
             }
             if (msEndTime <= maxTime)
