@@ -211,6 +211,14 @@ TEST_F(AnalyticsArchive, matchObjectGroups)
     ASSERT_EQ(2, result.data.size());
     ASSERT_EQ(kSteps, result.data[0].trackGroupId);
     ASSERT_EQ(kSteps-1, result.data[1].trackGroupId);
+
+    request.sortOrder = Qt::SortOrder::DescendingOrder;
+    request.limit = -1;
+    request.startTime = milliseconds(kBaseDateMs + kDeltaMs);
+    request.endTime = milliseconds(kBaseDateMs + (kSteps - 1) * kDeltaMs - 1);
+    result = archive.matchObjects(request);
+    for (int i = 0; i < result.data.size(); ++i)
+        ASSERT_EQ(kSteps - 1 - i, result.data[i].trackGroupId);
 }
 
 TEST_F(AnalyticsArchive, matchLongArchive)

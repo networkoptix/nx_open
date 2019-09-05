@@ -2465,7 +2465,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %value ubjson Universal Binary JSON data format.
      *     %value json JSON data format.
      *     %value periods Internal comperssed binary format.
-     * %param[opt]:integer detail Chunk detail level, in microseconds. Time periods that are
+     * %param[opt]:integer detail Chunk detail level, in milliseconds. Time periods that are
      *     shorter than the detail level are discarded. You can treat the detail level as the
      *     amount of microseconds per screen pixel.
      * %param[opt]:integer periodsType Chunk type.

@@ -103,11 +103,11 @@
     </message>
     <message>
       <source>Edit</source>
-      <translation>Szerkeztés</translation>
+      <translation>Szerkesztés</translation>
     </message>
     <message>
       <source>Hide</source>
-      <translation type="unfinished">Hide</translation>
+      <translation>Elrejtés</translation>
     </message>
   </context>
   <context>
@@ -126,7 +126,7 @@
     </message>
     <message>
       <source>Loading...</source>
-      <translation>Beolvasás...</translation>
+      <translation>Betöltés...</translation>
     </message>
     <message>
       <source>You have no access to %1. Some features could be unavailable.</source>

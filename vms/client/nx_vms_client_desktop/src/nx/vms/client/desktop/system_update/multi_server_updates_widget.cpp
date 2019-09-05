@@ -168,11 +168,11 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     NX_ASSERT(m_serverUpdateTool);
 
     m_clientUpdateTool.reset(new ClientUpdateTool(this));
-
     m_updateCheck = watcher->takeUpdateCheck();
 
-    m_updatesModel = m_serverUpdateTool->getModel();
     m_stateTracker = m_serverUpdateTool->getStateTracker();
+    m_updatesModel.reset(new ServerUpdatesModel(m_stateTracker, this));
+
     m_stateTracker->setServerFilter(
         [](const QnMediaServerResourcePtr& server) -> bool
         {
@@ -230,12 +230,6 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
         horizontalHeader->setStretchLastSection(true);
     }
     ui->tableView->setColumnHidden(ServerUpdatesModel::Columns::ProgressColumn, false);
-
-    connect(m_serverUpdateTool.data(), &ServerUpdateTool::packageDownloaded,
-        this, &MultiServerUpdatesWidget::atServerPackageDownloaded);
-
-    connect(m_serverUpdateTool.data(), &ServerUpdateTool::packageDownloadFailed,
-        this, &MultiServerUpdatesWidget::atServerPackageDownloadFailed);
 
     connect(m_clientUpdateTool.get(), &ClientUpdateTool::updateStateChanged,
         m_stateTracker.get(), &PeerStateTracker::atClientUpdateStateChanged);
@@ -330,6 +324,12 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
     connect(m_stateTracker.get(), &PeerStateTracker::itemOnlineStatusChanged, this,
         &MultiServerUpdatesWidget::atServerConfigurationChanged);
 
+    connect(m_serverUpdateTool.data(), &ServerUpdateTool::packageDownloaded,
+        this, &MultiServerUpdatesWidget::atServerPackageDownloaded);
+
+    connect(m_serverUpdateTool.data(), &ServerUpdateTool::packageDownloadFailed,
+        this, &MultiServerUpdatesWidget::atServerPackageDownloadFailed);
+
     connect(m_serverUpdateTool.data(), &ServerUpdateTool::startUpdateComplete,
         this, &MultiServerUpdatesWidget::atStartUpdateComplete);
 
@@ -352,6 +352,7 @@ MultiServerUpdatesWidget::MultiServerUpdatesWidget(QWidget* parent):
             if (systemId.isNull())
             {
                 NX_DEBUG(this, "localSystemIdChanged() we have disconnected. Detaching resource pool");
+                m_serverUpdateTool->saveInternalState();
                 m_stateTracker->setResourceFeed(nullptr);
                 return;
             }
@@ -596,6 +597,12 @@ MultiServerUpdatesWidget::VersionReport MultiServerUpdatesWidget::calculateUpdat
         report.versionMode = VersionReport::VersionMode::build;
         report.statusHighlight = VersionReport::HighlightMode::regular;
         report.statusMessages << tr("You have already installed this version.");
+
+        if (source == UpdateSourceType::internet)
+            report.alreadyInstalledMessage = tr("The latest version is already installed");
+        else
+            report.alreadyInstalledMessage = tr("This version is already installed");
+
         report.hasLatestVersion = true;
     }
     else if (contents.error == Error::noError)
@@ -1611,6 +1618,11 @@ void MultiServerUpdatesWidget::processInitialState()
         m_serverStatusCheck = m_serverUpdateTool->requestRemoteUpdateState();
 
     m_offlineUpdateCheck = m_serverUpdateTool->takeUpdateCheckFromFile();
+    if (!m_offlineUpdateCheck.valid())
+    {
+        NX_VERBOSE(this, "processInitialState() - there was no offline update file. State=%1",
+            toString(m_serverUpdateTool->getUploaderState()));
+    }
 
     setTargetState(WidgetUpdateState::initialCheck, {});
     // We have changed widgetState and checking. Should update Ui.
@@ -1657,6 +1669,10 @@ void MultiServerUpdatesWidget::processInitialCheckState()
                 NX_DEBUG(this, "processInitialCheckState() - offline update contents are empty.");
             }
         }
+        else
+        {
+            NX_DEBUG(this, "processInitialCheckState() - there was no offline update check.");
+        }
 
         ServerUpdateTool::RemoteStatus remoteStatus;
         m_serverUpdateTool->getServersStatusChanges(remoteStatus);
@@ -1690,18 +1706,22 @@ void MultiServerUpdatesWidget::processInitialCheckState()
                 "process to version %1", updateInfo.info.version);
         }
 
-        // TODO: Client could have no update available for some reason. We should ignore it
         // if update process is already in 'installing' phase.
         if (m_updateInfo.preferOtherUpdate(updateInfo))
         {
-            NX_INFO(this, "processInitialCheckState() - taking update info from mediaserver");
+            NX_INFO(this, "processInitialCheckState() - taking other update info from \"%1\"",
+                toString(updateInfo.sourceType));
             setUpdateTarget(updateInfo, /*activeUpdate=*/true);
+            // TODO: It can be update from file
             m_clientUpdateTool->setUpdateTarget(updateInfo);
         }
 
-        auto serversHaveDownloaded = m_stateTracker->peersInState(StatusCode::readyToInstall);
-        auto serversAreDownloading = m_stateTracker->peersInState(StatusCode::downloading);
-        auto serversWithError = m_stateTracker->peersInState(StatusCode::error);
+        auto serversHaveDownloaded = m_stateTracker->peersInState(
+            StatusCode::readyToInstall, /*withClients=*/false);
+        auto serversAreDownloading = m_stateTracker->peersInState(
+            StatusCode::downloading, /*withClients=*/false);
+        auto serversWithError = m_stateTracker->peersInState(
+            StatusCode::error, /*withClients=*/false);
         auto serversWithDownloadingError = m_stateTracker->peersWithDownloaderError();
         serversWithError.subtract(serversWithDownloadingError);
         auto peersAreInstalling = m_serverUpdateTool->getServersInstalling();
@@ -2134,6 +2154,8 @@ void MultiServerUpdatesWidget::syncVersionReport(const VersionReport& report)
 
     setHighlightMode(ui->targetVersionLabel, report.versionHighlight);
     setHighlightMode(ui->errorLabel, report.statusHighlight);
+
+    ui->latestVersionBannerLabel->setText(m_updateReport->alreadyInstalledMessage);
 }
 
 bool MultiServerUpdatesWidget::isChecking() const
@@ -2155,8 +2177,6 @@ bool MultiServerUpdatesWidget::hasActiveUpdate() const
 bool MultiServerUpdatesWidget::hasLatestVersion() const
 {
     bool hasLatestVersion = m_updateReport->hasLatestVersion;
-    if (m_updateInfo.isEmpty())
-        hasLatestVersion = true;
 
     if (m_widgetState != WidgetUpdateState::ready
         && m_widgetState != WidgetUpdateState::initial
@@ -2211,10 +2231,6 @@ void MultiServerUpdatesWidget::syncUpdateCheckToUi()
 
         if (latestVersion)
         {
-            if (m_updateInfo.sourceType == UpdateSourceType::internet)
-                ui->latestVersionBannerLabel->setText(tr("The latest version is already installed"));
-            else
-                ui->latestVersionBannerLabel->setText(tr("This version is already installed"));
             ui->versionStackedWidget->setCurrentWidget(ui->latestVersionPage);
         }
         else
@@ -2757,8 +2773,6 @@ QString MultiServerUpdatesWidget::toString(ServerUpdateTool::OfflineUpdateState 
             return "unpack";
         case ServerUpdateTool::OfflineUpdateState::ready:
             return "ready";
-        case ServerUpdateTool::OfflineUpdateState::preparing:
-            return "preparing";
         case ServerUpdateTool::OfflineUpdateState::push:
             return "push";
         case ServerUpdateTool::OfflineUpdateState::done:

@@ -120,7 +120,7 @@
     <h2>Naplóbeállítások</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} log level</label>
+            <label class="col-sm-4">{{name}} naplózási szint</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
                     <option value="none">Nincs: napló leállítva.</option>
@@ -128,8 +128,8 @@
                     <option value="error">Hiba: csak hibák naplózása.</option>
                     <option value="warning">Figyelmeztetés: Napló figyelmeztetések és hibák.</option>
                     <option value="info">Info: Napló hibák, figyelmeztetések és minden üzenet.</option>
-                    <option value="debug">Debug: Log every System message and debug information.</option>
-                    <option value="verbose">Verbose: Log all information available.</option>
+                    <option value="debug">Hibakeresés: Minden rendszerüzenet és hibakeresési információ naplózása.</option>
+                    <option value="verbose">Teljes: Naplózza az összes rendelkezésre álló információt.</option>
                 </select>
             </div>
         </div>
@@ -138,7 +138,7 @@
         </div>
     </form>
 
-    <h1>Advanced System settings</h1>
+    <h1>Haladó rendszerbeállítások</h1>
     <div class="alert alert-danger" role="alert">
         <b>Figyelem!</b> Bármilyen változtatás ezen az oldalon a szerver hibás működéséhez vezethet.
     </div>
@@ -186,7 +186,7 @@
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Figyelem!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Figyelem!</b> Egyes változtatások <b>minden</b> szerver újraindítását igénylik a rendszerben.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="restartServer()" >Jelenlegi szerver újraindítása</button>
         </div>

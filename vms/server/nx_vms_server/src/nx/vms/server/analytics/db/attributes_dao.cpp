@@ -101,8 +101,8 @@ std::set<int64_t> AttributesDao::lookupCombinedAttributes(
     query->prepare(R"sql(
         SELECT distinct combination_id
         FROM combined_attributes
-        WHERE attributes_id IN
-	        (SELECT docid FROM attributes_text_index WHERE content MATCH ?)
+        JOIN attributes_text_index on docid = attributes_id
+        WHERE content MATCH ?
     )sql");
 
     query->addBindValue(text);
