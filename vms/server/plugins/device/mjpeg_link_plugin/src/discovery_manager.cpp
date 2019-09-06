@@ -288,10 +288,11 @@ int DiscoveryManager::fromMDNSData(
     url.setScheme("http");
     const QByteArray encodedUrl = url.toEncoded();
 
-    if (encodedUrl.length() + 1 > std::min<int>(sizeof(cameraInfo->url), sizeof(cameraInfo->uid)))
+    if (encodedUrl.length() + 1 > sizeof(cameraInfo->url))
         return 0;
+    const auto uid = QCryptographicHash::hash(encodedUrl, QCryptographicHash::Md5).toHex();
     strncpy(cameraInfo->url, encodedUrl.data(), sizeof(cameraInfo->url) - 1);
-    strncpy(cameraInfo->uid, cameraInfo->url, sizeof(cameraInfo->uid) - 1);
+    strncpy(cameraInfo->uid, uid.data(), sizeof(cameraInfo->uid) - 1);
     strncpy(cameraInfo->modelName, cameraInfo->url, sizeof(cameraInfo->modelName) - 1);
 
     return 1;
