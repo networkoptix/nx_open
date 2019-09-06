@@ -1058,7 +1058,7 @@ void ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered()
     openNewWindow({lit("--delayed-drop"), data.serialized()});
 }
 
-void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& reply, int handle)
+void ActionHandler::at_cameraListChecked(bool success, int handle, const QnCameraListReply& reply)
 {
     if (!m_awaitingMoveCameras.contains(handle))
         return;
@@ -1066,7 +1066,7 @@ void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& re
     QnMediaServerResourcePtr server = m_awaitingMoveCameras.value(handle).dstServer;
     m_awaitingMoveCameras.remove(handle);
 
-    if (status != 0)
+    if (!success)
     {
         const auto text = QnDeviceDependentStrings::getNameFromSet(
             resourcePool(),
@@ -1219,8 +1219,14 @@ void ActionHandler::at_moveCameraAction_triggered() {
         resourcesToMove.push_back(camera);
     }
 
-    if (!resourcesToMove.isEmpty()) {
-        int handle = server->apiConnection()->checkCameraList(resourcesToMove, this, SLOT(at_cameraListChecked(int, const QnCameraListReply &, int)));
+    if (!resourcesToMove.isEmpty())
+    {
+        auto callback = nx::utils::guarded(this,
+            [this](bool success, int handle, const QnCameraListReply& reply)
+            {
+                at_cameraListChecked(success, handle, reply);
+            });
+        int handle = server->restConnection()->checkCameraList(resourcesToMove, callback, thread());
         m_awaitingMoveCameras.insert(handle, CameraMovingInfo(resourcesToMove, server));
     }
 }

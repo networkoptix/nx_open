@@ -54,7 +54,6 @@ namespace {
 
 // TODO: Introduce constants for API methods registered in media_server_process.cpp.
 QN_DEFINE_LEXICAL_ENUM(RequestObject,
-    (checkCamerasObject, "checkDiscovery")
     (PingSystemObject, "pingSystem")
     (GetNonceObject, "getRemoteNonce")
     (TestLdapSettingsObject, "testLdapSettings")
@@ -92,9 +91,6 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
     trace(m_serverId, handle, object(), lit("Received reply (%1ms)").arg(timer.elapsed()));
     switch (object())
     {
-        case checkCamerasObject:
-            processJsonReply<QnCameraListReply>(this, response, handle);
-            break;
         case PingSystemObject:
             processJsonReply<nx::vms::api::ModuleInformation>(this, response, handle);
             break;
@@ -222,21 +218,6 @@ int QnMediaServerConnection::sendAsyncPostRequestLogged(
 void QnMediaServerConnection::trace(int handle, int obj, const QString& message /*= QString()*/)
 {
     ::trace(m_serverId, handle, obj, message);
-}
-
-int QnMediaServerConnection::checkCameraList(
-    const QnNetworkResourceList& cameras, QObject* target, const char* slot)
-{
-    QnCameraListReply camList;
-    for (const QnResourcePtr& c: cameras)
-        camList.uniqueIdList << c->getUniqueId();
-
-    nx::network::http::HttpHeaders headers;
-    headers.emplace(nx::network::http::header::kContentType, "application/json");
-
-    return sendAsyncPostRequestLogged(checkCamerasObject,
-        std::move(headers), QnRequestParamList(), QJson::serialized(camList),
-        QN_STRINGIZE_TYPE(QnCameraListReply), target, slot);
 }
 
 int QnMediaServerConnection::testLdapSettingsAsync(

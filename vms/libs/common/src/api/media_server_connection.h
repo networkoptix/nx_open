@@ -37,18 +37,6 @@ public:
         const QnUuid& videowallGuid = QnUuid(),
         bool enableOfflineRequests = false);
 
-    /**
-     * Check the list of cameras for discovery. Forms a new list which contains only accessible
-     * cameras.
-     *
-     * Returns immediately. On request completion the specified slot of the specified target is
-     * called with signature <tt>(int status, QImage reply, int handle)</tt>.
-     * Status is 0 in case of success, in other cases it holds error code.
-     *
-     * @return Request handle.
-     */
-    int checkCameraList(const QnNetworkResourceList& cameras, QObject* target, const char* slot);
-
     int pingSystemAsync(const nx::utils::Url& url, const QString& getKey, QObject* target, const char* slot);
     int getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot);
     // It expects (int status, const QnLdapUsers& users, int handle, const QString& errorString) slot.
