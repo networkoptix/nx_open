@@ -1,6 +1,8 @@
 #include "time_constants.h"
 
 #include <limits>
+#include <chrono>
+
 #include <QtCore/QDateTime>
 
 namespace {
