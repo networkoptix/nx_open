@@ -1124,7 +1124,7 @@ bool MultiServerUpdatesWidget::atCancelCurrentAction()
         if (showCancelDialog())
         {
             NX_INFO(this) << "atCancelCurrentAction() at" << toString(m_widgetState);
-            m_serverUpdateTool->stopUpload();
+            m_serverUpdateTool->stopAllUploads();
             setTargetState(WidgetUpdateState::cancelingDownload, {});
             m_serverUpdateTool->requestStopAction();
         }
@@ -1440,17 +1440,16 @@ void MultiServerUpdatesWidget::atServerPackageDownloaded(const nx::update::Packa
 {
     if (m_widgetState == WidgetUpdateState::downloading)
     {
-        NX_INFO(this)
-            << "atServerPackageDownloaded() - downloaded server package"
-            << package.file;
+        NX_INFO(this, "atServerPackageDownloaded() - downloaded server package \"%1\"",
+            package.file);
 
-        m_serverUpdateTool->uploadPackage(package, m_serverUpdateTool->getDownloadDir());
+        auto dir = m_serverUpdateTool->getDownloadDir();
+        m_serverUpdateTool->uploadPackageToRecipients(package, dir);
     }
     else
     {
-        NX_INFO(this)
-            << "atServerPackageDownloaded() - download server package"
-            << package.file << "and widget is not in downloading state";
+        NX_INFO(this, "atServerPackageDownloaded() - downloaded server package \"%1\" "
+            "and widget is not in downloading state", package.file);
     }
 }
 
@@ -1507,10 +1506,23 @@ void MultiServerUpdatesWidget::atServerConfigurationChanged(std::shared_ptr<Upda
         NX_VERBOSE(this,
            "peer %1 has changed online status. We should repeat validation.", item->id);
         repeatUpdateValidation();
+
+        if (item->isServer() && m_updateInfo.peerHasUpdate(item->id))
+        {
+            auto uploaderState = m_serverUpdateTool->getUploaderState();
+            if (uploaderState == ServerUpdateTool::OfflineUpdateState::push
+                || uploaderState == ServerUpdateTool::OfflineUpdateState::ready
+                || uploaderState == ServerUpdateTool::OfflineUpdateState::done)
+            {
+                m_serverUpdateTool->startUploadsToServer(m_updateInfo, item->id);
+            }
+        }
     }
     else if (item->offline)
     {
         m_updateRemoteStateChanged = true;
+        if (item->isServer())
+            m_serverUpdateTool->stopUploadsToServer(item->id);
     }
 
     // TODO: We need task sets to be processed here and then to call loadDataToUi();
@@ -1752,7 +1764,7 @@ void MultiServerUpdatesWidget::processInitialCheckState()
             if (uploaderState == ServerUpdateTool::OfflineUpdateState::push ||
                 uploaderState == ServerUpdateTool::OfflineUpdateState::ready)
             {
-                m_serverUpdateTool->startUpload(m_updateInfo);
+                m_serverUpdateTool->startUpload(m_updateInfo, /*cleanExisting=*/true);
             }
 
             setTargetState(WidgetUpdateState::downloading, targets);
@@ -1814,7 +1826,7 @@ void MultiServerUpdatesWidget::processDownloadingState()
             && m_updateSourceMode == UpdateSourceType::file)
         {
             NX_VERBOSE(this, "processDownloadingState() - starting uploads");
-            m_serverUpdateTool->startUpload(m_updateInfo);
+            m_serverUpdateTool->startUpload(m_updateInfo, /*cleanExisting=*/true);
         }
         else
         {
