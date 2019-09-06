@@ -350,8 +350,8 @@ namespace {
         if (!NX_ASSERT(device, "device is null"))
             return {};
 
-        nx::analytics::EngineDescriptorManager engineDescriptorManager(commonModule);
-        nx::analytics::PluginDescriptorManager pluginDescriptorManager(commonModule);
+        const auto engineDescriptorManager = commonModule->analyticsEngineDescriptorManager();
+        const auto pluginDescriptorManager = commonModule->analyticsPluginDescriptorManager();
 
         auto providerFromItemDescriptor =
             [](const auto& itemDescriptor,
@@ -369,7 +369,7 @@ namespace {
         std::vector<ApiDeviceAnalyticsTypeInfo> result;
         for (const auto& [engineId, supportedItemIds] : supportedItemsByEngineId)
         {
-            const auto engineDescriptor = engineDescriptorManager.descriptor(engineId);
+            const auto engineDescriptor = engineDescriptorManager->descriptor(engineId);
             if (!engineDescriptor)
             {
                 NX_WARNING(typeid(Ec2StaticticsReporter),
@@ -387,7 +387,7 @@ namespace {
                 continue;
             }
 
-            const auto pluginDescriptor = pluginDescriptorManager.descriptor(
+            const auto pluginDescriptor = pluginDescriptorManager->descriptor(
                 engineDescriptor->pluginId);
 
             if (!pluginDescriptor)
@@ -448,8 +448,7 @@ namespace {
             device->supportedEventTypes(),
             [commonModule](const QString& eventTypeId)
             {
-                nx::analytics::EventTypeDescriptorManager eventTypeDescriptorManager(commonModule);
-                return eventTypeDescriptorManager.descriptor(eventTypeId);
+                return commonModule->analyticsEventTypeDescriptorManager()->descriptor(eventTypeId);
             });
 
 
@@ -459,9 +458,7 @@ namespace {
             device->supportedObjectTypes(),
             [commonModule](const QString& objectTypeId)
             {
-                nx::analytics::ObjectTypeDescriptorManager objectTypeDescriptorManager(
-                    commonModule);
-                return objectTypeDescriptorManager.descriptor(objectTypeId);
+                return commonModule->analyticsObjectTypeDescriptorManager()->descriptor(objectTypeId);
             });
 
         return result;

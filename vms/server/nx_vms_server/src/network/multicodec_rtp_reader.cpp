@@ -116,8 +116,15 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
 
     QnSecurityCamResourcePtr camRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
     if (camRes)
-        connect(this,       &QnMulticodecRtpReader::networkIssue, camRes.data(), &QnSecurityCamResource::networkIssue,              Qt::DirectConnection);
-    Qn::directConnect(res.data(), &QnResource::propertyChanged, this, &QnMulticodecRtpReader::at_propertyChanged);
+    {
+        connect(this, &QnMulticodecRtpReader::networkIssue, camRes.data(),
+            &QnSecurityCamResource::networkIssue, Qt::DirectConnection);
+
+        m_ignoreRtcpReports = camRes->resourceData().value<bool>(
+            ResourceDataKey::kIgnoreRtcpReports, m_ignoreRtcpReports);
+    }
+    Qn::directConnect(res.data(), &QnResource::propertyChanged,
+        this, &QnMulticodecRtpReader::at_propertyChanged);
 
     m_timeHelper.setTimePolicy(getTimePolicy(m_resource));
 }
@@ -272,10 +279,14 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataInternal()
         if (!result)
             continue;
 
+        nx::streaming::rtp::RtcpSenderReport rtcpReport;
+        if (!m_ignoreRtcpReports && track.ioDevice)
+            rtcpReport = track.ioDevice->getSenderReport();
+
         result->timestamp = m_timeHelper.getTime(
             qnSyncTime->currentTimePoint(),
             result->timestamp,
-            track.ioDevice ? track.ioDevice->getSenderReport() : nx::streaming::rtp::RtcpSenderReport(),
+            rtcpReport,
             track.onvifExtensionTimestamp,
             track.parser->getFrequency(),
             m_role == Qn::CR_LiveVideo,
@@ -355,7 +366,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         if (bytesRead < 1)
         {
             const bool isInvalidTrack = trackIndexIter == m_trackIndices.end();
-            const bool isBufferAllocated = m_demuxedData.size() > rtpChannelNum
+            const bool isBufferAllocated = (int) m_demuxedData.size() > rtpChannelNum
+                && rtpChannelNum >= 0
                 && m_demuxedData[rtpChannelNum];
 
             if (isInvalidTrack && isBufferAllocated)

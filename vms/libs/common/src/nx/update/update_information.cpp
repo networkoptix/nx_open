@@ -41,7 +41,7 @@ QString toString(InformationError error)
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (Variant)(Package)(Information),
+    (Variant)(Package)(Information)(UpdateDeliveryInfo),
     (ubjson)(json)(datastream)(eq),
     _Fields)
 
@@ -122,6 +122,15 @@ nx::utils::SoftwareVersion UpdateContents::getVersion() const
     return nx::utils::SoftwareVersion(info.version);
 }
 
+UpdateDeliveryInfo UpdateContents::getUpdateDeliveryInfo() const
+{
+    UpdateDeliveryInfo result;
+    result.version = info.version;
+    result.releaseDateMs = info.releaseDateMs;
+    result.releaseDeliveryDays = info.releaseDeliveryDays;
+    return result;
+}
+
 bool UpdateContents::isValidToInstall() const
 {
     return missingUpdate.empty()
@@ -146,11 +155,6 @@ bool UpdateContents::preferOtherUpdate(const UpdateContents& other) const
         && other.sourceType == UpdateSourceType::mediaservers)
     {
         return true;
-    }
-    else if (sourceType != UpdateSourceType::mediaservers
-        && other.sourceType == UpdateSourceType::mediaservers)
-    {
-        return false;
     }
 
     return other.getVersion() > getVersion();

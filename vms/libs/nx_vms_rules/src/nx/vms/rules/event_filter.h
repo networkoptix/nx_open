@@ -16,9 +16,13 @@ public:
     EventFilter(const QnUuid& id, const QString& eventType);
     virtual ~EventFilter();
 
+    QnUuid id() const;
     QString eventType() const;
 
-    bool addField(const QString& name, EventField* field);
+    // Takes ownership.
+    void addField(const QString& name, EventField* field);
+
+    const QHash<QString, EventField*>& fields() const;
 
     bool match(const EventPtr& event) const;
 

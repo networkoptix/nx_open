@@ -1,15 +1,10 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef ILP_DISCOVERY_MANAGER_H
-#define ILP_DISCOVERY_MANAGER_H
+#pragma once
 
 #include <camera/camera_plugin.h>
 
 #include <plugins/plugin_tools.h>
-
 
 //!Represents defined (in settings) image directories as cameras with dts archive storage
 class DiscoveryManager
@@ -51,5 +46,3 @@ public:
 private:
     nxpt::CommonRefManager m_refManager;
 };
-
-#endif  //ILP_DISCOVERY_MANAGER_H

@@ -23,7 +23,6 @@
 namespace nx::vms::client::desktop {
 
 class UploadManager;
-class ServerUpdatesModel;
 class PeerStateTracker;
 struct UpdateItem;
 
@@ -56,7 +55,12 @@ public:
     // Check if we should sync UI and data from here.
     bool hasRemoteChanges() const;
     bool hasOfflineUpdateChanges() const;
-    void resumeTasks();
+
+    void onConnectToSystem(QnUuid systemId);
+    void onDisconnectFromSystem();
+
+    bool hasInitiatedThisUpdate() const;
+
 
     /**
      * Sends GET https://localhost:7001/ec2/updateInformation and stores response in an internal
@@ -120,8 +124,6 @@ public:
         unpack,
         // Data is unpacked and we are ready to push packages to the servers.
         ready,
-        // Preparing for upload. We are calculating recipients and a free space.
-        preparing,
         // Pushing to the servers.
         push,
         // All update contents are pushed to the servers. They can start the update.
@@ -160,6 +162,8 @@ public:
 
     /** Stops all uploads. */
     void stopUpload();
+
+    void saveInternalState();
 
     /**
      * Get a path to a folder with downloads.
@@ -210,7 +214,6 @@ public:
     /** Get authentication string for current connection to mediaserver. */
     QString getServerAuthString() const;
 
-    std::shared_ptr<ServerUpdatesModel> getModel();
     std::shared_ptr<PeerStateTracker> getStateTracker();
 
     // These are debug functions that return URL to appropriate mediaserver API calls.
@@ -276,7 +279,6 @@ private:
     QnMediaServerResourceList getServersForUpload();
 
     void markUploadCompleted(const QString& uploadId);
-    void saveInternalState();
     void loadInternalState();
     void changeUploadState(OfflineUpdateState newState);
 
@@ -284,6 +286,8 @@ private:
     void atDownloaderStatusChanged(const FileInformation& fileInformation);
     void atChunkDownloadFailed(const QString& fileName);
     void atDownloadFailed(const QString& fileName);
+    void atDownloadFinished(const QString& fileName);
+    void atDownloadStalled(const QString& fileName, bool stalled);
 
     const nx::update::Package* findPackageForFile(const QString& fileName) const;
 
@@ -291,7 +295,9 @@ private:
 
 private:
     OfflineUpdateState m_offlineUpdaterState = OfflineUpdateState::initial;
+    bool m_wasPushingManualPackages = false;
     bool m_offlineUpdateStateChanged = false;
+    bool m_initiatedUpdate = false;
 
     QString m_offlineUpdateFile;
     std::promise<UpdateContents> m_offlineUpdateCheckResult;
@@ -309,9 +315,9 @@ private:
     std::set<QString> m_activeUploads;
     std::set<QString> m_completedUploads;
 
+    // It helps to track downloading progress for files.
     std::map<QString, int> m_activeDownloads;
     std::set<QString> m_completeDownloads;
-    std::set<QString> m_failedDownloads;
     std::set<QString> m_issuedDownloads;
 
     std::map<QString, nx::vms::client::desktop::UploadState> m_uploadStateById;
@@ -334,11 +340,9 @@ private:
     std::atomic_bool m_requestingFinish = false;
 
     std::shared_ptr<PeerStateTracker> m_stateTracker;
-    std::shared_ptr<ServerUpdatesModel> m_updatesModel;
 
     // Time at which install command was issued.
     qint64 m_timeStartedInstall = 0;
-    bool m_protoProblemDetected = false;
     QSet<rest::Handle> m_requestingInstall;
 
     /** We use this downloader when client downloads updates for server without internet. */
@@ -353,6 +357,7 @@ private:
      * This information is extracted from ec2/updateInformation request.
      */
     QSet<QnUuid> m_serversAreInstalling;
+    QnUuid m_systemId;
 };
 
 /**

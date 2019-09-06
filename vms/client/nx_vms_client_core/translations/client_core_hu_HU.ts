@@ -7,21 +7,21 @@
       <source>Bytes</source>
       <comment>Full suffix for displaying bytes</comment>
       <translation>
-        <numerusform>Byte</numerusform>
-        <numerusform>Byte</numerusform>
+        <numerusform>Bájt</numerusform>
+        <numerusform>Bájt</numerusform>
       </translation>
     </message>
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation type="unfinished">B</translation>
+      <translation>B</translation>
     </message>
     <message numerus="yes">
       <source>Kilobytes</source>
       <comment>Full suffix for displaying kilobytes</comment>
       <translation>
-        <numerusform>Kilobyte</numerusform>
-        <numerusform>Kilobytes</numerusform>
+        <numerusform>Kilobájt</numerusform>
+        <numerusform>Kilobájt</numerusform>
       </translation>
     </message>
     <message>
@@ -45,9 +45,9 @@
     <message numerus="yes">
       <source>Gigabytes</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gigabájt</numerusform>
-        <numerusform>Gigabytes</numerusform>
+        <numerusform>Gigabájt</numerusform>
       </translation>
     </message>
     <message>
@@ -58,9 +58,9 @@
     <message numerus="yes">
       <source>Terabytes</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Terabájt</numerusform>
-        <numerusform>Terabytes</numerusform>
+        <numerusform>Terabájt</numerusform>
       </translation>
     </message>
     <message>
@@ -71,15 +71,15 @@
     <message numerus="yes">
       <source>Petabytes</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Petabájt</numerusform>
-        <numerusform>Petabytes</numerusform>
+        <numerusform>Petabájt</numerusform>
       </translation>
     </message>
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation type="unfinished">PB</translation>
+      <translation>PB</translation>
     </message>
   </context>
   <context>
@@ -187,12 +187,12 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation>mmp</translation>
+      <translation>ezredmásodperc</translation>
     </message>
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation>s</translation>
+      <translation>mp</translation>
     </message>
     <message>
       <source>m</source>
@@ -202,12 +202,12 @@
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation>ó</translation>
+      <translation>óra</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation>n</translation>
+      <translation>nap</translation>
     </message>
     <message>
       <source>w</source>
@@ -217,12 +217,12 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>H</translation>
+      <translation>hó</translation>
     </message>
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation>é</translation>
+      <translation>év</translation>
     </message>
     <message>
       <source>msec</source>
@@ -269,7 +269,7 @@
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
         <numerusform>milliszekundum</numerusform>
-        <numerusform>milliszekundum</numerusform>
+        <numerusform>milliszekundumok</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -277,7 +277,7 @@
       <comment>Full suffix for displaying seconds</comment>
       <translation>
         <numerusform>másodperc</numerusform>
-        <numerusform>másodperc</numerusform>
+        <numerusform>másodpercek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -285,14 +285,14 @@
       <comment>Full suffix for displaying minutes</comment>
       <translation>
         <numerusform>perc</numerusform>
-        <numerusform>perc</numerusform>
+        <numerusform>percek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>órák</numerusform>
+        <numerusform>óra</numerusform>
         <numerusform>órák</numerusform>
       </translation>
     </message>
@@ -301,14 +301,14 @@
       <comment>Full suffix for displaying days</comment>
       <translation>
         <numerusform>nap</numerusform>
-        <numerusform>nap</numerusform>
+        <numerusform>napok</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
       <translation>
-        <numerusform>hetek</numerusform>
+        <numerusform>hét</numerusform>
         <numerusform>hetek</numerusform>
       </translation>
     </message>
@@ -316,7 +316,7 @@
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
       <translation>
-        <numerusform>hónapok</numerusform>
+        <numerusform>hónap</numerusform>
         <numerusform>hónapok</numerusform>
       </translation>
     </message>
@@ -324,7 +324,7 @@
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
       <translation>
-        <numerusform>évek</numerusform>
+        <numerusform>év</numerusform>
         <numerusform>évek</numerusform>
       </translation>
     </message>

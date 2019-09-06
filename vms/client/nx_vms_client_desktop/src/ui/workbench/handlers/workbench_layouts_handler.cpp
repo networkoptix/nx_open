@@ -201,10 +201,14 @@ void LayoutsHandler::at_openLayoutAction_triggered(
     if (!currentUser)
         return;
 
-    // User should be mentioned in actionParams.additionalResources to be able to handle this action.
+    const auto roleId = QnUserRolesManager::unifiedUserRoleId(currentUser);
+
+    // Either user or his role should be mentioned in actionParams.additionalResources
+    // so that user can handle this action.
     auto permittedUsers = actionParams.additionalResources;
-    const auto it = std::find(permittedUsers.begin(), permittedUsers.end(), currentUser->getId());
-    if (it == permittedUsers.end() && !actionParams.allUsers)
+    const auto itU = std::find(permittedUsers.begin(), permittedUsers.end(), currentUser->getId());
+    const auto itR = std::find(permittedUsers.begin(), permittedUsers.end(), roleId);
+    if (!actionParams.allUsers && itU == permittedUsers.end() && itR == permittedUsers.end())
         return;
 
     if (accessController()->hasPermissions(layout, Qn::ReadPermission))

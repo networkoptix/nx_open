@@ -138,7 +138,7 @@ public:
     static std::deque<nx::vms::server::Chunk> mergeChunks(
         const std::deque<nx::vms::server::Chunk>& chunks1,
         const std::deque<nx::vms::server::Chunk>& chunks2);
-    void addChunks(const nx::vms::server::ChunksDeque& chunk);
+    void addChunks(nx::vms::server::ChunksDeque chunk);
 
     void assignChunksUnsafe(
         std::deque<nx::vms::server::Chunk>::iterator begin,

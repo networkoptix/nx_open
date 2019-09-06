@@ -58,46 +58,44 @@ ThirdPartyResourceSearcher::~ThirdPartyResourceSearcher()
 {
 }
 
-QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resourceTypeId, const QnResourceParams& params )
+QnResourcePtr ThirdPartyResourceSearcher::createResource(
+    const QnUuid &resourceTypeId, const QnResourceParams& params )
 {
     QnThirdPartyResourcePtr result;
-
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
 
-    if( resourceType.isNull() )
+    if (resourceType.isNull())
     {
-        NX_DEBUG(this, lm("ThirdPartyResourceSearcher. No resource type for ID = %1").arg(resourceTypeId.toString()));
+        NX_DEBUG(this, "No resource type for ID = %1", resourceTypeId);
         return result;
     }
 
-    if( resourceType->getManufacturer() != manufacturer() )
+    if (resourceType->getManufacturer() != manufacturer())
         return result;
 
     nxcip::CameraInfo cameraInfo;
-    //TODO #ak restore all resource cameraInfo fields here
-    strcpy( cameraInfo.url, params.url.toLatin1().constData() );
+    // TODO: #ak restore all resource cameraInfo fields here.
+    strcpy(cameraInfo.url, params.url.toLatin1().constData());
 
     nxcip_qt::CameraDiscoveryManager* discoveryManager = NULL;
-    //vendor is required to find plugin to use
-    //choosing correct plugin
-    for( auto
-        it = m_thirdPartyCamPlugins.begin();
-        it != m_thirdPartyCamPlugins.end();
-        ++it )
+    // Vendor is required to find plugin to use.
+    // Choosing correct plugin.
+    for (auto it = m_thirdPartyCamPlugins.begin(); it != m_thirdPartyCamPlugins.end(); ++it)
     {
-        if( params.vendor.startsWith(it->getVendorName()) )
+        if (params.vendor.startsWith(it->getVendorName()))
         {
             discoveryManager = &*it;
             break;
         }
     }
-    if( !discoveryManager )
+    if (!discoveryManager)
         return QnThirdPartyResourcePtr();
 
-    NX_ASSERT( discoveryManager->getRef() );
-    //NOTE not calling discoveryManager->createCameraManager here because we do not know camera parameters (model, firmware, even uid),
-        //so just instanciating QnThirdPartyResource
-    result = QnThirdPartyResourcePtr( new QnThirdPartyResource(m_serverModule, cameraInfo, nullptr, *discoveryManager ) );
+    NX_ASSERT(discoveryManager->getRef());
+    // NOTE: not calling discoveryManager->createCameraManager here because we do not know camera
+    // parameters (model, firmware, even uid), so just instanciating QnThirdPartyResource.
+    result = QnThirdPartyResourcePtr(
+        new QnThirdPartyResource(m_serverModule, cameraInfo, nullptr, *discoveryManager));
     result->setTypeId(resourceTypeId);
 
     // If third party driver returns MAC based physical ID then re-format MAC address string
@@ -108,8 +106,8 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resource
         uuidStr = uuidMac.toString();
     result->setPhysicalId(uuidStr);
 
-    NX_VERBOSE(this, lm("Created third party resource (manufacturer %1, res type id %2)").
-        arg(discoveryManager->getVendorName()).arg(resourceTypeId.toString()));
+    NX_VERBOSE(this, "Created third party resource (manufacturer %1, res type id %2)",
+        discoveryManager->getVendorName(), resourceTypeId);
 
     return result;
 }

@@ -77,6 +77,11 @@ QnAbstractStreamDataProvider* QnClientCameraResource::createDataProvider(
      return result;
 }
 
+QString QnClientCameraResource::idForToStringFromPtr() const
+{
+    return getName();
+}
+
 QnConstResourceVideoLayoutPtr QnClientCameraResource::getVideoLayout(
     const QnAbstractStreamDataProvider* dataProvider) const
 {

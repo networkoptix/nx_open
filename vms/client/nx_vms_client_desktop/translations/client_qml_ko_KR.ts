@@ -9,11 +9,11 @@
     </message>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>카메라 분석은 카메라를 볼 때만 작동합니다. 항상 작동하도록 녹음을 활성화하십시오.</translation>
     </message>
     <message>
       <source>This is the built-in functionality</source>
-      <translation type="unfinished">This is the built-in functionality</translation>
+      <translation>이것은 내장된 기능입니다</translation>
     </message>
   </context>
   <context>
@@ -73,7 +73,7 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>플러그인이 설치되지 않았습니다</translation>
     </message>
     <message>
       <source>Server is offline</source>
@@ -108,7 +108,7 @@
     </message>
     <message>
       <source>Hide</source>
-      <translation type="unfinished">Hide</translation>
+      <translation>숨김</translation>
     </message>
   </context>
   <context>

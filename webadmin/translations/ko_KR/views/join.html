@@ -48,23 +48,23 @@
         </ng-form>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <label for="currentSystemPassword" class="control-label">Current Password (for this System)</label>
+            <label for="currentSystemPassword" class="control-label"> (이 시스템) 에 대 한 현재 암호</label>
             <div class="">
                 <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="패스워드" required />
             </div>
         </div>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <p>The current System is about to be merged <b>{{systems.systemName}}</b> with System <b>{{systems.joinSystemName}}</b></p>
+            <p>현재 <b>{{systems.systemName}}</b> 시스템이 시스템 <b>{{systems.joinSystemName}}</b>와 병합 될 예정입니다</p>
             <p>
-                The new System will have password and name from the following System:<br/>
-                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (current)</label> <br/>
-                <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
+                새 시스템에는 다음 시스템의 암호와 이름이 갖게됩니다: <0 />
+                <label> <2 /> {{systems.systemName}} (현재) </label> <0 />
+                <label ng-if="!systems.remoteSystemIsNew"> <4 /> {{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>
     <div class="modal-footer" >
-        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid">Find System</button>
-        <button class="btn btn-primary " ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid">Merge with {{systems.joinSystemName}}</button>
+        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid"> 시스템 검색 </button>
+        <button class="btn btn-primary " ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid"> {{systems.joinSystemName}}과 병합 </button>
     </div>
 </form>

@@ -30,7 +30,7 @@ public:
     /*
     * Returns storage usage in range [0..1]
     */
-    float getAvarageUsage();
+    float getAverageUsage();
     virtual void pleaseStop() override;
 protected:
     virtual void run();

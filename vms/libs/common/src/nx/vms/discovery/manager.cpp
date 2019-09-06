@@ -338,8 +338,10 @@ void Manager::updateEndpoints(const QnMediaServerResource* server)
         [this, id = server->getId(), allowed = std::move(allowedEndpoints),
             forbidden = std::move(forbiddenEndpoints)]() mutable
         {
-            NX_DEBUG(this, lm("Server %1 resource endpoints: add %2, forbid %3")
-                .arg(id).container(allowed).container(forbidden));
+            NX_DEBUG(this, "Server %1 resource endpoints: add %2, forbid %3",
+                id,
+                containerString(allowed),
+                containerString(forbidden));
 
             m_moduleConnector->setForbiddenEndpoints(std::move(forbidden), id);
             if (allowed.size() != 0)

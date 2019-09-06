@@ -111,7 +111,7 @@ def determine_package_versions(
 
 
 def sync_dependencies(syncher, platform, arch, box, release_version, options={}):
-    have_mediaserver = platform not in ("android", "ios", "macosx")
+    have_mediaserver = platform not in ("android", "ios")
     have_desktop_client = platform in ("windows", "macosx") \
         or (platform == "linux" and (box == "none" or arch == "arm64"))
     have_mobile_client = have_desktop_client or platform in ("android", "ios")
@@ -213,8 +213,9 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
         sync("any/certificates", path_variable="certificates_path")
 
     if have_mediaserver:
-        sync("any/nx_sdk-1.7.1")
-        sync("any/nx_storage_sdk-1.7.1")
+        if platform == "windows" or (platform == "linux" and arch == "x64"):
+            sync("nx_box_tool-dev", path_variable="nx_box_tool_dev_dir")
+
         sync("sigar")
         sync("any/apidoctool-2.1", path_variable="APIDOCTOOL_PATH")
         if not sync("any/server-external", optional=True):

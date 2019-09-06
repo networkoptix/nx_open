@@ -57,9 +57,9 @@
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
             <p>El Sistema actual está a punto de fusionarse <b>{{systems.systemName}}</b> con el Sistema <b>{{systems.joinSystemName}}</b></p>
             <p>
-                El nuevo Sistema tendrá la contraseña y el nombre del siguiente Sistema: <0 />
-                <label> <2 /> {{systems.systemName}} (actual) </label> <0 />
-                <label ng-if="!systems.remoteSystemIsNew"> <4 /> {{systems.joinSystemName}}</label>
+                El nuevo Sistema tendrá la contraseña y el nombre del siguiente Sistema:<br/>
+                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/>{{systems.systemName}} (actual)</label><br/>
+                <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/>{{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>

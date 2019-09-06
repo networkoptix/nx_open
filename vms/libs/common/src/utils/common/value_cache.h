@@ -53,6 +53,11 @@ public:
         m_cachedVal.reset();
     }
 
+    void resetThreadUnsafe()
+    {
+        m_cachedVal.reset();
+    }
+
     void update()
     {
         const ValueType newVal = m_valGenerationFunc();

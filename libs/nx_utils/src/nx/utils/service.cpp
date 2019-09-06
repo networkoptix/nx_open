@@ -127,7 +127,7 @@ bool Service::isTerminated() const
 void Service::initializeLog(const AbstractServiceSettings& settings)
 {
     auto logSettings = settings.logging();
-    logSettings.updateDirectoryIfEmpty(settings.dataDir());
+    logSettings.updateDirectoryIfEmpty(settings.dataDir() + "/log");
     utils::log::setMainLogger(
         nx::utils::log::buildLogger(
             logSettings,

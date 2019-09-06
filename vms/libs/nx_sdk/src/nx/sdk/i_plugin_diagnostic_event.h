@@ -14,7 +14,7 @@ namespace sdk {
 class IPluginDiagnosticEvent: public nx::sdk::Interface<IPluginDiagnosticEvent>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::IPluginDiagnosticEvent"); }
+    static auto interfaceId() { return makeId("nx::sdk::IPluginDiagnosticEvent"); }
 
     enum class Level
     {

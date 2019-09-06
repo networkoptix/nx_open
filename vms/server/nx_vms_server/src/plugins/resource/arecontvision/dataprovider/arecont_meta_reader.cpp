@@ -6,6 +6,8 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/log/log.h>
 
+static const int kHttpTimeoutMs = 3000;
+
 QnMetaDataV1Ptr ArecontMetaReader::parseMotionMetadata(
     int channel, const QString& response, const ParsingInfo& info)
 {
@@ -54,7 +56,6 @@ ArecontMetaReader::ArecontMetaReader(
     std::chrono::milliseconds minRepeatInterval,
     int minFrameInterval)
     :
-    m_metaDataClient(nx::network::http::AsyncHttpClient::create()),
     m_channelCount(channelCount),
     m_minRepeatInterval(minRepeatInterval),
     m_minFrameInterval(minFrameInterval)
@@ -63,7 +64,13 @@ ArecontMetaReader::ArecontMetaReader(
 
 ArecontMetaReader::~ArecontMetaReader()
 {
-    m_metaDataClient->pleaseStopSync();
+    QnMutexLocker lock(&m_httpMutex);
+    while (m_metaDataClientBusy)
+        m_httpWaitCondition.wait(&m_httpMutex);
+
+    // It is guarantee callback is not called any more if m_metaDataClientBusy is false.
+    if (m_metaDataClient)
+        m_metaDataClient->pleaseStopSync();
 }
 
 bool ArecontMetaReader::hasData()
@@ -86,8 +93,10 @@ void ArecontMetaReader::requestIfReady(QnPlAreconVisionResource* resource)
 
     if (repeatIntervalExceeded || frameIntervalExceeded)
     {
-        if (!m_metaDataClientBusy.exchange(true))
+        QnMutexLocker lock(&m_httpMutex);
+        if (!m_metaDataClientBusy)
         {
+            m_metaDataClientBusy = true;
             m_framesSinceLastMetaData = 0;
             m_lastMetaRequest.restart();
             requestAsync(resource);
@@ -117,6 +126,9 @@ void ArecontMetaReader::requestAsync(QnPlAreconVisionResource* resource)
         resource->getProperty(lit("MaxSensorHeight")).toInt()
     };
 
+    m_metaDataClient = nx::network::http::AsyncHttpClient::create();
+    m_metaDataClient->setResponseReadTimeoutMs(kHttpTimeoutMs);
+    m_metaDataClient->setMessageBodyReadTimeoutMs(kHttpTimeoutMs);
     m_metaDataClient->doGet(url,
         [this, info](nx::network::http::AsyncHttpClientPtr)
         {
@@ -125,7 +137,10 @@ void ArecontMetaReader::requestAsync(QnPlAreconVisionResource* resource)
                 m_currentChannel = (m_currentChannel + 1) % m_channelCount;
 
             m_metaDataClient->takeSocket(); //< Close connection.
+
+            QnMutexLocker lock(&m_httpMutex);
             m_metaDataClientBusy = false;
+            m_httpWaitCondition.wakeAll();
         }
     );
 }

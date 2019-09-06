@@ -502,23 +502,21 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
     nx::vms::api::rules::ActionBuilder builder;
 
     filter.eventType = "DebugEvent";
-    filter.fieldBlocks << QList<nx::vms::api::rules::Field>();
-    filter.fieldBlocks[0] << nx::vms::api::rules::Field();
-    filter.fieldBlocks[0][0].name = "action";
-    filter.fieldBlocks[0][0].metatype = "nx.stringWithKeywords";
-    filter.fieldBlocks[0][0].props["string"] = "Inc";
+    filter.fields << nx::vms::api::rules::Field();
+    filter.fields[0].name = "action";
+    filter.fields[0].metatype = "nx.stringWithKeywords";
+    filter.fields[0].props["string"] = "Inc";
     rule.eventList << filter;
 
     builder.actionType = "nx.showNotification";
-    builder.fieldBlocks << QList<nx::vms::api::rules::Field>();
-    builder.fieldBlocks[0] << nx::vms::api::rules::Field();
-    builder.fieldBlocks[0] << nx::vms::api::rules::Field();
-    builder.fieldBlocks[0][0].name = "caption";
-    builder.fieldBlocks[0][0].metatype = "nx.substitution";
-    builder.fieldBlocks[0][0].props["fieldName"] = "action";
-    builder.fieldBlocks[0][1].name = "description";
-    builder.fieldBlocks[0][1].metatype = "nx.substitution";
-    builder.fieldBlocks[0][1].props["fieldName"] = "value";
+    builder.fields << nx::vms::api::rules::Field();
+    builder.fields << nx::vms::api::rules::Field();
+    builder.fields[0].name = "caption";
+    builder.fields[0].metatype = "nx.substitution";
+    builder.fields[0].props["fieldName"] = "action";
+    builder.fields[1].name = "description";
+    builder.fields[1].metatype = "nx.substitution";
+    builder.fields[1].props["fieldName"] = "value";
     rule.actionList << builder;
 
     engine->addRule(rule);

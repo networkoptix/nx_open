@@ -9,12 +9,14 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <nx/sdk/i_plugin.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <plugins/plugin_api.h>
 #include <nx/vms/server/plugins/utility_provider.h>
 #include <plugins/settings.h>
 
 #include <nx/vms/api/data/analytics_data.h>
+
+#include <nx/vms/server/server_module_aware.h>
 
 class QDir;
 class QFileInfo;
@@ -26,12 +28,14 @@ class QFileInfo;
  *
  * NOTE: Methods of this class are thread-safe.
  */
-class PluginManager: public QObject
+class PluginManager:
+    public QObject,
+    public nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 
 public:
-    PluginManager(QObject* parent);
+    PluginManager(QnMediaServerModule* parent);
 
     virtual ~PluginManager();
 
@@ -53,7 +57,7 @@ public:
                 continue;
 
             // It is safe to treat new SDK plugins as if they were old SDK plugins for the purpose
-            // of calling queryInterface().
+            // of calling queryInterface(), hence querying all plugins - old and new.
             auto oldSdkPlugin = reinterpret_cast<nxpl::PluginInterface*>(plugin.get());
             if (const auto ptr = oldSdkPlugin->queryInterface(oldSdkInterfaceId))
                 foundPlugins.push_back(static_cast<Interface*>(ptr));
@@ -77,7 +81,7 @@ public:
             if (!plugin)
                 continue;
 
-            if (const auto ptr = nx::sdk::queryInterfacePtr<Interface>(plugin))
+            if (const auto ptr = plugin->queryInterface<Interface>())
                 foundPlugins.push_back(ptr);
         }
         return foundPlugins;

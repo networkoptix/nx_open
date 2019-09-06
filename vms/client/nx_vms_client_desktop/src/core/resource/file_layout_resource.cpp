@@ -5,6 +5,8 @@
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
 
+#include <client/client_globals.h>
+
 QnFileLayoutResource::QnFileLayoutResource(QnCommonModule* commonModule):
     base_type(commonModule)
 {
@@ -120,5 +122,8 @@ void QnFileLayoutResource::updateInternal(const QnResourcePtr& other, Qn::Notifi
             notifiers <<
                 [r = toSharedPointer(this)]{ emit r->readOnlyChanged(r); };
         }
+
+        // TODO: #GDM Temporary solution. Must be converted to a field like everything else.
+        setData(Qn::LayoutWatermarkRole, localOther->data(Qn::LayoutWatermarkRole));
     }
 }

@@ -123,7 +123,7 @@ public:
         return nullptr;
     }
 
-    virtual float getAvarageWritingUsage() const override
+    virtual float getAverageWritingUsage() const override
     {
         return 0.0;
     }

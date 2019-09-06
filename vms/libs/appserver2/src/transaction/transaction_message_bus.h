@@ -47,7 +47,7 @@ public:
         const nx::utils::Url& url) override;
     virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
 
-    virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
+    virtual ConnectionInfoList connectionsInfo() const override;
     bool moveConnectionToReadyForStreaming(const std::string& connectionGuid);
     //!Blocks till connection \a connectionGuid is ready to accept new transactions
     void waitForNewTransactionsReady(const std::string& connectionGuid);

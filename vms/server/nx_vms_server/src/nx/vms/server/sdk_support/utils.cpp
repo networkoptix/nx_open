@@ -11,8 +11,9 @@
 #include <nx/sdk/i_attribute.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 #include <nx/sdk/analytics/helpers/object_track_info.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
+#include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/to_string.h>
 #include <nx/vms/server/resource/resource_fwd.h>
 
@@ -21,6 +22,7 @@
 #include <nx/sdk/helpers/list.h>
 #include <nx/sdk/analytics/helpers/timestamped_object_metadata.h>
 #include <nx/vms/server/analytics/frame_converter.h>
+#include <nx/vms/server/sdk_support/conversion_utils.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -42,96 +44,6 @@ nx::utils::log::Tag kLogTag(QString("SdkSupportUtils"));
 
 } // namespace
 
-nx::vms::api::analytics::PixelFormat fromSdkPixelFormat(
-    IUncompressedVideoFrame::PixelFormat sdkPixelFormat)
-{
-    using namespace nx::vms::api::analytics;
-
-    switch (sdkPixelFormat)
-    {
-        case IUncompressedVideoFrame::PixelFormat::yuv420:
-            return PixelFormat::yuv420;
-        case IUncompressedVideoFrame::PixelFormat::argb:
-            return PixelFormat::argb;
-        case IUncompressedVideoFrame::PixelFormat::abgr:
-            return PixelFormat::abgr;
-        case IUncompressedVideoFrame::PixelFormat::rgba:
-            return PixelFormat::rgba;
-        case IUncompressedVideoFrame::PixelFormat::bgra:
-            return PixelFormat::bgra;
-        case IUncompressedVideoFrame::PixelFormat::rgb:
-            return PixelFormat::rgb;
-        case IUncompressedVideoFrame::PixelFormat::bgr:
-            return PixelFormat::bgr;
-        default:
-            NX_ASSERT(false, lm("Wrong pixel format, %1").args((int) sdkPixelFormat));
-            return PixelFormat::undefined;
-    }
-}
-
-std::optional<IUncompressedVideoFrame::PixelFormat> toSdkPixelFormat(
-    nx::vms::api::analytics::PixelFormat pixelFormat)
-{
-    using namespace nx::vms::api::analytics;
-
-    switch (pixelFormat)
-    {
-        case PixelFormat::yuv420:
-            return IUncompressedVideoFrame::PixelFormat::yuv420;
-        case PixelFormat::argb:
-            return IUncompressedVideoFrame::PixelFormat::argb;
-        case PixelFormat::abgr:
-            return IUncompressedVideoFrame::PixelFormat::abgr;
-        case PixelFormat::rgba:
-            return IUncompressedVideoFrame::PixelFormat::rgba;
-        case PixelFormat::bgra:
-            return IUncompressedVideoFrame::PixelFormat::bgra;
-        case PixelFormat::rgb:
-            return IUncompressedVideoFrame::PixelFormat::rgb;
-        case PixelFormat::bgr:
-            return IUncompressedVideoFrame::PixelFormat::bgr;
-        default:
-            NX_ASSERT(false, lm("Wrong pixel format").args((int) pixelFormat));
-            return std::nullopt;
-    }
-}
-
-AVPixelFormat sdkToAvPixelFormat(IUncompressedVideoFrame::PixelFormat pixelFormat)
-{
-    using PixelFormat = IUncompressedVideoFrame::PixelFormat;
-    switch (pixelFormat)
-    {
-        case PixelFormat::yuv420: return AV_PIX_FMT_YUV420P;
-        case PixelFormat::argb: return AV_PIX_FMT_ARGB;
-        case PixelFormat::abgr: return AV_PIX_FMT_ABGR;
-        case PixelFormat::rgba: return AV_PIX_FMT_RGBA;
-        case PixelFormat::bgra: return AV_PIX_FMT_BGRA;
-        case PixelFormat::rgb: return AV_PIX_FMT_RGB24;
-        case PixelFormat::bgr: return AV_PIX_FMT_BGR24;
-
-        default:
-            NX_ASSERT(false, lm("Unsupported PixelFormat value: %1").arg(
-                pixelFormatToStdString(pixelFormat)));
-            return AV_PIX_FMT_NONE;
-    }
-}
-
-std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> avPixelFormatToSdk(
-    AVPixelFormat avPixelFormat)
-{
-    using PixelFormat = IUncompressedVideoFrame::PixelFormat;
-    switch (avPixelFormat)
-    {
-        case AV_PIX_FMT_YUV420P: return PixelFormat::yuv420;
-        case AV_PIX_FMT_ARGB: return PixelFormat::argb;
-        case AV_PIX_FMT_ABGR: return PixelFormat::abgr;
-        case AV_PIX_FMT_RGBA: return PixelFormat::rgba;
-        case AV_PIX_FMT_BGRA: return PixelFormat::bgra;
-        case AV_PIX_FMT_RGB24: return PixelFormat::rgb;
-        case AV_PIX_FMT_BGR24: return PixelFormat::bgr;
-        default: return std::nullopt;
-    }
-}
 
 analytics::SdkObjectFactory* getSdkObjectFactory(QnMediaServerModule* serverModule)
 {
@@ -178,64 +90,24 @@ Ptr<DeviceInfo> deviceInfoFromResource(const QnVirtualCameraResourcePtr& device)
     return deviceInfo;
 }
 
-std::unique_ptr<nx::plugins::SettingsHolder> toSettingsHolder(const QVariantMap& settings)
-{
-    QMap<QString, QString> settingsMap;
-    for (auto itr = settings.cbegin(); itr != settings.cend(); ++itr)
-        settingsMap[itr.key()] = itr.value().toString();
-
-    return std::make_unique<nx::plugins::SettingsHolder>(settingsMap);
-}
-
-Ptr<IStringMap> toIStringMap(const QVariantMap& map)
-{
-    const auto stringMap = makePtr<StringMap>();
-    for (auto it = map.cbegin(); it != map.cend(); ++it)
-        stringMap->setItem(it.key().toStdString(), it.value().toString().toStdString());
-
-    return stringMap;
-}
-
-Ptr<IStringMap> toIStringMap(const QMap<QString, QString>& map)
-{
-    const auto stringMap = makePtr<StringMap>();
-    for (auto it = map.cbegin(); it != map.cend(); ++it)
-        stringMap->setItem(it.key().toStdString(), it.value().toStdString());
-
-    return stringMap;
-}
-
-Ptr<IStringMap> toIStringMap(const QString& mapJson)
+std::optional<QVariantMap> toQVariantMap(const QString& mapJson)
 {
     bool isValid = false;
     const auto deserialized = QJson::deserialized<std::vector<StringMapItem>>(
-        mapJson.toUtf8(), /*defaultValue*/ {}, &isValid);
+        mapJson.toUtf8(), /*defaultValue*/{}, &isValid);
 
     if (!isValid)
-        return nullptr;
+        std::nullopt;
 
-    const auto stringMap = makePtr<StringMap>();
+    QVariantMap result;
     for (const auto& setting: deserialized)
     {
-        if (stringMap->value(setting.name.c_str()) != nullptr) //< Duplicate key.
-            return nullptr;
-        stringMap->setItem(setting.name, setting.value);
+        result.insert(
+            QString::fromStdString(setting.name),
+            QString::fromStdString(setting.value));
     }
 
-    return stringMap;
-}
-
-QVariantMap fromIStringMap(const IStringMap* map)
-{
-    QVariantMap variantMap;
-    if (!map)
-        return variantMap;
-
-    const auto count = map->count();
-    for (auto i = 0; i < count; ++i)
-        variantMap.insert(map->key(i), map->value(i));
-
-    return variantMap;
+    return result;
 }
 
 std::optional<IUncompressedVideoFrame::PixelFormat>
@@ -373,7 +245,7 @@ nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrame(
     if (!dataPacket)
         return nullptr;
 
-    return nx::sdk::queryInterfacePtr<IUncompressedVideoFrame>(dataPacket);
+    return dataPacket->queryInterface<IUncompressedVideoFrame>();
 }
 
 std::map<QString, QString> attributesMap(
@@ -385,7 +257,7 @@ std::map<QString, QString> attributesMap(
     std::map<QString, QString> result;
     for (int i = 0; i < metadata->attributeCount(); ++i)
     {
-        const auto attribute = toPtr(metadata->attribute(i));
+        const auto attribute = metadata->attribute(i);
         result.emplace(
             QString::fromStdString(attribute->name()),
             QString::fromStdString(attribute->value()));

@@ -30,8 +30,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/videowall_resource.h>
 
-#include <api/session_manager.h>
-
 #include <ui/common/palette.h>
 #include <ui/common/frame_section.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>

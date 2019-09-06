@@ -40,8 +40,8 @@ struct UpdateItem
      * It is displayed only in debug mode.
      */
     QString debugMessage;
-    /** Message generated from nx::update::Status::errorCode. */
-    QString statusMessage;
+
+    QString statusMessage; /**< Message generated from nx::update::Status::errorCode. */
     ErrorCode errorCode = ErrorCode::noError;
 
     QString verificationMessage;
@@ -176,7 +176,7 @@ public:
 
     QList<UpdateItemPtr> allItems() const;
     QSet<QnUuid> allPeers() const;
-    QSet<QnUuid> peersInState(StatusCode state) const;
+    QSet<QnUuid> peersInState(StatusCode state, bool withClient = true) const;
     QSet<QnUuid> legacyServers() const;
     QSet<QnUuid> offlineServers() const;
     QSet<QnUuid> offlineAndInState(StatusCode state) const;
@@ -222,7 +222,7 @@ public:
      * readyToInstall->installing or when we cancel current action.
      * It will reset all internal task sets.
      */
-    void setTask(const QSet<QnUuid>& targets);
+    void setTask(const QSet<QnUuid>& targets, bool reset = true);
     void setTaskError(const QSet<QnUuid>& targets, const QString& error);
     void addToTask(QnUuid id);
     void removeFromTask(QnUuid id);

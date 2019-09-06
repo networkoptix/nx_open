@@ -15,7 +15,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <client/client_settings.h>
-
+#include <network/system_helpers.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/common/message_box.h>
@@ -101,7 +101,17 @@ WorkbenchUpdateWatcher::WorkbenchUpdateWatcher(QObject* parent):
             m_userLoggedIn = user != nullptr;
             syncState();
             if (m_private && m_private->serverUpdateTool)
-                m_private->serverUpdateTool->resumeTasks();
+            {
+                if (m_userLoggedIn)
+                {
+                    auto systemId = helpers::currentSystemLocalId(commonModule());
+                    m_private->serverUpdateTool->onConnectToSystem(systemId);
+                }
+                else
+                {
+                    m_private->serverUpdateTool->onDisconnectFromSystem();
+                }
+            }
         });
 }
 
@@ -219,11 +229,16 @@ void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& cont
     // Maximum days for release delivery.
     int releaseDeliveryDays = contents.info.releaseDeliveryDays;
 
-    nx::update::Information oldUpdateInfo = qnSettings->latestUpdateInfo();
+    nx::update::UpdateDeliveryInfo oldUpdateInfo = qnSettings->updateDeliveryInfo();
     if (nx::utils::SoftwareVersion(oldUpdateInfo.version) != targetVersion
         || oldUpdateInfo.releaseDateMs != releaseDateMs
         || oldUpdateInfo.releaseDeliveryDays != releaseDeliveryDays)
     {
+        NX_VERBOSE(this, "atCheckerUpdateAvailable(%1) - saving new update info and picking "
+            "delivery date. old_version=\"%2\", old_delivery=%3:%4, new_delivery=%5:%6",
+            contents.getVersion().toString(), oldUpdateInfo.version,
+            oldUpdateInfo.releaseDateMs, oldUpdateInfo.releaseDeliveryDays,
+            releaseDateMs, releaseDeliveryDays);
         // New release was published - or we decided to change delivery period.
         // Estimating new delivery date.
         QDateTime releaseDate = QDateTime::fromMSecsSinceEpoch(releaseDateMs);
@@ -234,11 +249,13 @@ void WorkbenchUpdateWatcher::atCheckerUpdateAvailable(const UpdateContents& cont
         qint64 timeToDeliverMs = timeToDeliverMinutes * kSecsPerMinute;
         qnSettings->setUpdateDeliveryDate(releaseDate.addSecs(timeToDeliverMs).toMSecsSinceEpoch());
     }
-    qnSettings->setLatestUpdateInfo(contents.info);
+    qnSettings->setUpdateDeliveryInfo(contents.getUpdateDeliveryInfo());
     qnSettings->save();
 
+    auto currentTimeFromEpoch = QDateTime::currentMSecsSinceEpoch();
+    auto updateDeliveryDate = qnSettings->updateDeliveryDate();
     // Update is postponed
-    if (qnSettings->updateDeliveryDate() > QDateTime::currentMSecsSinceEpoch())
+    if (updateDeliveryDate > currentTimeFromEpoch)
         return;
 
     showUpdateNotification(targetVersion, contents.info.releaseNotesUrl, contents.info.description);

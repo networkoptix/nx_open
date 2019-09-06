@@ -1,4 +1,7 @@
 #include "multiserver_update_request_helpers.h"
+
+#include <unordered_map>
+
 #include <nx/update/update_information.h>
 #include <media_server/media_server_module.h>
 #include <common/common_module.h>
@@ -101,19 +104,23 @@ void getStoragesDataRemotely(
         reply->push_back(nx::update::storage::ServerToStorages(p.first, p.second));
 }
 
-IfParticipantPredicate makeIfParticipantPredicate(UpdateManager* updateManager)
+IfParticipantPredicate makeIfParticipantPredicate(
+    UpdateManager* updateManager, const QList<QnUuid>& forcedParticipants)
 {
     try
     {
         const auto updateInfo = updateManager->updateInformation(
-            UpdateManager::InformationCategory::target);
+            UpdateManager::InformationCategory::target).value();
+
+        const auto participants =
+            forcedParticipants.isEmpty() ? updateInfo.participants : forcedParticipants;
 
         return
-            [updateInfo](
+            [updateInfo, participants](
                 const QnUuid& id,
                 const nx::vms::api::SoftwareVersion& version)
             {
-                if (!updateInfo.participants.isEmpty() && !updateInfo.participants.contains(id))
+                if (!participants.isEmpty() && !participants.contains(id))
                     return ParticipationStatus::notInList;
 
                 return version <= nx::vms::api::SoftwareVersion(updateInfo.version)

@@ -1,9 +1,14 @@
 #include "media_resource_widget_p.h"
 
-#include <core/resource_management/resource_pool.h>
+#include <analytics/db/analytics_db_types.h>
 
+#include <api/server_rest_connection.h>
+
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/client_camera.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+
+#include <nx/streaming/abstract_archive_stream_reader.h>
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
@@ -11,8 +16,17 @@
 #include <nx/vms/client/desktop/ui/graphics/items/resource/widget_analytics_controller.h>
 #include <nx/vms/client/desktop/analytics/analytics_metadata_provider_factory.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <nx/vms/client/desktop/ini.h>
 
 #include <utils/license_usage_helper.h>
+
+#include <nx/analytics/metadata_log_parser.h>
+
+#include <nx/utils/guarded_callback.h>
+
+using nx::vms::api::StreamDataFilter;
+using nx::vms::api::StreamDataFilters;
+using namespace std::chrono;
 
 namespace nx::vms::client::desktop {
 
@@ -70,6 +84,15 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
 			&MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
 
         updateIsAnalyticsSupported();
+        requestAnalyticsObjectsExistence();
+
+        const QString debugAnalyticsLogFile = ini().debugAnalyticsVideoOverlayFromLogFile;
+        if (!debugAnalyticsLogFile.isEmpty())
+        {
+            auto metadataLogParser = std::make_unique<nx::analytics::MetadataLogParser>();
+            if (metadataLogParser->loadLogFile(debugAnalyticsLogFile))
+                std::swap(metadataLogParser, this->analyticsMetadataLogParser);
+        }
     }
 }
 
@@ -180,6 +203,52 @@ QSharedPointer<media::AbstractMetadataConsumer>
     return getMetadataConsumer(analyticsMetadataProvider.data());
 }
 
+void MediaResourceWidgetPrivate::setMotionEnabled(bool enabled)
+{
+    setStreamDataFilter(nx::vms::api::StreamDataFilter::motion, enabled);
+}
+
+bool MediaResourceWidgetPrivate::isAnalyticsEnabledInStream() const
+{
+    if (!isAnalyticsSupported || m_forceDisabledAnalytics)
+        return false;
+
+    if (const auto reader = display()->archiveReader())
+        return reader->streamDataFilter().testFlag(StreamDataFilter::objectDetection);
+
+    return false;
+}
+
+void MediaResourceWidgetPrivate::setAnalyticsEnabledInStream(bool enabled)
+{
+    NX_VERBOSE(this, "Setting analytics frames %1", enabled ? "enabled" : "disabled");
+
+    setStreamDataFilter(nx::vms::api::StreamDataFilter::objectDetection, enabled);
+
+    // Earlier we didn't unset forced video buffer length to avoid micro-freezes required to
+    // fill in the video buffer on succeeding analytics mode activations. But it looks like this
+    // mode causes a lot of glitches when enabled, so we'd prefer to leave on a safe side.
+    const auto forcedVideoBufferLength = enabled
+        ? milliseconds(ini().analyticsVideoBufferLengthMs)
+        : milliseconds::zero();
+
+    display()->camDisplay()->setForcedVideoBufferLength(forcedVideoBufferLength);
+}
+
+void MediaResourceWidgetPrivate::setAnalyticsFilter(const nx::analytics::db::Filter& value)
+{
+    m_forceDisabledAnalytics = !resource
+        || (ini().applyCameraFilterToSceneItems && !value.deviceIds.empty()
+            && std::find(value.deviceIds.cbegin(), value.deviceIds.cend(), resource->getId())
+                == value.deviceIds.cend());
+
+    if (m_forceDisabledAnalytics)
+        analyticsController->clearAreas();
+
+    NX_VERBOSE(this, "Update analytics filter to %1", value);
+    analyticsController->setFilter(value);
+}
+
 void MediaResourceWidgetPrivate::updateIsPlayingLive()
 {
     setIsPlayingLive(m_display && m_display->camDisplay()->isRealTimeSource());
@@ -231,6 +300,10 @@ void MediaResourceWidgetPrivate::setIsUnauthorized(bool value)
 
 bool MediaResourceWidgetPrivate::calculateIsAnalyticsSupported() const
 {
+    // If we found some analytics objects in the archive, that's enough.
+    if (m_analyticsObjectsFound)
+        return true;
+
     // Analytics stream should be enabled only for cameras with enabled analytics engine and only
     // if at least one of these engines has the objects support.
     if (!camera || !analyticsMetadataProvider)
@@ -252,6 +325,74 @@ void MediaResourceWidgetPrivate::updateIsAnalyticsSupported()
 
     this->isAnalyticsSupported = isAnalyticsSupported;
     emit analyticsSupportChanged();
+}
+
+void MediaResourceWidgetPrivate::requestAnalyticsObjectsExistence()
+{
+    NX_ASSERT(camera);
+    const auto server = camera->getParentServer();
+    if (!server)
+        return;
+
+    const auto connection = server->restConnection();
+    if (!NX_ASSERT(connection))
+        return;
+
+    nx::analytics::db::Filter filter;
+    filter.deviceIds.push_back(camera->getId());
+    filter.maxObjectTracksToSelect = 1;
+    filter.timePeriod = {QnTimePeriod::kMinTimeValue, QnTimePeriod::kMaxTimeValue};
+
+    auto callback = nx::utils::guarded(this,
+        [this](bool success, rest::Handle /*handle*/, analytics::db::LookupResult&& result)
+        {
+            if (m_analyticsObjectsFound)
+                return;
+
+            m_analyticsObjectsFound = success && !result.empty();
+            if (m_analyticsObjectsFound)
+                updateIsAnalyticsSupported();
+
+            if (!success)
+            {
+                NX_VERBOSE(this, "Analytics request failed, try again");
+                requestAnalyticsObjectsExistence();
+            }
+        });
+    NX_VERBOSE(this, "Request analytics objects existance for camera %1", camera);
+    connection->lookupObjectTracks(filter, /*isLocal*/ false, callback, this->thread());
+}
+
+void MediaResourceWidgetPrivate::setStreamDataFilter(StreamDataFilter filter, bool on)
+{
+    if (auto reader = display()->archiveReader())
+    {
+        StreamDataFilters filters = reader->streamDataFilter();
+        filters.setFlag(filter, on);
+        if (filters.testFlag(StreamDataFilter::motion)
+            || filters.testFlag(StreamDataFilter::objectDetection))
+        {
+            // Ensure filters are consistent.
+            filters.setFlag(StreamDataFilter::media);
+        }
+        setStreamDataFilters(filters);
+    }
+}
+
+void MediaResourceWidgetPrivate::setStreamDataFilters(StreamDataFilters filters)
+{
+    auto reader = display()->archiveReader();
+    if (!reader)
+        return;
+
+    if (!reader->setStreamDataFilter(filters))
+        return;
+
+     const auto positionUsec = display()->camDisplay()->getExternalTime();
+     if (positionUsec == AV_NOPTS_VALUE || positionUsec == DATETIME_NOW)
+         return;
+
+    reader->jumpTo(/*mksek*/ positionUsec, /*skipTime*/ positionUsec);
 }
 
 } // namespace nx::vms::client::desktop

@@ -60,7 +60,7 @@ FcResourceSearcher::~FcResourceSearcher()
 QList<QnResourcePtr> FcResourceSearcher::checkHostAddr(
     const nx::utils::Url& url,
     const QAuthenticator& auth,
-    bool doMultichannelCheck)
+    bool /*doMultichannelCheck*/)
 {
     QList<QnResourcePtr> result;
     nx::network::http::HttpClient httpClient;
@@ -173,11 +173,11 @@ QnResourcePtr FcResourceSearcher::makeResource(
 }
 
 QnResourcePtr FcResourceSearcher::createResource(
-    const QnUuid &resourceTypeId,
-    const QnResourceParams &params)
+    const QnUuid& resourceTypeId,
+    const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
-    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
+    const QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
 
     if (resourceType.isNull())
         return result;

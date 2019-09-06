@@ -217,7 +217,10 @@ void CameraAdvancedParamsWidget::sendCustomParameterCommand(
 
         nx::core::ptz::Vector speed;
 
-        speed.pan = values[0].toDouble(&ok);
+        // Workaround for VMS-15380: changing sign of 'pan' control to make camera
+        // rotate in a proper direction.
+        // TODO: We need some flag to set a proper direction for camera rotation.
+        speed.pan = -values[0].toDouble(&ok);
         speed.tilt = values[1].toDouble(&ok);
 
         // Control provides the angle in range [-180; 180],
@@ -340,11 +343,11 @@ bool CameraAdvancedParamsWidget::isCameraAvailable() const {
 rest::QnConnectionPtr CameraAdvancedParamsWidget::getServerConnection(
     const QnNetworkResourcePtr& camera)
 {
-    if (!camera)
-        return {};
-
-    if (const auto& server = camera->getParentResource().dynamicCast<QnMediaServerResource>())
-        return server->restConnection();
+    if (auto cam = camera.dynamicCast<QnSecurityCamResource>())
+    {
+        if (const auto server = cam->getParentServer())
+            return server->restConnection();
+    }
 
     return {};
 }

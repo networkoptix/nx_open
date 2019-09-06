@@ -18,8 +18,6 @@
 
 #include <nx/vms/api/analytics/device_agent_manifest.h>
 
-#include <nx/utils/std/cppnx.h>
-
 namespace nx {
 namespace vms_server_plugins {
 namespace analytics {
@@ -68,11 +66,12 @@ EventMetadataPacket* createCommonEventMetadataPacket(
     return packet;
 }
 
-template<class T, size_t N, class Check = std::enable_if_t<!std::is_same<const char*, T>::value>>
-std::array<T, N> makeEventSearchKeys(const std::array<T, N>& src)
+template<class T, class Check = std::enable_if_t<!std::is_same<const char*, T>::value>>
+std::vector<T> makeEventSearchKeys(const std::vector<T>& src)
 {
-    std::array<T, N> result;
-    std::transform(src.begin(), src.end(), result.begin(),
+    std::vector<T> result;
+    result.reserve(src.size());
+    std::transform(src.begin(), src.end(), std::back_inserter(result),
         [](const auto& item)
         {
             static const T prefix("\n");
@@ -82,8 +81,8 @@ std::array<T, N> makeEventSearchKeys(const std::array<T, N>& src)
     return result;
 }
 
-static const auto kEventMessageKeys = nx::utils::make_array<QByteArray>(
-    "ip", "unitname", "datetime", "dts", "type", "info", "id", "rulesname", "rulesdts");
+static const auto kEventMessageKeys = std::vector<QByteArray>{
+    "ip", "unitname", "datetime", "dts", "type", "info", "id", "rulesname", "rulesdts"};
 
 static const auto kEventMessageSearchKeys = makeEventSearchKeys(kEventMessageKeys);
 
@@ -429,13 +428,21 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
     m_handler.reset(handler);
 }
 
-
-Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
-    if (metadataTypes->isEmpty())
-        stopFetchingMetadata();
+    const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
+    if (const char* const kMessage = "Event type id list is null";
+        !NX_ASSERT(eventTypeIds, kMessage))
+    {
+        *outResult = error(ErrorCode::internalError, kMessage);
+        return;
+    }
 
-    return startFetchingMetadata(metadataTypes);
+    stopFetchingMetadata();
+
+    if (eventTypeIds->count() != 0)
+        *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
 Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
@@ -446,7 +453,7 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
     if (auto error = prepare(vcaCameraConrtoller))
         return std::move(error.value());
 
-    const auto eventTypeIds = toPtr(metadataTypes->eventTypeIds());
+    const auto eventTypeIds = metadataTypes->eventTypeIds();
     if (const char* const kMessage = "Event type id list is nullptr";
         !NX_ASSERT(eventTypeIds, kMessage))
     {
@@ -505,7 +512,7 @@ void DeviceAgent::stopFetchingMetadata()
     }
 }
 
-StringResult DeviceAgent::manifest() const
+void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
     // If camera has no enabled events at the moment, return empty manifest.
     QString host = m_url.host();
@@ -516,21 +523,24 @@ StringResult DeviceAgent::manifest() const
     for (const auto& rule : vcaCameraConrtoller.suppotedRules())
     {
         if (rule.second.ruleEnabled) //< At least one enabled rule.
-            return new nx::sdk::String(m_cameraManifest);
+        {
+            *outResult = new nx::sdk::String(m_cameraManifest);
+            return;
+        }
     }
 
-    return error(ErrorCode::otherError, "No rules are enabled on the device");
+    *outResult = error(ErrorCode::otherError, "No rules are enabled on the device");
 }
 
-StringMapResult DeviceAgent::setSettings(const IStringMap* /*settings*/)
+void DeviceAgent::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
-    return nullptr;
 }
 
-SettingsResponseResult DeviceAgent::pluginSideSettings() const
+void DeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
 } // namespace vca

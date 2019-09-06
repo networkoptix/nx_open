@@ -259,7 +259,7 @@ int QnUpdateInformationRestHandler::makeUpdateInformationResponseFromLocalData(
     try
     {
         const auto updateInfo = serverModule()->updateManager()->updateInformation(
-            *categoryFromString(request.version));
+            categoryFromString(request.version).value()).value();
 
         QnFusionRestHandlerDetail::serializeJsonRestReply(
             updateInfo,

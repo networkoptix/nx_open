@@ -12,6 +12,7 @@ namespace ec2
     struct QnTransportConnectionInfo
     {
         QnUuid remotePeerId;
+        QnUuid remotePeerDbId;
         nx::utils::Url url;
         QString state;
         QString previousState;
@@ -23,10 +24,19 @@ namespace ec2
         QVector<nx::vms::api::PersistentIdData> subscribedFrom;
     };
 
+    struct ConnectionInfoList
+    {
+        QVector<QnTransportConnectionInfo> connections;
+        nx::vms::api::PersistentIdData idData;
+    };
+
 #define QnTransportConnectionInfo_Fields \
-    (remotePeerId)(url)(state)(previousState)(isIncoming)(isStarted)(gotPeerInfo)(peerType) \
+    (remotePeerId)(remotePeerDbId)(url)(state)(previousState)(isIncoming)(isStarted)(gotPeerInfo)(peerType) \
     (subscribedTo)(subscribedFrom)
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnTransportConnectionInfo), (json));
+#define ConnectionInfoList_Fields \
+    (connections)(idData)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnTransportConnectionInfo) (ConnectionInfoList), (json));
 
 } // namespace ec2

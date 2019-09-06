@@ -56,7 +56,7 @@ void ThreadsafeMessageBusAdapter::dropConnections()
     base_type::dropConnections();
 }
 
-QVector<QnTransportConnectionInfo> ThreadsafeMessageBusAdapter::connectionsInfo() const
+ConnectionInfoList ThreadsafeMessageBusAdapter::connectionsInfo() const
 {
     QnMutexLocker guard(&m_mutex);
     return base_type::connectionsInfo();

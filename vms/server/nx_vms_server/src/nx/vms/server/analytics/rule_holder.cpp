@@ -25,39 +25,72 @@ RuleHolder::RuleHolder(QnCommonModule* commonModule):
 
 RuleHolder::AffectedResources RuleHolder::addRule(const nx::vms::event::RulePtr& rule)
 {
+    if (!NX_ASSERT(rule))
+        return {};
+
+    NX_DEBUG(this, "Adding rule %1, rule event type: %2, rule resources %3",
+        rule->id(), rule->eventType(), rule->eventResources());
+
     QnMutexLocker lock(&m_mutex);
     return addRuleUnsafe(rule);
 }
 
 RuleHolder::AffectedResources RuleHolder::updateRule(const nx::vms::event::RulePtr& rule)
 {
+    if (!NX_ASSERT(rule))
+        return {};
+
+    NX_DEBUG(this, "Updating rule %1, rule event type: %2, rule resources %3",
+        rule->id(), rule->eventType(), rule->eventResources());
+
     QnMutexLocker lock(&m_mutex);
     const bool ruleIsNeededToBeWatched = needToWatchRule(rule);
     const bool ruleIsBeingWatched = isRuleBeingWatched(rule->id());
 
     if (!ruleIsBeingWatched && !ruleIsNeededToBeWatched)
+    {
+        NX_DEBUG(this, "Updating rule: rule %1 is not watched and doesn't need to be watched, "
+            "no resources are affected", rule->id());
         return AffectedResources();
+    }
 
     if (ruleIsBeingWatched && !ruleIsNeededToBeWatched)
+    {
+        NX_DEBUG(this,
+            "Updating rule: rule %1 is already watched but doesn't need to be watched anymore",
+            rule->id());
         return removeRuleUnsafe(rule->id());
+    }
 
     if (!ruleIsBeingWatched && ruleIsNeededToBeWatched)
+    {
+        NX_DEBUG(this,
+            "Updating rule: rule %1 hasn't been watched, but now it has to watched", rule->id());
         return addRuleUnsafe(rule);
+    }
 
     if (ruleIsBeingWatched && ruleIsNeededToBeWatched)
+    {
+        NX_DEBUG(this,
+            "Updating rule: rule %1 has been watched and keeps to be watched", rule->id());
         return updateRuleUnsafe(rule);
+    }
 
     return handleChanges();
 }
 
 RuleHolder::AffectedResources RuleHolder::removeRule(const QnUuid& ruleId)
 {
+    NX_DEBUG(this, "Removing rule %1", ruleId);
+
     QnMutexLocker lock(&m_mutex);
     return removeRuleUnsafe(ruleId);
 }
 
 RuleHolder::AffectedResources RuleHolder::resetRules(const nx::vms::event::RuleList& rules)
 {
+    NX_DEBUG(this, "Resetting rule, rule count %1", rules.size());
+
     QnMutexLocker lock(&m_mutex);
     m_watchedRules.clear();
     m_anyResourceRules.clear();
@@ -66,7 +99,7 @@ RuleHolder::AffectedResources RuleHolder::resetRules(const nx::vms::event::RuleL
     {
         if (isAnyResourceRule(rule))
             m_anyResourceRules.insert(rule->id());
-        else
+        else if (needToWatchRule(rule))
             m_watchedRules.insert(rule->id());
     }
 
@@ -75,6 +108,7 @@ RuleHolder::AffectedResources RuleHolder::resetRules(const nx::vms::event::RuleL
 
 RuleHolder::AffectedResources RuleHolder::addResource(const QnResourcePtr& /*resourcePtr*/)
 {
+    NX_DEBUG(this, "Adding resource");
     QnMutexLocker lock(&m_mutex);
     return handleChanges();
 }
@@ -88,7 +122,13 @@ RuleHolder::EventIds RuleHolder::watchedEvents(const QnUuid& resourceId) const
 RuleHolder::AffectedResources RuleHolder::addRuleUnsafe(const nx::vms::event::RulePtr& rule)
 {
     if (!needToWatchRule(rule))
+    {
+        NX_DEBUG(this,
+            "Adding rule: rule %1 doesn't need to be watched, no resources are affected",
+            rule->id());
+
         return QSet<QnUuid>();
+    }
 
     if (isAnyResourceRule(rule))
         m_anyResourceRules.insert(rule->id());
@@ -101,7 +141,11 @@ RuleHolder::AffectedResources RuleHolder::addRuleUnsafe(const nx::vms::event::Ru
 RuleHolder::AffectedResources RuleHolder::removeRuleUnsafe(const QnUuid& ruleId)
 {
     if (!isRuleBeingWatched(ruleId))
+    {
+        NX_DEBUG(this,
+            "Removing rule: rule %1 hasn't been watched, no resources are affected", ruleId);
         return RuleHolder::AffectedResources();
+    }
 
     m_watchedRules.remove(ruleId);
     m_anyResourceRules.remove(ruleId);
@@ -127,7 +171,13 @@ RuleHolder::AffectedResources RuleHolder::updateRuleUnsafe(const nx::vms::event:
 
 bool RuleHolder::isAnyResourceRule(const nx::vms::event::RulePtr& rule) const
 {
+#if 0
+    // "Any resource" rules are not allowed for analytics SDK event now.
+    // If it changes - uncomment this section.
     return rule && rule->eventResources().isEmpty();
+#else
+    return false;
+#endif
 }
 
 bool RuleHolder::isRuleBeingWatched(const QnUuid& ruleId) const
@@ -215,6 +265,7 @@ RuleHolder::AffectedResources RuleHolder::handleChanges()
 {
     AffectedResources affectedResources;
     auto newWatchedEvents = calculateWatchedEvents();
+    NX_DEBUG(this, "Calculating changes: new watched event list is %1", newWatchedEvents);
 
     for (const auto& resourceId: newWatchedEvents.keys() + m_watchedEvents.keys())
     {
@@ -223,7 +274,7 @@ RuleHolder::AffectedResources RuleHolder::handleChanges()
     }
 
     m_watchedEvents.swap(newWatchedEvents);
-
+    NX_DEBUG(this, "Calculating changes: affected resources list is %1", affectedResources);
     return affectedResources;
 }
 

@@ -29,15 +29,14 @@ EngineHandler::EngineHandler(
 void EngineHandler::handlePluginDiagnosticEvent(
     nx::sdk::IPluginDiagnosticEvent* sdkPluginDiagnosticEvent)
 {
-    nx::vms::event::PluginDiagnosticEventPtr pluginDiagnosticEvent(
+    PluginDiagnosticEventPtr pluginDiagnosticEvent(
         new PluginDiagnosticEvent(
             qnSyncTime->currentUSecsSinceEpoch(),
             m_engineResourceId,
             sdkPluginDiagnosticEvent->caption(),
             sdkPluginDiagnosticEvent->description(),
-            nx::vms::server::sdk_support::fromPluginDiagnosticEventLevel(
-                sdkPluginDiagnosticEvent->level()),
-            QnSecurityCamResourcePtr()));
+            sdk_support::fromPluginDiagnosticEventLevel(sdkPluginDiagnosticEvent->level()),
+            QnVirtualCameraResourcePtr()));
 
     emit pluginDiagnosticEventTriggered(pluginDiagnosticEvent);
 }

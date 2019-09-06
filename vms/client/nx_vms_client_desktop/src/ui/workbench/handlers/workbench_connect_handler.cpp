@@ -9,7 +9,6 @@
 #include <api/abstract_connection.h>
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
-#include <api/session_manager.h>
 #include <api/global_settings.h>
 #include <api/model/connection_info.h>
 
@@ -101,6 +100,8 @@
 #include <nx/vms/client/desktop/ui/dialogs/session_expired_dialog.h>
 
 #include <nx/vms/client/desktop/ini.h>
+
+#include <nx/analytics/utils.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
@@ -552,8 +553,6 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
     QnAppServerConnectionFactory::setEc2Connection(connection);
     qnClientMessageProcessor->init(connection);
 
-    commonModule()->sessionManager()->start();
-
     context()->setUserName(
         connectionInfo.effectiveUserName.isEmpty()
         ? url.userName()
@@ -649,9 +648,20 @@ void QnWorkbenchConnectHandler::showWarnMessagesOnce()
 
     menu()->triggerIfPossible(action::AllowStatisticsReportMessageAction);
     menu()->triggerIfPossible(action::VersionMismatchMessageAction);
-    menu()->triggerIfPossible(action::ConfirmAnalyticsStorageAction);
 
     context()->instance<QnWorkbenchLicenseNotifier>()->checkLicenses();
+
+    // Ask user for analytics storage locations (e.g. in the case of migration).
+    const auto& servers = context()->resourcePool()->getAllServers(Qn::AnyStatus);
+    if (std::any_of(servers.begin(), servers.end(),
+        [this](const auto& server)
+        {
+            return server->metadataStorageId().isNull()
+                && nx::analytics::hasActiveObjectEngines(commonModule(), server->getId());
+        }))
+    {
+        menu()->triggerIfPossible(action::ConfirmAnalyticsStorageAction);
+    }
 }
 
 void QnWorkbenchConnectHandler::stopReconnecting()
@@ -700,7 +710,7 @@ void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
 {
     const auto resourceModeAction = action(action::ResourcesModeAction);
 
-    NX_DEBUG(this) << "State changed" << logicalValue << physicalValue;
+    NX_DEBUG(this, "State changed logical=%1, physical=%2", logicalValue, physicalValue);
     switch (logicalValue)
     {
         case LogicalState::disconnected:
@@ -1144,8 +1154,6 @@ void QnWorkbenchConnectHandler::clearConnection()
 
     qnClientMessageProcessor->init(nullptr);
     QnAppServerConnectionFactory::setEc2Connection(nullptr);
-
-    commonModule()->sessionManager()->stop();
     context()->setUserName(QString());
 
     /* Get ready for the next connection. */
