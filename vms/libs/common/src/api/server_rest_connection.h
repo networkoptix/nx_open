@@ -273,6 +273,14 @@ public:
         Result<QByteArray>::type callback,
         QThread* targetThread = nullptr);
 
+    Handle downloadFileChunkFromInternetUsingServer(const QnUuid& server,
+        const QString& fileName,
+        const nx::utils::Url &url,
+        int chunkIndex,
+        int chunkSize,
+        Result<QByteArray>::type callback,
+        QThread* targetThread = nullptr);
+
     Handle uploadFileChunk(
         const QString& fileName,
         int index,
@@ -470,7 +478,7 @@ public:
         Result<UpdateInformationData>::type&& callback,
         QThread* targetThread = nullptr);
 
-    /** Get information for a vertain version. */
+    /** Get information for a certain version. */
     Handle getUpdateInfo(
         const QString& version,
         Result<UpdateInformationData>::type&& callback,
@@ -516,6 +524,10 @@ public:
 
     Handle getModuleInformationAll(
         Result<RestResultWithData<QList<nx::vms::api::ModuleInformation>>>::type callback,
+        QThread* targetThread = nullptr);
+
+    Handle getMediaServers(
+        Result<nx::vms::api::MediaServerDataList>::type callback,
         QThread* targetThread = nullptr);
 
     Handle getEngineAnalyticsSettings(

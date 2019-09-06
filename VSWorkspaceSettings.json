@@ -5,6 +5,7 @@
     "/build_utils",
     "/ci/",
     "/cloud_portal/",
+    "/cloud/deploy",
     "/dependencies/",
     "/doc/",
     "/func_tests_old/",
@@ -12,11 +13,18 @@
     "/paxton_plugin/",
     "/tests/",
     "/translation/",
+    "/vms/nx_box_tool/",
     "/vms/translation/",
     "/webadmin/",
     "distribution",
     "*.py",
     "*.png",
-    ".hg*"
+    ".hg*",
+    "*.xml",
+    "*.json",
+    "*.log",
+    "*.ts",
+    "*.mkv",
+    "*.sql"
   ]
 }

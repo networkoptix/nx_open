@@ -24,7 +24,7 @@ extern "C"
 static const int SECTOR_SIZE = 32768;
 static const qint64 AVG_USAGE_AGGREGATE_TIME = 15 * 1000000ll; // aggregation time in usecs
 static const int DATA_PRIORITY_THRESHOLD = SECTOR_SIZE * 2;
-const int kMkvMaxHeaderOffset = 1024;
+const int kMkvMaxHeaderOffset = 1536;
 
 // -------------- QueueFileWriter ------------
 

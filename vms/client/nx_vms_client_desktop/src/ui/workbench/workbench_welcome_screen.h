@@ -20,6 +20,7 @@ class QnWorkbenchWelcomeScreen: public Connective<QQuickWidget>, public QnWorkbe
     Q_PROPERTY(QString cloudUserName READ cloudUserName NOTIFY cloudUserNameChanged)
     Q_PROPERTY(bool isLoggedInToCloud READ isLoggedInToCloud NOTIFY isLoggedInToCloudChanged)
     Q_PROPERTY(bool isCloudEnabled READ isCloudEnabled NOTIFY isCloudEnabledChanged)
+    Q_PROPERTY(bool saveCredentialsAllowed READ saveCredentialsAllowed CONSTANT)
 
     Q_PROPERTY(bool visibleControls READ visibleControls WRITE setVisibleControls NOTIFY visibleControlsChanged)
     Q_PROPERTY(QString connectingToSystem READ connectingToSystem WRITE setConnectingToSystem NOTIFY connectingToSystemChanged)
@@ -138,6 +139,8 @@ private:
         const nx::utils::SharedGuardPtr& completionTracker = nullptr);
 
     void handleStartupTileAction(const QString& systemId, bool initial);
+
+    bool saveCredentialsAllowed() const;
 
 protected:
     virtual void showEvent(QShowEvent* event) override;

@@ -125,23 +125,6 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
     contents.resetVerification();
     removeAllServers();
 
-    // Update to 4.0.0.28524
-    // client = 4.0.0.28524
-    // server = 4.0.0.28524
-    // server = 4.0.0.28523 offline
-    // Showing page 'This version is already installed', even when we have offline server with
-    // lower version.
-    makeServer(Version("4.0.0.28524"));
-    makeServer(Version("4.0.0.28523"), /*online=*/false);
-    clientData = makeClientData(Version("4.0.0.28524"));
-    verifyUpdateContents(contents, getAllServers(), clientData, options);
-    EXPECT_EQ(contents.alreadyInstalled, true);
-    {
-        const auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(contents, clientData.clientId);
-        EXPECT_TRUE(report.hasLatestVersion);
-    }
-    removeAllServers();
-
     // According to VMS-15430, VMS-15250, we should show 'Latest version installed'
     // Update to 4.0.0.28524
     // client = 4.0.0.28526

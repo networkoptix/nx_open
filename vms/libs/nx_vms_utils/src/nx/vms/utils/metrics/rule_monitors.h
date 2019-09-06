@@ -32,12 +32,17 @@ private:
 class NX_VMS_UTILS_API AlarmMonitor
 {
 public:
-    AlarmMonitor(QString parameter, QString level, ValueGenerator condition, TextGenerator text);
+    AlarmMonitor(
+        QString parameter,
+        api::metrics::AlarmLevel level,
+        ValueGenerator condition,
+        TextGenerator text);
+
     std::optional<api::metrics::Alarm> currentAlarm();
 
 private:
     const QString m_parameter;
-    const QString m_level;
+    const api::metrics::AlarmLevel m_level;
     const ValueGenerator m_condition;
     const TextGenerator m_text;
 };

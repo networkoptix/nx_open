@@ -160,6 +160,8 @@ public:
         // Upload state for ServerUpdateTool.
         SYSTEM_UPDATER_STATE,
 
+        SAVE_CREDENTIALS_ALLOWED,
+
         VARIABLE_COUNT
     };
 
@@ -261,6 +263,8 @@ private:
         QN_DECLARE_RW_PROPERTY(bool, allLayoutsSelectionDialogMode, setAllLayoutsSelectionDialogMode, ALL_LAYOUTS_SELECTION_DIALOG_MODE, 0)
         QN_DECLARE_RW_PROPERTY(QString, systemUpdaterState, setSystemUpdaterState, SYSTEM_UPDATER_STATE, 0)
         QN_DECLARE_R_PROPERTY(bool,                         allowMtDecoding,                                    ALLOW_MT_DECODING,          true)
+
+        QN_DECLARE_R_PROPERTY(bool, saveCredentialsAllowed, SAVE_CREDENTIALS_ALLOWED, true)
     QN_END_PROPERTY_STORAGE()
 
     void migrateKnownServerConnections();
