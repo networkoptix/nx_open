@@ -426,8 +426,29 @@ static std::string timestampedObjectMetadataToString(
     if (!metadata)
         return "null";
 
+    std::string attributeString;
+    if (metadata->attributeCount() > 0)
+    {
+        attributeString += "\n    Attributes:\n";
+        for (int i = 0; i < metadata->attributeCount(); ++i)
+        {
+            const Ptr<const IAttribute> attribute = metadata->attribute(i);
+            if (!attribute)
+                continue;
+
+            attributeString += "        "
+                + nx::kit::utils::toString(attribute->name())
+                + ": "
+                + nx::kit::utils::toString(attribute->value());
+
+            if (i < metadata->attributeCount() - 1)
+                attributeString += "\n";
+        }
+    }
+
     return nx::kit::utils::format("timestamp: %lld, id: %s",
-        metadata->timestampUs(), UuidHelper::toStdString(metadata->trackId()).c_str());
+        metadata->timestampUs(), UuidHelper::toStdString(metadata->trackId()).c_str())
+        + attributeString;
 }
 
 static std::string objectTrackToString(
