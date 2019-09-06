@@ -471,7 +471,7 @@ void Appserver2Process::registerHttpHandlers(
         });
 
     m_tcpListener->addHandler<JsonConnectionProcessor>("HTTP",
-        nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1), //< remove '/'
+        nx::vms::time::TimeSyncManager::kTimeSyncUrlPath.mid(1), //< remove '/'
         [](const nx::network::http::Request& request, QnHttpConnectionListener* owner, QnJsonRestResult* result)
     {
         auto timeSyncManager = owner->commonModule()->ec2Connection()->timeSyncManager();

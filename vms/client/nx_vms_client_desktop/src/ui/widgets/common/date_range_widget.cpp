@@ -5,7 +5,7 @@
 
 #include <common/common_module.h>
 
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 #include <client/client_settings.h>
 #include <nx/vms/client/desktop/common/utils/current_date_monitor.h>
@@ -49,8 +49,8 @@ QnDateRangeWidget::QnDateRangeWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    ui->dateEditFrom->setDisplayFormat(getFormatString(datetime::Format::dd_MM_yyyy));
-    ui->dateEditTo->setDisplayFormat(getFormatString(datetime::Format::dd_MM_yyyy));
+    ui->dateEditFrom->setDisplayFormat(getFormatString(nx::vms::time::Format::dd_MM_yyyy));
+    ui->dateEditTo->setDisplayFormat(getFormatString(nx::vms::time::Format::dd_MM_yyyy));
 
     reset();
 

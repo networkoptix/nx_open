@@ -2,7 +2,7 @@
 
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/resource_display_info.h>
@@ -379,11 +379,11 @@ QString StringsHelper::eventTimestampInHtml(const EventParameters &params,
     const int count = qMax(aggregationCount, 1);
     return count == 1
         ? tr("%2 <b>%1</b>", "%1 means time, %2 means date")
-            .arg(datetime::toString(time.time()))
-            .arg(datetime::toString(time.date()))
+            .arg(nx::vms::time::toString(time.time()))
+            .arg(nx::vms::time::toString(time.date()))
         : tr("%n times, first: %2 <b>%1</b>", "%1 means time, %2 means date", count)
-            .arg(datetime::toString(time.time()))
-            .arg(datetime::toString(time.date()));
+            .arg(nx::vms::time::toString(time.time()))
+            .arg(nx::vms::time::toString(time.date()));
 }
 
 QString StringsHelper::eventTimestamp(const EventParameters &params,
@@ -395,25 +395,25 @@ QString StringsHelper::eventTimestamp(const EventParameters &params,
     const int count = qMax(aggregationCount, 1);
     return count == 1
         ? tr("Time: %1 on %2", "%1 means time, %2 means date")
-            .arg(datetime::toString(time.time()))
-            .arg(datetime::toString(time.date()))
+            .arg(nx::vms::time::toString(time.time()))
+            .arg(nx::vms::time::toString(time.date()))
         : tr("First occurrence: %1 on %2 (%n times total)", "%1 means time, %2 means date", count)
-            .arg(datetime::toString(time.time()))
-            .arg(datetime::toString(time.date()));
+            .arg(nx::vms::time::toString(time.time()))
+            .arg(nx::vms::time::toString(time.date()));
 }
 
 QString StringsHelper::eventTimestampDate(const EventParameters &params) const
 {
     quint64 ts = params.eventTimestampUsec;
     QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-    return datetime::toString(time.date());
+    return nx::vms::time::toString(time.date());
 }
 
 QString StringsHelper::eventTimestampTime(const EventParameters &params) const
 {
     quint64 ts = params.eventTimestampUsec;
     QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
-    return datetime::toString(time.time());
+    return nx::vms::time::toString(time.time());
 }
 
 QnResourcePtr StringsHelper::eventSource(const EventParameters &params) const
@@ -567,7 +567,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
             // todo: #gdm add server/client timezone conversion
             result = tr("Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1").
-                arg(datetime::toString(dt));
+                arg(nx::vms::time::toString(dt));
         }
         case EventReason::backupDone:
         {
@@ -580,7 +580,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
             // todo: #gdm add server/client timezone conversion
             result = tr("Archive backup is canceled by user. Data is backed up to %1").
-                arg(datetime::toString(dt));
+                arg(nx::vms::time::toString(dt));
             break;
         }
         case EventReason::licenseRemoved:

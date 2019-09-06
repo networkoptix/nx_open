@@ -12,7 +12,7 @@
 #include <QtWidgets/QOpenGLWidget>
 #include <QtGui/private/qopengltexturecache_p.h>
 
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -2185,8 +2185,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
 
             // TODO: #Elric move out, common code, another copy is in QnWorkbenchScreenshotHandler
             QString timeString = (widget->resource()->toResource()->flags() & Qn::utc)
-                ? datetime::toString(displayTime)
-                : datetime::toString(displayTime, datetime::Format::hh_mm_ss_zzz);
+                ? nx::vms::time::toString(displayTime)
+                : nx::vms::time::toString(displayTime, nx::vms::time::Format::hh_mm_ss_zzz);
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
 

@@ -60,7 +60,7 @@ public:
         int* distance,
         nx::network::SocketAddress* knownPeerAddress) const override;
     virtual TransactionMessageBusAdapter* messageBus() const override { return nullptr; }
-    virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const override { return nullptr; }
+    virtual nx::vms::time::AbstractTimeSyncManager* timeSyncManager() const override { return nullptr; }
     virtual QnCommonModule* commonModule() const override { return nullptr; }
 protected:
     virtual int dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler) override;

@@ -9,7 +9,7 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 #include <ui/style/skin.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -202,7 +202,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     QString filePath = recorderSettings.recordingFolder() + QString(lit("/")) +
         nx::utils::replaceNonFileNameCharacters(
             QString(lit("video_recording_%1.avi"))
-                .arg(datetime::toString(dt, datetime::Format::filename_date)), QLatin1Char('_'));
+                .arg(nx::vms::time::toString(dt, nx::vms::time::Format::filename_date)), QLatin1Char('_'));
     QnAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
     QnAudioDeviceInfo secondAudioDevice;
     if (recorderSettings.secondaryAudioDevice().fullName() != audioDevice.fullName())

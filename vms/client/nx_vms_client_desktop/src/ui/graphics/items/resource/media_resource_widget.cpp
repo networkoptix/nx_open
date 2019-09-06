@@ -34,7 +34,7 @@
 #include <client_core/client_core_module.h>
 
 #include <common/common_module.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -2040,7 +2040,7 @@ QString QnMediaResourceWidget::calculatePositionText() const
                 return QString();
 
             const auto dateTimeMs = dateTimeUsec / kMicroInMilliSeconds;
-            const QString result = datetime::toString(dateTimeMs);
+            const QString result = nx::vms::time::toString(dateTimeMs);
 
             return ini().showPreciseItemTimestamps
                 ? lit("%1<br>%2 us").arg(result).arg(dateTimeUsec)

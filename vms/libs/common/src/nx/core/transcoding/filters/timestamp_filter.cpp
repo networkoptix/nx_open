@@ -6,12 +6,12 @@
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
 
-#include <translation/datetime_formatter.h>
 #include <utils/common/util.h>
 #include <utils/media/frame_info.h>
 #include <nx/core/transcoding/filters/image_to_frame_painter.h>
 #include <nx/core/transcoding/filters/transcoding_settings.h>
 #include <nx/utils/log/assert.h>
+#include <nx/vms/time/formatter.h>
 
 namespace {
 
@@ -116,7 +116,7 @@ QString TimestampFilter::timestampTextUtc(
     Qt::DateFormat format)
 {
     // TODO: Here was this code, which was not consistent with other places.
-    // However, sometime datetime::toString should be expanded to accept different zones.
+    // However, sometime nx::vms::time::toString should be expanded to accept different zones.
     // const auto secondsFromUtc = QDateTime::currentDateTime().offsetFromUtc()
     //     + (displayOffsetMs / 1000);
     // const auto dateTime = QDateTime::fromMSecsSinceEpoch(
@@ -127,9 +127,9 @@ QString TimestampFilter::timestampTextUtc(
     switch (format)
     {
         case Qt::DefaultLocaleLongDate:
-            return datetime::toString(dateTime, datetime::Format::dddd_d_MMMM_yyyy_hh_mm_ss);
+            return nx::vms::time::toString(dateTime, nx::vms::time::dddd_d_MMMM_yyyy_hh_mm_ss);
         case Qt::DefaultLocaleShortDate:
-            return datetime::toString(dateTime);
+            return nx::vms::time::toString(dateTime);
         case Qt::ISODate:
         case Qt::RFC2822Date:
             return dateTime.toString(format);
@@ -141,7 +141,7 @@ QString TimestampFilter::timestampTextUtc(
 
 QString TimestampFilter::timestampTextSimple(qint64 timeOffsetMs)
 {
-    return datetime::toString(timeOffsetMs, datetime::Format::hh_mm_ss);
+    return nx::vms::time::toString(timeOffsetMs, nx::vms::time::Format::hh_mm_ss);
 }
 
 } // namespace transcoding

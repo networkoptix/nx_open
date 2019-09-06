@@ -14,7 +14,7 @@
 #include <nx_ec/ec_api.h>
 
 #include <transaction/threadsafe_message_bus_adapter.h>
-#include <nx/vms/time_sync/abstract_time_sync_manager.h>
+#include <nx/vms/time/abstract_time_sync_manager.h>
 
 namespace ec2 {
 
@@ -51,7 +51,7 @@ public:
         impl::ConnectHandlerPtr handler) override;
 
     virtual TransactionMessageBusAdapter* messageBus() const override;
-    virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const override;
+    virtual nx::vms::time::AbstractTimeSyncManager* timeSyncManager() const override;
 
     virtual void shutdown() override;
 
@@ -60,7 +60,7 @@ private:
     std::unique_ptr<ThreadsafeMessageBusAdapter> m_bus;
     std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
     std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
-    std::unique_ptr<nx::vms::time_sync::AbstractTimeSyncManager> m_timeSynchronizationManager;
+    std::unique_ptr<nx::vms::time::AbstractTimeSyncManager> m_timeSynchronizationManager;
     bool m_terminated;
     int m_runningRequests;
     bool m_sslEnabled;

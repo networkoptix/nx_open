@@ -11,7 +11,7 @@
 #include <nx/vms/event/strings_helper.h>
 
 #include <common/common_module.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 #include <client_core/client_core_module.h>
 
@@ -410,7 +410,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
 
             const auto timeWatcher = context()->instance<nx::vms::client::core::ServerTimeWatcher>();
             QDateTime dt = timeWatcher->displayTime(timestampMs);
-            return datetime::toString(dt);
+            return nx::vms::time::toString(dt);
         }
         case EventColumn:
         {

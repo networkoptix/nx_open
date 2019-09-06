@@ -10,7 +10,7 @@
 
 #include <client_core/client_core_module.h>
 
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 #include <common/common_module.h>
 
 #include <core/resource/resource.h>
@@ -288,13 +288,13 @@ QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool s
 QString QnAuditLogModel::formatDateTime(const QDateTime& dateTime, bool showDate, bool showTime)
 {
     if (showDate && showTime)
-        return datetime::toString(dateTime);
+        return nx::vms::time::toString(dateTime);
 
     if (showDate)
-        return datetime::toString(dateTime.date());
+        return nx::vms::time::toString(dateTime.date());
 
     if (showTime)
-        return datetime::toString(dateTime.time());
+        return nx::vms::time::toString(dateTime.time());
 
     return QString();
 }

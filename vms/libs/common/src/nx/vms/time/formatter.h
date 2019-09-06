@@ -4,9 +4,7 @@
 #include <QtCore/QString>
 #include <QtCore/QDateTime>
 
-namespace datetime {
-
-// Formats date and time using specified locale and time format settings.
+namespace nx::vms::time {
 
 enum Format
 {
@@ -29,8 +27,8 @@ enum Format
     dd_MM_yyyy, // ~=QLocale::Date::ShortFormat
     d_MMMM_yyyy,
     dd_MMMM_yyyy,
-    yyyy_MM_dd_hh_mm_ss, // ~=QLocale::DateTime::ShortFormat
-    dddd_d_MMMM_yyyy_hh_mm_ss, // ~=QLocale::DateTime::LongFormat
+    yyyy_MM_dd_hh_mm_ss, // ~=QLocale::nx::vms::time::ShortFormat
+    dddd_d_MMMM_yyyy_hh_mm_ss, // ~=QLocale::nx::vms::time::LongFormat
 
     filename_date, // "yyyy_MMM_dd_hh_mm_ss"
     filename_time, // "hh_mm_ss"
@@ -39,6 +37,7 @@ enum Format
 class Formatter;
 using FormatterPtr = QSharedPointer<Formatter>;
 
+// Formats date and time using specified locale and time format settings.
 class Formatter
 {
 public:
@@ -91,4 +90,4 @@ QString getFormatString(
 
 bool is24HoursTimeFormat(FormatterPtr formatter = Formatter::system());
 
-} // namespace datetime
+} // namespace nx::vms::time

@@ -57,7 +57,7 @@
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <client/client_resource_processor.h>
 #include <utils/media/voice_spectrum_analyzer.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 #include <ui/window_utils.h>
 
 static const QString kQmlRoot = "qrc:///qml";
@@ -203,7 +203,7 @@ QnMobileClientModule::QnMobileClientModule(
     if (QnAppInfo::isAndroid())
     {
         // We have to use android-specific code to check if we use 24-hours time format.
-        datetime::Formatter::forceSystemTimeFormat(is24HoursTimeFormat());
+        nx::vms::time::Formatter::forceSystemTimeFormat(is24HoursTimeFormat());
     }
     m_context.reset(new QnContext());
     const auto eventRulesWatcher = commonModule->store(new nx::client::mobile::EventRulesWatcher());

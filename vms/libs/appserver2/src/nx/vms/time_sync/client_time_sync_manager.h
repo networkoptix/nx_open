@@ -4,9 +4,7 @@
 #include <nx/vms/time_sync/time_sync_manager.h>
 #include <nx_ec/ec_api_fwd.h>
 
-namespace nx {
-namespace vms {
-namespace time_sync {
+namespace nx::vms::time {
 
 class ClientTimeSyncManager: public TimeSyncManager
 {
@@ -28,6 +26,4 @@ private:
     ec2::AbstractECConnectionPtr m_connection;
 };
 
-} // namespace time_sync
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::time

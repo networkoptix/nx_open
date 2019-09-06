@@ -41,7 +41,7 @@
 #include <nx_ec/managers/abstract_event_rules_manager.h>
 #include <nx_ec/managers/abstract_analytics_manager.h>
 #include <nx/vms/api/data/timestamp.h>
-#include <nx/vms/time_sync/abstract_time_sync_manager.h>
+#include <nx/vms/time/abstract_time_sync_manager.h>
 #include <nx_ec/impl/regular_completion_handler.h>
 
 #include "ec_api_fwd.h"
@@ -990,7 +990,7 @@ public:
         int* distance,
         nx::network::SocketAddress* knownPeerAddress) const = 0;
     virtual TransactionMessageBusAdapter* messageBus() const = 0;
-    virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const = 0;
+    virtual nx::vms::time::AbstractTimeSyncManager* timeSyncManager() const = 0;
 
     virtual ECConnectionNotificationManager* notificationManager()
     {
@@ -1157,7 +1157,7 @@ public:
     }
 
     virtual TransactionMessageBusAdapter* messageBus() const = 0;
-    virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const = 0;
+    virtual nx::vms::time::AbstractTimeSyncManager* timeSyncManager() const = 0;
 
     virtual void shutdown()
     {

@@ -171,7 +171,7 @@ public:
                     else if (globalSettings->primaryTimeServer().isNull())
                         globalSettings->setPrimaryTimeServer(commonModule->moduleGUID());
 
-                    auto timeSyncManager = dynamic_cast<nx::vms::time_sync::ServerTimeSyncManager*>
+                    auto timeSyncManager = dynamic_cast<nx::vms::time::ServerTimeSyncManager*>
                         (m_appserver->moduleInstance()->ecConnection()->timeSyncManager());
                     timeSyncManager->setClock(m_testSystemClock, m_testSteadyClock);
 

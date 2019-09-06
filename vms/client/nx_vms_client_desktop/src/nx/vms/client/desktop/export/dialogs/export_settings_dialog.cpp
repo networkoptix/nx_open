@@ -10,7 +10,7 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 #include <ui/common/palette.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -575,12 +575,12 @@ void ExportSettingsDialog::setMediaParams(
     QString timePart;
     if (resource->hasFlags(Qn::utc))
     {
-        timePart = datetime::toString(startTimeMs + timestampOffsetMs,
-            datetime::Format::filename_date);
+        timePart = nx::vms::time::toString(startTimeMs + timestampOffsetMs,
+            nx::vms::time::Format::filename_date);
     }
     else
     {
-        timePart = datetime::toString(startTimeMs, datetime::Format::filename_time);
+        timePart = nx::vms::time::toString(startTimeMs, nx::vms::time::Format::filename_time);
     }
 
     Filename baseFileName = currentSettings.fileName;

@@ -1,4 +1,4 @@
-#include "datetime_formatter.h"
+#include "formatter.h"
 
 #include <map>
 
@@ -29,9 +29,9 @@ QString getShortFormatWithSeconds(const QLocale& locale)
 
 //--------------------------------------------------------------------------------------------------
 
-using FormatsHash = QHash<datetime::Format, QString>;
-using Formatter = datetime::Formatter;
-using FormatterPtr = datetime::FormatterPtr;
+using FormatsHash = QHash<nx::vms::time::Format, QString>;
+using Formatter = nx::vms::time::Formatter;
+using FormatterPtr = nx::vms::time::FormatterPtr;
 
 // This class is to define context for Qt Linguist only.
 class DateTimeFormats
@@ -47,7 +47,7 @@ private:
 
 FormatsHash DateTimeFormats::getFormats(const QLocale& locale, bool is24HoursTimeFormat)
 {
-    using namespace datetime;
+    using namespace nx::vms::time;
 
     FormatsHash result = defaultFormats();
     result[Format::hh] = is24HoursTimeFormat ? "hh:00" : "h AP";
@@ -79,7 +79,7 @@ FormatsHash DateTimeFormats::getFormats(const QLocale& locale, bool is24HoursTim
 
 const FormatsHash& DateTimeFormats::defaultFormats()
 {
-    using namespace datetime;
+    using namespace nx::vms::time;
     static const FormatsHash result =
     {
         {Format::h, "hh"},
@@ -157,7 +157,7 @@ bool SystemFormatterHolder::is24HoursTimeFormat()
 
 //--------------------------------------------------------------------------------------------------
 
-namespace datetime {
+namespace nx::vms::time {
 
 struct Formatter::Private
 {
@@ -180,7 +180,7 @@ Formatter::Private::Private(const QLocale& locale, bool is24HoursFormat):
 
 QString Formatter::Private::getLocalizedHours(const QTime& value)
 {
-    if (datetime::is24HoursTimeFormat())
+    if (nx::vms::time::is24HoursTimeFormat())
         return value.toString(QStringLiteral("hh"));
 
     const auto hours = value.hour() % 12;
@@ -286,4 +286,4 @@ bool is24HoursTimeFormat(FormatterPtr formatter)
     return formatter->is24HoursTimeFormat();
 }
 
-} // namespace datetime
+} // namespace nx::vms::time

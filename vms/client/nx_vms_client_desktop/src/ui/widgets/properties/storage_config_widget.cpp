@@ -24,7 +24,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_changes_listener.h>
 #include <server/server_storage_manager.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 #include <ui/dialogs/storage_url_dialog.h>
 #include <ui/dialogs/backup_settings_dialog.h>
 #include <ui/dialogs/backup_cameras_dialog.h>
@@ -925,7 +925,7 @@ QString QnStorageConfigWidget::backupPositionToString(qint64 backupTimeMs)
     QDateTime backupDateTime = ServerTimeWatcher::serverTime(m_server, backupTimeMs);
     if (context()->instance<ServerTimeWatcher>()->timeMode() == ServerTimeWatcher::clientTimeMode)
         backupDateTime = backupDateTime.toLocalTime();
-    return datetime::toString(backupDateTime);
+    return nx::vms::time::toString(backupDateTime);
 }
 
 QString QnStorageConfigWidget::intervalToString(qint64 backupTimeMs)

@@ -2,7 +2,7 @@
 
 #include <api/model/time_reply.h>
 #include <nx/network/rest/handler.h>
-#include <nx/vms/time_sync/abstract_time_sync_manager.h>
+#include <nx/vms/time/abstract_time_sync_manager.h>
 
 class QnCommonModule;
 

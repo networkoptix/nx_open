@@ -18,9 +18,7 @@
 #include <nx/utils/time.h>
 #include <common/static_common_module.h>
 
-namespace nx {
-namespace vms {
-namespace time_sync {
+namespace nx::vms::time {
 
 const QString TimeSyncManager::kTimeSyncUrlPath(lit("/api/synchronizedTime"));
 const std::chrono::milliseconds TimeSyncManager::kMaxJitterForLocalClock(250);
@@ -251,6 +249,4 @@ QString TimeSyncManager::idForToStringFromPtr() const
     return qnStaticCommon->moduleDisplayName(this->commonModule()->moduleGUID());
 }
 
-} // namespace time_sync
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::time

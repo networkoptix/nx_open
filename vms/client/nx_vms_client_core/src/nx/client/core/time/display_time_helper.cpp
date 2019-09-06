@@ -3,7 +3,7 @@
 #include <QtQml/QtQml>
 
 #include <nx/client/core/time/time_constants.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 namespace nx::client::core {
 
@@ -22,7 +22,7 @@ struct DisplayTimeHelper::Private
 DisplayTimeHelper::Private::Private(DisplayTimeHelper* owner):
     q(owner),
     position(0),
-    displayOffset(datetime::systemDisplayOffset()),
+    displayOffset(nx::vms::time::systemDisplayOffset()),
     dateTime(getDateTime())
 {
 }
@@ -92,27 +92,27 @@ qint64 DisplayTimeHelper::displayOffset() const
 
 QString DisplayTimeHelper::fullDate() const
 {
-    return datetime::toString(d->dateTime, datetime::Format::d_MMMM_yyyy);
+    return nx::vms::time::toString(d->dateTime, nx::vms::time::Format::d_MMMM_yyyy);
 }
 
 QString DisplayTimeHelper::hours() const
 {
-    return datetime::toString(d->dateTime, datetime::Format::h);
+    return nx::vms::time::toString(d->dateTime, nx::vms::time::Format::h);
 }
 
 QString DisplayTimeHelper::minutes() const
 {
-    return datetime::toString(d->dateTime, datetime::Format::m);
+    return nx::vms::time::toString(d->dateTime, nx::vms::time::Format::m);
 }
 
 QString DisplayTimeHelper::seconds() const
 {
-    return datetime::toString(d->dateTime, datetime::Format::s);
+    return nx::vms::time::toString(d->dateTime, nx::vms::time::Format::s);
 }
 
 QString DisplayTimeHelper::noonMark() const
 {
-    return datetime::toString(d->dateTime, datetime::Format::a);
+    return nx::vms::time::toString(d->dateTime, nx::vms::time::Format::a);
 }
 
 } // namespace nx::client::core

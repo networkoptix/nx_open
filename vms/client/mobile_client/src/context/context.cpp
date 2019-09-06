@@ -34,7 +34,7 @@
 #include <utils/common/delayed.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/mobile_client/controllers/audio_controller.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
 
 using namespace nx::vms::utils;
