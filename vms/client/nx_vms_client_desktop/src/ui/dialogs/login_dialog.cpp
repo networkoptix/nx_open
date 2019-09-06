@@ -249,6 +249,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     updateFocus();
 
     /* Should be done after model resetting to avoid state loss. */
+    ui->autoLoginCheckBox->setVisible(qnSettings->saveCredentialsAllowed());
     ui->autoLoginCheckBox->setChecked(qnSettings->autoLogin());
 
     commonModule()->moduleDiscoveryManager()->onSignals(this,
@@ -322,7 +323,9 @@ void QnLoginDialog::accept()
                 {
                     // In most cases we will connect succesfully by this url. So we can store it.
 
-                    const bool autoLogin = ui->autoLoginCheckBox->isChecked();
+                    const bool autoLogin = qnSettings->saveCredentialsAllowed()
+                        && ui->autoLoginCheckBox->isChecked();
+
                     nx::utils::Url lastUrlForLoginDialog = url;
                     if (!autoLogin)
                         lastUrlForLoginDialog.setPassword(QString());
@@ -330,8 +333,8 @@ void QnLoginDialog::accept()
                     qnSettings->setLastLocalConnectionUrl(lastUrlForLoginDialog.toString());
                     qnSettings->save();
 
-                    const bool storePasswordForTile =
-                        haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin;
+                    const bool storePasswordForTile = qnSettings->saveCredentialsAllowed()
+                        && haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin;
 
                     LogonParameters parameters(url);
                     parameters.storePassword = storePasswordForTile;
@@ -649,7 +652,8 @@ void QnLoginDialog::at_saveButton_clicked()
         return;
 
     QString name = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
-    bool savePassword = !ui->passwordLineEdit->text().isEmpty();
+    bool savePassword = qnSettings->saveCredentialsAllowed()
+        && !ui->passwordLineEdit->text().isEmpty();
     {
         QScopedPointer<QnConnectionNameDialog> dialog(new QnConnectionNameDialog(this));
         dialog->setName(name);

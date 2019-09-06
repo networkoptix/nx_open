@@ -425,7 +425,8 @@ bool StartupActionsHandler::connectToSystemIfNeeded(
         return true;
 
     // Attempt auto-login, if needed.
-    if (qnSettings->autoLogin() && qnSettings->lastUsedConnection().url.isValid()
+    if (qnSettings->autoLogin() && qnSettings->saveCredentialsAllowed()
+        && qnSettings->lastUsedConnection().url.isValid()
         && !qnSettings->lastUsedConnection().localId.isNull())
     {
         menu()->trigger(ConnectAction,

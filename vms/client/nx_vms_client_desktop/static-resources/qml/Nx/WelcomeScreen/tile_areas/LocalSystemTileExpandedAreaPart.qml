@@ -97,6 +97,7 @@ Column
             id: savePasswordCheckBoxControl;
             text: qsTr("Save password");
 
+            visible: context.saveCredentialsAllowed;
             enabled: !control.isConnecting && !control.factorySystem;
             onAccepted: control.connectButtonClicked();
 
@@ -116,6 +117,7 @@ Column
         NxCheckBox
         {
             id: autoLoginCheckBoxItem;
+            visible: savePasswordCheckBoxControl.visible;
             enabled: savePasswordCheckBoxControl.enabled
                 && savePasswordCheckBoxControl.checked
                 && !control.isConnecting;
