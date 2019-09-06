@@ -62,6 +62,7 @@ struct UpdateItem
     int protocol = 0;
     bool installing = false;
     bool storeUpdates = true;
+    bool hasInternet = false;
     /**
      * Actual status can become unknown when we just issue update command. We should wait for
      * another response from /ec2/updateStatus to get relevant state.
@@ -76,6 +77,9 @@ struct UpdateItem
 
     int freeSpace = -1;
     int requiredSpace = -1;
+
+    bool isServer() const;
+    bool isClient() const;
 };
 
 using UpdateItemPtr = std::shared_ptr<UpdateItem>;
@@ -130,7 +134,7 @@ public:
      * It will return number if peers with changed data.
      */
     int setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
-    int setFreeSpaceData(const  QnUpdateFreeSpaceReply& freeSpaceData);
+
     void markStatusUnknown(const QSet<QnUuid>& targets);
     /**
      * Forcing update for mediaserver versions.

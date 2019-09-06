@@ -167,8 +167,8 @@ private:
     QnLiveStreamProviderPtr m_primaryReader;
     QnLiveStreamProviderPtr m_secondaryReader;
 
-    QnVideoCameraGopKeeper* m_primaryGopKeeper;
-    QnVideoCameraGopKeeper* m_secondaryGopKeeper;
+    std::unique_ptr<QnVideoCameraGopKeeper> m_primaryGopKeeper;
+    std::unique_ptr<QnVideoCameraGopKeeper> m_secondaryGopKeeper;
     QSet<void*> m_cameraUsers;
     QnCompressedAudioDataPtr m_lastAudioFrame;
     //!index - is a \a MediaQuality element

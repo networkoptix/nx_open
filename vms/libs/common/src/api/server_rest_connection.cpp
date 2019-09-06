@@ -241,6 +241,14 @@ Handle ServerConnection::getModuleInformationAll(
     return executeGet("/api/moduleInformation", params, callback, targetThread);
 }
 
+Handle ServerConnection::getMediaServers(
+    Result<nx::vms::api::MediaServerDataList>::type callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params;
+    return executeGet("/ec2/getMediaServers", params, callback, targetThread);
+}
+
 Handle ServerConnection::detachSystemFromCloud(
     const QString& currentAdminPassword,
     const QString& resetAdminPassword,
@@ -527,6 +535,30 @@ Handle ServerConnection::downloadFileChunkFromInternet(
             {lit("fromInternet"), lit("true")}},
         callback,
         targetThread);
+}
+
+Handle ServerConnection::downloadFileChunkFromInternetUsingServer(
+    const QnUuid& server,
+    const QString& fileName,
+    const nx::utils::Url& url,
+    int chunkIndex,
+    int chunkSize,
+    Result<QByteArray>::type callback,
+    QThread* targetThread)
+{
+    QnRequestParamList params{
+        {lit("url"), url.toString()},
+        {lit("chunkSize"), QString::number(chunkSize)},
+        {lit("fromInternet"), lit("true")}};
+    QString path = lit("/api/downloads/%1/chunks/%2").arg(fileName).arg(chunkIndex);
+    nx::network::http::ClientPool::Request request = prepareRequest(
+            nx::network::http::Method::get, prepareUrl(path, params));
+    nx::network::http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server.toByteArray());
+    nx::network::http::insertOrReplaceHeader(&request.headers, header);
+    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    NX_VERBOSE(m_logTag, "<%1> %2", handle, request.url);
+
+    return handle;
 }
 
 Handle ServerConnection::uploadFileChunk(

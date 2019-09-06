@@ -158,10 +158,10 @@ public:
         const std::set<nx::utils::SoftwareVersion>& clientVersions, bool checkClient = true) const;
 
     /** Start uploading local update packages to the servers. */
-    bool startUpload(const UpdateContents& contents);
+    bool startUpload(const UpdateContents& contents, bool cleanExisting);
 
     /** Stops all uploads. */
-    void stopUpload();
+    void stopAllUploads();
 
     void saveInternalState();
 
@@ -206,6 +206,9 @@ public:
 
     OfflineUpdateState getUploaderState() const;
 
+    void startUploadsToServer(const UpdateContents& contents, const QnUuid& peer);
+    void stopUploadsToServer(const QnUuid& peer);
+
     bool haveActiveUpdate() const;
 
     /** Get recipients for upload for specified update package. */
@@ -237,7 +240,7 @@ public:
      * @param sourceDir Directory that contains this package
      * @returns number of recipients for this package.
      */
-    int uploadPackage(const nx::update::Package& package, const QDir& sourceDir);
+    int uploadPackageToRecipients(const nx::update::Package& package, const QDir& sourceDir);
 
     TimePoint::duration getInstallDuration() const;
 
@@ -292,6 +295,8 @@ private:
     const nx::update::Package* findPackageForFile(const QString& fileName) const;
 
     void dropAllRequests(const QString& reason);
+    bool uploadPackageToServer(const QnUuid& serverId,
+        const nx::update::Package& package, QDir storageDir);
 
 private:
     OfflineUpdateState m_offlineUpdaterState = OfflineUpdateState::initial;
