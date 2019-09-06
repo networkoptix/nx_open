@@ -5,11 +5,13 @@
 #include <common/common_module.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
+#include <nx/vms/api/data/media_server_data.h>
 #include <utils/applauncher_utils.h>
 #include <utils/common/app_info.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/update/update_check.h>
 #include <nx/vms/common/p2p/downloader/private/resource_pool_peer_manager.h>
@@ -112,7 +114,11 @@ ClientUpdateTool::~ClientUpdateTool()
 void ClientUpdateTool::setState(State newState)
 {
     if (m_state == newState)
+    {
+        if (m_state != State::downloading && m_state != State::installing)
+            emit updateStateChanged((int)m_state, 0, {});
         return;
+    }
 
     m_state = newState;
     m_stateChanged = true;
@@ -201,6 +207,38 @@ void ClientUpdateTool::setServerUrl(const nx::utils::Url& serverUrl, const QnUui
     m_proxyPeerManager->setServerDirectConnection(serverId, m_serverConnection);
 }
 
+void ClientUpdateTool::checkServersInSystem()
+{
+    if (!m_serverConnection)
+    {
+        NX_WARNING(this, "checkServersInSystem() - No connection to server");
+        return;
+    }
+    m_serverConnection->getMediaServers(nx::utils::guarded(this,
+        [this](bool success, [[maybe_unused]] int handle, const nx::vms::api::MediaServerDataList& mediaservers)
+        {
+            if (!success)
+                return;
+            QSet<QnUuid> withInternet;
+            QSet<QnUuid> withoutInternet;
+
+            for (const auto& server: mediaservers)
+            {
+                bool hasInternet = server.flags.testFlag(
+                    nx::vms::api::ServerFlag::SF_HasPublicIP);
+                if (hasInternet)
+                    withInternet.insert(server.id);
+                else
+                    withoutInternet.insert(server.id);
+            }
+
+            NX_VERBOSE(this,
+                "checkServersInSystem() - got %1 servers with internet and %2 servers without",
+                withInternet.size(), withoutInternet.size());
+            m_proxyPeerManager->setPeersWithInternetAccess(withInternet);
+        }), thread());
+}
+
 std::set<nx::utils::SoftwareVersion> ClientUpdateTool::getInstalledClientVersions(
     bool includeCurrentVersion) const
 {
@@ -255,6 +293,13 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
                 << m_clientPackage.localFile;
             setState(State::complete);
         }
+    }
+    else if (!contents.needClientUpdate)
+    {
+        NX_INFO(this, "setUpdateTarget(%1) - no need to install this version",
+            contents.info.version);
+        setState(State::initial);
+        return;
     }
     else if (contents.sourceType == nx::update::UpdateSourceType::file)
     {
@@ -545,7 +590,7 @@ bool ClientUpdateTool::installUpdateAsync()
                 }
                 if (stopInstallationAttempts)
                     break;
-            }while(--installationAttempts > 0);
+            } while (--installationAttempts > 0);
 
             return ResultType::otherError;
         }, m_updateFile, m_updateVersion);

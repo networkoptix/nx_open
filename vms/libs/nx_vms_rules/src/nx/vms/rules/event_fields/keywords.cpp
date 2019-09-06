@@ -9,13 +9,15 @@ Keywords::Keywords()
 bool Keywords::match(const QVariant& value) const
 {
     const auto& string = value.toString();
-    for (const auto& word: m_list)
-    {
-        if (string.contains(word))
-            return true;
-    }
 
-    return false;
+    if (string.isEmpty())
+        return false;
+
+    return std::any_of(m_list.cbegin(), m_list.cend(),
+        [string](const auto& word)
+        {
+            return string.contains(word);
+        });
 }
 
 QString Keywords::string() const

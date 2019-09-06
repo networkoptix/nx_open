@@ -32,7 +32,7 @@ def main():
     args = parser.parse_args()
 
     with open(args.config, 'r') as f:
-        config = yaml.load(f)
+        config = yaml.load(f, Loader=yaml.SafeLoader)
 
     output_filename = os.path.join(
         args.output, config['server_debug_distribution_name']) + '.zip'

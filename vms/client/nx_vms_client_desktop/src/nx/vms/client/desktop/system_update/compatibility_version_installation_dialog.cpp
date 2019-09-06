@@ -218,7 +218,7 @@ void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
             auto updateContents = m_private->updateInfoMediaserver.get();
             if (updateContents.getVersion() != m_versionToInstall)
             {
-                NX_ERROR(this, "atUpdateCurrentState() - updateInfoMediaserver mismatch. "
+                NX_DEBUG(this, "atUpdateCurrentState() - updateInfoMediaserver mismatch. "
                     "We need %1 but server returned %2.",
                     m_versionToInstall, updateContents.getVersion());
             }
@@ -248,6 +248,7 @@ void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
     }
 
     m_private->clientUpdateTool->checkInternalState();
+    m_private->clientUpdateTool->checkServersInSystem();
 }
 
 int CompatibilityVersionInstallationDialog::startUpdate()

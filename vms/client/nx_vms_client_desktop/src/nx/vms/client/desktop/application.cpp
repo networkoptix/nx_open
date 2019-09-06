@@ -231,6 +231,9 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
         && startupParams.screen < desktop->screenCount();
     const bool customWindowGeometry = !startupParams.windowGeometry.isEmpty();
 
+    // Window handle must exist before events processing. This is required to initialize the scene.
+    mainWindow->winId();
+
     if (customWindowGeometry)
     {
         // We must handle all 'WindowScreenChange' events _before_ we move window.

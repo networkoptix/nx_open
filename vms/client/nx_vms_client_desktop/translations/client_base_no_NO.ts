@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="no" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Hvilken som helst type</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Velg område</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Velg et område på videoen...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>I valgt område</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Kunne ikke utføre plugin-handlingen</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Angi parametere</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Handling krever at noen parametere fylles ut.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -950,7 +981,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Unpin Calendar</source>
-      <translation type="unfinished">Unpin Calendar</translation>
+      <translation>Løsne kalenderen</translation>
     </message>
   </context>
   <context>
@@ -1013,6 +1044,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Vennligst tast inn passord for layout %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Server-hendelser</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Analyse-hendelser</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Enhver hendelse</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Ethvert enhetsproblem</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Ethvert kameraproblem</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Enhver serverhendelse</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Enhetsproblemer</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Kameraproblemer</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Enhver analysehendelse</translation>
     </message>
   </context>
   <context>
@@ -1652,24 +1722,12 @@ to view more bookmarks</source>
       <translation>Serveren er oppdatert</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Forretningsregel oppdatert</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Server fjernet</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Forretningsregel fjernet</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Bruker fjernet</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Forretningsregel tilbakestilt</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1765,6 +1823,18 @@ to view more bookmarks</source>
         <numerusform>%n handlinger</numerusform>
         <numerusform>%n handlinger</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>Hendelsesregel endret</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>Hendelsesregel fjernet</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>Hendelsesregler tilbakestilles til standard</translation>
     </message>
   </context>
   <context>
@@ -2045,8 +2115,8 @@ to view more bookmarks</source>
       <translation>Hvilket som helst kamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Krev godkjenning fungerer bare for generiske hendelser hvis kameramodifiserere brukes i URLen for generisk hendelse</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Krev godkjenning fungerer bare for generiske hendelser hvis kameraidentifikatorer brukes i URLen for generisk hendelse</translation>
     </message>
   </context>
   <context>
@@ -5599,12 +5669,6 @@ til %1</translation>
       <translation>Hva gjør du med gjeldende analysedata?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Gjeldende analysedata blir ikke automatisk flyttet til et annet sted og vil bli utilgjengelige. Du kan beholde den og flytte manuelt senere, eller slette permanent.
-Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kontakte support før du fortsetter.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Slett</translation>
     </message>
@@ -5615,6 +5679,12 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Cancel</source>
       <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Gjeldende analysedata blir ikke automatisk flyttet til et annet sted og vil bli utilgjengelige. Du kan beholde den og flytte manuelt senere, eller slette permanent.
+Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kontakte support før du fortsetter.</translation>
     </message>
   </context>
   <context>
@@ -5937,10 +6007,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Inkluderer ikke personlig informasjon og er helt anonym.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Mislykkede servertiltak kan fremdeles be om kamerastatusoppdateringer uavhengig av denne innstillingen.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Aktiver enheter og servere autodiscovery og automatisert status status sjekk</translation>
     </message>
@@ -5951,6 +6017,10 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Når det er aktivert, oppdager systemet kontinuerlig nye kameraer og servere, og sender forespørsler til kameraer for statusoppdatering.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Hvis Failover er aktivert, kan det hende at serveren fremdeles ber om kamerastatusoppdateringer uavhengig av denne innstillingen.</translation>
     </message>
   </context>
   <context>
@@ -5970,44 +6040,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Regneark (CSV) File</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Server</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Avvik</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Dato</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Tidssone</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Tid</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Ingen server har Internett-tilgang. Tid blir ikke synkronisert.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>VMS-tid er synkronisert med Internett og er ikke avhengig av lokal tid på servere.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>VMS-tid synkroniseres med lokal tid på den valgte serveren og er ikke avhengig av lokal tid på andre servere.</translation>
     </message>
   </context>
   <context>
@@ -7142,6 +7174,34 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Velg område på videoen for å filtrere resultatene</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>I valgt område</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Valgte kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Velg enhet</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Valgte medier</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ingen</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7382,38 +7442,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
         <numerusform>%n objekter</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>Hvilken som helst type</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Velg område</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Velg et område på videoen...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>I valgt område</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>ikke navngitt analysemotor</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Kunne ikke utføre plugin-handlingen</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Angi parametere</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Handling krever at noen parametere fylles ut.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7456,17 +7484,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Applying changes...</source>
       <translation>Bruker endringer...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Denne I / O-modulen har ingen avanserte innstillinger</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Dette kameraet har ingen avanserte innstillinger</translation>
     </message>
   </context>
   <context>
@@ -7597,7 +7614,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>Videostrømmen for bevegelsesdeteksjon er deaktivert</translation>
     </message>
   </context>
   <context>
@@ -7735,6 +7752,14 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Plugins</source>
       <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Bevegelsesdeteksjon er deaktivert, alle tidsplanen med &quot;Bevegelse&quot; og &quot;Bevegelse + Lo-Res&quot; vil bli endret til &quot;Alltid&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Dobbelstrømming er deaktivert, alle tidsplanen med Bevegelse og &quot;Bevegelse + Lo-Res&quot; vil bli endret til &quot;Alltid&quot;</translation>
     </message>
   </context>
   <context>
@@ -8016,42 +8041,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation>Server-hendelser</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Analyse-hendelser</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Ethvert enhetsproblem</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Ethvert kameraproblem</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Enhver serverhendelse</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Enhetsproblemer</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Kameraproblemer</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Enhver hendelse</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Enhver analysehendelse</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Ingen hendelser</translation>
     </message>
@@ -8061,10 +8050,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
         <numerusform>%n hendelse</numerusform>
         <numerusform>%n hendelser</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>ikke navngitt analysemotor</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8455,7 +8440,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>Kan ikke starte søkeprosessen</translation>
     </message>
   </context>
   <context>
@@ -8568,6 +8553,53 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Noen servere er frakoblet og vil ikke bli oppdatert. Hoppe over dem?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Mangler oppdateringspakke for klienten og %n servere</numerusform>
+        <numerusform>Mangler oppdateringspakke for klienten og %n servere</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Mangler oppdateringspakke for klienten</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Det er ingen online-servere å oppdatere.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Vil du avbryte oppdateringen og slette alle nedlastede data?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>OS-versjoner av enkelte komponenter støttes ikke lenger. Vennligst fjern dem fra systemet eller oppdatere operativsystemet til en støttet versjon.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>OS-versjonen av klienten støttes ikke lenger. Vennligst oppdater operativsystemet til en støttet versjon.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Kunne ikke starte oppdateringen</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Kunne ikke avbryte oppdateringen</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Kunne ikke starte installasjonen</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Noen servere har ikke fullført oppdateringsprosessen. Fullfør likevel?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Kunne ikke laste ned oppdateringspakker til noen komponenter</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Hvis problemet vedvarer, kan du kontakte kundestøtte.</translation>
@@ -8585,16 +8617,48 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Oppdateringen er fullført</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client vil bli startet på nytt til den oppdaterte versjonen.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Oppdateringen er fullført, men noen komponenter har mislyktes i en oppdatering</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Oppdater %1 manuelt ved å bruke en installasjonspakke.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 vil bli startet på nytt til den oppdaterte versjonen.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Det oppstod en feil under installasjonen av oppdateringer:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Laster ned oppdateringer...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Fullfør oppdateringen</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Avbryt</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>Den siste versjonen er allerede installert</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Denne versjonen er allerede installert</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Installer oppdatering</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8613,12 +8677,12 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Last ned og installer</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Velg en annen celle</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Bla etter en annen fil...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Velg en annen celle</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8641,6 +8705,10 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Installerer klientoppdateringer...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Starter oppdatering til ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Oppdaterer til ...</translation>
     </message>
@@ -8649,12 +8717,24 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Klar til å oppdatere til</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Installer oppdatering</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Systemet er oppdatert til</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Noen servere har ingen oppdateringspakker tilgjengelig.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Noen servere har fått en intern feil.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Ta kontakt med kundesupport.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Noen servere har gått offline. Vent til de blir online for å fortsette.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8663,6 +8743,10 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Continue in Background</source>
       <translation>Fortsett i bakgrunnen</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Siste tilgjengelige oppdatering</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8675,109 +8759,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Update from mediaservers</source>
       <translation>Oppdatering fra mediaservere</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Siste tilgjengelige oppdatering</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Mangler oppdateringspakke for klienten og %n servere</numerusform>
-        <numerusform>Mangler oppdateringspakke for klienten og %n servere</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Mangler oppdateringspakke for klienten</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Fullfør oppdateringen</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Avbryt</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>Den siste versjonen er allerede installert</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Denne versjonen er allerede installert</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Det er ingen online-servere å oppdatere.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Vil du avbryte oppdateringen og slette alle nedlastede data?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Det oppstod en feil under installasjonen av oppdateringer:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Noen servere har gått offline. Vent til de blir online for å fortsette.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Oppdateringen er fullført, men noen komponenter har mislyktes i en oppdatering</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Oppdater %1 manuelt ved å bruke en installasjonspakke.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 vil bli startet på nytt til den oppdaterte versjonen.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Kunne ikke laste ned oppdateringspakker til noen komponenter</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>OS-versjoner av enkelte komponenter støttes ikke lenger. Vennligst fjern dem fra systemet eller oppdatere operativsystemet til en støttet versjon.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>OS-versjonen av klienten støttes ikke lenger. Vennligst oppdater operativsystemet til en støttet versjon.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Kunne ikke starte oppdateringen</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Starter oppdatering til ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Kunne ikke avbryte oppdateringen</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Kunne ikke starte installasjonen</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>Noen servere har ingen oppdateringspakker tilgjengelig.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>Noen servere har fått en intern feil.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>Vennligst kontakt kundesupport.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -8856,7 +8837,7 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>Noen brukere har ikke tilgang til valgt visning. Handling vil ikke fungere for dem.</translation>
     </message>
   </context>
   <context>
@@ -9063,11 +9044,11 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>Bevegelsesdeteksjon er deaktivert eller støttes ikke</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>Dobbeltstrømming er deaktivert eller støttes ikke</translation>
     </message>
   </context>
   <context>
@@ -9246,14 +9227,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Velg område på videoen for å filtrere resultatene</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>I valgt område</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Ingen bevegelse</translation>
     </message>
@@ -9267,23 +9240,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
         <numerusform>%n bevegelseshendelse</numerusform>
         <numerusform>%n bevegelseshendelser</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Valgte kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Valgt enhet</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Valgte medier</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ingen</translation>
     </message>
   </context>
   <context>
@@ -9418,6 +9374,14 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Filen ble ødelagt mens den ble lastet opp til serveren</translation>
+    </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>Ekstern fil &quot;%1&quot; er ødelagt</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>Serveren har allerede denne filen &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9948,18 +9912,22 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>OK</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>Bekreft lagringssted for å lagre analysedata på &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>Bekreft lagringssted for analysedataene på &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>Analytics-databasen bør lagres på en lokal lagring og kan ta opptil hundre gigabyte.
-Når en plassering for å lagre analysedata er valgt, kan de ikke lett endres uten å miste eksisterende data. Vi anbefalte å velge plassering nøye og ikke bruke systempartisjon for å unngå alvorlig systemfeil.
-Analysedata blir som standard lagret i mediaserver&apos;installasjonskatalog.
-Du kan endre lagringssted i fanen &quot;Storage Management&quot; i dialogboksen Serverinnstillinger.</translation>
+      <source>the largest available partition</source>
+      <translation>den største tilgjengelige partisjonen</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation>Analysedatabasen bør bare lagres på en lokal stasjon og kan ta store mengder plass.
+Når et sted å lagre analysedata er valgt, kan det ikke endres uten å miste eksisterende data. Vi anbefaler å velge et egnet lagrinssted og unngå å bruke systempartisjonen, da det kan føre til alvorlig funksjonsfeil i systemet.
+Som standard lagres analysedata på %1.
+Du kan velge et annet lagringssted i fanen &quot;Storage Management&quot; i dialogboksen Serverinnstillinger.</translation>
     </message>
   </context>
   <context>

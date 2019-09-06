@@ -126,8 +126,8 @@ void TransactionExecutor::run()
                 auto& command = queue[i];
                 if (!dbTran && ApiCommand::isPersistent(command.command))
                 {
-                    dbTran.reset(
-                        new detail::QnDbManager::QnDbTransactionLocker(m_db->getTransaction()));
+                    dbTran.reset(new detail::QnDbManager::QnDbTransactionLocker(
+                        m_db->getTransaction(), __FILE__, __LINE__));
                 }
 
                 result = command.result = command.execTranFunc(&command.postProcList);

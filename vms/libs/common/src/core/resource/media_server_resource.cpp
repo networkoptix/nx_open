@@ -4,10 +4,8 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
 
-#include <api/session_manager.h>
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
-#include <api/media_server_connection.h>
 #include <api/model/ping_reply.h>
 #include <api/network_proxy_factory.h>
 #include <api/runtime_info_manager.h>
@@ -272,26 +270,6 @@ QList<nx::network::SocketAddress> QnMediaServerResource::getAllAvailableAddresse
     }
 
     return result.toList();
-}
-
-QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
-{
-    QnMutexLocker lock(&m_mutex);
-
-    /* We want the video server connection to be deleted in its associated thread,
-     * no matter where the reference count reached zero. Hence the custom deleter. */
-    if (!m_apiConnection)
-    {
-        QnMediaServerResourcePtr thisPtr = toSharedPointer(this).dynamicCast<QnMediaServerResource>();
-        m_apiConnection = QnMediaServerConnectionPtr(
-            new QnMediaServerConnection(
-                commonModule(),
-                thisPtr,
-                commonModule()->videowallGuid()),
-                &qnDeleteLater);
-    }
-
-    return m_apiConnection;
 }
 
 rest::QnConnectionPtr QnMediaServerResource::restConnection()

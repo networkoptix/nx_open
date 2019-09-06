@@ -809,12 +809,21 @@ CameraDiagnostics::Result QnPlOnvifResource::initOnvifCapabilitiesAndUrls(
     if (getMediaUrl().isEmpty())
         return CameraDiagnostics::CameraInvalidParams("ONVIF media URL is not filled by camera");
 
-    QString media2ServiceUrl;
-    fetchOnvifMedia2Url(&media2ServiceUrl); //< We ignore the result,
-    // because old devices may not support Device::getServices request.
+    const auto doIgnoreMedia2byPropertyKeyAsString = getProperty(
+        ResourcePropertyKey::kOnvifIgnoreMedia2);
+    const bool doIgnoreMedia2byPropertyKey = doIgnoreMedia2byPropertyKeyAsString.toInt() > 0;
 
-    setMedia2Url(media2ServiceUrl);
+    const auto doIgnoreMedia2byDataKey = resourceData().value<bool>(
+        ResourceDataKey::kOnvifIgnoreMedia2, false);
 
+    if (!(doIgnoreMedia2byPropertyKey || doIgnoreMedia2byDataKey))
+    {
+        QString media2ServiceUrl;
+        fetchOnvifMedia2Url(&media2ServiceUrl); //< We ignore the result,
+        // because old devices may not support Device::getServices request.
+
+        setMedia2Url(media2ServiceUrl);
+    }
     return result;
 }
 
@@ -3359,7 +3368,7 @@ bool QnPlOnvifResource::loadXmlParametersInternal(
     bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
 
     if (!result)
-        NX_DEBUG(this, "Error while parsing xml (onvif) %1", paramsTemplateFileName);
+        NX_WARNING(this, "Error while parsing xml (onvif) %1", paramsTemplateFileName);
 
     return result;
 }
@@ -3790,6 +3799,17 @@ void QnPlOnvifResource::stopInputPortStatesMonitoring()
             // Pulling as ODM is used, so we need to wait until async Renew-Pull Cycle stops.
             renewPullCycleFuture.wait();
         }
+    }
+
+    if (serverModule()->isStopping())
+    {
+        /*
+            This of course does not solve the problem completely, but dramatically lowers the crash
+            probability. As we can't fix the core crash reason before release, let's use this crutch.
+            The crash is possible, if server begins to stop after "if (serverModule()->isStopping())"
+            check is finished and stops really quickly (that is nearly impossible).
+        */
+        return;
     }
 
     if (QnSoapServer::instance() && QnSoapServer::instance()->getService())
@@ -4306,7 +4326,9 @@ bool QnPlOnvifResource::RenewSubscriptionAsOdmThreadSafe()
     soapWrapper.soap()->imode |= SOAP_XML_IGNORENS;
 
     _wsnt__Renew request;
-    auto interval = resourceData().value<QString>("renewIntervalForPullingAsOdm", "PT2M");
+
+    auto interval = resourceData().value<QString>(ResourceDataKey::kRenewIntervalForPullingAsOdm,
+        "PT2M");
     std::string odmRenewTerminationTime = interval.toStdString();
     request.TerminationTime = &odmRenewTerminationTime;
 
@@ -4613,11 +4635,6 @@ void QnPlOnvifResource::setOutputPortStateNonSafe(
     NX_DEBUG(this, "Successfully set relay %1 output state to %2. endpoint %3",
         relayOutputInfo.token, onvifActive, soapWrapper.endpoint());
     return /*true*/;
-}
-
-QnMutex* QnPlOnvifResource::getStreamConfMutex()
-{
-    return &m_streamConfMutex;
 }
 
 void QnPlOnvifResource::beforeConfigureStream(Qn::ConnectionRole /*role*/)

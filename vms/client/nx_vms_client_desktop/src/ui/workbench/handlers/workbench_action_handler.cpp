@@ -22,7 +22,6 @@
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
-#include <api/media_server_connection.h>
 
 #include <nx/vms/event/action_parameters.h>
 
@@ -459,8 +458,35 @@ void ActionHandler::addToLayout(
 
     qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemTimeRole, params.time);
 
+    if (params.timelineWindow.isValid())
+    {
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            data.uuid, Qn::ItemSliderWindowRole, params.timelineWindow);
+    }
+
+    if (params.timelineSelection.isValid())
+    {
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            data.uuid, Qn::ItemSliderSelectionRole, params.timelineSelection);
+    }
+
+    if (!params.motionSelection.empty())
+    {
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            data.uuid, Qn::ItemMotionSelectionRole, params.motionSelection);
+    }
+
+    if (params.analyticsSelection.isValid())
+    {
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            data.uuid, Qn::ItemAnalyticsSelectionRole, params.analyticsSelection);
+    }
+
     if (params.frameDistinctionColor.isValid())
-        qnResourceRuntimeDataManager->setLayoutItemData(data.uuid, Qn::ItemFrameDistinctionColorRole, params.frameDistinctionColor);
+    {
+        qnResourceRuntimeDataManager->setLayoutItemData(
+            data.uuid, Qn::ItemFrameDistinctionColorRole, params.frameDistinctionColor);
+    }
 
     if (!params.zoomWindowRectangleVisible)
     {
@@ -870,6 +896,14 @@ void ActionHandler::at_openInLayoutAction_triggered()
             AddToLayoutParams addParams;
             addParams.usePosition = !position.isNull();
             addParams.position = position;
+            addParams.timelineWindow =
+                parameters.argument<QnTimePeriod>(Qn::ItemSliderWindowRole);
+            addParams.timelineSelection =
+                parameters.argument<QnTimePeriod>(Qn::ItemSliderSelectionRole);
+            addParams.motionSelection =
+                parameters.argument<QList<QRegion>>(Qn::ItemMotionSelectionRole);
+            addParams.analyticsSelection =
+                parameters.argument<QRectF>(Qn::ItemAnalyticsSelectionRole);
 
             // Live viewers must not open items on archive position
             if (accessController()->hasGlobalPermission(GlobalPermission::viewArchive))
@@ -1058,7 +1092,7 @@ void ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered()
     openNewWindow({lit("--delayed-drop"), data.serialized()});
 }
 
-void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& reply, int handle)
+void ActionHandler::at_cameraListChecked(bool success, int handle, const QnCameraListReply& reply)
 {
     if (!m_awaitingMoveCameras.contains(handle))
         return;
@@ -1066,7 +1100,7 @@ void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& re
     QnMediaServerResourcePtr server = m_awaitingMoveCameras.value(handle).dstServer;
     m_awaitingMoveCameras.remove(handle);
 
-    if (status != 0)
+    if (!success)
     {
         const auto text = QnDeviceDependentStrings::getNameFromSet(
             resourcePool(),
@@ -1219,8 +1253,14 @@ void ActionHandler::at_moveCameraAction_triggered() {
         resourcesToMove.push_back(camera);
     }
 
-    if (!resourcesToMove.isEmpty()) {
-        int handle = server->apiConnection()->checkCameraList(resourcesToMove, this, SLOT(at_cameraListChecked(int, const QnCameraListReply &, int)));
+    if (!resourcesToMove.isEmpty())
+    {
+        auto callback = nx::utils::guarded(this,
+            [this](bool success, int handle, const QnCameraListReply& reply)
+            {
+                at_cameraListChecked(success, handle, reply);
+            });
+        int handle = server->restConnection()->checkCameraList(resourcesToMove, callback, thread());
         m_awaitingMoveCameras.insert(handle, CameraMovingInfo(resourcesToMove, server));
     }
 }
@@ -1834,7 +1874,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
 
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid());
+    layout->setIdUnsafe(QnUuid::createUuid());
     layout->setData(Qt::DecorationRole, qnSkin->icon("layouts/preview_search.png"));
     layout->setName(tr("Preview Search for %1").arg(resource->getName()));
     if (context()->user())
@@ -2557,45 +2597,106 @@ void ActionHandler::confirmAnalyticsStorageLocation()
     const QnMediaServerResourceList servers = resourcePool()->getResources<QnMediaServerResource>();
     for (const auto& server: servers)
     {
-        if (server->metadataStorageId().isNull()
-            && nx::analytics::hasActiveObjectEngines(commonModule(), server->getId()))
+        if (server->metadataStorageId().isNull())
         {
-            const auto name = server->getName();
-            QnMessageBox msgBox(
-                QnMessageBoxIcon::Warning,
-                tr("Confirm storage location to store analytics data on '%1'").arg(name),
-                tr("Analytics database should be stored on a local storage"
-                    " and can occupy up to hundred gigabytes."
-                    "\n"
-                    "Once location to store analytics data is selected,"
-                    " it cannot be easily changed without loosing exitsing data. "
-                    "We recommed to choose location carefully and not to use"
-                    " system partition to avoid severe system malfunction."
-                    "\n"
-                    "By default analytics data will be stored"
-                    " in mediaserver's installation directory."
-                    "\n"
-                    "You can change storage location in the \"Storage Management\""
-                    " tab in the Server Settings dialog."
-                ),
-                QDialogButtonBox::StandardButtons(),
-                QDialogButtonBox::NoButton,
-                mainWindowWidget());
+            const auto serverName = server->getName();
+            auto storages = server->getStorages();
 
-            const auto openSettings = msgBox.addButton(tr("Open Server Settings"),
-                QDialogButtonBox::ButtonRole::ResetRole, Qn::ButtonAccent::NoAccent);
-            msgBox.addButton(tr("OK"),
-                QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Standard);
+            if (storages.empty())
+                continue;
 
-            msgBox.exec();
+            std::sort(storages.begin(), storages.end(),
+                [](const QnStorageResourcePtr& a, const QnStorageResourcePtr& b)
+                {
+                    // TODO: #spanasenko use proper enums
+                    bool aMayBeUsed = a->getStorageType() == "local" && a->isWritable();
+                    bool bMayBeUsed = b->getStorageType() == "local" && b->isWritable();
+                    bool aIsSystem = a->statusFlag() & Qn::StorageStatus::system;
+                    bool bIsSystem = b->statusFlag() & Qn::StorageStatus::system;
 
-            if (msgBox.clickedButton() == openSettings)
+                    // Only writeable local storages should be used.
+                    if (aMayBeUsed && !bMayBeUsed)
+                        return true;
+                    if (!aMayBeUsed && bMayBeUsed)
+                        return false;
+
+                    // System disk is the worst option.
+                    if (!aIsSystem && bIsSystem)
+                        return true;
+                    if (aIsSystem && !bIsSystem)
+                        return false;
+
+                    // Prefer storages enabled for writing.
+                    if (a->isUsedForWriting() && !b->isUsedForWriting())
+                        return true;
+                    if (!a->isUsedForWriting() && b->isUsedForWriting())
+                        return false;
+
+                    // Than prefer storages that aren't used for backup.
+                    if (!a->isBackup() && b->isBackup())
+                        return true;
+                    if (a->isBackup() && !b->isBackup())
+                        return false;
+
+                    // Take the storage with the most space avaliable first.
+                    return a->getFreeSpace() > b->getFreeSpace();
+                });
+
+            const auto& best = storages.front();
+
+            if (best->statusFlag() & Qn::StorageStatus::system)
             {
-                QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(mainWindowWidget()));
-                dialog->setWindowModality(Qt::ApplicationModal);
-                dialog->setServer(server);
-                dialog->setCurrentPage(QnServerSettingsDialog::StorageManagmentPage);
-                dialog->exec();
+                const auto defaultDir = storages.empty()
+                    ? tr("the largest available partition") //< Should be unreachable, but...
+                    : best->getPath();
+                QnMessageBox msgBox(
+                    QnMessageBoxIcon::Warning,
+                    tr("Confirm storage location for the analytics data on \"%1\"").arg(serverName),
+                    tr("The analytics database should only be stored on a local drive"
+                        " and can take up large amounts of space."
+                        "\n"
+                        "Once a location to store analytics data is selected,"
+                        " it cannot be easily changed without losing existing data. "
+                        "We recommend to choose the location carefully and to avoid using"
+                        " the system partition as it may cause severe system malfunction."
+                        "\n"
+                        "By default analytics data will be stored on %1."
+                        "\n"
+                        "You can select another storage location in the \"Storage Management\" tab"
+                        " of the Server Settings dialog."
+                    ).arg(defaultDir),
+                    QDialogButtonBox::StandardButtons(),
+                    QDialogButtonBox::NoButton,
+                    mainWindowWidget());
+
+                const auto openSettings = msgBox.addButton(tr("Open Server Settings"),
+                    QDialogButtonBox::ButtonRole::ResetRole, Qn::ButtonAccent::NoAccent);
+                const auto ok = msgBox.addButton(tr("OK"),
+                    QDialogButtonBox::ButtonRole::AcceptRole, Qn::ButtonAccent::Standard);
+
+                msgBox.setEscapeButton(ok); //< Used to close the dialog by ESC / "X" button on Mac
+
+                msgBox.exec();
+
+                if (msgBox.clickedButton() == openSettings)
+                {
+                    QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(mainWindowWidget()));
+                    dialog->setWindowModality(Qt::ApplicationModal);
+                    dialog->setServer(server);
+                    dialog->setCurrentPage(QnServerSettingsDialog::StorageManagmentPage);
+                    dialog->exec();
+                }
+            }
+
+            if (server->metadataStorageId().isNull() && !storages.empty())
+            {
+                // User hasn't choose analytics location, so we have to use the best option.
+                if (best->getStorageType() == "local" && best->isWritable())
+                {
+                    // todo: It is better to do next calls after this call is finished
+                    server->setMetadataStorageId(best->getId());
+                    server->savePropertiesAsync();
+                }
             }
         }
     }

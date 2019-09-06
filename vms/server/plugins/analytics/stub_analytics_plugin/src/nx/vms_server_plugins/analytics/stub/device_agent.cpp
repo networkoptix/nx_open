@@ -7,6 +7,8 @@
 #include <mutex>
 #include <chrono>
 #include <ctime>
+#include <thread>
+#include <type_traits>
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
@@ -19,6 +21,7 @@
 #include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/settings_response.h>
+#include <nx/sdk/helpers/error.h>
 
 #include "utils.h"
 #include "stub_analytics_plugin_ini.h"
@@ -97,7 +100,8 @@ static const std::vector<EventDescriptor> kEventsToFire = {
 } // namespace
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
-    VideoFrameProcessingDeviceAgent(engine, deviceInfo, NX_DEBUG_ENABLE_OUTPUT)
+    VideoFrameProcessingDeviceAgent(deviceInfo, NX_DEBUG_ENABLE_OUTPUT),
+    m_engine(engine)
 {
     m_pluginDiagnosticEventThread =
         std::make_unique<std::thread>([this]() { processPluginDiagnosticEvents(); });
@@ -174,7 +178,7 @@ std::string DeviceAgent::manifestString() const
 )json";
 }
 
-StringMapResult DeviceAgent::settingsReceived()
+Result<const IStringMap*> DeviceAgent::settingsReceived()
 {
     parseSettings();
     updateObjectGenerationParameters();
@@ -186,12 +190,18 @@ StringMapResult DeviceAgent::settingsReceived()
 /** @param func Name of the caller for logging; supply __func__. */
 void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* func)
 {
+    if (m_deviceAgentSettings.additionalFrameProcessingDelay.load()
+        > std::chrono::milliseconds::zero())
+    {
+        std::this_thread::sleep_for(m_deviceAgentSettings.additionalFrameProcessingDelay.load());
+    }
+
     NX_OUTPUT << func << "(): timestamp " << videoFrame->timestampUs() << " us;"
         << " frame #" << m_frameCounter;
 
     if (m_deviceAgentSettings.leakFrames)
     {
-        NX_PRINT << "Intentionally creating a memomry leak with IDataPacket @"
+        NX_PRINT << "Intentionally creating a memory leak with IDataPacket @"
             << nx::kit::utils::toString(videoFrame);
         videoFrame->addRef();
     }
@@ -205,12 +215,16 @@ void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* f
     }
 
     ++m_frameCounter;
-    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
+
+    const int64_t frameTimestamp = videoFrame->timestampUs();
+    m_lastVideoFrameTimestampUs = frameTimestamp;
+    if (m_frameTimestampQueue.empty() || m_frameTimestampQueue.back() < frameTimestamp)
+        m_frameTimestampQueue.push_back(frameTimestamp);
 }
 
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
 {
-    if (engine()->needUncompressedVideoFrames())
+    if (m_engine->needUncompressedVideoFrames())
     {
         NX_PRINT << "ERROR: Received compressed video frame, contrary to manifest.";
         return false;
@@ -222,7 +236,7 @@ bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFr
 
 bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* videoFrame)
 {
-    if (!engine()->needUncompressedVideoFrames())
+    if (!m_engine->needUncompressedVideoFrames())
     {
         NX_PRINT << "ERROR: Received uncompressed video frame, contrary to manifest.";
         return false;
@@ -257,13 +271,13 @@ bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPac
     return true;
 }
 
-Result<void> DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* /*outResult*/, const IMetadataTypes* neededMetadataTypes)
 {
-    if (metadataTypes->isEmpty())
+    if (neededMetadataTypes->isEmpty())
         stopFetchingMetadata();
 
-    startFetchingMetadata(metadataTypes);
-    return {};
+    startFetchingMetadata(neededMetadataTypes);
 }
 
 void DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadataTypes*/)
@@ -337,12 +351,13 @@ void DeviceAgent::processPluginDiagnosticEvents()
     }
 }
 
-SettingsResponseResult DeviceAgent::pluginSideSettings() const
+void DeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* outResult) const
 {
-    auto response = new SettingsResponse();
+    const auto response = new SettingsResponse();
     response->setValue("pluginSideTestSpinBox", "100");
 
-    return response;
+    *outResult = response;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -381,6 +396,13 @@ void DeviceAgent::setObjectCount(int objectCount)
         objectCount = 1;
     }
     m_objectContexts.resize(objectCount);
+}
+
+void DeviceAgent::cleanUpTimestampQueue()
+{
+    std::unique_lock<std::mutex> lock(m_objectGenerationMutex);
+    m_frameTimestampQueue.clear();
+    m_lastVideoFrameTimestampUs = 0;
 }
 
 IMetadataPacket* DeviceAgent::cookSomeEvents()
@@ -447,11 +469,23 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     if (m_lastVideoFrameTimestampUs == 0)
         return {};
 
+    if (m_frameTimestampQueue.empty())
+        return {};
+
+    const std::chrono::microseconds delay(
+        m_lastVideoFrameTimestampUs - m_frameTimestampQueue.front());
+
+    if (delay < m_deviceAgentSettings.overallMetadataDelay.load())
+        return {};
+
     if (m_frameCounter % m_deviceAgentSettings.generateObjectsEveryNFrames != 0)
         return {};
 
+    const auto metadataTimestamp = m_frameTimestampQueue.front();
+    m_frameTimestampQueue.pop_front();
+
     auto objectMetadataPacket = new ObjectMetadataPacket();
-    objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
+    objectMetadataPacket->setTimestampUs(metadataTimestamp);
     objectMetadataPacket->setDurationUs(0);
 
     for (auto& context: m_objectContexts)
@@ -473,9 +507,8 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
 
         ++(context.frameCounter);
 
-        static const int kNumberOfFramesBeforePreviewGeneration = 60;
         bool previewIsNeeded = m_deviceAgentSettings.generatePreviews
-            && context.frameCounter > kNumberOfFramesBeforePreviewGeneration
+            && context.frameCounter > m_deviceAgentSettings.numberOfFramesBeforePreviewGeneration
             && !context.isPreviewGenerated;
 
         if (previewIsNeeded)
@@ -484,7 +517,7 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
             const auto size = object->size();
             auto bestShotPacket = makeObjectTrackBestShotPacket(
                 object->id(),
-                m_lastVideoFrameTimestampUs,
+                metadataTimestamp,
                 Rect(position.x, position.y, size.width, size.height));
 
             if (bestShotPacket)
@@ -510,12 +543,12 @@ int64_t DeviceAgent::usSinceEpoch() const
 
 bool DeviceAgent::checkVideoFrame(const IUncompressedVideoFrame* frame) const
 {
-    if (frame->pixelFormat() != engine()->pixelFormat())
+    if (frame->pixelFormat() != m_engine->pixelFormat())
     {
         NX_PRINT << __func__ << "() ERROR: Video frame has pixel format "
             << pixelFormatToStdString(frame->pixelFormat())
             << " instead of "
-            << pixelFormatToStdString(engine()->pixelFormat());
+            << pixelFormatToStdString(m_engine->pixelFormat());
         return false;
     }
 
@@ -627,21 +660,30 @@ void DeviceAgent::dumpSomeFrameBytes(
 void DeviceAgent::parseSettings()
 {
     auto assignIntegerSetting =
-        [this](const std::string& parameterName, std::atomic<int>* target)
+        [this](
+            const std::string& parameterName,
+            auto target,
+            std::function<void()> onChange = nullptr)
         {
             using namespace nx::kit::utils;
             int result = 0;
             const auto parameterValueString = settingValue(parameterName);
             if (fromString(parameterValueString, &result))
             {
-                *target = result;
+                using AtomicValueType = decltype(target->load());
+                if (target->load() != AtomicValueType{result})
+                {
+                    target->store(AtomicValueType{ result });
+                    if (onChange)
+                        onChange();
+                }
             }
             else
             {
                 NX_PRINT << "Received an incorrect setting value for '"
-                    << parameterName << "' "
-                    << parameterValueString
-                    << ". Expected an integer";
+                    << parameterName << "': "
+                    << nx::kit::utils::toString(parameterValueString)
+                    << ". Expected an integer.";
             }
         };
 
@@ -663,6 +705,19 @@ void DeviceAgent::parseSettings()
     assignIntegerSetting(
         kNumberOfObjectsToGenerateSetting,
         &m_deviceAgentSettings.numberOfObjectsToGenerate);
+
+    assignIntegerSetting(
+        kAdditionalFrameProcessingDelayMs,
+        &m_deviceAgentSettings.additionalFrameProcessingDelay);
+
+    assignIntegerSetting(
+        kOverallMetadataDelayMsSetting,
+        &m_deviceAgentSettings.overallMetadataDelay,
+        [this]() { cleanUpTimestampQueue(); });
+
+    assignIntegerSetting(
+        kGeneratePreviewAfterNFramesSetting,
+        &m_deviceAgentSettings.numberOfFramesBeforePreviewGeneration);
 }
 
 void DeviceAgent::updateObjectGenerationParameters()

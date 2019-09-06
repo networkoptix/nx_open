@@ -32,6 +32,15 @@ struct HanwhaResult
     CameraDiagnostics::Result diagnostics;
     Value value;
 
+    HanwhaResult(
+        CameraDiagnostics::Result diagnostics = CameraDiagnostics::Result{},
+        Value value = Value{})
+        :
+        diagnostics(std::move(diagnostics)),
+        value(std::move(value))
+    {
+    }
+
     inline operator bool() const { return diagnostics.errorCode == CameraDiagnostics::ErrorCode::noError; }
     inline Value* operator->() { return &value; }
     inline const Value* operator->() const { return &value; }

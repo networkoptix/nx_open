@@ -88,6 +88,11 @@ bool QnSystemSortFilterListModel::isForgotten(const QString& /* id */) const
     return false;
 }
 
+bool QnSystemSortFilterListModel::isHidden(const QModelIndex& /* dataIndex */) const
+{
+    return false;
+}
+
 bool QnSystemSortFilterListModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& /* sourceParent */) const
@@ -96,6 +101,9 @@ bool QnSystemSortFilterListModel::filterAcceptsRow(
     // Filters out offline non-cloud systems with last connection more than N (defined) days ago
     if (!dataIndex.isValid())
         return true;
+
+    if (isHidden(dataIndex))
+        return false;
 
     if (dataIndex.data(QnSystemsModel::IsConnectableRoleId).toBool())
         return true;    //< Skips every connectable system
@@ -243,6 +251,46 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
 bool QnOrderedSystemsModel::isForgotten(const QString& id) const
 {
     return qnForgottenSystemsManager && qnForgottenSystemsManager->isForgotten(id);
+}
+
+bool QnOrderedSystemsModel::isHidden(const QModelIndex& dataIndex) const
+{
+    if (m_tileHideOptions.testFlag(Incompatible)
+        && !dataIndex.data(QnSystemsModel::IsCompatibleVersionRoleId).toBool())
+        return true;
+
+    if (m_tileHideOptions.testFlag(NotConnectableCloud)
+        && dataIndex.data(QnSystemsModel::IsCloudSystemRoleId).toBool()
+        && !dataIndex.data(QnSystemsModel::IsConnectableRoleId).toBool())
+        return true;
+
+    if (m_tileHideOptions.testFlag(CompatibleVersion)
+        && !dataIndex.data(QnSystemsModel::CompatibleVersionRoleId).isNull())
+        return true;
+
+    return false;
+}
+
+void QnOrderedSystemsModel::setTileHideOptions(int flags)
+{
+    if (m_tileHideOptions == flags)
+        return;
+
+    m_tileHideOptions = None;
+
+    if (flags & Incompatible)
+        m_tileHideOptions |= Incompatible;
+    if (flags & NotConnectableCloud)
+        m_tileHideOptions |= NotConnectableCloud;
+    if (flags & CompatibleVersion)
+        m_tileHideOptions |= CompatibleVersion;
+
+    emit tileHideOptionsChanged(m_tileHideOptions);
+}
+
+int QnOrderedSystemsModel::tileHideOptions() const
+{
+    return m_tileHideOptions;
 }
 
 QString QnOrderedSystemsModel::minimalVersion() const

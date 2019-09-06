@@ -10,7 +10,7 @@
                 <label for="otherSystemUrl" class="control-label">Annan systemURL</label>
                 <div class="">
                     <div class="input-group" uib-dropdown>
-                        <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="värd: port" required />
+                        <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="värd:port" required />
 
                         <ul uib-dropdown class="dropdown-menu" role="menu" id="discoveredUrls">
                             <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>Inga system hittades</a></li>
@@ -57,9 +57,9 @@
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
             <p>Det nuvarande systemet håller på att slås samman <b>{{systems.systemName}}</b> med system <b>{{systems.joinSystemName}}</b></p>
             <p>
-                Det nya systemet kommer att ha lösenord och namn från följande system: <0 />
-                <label> <2 /> {{systems.systemName}} (nuvarande) </label> <0 />
-                <label ng-if="!systems.remoteSystemIsNew"> <4 /> {{systems.joinSystemName}}</label>
+                Det nya systemet kommer att ha lösenord och namn från följande system:<br/>
+                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/>{{systems.systemName}} (nuvarande)</label><br/>
+                <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/>{{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>

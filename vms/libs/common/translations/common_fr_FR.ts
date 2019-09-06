@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="fr" sourcelanguage="en">
   <context>
-    <name>DateTimeFormats</name>
-    <message>
-      <source>MM/dd</source>
-      <translation>MM/jj</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <translation>MMMM aaaa</translation>
-    </message>
-  </context>
-  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -877,7 +866,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>Inconnue</translation>
+      <translation>Inconnu</translation>
     </message>
     <message>
       <source>FREE License</source>

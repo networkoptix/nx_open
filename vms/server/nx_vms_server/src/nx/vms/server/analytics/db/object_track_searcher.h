@@ -1,5 +1,7 @@
 #pragma once
 
+#include <set>
+
 #include <nx/sql/filter.h>
 #include <nx/sql/query.h>
 #include <nx/sql/query_context.h>
@@ -51,20 +53,9 @@ public:
 
     void loadCurrentRecord(nx::sql::SqlQuery*, ObjectTrack*);
 
-    static void addTrackFilterConditions(
-        const Filter& filter,
-        const DeviceDao& deviceDao,
-        const ObjectTypeDao& objectTypeDao,
-        const ObjectFields& fieldNames,
-        nx::sql::Filter* sqlFilter);
-
     static void addDeviceFilterCondition(
         const std::vector<QnUuid>& deviceIds,
         const DeviceDao& deviceDao,
-        nx::sql::Filter* sqlFilter);
-
-    static void addBoundingBoxToFilter(
-        const QRect& boundingBox,
         nx::sql::Filter* sqlFilter);
 
     /**
@@ -76,14 +67,13 @@ public:
         const TimeRangeFields& timeRangeFields,
         nx::sql::Filter* sqlFilter);
 
-    static bool satisfiesFilter(
-        const Filter& filter, const ObjectTrack& track);
-
-    static bool matchAttributes(
-        const std::vector<nx::common::metadata::Attribute>& attributes,
-        const QString& filter);
-
 private:
+    struct TrackQueryResult
+    {
+        std::vector<ObjectTrack> tracks;
+        std::set<QnUuid> ids;
+    };
+
     const DeviceDao& m_deviceDao;
     const ObjectTypeDao& m_objectTypeDao;
     AttributesDao* m_attributesDao = nullptr;
@@ -98,21 +88,28 @@ private:
 
     void fetchTracksFromDb(
         nx::sql::QueryContext* queryContext,
-        const std::vector<std::int64_t>& trackGroups,
-        std::vector<ObjectTrack>* result);
+        const std::set<std::int64_t>& trackGroups,
+        TrackQueryResult* result);
 
     void prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* query);
 
-    void prepareLookupQuery(nx::sql::AbstractSqlQuery* query);
+    std::vector<ObjectTrack> loadTracks(nx::sql::AbstractSqlQuery* query, int limit = 0);
 
-    std::tuple<QString /*query text*/, nx::sql::Filter> prepareBoxFilterSubQuery();
-
-    nx::sql::Filter prepareTrackFilterSqlExpression();
-
-    std::vector<ObjectTrack> loadTracks(nx::sql::AbstractSqlQuery* query);
-    ObjectTrack loadTrack(nx::sql::AbstractSqlQuery* query);
+    /**
+     * Loads current record from query as an ObjectTrack.
+     * @return std::nullopt if the record is not matched by the filter.
+     */
+    template<typename FilterFunc>
+    // requires std::is_same_v<std::invoke_result_t<FilterFunc, const ObjectTrack&>, bool>
+    std::optional<ObjectTrack> loadTrack(
+        nx::sql::AbstractSqlQuery* query,
+        FilterFunc filter);
 
     void filterTrack(std::vector<ObjectPosition>* const track);
+
+    void truncateTrack(
+        std::vector<ObjectPosition>* const track,
+        int maxSize);
 
     static void addObjectTypeIdToFilter(
         const std::vector<QString>& objectTypes,

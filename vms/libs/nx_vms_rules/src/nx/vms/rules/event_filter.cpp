@@ -1,5 +1,7 @@
 #include "event_filter.h"
 
+#include <QScopedValueRollback>
+
 #include "event_field.h"
 
 namespace nx::vms::rules {
@@ -15,19 +17,28 @@ EventFilter::~EventFilter()
     qDeleteAll(m_fields);
 }
 
+QnUuid EventFilter::id() const
+{
+    return m_id;
+}
+
 QString EventFilter::eventType() const
 {
     return m_eventType;
 }
 
- bool EventFilter::addField(const QString& name, EventField* field)
- {
-    if (m_fields.contains(name))
-        return false;
-
+void EventFilter::addField(const QString& name, EventField* field)
+{
+    // TODO: assert?
+    delete m_fields.value(name, nullptr);
     m_fields[name] = field;
-    return true;
- }
+    updateState();
+}
+
+const QHash<QString, EventField*>& EventFilter::fields() const
+{
+    return m_fields;
+}
 
 bool EventFilter::match(const EventPtr& event) const
 {
@@ -44,6 +55,26 @@ bool EventFilter::match(const EventPtr& event) const
             return false;
     }
     return true;
+}
+
+void EventFilter::connectSignals()
+{
+    for (auto& field: m_fields)
+    {
+        field->connectSignals();
+        connect(field, &Field::stateChanged, this, &EventFilter::updateState);
+    }
+}
+
+void EventFilter::updateState()
+{
+    //TODO: #spanasenko Update derived values (error messages, etc.)
+
+    if (m_updateInProgress)
+        return;
+
+    QScopedValueRollback<bool> guard(m_updateInProgress, true);
+    emit stateChanged();
 }
 
 } // namespace nx::vms::rules

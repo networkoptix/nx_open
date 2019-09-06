@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="it" sourcelanguage="en">
   <context>
-    <name>DateTimeFormats</name>
-    <message>
-      <source>MM/dd</source>
-      <translation>Dd/MM</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <translation type="unfinished">MMMM yyyy</translation>
-    </message>
-  </context>
-  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -124,7 +113,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>Ok</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -824,7 +813,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>Moduli I / O</translation>
+      <translation>Modulo I / O</translation>
     </message>
     <message>
       <source>I/O module</source>

@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ja" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>全てのタイプ</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>エリア選択</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>ビデオ上のエリアを選択してください</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>選択されたエリア</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>プラグインアクションの実行に失敗しました</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>パラメータを入力</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>アクションにはいくつかのパラメータ入力が必要です</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1015,6 +1046,45 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>サーバーイベント</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>分析イベント</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>全イベント</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>全デバイス障害</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>全カメラ障害</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>全サーバーイベント</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>デバイスの問題</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>カメラの問題</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>全分析イベント</translation>
+    </message>
+  </context>
+  <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
@@ -1635,24 +1705,12 @@ to view more bookmarks</source>
       <translation>サーバー更新</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>ビジネスルールの更新</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>サーバー削除</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>ビジネスルール削除</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>ユーザー削除</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>ビジネスルールリセット</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1747,6 +1805,18 @@ to view more bookmarks</source>
       <translation>
         <numerusform>%n アクション</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>イベントルールが変更されました</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>イベントルールが削除されました</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>イベントルールをデフォルトにリセット</translation>
     </message>
   </context>
   <context>
@@ -2021,8 +2091,8 @@ to view more bookmarks</source>
       <translation>全カメラ</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>カメライベントが一般イベントで使用されている場合、強制承認は一般的イベントに対してのみ機能します</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>カメラ識別子が汎用イベントURLで使用されている場合、強制承認は汎用イベントに対してのみ機能します</translation>
     </message>
   </context>
   <context>
@@ -3145,7 +3215,7 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation>このカメラは現在選択されているレイアウトに含まれていません　アクションが実行される前にカメラを追加すればアクションは動作します。</translation>
+      <translation>このカメラは現在選択されているレイアウトに含まれていません。アクションが実行される前にカメラを追加すればアクションは動作します。</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
@@ -5532,12 +5602,6 @@ to %1</source>
       <translation>現在の分析データをどうしますか？</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>現在の分析データは自動的に別の場所に移動されることなく、アクセス不能になります。そのままにして後で手動で移動するか、完全に削除することができます。
-分析データを別の保管場所に移動する予定の場合は、作業を進める前にサポートに連絡してください。</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>削除</translation>
     </message>
@@ -5548,6 +5612,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cancel</source>
       <translation>キャンセル</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>現在の分析データは自動的に別の場所に移動されず、アクセスできなくなります。保持して後で手動で移動するか、完全に削除できます。
+分析データを別の保管場所に移動する場合は、移動作業を進める前にサポートに連絡してください。</translation>
     </message>
   </context>
   <context>
@@ -5870,10 +5940,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>いかなる個人情報も含まず、完全に匿名です。</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>フェイルオーバーサーバーの対策では、この設定に関係なくカメラステータスの更新を要求することがあります。</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>デバイスとサーバーの自動検出と自動デバイスステータスチェックを有効にする</translation>
     </message>
@@ -5884,6 +5950,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>有効にすると、システムは新しいカメラとサーバーを継続的に検出し、状態更新のために検出リクエストをカメラに送信します。</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>フェールオーバーが有効になっている場合、サーバーはこの設定に関係なくカメラステータスの更新を要求する場合があります。</translation>
     </message>
   </context>
   <context>
@@ -5903,44 +5973,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>スプレッドシート（CSV）ファイル</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>サーバー</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>オフセット</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>日付</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>タイムゾーン</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>時間</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>インターネットにアクセスできるサーバーはありません　時間は同期されていません</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>VMSの時間はインターネットと同期しており、サーバーの現地時間には依存しません。</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>VMSの時間は選択したサーバーの現地時間と同期され、他のサーバーの現地時間には依存しません。</translation>
     </message>
   </context>
   <context>
@@ -7039,6 +7071,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>結果をフィルター処理するためにビデオのエリアを選択します</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>選択されたエリア</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>選択したカメラ</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>選択したデバイス</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>選択したメディア</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>なし</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7277,38 +7337,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n オブジェクト</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation>全てのタイプ</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>エリア選択</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>ビデオ上のエリアを選択してください</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>選択されたエリア</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>無名の分析エンジン</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>プラグインアクションの実行に失敗しました</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>パラメータを入力</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>アクションにはいくつかのパラメータ入力が必要です</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7350,17 +7378,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>変更の適応中...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>この I/O モジュールは、アドバンス設定がありません</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>この I/O モジュールは、アドバンス設定がありません</translation>
     </message>
   </context>
   <context>
@@ -7489,7 +7506,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>モーション検知ストリームが無効になっています</translation>
     </message>
   </context>
   <context>
@@ -7624,6 +7641,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>Plugins</source>
       <translation>プラグイン</translation>
     </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>モーション検知は無効です。すべてのスケジュール録画 &quot;モーション&quot; と&quot;モーション + Lo-Res&quot; は&quot;Always&quot; に変更されます。</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>デュアルストリーミングは無効です。すべてのスケジュール録画&quot;モーション + Lo-Res&quot;は&quot;Always&quot;に変更されます。</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsLicenseWatcher</name>
@@ -7696,7 +7721,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation>クライアント更新プログラムをインストールするにはディスク容量が足りません</translation>
+      <translation>クライアント更新プログラムをインストールするにはディスク容量が足りません。</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
@@ -7899,42 +7924,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation>サーバーイベント</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>分析イベント</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>全デバイス障害</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>全カメラ障害</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>全サーバーイベント</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>デバイスの問題</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>カメラの問題</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>全イベント</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>全分析イベント</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>イベントなし</translation>
     </message>
@@ -7943,10 +7932,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>
         <numerusform>%n イベント</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>無名の分析エンジン</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8334,7 +8319,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>検索処理を開始できません</translation>
     </message>
   </context>
   <context>
@@ -8447,6 +8432,52 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>一部のサーバーはオフラインであり、更新されません。スキップしますか？</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>クライアントおよび %n サーバー用の更新パッケージがありません</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>クライアント用の更新パッケージがありません</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>更新するオンラインサーバーはありません。</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>更新をキャンセルしてダウンロードしたデータをすべて削除しますか？</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>一部のコンポーネントのOSバージョンはサポートが終了しました。システムから削除するか、サポートされているバージョンにOSを更新してください。</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>クライアントのOSバージョンはサポートが終了しました。 OSをサポートされているバージョンに更新してください。</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>更新を開始できませんでした</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>更新をキャンセルできませんでした</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>インストールを開始できませんでした</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>一部のサーバーでは更新プロセスが完了しませんでした。終了しますか？</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>一部のコンポーネントに更新パッケージをダウンロードできませんでした</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>問題が解決しない場合は、カスタマー サポートに連絡してください</translation>
@@ -8464,16 +8495,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>更新が完了しました</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Clientはアップデートされたバージョンに再起動されます。</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>アップデートは完了しましたが、一部のコンポーネントがアップデートに失敗しました</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>インストール パッケージを使用して手動で %1 を更新してください</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 は、更新されたバージョンで再起動します</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>アップデートのインストール中にエラーが発生しました。</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>アップデートをダウンロードしています…</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>更新終了</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>キャンセル</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>お使いのソフトウェアは最新版です</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>このバージョンは既にインストールされています</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>更新をインストール</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8492,12 +8555,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ダウンロードとインストール</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>別のビルドを選択</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>他のファイルを参照しています...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>別のビルドを選択</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8520,6 +8583,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>クライアントアップデートをインストールしています...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>更新を開始中...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>更新しています...</translation>
     </message>
@@ -8528,12 +8595,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>更新の準備ができました</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>更新をインストール</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>システム更新</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>利用可能な更新パッケージがないサーバもあります。</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>一部のサーバーで内部エラーが発生しました。</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>サポートにお問合せください.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>一部のサーバーがオフラインになりました。オンラインになるまで待ってください。</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8542,6 +8621,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>バック グラウンドで続行</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>最新の利用可能な更新プログラム</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8554,108 +8637,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>メディアサーバーからの更新</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>最新の利用可能な更新プログラム</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>クライアントおよび %n サーバー用の更新パッケージがありません</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>クライアント用の更新パッケージがありません</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>更新終了</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>キャンセル</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>お使いのソフトウェアは最新版です</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>このバージョンは既にインストールされています</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>更新するオンラインサーバーはありません。</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>更新をキャンセルしてダウンロードしたデータをすべて削除しますか？</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>アップデートのインストール中にエラーが発生しました。</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>一部のサーバーがオフラインになりました。オンラインになるまで待ってください。</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>アップデートは完了しましたが、一部のコンポーネントがアップデートに失敗しました</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>インストール パッケージを使用して手動で %1 を更新してください</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 は、更新されたバージョンで再起動します</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>一部のコンポーネントに更新パッケージをダウンロードできませんでした</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>一部のコンポーネントのOSバージョンはサポートが終了しました。システムから削除するか、サポートされているバージョンにOSを更新してください。</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>クライアントのOSバージョンはサポートが終了しました。 OSをサポートされているバージョンに更新してください。</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>更新を開始できませんでした</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>更新を開始中...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>更新をキャンセルできませんでした</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>インストールを開始できませんでした</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>利用可能な更新パッケージがないサーバもあります。</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>一部のサーバーで内部エラーが発生しました。</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>カスタマサポートにお問い合わせください。</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -8733,7 +8714,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>一部のユーザーは選択されたレイアウトにアクセスできません。アクションは動作しません。</translation>
     </message>
   </context>
   <context>
@@ -8939,11 +8920,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>モーション検知は無効になっているかサポートされていません</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>デュアルストリーミングは無効になっているかサポートされていません</translation>
     </message>
   </context>
   <context>
@@ -9122,14 +9103,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>結果をフィルター処理するためにビデオのエリアを選択します</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>選択されたエリア</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>モーションなし</translation>
     </message>
@@ -9142,23 +9115,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>
         <numerusform>%n モーションイベント</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>選択したカメラ</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>選択したデバイス</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>選択したメディア</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>なし</translation>
     </message>
   </context>
   <context>
@@ -9290,6 +9246,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>File was corrupted while being uploaded to the server</source>
       <translation>ファイルがサーバーにアップロードされている間に破損しました</translation>
+    </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>リモートファイル &quot;%1&quot; が破損しています</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>サーバーにはすでにこのファイル &quot;%1&quot; があります</translation>
     </message>
   </context>
   <context>
@@ -9811,18 +9775,22 @@ If you intended to move analytics data to another storage location, please conta
       <translation>OK</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>&apos;%1&apos; で分析データを保管する場所を確認してください</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>&quot;%1&quot; で分析データの保管場所を確認してください</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>分析データベースはローカルストレージに保存する必要があり、最大100ギガバイトを占めることがあります。
-分析データの保存場所を選択した後は、既存のデータを失うことなく簡単に変更することはできません。重度のシステム誤動作を避けるために、慎重に場所を選択し、システムパーティションを使用しないことをお勧めします。
-デフォルトでは、分析データはメディアサーバー&apos;のインストールディレクトリに保存されます。
-[サーバー設定]ダイアログの[ &quot;Storage Management&quot;]タブで、保存場所を変更できます。</translation>
+      <source>the largest available partition</source>
+      <translation>利用可能な最大のパーティション</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation>分析データベースはローカルドライブにのみ保存する必要があり、大量のスペースを占有する可能性があります。
+分析データの保存場所を選択すると、既存のデータを失わずに簡単に変更することはできません。深刻なシステムの誤動作を引き起こす可能性があるため、場所を慎重に選択し、システムパーティションの使用を避けることをお勧めします。
+デフォルトでは、分析データは %1に保存されます。
+サーバー設定ダイアログの &quot;ストレージ管理&quot; タブで別のストレージの場所を選択できます。</translation>
     </message>
   </context>
   <context>

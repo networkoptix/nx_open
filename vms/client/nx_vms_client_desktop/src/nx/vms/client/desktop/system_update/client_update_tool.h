@@ -137,6 +137,8 @@ public:
      */
     void setServerUrl(const nx::utils::Url& serverUrl, const QnUuid& serverId);
 
+    void checkServersInSystem();
+
     std::future<UpdateContents> requestInstalledUpdateInfo();
     /**
      * Requests update information from the internet. It can proxy request through mediaserver if

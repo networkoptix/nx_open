@@ -350,7 +350,6 @@ public:
     virtual int suggestBitrateKbps(
         const QnLiveStreamParams& streamParams, Qn::ConnectionRole role) const override;
 
-    QnMutex* getStreamConfMutex();
     virtual void beforeConfigureStream(Qn::ConnectionRole role);
     virtual void afterConfigureStream(Qn::ConnectionRole role);
     virtual CameraDiagnostics::Result customStreamConfiguration(
@@ -748,6 +747,7 @@ private:
     mutable QnConstResourceVideoLayoutPtr m_videoLayout;
     mutable QnOnvifServiceUrls m_serviceUrls;
     nx::utils::AsyncOperationGuard m_asyncConnectGuard;
+
 protected:
     nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
     nx::vms::server::resource::OnvifMulticastParametersProvider m_primaryMulticastParametersProvider;

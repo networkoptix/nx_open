@@ -22,7 +22,6 @@ static const std::chrono::milliseconds kDetalizationLevel(1);
 static const std::chrono::milliseconds kMinChunkDuration(1000);
 static const std::chrono::milliseconds kStartTimestampThreshold(10000);
 static const QString kRecorderThreadName = lit("Edge recorder");
-static const int64_t kMaxRecordingDiffMs = 2000;
 
 } // namespace
 

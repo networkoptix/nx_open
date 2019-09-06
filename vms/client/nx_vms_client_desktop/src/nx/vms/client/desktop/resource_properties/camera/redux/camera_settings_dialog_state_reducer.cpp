@@ -211,18 +211,8 @@ State loadNetworkInfo(State state, const Camera& camera)
     state.singleCameraProperties.ipAddress = QnResourceDisplayInfo(camera).host();
     state.singleCameraProperties.webPage = calculateWebPage(camera);
     state.singleCameraProperties.settingsUrlPath = settingsUrlPath(camera);
-
-    const bool isIoModule = camera->isIOModule();
-    const bool hasPrimaryStream = !isIoModule || camera->isAudioSupported();
-    if (hasPrimaryStream)
-        state.singleCameraSettings.primaryStream.setBase(camera->sourceUrl(Qn::CR_LiveVideo));
-
-    const bool hasSecondaryStream = camera->hasDualStreaming();
-    if (hasSecondaryStream)
-    {
-        state.singleCameraSettings.secondaryStream.setBase(
-            camera->sourceUrl(Qn::CR_SecondaryLiveVideo));
-    }
+    state.singleCameraSettings.primaryStream.setBase(camera->sourceUrl(Qn::CR_LiveVideo));
+    state.singleCameraSettings.secondaryStream.setBase(camera->sourceUrl(Qn::CR_SecondaryLiveVideo));
 
     return state;
 }
@@ -433,6 +423,43 @@ Qn::RecordingType fixupRecordingType(const State& state)
     return state.recording.brush.recordingType;
 }
 
+std::optional<State::ScheduleAlert> calculateScheduleAlert(const State& state)
+{
+    if (state.supportsMotionPlusLQ())
+        return {};
+
+    const bool hasMotion = state.isMotionDetectionEnabled();
+    if (state.recording.schedule.hasValue())
+    {
+        for (const auto& task: state.recording.schedule())
+        {
+            switch (task.recordingType)
+            {
+                case Qn::RecordingType::motionOnly:
+                    if (!hasMotion)
+                        return State::ScheduleAlert::scheduleChangeDueToNoMotion;
+                    break;
+
+                case Qn::RecordingType::motionAndLow:
+                    return hasMotion
+                        ? State::ScheduleAlert::scheduleChangeDueToNoDualStreaming
+                        : State::ScheduleAlert::scheduleChangeDueToNoMotion;
+
+                default:
+                    break;
+            }
+        }
+
+        return {};
+    }
+    else
+    {
+        return hasMotion
+            ? State::ScheduleAlert::scheduleChangeDueToNoDualStreaming
+            : State::ScheduleAlert::scheduleChangeDueToNoMotion;
+    }
+}
+
 std::optional<State::RecordingAlert> updateArchiveLengthAlert(const State& state)
 {
     const bool warning = state.recording.minDays.automatic.hasValue()
@@ -480,6 +507,7 @@ State CameraSettingsDialogStateReducer::setSettingsOptimizationEnabled(State sta
 {
     state.settingsOptimizationEnabled = value;
     state.recording.brush.recordingType = fixupRecordingType(state);
+    state.scheduleAlert = calculateScheduleAlert(state);
     return state;
 }
 
@@ -534,6 +562,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.motionAlert = {};
     state.analytics.enabledEngines = {};
     state.analytics.settingsValuesByEngineId = {};
+    state.enableMotionDetection = {};
 
     state.deviceType = firstCamera
         ? QnDeviceDependentStrings::calculateDeviceType(firstCamera->resourcePool(), cameras)
@@ -829,6 +858,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     }
 
     state.recording.brush.recordingType = fixupRecordingType(state);
+    state.scheduleAlert = calculateScheduleAlert(state);
     return state;
 }
 
@@ -1133,6 +1163,7 @@ State CameraSettingsDialogStateReducer::setMotionDetectionEnabled(State state, b
     state.hasChanges = true;
     state.enableMotionDetection.setUser(value);
     state.recording.brush.recordingType = fixupRecordingType(state);
+    state.scheduleAlert = calculateScheduleAlert(state);
     return state;
 }
 
@@ -1216,6 +1247,7 @@ State CameraSettingsDialogStateReducer::setDualStreamingDisabled(State state, bo
     state.expert.dualStreamingDisabled.setUser(value);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.recording.brush.recordingType = fixupRecordingType(state);
+    state.scheduleAlert = calculateScheduleAlert(state);
     state.hasChanges = true;
     return state;
 }
@@ -1306,6 +1338,7 @@ State CameraSettingsDialogStateReducer::setForcedMotionStreamType(
 
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.recording.brush.recordingType = fixupRecordingType(state);
+    state.scheduleAlert = calculateScheduleAlert(state);
     state.hasChanges = true;
     return state;
 }

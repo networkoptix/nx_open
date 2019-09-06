@@ -27,6 +27,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(/* global namespace */, MediaQuality,
     (MEDIA_Quality_None, "")
 )
 
+static const QRect kMaxGridRect(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight);
+
 bool isLowMediaQuality(MediaQuality q)
 {
     return q == MEDIA_Quality_Low || q == MEDIA_Quality_LowIframesOnly;
@@ -365,7 +367,7 @@ QRect QnMetaDataV1::rectFromNormalizedRect(const QRectF& rectF)
     const int y = y1 + kEpsilon;
 
     const auto result = QRect(x, y, x2 - x + (1.0 - kEpsilon), y2 - y + (1.0 - kEpsilon));
-    return result.intersected(QRect(0, 0, Qn::kMotionGridWidth, Qn::kMotionGridHeight));
+    return result.intersected(kMaxGridRect);
 }
 
 void QnMetaDataV1::addMotion(const QRectF& rectF)
@@ -479,7 +481,7 @@ void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart
 
     for (int i = 0; i < region.rectCount(); ++i)
     {
-        const QRect& rect = region.rects().at(i);
+        QRect rect = region.rects().at(i).intersected(kMaxGridRect);
         if (maskStart)
             *maskStart = qMin((rect.left() * Qn::kMotionGridHeight + rect.top()) / 128, *maskStart);
         if (maskEnd)

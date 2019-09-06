@@ -1,5 +1,6 @@
 #include "nx_rtp_parser.h"
 
+#include <nx/kit/utils.h>
 #include <nx/utils/log/log.h>
 
 #include <analytics/common/object_metadata.h>
@@ -13,7 +14,6 @@
 
 #include <nx/debugging/visual_metadata_debugger_factory.h>
 
-#include <nx/analytics/frame_info.h>
 #include <nx/analytics/analytics_logging_ini.h>
 
 #include <motion/motion_detection.h>
@@ -35,12 +35,12 @@ QnNxRtpParser::QnNxRtpParser(QnUuid deviceId):
     m_isAudioEnabled(true),
     m_visualDebugger(VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::nxRtpParser)),
     m_primaryLogger(
-        "rtp_parser_",
+        lm("rtp_parser_@%1_").arg(nx::kit::utils::toString(this)),
         m_deviceId,
         /*engineId*/ QnUuid(),
         nx::vms::api::StreamIndex::primary),
     m_secondaryLogger(
-        "rtp_parser_",
+        lm("rtp_parser_@%1_").arg(nx::kit::utils::toString(this)),
         m_deviceId,
         /*engineId*/ QnUuid(),
         nx::vms::api::StreamIndex::secondary)
@@ -49,7 +49,7 @@ QnNxRtpParser::QnNxRtpParser(QnUuid deviceId):
 
 void QnNxRtpParser::logMediaData(const QnAbstractMediaDataPtr& data)
 {
-    if (!nx::analytics::loggingIni().isLoggingEnabled())
+    if (!nx::analytics::loggingIni().isLoggingEnabled() || !data)
         return;
 
     const bool isSecondaryProvider = data->flags & QnAbstractMediaData::MediaFlags_LowQuality;
@@ -102,12 +102,12 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
 
             const QnAbstractMediaData::DataType dataType =
                 (QnAbstractMediaData::DataType) *(payload++);
-            quint32 timestampHigh = qFromBigEndian(*(quint32*) payload);
+            const quint32 timestampHigh = qFromBigEndian(*(quint32*) payload);
             dataSize -= RTSP_FFMPEG_GENERIC_HEADER_SIZE;
             payload  += 4; // deserialize timeStamp high part
 
-            quint8 cseq = *payload++;
-            quint16 flags = (payload[0]<<8) + payload[1];
+            const quint8 cseq = *payload++;
+            const quint16 flags = (payload[0]<<8) + payload[1];
             payload += 2;
 
             if (dataType == QnAbstractMediaData::EMPTY_DATA)
@@ -139,8 +139,8 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 if (dataSize < RTSP_FFMPEG_METADATA_HEADER_SIZE)
                     return false;
 
-                auto duration = qFromBigEndian(*((quint32*) payload)) * 1000;
-                auto metadataType = (MetadataType) qFromBigEndian(*((quint32*) (payload) + 1));
+                const auto duration = qFromBigEndian(*((quint32*) payload)) * 1000;
+                const auto metadataType = (MetadataType) qFromBigEndian(*((quint32*) (payload) + 1));
 
                 QnAbstractCompressedMetadata* metadata = nullptr;
 
@@ -169,7 +169,7 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 if (dataSize < RTSP_FFMPEG_VIDEO_HEADER_SIZE)
                     return false;
 
-                quint32 fullPayloadLen = (payload[0] << 16) + (payload[1] << 8) + payload[2];
+                const quint32 fullPayloadLen = (payload[0] << 16) + (payload[1] << 8) + payload[2];
 
                 dataSize -= RTSP_FFMPEG_VIDEO_HEADER_SIZE;
                 payload += RTSP_FFMPEG_VIDEO_HEADER_SIZE; // deserialize video flags
@@ -211,46 +211,31 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 return false;
             }
 
-            if (m_nextDataPacket)
-            {
-                m_nextDataPacket->opaque = cseq;
-                m_nextDataPacket->flags = static_cast<QnAbstractMediaData::MediaFlags>(flags);
+            if (!NX_ASSERT(m_nextDataPacket))
+                return false;
 
-                if (context)
-                    m_nextDataPacket->compressionType = context->getCodecId();
-                m_nextDataPacket->timestamp =
-                    qFromBigEndian(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
+            m_nextDataPacket->opaque = cseq;
+            m_nextDataPacket->flags = static_cast<QnAbstractMediaData::MediaFlags>(flags);
 
-                // TODO: Investigate whether this code is needed.
-                //m_nextDataPacket->channelNumber = channelNum;
-                /*
-                if (mediaPacket->timestamp < 0x40000000 && m_prevTimestamp[ssrc] > 0xc0000000)
-                    m_timeStampCycles[ssrc]++;
-                mediaPacket->timestamp += ((qint64) m_timeStampCycles[ssrc] << 32);
-                */
-            }
+            if (context)
+                m_nextDataPacket->compressionType = context->getCodecId();
+            m_nextDataPacket->timestamp =
+                qFromBigEndian(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
         }
 
-        if (m_nextDataPacket)
-        {
-            NX_ASSERT(m_nextDataPacketBuffer);
+        if (NX_ASSERT(m_nextDataPacketBuffer))
             m_nextDataPacketBuffer->write((const char*) payload, dataSize);
 
-            if (m_nextDataPacket->dataType == QnAbstractMediaData::VIDEO)
-                m_lastFramePtsUs = m_nextDataPacket->timestamp;
-
-            logMediaData(m_nextDataPacket);
-        }
+        if (m_nextDataPacket->dataType == QnAbstractMediaData::VIDEO)
+            m_lastFramePtsUs = m_nextDataPacket->timestamp;
 
         if (rtpHeader->marker)
         {
-            if (m_nextDataPacket)
-            {
-                if (m_nextDataPacket->flags & QnAbstractMediaData::MediaFlags_LIVE)
-                    m_position = DATETIME_NOW;
-                else
-                    m_position = m_nextDataPacket->timestamp;
-            }
+            if (m_nextDataPacket->flags & QnAbstractMediaData::MediaFlags_LIVE)
+                m_position = DATETIME_NOW;
+            else
+                m_position = m_nextDataPacket->timestamp;
+
             if (m_nextDataPacket->dataType == QnAbstractMediaData::AUDIO && !m_isAudioEnabled)
             {
                 // Skip audio packet.
@@ -258,6 +243,7 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
             else
             {
                 m_mediaData = m_nextDataPacket;
+                logMediaData(m_mediaData);
                 gotData = true;
 
                 if (m_nextDataPacket->dataType == QnAbstractMediaData::DataType::VIDEO)

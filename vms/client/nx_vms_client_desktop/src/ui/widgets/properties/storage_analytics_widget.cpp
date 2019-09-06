@@ -349,8 +349,6 @@ void QnStorageAnalyticsWidget::queryStatsFromServer(qint64 bitrateAveragingPerio
             if (tool)
                 tool->atReceivedStats(success, handle, data);
         });
-    //m_statsRequest[index].handle = m_server->apiConnection()->getRecordingStatisticsAsync(
-    //    bitrateAveragingPeriodMs, this, SLOT(atReceivedStats(int, const QnRecordingStatsReply&, int)));
 }
 
 void QnStorageAnalyticsWidget::atReceivedStats(

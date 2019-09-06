@@ -51,12 +51,12 @@ void VisualMetadataDebugger::push(const CLConstVideoDecoderOutputPtr& frame)
 
 void VisualMetadataDebugger::push(const QnConstCompressedMetadataPtr& compressedMetadata)
 {
+    using namespace nx::common::metadata;
     if (compressedMetadata->metadataType != MetadataType::ObjectDetection)
         return;
 
     QnMutexLocker lock(&m_mutex);
-    auto metadataPacket = nx::common::metadata::fromCompressedMetadataPacket(compressedMetadata);
-    if (metadataPacket)
+    if (const auto metadataPacket = fromCompressedMetadataPacket(compressedMetadata))
         m_metadataQueue.push(metadataPacket);
 }
 
@@ -254,7 +254,7 @@ QByteArray VisualMetadataDebugger::makeMetadataString(
     for (const auto& objectMetadata : metadataPacket->objectMetadataList)
     {
         str += lit("\tObject:%1,%2,%3,%4,%5,%6\n")
-            .arg(objectMetadata.objectTypeId)
+            .arg(objectMetadata.typeId)
             .arg(objectMetadata.trackId.toString())
             .arg(objectMetadata.boundingBox.x())
             .arg(objectMetadata.boundingBox.y())

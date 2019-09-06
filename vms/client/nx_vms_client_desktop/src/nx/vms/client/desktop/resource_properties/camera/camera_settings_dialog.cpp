@@ -8,8 +8,10 @@
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
+#include <core/resource/media_server_resource.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/widgets/views/resource_list_view.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_selection_watcher.h>
 #include <ui/common/read_only.h>
@@ -45,6 +47,7 @@
 
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/system_health/default_password_cameras_watcher.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
 namespace nx::vms::client::desktop {
@@ -72,17 +75,21 @@ struct CameraSettingsDialog::Private: public QObject
             advancedSettingsWidget->reloadData();
     }
 
+    void updateAdvancedSettingsVisibility()
+    {
+        q->setPageVisible(int(CameraSettingsTab::advanced),
+            store->state().isSingleCamera() && advancedSettingsWidget->shouldBeVisible());
+    }
+
     void initializeAdvancedSettingsWidget()
     {
         advancedSettingsWidget = new CameraAdvancedSettingsWidget(q->ui->tabWidget);
-        installEventHandler(q, QEvent::Show, advancedSettingsWidget,
-            [this](QObject* /*watched*/, QEvent* /*event*/)
-            {
-                advancedSettingsWidget->updateFromResource();
-            });
-
         connect(advancedSettingsWidget, &CameraAdvancedSettingsWidget::hasChangesChanged,
             q, &CameraSettingsDialog::updateButtonsAvailability);
+
+        connect(advancedSettingsWidget, &CameraAdvancedSettingsWidget::visibilityUpdateRequested,
+            this, &Private::updateAdvancedSettingsVisibility);
+
         connect(q->ui->tabWidget, &QTabWidget::currentChanged,
             this, &Private::tryReloadAdvancedSettings);
 
@@ -99,7 +106,6 @@ struct CameraSettingsDialog::Private: public QObject
         if (advancedSettingsAreVisible)
         {
             advancedSettingsWidget->setCamera(cameras.first());
-            advancedSettingsWidget->updateFromResource();
             tryReloadAdvancedSettings();
         }
     }
@@ -119,6 +125,25 @@ struct CameraSettingsDialog::Private: public QObject
                 store->setRecordingEnabled(false);
         }
 
+        if (!store->state().analytics.enabledEngines().empty())
+        {
+            for (const auto& camera: cameras)
+            {
+                const auto& server = camera->getParentServer();
+
+                if (server.isNull())
+                    continue;
+
+                if (server->metadataStorageId().isNull())
+                {
+                    // We need to choose analytics storage locations.
+                    q->workbench()->context()->menu()->triggerIfPossible(
+                        ui::action::ConfirmAnalyticsStorageAction);
+                            //< TODO: #spanasenko Specify the server ID?
+                }
+            }
+        }
+
         deviceAgentSettingsAdaptor->applySettings();
 
         const auto& state = store->state();
@@ -129,6 +154,10 @@ struct CameraSettingsDialog::Private: public QObject
                 CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
                 if (advancedSettingsWidget->hasChanges())
                     advancedSettingsWidget->submitToResource();
+
+                for (const auto& camera: cameras)
+                    camera->updatePreferredServerId();
+
                 resetChanges();
             };
 
@@ -227,7 +256,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
 {
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
-    ui->alertBar->setReservedSpace(false);
+    ui->scheduleAlertBar->setReservedSpace(false);
 
     d->store = new CameraSettingsDialogStore(this);
 
@@ -391,6 +420,7 @@ bool CameraSettingsDialog::tryClose(bool force)
 
 void CameraSettingsDialog::forcedUpdate()
 {
+    d->analyticsEnginesWatcher->update();
 }
 
 bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras, bool force)
@@ -509,6 +539,34 @@ void CameraSettingsDialog::updateButtonsAvailability()
         applyButton->setEnabled(d->hasChanges());
 }
 
+void CameraSettingsDialog::updateScheduleAlert()
+{
+    const auto& state = d->store->state();
+    if (!state.scheduleAlert)
+    {
+        ui->scheduleAlertBar->setText({});
+    }
+    else
+    {
+        switch (*state.scheduleAlert)
+        {
+            case CameraSettingsDialogState::ScheduleAlert::scheduleChangeDueToNoMotion:
+                ui->scheduleAlertBar->setText(tr("Motion detection is disabled, all schedule "
+                    "records \"Motion\" and \"Motion + Lo-Res\" will be changed to \"Always\""));
+                break;
+
+            case CameraSettingsDialogState::ScheduleAlert::scheduleChangeDueToNoDualStreaming:
+                ui->scheduleAlertBar->setText(tr("Dual streaming is disabled, all schedule "
+                    "records \"Motion + Lo-Res\" will be changed to \"Always\""));
+                break;
+
+            default:
+                NX_ASSERT(false);
+                ui->scheduleAlertBar->setText({});
+        }
+    }
+}
+
 void CameraSettingsDialog::updateState(const CameraSettingsDialogState& state)
 {
     static const QString kWindowTitlePattern = lit("%1 - %2");
@@ -529,6 +587,7 @@ void CameraSettingsDialog::updateState(const CameraSettingsDialogState& state)
     setWindowTitle(kWindowTitlePattern.arg(caption).arg(description));
 
     updateButtonsAvailability();
+    updateScheduleAlert();
 
     // TODO: #vkutin #gdm Ensure correct visibility/enabled state.
     // Legacy code has more complicated conditions.
@@ -555,14 +614,14 @@ void CameraSettingsDialog::updateState(const CameraSettingsDialogState& state)
         state.isSingleCamera()
             && !state.singleCameraProperties.settingsUrlPath.isEmpty());
 
-    setPageVisible(int(CameraSettingsTab::advanced), state.isSingleCamera());
-
     setPageVisible(int(CameraSettingsTab::analytics),
         state.isSingleCamera() && !state.analytics.engines.empty());
 
     // Always displaying for single camera as it contains Logical Id setup.
     setPageVisible(int(CameraSettingsTab::expert),
         state.supportsVideoStreamControl() || state.isSingleCamera());
+
+    d->updateAdvancedSettingsVisibility();
 }
 
 } // namespace nx::vms::client::desktop

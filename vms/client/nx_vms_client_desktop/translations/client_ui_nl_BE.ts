@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Klantenservice</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>ARM ondersteuningsbeleid</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -3078,8 +3073,8 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation>Analytics-gegevens kunnen tientallen gigabytes aan opslagruimte innemen. We raden aan om een andere locatie te kiezen in plaats van de systeempartitie.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <translation>Analytics gegevens kunnen grote hoeveelheden ruimte gebruiken. We raden aan om een andere locatie voor te kiezen in plaats van de systeem partitie.</translation>
     </message>
   </context>
   <context>
@@ -3185,19 +3180,6 @@
       <location/>
       <source>Area Width</source>
       <translation>Breedte van het tekstvak</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeServerSelectionWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>Sync time with the Internet</source>
-      <translation>Tijdsynchronisatie met het internet</translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS Time</source>
-      <translation>VMS tijd</translation>
     </message>
   </context>
   <context>

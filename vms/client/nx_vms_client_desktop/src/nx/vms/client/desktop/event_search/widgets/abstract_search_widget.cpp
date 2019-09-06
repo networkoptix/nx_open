@@ -88,8 +88,13 @@ QMenu* AbstractSearchWidget::createDropdownMenu()
 {
     auto result = new QMenu(this);
     result->setProperty(style::Properties::kMenuAsDropdown, true);
-    result->setWindowFlags(result->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    fixMenuFlags(result);
     return result;
+}
+
+void AbstractSearchWidget::fixMenuFlags(QMenu* menu)
+{
+    menu->setWindowFlags(menu->windowFlags() | Qt::BypassGraphicsProxyWidget);
 }
 
 void AbstractSearchWidget::addDeviceDependentAction(

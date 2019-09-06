@@ -13,16 +13,22 @@
 #include <camera/loaders/flat_camera_data_loader.h>
 #include <camera/loaders/layout_file_camera_data_loader.h>
 
-#include <nx/fusion/serialization/json.h>
-#include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/model_functions.h>
+
 #include <nx/utils/log/log.h>
+#include <nx/utils/datetime.h>
 
 namespace {
-    const qint64 requestIntervalMs = 30 * 1000;
 
-    QString dt(qint64 time) {
-        return QDateTime::fromMSecsSinceEpoch(time).toString(lit("MMM/dd/yyyy hh:mm:ss"));
-    }
+const qint64 requestIntervalMs = 30 * 1000;
+
+} // namespace
+
+using AllowedContent = QnCachingCameraDataLoader::AllowedContent;
+
+QString toString(AllowedContent value)
+{
+    return containerString(value);
 }
 
 QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnMediaResourcePtr &resource,
@@ -45,12 +51,12 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnMediaResourcePtr &r
     // but timer should check it much more often.
     loadTimer->setInterval(requestIntervalMs / 10);
     loadTimer->setSingleShot(false);
-    connect(loadTimer, &QTimer::timeout, this, [this]
-    {
-        trace(lit("Checking load by timer (enabled: %1)").arg(m_enabled));
-        if (m_enabled)
+    connect(loadTimer, &QTimer::timeout, this,
+        [this]
+        {
+            NX_VERBOSE(this, "Checking load by timer (allowed: %1)", toString(m_allowedContent));
             load();
-    });
+        });
     loadTimer->start();
     load(true);
 }
@@ -94,11 +100,11 @@ void QnCachingCameraDataLoader::initLoaders() {
                 (const QnAbstractCameraDataPtr &data,
                     const QnTimePeriod &updatedPeriod, int handle)
                 {
-                    trace(lit("Handling reply %1 for period %2 (%3)")
-                        .arg(handle)
-                        .arg(updatedPeriod.startTimeMs)
-                        .arg(dt(updatedPeriod.startTimeMs)),
-                        dataType);
+                    NX_VERBOSE(this, "Handling %1 reply %2 for period %3 (%4)",
+                        dataType,
+                        handle,
+                        updatedPeriod.startTimeMs,
+                        nx::utils::timestampToDebugString(updatedPeriod.startTimeMs));
 
                     NX_ASSERT(updatedPeriod.isInfinite(), "We are always loading till very end.");
                     at_loader_ready(data, updatedPeriod.startTimeMs, dataType);
@@ -107,26 +113,39 @@ void QnCachingCameraDataLoader::initLoaders() {
             connect(loader, &QnAbstractCameraDataLoader::failed, this,
                 [this, dataType]()
                 {
-                    NX_VERBOSE(this, lm("Chunks %1: failed to load")
-                        .arg(dataType == Qn::RecordingContent ? lit("rec") : lit("mot")));
+                    NX_VERBOSE(this, "Chunks %1: failed to load", dataType);
                     emit loadingFailed();
                 });
         }
     }
 }
 
-void QnCachingCameraDataLoader::setEnabled(bool value) {
-    if (m_enabled == value)
+void QnCachingCameraDataLoader::setAllowedContent(AllowedContent value)
+{
+    if (m_allowedContent == value)
         return;
 
-    trace(lit("Set loader enabled %1").arg(value));
-    m_enabled = value;
-    if (value)
-        load(true);
+    NX_VERBOSE(this, "Set loader allowed content to %1", toString(value));
+
+    AllowedContent addedContent;
+    std::set_difference(value.cbegin(), value.cend(),
+        m_allowedContent.cbegin(), m_allowedContent.cend(),
+        std::inserter(addedContent, addedContent.begin()));
+
+    m_allowedContent = value;
+
+    for (auto contentType: addedContent)
+        updateTimePeriods(contentType, /*forced*/ true);
 }
 
-bool QnCachingCameraDataLoader::enabled() const {
-    return m_enabled;
+AllowedContent QnCachingCameraDataLoader::allowedContent() const
+{
+    return m_allowedContent;
+}
+
+bool QnCachingCameraDataLoader::isContentAllowed(Qn::TimePeriodContent content) const
+{
+    return m_allowedContent.find(content) != m_allowedContent.cend();
 }
 
 void QnCachingCameraDataLoader::updateServer(const QnMediaServerResourcePtr& server)
@@ -143,20 +162,24 @@ void QnCachingCameraDataLoader::updateServer(const QnMediaServerResourcePtr& ser
     }
 }
 
+QString QnCachingCameraDataLoader::idForToStringFromPtr() const
+{
+    return m_resource->toResourcePtr()->getName();
+}
+
 QnMediaResourcePtr QnCachingCameraDataLoader::resource() const
 {
     return m_resource;
 }
 
-void QnCachingCameraDataLoader::load(bool forced) {
-    for (int i = 0; i < Qn::TimePeriodContentCount; ++i) {
-        Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
-        updateTimePeriods(timePeriodType, forced);
-    }
+void QnCachingCameraDataLoader::load(bool forced)
+{
+    for (auto content: m_allowedContent)
+        updateTimePeriods(content, forced);
 }
 
-
-const QList<QRegion> &QnCachingCameraDataLoader::motionRegions() const {
+const QList<QRegion> &QnCachingCameraDataLoader::motionRegions() const
+{
     return m_motionRegions;
 }
 
@@ -211,7 +234,6 @@ bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType)
 
     if (!loader)
     {
-        qnWarning("No valid loader in scope.");
         emit loadingFailed();
         return false;
     }
@@ -252,7 +274,7 @@ bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType)
     }
 
     if (handle <= 0)
-        trace(lit("Loading failed"), periodType);
+        NX_VERBOSE(this, "Loading of %1 failed", periodType);
 
     return handle > 0;
 }
@@ -265,37 +287,33 @@ void QnCachingCameraDataLoader::at_loader_ready(
     qint64 startTimeMs,
     Qn::TimePeriodContent dataType)
 {
-    auto timePeriodType = (dataType);
-    m_cameraChunks[timePeriodType] = data
+    m_cameraChunks[dataType] = data
         ? data->dataSource()
         : QnTimePeriodList();
-    trace(lit("Received chunks update. Total size: %1 for period %2 (%3)")
-        .arg(m_cameraChunks[timePeriodType].size())
-        .arg(startTimeMs)
-        .arg(dt(startTimeMs)),
-        dataType);
-    emit periodsChanged(timePeriodType, startTimeMs);
+    NX_VERBOSE(this, "Received %1 chunks update. Total size: %2 for period %3 (%4)",
+        dataType,
+        m_cameraChunks[dataType].size(),
+        startTimeMs,
+        nx::utils::timestampToDebugString(startTimeMs));
+    emit periodsChanged(dataType, startTimeMs);
 }
 
 void QnCachingCameraDataLoader::invalidateCachedData()
 {
-    NX_VERBOSE(this, "Chunks: mark local cache as dirty");
+    NX_VERBOSE(this, "Mark local cache as dirty");
 
-    for (int i = 0; i < Qn::TimePeriodContentCount; i++)
-    {
-        if (auto loader = m_loaders[i])
-            loader->discardCachedData();
-    }
+    for (auto loader: m_loaders)
+        loader->discardCachedData();
 }
 
 void QnCachingCameraDataLoader::discardCachedDataType(Qn::TimePeriodContent type)
 {
-    trace(lit("discardCachedDataType()"), type);
+    NX_VERBOSE(this, "Discard cached %1 chunks", type);
     if (auto loader = m_loaders[type])
         loader->discardCachedData();
 
     m_cameraChunks[type].clear();
-    if (m_enabled)
+    if (isContentAllowed(type))
     {
         updateTimePeriods(type, true);
         emit periodsChanged(type);
@@ -304,7 +322,7 @@ void QnCachingCameraDataLoader::discardCachedDataType(Qn::TimePeriodContent type
 
 void QnCachingCameraDataLoader::discardCachedData()
 {
-    NX_VERBOSE(this) << "Chunks: clear local cache";
+    NX_VERBOSE(this, "Discard all cached data");
     for (int i = 0; i < Qn::TimePeriodContentCount; i++)
         discardCachedDataType(Qn::TimePeriodContent(i));
 }
@@ -314,22 +332,11 @@ void QnCachingCameraDataLoader::updateTimePeriods(Qn::TimePeriodContent periodTy
     if (forced || m_previousRequestTime[periodType].hasExpired(requestIntervalMs))
     {
         if (forced)
-            trace(lit("updateTimePeriods(forced)"), periodType);
+            NX_VERBOSE(this, "updateTimePeriods %1 (forced)", periodType);
         else
-            trace(lit("updateTimePeriods(by timer)"), periodType);
+            NX_VERBOSE(this, "updateTimePeriods %1 (by timer)", periodType);
 
         if (loadInternal(periodType))
             m_previousRequestTime[periodType].restart();
-    }
-}
-
-void QnCachingCameraDataLoader::trace(const QString& message, Qn::TimePeriodContent periodType)
-{
-    if (m_resource)
-    {
-        NX_VERBOSE(this, lm("Chunks (cached) %1: (%2) %3")
-            .arg(periodType == Qn::RecordingContent ? lit("rec") : lit("mot"))
-            .arg(m_resource->toResourcePtr()->getName())
-            .arg(message));
     }
 }

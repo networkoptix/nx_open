@@ -177,7 +177,7 @@ void AbstractSearchListModel::setRelevantTimePeriod(const QnTimePeriod& value)
 
     m_relevantTimePeriod = value;
 
-    if (!m_relevantTimePeriod.isValid() || !m_fetchedTimeWindow.contains(m_relevantTimePeriod))
+    if (!m_relevantTimePeriod.isValid() || m_fetchedTimeWindow != m_relevantTimePeriod)
     {
         clear();
     }
@@ -190,6 +190,9 @@ void AbstractSearchListModel::setRelevantTimePeriod(const QnTimePeriod& value)
         if (!m_relevantTimePeriod.isInfinite())
             setLive(false);
 
+        // TODO: #vkutin Investigate the scenario.
+        // Default canFetchMore implementation compares fetched time window with relevant time
+        // period. But as we assigned one to another a few lines above, it never works.
         if (canFetchMore())
             emit dataNeeded();
     }
@@ -275,13 +278,8 @@ void AbstractSearchListModel::setLive(bool value)
     if (value == m_live)
         return;
 
-    if (value)
-    {
-        const bool supported = effectiveLiveSupported();
-        NX_ASSERT(supported);
-        if (!supported)
-            return;
-    }
+    if (value && !(NX_ASSERT(liveSupported()) && effectiveLiveSupported()))
+        return;
 
     NX_VERBOSE(this, "Setting live mode to %1", value);
     m_live = value;

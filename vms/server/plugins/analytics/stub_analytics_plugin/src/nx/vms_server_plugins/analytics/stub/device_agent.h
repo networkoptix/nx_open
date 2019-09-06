@@ -8,10 +8,10 @@
 #include <condition_variable>
 #include <vector>
 #include <string>
+#include <deque>
 
 #include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
-#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include "engine.h"
 #include "objects/random.h"
@@ -27,15 +27,17 @@ public:
     DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
     virtual ~DeviceAgent() override;
 
-    virtual nx::sdk::Result<void> setNeededMetadataTypes(
+protected:
+    virtual void getPluginSideSettings(
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
+
+    virtual void doSetNeededMetadataTypes(
+        nx::sdk::Result<void>* outValue,
         const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
-    virtual nx::sdk::SettingsResponseResult pluginSideSettings() const override;
-
-protected:
     virtual std::string manifestString() const override;
 
-    virtual nx::sdk::StringMapResult settingsReceived() override;
+    virtual nx::sdk::Result<const nx::sdk::IStringMap*> settingsReceived() override;
 
     virtual bool pushCompressedVideoFrame(
         const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
@@ -47,8 +49,6 @@ protected:
         std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
 
 private:
-    virtual Engine* engine() const override { return engineCasted<Engine>(); }
-
     nx::sdk::analytics::IMetadataPacket* cookSomeEvents();
     std::vector<nx::sdk::analytics::IMetadataPacket*> cookSomeObjects();
 
@@ -77,6 +77,8 @@ private:
 
     void setObjectCount(int objectCount);
 
+    void cleanUpTimestampQueue();
+
     void parseSettings();
 
     template<typename ObjectType>
@@ -98,6 +100,8 @@ private:
     void updateEventGenerationParameters();
 
 private:
+    Engine* const m_engine;
+
     std::atomic<bool> m_terminated{false};
 
     std::unique_ptr<std::thread> m_pluginDiagnosticEventThread;
@@ -112,6 +116,8 @@ private:
 
     int m_frameCounter = 0;
     std::string m_eventTypeId;
+
+    std::deque<int64_t> m_frameTimestampQueue;
     int64_t m_lastVideoFrameTimestampUs = 0;
 
     struct DeviceAgentSettings
@@ -140,6 +146,14 @@ private:
 
         std::atomic<bool> throwPluginDiagnosticEvents{false};
         std::atomic<bool> leakFrames{false};
+
+        std::atomic<std::chrono::milliseconds> additionalFrameProcessingDelay{
+            std::chrono::milliseconds::zero()};
+
+        std::atomic<std::chrono::milliseconds> overallMetadataDelay{
+            std::chrono::milliseconds::zero()};
+
+        std::atomic<int> numberOfFramesBeforePreviewGeneration{30};
     };
 
     DeviceAgentSettings m_deviceAgentSettings;

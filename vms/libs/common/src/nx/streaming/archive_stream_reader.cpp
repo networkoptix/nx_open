@@ -122,6 +122,7 @@ void QnArchiveStreamReader::needMoreData()
 
 void QnArchiveStreamReader::previousFrame(qint64 mksec)
 {
+    --mksec;
     if (m_navDelegate) {
         m_navDelegate->previousFrame(mksec);
         return;

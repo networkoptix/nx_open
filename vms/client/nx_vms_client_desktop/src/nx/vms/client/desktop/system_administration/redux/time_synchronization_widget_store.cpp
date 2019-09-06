@@ -111,9 +111,9 @@ void TimeSynchronizationWidgetStore::setTimeOffsets(const TimeOffsetInfoList &of
             {
                 const auto idx = nx::utils::algorithm::index_of(offsetList,
                     [&server](const TimeOffsetInfo& offsetInfo)
-                {
-                    return server.id == offsetInfo.serverId;
-                });
+                    {
+                        return server.id == offsetInfo.serverId;
+                    });
 
                 if (idx >= 0)
                 {

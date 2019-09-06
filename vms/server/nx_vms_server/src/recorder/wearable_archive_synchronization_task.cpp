@@ -216,7 +216,7 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
 
     if (!m_withMotion)
     {
-        auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& motion) { return false; };
+        auto saveMotionHandler = [](const QnConstMetaDataV1Ptr& /*motion*/) { return false; };
         m_recorder->setSaveMotionHandler(saveMotionHandler);
     }
 
@@ -237,6 +237,14 @@ void WearableArchiveSynchronizationTask::createStreamRecorder(qint64 startTimeMs
 
             emit stateChanged(m_state);
         }, Qt::DirectConnection);
+
+    m_recorder->setEndOfRecordingHandler(
+        [this]
+        {
+            if (m_archiveReader)
+                m_archiveReader->pleaseStop();
+            m_recorder->pleaseStop();
+        });
 }
 
 } // namespace recorder

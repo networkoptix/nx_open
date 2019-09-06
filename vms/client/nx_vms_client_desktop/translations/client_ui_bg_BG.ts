@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation type="unfinished">Customer Support</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation type="unfinished">ARM support policy</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -3078,8 +3073,8 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>
@@ -3185,19 +3180,6 @@
       <location/>
       <source>Area Width</source>
       <translation type="unfinished">Area Width</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeServerSelectionWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>Sync time with the Internet</source>
-      <translation type="unfinished">Sync time with the Internet</translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
     </message>
   </context>
   <context>

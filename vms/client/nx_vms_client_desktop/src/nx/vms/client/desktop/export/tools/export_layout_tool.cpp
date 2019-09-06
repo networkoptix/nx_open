@@ -148,12 +148,12 @@ ExportLayoutTool::ExportLayoutTool(ExportLayoutSettings settings, QObject* paren
 {
     // Make m_layout a deep exact copy of original layout.
     m_layout.reset(new QnLayoutResource());
-    m_layout->setId(d->settings.layout->getId()); //before update() uuid's must be the same
+    m_layout->setIdUnsafe(d->settings.layout->getId()); //before update() uuid's must be the same
     m_layout->update(d->settings.layout);
 
     // If exporting layout, create new guid. If layout just renamed or saved, keep guid.
     if (d->settings.mode != ExportLayoutSettings::Mode::LocalSave)
-        m_layout->setId(QnUuid::createUuid());
+        m_layout->setIdUnsafe(QnUuid::createUuid());
 
     m_isExportToExe = nx::utils::AppInfo::isWindows()
         && FileExtensionUtils::isExecutable(d->settings.fileName.extension);

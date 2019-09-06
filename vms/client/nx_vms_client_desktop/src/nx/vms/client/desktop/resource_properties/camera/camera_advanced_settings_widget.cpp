@@ -45,25 +45,30 @@ void CameraAdvancedSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     if (m_camera)
     {
         connect(m_camera, &QnResource::statusChanged, this,
-            &CameraAdvancedSettingsWidget::updatePage);
+            &CameraAdvancedSettingsWidget::visibilityUpdateRequested);
     }
 
     ui->cameraAdvancedParamsWidget->setCamera(m_camera);
 }
 
-void CameraAdvancedSettingsWidget::updateFromResource()
+void CameraAdvancedSettingsWidget::reloadData()
 {
-    updatePage();
-
-    const bool isIoModule = m_camera && m_camera->isIOModule();
-
-    ui->noSettingsLabel->setText(isIoModule
-        ? tr("This I/O module has no advanced settings")
-        : tr("This camera has no advanced settings"));
+    if (shouldBeVisible())
+        ui->cameraAdvancedParamsWidget->loadValues();
 }
 
+bool CameraAdvancedSettingsWidget::hasChanges() const
+{
+    return shouldBeVisible() && ui->cameraAdvancedParamsWidget->hasChanges();
+}
 
-bool CameraAdvancedSettingsWidget::hasManualPage() const
+void CameraAdvancedSettingsWidget::submitToResource()
+{
+    if (hasChanges())
+        ui->cameraAdvancedParamsWidget->saveValues();
+}
+
+bool CameraAdvancedSettingsWidget::shouldBeVisible() const
 {
     if (!m_camera)
         return false;
@@ -72,32 +77,7 @@ bool CameraAdvancedSettingsWidget::hasManualPage() const
     if (params.groups.empty())
         return false;
 
-     return m_camera->isOnline()
-        || ui->cameraAdvancedParamsWidget->hasItemsAvailableInOffline();
-}
-
-void CameraAdvancedSettingsWidget::updatePage()
-{
-    ui->stackedWidget->setCurrentWidget(hasManualPage() ? ui->manualPage : ui->noSettingsPage);
-}
-
-void CameraAdvancedSettingsWidget::reloadData()
-{
-    updatePage();
-
-    if (hasManualPage())
-        ui->cameraAdvancedParamsWidget->loadValues();
-}
-
-bool CameraAdvancedSettingsWidget::hasChanges() const
-{
-    return hasManualPage() && ui->cameraAdvancedParamsWidget->hasChanges();
-}
-
-void CameraAdvancedSettingsWidget::submitToResource()
-{
-    if (hasChanges())
-        ui->cameraAdvancedParamsWidget->saveValues();
+    return m_camera->isOnline() || ui->cameraAdvancedParamsWidget->hasItemsAvailableInOffline();
 }
 
 } // namespace nx::vms::client::desktop

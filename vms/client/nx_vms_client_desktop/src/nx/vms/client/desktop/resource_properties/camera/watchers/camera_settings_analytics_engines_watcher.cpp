@@ -186,4 +186,9 @@ void CameraSettingsAnalyticsEnginesWatcher::setCamera(const QnVirtualCameraResou
     d->setCamera(camera);
 }
 
+void CameraSettingsAnalyticsEnginesWatcher::update()
+{
+    d->updateStore();
+}
+
 } // namespace nx::vms::client::desktop

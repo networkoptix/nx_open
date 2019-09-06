@@ -13,7 +13,6 @@ extern "C"
 }
 
 #include <api/app_server_connection.h>
-#include <api/session_manager.h>
 #include <api/network_proxy_factory.h>
 
 #include <common/common_module.h>
@@ -841,7 +840,8 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
 
 void QnRtspClientArchiveDelegate::setSpeed(qint64 displayTime, double value)
 {
-    if (value == 0.0)
+    // Don't seek stream on pause if not reverse play currently
+    if (value == 0.0 && m_rtspSession->getScale() >= 0)
         return;
 
     m_position = displayTime;

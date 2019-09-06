@@ -14,7 +14,7 @@ namespace sdk {
 class IDeviceInfo: public nx::sdk::Interface<IDeviceInfo>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::IDeviceInfo"); }
+    static auto interfaceId() { return makeId("nx::sdk::IDeviceInfo"); }
 
     /* @return Unique id of the device. */
     virtual const char* id() const = 0;

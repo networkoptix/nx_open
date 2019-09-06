@@ -110,28 +110,28 @@ def main():
         if isMac:
             archiveMacOsFrameworks(a, lib_dir, join(conf.QT_DIR, "lib"))
 
-        # Archive analytics_sdk unit tests.
+        # Archive metadata_sdk unit tests.
         ut_bin_glob = "Debug\\*_ut.exe" if isWindows else "*_ut"
         ut_lib_globs = {
             "Linux": ["*.so*"],
             "Windows": ["Debug\\*.dll", "Debug\\*.pdb"],
             "Darwin": ["*.dylib"]
         }[conf.CMAKE_SYSTEM_NAME]
-        analytics_sdk_dir = "nx_analytics_sdk"
-        analytics_sdk_ut_dir = join(analytics_sdk_dir, "analytics_sdk-build")
-        analytics_sdk_nx_kit_ut_dir = join(analytics_sdk_ut_dir, join("nx_kit", "unit_tests"))
-        src_analytics_sdk_ut_dir = join(conf.BUILD_DIR, analytics_sdk_ut_dir)
-        src_analytics_sdk_nx_kit_ut_dir = join(conf.BUILD_DIR, analytics_sdk_nx_kit_ut_dir)
+        metadata_sdk_dir = "nx_metadata_sdk"
+        metadata_sdk_ut_dir = join(metadata_sdk_dir, "metadata_sdk-build")
+        metadata_sdk_nx_kit_ut_dir = join(metadata_sdk_ut_dir, join("nx_kit", "unit_tests"))
+        src_metadata_sdk_ut_dir = join(conf.BUILD_DIR, metadata_sdk_ut_dir)
+        src_metadata_sdk_nx_kit_ut_dir = join(conf.BUILD_DIR, metadata_sdk_nx_kit_ut_dir)
         for ut_lib_glob in ut_lib_globs:
-            archiveByGlob(a, "analytics_sdk unit test libraries", analytics_sdk_dir,
-                join(src_analytics_sdk_ut_dir, ut_lib_glob))
-            archiveByGlob(a, "analytics_sdk nx_kit unit test libraries", analytics_sdk_dir,
-                join(src_analytics_sdk_nx_kit_ut_dir, ut_lib_glob))
+            archiveByGlob(a, "metadata_sdk unit test libraries", metadata_sdk_dir,
+                join(src_metadata_sdk_ut_dir, ut_lib_glob))
+            archiveByGlob(a, "metadata_sdk nx_kit unit test libraries", metadata_sdk_dir,
+                join(src_metadata_sdk_nx_kit_ut_dir, ut_lib_glob))
 
-        archiveByGlob(a, "analytics_sdk nx_kit unit test executables", analytics_sdk_dir,
-            join(src_analytics_sdk_nx_kit_ut_dir, ut_bin_glob))
-        archiveByGlob(a, "analytics_sdk unit test executables", analytics_sdk_dir,
-            join(src_analytics_sdk_ut_dir, ut_bin_glob))
+        archiveByGlob(a, "metadata_sdk nx_kit unit test executables", metadata_sdk_dir,
+            join(src_metadata_sdk_nx_kit_ut_dir, ut_bin_glob))
+        archiveByGlob(a, "metadata_sdk unit test executables", metadata_sdk_dir,
+            join(src_metadata_sdk_ut_dir, ut_bin_glob))
 
 
 if __name__ == "__main__":

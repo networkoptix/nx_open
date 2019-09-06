@@ -115,9 +115,14 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
         m_analyticsEventsSaver = QnAbstractDataReceptorPtr(
             new ConditionalDataProxy(
                 m_analyticsEventsSaver,
-                [this](const QnAbstractDataPacketPtr& /*data*/)
+                [deviceWeakPtr = m_cameraRes.toWeakRef()](const QnAbstractDataPacketPtr& /*data*/)
                 {
-                    return m_cameraRes->getStatus() == Qn::Recording;
+                    // TODO: Weak pointer solution is temporary. Live stream provider should
+                    // properly unsubscribe from metadata source.
+                    if (const auto device = deviceWeakPtr.toStrongRef())
+                        return device->getStatus() == Qn::Recording;
+
+                    return false;
                 }));
         m_dataReceptorMultiplexer->add(m_analyticsEventsSaver);
     }
@@ -525,7 +530,7 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
         {
             m_metadataLogger->pushData(
                 metadata,
-                lm("Queue size: %1").args(m_metadataReceptor->metadataQueue.size()));
+                lm("Queue size %1").args(m_metadataReceptor->metadataQueue.size()));
         }
 
         return metadata;
@@ -638,7 +643,7 @@ void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded(const QnCompressedVideo
 }
 
 void QnLiveStreamProvider::saveBitrateIfNeeded(
-    const QnCompressedVideoDataPtr& videoData,
+    const QnCompressedVideoDataPtr& /*videoData*/,
     const QnLiveStreamParams& liveParams,
     bool isCameraConfigured)
 {

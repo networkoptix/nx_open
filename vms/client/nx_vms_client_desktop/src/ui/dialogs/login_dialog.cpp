@@ -3,14 +3,14 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QDir>
-
 #include <QtGui/QStandardItem>
 #include <QtGui/QStandardItemModel>
-
+#include <QtQml/QQmlContext>
+#include <QtQuick/QQuickItem>
+#include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QApplication>
 
 #include <api/app_server_connection.h>
-#include <api/session_manager.h>
 #include <api/model/connection_info.h>
 
 #include <common/common_module.h>
@@ -43,16 +43,17 @@
 
 #include <nx/vms/client/desktop/system_logon/data/logon_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/connection_name_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
+#include <ui/graphics/opengl/gl_functions.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/rendering_widget.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
 #include <helpers/system_helpers.h>
@@ -61,8 +62,6 @@ using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
 namespace {
-
-static const QnUuid kCustomConnectionLocalId;
 
 static const QString kLocalHost("127.0.0.1");
 
@@ -144,6 +143,21 @@ struct AutoFoundSystemViewModel
     }
 };
 
+class IntroContainer: public QWidget
+{
+public:
+    IntroContainer(QWidget* intro, QWidget* parent = nullptr): QWidget(parent)
+    {
+        intro->setParent(this);
+        anchorWidgetToParent(intro);
+    }
+
+    static constexpr qreal kAspectRatio = 16.0 / 9.0;
+
+    virtual bool hasHeightForWidth() const override { return true; }
+    virtual int heightForWidth(int width) const override { return width / kAspectRatio; }
+};
+
 } // namespace
 
 /************************************************************************/
@@ -174,8 +188,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::LoginDialog),
-    m_connectionsModel(new QStandardItemModel(this)),
-    m_renderingWidget(new QnRenderingWidget(this))
+    m_connectionsModel(new QStandardItemModel(this))
 {
     ui->setupUi(this);
 
@@ -183,8 +196,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
 
     setWindowTitle(tr("Connect to Server..."));
     setHelpTopic(this, Qn::Login_Help);
-
-    m_renderingWidget->setEffectiveWidth(kMinIntroWidth);
 
     QHBoxLayout* bbLayout = dynamic_cast<QHBoxLayout*>(ui->buttonBox->layout());
     NX_ASSERT(bbLayout);
@@ -198,30 +209,11 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
         bbLayout->insertWidget(0, versionLabel);
     }
 
-    QString introPath;
-    for (auto name: kIntroNames)
-    {
-        introPath = qnSkin->path(name);
-        if (!introPath.isEmpty())
-            break;
-    }
-
-    QnAviResourcePtr resource =
-        QnAviResourcePtr(new QnAviResource(lit("qtfile://") + introPath, commonModule()));
-    if (FileTypeSupport::isImageFileExt(introPath))
-        resource->addFlags(Qn::still_image);
-    resource->setCommonModule(commonModule());
-
-    m_renderingWidget->setResource(resource);
-
-    QVBoxLayout* layout = new QVBoxLayout(ui->videoSpacer);
-    layout->setSpacing(0);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(m_renderingWidget);
+    setupIntroView();
 
     ui->connectionsComboBox->setModel(m_connectionsModel);
 
-    m_lastUsedItem = NULL;
+    m_lastUsedItem = nullptr;
     m_savedSessionsItem = new QStandardItem(tr("Saved Sessions"));
     m_savedSessionsItem->setFlags(Qt::ItemIsEnabled);
     m_autoFoundItem = new QStandardItem(tr("Auto-Discovered Servers"));
@@ -251,6 +243,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     updateFocus();
 
     /* Should be done after model resetting to avoid state loss. */
+    ui->autoLoginCheckBox->setVisible(qnSettings->saveCredentialsAllowed());
     ui->autoLoginCheckBox->setChecked(qnSettings->autoLogin());
 
     commonModule()->moduleDiscoveryManager()->onSignals(this,
@@ -261,6 +254,46 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
 
 QnLoginDialog::~QnLoginDialog()
 {
+}
+
+void QnLoginDialog::setupIntroView()
+{
+    QString introPath;
+    for (auto name: kIntroNames)
+    {
+        introPath = qnSkin->path(name);
+        if (!introPath.isEmpty())
+            break;
+    }
+
+    if (!NX_ASSERT(!introPath.isEmpty()))
+        return;
+
+    introPath.replace('\\', "/");
+
+    auto layout = new QVBoxLayout(ui->videoSpacer);
+    layout->setSpacing(0);
+    layout->setContentsMargins({});
+
+    QImage image;
+    if (image.load(introPath))
+    {
+        const auto staticIntro = new QLabel(this);
+        staticIntro->setAlignment(Qt::AlignCenter);
+        staticIntro->setPixmap(QPixmap::fromImage(image));
+        layout->addWidget(new IntroContainer(staticIntro));
+    }
+    else
+    {
+        const auto introWidget = new QQuickWidget(qnClientCoreModule->mainQmlEngine(), this);
+        introWidget->rootContext()->setContextProperty("maxTextureSize",
+            QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE));
+
+        introWidget->setSource({ "Nx/Intro/Intro.qml" });
+        introWidget->rootObject()->setProperty("introPath", QString("file:///") + introPath);
+        introWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+        layout->addWidget(new IntroContainer(introWidget));
+    }
 }
 
 void QnLoginDialog::updateFocus()
@@ -324,7 +357,9 @@ void QnLoginDialog::accept()
                 {
                     // In most cases we will connect succesfully by this url. So we can store it.
 
-                    const bool autoLogin = ui->autoLoginCheckBox->isChecked();
+                    const bool autoLogin = qnSettings->saveCredentialsAllowed()
+                        && ui->autoLoginCheckBox->isChecked();
+
                     nx::utils::Url lastUrlForLoginDialog = url;
                     if (!autoLogin)
                         lastUrlForLoginDialog.setPassword(QString());
@@ -332,8 +367,8 @@ void QnLoginDialog::accept()
                     qnSettings->setLastLocalConnectionUrl(lastUrlForLoginDialog.toString());
                     qnSettings->save();
 
-                    const bool storePasswordForTile =
-                        haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin;
+                    const bool storePasswordForTile = qnSettings->saveCredentialsAllowed()
+                        && haveToStorePassword(connectionInfo.localSystemId, url) || autoLogin;
 
                     LogonParameters parameters(url);
                     parameters.storePassword = storePasswordForTile;
@@ -399,12 +434,6 @@ void QnLoginDialog::showEvent(QShowEvent *event)
 #endif
 }
 
-void QnLoginDialog::hideEvent(QHideEvent *event)
-{
-    base_type::hideEvent(event);
-    m_renderingWidget->stopPlayback();
-}
-
 QString QnLoginDialog::defaultLastUsedConnectionName()
 {
     return tr("* Last used connection *");
@@ -453,7 +482,7 @@ void QnLoginDialog::resetSavedSessionsModel()
         url.setHost(kLocalHost);
         url.setUserName(helpers::kFactorySystemUser);
 
-        customConnections.append(QnConnectionData(lit("default"), url, kCustomConnectionLocalId));
+        customConnections.append(QnConnectionData(lit("default"), url, QnUuid()));
     }
 
     m_savedSessionsItem->removeRows(0, m_savedSessionsItem->rowCount());
@@ -464,7 +493,7 @@ void QnLoginDialog::resetSavedSessionsModel()
             return QString::compare(left.name, right.name, Qt::CaseInsensitive) < 0;
         });
 
-    for (const auto& connection : customConnections)
+    for (const auto& connection: customConnections)
     {
         NX_ASSERT(!connection.name.isEmpty());
         if (connection.name == deprecatedLastUsedConnectionName())
@@ -624,25 +653,35 @@ void QnLoginDialog::at_testButton_clicked()
 
 QStandardItem* QnLoginDialog::newConnectionItem(const QnConnectionData& connection)
 {
+    using namespace nx::vms::client::core::helpers;
+
     if (connection == QnConnectionData())
         return nullptr;
 
     const auto text = (!connection.name.isEmpty() ? connection.name
         : tr("%1 at %2").arg(connection.url.userName(), connection.url.host()));
 
-    auto result = ::newConnectionItem(text, connection.url);
+    auto url = connection.url;
+    const auto savedCredentials = getCredentials(connection.localId, url.userName());
+    if (savedCredentials.isValid())
+        url.setPassword(savedCredentials.password);
+
+    auto result = ::newConnectionItem(text, url);
     result->setData(QVariant::fromValue(connection), Qn::ConnectionInfoRole);
     return result;
 }
 
 void QnLoginDialog::at_saveButton_clicked()
 {
+    using namespace nx::vms::client::core::helpers;
+
     NX_ASSERT(isValid());
     if (!isValid())
         return;
 
     QString name = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
-    bool savePassword = !ui->passwordLineEdit->text().isEmpty();
+    bool savePassword = qnSettings->saveCredentialsAllowed()
+        && !ui->passwordLineEdit->text().isEmpty();
     {
         QScopedPointer<QnConnectionNameDialog> dialog(new QnConnectionNameDialog(this));
         dialog->setName(name);
@@ -673,17 +712,28 @@ void QnLoginDialog::at_saveButton_clicked()
         if (dialog.exec() == QDialogButtonBox::Cancel)
             return;
 
+        const auto existingConnection = connections.getByName(name);
+        if (!existingConnection.localId.isNull())
+            removeCredentials(existingConnection.localId, existingConnection.url.userName());
+
         connections.removeOne(name);
     }
 
+    // Generate custom uuid to securely store credentials.
     const nx::utils::Url url = currentUrl();
-    auto connectionData = QnConnectionData(name, url, kCustomConnectionLocalId);
+    auto connectionData = QnConnectionData(name, url, QnUuid::createUuid());
 
     if (!savePassword)
         connectionData.url.setPassword(QString());
     connections.prepend(connectionData);
     qnSettings->setCustomConnections(connections);
     qnSettings->save();
+
+    const auto credentials = savePassword
+        ? nx::vms::common::Credentials(url)
+        : nx::vms::common::Credentials(url.userName(), QString());
+    storeCredentials(connectionData.localId, credentials);
+    qnClientCoreSettings->save();
 
     resetSavedSessionsModel();
 

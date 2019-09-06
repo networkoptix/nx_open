@@ -241,6 +241,7 @@ vms::event::EventParameters convertOldEventParameters(
     return result;
 }
 
+// TODO: Investigate why getBookmarksQueryLimit() is unused.
 int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter& filter)
 {
     if (filter.sparsing.used)
@@ -323,7 +324,7 @@ QnServerDb::QnDbTransaction* QnServerDb::getTransaction()
 
 bool QnServerDb::createDatabase()
 {
-    QnDbTransactionLocker tran(getTransaction());
+    QnDbTransactionLocker tran(getTransaction(), __FILE__, __LINE__);
 
     QSqlQuery versionQuery(m_sdb);
     versionQuery.prepare("SELECT sql from sqlite_master where name = 'runtime_actions'");
@@ -420,7 +421,7 @@ int QnServerDb::auditRecordMaxId() const
 
 bool QnServerDb::addAuditRecords(const std::map<int, QnAuditRecord>& records)
 {
-    QnDbTransactionLocker tran(getTransaction());
+    QnDbTransactionLocker tran(getTransaction(), __FILE__, __LINE__);
 
     if (!m_sdb.isOpen())
         return false;
@@ -455,7 +456,7 @@ bool QnServerDb::addAuditRecords(const std::map<int, QnAuditRecord>& records)
 
 bool QnServerDb::closeUnclosedAuditRecords(int lastRunningTimeSec)
 {
-    QnDbTransactionLocker tran(getTransaction());
+    QnDbTransactionLocker tran(getTransaction(), __FILE__, __LINE__);
     if (!m_sdb.isOpen())
         return false;
 
@@ -1079,7 +1080,7 @@ bool QnServerDb::getBookmarks(
 
 bool QnServerDb::getMaxBookmarksMaxDurationMs(
     const QList<QnUuid>& cameraIds,
-    const QnCameraBookmarkSearchFilter& filter,
+    const QnCameraBookmarkSearchFilter& /*filter*/,
     qint64* outResult) const
 {
     *outResult = 0;
@@ -1140,6 +1141,7 @@ bool QnServerDb::getBookmarks(
             QnBookmarkSortOrder(Qn::BookmarkCameraThenStartTime, filter.orderBy.order));
 
         // Bookmarks between start end end time
+        // TODO: Investigate why needSecondRequest is unused.
         bool needSecondRequest = true;
         if (filter.limit > 0)
         {
@@ -1372,7 +1374,7 @@ bool QnServerDb::addOrUpdateBookmark(const QnCameraBookmark& bookmark, bool isUp
     if (!bookmark.isValid())
         return false;
 
-    QnDbTransactionLocker tran(getTransaction());
+    QnDbTransactionLocker tran(getTransaction(), __FILE__, __LINE__);
 
     int docId = 0;
     if (isUpdate)
@@ -1515,7 +1517,7 @@ bool QnServerDb::deleteAllBookmarksForCamera(const QnUuid& cameraId)
     bool result;
 
     {
-        QnDbTransactionLocker tran(getTransaction());
+        QnDbTransactionLocker tran(getTransaction(), __FILE__, __LINE__);
 
         {
             QSqlQuery delQuery(m_sdb);
@@ -1561,7 +1563,7 @@ bool QnServerDb::deleteBookmark(const QnUuid& bookmarkId)
 
     bool result;
     {
-        QnDbTransactionLocker tran(getTransaction());
+        QnDbTransactionLocker tran(getTransaction(), __FILE__, __LINE__);
 
         {
             QSqlQuery cleanTagQuery(m_sdb);
@@ -1669,9 +1671,8 @@ bool QnServerDb::updateLastRemoteArchiveSyncTimeMs(const QnResourcePtr& resource
 bool QnServerDb::deleteBookmarksToTime(const QMap<QnUuid, qint64>& dataToDelete)
 {
     bool result;
-
     {
-        QnDbTransactionLocker tran(getTransaction());
+        QnDbTransactionLocker tran(getTransaction(), __FILE__, __LINE__);
 
         for (auto itr = dataToDelete.begin(); itr != dataToDelete.end(); ++itr)
         {

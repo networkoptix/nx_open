@@ -44,4 +44,14 @@ bool NotificationListModel::defaultAction(const QModelIndex& index)
     return true;
 }
 
+int NotificationListModel::maximumCount() const
+{
+    return d->maximumCount();
+}
+
+void NotificationListModel::setMaximumCount(int value)
+{
+    d->setMaximumCount(value);
+}
+
 } // namespace nx::vms::client::desktop

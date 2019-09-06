@@ -310,3 +310,14 @@ void QnMaskedProxyWidget::contextMenuEvent(QGraphicsSceneContextMenuEvent* event
     QApplication::sendEvent(receiver, &contextMenuEvent);
     event->setAccepted(contextMenuEvent.isAccepted());
 }
+
+bool QnMaskedProxyWidget::sceneEvent(QEvent* event)
+{
+    // Default behavior of the QGraphicsItem is to ignore event by default, and our instruments
+    // implementation relies on this. ForwardingInstrument pass the event to the currently focused
+    // item (even if it is hidden). But masked proxy widget breaks this agreement when it is
+    // hidden as it simply returns the event unchanged.
+    if (event->type() == QEvent::KeyPress)
+        event->ignore();
+    return base_type::sceneEvent(event);
+}

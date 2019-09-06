@@ -7,6 +7,7 @@
 
 #include <nx/utils/stree/stree_manager.h>
 #include <nx/utils/std/optional.h>
+#include <nx/utils/random_cryptographic_device.h>
 
 namespace nx {
 namespace network {
@@ -43,12 +44,12 @@ public:
         const nx::network::http::Request& request,
         nx::network::http::server::AuthenticationCompletionHandler completionHandler) override;
 
-    static nx::String realm(); 
+    static nx::String realm();
 
 private:
     const nx::network::http::AuthMethodRestrictionList& m_authRestrictionList;
     const nx::utils::stree::StreeManager& m_stree;
-    std::random_device m_rd;
+    nx::utils::random::CryptographicDevice m_rd;
     std::uniform_int_distribution<size_t> m_dist;
 
     bool validateNonce(const nx::network::http::StringType& nonce);

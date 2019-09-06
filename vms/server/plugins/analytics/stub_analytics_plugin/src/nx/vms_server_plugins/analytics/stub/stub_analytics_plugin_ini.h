@@ -19,7 +19,7 @@ struct Ini: public nx::kit::IniConfig
 
     Ini(): IniConfig("stub_analytics_plugin.ini") { reload(); }
 
-    NX_INI_FLAG(1, enableOutput, "");
+    NX_INI_FLAG(0, enableOutput, "");
     NX_INI_STRING("", needUncompressedVideoFrames, needUncompressedVideoFramesDescription.c_str());
     NX_INI_FLAG(0, deviceDependent, "Respective capability in the manifest.");
     NX_INI_INT(-1, crashDeviceAgentOnFrameN,

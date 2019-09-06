@@ -40,7 +40,7 @@
         "unsafePortConfirm": "אין זה בטוח להשתמש במספר היציאה הקטן מ -1025. ייתכן שהשרת לה יהיה נגיש. המשך בכל זאת?",
         "confirmDisconnectFromCloud": "נתק את המערכת מ- {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'> כל משתמשי הענן יימחקו.</span> <br><br>המערכת תהיה נגישה דרך הרשת המקומית עם חשבון מנהל מערכת מקומי.",
-        "confirmDisconnectFromCloudAction": "התנתק",
+        "confirmDisconnectFromCloudAction": "נתק",
         "disconnectedFromCloudSuccess": "המערכת נותקה בהצלחה מ {{CLOUD_NAME}}",
         "disconnectedFromCloudError": "לא ניתן לנתק את המערכת",
         "confirmDisconnectFromSystem": "נתק שרת מהמערכת הנוכחית",

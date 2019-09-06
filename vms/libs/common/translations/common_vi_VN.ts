@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="vi" sourcelanguage="en">
   <context>
-    <name>DateTimeFormats</name>
-    <message>
-      <source>MM/dd</source>
-      <translation type="unfinished">MM/dd</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <translation>MMMM yyyy</translation>
-    </message>
-  </context>
-  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -805,7 +794,7 @@
     <message numerus="yes">
       <source>%n Cameras</source>
       <translation>
-        <numerusform>%n Camera</numerusform>
+        <numerusform>%n camera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1010,7 +999,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Lỗi không rõ.</translation>
+      <translation>Lỗi không xác định.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>
@@ -1537,7 +1526,7 @@
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Sự kiện chẩn đoán plugin không xác định</translation>
     </message>
     <message>
       <source>RAID error. %1.</source>

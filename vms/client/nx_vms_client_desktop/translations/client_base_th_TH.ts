@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="th" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>ทุกชนิด</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>เลือกพื้นที่</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>เลือกบางพื้นที่ในวิดีโอ</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>ในพื้นที่ที่เลือก</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>ไม่สามารถดำเนินการกับปลั๊กอินได้</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>ป้อนพารามิเตอร์</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>การดำเนินการต้องเติมพารามิเตอร์บางอย่าง</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -873,7 +904,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation>การตั้งค่าเครื่องมือวิเคราะห์ ...</translation>
+      <translation>การตั้งค่าเครื่องมือวิเคราะห์...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -893,11 +924,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation>กล้องเสมือน ...</translation>
+      <translation>กล้องเสมือน...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation>ใหม่กล้องเสมือนจริง ...</translation>
+      <translation>ใหม่กล้องเสมือนจริง...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -917,31 +948,31 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Files...</source>
-      <translation>ไฟล์ ...</translation>
+      <translation>ไฟล์...</translation>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>สลับไปที่แท็บการแจ้งเตือน</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>เปลี่ยนเป็นแท็บ Motion</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>สลับไปที่แท็บบุ๊คมาร์ค</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>สลับไปที่แท็บเหตุการณ์</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>สลับไปที่แท็บวัตถุ</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>เฟรมวัตถุและข้อมูลต่างๆ</translation>
     </message>
     <message>
       <source>Pin Calendar</source>
@@ -995,23 +1026,62 @@ to view more bookmarks</source>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>กรุณาใส่รหัสผ่านที่ถูกต้อง</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>รหัสผ่านไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>รูปแบบที่เข้ารหัส</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>ไฟล์ %1 ถูกเข้ารหัส กรุณาใส่รหัสผ่าน:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>กรุณาใส่รหัสผ่านใหม่สำหรับเลย์เอาต์ %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>เหตุการณ์เซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>วิเคราะห์เหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>ทุกเหตุการณ์</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>ปัญหาเกี่ยวกับกล้อง</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>เหตุการณ์ของเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>ปัญหาเกี่ยวกับอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>ปัญหาของกล้อง</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>วิเคราะห์เหตุการณ์</translation>
     </message>
   </context>
   <context>
@@ -1039,7 +1109,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>All Files</source>
-      <translation type="unfinished">All Files</translation>
+      <translation>ไฟล์ทั้งหมด</translation>
     </message>
   </context>
   <context>
@@ -1322,7 +1392,7 @@ to view more bookmarks</source>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>เลย์เอาต์ถูกล็อค</translation>
     </message>
   </context>
   <context>
@@ -1576,15 +1646,15 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>รายละเอียดสำหรับ %n ครั้ง %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>รายละเอียดสำหรับกล้อง %n ตัวจาก %1</numerusform>
       </translation>
     </message>
   </context>
@@ -1635,24 +1705,12 @@ to view more bookmarks</source>
       <translation>การปรับปรุงเซิร์ฟเวอร์</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>การปรับปรุง กฎ ธุรกิจ</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>ลบ เซิร์ฟเวอร์ ออก</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>ลบ กฎ ทางธุรกิจออก</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>ลบ ผู้ใช้ ออก</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>การตั้งค่า กฎ ทางธุรกิจ</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1740,13 +1798,25 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>ติดตั้งการอัปเดตเรียบร้อยแล้ว</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n การกระทำ</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>กฎกิจกรรมเปลี่ยนไป</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>ลบกฎกิจกรรมแล้ว</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>กฎกิจกรรมถูกรีเซ็ตเป็นค่าเริ่มต้น</translation>
     </message>
   </context>
   <context>
@@ -2021,8 +2091,8 @@ to view more bookmarks</source>
       <translation>กล้องใดก็ได้</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>การรับทราบแรงจะทำงานเฉพาะกับเหตุการณ์ทั่วไปหากมีการใช้ตัวดัดแปลงกล้องใน URL เหตุการณ์ทั่วไป</translation>
     </message>
   </context>
   <context>
@@ -2555,7 +2625,7 @@ to %1</source>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
+      <translation>เกิดข้อผิดพลาดของเซิร์ฟเวอร์ โปรดลองอีกครั้งในภายหลัง</translation>
     </message>
   </context>
   <context>
@@ -2713,7 +2783,7 @@ to %1</source>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>ไม่สามารถเข้าสู่โหมดความเข้ากันได้สำหรับรุ่น %1</translation>
     </message>
   </context>
   <context>
@@ -2979,15 +3049,15 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>บันทึกเหตุการณ์ตั้งแต่วันที่ %1 ถึง %2 -%n เหตุการณ์ที่พบ</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>บันทึกเหตุการณ์สำหรับ%1 - %n เหตุการณ์ที่พบ</numerusform>
       </translation>
     </message>
   </context>
@@ -3061,8 +3131,8 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (ของ%n กล้อง)</numerusform>
       </translation>
     </message>
   </context>
@@ -3145,11 +3215,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>กล้องนี้ไม่ได้อยู่ในรูปแบบที่เลือก การดำเนินการจะทำงานถ้ากล้องถูกทริกเกอร์ดำเนินการก่อน</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>กล้องนี้ไม่ได้อยู่ในรูปแบบที่เลือก การดำเนินการจะทำงานถ้ากล้องถูกทริกเกอร์ดำเนินการก่อน</translation>
     </message>
   </context>
   <context>
@@ -3186,7 +3256,7 @@ to %1</source>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>อัตโนมัติ (%1)</translation>
     </message>
   </context>
   <context>
@@ -3344,7 +3414,7 @@ to %1</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>กรุณาใส่ค่า</translation>
     </message>
   </context>
   <context>
@@ -3549,7 +3619,7 @@ to %1</source>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>แชนแนล</translation>
     </message>
   </context>
   <context>
@@ -3738,13 +3808,13 @@ to %1</source>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+      <translation>ใบอนุญาตทุกใบสามารถปิดการใช้งานได้เพียงไม่กี่ครั้ง</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>%1  มีใช้อยู่ในปัจจุบัน</numerusform>
+        <numerusform>%1 มีใช้อยู่ในปัจจุบัน</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4039,7 +4109,7 @@ to %1</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>พื้นที่ซูม</translation>
     </message>
   </context>
   <context>
@@ -4194,11 +4264,11 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>กล้องเสมือน...</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>กล้องเสมือน %1</translation>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
@@ -4425,8 +4495,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>ประมาณ %n นาที</numerusform>
       </translation>
     </message>
   </context>
@@ -4606,11 +4676,11 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>บิตเรตปัจจุบัน</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>ไม่มีข้อมูลสำหรับการคาดการณ์</translation>
     </message>
   </context>
   <context>
@@ -4654,11 +4724,11 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>ไฟล์ในเครื่อง</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>ไม่มีไฟล์ในเครื่อง</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4674,7 +4744,7 @@ to %1</source>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>เปิดทั้งหมด</translation>
     </message>
     <message>
       <source>All types</source>
@@ -4791,11 +4861,11 @@ to %1</source>
     </message>
     <message>
       <source>Videowalls</source>
-      <translation>videowalls</translation>
+      <translation>Videowalls</translation>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>เครื่องมือวิเคราะห์เหตุการณ์</translation>
     </message>
   </context>
   <context>
@@ -5053,7 +5123,7 @@ to %1</source>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>ปลั๊กอิน</translation>
     </message>
   </context>
   <context>
@@ -5397,23 +5467,23 @@ to %1</source>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>5 นาทีสุดท้าย</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>60 นาทีสุดท้าย</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>24 ชั่วโมงที่แล้ว</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>ระยะเวลายาวนานที่สุด</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>การคาดการณ์มีเฉพาะสำหรับกล้องที่กำลังเปิดใช้การบันทึก</translation>
     </message>
   </context>
   <context>
@@ -5528,13 +5598,7 @@ to %1</source>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
-    </message>
-    <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>จะทำอย่างไรกับข้อมูลการวิเคราะห์ในปัจจุบัน?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -5547,6 +5611,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cancel</source>
       <translation>ยกเลิก</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>ข้อมูลการวิเคราะห์ปัจจุบันจะไม่ถูกย้ายไปที่อื่นโดยอัตโนมัติและจะไม่สามารถเข้าถึงได้ คุณสามารถเก็บมันและย้ายด้วยตนเองในภายหลังหรือลบอย่างถาวร
+หากคุณต้องการย้ายข้อมูลการวิเคราะห์ไปยังที่เก็บข้อมูลอื่นโปรดติดต่อฝ่ายสนับสนุนก่อนดำเนินการต่อ</translation>
     </message>
   </context>
   <context>
@@ -5597,11 +5667,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics data</source>
-      <translation type="unfinished">Use to store analytics data</translation>
+      <translation>ใช้เพื่อการวิเคราะห์พื้นที่จัดเก็บ</translation>
     </message>
     <message>
       <source>Stores analytics data</source>
-      <translation type="unfinished">Stores analytics data</translation>
+      <translation>การวิเคราะห์พื้นที่จัดเก็บ</translation>
     </message>
   </context>
   <context>
@@ -5690,7 +5760,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>ปลั๊กอิน</translation>
     </message>
   </context>
   <context>
@@ -5827,19 +5897,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>ไม่มีเซิร์ฟเวอร์ที่สามารถเชื่อมต่ออินเทอร์เน็ตสำหรับการซิงโครไนซ์เวลา</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>ระบบกำลังทำงานในเซฟโหมด</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>ไม่มีเซิร์ฟเวอร์ที่สามารถเชื่อมต่ออินเทอร์เน็ตสำหรับการซิงโครไนซ์เวลา</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>ไม่มีเซิร์ฟเวอร์ที่สามารถเชื่อมต่ออินเทอร์เน็ตสำหรับการซิงโครไนซ์เวลา.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
@@ -5869,10 +5939,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ไม่รวมข้อมูลส่วนบุคคลใด ๆ และไม่ระบุชื่อ</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>มาตรการการเซิร์ฟเวอร์ล้มเหลวยังคงร้องขอการปรับปรุงสถานะของกล้องโดยไม่คำนึงถึงการตั้งค่านี้</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>เปิดใช้งานอุปกรณ์และเซิร์ฟเวอร์ค้นหาอัตโนมัติและตรวจสอบสถานะอุปกรณ์อัตโนมัติ</translation>
     </message>
@@ -5883,6 +5949,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>เมื่อเปิดใช้งานระบบจะค้นพบกล้องและเซิร์ฟเวอร์ใหม่อย่างต่อเนื่องและส่งคำขอการค้นพบไปยังกล้องเพื่ออัพเดทสถานะ</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>หากเปิดใช้งาน Failover เซิร์ฟเวอร์อาจยังร้องขอการอัพเดตสถานะกล้องโดยไม่คำนึงถึงการตั้งค่านี้</translation>
     </message>
   </context>
   <context>
@@ -5902,44 +5972,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>ไฟล์สเปรดชีต (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>เซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>สาขา</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>วันที่</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>เขตเวลา</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>เวลา</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>ไม่มีเซิร์ฟเวอร์ที่มีการเข้าถึงอินเทอร์เน็ต เวลาไม่ได้ซิงโครไนซ์</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>เวลา VMS ถูกซิงโครไนซ์กับอินเทอร์เน็ตและไม่ขึ้นอยู่กับเวลาท้องถิ่นบนเซิร์ฟเวอร์</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>เวลา VMS ถูกซิงโครไนซ์กับเวลาท้องถิ่นบนเซิร์ฟเวอร์ที่เลือกและไม่ขึ้นอยู่กับเวลาท้องถิ่นบนเซิร์ฟเวอร์อื่น</translation>
     </message>
   </context>
   <context>
@@ -6806,7 +6838,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation>เปิดการบันทึกกล้องเสมือน ...</translation>
+      <translation>เปิดการบันทึกกล้องเสมือน...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
@@ -7038,6 +7070,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>เลือกพื้นที่บนวิดีโอเพื่อกรองผลลัพธ์</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>ในพื้นที่ที่เลือก</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>เลือกกล้อง</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>เลือกอุปกรณ์</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>เลือกสื่อ</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ไม่มี</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7070,7 +7130,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>LST</translation>
+      <translation>Lst</translation>
     </message>
     <message>
       <source>Lo</source>
@@ -7080,7 +7140,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>ME</translation>
+      <translation>Me</translation>
     </message>
     <message>
       <source>Hi</source>
@@ -7257,7 +7317,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>แทร็กที่ไม่รู้จัก</translation>
     </message>
   </context>
   <context>
@@ -7275,38 +7335,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>
         <numerusform>%n วัตถุ</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Any type</source>
-      <translation>ทุกชนิด</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>เลือกพื้นที่</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>เลือกบางพื้นที่ในวิดีโอ</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>ในพื้นที่ที่เลือก</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>โปรแกรมวิเคราะห์ชื่อ</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>ไม่สามารถดำเนินการกับปลั๊กอินได้</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>ป้อนพารามิเตอร์</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>การดำเนินการต้องเติมพารามิเตอร์บางอย่าง</translation>
     </message>
   </context>
   <context>
@@ -7349,17 +7377,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>ใช้การเปลี่ยนแปลง...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>โมดูล I / O นี้ไม่มีการตั้งค่าขั้นสูง</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>กล้องนี้ไม่มีการตั้งค่าขั้นสูง</translation>
     </message>
   </context>
   <context>
@@ -7416,7 +7433,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
       <translation>
-        <numerusform>รหัสนี้ใช้กับกล้อง %n ต่อไปนี้: </numerusform>
+        <numerusform>รหัสนี้ใช้กับกล้อง %n ต่อไปนี้:</numerusform>
       </translation>
     </message>
     <message>
@@ -7425,7 +7442,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>Multicast</translation>
     </message>
   </context>
   <context>
@@ -7488,7 +7505,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>การตรวจจับการเคลื่อนไหวถูกปิดใช้งาน</translation>
     </message>
   </context>
   <context>
@@ -7621,7 +7638,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>ปลั๊กอิน</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>การตรวจจับความเคลื่อนไหวถูกปิดใช้งานบันทึกกำหนดการทั้งหมด &quot;Motion&quot; และ &quot;Motion + Lo-Res&quot; จะเปลี่ยนเป็น &quot;เสมอ&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>การตรวจจับความเคลื่อนไหวถูกปิดใช้งานบันทึกกำหนดการทั้งหมด Motion และ &quot;Motion + Lo-Res&quot; จะเปลี่ยนเป็น &quot;เสมอ&quot;</translation>
     </message>
   </context>
   <context>
@@ -7675,19 +7700,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>โมดูลนี้ถูกติดตั้งไว้อยู่แล้ว:</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>ไม่ได้ติดตั้งเวอร์ชันนี้</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>รูปแบบเวอร์ชันไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>แพ็คเกจการอัพเดทไม่สมบูรณ์</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -7695,11 +7720,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+      <translation>เนื้อที่ว่างบนดิสก์ไม่เพียงพอสำหรับติดตั้งการอัปเดตไคลเอ็นต์</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation type="unfinished">Installation package has been lost.</translation>
+      <translation>แพ็คเกจการติดตั้งสูญหาย</translation>
     </message>
   </context>
   <context>
@@ -7752,7 +7777,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>กล้องบางตัวที่เลือกต้องใช้รหัสผ่านในการตั้งค่า</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -7813,7 +7838,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Checking host...</source>
-      <translation type="unfinished">Checking host...</translation>
+      <translation>กำลังตรวจสอบโฮสต์</translation>
     </message>
     <message>
       <source>Finished</source>
@@ -7833,12 +7858,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>เพิ่มอุปกรณ์ทั้งหมดแล้ว</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>กำลังเพิ่มอุปกรณ์ %n รายการ คุณสามารถปิดกล่องโต้ตอบนี้หรือเริ่มการค้นหาใหม่</numerusform>
       </translation>
     </message>
     <message>
@@ -7848,23 +7873,23 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Add %n Devices</source>
       <translation>
-        <numerusform>เพิ่มอุปกรณ์</numerusform>
+        <numerusform>เพิ่ม %n อุปกรณ์</numerusform>
       </translation>
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>พื้นที่สำหรับกรอกข้อความไม่สามารถว่างได้</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>โปรดตรวจสอบและยอมรับ %1 เพื่อดำเนินการต่อ</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>การใช้ซอฟต์แวร์คุณต้องยอมรับข้อตกลงใบอนุญาตของผู้ใช้</translation>
     </message>
   </context>
   <context>
@@ -7898,42 +7923,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>ไม่พบเหตุการณ์</translation>
     </message>
@@ -7944,12 +7933,8 @@ If you intended to move analytics data to another storage location, please conta
       </translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation>โปรแกรมวิเคราะห์ชื่อ</translation>
-    </message>
-    <message>
       <source>No events occurred</source>
-      <translation type="unfinished">No events occurred</translation>
+      <translation>ไม่มีเหตุการณ์ที่เกิดขึ้น</translation>
     </message>
   </context>
   <context>
@@ -7965,7 +7950,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>โปรดใส่รหัสผ่านของคุณ</translation>
     </message>
   </context>
   <context>
@@ -8114,7 +8099,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>คุณกำลังจะส่งวิดีโอยาว ๆ อาจต้องใช้พื้นที่เก็บข้อมูลจำนวนมากและใช้เวลานาน</translation>
     </message>
   </context>
   <context>
@@ -8148,15 +8133,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Image is not round</source>
-      <translation type="unfinished">Image is not round</translation>
+      <translation>ภาพไม่กลม</translation>
     </message>
     <message>
       <source>Image might be too dim</source>
-      <translation type="unfinished">Image might be too dim</translation>
+      <translation>ภาพอาจจะมืดเกินไป</translation>
     </message>
     <message>
       <source>Invalid input image</source>
-      <translation type="unfinished">Invalid input image</translation>
+      <translation>ภาพอินพุตไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>Internal error</source>
@@ -8186,14 +8171,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n ใหม่</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>%n อุปกรณ์ที่พบ</numerusform>
       </translation>
     </message>
   </context>
@@ -8238,7 +8223,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>คัดลอกตำแหน่งลิงก์</translation>
     </message>
   </context>
   <context>
@@ -8333,7 +8318,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>ไม่สามารถเริ่มกระบวนการค้นหาได้</translation>
     </message>
   </context>
   <context>
@@ -8359,27 +8344,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Checking for updates automatically</source>
-      <translation type="unfinished">Checking for updates automatically</translation>
+      <translation>ตรวจสอบอัพเดทอัตโนมัติ</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>ตรวจสอบสำหรับการอัพเดต</translation>
     </message>
     <message>
       <source>Force check</source>
-      <translation type="unfinished">Force check</translation>
+      <translation>ตรวจสอบกำลัง</translation>
     </message>
     <message>
       <source>Disable Automatically Checking</source>
-      <translation type="unfinished">Disable Automatically Checking</translation>
+      <translation>ปิดใช้งานการตรวจสอบอัตโนมัติ</translation>
     </message>
     <message>
       <source>Check Once</source>
-      <translation type="unfinished">Check Once</translation>
+      <translation>ตรวจสอบครั้งเดียว</translation>
     </message>
     <message>
       <source>Check Automatically</source>
-      <translation type="unfinished">Check Automatically</translation>
+      <translation>ตรวจสอบอัตโนมัติ</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -8391,27 +8376,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation type="unfinished">You have already installed this version.</translation>
+      <translation>คุณได้ติดตั้งเวอร์ชันนี้แล้ว</translation>
     </message>
     <message>
       <source>Unable to check updates on the internet</source>
-      <translation type="unfinished">Unable to check updates on the internet</translation>
+      <translation>ไม่สามารถตรวจสอบการอัปเดตบนอินเทอร์เน็ต</translation>
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>ไม่พบไฟล์</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation type="unfinished">Cannot update from the selected file</translation>
+      <translation>ไม่สามารถอัปเดตจากไฟล์ที่เลือก</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation type="unfinished">Invalid update information</translation>
+      <translation>ข้อมูลการอัพเดทไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+      <translation>ไม่สามารถปรับเป็นรุ่นก่อนหน้าได้</translation>
     </message>
     <message>
       <source>Update file is not found</source>
@@ -8419,11 +8404,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation type="unfinished">Upgrade package is broken</translation>
+      <translation>แพ็คเกจการอัปเกรดใช้งานไม่ได้</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation type="unfinished">Missing update package for some servers</translation>
+      <translation>ไม่มีแพ็คเกจการอัปเดตสำหรับเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
@@ -8432,7 +8417,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No update package available</source>
-      <translation type="unfinished">No update package available</translation>
+      <translation>ไม่มีอัพเดทที่พร้อมใช้</translation>
     </message>
     <message>
       <source>Select Update File...</source>
@@ -8445,6 +8430,52 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>เซิร์ฟเวอร์บางเครื่องอยู่ในสถานะออฟไลน์และจะไม่ได้รับการอัพเดท ข้ามไปได้หรือไม่</translation>
+    </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>ไม่มีแพ็คเกจการอัปเดตสำหรับไคลเอ็นต์และเซิร์ฟเวอร์ %n</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>ไม่มีแพ็คเกจการอัปเดตสำหรับไคลเอ็นต์</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>ไม่มีเซิร์ฟเวอร์ออนไลน์ที่จะอัปเดต</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>ยกเลิกการอัปเดตและลบข้อมูลที่ดาวน์โหลดทั้งหมดหรือไม่?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>ส่วนประกอบบางอย่างในเวอร์ชั่นระบบปฏิบัติการไม่รองรับ โปรดลบออกจากระบบหรืออัปเดตระบบปฏิบัติการเป็นรุ่นที่รองรับ</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>ไคลเอ็นต์เวอร์ชัน OS ไม่ได้รับการสนับสนุน โปรดอัปเดตระบบปฏิบัติการเป็นเวอร์ชันที่รองรับ</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>ไม่สามารถติดตั้งการอัปเดต</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>ไม่สามารถติดตั้งการอัปเดต</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>ไม่สามารถเริ่มการติดตั้งได้</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>เซิร์ฟเวอร์บางตัวยังไม่เสร็จสิ้นกระบวนการอัพเดต เสร็จแล้วหรือยัง?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>ไม่สามารถดาวน์โหลดแพ็คเกจการอัพเดทไปยังส่วนประกอบบางอย่างได้</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -8463,16 +8494,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation>อัปเดตเสร็จสมบูรณ์แล้ว</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client จะถูกรีสตาร์ทเป็นเวอร์ชั่นที่อัพเดต</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>การอัปเดตเสร็จสมบูรณ์ แต่ส่วนประกอบบางตัวไม่สามารถอัปเดตได้</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>โปรดอัปเดต %1 ด้วยตนเองโดยใช้แพ็คเกจการติดตั้ง</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 จะเริ่มต้นใหม่เป็นเวอร์ชันที่ได้รับการปรับปรุง</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>ตกลง</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>มีข้อผิดพลาดขณะติดตั้งการอัปเดต:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>กำลังดาวน์โหลดการอัปเดต...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>เสร็จสิ้นการอัพเดท</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>ยกเลิก</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>ติดตั้งเวอร์ชันล่าสุดแล้ว</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>ติดตั้งเวอร์ชันล่าสุดแล้ว</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>ติดตั้งการปรับปรุง</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8491,12 +8554,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ดาวน์โหลด &amp;&amp; ติดตั้ง</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>เลือกอีกหมวดหมู่</translation>
+      <source>Browse for Another File...</source>
+      <translation>เรียกดูไฟล์อื่น...</translation>
     </message>
     <message>
-      <source>Browse for Another File...</source>
-      <translation>เรียกดูไฟล์อื่น ...</translation>
+      <source>Select Another Build</source>
+      <translation>เลือกอีกหมวดหมู่</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8519,6 +8582,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation>กำลังติดตั้งการอัปเดตไคลเอ็นต์...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>กำลังเริ่มอัปเดตเป็น ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>กำลังอัพเดทเป็น</translation>
     </message>
@@ -8527,12 +8594,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>พร้อมอัพเดทแล้ว</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>ติดตั้งการปรับปรุง</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>อัพเดทระบบ</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>เซิร์ฟเวอร์บางตัวไม่มีแพ็คเกจการอัพเดท</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>เซิร์ฟเวอร์บางตัวพบข้อผิดพลาดภายใน</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>กรุณาติดต่อฝ่ายสนับสนุน</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>เซิร์ฟเวอร์บางเครื่องออฟไลน์ โปรดรอจนกว่าจะออนไลน์เพื่อดำเนินการต่อ</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8541,6 +8620,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>ดำเนินการต่อในเบื้องหลัง</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>อัพเดตล่าสุดที่มีให้</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8553,108 +8636,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation>อัปเดตจากสื่อกลาง</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>อัพเดตล่าสุดที่มีให้</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>ไม่มีแพ็คเกจการอัปเดตสำหรับไคลเอ็นต์และเซิร์ฟเวอร์ %n</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>ไม่มีแพ็คเกจการอัปเดตสำหรับไคลเอ็นต์</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>เสร็จสิ้นการอัพเดท</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>ยกเลิก</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>ติดตั้งเวอร์ชันล่าสุดแล้ว</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>ติดตั้งเวอร์ชันล่าสุดแล้ว</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>ไม่มีเซิร์ฟเวอร์ออนไลน์ที่จะอัปเดต</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>ยกเลิกการอัปเดตและลบข้อมูลที่ดาวน์โหลดทั้งหมดหรือไม่?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>โปรดอัปเดต %1 ด้วยตนเองโดยใช้แพ็คเกจการติดตั้ง</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 จะเริ่มต้นใหม่เป็นเวอร์ชันที่ได้รับการปรับปรุง</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>ไม่สามารถดาวน์โหลดแพ็คเกจการอัพเดทไปยังส่วนประกอบบางอย่างได้</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -8698,7 +8679,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>เหตุการณ์การวิเคราะห์ปลั๊กอินที่ไม่รู้จัก</translation>
     </message>
   </context>
   <context>
@@ -8724,7 +8705,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
-      <translation>เค้าโครงเฉพาะสามารถแสดงต่อเจ้าของได้เท่านั้น </translation>
+      <translation>เค้าโครงเฉพาะสามารถแสดงต่อเจ้าของได้เท่านั้น</translation>
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
@@ -8732,7 +8713,8 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>ไม่มีผู้ใช้ที่เลือกมีสิทธิ์ในการเลือกเค้าโครงที่เลือก การดำเนินการ
+จะไม่ทำงาน</translation>
     </message>
   </context>
   <context>
@@ -8771,39 +8753,39 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation type="unfinished">Waiting for peer data</translation>
+      <translation>กำลังรอข้อมูลเพียร์</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation type="unfinished">There is not enough space to download update files.</translation>
+      <translation>มีพื้นที่ไม่เพียงพอในการดาวน์โหลดไฟล์อัพเดต</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation type="unfinished">There is not enough space to extract update files.</translation>
+      <translation>มีพื้นที่ไม่เพียงพอในการแตกไฟล์อัพเดต</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>ไม่สามารถดาวน์โหลดแพคเกจโปรแกรมปรับปรุงได้</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation type="unfinished">Update contents are invalid.</translation>
+      <translation>เนื้อหาการอัพเดทไม่ถูกต้อง</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation type="unfinished">Update archive is corrupted.</translation>
+      <translation>การอัปเดตที่เก็บถาวรเสียหาย</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation type="unfinished">Update files cannot be extracted.</translation>
+      <translation>ไม่สามารถแตกไฟล์อัพเดตได้</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation type="unfinished">Internal downloader error.</translation>
+      <translation>ข้อผิดพลาดของตัวดาวน์โหลดภายใน</translation>
     </message>
     <message>
       <source>Internal client error.</source>
-      <translation type="unfinished">Internal client error.</translation>
+      <translation>ข้อผิดพลาดภายในไคลเอ็นต์</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -8811,23 +8793,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation type="unfinished">Unexpected error code.</translation>
+      <translation>รหัสข้อผิดพลาดที่ไม่คาดคิด</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation type="unfinished">Ready to install update</translation>
+      <translation>พร้อมติดตั้งการอัปเดต</translation>
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>แพ็คเกจการอัพเดทเสียหาย.</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>มีพื้นที่ไม่เพียงพอในการแตกไฟล์อัพเดต</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>ข้อผิดพลาดภายในเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
@@ -8938,11 +8920,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>การตรวจจับการเคลื่อนไหวถูกปิดใช้งานหรือไม่รองรับ</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>การสตรีมคู่ถูกปิดใช้งานหรือไม่รองรับ</translation>
     </message>
   </context>
   <context>
@@ -8979,7 +8961,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
       <source>Library</source>
-      <translation type="unfinished">Library</translation>
+      <translation>ไลบรารี</translation>
     </message>
     <message>
       <source>Version</source>
@@ -8991,27 +8973,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>ไม่มีข้อผิดพลาด</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>ไม่สามารถโหลดไฟล์ไลบรารี</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>ไลบรารีปลั๊กอินไม่ถูกต้องหรือเข้ากันไม่ได้</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>ไลบรารีปลั๊กอินล้มเหลวในการเริ่มต้น</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>ปลั๊กอินส่งคืนรายการที่ไม่ดี</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>ไม่สนับสนุนรุ่นปลั๊กอิน API</translation>
     </message>
     <message>
       <source>unknown error</source>
@@ -9019,15 +9001,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>ไม่ได้โหลด</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>เพียบ</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>ปลั๊กอินอยู่ในบัญชีดำ</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9035,7 +9017,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>ปลั๊กอินเป็นตัวเลือกและไม่อยู่ในรายการสีขาว</translation>
     </message>
     <message>
       <source>internal error</source>
@@ -9069,15 +9051,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>ไม่มีการเชื่อมต่อไปยังเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>ข้อผิดพลาดของเครือข่าย.</translation>
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>ข้อผิดพลาดของเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>
@@ -9121,14 +9103,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>เลือกพื้นที่บนวิดีโอเพื่อกรองผลลัพธ์</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>ในพื้นที่ที่เลือก</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>ไม่มีการเคลื่อนไหว</translation>
     </message>
@@ -9142,23 +9116,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>กิจกรรมเคลื่อนไหว %n</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>เลือกกล้อง</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>เลือกอุปกรณ์</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>เลือกสื่อ</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ไม่มี</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SoftwareTriggerButton</name>
@@ -9171,8 +9128,8 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>ที่อยู่อีเมลไม่ได้ตั้งค่าสำหรับการใช้งาน %n</numerusform>
       </translation>
     </message>
     <message>
@@ -9190,13 +9147,13 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>ดับเบิลคลิกเพื่อเพิ่มกล้องในเค้าโครงปัจจุบันหรือ ctrl + คลิกเพื่อเปิดในแท็บใหม่</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>ไม่มีที่เก็บถาวร</translation>
     </message>
   </context>
   <context>
@@ -9207,7 +9164,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>โซนเวลา</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9215,7 +9172,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>เวลาของเซิร์ฟเวอร์ระบบปฏิบัติการ</translation>
     </message>
     <message>
       <source>VMS Time</source>
@@ -9226,31 +9183,31 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>เวลาทั่วไปและซิงโครไนซ์ระหว่างเซิร์ฟเวอร์ทั้งหมด สามารถแตกต่างกับเวลาระบบปฏิบัติการบนเซิร์ฟเวอร์เฉพาะใด ๆ</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>ซิงค์เวลากับอินเทอร์เน็ต</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>ซิงโครไนซ์กับเวลาท้องถิ่นของเซิร์ฟเวอร์ที่เลือก</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>ไม่ตรงกัน แต่ละเซิร์ฟเวอร์ใช้เวลาท้องถิ่นของตนเอง</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>เท่ากับเวลาท้องถิ่นของเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>ไม่มีการเชื่อมต่ออินเทอร์เน็ต. เวลาไม่ได้รับการซิงโครไนซ์</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>เซิร์ฟเวอร์เวลาออฟไลน์ เวลาไม่ได้รับการซิงโครไนซ์</translation>
     </message>
   </context>
   <context>
@@ -9276,7 +9233,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>ไม่สามารถสร้างการอัปโหลดที่ฝั่งเซิร์ฟเวอร์: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9290,16 +9247,24 @@ If you intended to move analytics data to another storage location, please conta
       <source>File was corrupted while being uploaded to the server</source>
       <translation>ไฟล์เสียหายขณะอัปโหลดไปยังเซิร์ฟเวอร์</translation>
     </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>รีโมตไฟล์ &quot;%1&quot; เสียหาย</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>เซิร์ฟเวอร์แล้วมีไฟล์นี้ &quot;%1&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>ตรวจพบความเคลื่อนไหวเฉพาะระหว่างการอัปโหลดวิดีโอ</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>การเปิดใช้งานหรือปิดใช้งานการตั้งค่านี้จะไม่เปลี่ยนแปลงสิ่งใดในไฟล์เก็บถาวรที่มีอยู่</translation>
     </message>
   </context>
   <context>
@@ -9397,27 +9362,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>เริ่มส่งออก...</translation>
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>กำลังบันทึกเค้าโครง</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation type="unfinished">Stop Saving</translation>
+      <translation>หยุดการบันทึก</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation type="unfinished">Saving failed</translation>
+      <translation>บันทึกล้มเหลว!</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation type="unfinished">Starting saving...</translation>
+      <translation>เริ่มบันทึก...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>เรากำลังเตรียมไฟล์สำหรับกระบวนการส่งออก กรุณารอสักครู่</translation>
     </message>
   </context>
   <context>
@@ -9454,7 +9419,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>สร้างความละเอียดใหม่</translation>
     </message>
   </context>
   <context>
@@ -9495,7 +9460,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>ปลั๊กอินใด ๆ</translation>
     </message>
   </context>
   <context>
@@ -9626,7 +9591,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>เค้าโครงเต็ม</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -9678,11 +9643,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>กล้องเสมือนไม่สามารถย้ายระหว่างเซิร์ฟเวอร์ได้</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
-      <translation type="unfinished">Layout is locked and cannot be changed</translation>
+      <translation>เค้าโครงถูกล็อคและไม่สามารถเปลี่ยนแปลงได้</translation>
     </message>
     <message>
       <source>Open File</source>
@@ -9690,7 +9655,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>รองรับทั้งหมด</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9793,35 +9758,39 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>ไม่สามารถเปลี่ยนรหัสผ่านในกล้อง %n ตัวจาก %1</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>คำเตือน! โครงสร้างนี้มีไว้เพื่อการทดสอบเท่านั้น.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>เปิดการตั้งค่าเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>ตกลง</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>ยืนยันที่เก็บสินค้าเพื่อจัดเก็บข้อมูลการวิเคราะห์ใน &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+      <source>the largest available partition</source>
+      <translation>พาร์ติชันที่มีขนาดใหญ่ที่สุด</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation>ฐานข้อมูลการวิเคราะห์ควรเก็บไว้ในไดรฟ์ในเครื่องเท่านั้นและอาจใช้พื้นที่จำนวนมาก
+เมื่อเลือกสถานที่จัดเก็บข้อมูลการวิเคราะห์แล้วจะไม่สามารถเปลี่ยนแปลงได้อย่างง่ายดายโดยไม่สูญเสียข้อมูลที่มีอยู่ เราแนะนำให้เลือกตำแหน่งที่ตั้งอย่างระมัดระวังและหลีกเลี่ยงการใช้พาร์ติชันระบบเนื่องจากอาจทำให้ระบบทำงานผิดปกติอย่างรุนแรง
+โดยค่าเริ่มต้นข้อมูลการวิเคราะห์จะถูกเก็บไว้ใน %1
+คุณสามารถเลือกที่เก็บข้อมูลอื่นได้ในแท็บ &quot;การจัดการที่เก็บ&quot; ของกล่องโต้ตอบการตั้งค่าเซิร์ฟเวอร์</translation>
     </message>
   </context>
   <context>

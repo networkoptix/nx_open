@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="cs" sourcelanguage="en">
   <context>
-    <name>DateTimeFormats</name>
-    <message>
-      <source>MM/dd</source>
-      <translation type="unfinished">MM/dd</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <translation type="unfinished">MMMM yyyy</translation>
-    </message>
-  </context>
-  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -417,7 +406,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>Nelze najít enkodér pro kodek %1.</translation>
+      <translation>Nelze najít kodér pro kodek %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -892,14 +881,12 @@
         <numerusform>%n Kamera</numerusform>
         <numerusform>%n Cameras</numerusform>
         <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
       <translation type="unfinished">
         <numerusform>%n kamera</numerusform>
-        <numerusform>%n cameras</numerusform>
         <numerusform>%n cameras</numerusform>
         <numerusform>%n cameras</numerusform>
       </translation>

@@ -15,7 +15,8 @@ protected:
     virtual Source baseSource() const override;
 
     virtual bool calculateAccess(const QnResourceAccessSubject& subject,
-        const QnResourcePtr& resource) const override;
+        const QnResourcePtr& resource,
+        nx::vms::api::GlobalPermissions globalPermissions) const override;
 
     virtual void handleResourceAdded(const QnResourcePtr& resource);
 

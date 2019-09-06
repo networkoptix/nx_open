@@ -85,9 +85,22 @@ struct Information
 };
 
 #define Information_Fields (version)(cloudHost)(eulaLink)(eulaVersion)(releaseNotesUrl) \
-    (description)(packages)(participants)(lastInstallationRequestTime)(eula)
+    (description)(packages)(participants)(lastInstallationRequestTime)(eula)(releaseDateMs) \
+    (releaseDeliveryDays)
 
 QN_FUSION_DECLARE_FUNCTIONS(Information, (ubjson)(json)(eq))
+
+struct UpdateDeliveryInfo
+{
+    QString version;
+    /** Release date - in msecs since epoch. */
+    qint64 releaseDateMs = 0;
+    /** Maximum days for release delivery. */
+    int releaseDeliveryDays = 0;
+};
+
+#define UpdateDeliveryInfo_Fields (version)(releaseDateMs)(releaseDeliveryDays)
+QN_FUSION_DECLARE_FUNCTIONS(UpdateDeliveryInfo, (ubjson)(json)(eq))
 
 struct PackageInformation
 {
@@ -271,6 +284,10 @@ struct UpdateContents
     /** We have already installed this version. Widget will show appropriate status.*/
     bool alreadyInstalled = false;
 
+    bool needClientUpdate = false;
+
+    bool noServerWithInternet = true;
+
     /** Resets data from verification. */
     void resetVerification();
 
@@ -278,6 +295,8 @@ struct UpdateContents
     uint64_t getClientSpaceRequirements(bool withClient) const;
 
     nx::utils::SoftwareVersion getVersion() const;
+
+    UpdateDeliveryInfo getUpdateDeliveryInfo() const;
 
     /** Check if we can apply this update. */
     bool isValidToInstall() const;
@@ -288,6 +307,9 @@ struct UpdateContents
      * update contents valid, but we can not do anything with an empty update.
      */
     bool isEmpty() const;
+
+    /** Checks if peer has update package. */
+    bool peerHasUpdate(const QnUuid& id) const;
 
     /**
      * Compares this update info with 'other' and decides whether we should pick other one.
@@ -311,3 +333,4 @@ bool isPackageNewerForVariant(
 
 Q_DECLARE_METATYPE(nx::update::Information);
 Q_DECLARE_METATYPE(nx::update::UpdateContents);
+Q_DECLARE_METATYPE(nx::update::UpdateDeliveryInfo);

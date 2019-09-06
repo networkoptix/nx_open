@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="he" sourcelanguage="en">
   <context>
-    <name>DateTimeFormats</name>
-    <message>
-      <source>MM/dd</source>
-      <translation>MM/dd</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <translation>MMMM yyyy</translation>
-    </message>
-  </context>
-  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -1112,7 +1101,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>שגיאה לא ידועה.</translation>
+      <translation>שגיאה לא מוכרת.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>

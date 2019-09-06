@@ -138,7 +138,9 @@ private:
         {
             using namespace nx::test;
             NX_TEST_API_POST(
-                m_launcher, url, QByteArray(), nullptr, nx::network::http::StatusCode::ok, "admin",
+                m_launcher, url, QByteArray(), nullptr,
+                Equals(nx::network::http::StatusCode::ok),
+                "admin",
                 "admin", &rawResponse);
         }();
 
@@ -167,7 +169,8 @@ private:
         NX_TEST_API_POST(m_launcher, composeUploadUrl(fileName, fileData), QByteArray());
         NX_TEST_API_POST(
             m_launcher, QString("/api/downloads/%1/chunks/0").arg(fileName),
-            fileData, nullptr, nx::network::http::StatusCode::ok, "admin", "admin", nullptr,
+            fileData, nullptr,
+            Equals(nx::network::http::StatusCode::ok), "admin", "admin", nullptr,
             "application/octet-stream");
 
         using namespace vms::common::p2p::downloader;
@@ -221,8 +224,9 @@ protected:
         const auto url = QString("/api/wearableCamera/add?name=%1").arg(m_wearableCameraName);
 
         NX_TEST_API_POST(
-            m_server.get(), url, QByteArray(),nullptr, nx::network::http::StatusCode::ok, "admin",
-            "admin", &response);
+            m_server.get(), url, QByteArray(),nullptr,
+            Equals(nx::network::http::StatusCode::ok),
+            "admin", "admin", &response);
 
         addCameraRestResult = QJson::deserialized<QnJsonRestResult>(response);
         QnWearableCameraReply reply = addCameraRestResult.deserialized<QnWearableCameraReply>();

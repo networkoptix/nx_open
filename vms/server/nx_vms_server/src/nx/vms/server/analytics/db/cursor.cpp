@@ -159,7 +159,7 @@ nx::common::metadata::ObjectMetadata Cursor::toMetadataObject(
     int trackPositionIndex)
 {
     nx::common::metadata::ObjectMetadata result;
-    result.objectTypeId = track.objectTypeId;
+    result.typeId = track.objectTypeId;
     result.trackId = track.id;
     result.boundingBox = track.objectPositionSequence[trackPositionIndex].boundingBox;
     result.attributes = track.attributes;

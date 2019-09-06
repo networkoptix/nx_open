@@ -6,6 +6,7 @@ namespace node_view {
 struct NodeViewBaseSortModel::Private
 {
     QString filter;
+    FilterFunctor filterFunctor;
     NodeViewBaseSortModel::FilterScope scope;
 };
 
@@ -65,8 +66,9 @@ bool NodeViewBaseSortModel::filterAcceptsRow(
         const auto index = source->index(sourceRow, column, sourceParent);
         if (d->scope == AnyNodeFilterScope || source->rowCount(index) == 0)
         {
-            const auto text = index.data().toString();
-            if (text.contains(d->filter, Qt::CaseInsensitive))
+            if (d->filterFunctor && d->filterFunctor(index, d->filter))
+                return true;
+            else if (index.data().toString().contains(d->filter, Qt::CaseInsensitive))
                 return true;
         }
 
@@ -80,6 +82,10 @@ bool NodeViewBaseSortModel::filterAcceptsRow(
     return false;
 }
 
+void NodeViewBaseSortModel::setFilterFunctor(FilterFunctor filterFunctor)
+{
+    d->filterFunctor = filterFunctor;
+}
 
 } // namespace node_view
 } // namespace nx::vms::client::desktop

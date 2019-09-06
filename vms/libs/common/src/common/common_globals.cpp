@@ -204,3 +204,20 @@ nx::vms::api::StreamIndex toStreamIndex(ConnectionRole role)
 }
 
 } // namespace Qn
+
+QString toString(Qn::TimePeriodContent value)
+{
+    switch (value)
+    {
+        case Qn::TimePeriodContent::RecordingContent:
+            return "recorded";
+        case Qn::TimePeriodContent::MotionContent:
+            return "motion";
+        case Qn::TimePeriodContent::AnalyticsContent:
+            return "analytics";
+        default:
+            break;
+    }
+    NX_ASSERT(false, "Should never get here");
+    return QString::number(value);
+}

@@ -2,22 +2,11 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="no" sourcelanguage="en">
   <context>
-    <name>DateTimeFormats</name>
-    <message>
-      <source>MM/dd</source>
-      <translation>dd/MM</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <translation>MMMM yyyy</translation>
-    </message>
-  </context>
-  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation type="unfinished">Language Name</translation>
+      <translation>Norsk</translation>
     </message>
   </context>
   <context>
@@ -824,7 +813,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I / O-Modul</translation>
+      <translation>I / O-modul</translation>
     </message>
     <message>
       <source>I/O module</source>

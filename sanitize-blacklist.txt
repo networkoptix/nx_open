@@ -1,0 +1,2 @@
+[address]
+fun:_Z12soap_fdeleteP4soapP10soap_clist

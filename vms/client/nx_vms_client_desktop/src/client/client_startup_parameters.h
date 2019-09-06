@@ -65,6 +65,7 @@ struct QnStartupParameters
     QString engineVersion;
     int vmsProtocolVersion = 0;
     QString ipVersion;
+    QString scriptFile;
 
     /** Uri when the client was launched as uri handler. */
     nx::vms::utils::SystemUri customUri;

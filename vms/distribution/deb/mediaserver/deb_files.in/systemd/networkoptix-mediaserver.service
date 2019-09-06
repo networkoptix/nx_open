@@ -2,8 +2,8 @@
 
 [Unit]
 Description=@company.name@ Media Server
-After=network.target local-fs.target remote-fs.target \
-    @deb.customization.company.name@-root-tool.service
+After=network.target local-fs.target remote-fs.target
+Requires=@root_tool_service@
 
 [Service]
 ExecStart=/opt/@deb.customization.company.name@/mediaserver/bin/mediaserver

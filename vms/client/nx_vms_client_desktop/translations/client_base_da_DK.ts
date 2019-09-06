@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="da" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation type="unfinished">Any type</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation type="unfinished">Select area</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation type="unfinished">Select some area on the video...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation type="unfinished">In selected area</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation type="unfinished">Failed to execute plugin action</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation type="unfinished">Enter parameters</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -1016,6 +1047,45 @@ to view more bookmarks</translation>
     </message>
   </context>
   <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation type="unfinished">Server events</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation type="unfinished">Analytics events</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation type="unfinished">Any event</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation type="unfinished">Any device issue</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation type="unfinished">Any camera issue</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation type="unfinished">Any server event</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation type="unfinished">Device issues</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation type="unfinished">Camera issues</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation type="unfinished">Any analytics event</translation>
+    </message>
+  </context>
+  <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
@@ -1652,24 +1722,12 @@ to view more bookmarks</translation>
       <translation type="unfinished">Server updated</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation type="unfinished">Business rule updated</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation type="unfinished">Server removed</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation type="unfinished">Business rule removed</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation type="unfinished">User removed</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation type="unfinished">Business rule reseted</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1765,6 +1823,18 @@ to view more bookmarks</translation>
         <numerusform>%n actions</numerusform>
         <numerusform>%n actions</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation type="unfinished">Event rule changed</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation type="unfinished">Event rule removed</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation type="unfinished">Event rules reset to default</translation>
     </message>
   </context>
   <context>
@@ -2045,8 +2115,8 @@ to view more bookmarks</translation>
       <translation type="unfinished">Any Camera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
     </message>
   </context>
   <context>
@@ -5599,12 +5669,6 @@ to %1</translation>
       <translation type="unfinished">What to do with current analytics data?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation type="unfinished">Delete</translation>
     </message>
@@ -5615,6 +5679,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cancel</source>
       <translation type="unfinished">Cancel</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
     </message>
   </context>
   <context>
@@ -5937,10 +6007,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Does not include any personal information and is completely anonymous.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
     </message>
@@ -5951,6 +6017,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
     </message>
   </context>
   <context>
@@ -5970,44 +6040,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation type="unfinished">Spread Sheet (CSV) File</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation type="unfinished">Server</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation type="unfinished">Offset</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation type="unfinished">Date</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation type="unfinished">Timezone</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation type="unfinished">Time</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation type="unfinished">No server has Internet access. Time is not being synchronized.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
     </message>
   </context>
   <context>
@@ -6115,7 +6147,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserManagementWidget</name>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Redigere</translation>
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
@@ -7142,6 +7174,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation type="unfinished">Select area on the video to filter results</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation type="unfinished">In selected area</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation type="unfinished">Selected camera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation type="unfinished">Selected device</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation type="unfinished">Selected media</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation type="unfinished">none</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7382,38 +7442,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n objects</numerusform>
       </translation>
     </message>
-    <message>
-      <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation type="unfinished">Failed to execute plugin action</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
-    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
@@ -7456,17 +7484,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation type="unfinished">Applying changes...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation type="unfinished">This I/O module has no advanced settings</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation type="unfinished">This camera has no advanced settings</translation>
     </message>
   </context>
   <context>
@@ -7735,6 +7752,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Plugins</source>
       <translation type="unfinished">Plugins</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation type="unfinished">Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation type="unfinished">Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
     </message>
   </context>
   <context>
@@ -8016,42 +8041,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation type="unfinished">No events</translation>
     </message>
@@ -8061,10 +8050,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n events</numerusform>
         <numerusform>%n events</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8568,6 +8553,53 @@ If you intended to move analytics data to another storage location, please conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation type="unfinished">
+        <numerusform>Missing update package for the client and %n servers</numerusform>
+        <numerusform>Missing update package for the client and %n servers</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation type="unfinished">Missing update package for the client</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation type="unfinished">There are no online servers to update.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation type="unfinished">Failed to start update</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation type="unfinished">Failed to cancel update</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation type="unfinished">Failed to start installation</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation type="unfinished">Failed to download update packages to some components</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation type="unfinished">If the problem persists, please contact Customer Support.</translation>
@@ -8585,16 +8617,48 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Update completed</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation type="unfinished">Update completed, but some components have failed an update</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation type="unfinished">Please update %1 manually using an installation package.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation type="unfinished">%1 will be restarted to the updated version.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation type="unfinished">OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation type="unfinished">There was an error while installing updates:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation type="unfinished">Downloading updates...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation type="unfinished">Finish Update</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation type="unfinished">Cancel</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation type="unfinished">The latest version is already installed</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation type="unfinished">This version is already installed</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation type="unfinished">Install update</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8613,12 +8677,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Download &amp;&amp; Install</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation type="unfinished">Browse for Another File...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation type="unfinished">Select Another Build</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8641,6 +8705,10 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Installing client updates...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation type="unfinished">Starting update to ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation type="unfinished">Updating to ...</translation>
     </message>
@@ -8649,12 +8717,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Ready to update to</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation type="unfinished">Install update</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation type="unfinished">System updated to</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation type="unfinished">Some servers have no update packages available.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation type="unfinished">Some servers have encountered an internal error.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation type="unfinished">Please contact Customer Support.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8663,6 +8743,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation type="unfinished">Continue in Background</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation type="unfinished">Latest Available Update</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8675,109 +8759,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update from mediaservers</source>
       <translation type="unfinished">Update from mediaservers</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation type="unfinished">Latest Available Update</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation type="unfinished">Please update %1 manually using an installation package.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation type="unfinished">%1 will be restarted to the updated version.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -9246,14 +9227,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation type="unfinished">No motion</translation>
     </message>
@@ -9267,23 +9240,6 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n motion events</numerusform>
         <numerusform>%n motion events</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation type="unfinished">Selected camera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
     </message>
   </context>
   <context>
@@ -9418,6 +9374,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>File was corrupted while being uploaded to the server</source>
       <translation type="unfinished">File was corrupted while being uploaded to the server</translation>
+    </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation type="unfinished">Remote file &quot;%1&quot; is corrupted</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation type="unfinished">Server already has this file &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9948,18 +9912,22 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">OK</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+      <source>the largest available partition</source>
+      <translation type="unfinished">the largest available partition</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

@@ -2,7 +2,7 @@
 
 #include <analytics/db/config.h>
 
-#include "serializers.h"
+#include <analytics/db/analytics_db_utils.h>
 
 namespace nx::analytics::db {
 

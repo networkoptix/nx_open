@@ -3,7 +3,6 @@
 #include <common/common_globals.h>
 
 #include <nx/core/core_fwd.h>
-#include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/user_access_data.h>
 
 #include <nx/utils/singleton.h>
@@ -11,6 +10,10 @@
 
 #include <utils/common/connective.h>
 #include <common/common_module_aware.h>
+#include <nx_ec/data/api_fwd.h>
+
+
+class QnResourceAccessSubject;
 
 class QnGlobalPermissionsManager:
     public Connective<QObject>,
@@ -25,6 +28,11 @@ public:
 
     /** Get a set of global permissions that will not work without the given one. */
     static GlobalPermissions dependentPermissions(GlobalPermission value);
+
+    /** Checks if specified permissions contains required one. */
+    static bool containsPermission(
+        GlobalPermissions globalPermissions,
+        GlobalPermission requiredPermission);
 
     /**
     * \param user                      User or role to get global permissions for.
@@ -49,6 +57,7 @@ public:
     bool hasGlobalPermission(const Qn::UserAccessData& accessRights,
         GlobalPermission requiredPermission) const;
 
+    bool canSeeAnotherUsers(const Qn::UserAccessData& accessRights) const;
 signals:
     void globalPermissionsChanged(const QnResourceAccessSubject& subject,
         GlobalPermissions permissions);

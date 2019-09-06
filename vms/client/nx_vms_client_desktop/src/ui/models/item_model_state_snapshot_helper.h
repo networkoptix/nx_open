@@ -6,17 +6,19 @@
 #include <QtCore/QModelIndex>
 #include <QtCore/QSet>
 
+#include <client/client_globals.h>
+
 class QAbstractItemModel;
 
 namespace nx::vms::client::desktop {
 
-class NX_VMS_CLIENT_DESKTOP_API ItemModelStateSnapshotHelper
+class ItemModelStateSnapshotHelper
 {
 public:
     struct SnapshotParams
     {
         QModelIndex parentIndex = QModelIndex();
-        QSet<int> roles = {Qt::DisplayRole};
+        QSet<int> roles = {Qt::DisplayRole, Qn::ResourceIconKeyRole};
         std::optional<int> startRow; //< Applied only for children of item at parentIndex
         std::optional<int> rowCount; //< Applied only for children of item at parentIndex
         std::optional<int> depth;

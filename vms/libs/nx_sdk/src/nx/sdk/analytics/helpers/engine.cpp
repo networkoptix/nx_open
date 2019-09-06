@@ -11,7 +11,7 @@
 
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/helpers/log_utils.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/plugin_diagnostic_event.h>
@@ -23,40 +23,14 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-class PrintPrefixMaker
+static std::string makePrintPrefix(const IEngineInfo* engineInfo = nullptr)
 {
-public:
-    std::string makePrintPrefix(
-        const std::string& overridingPrintPrefix,
-        const IEngineInfo* engineInfo = nullptr)
-    {
-        if (!overridingPrintPrefix.empty())
-            return overridingPrintPrefix;
+    return "[" + libContext().name() + "_engine"
+        + (!engineInfo ? "" : (std::string("_") + engineInfo->id())) + "] ";
+}
 
-        std::string printPrefix = std::string("[") + libContext().name() + "_engine";
-        if (engineInfo)
-            printPrefix += std::string("_") + engineInfo->id();
-
-        printPrefix += "] ";
-        return printPrefix;
-    }
-
-private:
-    /** Used by the above NX_KIT_ASSERT (via NX_PRINT). */
-    struct
-    {
-        const std::string printPrefix = "nx::sdk::analytics::Engine(): ";
-    } logUtils;
-};
-
-Engine::Engine(
-    IPlugin* plugin,
-    bool enableOutput,
-    const std::string& printPrefix)
-    :
-    logUtils(enableOutput, PrintPrefixMaker().makePrintPrefix(printPrefix)),
-    m_plugin(plugin),
-    m_overridingPrintPrefix(printPrefix)
+Engine::Engine(bool enableOutput):
+    logUtils(enableOutput, makePrintPrefix())
 {
     NX_PRINT << "Created " << this << ": \"" << libContext().name() << "\"";
 }
@@ -91,34 +65,33 @@ Engine::~Engine()
 
 void Engine::setEngineInfo(const IEngineInfo* engineInfo)
 {
-    logUtils.setPrintPrefix(
-        PrintPrefixMaker().makePrintPrefix(m_overridingPrintPrefix, engineInfo));
+    logUtils.setPrintPrefix(makePrintPrefix(engineInfo));
 }
 
-StringMapResult Engine::setSettings(const IStringMap* settings)
+void Engine::doSetSettings(Result<const IStringMap*>* outResult, const IStringMap* settings)
 {
     if (!logUtils.convertAndOutputStringMap(&m_settings, settings, "Received settings"))
-        return error(ErrorCode::invalidParams, "Unable to convert the input string map");
-
-    return settingsReceived();
+        *outResult = error(ErrorCode::invalidParams, "Unable to convert the input string map");
+    else
+        *outResult = settingsReceived();
 }
 
-SettingsResponseResult Engine::pluginSideSettings() const
+void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
-StringResult Engine::manifest() const
+void Engine::getManifest(Result<const IString*>* outResult) const
 {
-    return new String(manifestString());
+    *outResult = new String(manifestString());
 }
 
-Result<void> Engine::executeAction(IAction* action)
+void Engine::doExecuteAction(Result<IAction::Result>* outResult, const IAction* action)
 {
     if (!action)
     {
         NX_PRINT << __func__ << "(): INTERNAL ERROR: action is null";
-        return error(ErrorCode::invalidParams, "Action is null");
+        *outResult = error(ErrorCode::invalidParams, "Action is null");
+        return;
     }
 
     std::map<std::string, std::string> params;
@@ -130,35 +103,25 @@ Result<void> Engine::executeAction(IAction* action)
     NX_OUTPUT << "    deviceId: " << action->deviceId();
     NX_OUTPUT << "    timestampUs: " << action->timestampUs();
 
-    const auto actionParams = toPtr(action->params());
+    const auto actionParams = action->params();
 
     if (!logUtils.convertAndOutputStringMap(
         &params, actionParams.get(), "params", /*outputIndent*/ 4))
     {
         // The error is already logged.
-        return error(ErrorCode::invalidParams, "Invalid action parameters");
+        *outResult = error(ErrorCode::invalidParams, "Invalid action parameters");
+        return;
     }
 
     NX_OUTPUT << "}";
 
-    std::string actionUrl;
-    std::string messageToUser;
-
-    auto result = executeAction(
+    *outResult = executeAction(
         action->actionId(),
         action->objectTrackId(),
         action->deviceId(),
         action->timestampUs(),
-        nx::sdk::toPtr(action->objectTrackInfo()),
-        params,
-        &actionUrl,
-        &messageToUser);
-
-    const char* const actionUrlPtr = actionUrl.empty() ? nullptr : actionUrl.c_str();
-    const char* const messageToUserPtr = messageToUser.empty() ? nullptr : messageToUser.c_str();
-    action->handleResult(actionUrlPtr, messageToUserPtr);
-
-    return result;
+        action->objectTrackInfo(),
+        params);
 }
 
 void Engine::setHandler(IEngine::IHandler* handler)
@@ -171,14 +134,6 @@ void Engine::setHandler(IEngine::IHandler* handler)
 bool Engine::isCompatible(const IDeviceInfo* /*deviceInfo*/) const
 {
     return true;
-}
-
-void Engine::assertPluginCasted(void* plugin) const
-{
-    // This method is placed in .cpp to allow NX_KIT_ASSERT() use the correct NX_PRINT() prefix.
-    NX_KIT_ASSERT(plugin,
-        "nx::sdk::analytics::Engine " + nx::kit::utils::toString(this)
-        + " has m_plugin of incorrect runtime type " + typeid(*m_plugin).name());
 }
 
 } // namespace analytics

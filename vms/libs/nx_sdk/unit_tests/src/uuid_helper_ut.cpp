@@ -16,11 +16,11 @@ namespace test {
 
 #define FIXED_UUID {0xd4,0xbb,0x55,0xa4,0xa8,0x7a,0x41,0x99,0xbb,0xd1,0x80,0x00,0xa4,0x80,0xa5,0xad}
 static constexpr char kFixedUuidString[]{"{D4BB55A4-A87A-4199-BBD1-8000A480A5AD}"};
-static constexpr uint8_t kFixedUuidBytes[Uuid::kSize] FIXED_UUID;
-static constexpr Uuid kFixedUuid FIXED_UUID;
+static constexpr uint8_t kFixedUuidBytes[Uuid::size()] FIXED_UUID;
+static const Uuid kFixedUuid FIXED_UUID; //< NOTE: Here constexpr does not work in MSVC 2015.
 
 static constexpr char kNullUuidString[]{"{00000000-0000-0000-0000-000000000000}"};
-static constexpr uint8_t kNullUuidBytes[Uuid::kSize]{};
+static constexpr uint8_t kNullUuidBytes[Uuid::size()]{};
 static constexpr Uuid kNullUuid = Uuid(); //< default constructor
 
 TEST(UuidHelper, uuidBasics)
@@ -42,7 +42,8 @@ TEST(UuidHelper, uuidBasics)
     ASSERT_FALSE(kFixedUuid == kNullUuid); //< operator==() for different uuids
 
     // Test that the default constructor yields an all-zeros uuid.
-    constexpr Uuid kAllZerosUuid{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    // NOTE: Here constexpr does not work in MSVC 2015.
+    const Uuid kAllZerosUuid{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     ASSERT_TRUE(kAllZerosUuid.isNull());
     constexpr Uuid kDefaultUuid = Uuid(); //< default constructor
     ASSERT_TRUE(kDefaultUuid.isNull());
@@ -53,7 +54,7 @@ TEST(UuidHelper, uuidBasics)
     for (const uint8_t b: kNullUuid)
         ASSERT_EQ(0, b);
 
-    for (int i = 0; i < Uuid::kSize; ++i)
+    for (int i = 0; i < Uuid::size(); ++i)
         ASSERT_EQ(kFixedUuidBytes[i], kFixedUuid[i]);
 }
 
@@ -69,7 +70,7 @@ TEST(UuidHelper, uuidRandom)
 TEST(UuidHelper, uuidBinaryCompatibilityWithOldSdk)
 {
     ASSERT_EQ(16, (int) sizeof(Uuid));
-    ASSERT_EQ((int) sizeof(Uuid), Uuid::kSize);
+    ASSERT_EQ((int) sizeof(Uuid), Uuid::size());
     ASSERT_EQ(sizeof(Uuid), sizeof(kFixedUuidBytes)); //< Check the integrity of this test.
     ASSERT_EQ(0, memcmp(&kFixedUuid, kFixedUuidBytes, sizeof(kFixedUuidBytes)));
     ASSERT_EQ(0, memcmp(&kNullUuid, kNullUuidBytes, sizeof(kNullUuidBytes)));
@@ -103,7 +104,8 @@ TEST(UuidHelper, fromRawData)
 {
     const Uuid uuidFromRawData = UuidHelper::fromRawData(kFixedUuidBytes);
     ASSERT_EQ(kFixedUuid, uuidFromRawData); //< operator==()
-    for (int i = 0; i < Uuid::kSize; ++i)
+    for (int i = 0; i < Uuid::size(); ++i)
+    for (int i = 0; i < Uuid::size(); ++i)
         ASSERT_EQ(kFixedUuidBytes[i], uuidFromRawData[i]);
 }
 

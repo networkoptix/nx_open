@@ -25,7 +25,7 @@ QnClientStorageResourcePtr QnClientStorageResource::newStorage( const QnMediaSer
 
     if (parentServer) {
         storage->setParentId(parentServer->getId());
-        storage->setId(fillID(parentServer->getId(), url));
+        storage->setIdUnsafe(fillID(parentServer->getId(), url));
     }
 
     storage->setName(QnUuid::createUuid().toString());

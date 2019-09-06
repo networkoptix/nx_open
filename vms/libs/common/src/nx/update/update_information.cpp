@@ -41,7 +41,7 @@ QString toString(InformationError error)
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (Variant)(Package)(Information),
+    (Variant)(Package)(Information)(UpdateDeliveryInfo),
     (ubjson)(json)(datastream)(eq),
     _Fields)
 
@@ -107,6 +107,18 @@ void UpdateContents::resetVerification()
     packagesGenerated = false;
 }
 
+bool UpdateContents::peerHasUpdate(const QnUuid& id) const
+{
+    // 1. Check in 'peersWithUpdatte'?
+    // 2. Iterate all over packets
+    for (const auto& package: info.packages)
+    {
+        if (package.targets.contains(id))
+            return true;
+    }
+    return false;
+}
+
 uint64_t UpdateContents::getClientSpaceRequirements(bool withClient) const
 {
     uint64_t spaceRequired = 0;
@@ -120,6 +132,15 @@ uint64_t UpdateContents::getClientSpaceRequirements(bool withClient) const
 nx::utils::SoftwareVersion UpdateContents::getVersion() const
 {
     return nx::utils::SoftwareVersion(info.version);
+}
+
+UpdateDeliveryInfo UpdateContents::getUpdateDeliveryInfo() const
+{
+    UpdateDeliveryInfo result;
+    result.version = info.version;
+    result.releaseDateMs = info.releaseDateMs;
+    result.releaseDeliveryDays = info.releaseDeliveryDays;
+    return result;
 }
 
 bool UpdateContents::isValidToInstall() const
@@ -146,11 +167,6 @@ bool UpdateContents::preferOtherUpdate(const UpdateContents& other) const
         && other.sourceType == UpdateSourceType::mediaservers)
     {
         return true;
-    }
-    else if (sourceType != UpdateSourceType::mediaservers
-        && other.sourceType == UpdateSourceType::mediaservers)
-    {
-        return false;
     }
 
     return other.getVersion() > getVersion();

@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="es-ES" sourcelanguage="en">
   <context>
-    <name>DateTimeFormats</name>
-    <message>
-      <source>MM/dd</source>
-      <translation>MM / dd</translation>
-    </message>
-    <message>
-      <source>MMMM yyyy</source>
-      <translation>MMMM aaaa</translation>
-    </message>
-  </context>
-  <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
@@ -824,7 +813,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>Módulo E/S</translation>
+      <translation>Modulos E/S</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -912,7 +901,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>No se pudo asignar el flujo de salida para la grabación.</translation>
+      <translation>No se pudo asignar secuencia de salida para la grabación.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>

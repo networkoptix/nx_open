@@ -9,100 +9,15 @@
 
 namespace nx::vms::api::metrics {
 
-using Value = QJsonValue; //< TODO: std::variant<QString, int>.
-using Status = QString; //< TODO: enum class { warning, error }.
+//< TODO: std::variant<QString, int>.
+struct NX_VMS_API Value: QJsonValue { using QJsonValue::QJsonValue; };
+NX_VMS_API void PrintTo(const Value& v, ::std::ostream* s);
 
-// -----------------------------------------------------------------------------------------------
+using ValueGroup
+    = std::map<QString /*parameterId*/, Value>;
 
-struct ParameterRule
-{
-    std::map<Status, Value> alarms;
-
-    // TODO: Should be optional.
-    QString name;
-    QString calculate;
-    QString insert;
-};
-#define ParameterRule_Fields (alarms)(name)(calculate)(insert)
-QN_FUSION_DECLARE_FUNCTIONS(ParameterRule, (json), NX_VMS_API)
-
-struct ParameterGroupRules: ParameterRule
-{
-    std::map<QString /*id*/, ParameterGroupRules> group;
-};
-#define ParameterGroupRules_Fields ParameterRule_Fields (group)
-QN_FUSION_DECLARE_FUNCTIONS(ParameterGroupRules, (json), NX_VMS_API)
-
-using ResourceRules
-    = std::map<QString /*id*/, ParameterGroupRules>;
-
-using SystemRules
-    = std::map<QString /*resourceGroup*/, ResourceRules>;
-
-// -----------------------------------------------------------------------------------------------
-
-struct ParameterManifest
-{
-    QString id;
-    QString name;
-    QString unit; //< TODO: Should be optional.
-};
-#define ParameterManifest_Fields (id)(name)(unit)
-QN_FUSION_DECLARE_FUNCTIONS(ParameterManifest, (json), NX_VMS_API)
-
-struct ParameterGroupManifest: ParameterManifest
-{
-    std::vector<ParameterGroupManifest> group;
-};
-#define ParameterGroupManifest_Fields ParameterManifest_Fields (group)
-QN_FUSION_DECLARE_FUNCTIONS(ParameterGroupManifest, (json), NX_VMS_API)
-
-NX_UTILS_API std::vector<ParameterGroupManifest>::iterator find(
-    std::vector<ParameterGroupManifest>& group, const QString& id);
-
-using ResourceManifest
-    = std::vector<ParameterGroupManifest>;
-
-using SystemManifest
-    = std::map<QString /*resourceGroup*/, ResourceManifest>;
-
-NX_UTILS_API ParameterGroupManifest makeParameterManifest(
-    QString id, QString name = {}, QString unit = {});
-
-NX_UTILS_API ParameterGroupManifest makeParameterGroupManifest(
-    QString id, QString name = {}, std::vector<ParameterGroupManifest> group = {});
-
-// -----------------------------------------------------------------------------------------------
-
-struct ParameterValue
-{
-    Value value;
-    Status status;
-};
-#define ParameterValue_Fields (value)(status)
-QN_FUSION_DECLARE_FUNCTIONS(ParameterValue, (json), NX_VMS_API)
-
-struct ParameterGroupValues: ParameterValue
-{
-    std::map<QString /*id*/, ParameterGroupValues> group;
-};
-#define ParameterGroupValues_Fields ParameterValue_Fields (group)
-QN_FUSION_DECLARE_FUNCTIONS(ParameterGroupValues, (json), NX_VMS_API)
-
-NX_UTILS_API ParameterGroupValues makeParameterValue(
-    Value value, Status status = {});
-
-NX_UTILS_API ParameterGroupValues makeParameterGroupValue(
-    std::map<QString, ParameterGroupValues> group);
-
-struct ResourceValues
-{
-    QString name;
-    QString parent;
-    std::map<QString /*id*/, ParameterGroupValues> values;
-};
-#define ResourceValues_Fields (name)(parent)(values)
-QN_FUSION_DECLARE_FUNCTIONS(ResourceValues, (json), NX_VMS_API)
+using ResourceValues =
+    std::map<QString /*groupId*/, ValueGroup>;
 
 using ResourceGroupValues =
     std::map<QString /*resourceId*/, ResourceValues>;
@@ -110,7 +25,101 @@ using ResourceGroupValues =
 using SystemValues
     = std::map<QString /*resourceGroup*/, ResourceGroupValues>;
 
-NX_UTILS_API void merge(SystemValues* destination, SystemValues* source);
-NX_UTILS_API SystemValues merge(std::vector<SystemValues> valuesList);
+NX_VMS_API void merge(SystemValues* destination, SystemValues* source);
+
+// -----------------------------------------------------------------------------------------------
+
+struct NX_VMS_API Label
+{
+    QString id;
+    QString name;
+
+    Label(QString id = {}, QString name = {});
+};
+
+enum class Display
+{
+    none = 0,
+    table = (1 << 0),
+    panel = (1 << 1),
+    both = table|panel,
+};
+Q_DECLARE_FLAGS(Displays, Display)
+
+struct NX_VMS_API ValueManifest: Label
+{
+    Displays display;
+    QString unit;
+
+    ValueManifest(Label label = {}, Displays display = Display::none, QString unit = {});
+};
+#define ValueManifest_Fields (id)(name)(unit)(display)
+QN_FUSION_DECLARE_FUNCTIONS(ValueManifest, (json), NX_VMS_API)
+
+struct NX_VMS_API ValueGroupManifest: Label
+{
+    std::vector<ValueManifest> values;
+
+    ValueGroupManifest(Label label = {});
+};
+#define ValueGroupManifest_Fields (id)(name)(values)
+QN_FUSION_DECLARE_FUNCTIONS(ValueGroupManifest, (json), NX_VMS_API)
+
+using ResourceManifest
+    = std::vector<ValueGroupManifest>;
+
+using SystemManifest
+    = std::map<QString /*resourceTypeGroup*/, ResourceManifest>;
+
+// -----------------------------------------------------------------------------------------------
+
+enum class AlarmLevel { warning, danger };
+
+struct NX_VMS_API AlarmRule
+{
+    AlarmLevel level;
+    QString condition;
+    QString text; //< TODO: Optional.
+};
+#define AlarmRule_Fields (level)(condition)(text)
+QN_FUSION_DECLARE_FUNCTIONS(AlarmRule, (json), NX_VMS_API)
+
+struct NX_VMS_API ValueRule: ValueManifest
+{
+    QString calculate;
+    QString insert;
+    std::vector<AlarmRule> alarms;
+};
+#define ValueRule_Fields ValueManifest_Fields(calculate)(insert)(alarms)
+QN_FUSION_DECLARE_FUNCTIONS(ValueRule, (json), NX_VMS_API)
+
+using ValueGroupRules
+    = std::map<QString /*id*/, ValueRule>;
+
+using ResourceRules
+    = std::map<QString /*id*/, ValueGroupRules>;
+
+using SystemRules
+    = std::map<QString /*resourceTypeGroup*/, ResourceRules>;
+
+// -----------------------------------------------------------------------------------------------
+
+struct NX_VMS_API Alarm
+{
+    QString resource;
+    QString parameter;
+    AlarmLevel level;
+    QString text;
+};
+#define Alarm_Fields (resource)(parameter)(level)(text)
+QN_FUSION_DECLARE_FUNCTIONS(Alarm, (json), NX_VMS_API)
+
+using Alarms = std::vector<Alarm>;
+
+NX_UTILS_API void merge(Alarms* destination, Alarms* source);
 
 } // namespace nx::vms::api::metrics
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::metrics::Display, (lexical), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::metrics::Displays, (lexical), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(nx::vms::api::metrics::AlarmLevel, (lexical), NX_VMS_API)
