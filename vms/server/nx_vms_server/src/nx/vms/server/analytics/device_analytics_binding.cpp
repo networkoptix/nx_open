@@ -107,7 +107,19 @@ bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
 
     auto neededMetadataTypes = this->neededMetadataTypes();
     if (neededMetadataTypes == m_lastMetadataTypes)
+    {
+        NX_DEBUG(this,
+            "Last needed metadata types are equal to the new ones, doing nothing. "
+            "Device %1 (%2), Engine %3 (%4)",
+            m_device->getUserDefinedName(), m_device->getId(),
+            m_engine->getName(), m_engine->getId());
         return true;
+    }
+
+    NX_DEBUG(this,
+        "Passing new needed metadata types to the DeviceAgent. Device %1 (%2), Engine %3 (%4)",
+        m_device->getUserDefinedName(), m_device->getId(),
+        m_engine->getName(), m_engine->getId());
 
     const bool result = m_deviceAgent->setNeededMetadataTypes(neededMetadataTypes);
     if (result)
