@@ -76,8 +76,6 @@ VideoCamera::VideoCamera(
     m_settings(settings),
     m_dataProviderFactory(dataProviderFactory),
     m_camera(camera),
-    m_primaryGopKeeper(nullptr),
-    m_secondaryGopKeeper(nullptr),
     m_loStreamHlsInactivityPeriodMS(m_settings.hlsInactivityPeriod() * MSEC_PER_SEC),
     m_hiStreamHlsInactivityPeriodMS(m_settings.hlsInactivityPeriod() * MSEC_PER_SEC)
 {
@@ -185,11 +183,9 @@ void VideoCamera::createReader(QnServer::ChunksCatalog catalog)
         return;
 
     QnAbstractStreamDataProvider* dataProvider = nullptr;
-    if (streamIndex == StreamIndex::primary
-        || (cameraResource && cameraResource->hasDualStreaming()))
-    {
-        dataProvider = m_dataProviderFactory->createDataProvider(m_resource, role);
-    }
+    if (streamIndex == StreamIndex::primary || m_camera->hasDualStreaming())
+        dataProvider = m_dataProviderFactory->createDataProvider(m_camera, role);
+
     if (!dataProvider)
         return;
 
@@ -212,7 +208,7 @@ void VideoCamera::createReader(QnServer::ChunksCatalog catalog)
             Qt::DirectConnection);
     }
 
-    auto gopKeeper = std::make_unique<QnVideoCameraGopKeeper>(this, m_resource, catalog);
+    auto gopKeeper = std::make_unique<nx::vms::server::GopKeeper>(this, m_camera, catalog);
     reader->addDataProcessor(gopKeeper.get());
 
     if (streamIndex == StreamIndex::primary)
