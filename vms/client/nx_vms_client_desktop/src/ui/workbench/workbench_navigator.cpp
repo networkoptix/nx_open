@@ -2795,8 +2795,7 @@ void QnWorkbenchNavigator::setSelectedExtraContent(Qn::TimePeriodContent value)
 
     if (ini().limitAnalyticsTimePeriodsLoading)
     {
-        auto loader = loaderByWidget(m_currentMediaWidget);
-        if (loader)
+        if (auto loader = loaderByWidget(m_currentMediaWidget, /*createIfNotExists*/ true))
         {
             auto allowedContent = loader->allowedContent();
             if (value == Qn::AnalyticsContent)

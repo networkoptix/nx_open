@@ -126,9 +126,15 @@ void QnCachingCameraDataLoader::setAllowedContent(AllowedContent value)
         return;
 
     NX_VERBOSE(this, "Set loader allowed content to %1", toString(value));
+
+    AllowedContent addedContent;
+    std::set_difference(value.cbegin(), value.cend(),
+        m_allowedContent.cbegin(), m_allowedContent.cend(),
+        std::inserter(addedContent, addedContent.begin()));
+
     m_allowedContent = value;
 
-    for (auto contentType: m_allowedContent)
+    for (auto contentType: addedContent)
         updateTimePeriods(contentType, /*forced*/ true);
 }
 
