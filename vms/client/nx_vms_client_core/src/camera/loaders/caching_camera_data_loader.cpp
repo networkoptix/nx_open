@@ -24,6 +24,13 @@ const qint64 requestIntervalMs = 30 * 1000;
 
 } // namespace
 
+using AllowedContent = QnCachingCameraDataLoader::AllowedContent;
+
+QString toString(AllowedContent value)
+{
+    return containerString(value);
+}
+
 QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnMediaResourcePtr &resource,
     const QnMediaServerResourcePtr& server,
     QObject* parent)
@@ -44,12 +51,12 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnMediaResourcePtr &r
     // but timer should check it much more often.
     loadTimer->setInterval(requestIntervalMs / 10);
     loadTimer->setSingleShot(false);
-    connect(loadTimer, &QTimer::timeout, this, [this]
-    {
-        NX_VERBOSE(this, "Checking load by timer (enabled: %1)", m_enabled);
-        if (m_enabled)
+    connect(loadTimer, &QTimer::timeout, this,
+        [this]
+        {
+            NX_VERBOSE(this, "Checking load by timer (allowed: %1)", m_allowedContent);
             load();
-    });
+        });
     loadTimer->start();
     load(true);
 }
@@ -113,19 +120,26 @@ void QnCachingCameraDataLoader::initLoaders() {
     }
 }
 
-void QnCachingCameraDataLoader::setEnabled(bool value)
+void QnCachingCameraDataLoader::setAllowedContent(AllowedContent value)
 {
-    if (m_enabled == value)
+    if (m_allowedContent == value)
         return;
 
-    NX_VERBOSE(this, "Set loader enabled %1", value);
-    m_enabled = value;
-    if (value)
-        load(true);
+    NX_VERBOSE(this, "Set loader allowed content to %1", value);
+    m_allowedContent = value;
+
+    for (auto contentType: m_allowedContent)
+        updateTimePeriods(contentType, /*forced*/ true);
 }
 
-bool QnCachingCameraDataLoader::enabled() const {
-    return m_enabled;
+AllowedContent QnCachingCameraDataLoader::allowedContent() const
+{
+    return m_allowedContent;
+}
+
+bool QnCachingCameraDataLoader::isContentAllowed(Qn::TimePeriodContent content) const
+{
+    return m_allowedContent.find(content) != m_allowedContent.cend();
 }
 
 void QnCachingCameraDataLoader::updateServer(const QnMediaServerResourcePtr& server)
@@ -152,15 +166,14 @@ QnMediaResourcePtr QnCachingCameraDataLoader::resource() const
     return m_resource;
 }
 
-void QnCachingCameraDataLoader::load(bool forced) {
-    for (int i = 0; i < Qn::TimePeriodContentCount; ++i) {
-        Qn::TimePeriodContent timePeriodType = static_cast<Qn::TimePeriodContent>(i);
-        updateTimePeriods(timePeriodType, forced);
-    }
+void QnCachingCameraDataLoader::load(bool forced)
+{
+    for (auto content: m_allowedContent)
+        updateTimePeriods(content, forced);
 }
 
-
-const QList<QRegion> &QnCachingCameraDataLoader::motionRegions() const {
+const QList<QRegion> &QnCachingCameraDataLoader::motionRegions() const
+{
     return m_motionRegions;
 }
 
@@ -283,11 +296,8 @@ void QnCachingCameraDataLoader::invalidateCachedData()
 {
     NX_VERBOSE(this, "Mark local cache as dirty");
 
-    for (int i = 0; i < Qn::TimePeriodContentCount; i++)
-    {
-        if (auto loader = m_loaders[i])
-            loader->discardCachedData();
-    }
+    for (auto loader: m_loaders)
+        loader->discardCachedData();
 }
 
 void QnCachingCameraDataLoader::discardCachedDataType(Qn::TimePeriodContent type)
@@ -297,7 +307,7 @@ void QnCachingCameraDataLoader::discardCachedDataType(Qn::TimePeriodContent type
         loader->discardCachedData();
 
     m_cameraChunks[type].clear();
-    if (m_enabled)
+    if (isContentAllowed(type))
     {
         updateTimePeriods(type, true);
         emit periodsChanged(type);

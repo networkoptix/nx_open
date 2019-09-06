@@ -198,6 +198,9 @@ struct Ini: nx::kit::IniConfig
 
     NX_INI_FLAG(0, resetResourceTreeModelOnUserChange,
         "Reset Resource Tree model during user session change.");
+
+    NX_INI_FLAG(0, limitAnalyticsTimePeriodsLoading,
+        "Do not send analytics time period requests when these periods are not visible.");
 };
 
 inline Ini& ini()
