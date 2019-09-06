@@ -43,6 +43,7 @@ protected:
     void whenListBuckets();
     void whenRemoveBucket(std::string bucketName = {});
     void thenAddBucketResponseIs(api::ResultCode resultCode);
+	void thenAddBucketFails();
     void thenListBucketsSucceeds();
     void thenRemoveBucketSucceeds();
     void andAddedBucketMatchesExpectedBucket();
