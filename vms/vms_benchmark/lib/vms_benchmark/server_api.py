@@ -4,8 +4,8 @@ from urllib.error import URLError
 import base64
 import json
 
-from nx_box_tool.camera import Camera
-from nx_box_tool.license import License
+from vms_benchmark.camera import Camera
+from vms_benchmark.license import License
 
 
 class ServerApi:
@@ -71,6 +71,23 @@ class ServerApi:
                 License.parse(license_description['licenseBlock'])
                 for license_description in result.payload
             ]
+
+        return None
+
+    def get_events(self, ts_from):
+        request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/getEvents?from={ts_from}")
+        credentials = f"{self.user}:{self.password}"
+        encoded_credentials = base64.b64encode(credentials.encode('ascii'))
+        request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
+        response = urllib.request.urlopen(request)
+
+        result = self.Response(response.code)
+
+        if 200 <= response.code < 300:
+            result.payload = json.loads(response.read())
+            if int(result.payload['error']) != 0:
+                return None
+            return result.payload['reply']
 
         return None
 
