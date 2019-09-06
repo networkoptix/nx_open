@@ -335,7 +335,7 @@ def main(config_file):
 
             print(f"    Waiting for test cameras discovering... (timeout is {discovering_timeout} seconds)")
             if not wait_test_cameras_discovered(discovering_timeout, 3):
-                raise exceptions.TestCameraError(f"Failed to discover {test_cameras_count} test cameras: timeout ended")
+                raise exceptions.TestCameraError('Timeout expired.')
 
             print("    All test cameras had been discovered successfully.")
 
@@ -438,17 +438,17 @@ if __name__ == '__main__':
         except exceptions.VmsBenchmarkError as e:
             def nx_print_exception(exception):
                 if isinstance(exception, exceptions.VmsBenchmarkError):
-                    print(f"{str(e)}", file=sys.stderr)
-                    if e.original_exception:
+                    print(f"{str(exception)}", file=sys.stderr)
+                    if exception.original_exception:
                         print('Caused by:\n    ', file=sys.stderr, end='')
-                        nx_print_exception(e.original_exception)
+                        nx_print_exception(exception.original_exception)
                 elif isinstance(exception, urllib.error.HTTPError):
                     if exception.code == 401:
                         print(f'Server refuses passed credentials: check vmsUser/vmsPassword.', file=sys.stderr)
                     else:
                         print(f'Unexpected HTTP request error (code {exception.code}.', file=sys.stderr)
                 else:
-                    print("ERROR: Internal error occurred !!.")
+                    print("ERROR: Internal error occurred.")
             logging.error(traceback.format_exc())
             print('ERROR: ', file=sys.stderr, end='')
             nx_print_exception(e)
