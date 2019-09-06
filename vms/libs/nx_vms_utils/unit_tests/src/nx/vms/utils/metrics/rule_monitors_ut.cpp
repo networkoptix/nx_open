@@ -7,10 +7,10 @@
 
 namespace nx::vms::utils::metrics::test {
 
-class MetricsRules: public ::testing::Test
+class MetricsGenerators: public ::testing::Test
 {
 public:
-    MetricsRules(): resource(0)
+    MetricsGenerators(): resource(0)
     {
         for (const auto& id: {"a", "b"})
         {
@@ -30,9 +30,7 @@ private:
     std::map<QString, Watch<TestResource>> m_watches;
 };
 
-class MetricsValueGenerator: public MetricsRules {};
-
-TEST_F(MetricsValueGenerator, Errors)
+TEST_F(MetricsGenerators, ValueErrors)
 {
     for (const auto& [formula, expectedError]: std::map<QString, QString>{
         {"str hello", "Unsupported function: str"},
@@ -53,7 +51,7 @@ TEST_F(MetricsValueGenerator, Errors)
     }
 }
 
-TEST_F(MetricsValueGenerator, Binary)
+TEST_F(MetricsGenerators, ValueBinary)
 {
     const auto helloWorld = parseFormulaOrThrow("const HelloWorld", monitors);
     EXPECT_EQ(helloWorld(), api::metrics::Value("HelloWorld"));
@@ -96,7 +94,7 @@ TEST_F(MetricsValueGenerator, Binary)
     EXPECT_EQ(parseFormulaOrThrow("notEqual %a hello", monitors)(), api::metrics::Value(false));
 }
 
-TEST_F(MetricsValueGenerator, Duration)
+TEST_F(MetricsGenerators, ValueDuration)
 {
     nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
 
@@ -131,7 +129,21 @@ TEST_F(MetricsValueGenerator, Duration)
     EXPECT_EQ(count(), api::metrics::Value(2));
     EXPECT_EQ(count7(), api::metrics::Value(1));
     EXPECT_EQ(countHello(), api::metrics::Value(1));
-    // TODO: Check period expirations.
+}
+
+TEST_F(MetricsGenerators, Text)
+{
+    const auto error = parseTemplate("x = %x", monitors);
+    EXPECT_EQ(error(), "x = {x IS NOT FOUND}");
+
+    const auto values = parseTemplate("a = %a, b = %b", monitors);
+    resource.update("a", 7);
+    resource.update("b", 8);
+    EXPECT_EQ(values(), "a = 7, b = 8");
+
+    resource.update("a", "hello");
+    resource.update("b", "world");
+    EXPECT_EQ(values(), "a = hello, b = world");
 }
 
 } // namespace nx::vms::utils::metrics::test
