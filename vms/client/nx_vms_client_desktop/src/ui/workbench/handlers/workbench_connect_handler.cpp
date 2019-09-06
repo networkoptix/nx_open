@@ -920,9 +920,9 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
         ConnectionOptions options;
         if (parameters.storeSession)
             options |= StoreSession;
-        if (parameters.storePassword)
+        if (parameters.storePassword && NX_ASSERT(qnSettings->saveCredentialsAllowed()))
             options |= StorePassword;
-        if (parameters.autoLogin)
+        if (parameters.autoLogin && NX_ASSERT(qnSettings->saveCredentialsAllowed()))
             options |= AutoLogin;
 
         // Ignore warning messages for now if one client instance is opened already.
@@ -931,7 +931,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
 
         testConnectionToServer(parameters.url, options, parameters.force);
     }
-    else
+    else if (qnSettings->saveCredentialsAllowed())
     {
         /* Try to load last used connection. */
         auto url = qnSettings->lastUsedConnection().url;

@@ -230,8 +230,8 @@ Item
                 return; // Do not update if it is not current item
 
             var credentials = authDataAccessor.getData(currentItemIndex, "credentials");
-            var password = credentials && credentials.password;
-            expandedArea.savePasswordCheckbox.checked = !!password;
+            var password = context.saveCredentialsAllowed ? (credentials && credentials.password) : "";
+            expandedArea.savePasswordCheckbox.checked = !!password && context.saveCredentialsAllowed;
             expandedArea.passwordTextField.text = password || "";
         }
     }
