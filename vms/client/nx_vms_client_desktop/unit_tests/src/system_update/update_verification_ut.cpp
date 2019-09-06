@@ -125,23 +125,6 @@ TEST_F(UpdateVerificationTest, testAlreadyInstalled)
     contents.resetVerification();
     removeAllServers();
 
-    // Update to 4.0.0.28524
-    // client = 4.0.0.28524
-    // server = 4.0.0.28524
-    // server = 4.0.0.28523 offline
-    // Showing page 'This version is already installed', even when we have offline server with
-    // lower version.
-    makeServer(Version("4.0.0.28524"));
-    makeServer(Version("4.0.0.28523"), /*online=*/false);
-    clientData = makeClientData(Version("4.0.0.28524"));
-    verifyUpdateContents(contents, getAllServers(), clientData, options);
-    EXPECT_EQ(contents.alreadyInstalled, true);
-    {
-        const auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(contents, clientData.clientId);
-        EXPECT_TRUE(report.hasLatestVersion);
-    }
-    removeAllServers();
-
     // According to VMS-15430, VMS-15250, we should show 'Latest version installed'
     // Update to 4.0.0.28524
     // client = 4.0.0.28526
@@ -246,6 +229,37 @@ TEST_F(UpdateVerificationTest, testForkedVersion)
     EXPECT_EQ(contents.error, nx::update::InformationError::noError);
     removeAllServers();
     contents.resetVerification();
+}
+
+TEST_F(UpdateVerificationTest, testFailedUpdateChechk)
+{
+    // This test checks how `calculateUpdateVersionReport` reacts to different errors
+    using VersionReport = MultiServerUpdatesWidget::VersionReport;
+    nx::update::UpdateContents contents;
+    contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
+    contents.changeset = "29681";
+    auto clientData = makeClientData(Version("4.0.0.29679"));
+
+    // "Unable to check updates on the internet"
+    contents.error = nx::update::InformationError::networkError;
+    auto report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
+        contents, clientData.clientId);
+    EXPECT_FALSE(report.hasLatestVersion);
+    EXPECT_TRUE(report.versionMode == VersionReport::VersionMode::empty);
+
+    // "Build not found"
+    contents.error = nx::update::InformationError::httpError;
+    report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
+        contents, clientData.clientId);
+    EXPECT_FALSE(report.hasLatestVersion);
+    EXPECT_TRUE(report.versionMode == VersionReport::VersionMode::build);
+
+    // "Unable to check updates on the internet"
+    contents.sourceType = nx::update::UpdateSourceType::internet;
+    report = MultiServerUpdatesWidget::calculateUpdateVersionReport(
+        contents, clientData.clientId);
+    EXPECT_FALSE(report.hasLatestVersion);
+    EXPECT_TRUE(report.versionMode == VersionReport::VersionMode::empty);
 }
 
 TEST_F(UpdateVerificationTest, packagesForSystemSupportTest)

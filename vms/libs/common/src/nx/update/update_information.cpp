@@ -107,6 +107,18 @@ void UpdateContents::resetVerification()
     packagesGenerated = false;
 }
 
+bool UpdateContents::peerHasUpdate(const QnUuid& id) const
+{
+    // 1. Check in 'peersWithUpdatte'?
+    // 2. Iterate all over packets
+    for (const auto& package: info.packages)
+    {
+        if (package.targets.contains(id))
+            return true;
+    }
+    return false;
+}
+
 uint64_t UpdateContents::getClientSpaceRequirements(bool withClient) const
 {
     uint64_t spaceRequired = 0;
@@ -155,11 +167,6 @@ bool UpdateContents::preferOtherUpdate(const UpdateContents& other) const
         && other.sourceType == UpdateSourceType::mediaservers)
     {
         return true;
-    }
-    else if (sourceType != UpdateSourceType::mediaservers
-        && other.sourceType == UpdateSourceType::mediaservers)
-    {
-        return false;
     }
 
     return other.getVersion() > getVersion();
