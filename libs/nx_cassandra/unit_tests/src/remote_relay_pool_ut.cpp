@@ -193,7 +193,7 @@ protected:
 
     std::pair<std::vector<std::string>, std::string> getDomainParts(const std::string& domainName)
     {
-        auto domainNameReversed = nx::utils::reverseWords(domainName, ".");
+        auto domainNameReversed = nx::utils::reverseWords(domainName, '.');
         std::vector<std::string> reversedParts;
         boost::split(reversedParts, domainNameReversed, boost::is_any_of("."));
 

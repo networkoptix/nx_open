@@ -8,4 +8,4 @@ Hallo, {{message.userFullName}}
 U heeft toegang gekregen tot het video management systeem "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Weergave in het %PRODUCT_NAME% portal: {{config.portal_url}}/systems/{{message.system_id}}
+View in %CLOUD_NAME% Portal: {{config.portal_url}}/systems/{{message.system_id}}

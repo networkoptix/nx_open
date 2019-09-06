@@ -43,7 +43,7 @@ public:
     /**
      * calls startRegistration() and startGetOnlineNodes();
      */
-    void start();
+    bool start();
 
     /**
      * Starts and repeats registering this node in the cluster.
@@ -129,7 +129,11 @@ private:
     };
 
 private:
+    bool validateSettings() const;
+
+private:
     const Settings& m_settings;
+    const std::string m_clusterId;
     NodeInfo m_thisNodeInfo;
     nx::utils::Url m_discoveryServiceUrl;
 

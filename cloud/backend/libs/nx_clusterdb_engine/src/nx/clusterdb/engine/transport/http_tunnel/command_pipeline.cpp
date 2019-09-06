@@ -98,7 +98,7 @@ void CommandPipeline::processMessage(
 {
     CommandTransportHeader cdbTransportHeader(m_protocolVersionRange.currentVersion());
     cdbTransportHeader.endpoint = m_remoteEndpoint;
-    cdbTransportHeader.systemId = m_clusterId;
+    cdbTransportHeader.clusterId = m_clusterId;
     cdbTransportHeader.connectionId = m_connectionRequestAttributes.connectionId;
     cdbTransportHeader.transactionFormatVersion =
         highestProtocolVersionCompatibleWithRemotePeer();

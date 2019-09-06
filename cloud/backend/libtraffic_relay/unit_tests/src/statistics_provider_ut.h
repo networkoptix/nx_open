@@ -7,7 +7,7 @@ namespace test {
 
 relaying::Statistics generateRelayingStatistics();
 controller::RelaySessionStatistics generateRelaySessionStatistics();
-nx::network::server::Statistics generateHttpServerStatistics();
+nx::network::http::server::HttpStatistics generateHttpServerStatistics();
 
 } // namespace test
 } // namespace relay

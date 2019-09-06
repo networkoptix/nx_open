@@ -1,0 +1,9 @@
+<h1>Здравствуйте, {{ message.userFullName }}</h1>
+
+<a href="mailto:{{ message.sender_email }}">{{ message.sender_name }}</a>дал следующий отзыв для {{ message.product }}:
+<div>{{ message.message }}</div>
+<br />
+<hr />
+<div>
+    С пользователем можно связаться: {{ message.sender_to_be_contacted}}
+</div>

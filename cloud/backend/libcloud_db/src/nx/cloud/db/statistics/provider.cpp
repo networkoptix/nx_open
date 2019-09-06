@@ -12,7 +12,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 //-------------------------------------------------------------------------------------------------
 
 Provider::Provider(
-    const network::server::AbstractStatisticsProvider& httpServerStatisticsProvider,
+    const network::http::server::AbstractHttpStatisticsProvider& httpServerStatisticsProvider,
     const clusterdb::engine::statistics::Provider& dataSyncEngineStatisticsProvider,
     const nx::sql::StatisticsCollector& statisticsCollector)
     :
@@ -24,7 +24,7 @@ Provider::Provider(
 
 Statistics Provider::statistics() const
 {
-    return {m_httpServerStatisticsProvider.statistics(),
+    return {m_httpServerStatisticsProvider.httpStatistics(),
         m_dataSyncEngineStatisticsProvider.statistics(),
         m_statisticsCollector.getQueryStatistics()};
 }

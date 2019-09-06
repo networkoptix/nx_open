@@ -1,0 +1,221 @@
+@import '../../../../app/styles/native-theme/theme_palette';
+@import '../../../../app/styles/custom/custom_palette';
+@import '../../../styles/theme_palette';
+@import '../../../styles/theme_variables';
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+@import '~bootstrap/scss/mixins/breakpoints';
+
+.ipvd {
+    
+    max-width : 1440px;
+    
+    nx-vendor-list {
+        .card {
+            margin : 0 0 1rem;
+        
+            &--body {
+                padding-bottom : .75rem;
+            }
+        }
+    }
+    
+    .list-inline > li {
+        display       : inline-block;
+        padding-left  : 5px;
+        padding-right : 5px;
+    }
+    
+    .text-placeholder {
+        color       : $light16;
+        font-family : $font-family-regular;
+        font-size   : rem(20px);
+        height      : 2rem;
+    }
+    
+    /*** overwrite default table of component cam-table ***/
+    .nx-table-wrapper {
+        margin : 0;
+        max-width: 1048px;
+        
+        .nx-table-header {
+            padding : .5rem .75rem;
+        }
+        
+        .nx-table {
+            th {
+                display : inline-block;
+                white-space: normal;
+    
+                .caption {
+                    line-height : 1rem;
+                    align-items : flex-end;
+    
+                    .nav-arrow {
+                        height: 18px;
+                    }
+                }
+    
+                &:nth-child(1) {
+                    padding-left : 1rem;
+                    width : 175px;
+                }
+    
+                &.debug {
+                    &:nth-child(1) {
+                        width : 130px;
+                    }
+                }
+
+                &:nth-child(2) {
+                    width : 150px;
+                }
+    
+                &.debug {
+                    &:nth-child(2) {
+                        width : 130px;
+                    }
+                }
+                
+                &:nth-child(3) {
+                    width : 110px;
+                }
+    
+                &:nth-child(4) {
+                    width : 100px;
+    
+                    .caption {
+                        div:first-of-type {
+                            width : 65px;
+                            line-height: 1rem;
+                        }
+                        
+                        .sort-dir {
+                            margin-top : 18px;
+                        }
+                    }
+                }
+    
+                &:nth-child(5) {
+                    width : 75px;
+    
+                    .caption {
+                        div:first-of-type {
+                            width : 26px;
+                            line-height : 1rem;
+                        }
+        
+                        .sort-dir {
+                            margin-top : 18px;
+                        }
+                    }
+                }
+    
+                &:nth-child(n+5) {
+                    .caption {
+                        justify-content : center;
+                    }
+                }
+    
+                &:nth-child(6) {
+                    width : 70px;
+                }
+    
+                &:nth-child(7) {
+                    width : 75px;
+                }
+                
+                &:nth-child(8) {
+                    width : 75px;
+                }
+    
+                &:nth-child(n+9) {
+                    width : 75px;
+                }
+    
+                &:nth-child(9) {
+                    width : 80px;
+                }
+    
+                &:nth-child(11) { // I/O last column
+                    width : 60px;
+                }
+            }
+            
+            td {
+                display : inline-block;
+                vertical-align : middle;
+                padding : rem(4px) 1rem rem(4px) 0;
+    
+                &:nth-child(n+1) > div {
+                    white-space : normal;
+                    line-height : 1rem;
+                }
+    
+                &:nth-child(1) {
+                    padding-left : 1rem;
+                    width : 175px;
+                }
+                
+                &.debug {
+                    &:nth-child(1) {
+                        width : 130px;
+                    }
+                }
+    
+                &:nth-child(2) {
+                    width : 150px;
+                }
+    
+                &.debug {
+                    &:nth-child(2) {
+                        width : 130px;
+                    }
+                }
+    
+                &:nth-child(3) {
+                    width : 110px;
+                }
+    
+                &:nth-child(4) {
+                    width : 100px;
+                }
+    
+                &:nth-child(5) {
+                    width : 75px;
+                    padding-right : 22px;
+                }
+                
+                &:nth-child(n+5) {
+                    text-align : center !important;
+                    padding-right: 20px;
+                }
+    
+                &:nth-child(6) {
+                    width : 70px;
+                }
+                
+                &:nth-child(7) {
+                    width : 75px;
+                }
+                
+                &:nth-child(8) {
+                    width : 75px;
+                }
+    
+                &:nth-child(n+9) {
+                    width : 75px;
+                }
+    
+                &:nth-child(9) {
+                    width : 80px;
+                }
+                
+                &:nth-child(11) { // I/O last column
+                    width : 60px;
+                }
+            }
+        }
+    }
+    /*** END overwrite default table of component cam-table ***/
+}

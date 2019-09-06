@@ -1,4 +1,6 @@
 <a class="menu-level-3"
-    [id]="item.id"
-    [routerLink]="['/main', item.path]"
-    [innerHtml]="item.label"></a>
+   [ngClass]="{'selected': selected }"
+   [id]="item.id"
+   [routerLink]="[itemPath]"
+   [queryParams]="item.query"
+   [innerHtml]="item.label"></a>

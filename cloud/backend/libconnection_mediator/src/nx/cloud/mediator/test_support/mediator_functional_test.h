@@ -64,22 +64,26 @@ public:
     network::SocketAddress httpEndpoint() const;
     network::SocketAddress httpsEndpoint() const;
     nx::utils::Url httpUrl() const;
+    nx::utils::Url stunTcpBaseUrl() const;
 
     std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
     std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection> systemConnection();
 
     std::unique_ptr<MediaServerEmulator> addServer(
         const AbstractCloudDataProvider::System& system,
-        nx::String name, ServerTweak::Value tweak = ServerTweak::defaultBehavior);
+        nx::String name, ServerTweak::Value tweak = ServerTweak::defaultBehavior,
+        const QString& tcpUrlScheme = "stun");
 
     std::unique_ptr<MediaServerEmulator> addRandomServer(
         const AbstractCloudDataProvider::System& system,
         boost::optional<QnUuid> serverId = boost::none,
-        ServerTweak::Value tweak = ServerTweak::defaultBehavior);
+        ServerTweak::Value tweak = ServerTweak::defaultBehavior,
+        const QString& tcpUrlScheme = "stun");
 
     std::vector<std::unique_ptr<MediaServerEmulator>> addRandomServers(
         const AbstractCloudDataProvider::System& system,
-        size_t count, ServerTweak::Value tweak = ServerTweak::defaultBehavior);
+        size_t count, ServerTweak::Value tweak = ServerTweak::defaultBehavior,
+        const QString& tcpUrlScheme = "stun");
 
     std::tuple<api::ResultCode, api::ListeningPeers>
         getListeningPeers() const;
@@ -87,6 +91,9 @@ public:
 protected:
     virtual void beforeModuleCreation() override;
     virtual void afterModuleDestruction() override;
+
+private:
+    nx::utils::Url buildMediatorTcpUrl(const QString& urlScheme) const;
 
 private:
     struct TcpProxyContext

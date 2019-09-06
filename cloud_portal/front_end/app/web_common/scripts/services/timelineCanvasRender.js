@@ -422,6 +422,9 @@ window.TimelineCanvasRender = function(canvas, timelineConfig, recordsProvider, 
             }
         }
     }
+    
+    var events_count = 0;
+    
     // !!! Draw events
     function drawOrCheckEvents(context, mouseX, mouseY){
         mouseY *= self.pixelAspectRatio;
@@ -450,14 +453,15 @@ window.TimelineCanvasRender = function(canvas, timelineConfig, recordsProvider, 
             if (self.recordsProvider && self.recordsProvider.chunksTree) {
                 // 1. Splice events
                 var events = self.recordsProvider.getIntervalRecords(start, end, levelIndex);
-
+                events_count = events.length;
                 // 2. Draw em!
                 for (var i = 0; i < events.length; i++) {
                     drawEvent(context, events[i], levelIndex);
                 }
             }
         }
-        return mouseX && 0 < mouseY && mouseY < self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height;
+        return mouseX > 0 && mouseX < self.canvas.width &&
+               mouseY > 0 && mouseY < self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height;
     }
 
     var chunkLoadingTexture = false;
@@ -963,7 +967,8 @@ window.TimelineCanvasRender = function(canvas, timelineConfig, recordsProvider, 
         if(!getFps){
             getFps = FpsCalculator();
         }
-        var fps = "fps: " + getFps();// + ' (' + mouseX + ',' + mouseY + ') ' + self.scaleManager.dateToScreenCoordinate(self.scaleManager.screenCoordinateToDate(mouseX));
+        
+        var fps = "fps: " + getFps() + " / events: " + events_count;// + ' (' + mouseX + ',' + mouseY + ') ' + self.scaleManager.dateToScreenCoordinate(self.scaleManager.screenCoordinateToDate(mouseX));
 
         context.font = formatFont(timelineConfig.markerDateFont);
         context.fillStyle = blurColor(timelineConfig.pointerMarkerTextColor, 0.7);

@@ -15,9 +15,6 @@ class DetachSystem:
 
 public:
     DetachSystem():
-        nx::utils::test::TestWithTemporaryDirectory(
-            "vms_cloud_intergration.DetachSystem",
-            QString()),
         m_cloudSystemFixture(testDataDir().toStdString())
     {
     }

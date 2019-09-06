@@ -22,7 +22,7 @@
                 </sequence> -->
             </condition>
 
-            <condition resName="request.path">
+            <condition resName="request.path" matchType="wildcard">
                 <set value="/cdb/account/resetPassword" resName="authenticated" resValue="true"/>
                 <condition value="/cdb/maintenance/vmsConnections" resName="secureSource">
                     <set value="true" resName="authenticated" resValue="true"/>
@@ -34,6 +34,8 @@
                     <set value="true" resName="authenticated" resValue="true"/>
                 </condition>
                 <set value="/cdb/ec2/info" resName="authenticated" resValue="true"/>
+                <set value="/cdb/auth_provider/caller-identity" resName="authenticated" resValue="true"/>
+                <set value="/cdb/auth_provider/system/*/access-level" resName="authenticated" resValue="true"/>
             </condition>
         </sequence>
 

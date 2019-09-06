@@ -91,7 +91,7 @@ protected:
         m_httpClient.setUserName(userName);
         m_httpClient.setUserPassword(password);
 
-        m_resourceServer->setAuthenticationEnabled(true);
+        m_resourceServer->enableAuthentication(".*");
         m_resourceServer->registerUserCredentials(userName.toUtf8(), password.toUtf8());
     }
 

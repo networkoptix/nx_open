@@ -114,7 +114,7 @@ protected:
 
     void enableAuthentication()
     {
-        m_httpServer.setAuthenticationEnabled(true);
+        m_httpServer.enableAuthentication(".*");
         m_httpServer.registerUserCredentials(m_credentials);
     }
 

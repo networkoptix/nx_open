@@ -30,6 +30,8 @@ enum ResultCode
 
 NX_KEY_VALUE_DB_API const char * toString(ResultCode result);
 
+NX_KEY_VALUE_DB_API std::optional<std::string> calculateUpperBound(const std::string& keyPrefix);
+
 using UpdateCompletionHandler = nx::utils::MoveOnlyFunc<void(ResultCode)>;
 
 /**
@@ -115,6 +117,8 @@ public:
     void getRangeWithPrefix(
         const std::string& keyPrefix,
         GetRangeCompletionHandler completionHandler);
+
+    void getAll(GetRangeCompletionHandler completionHandler);
 
 private:
     /**

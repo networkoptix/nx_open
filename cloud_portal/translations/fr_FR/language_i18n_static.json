@@ -1,0 +1,163 @@
+{
+	"search": {
+		"Search": "Recherche",
+		"search_ipvd": "Recherche par modèle ou fabricant",
+		"filter applied": "filtre appliqué",
+		"filters applied": "filtres appliqués",
+		"Any": "Tout",
+		"selected": "sélectionné",
+		"vendor": "Fabricant",
+		"vendors": "fabricants",
+		"hardwareType": "Type",
+		"hardwareTypes": "types",
+		"minResolution": "Résolution minimale"
+	},
+	"cameraFilters": {
+		"ptz": "Caméras PTZ",
+		"aptz": "Caméras avec PTZ avancé",
+		"fisheye": "Caméras Fisheye",
+		"H265": "Caméras H.265",
+		"IO": "Modules d'E / S",
+		"multiSensor": "Caméras multi-capteur",
+		"TwWayAudio": "Périphériques audio bidirectionnels",
+		"audio": "Caméras avec audio",
+		"encoder": "Encodeurs",
+		"highRes": "Caméras extra haute résolution"
+	},
+	"downloads": {
+		"mobile": {
+			"ios": {
+				"link": "%IOS_APPLICATION_LINK%"
+			},
+			"android": {
+				"link": "%ANDROID_APPLICATION_LINK%"
+			}
+		},
+		"groups": {
+			"windows": {
+				"label": "Windows",
+				"supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
+			},
+			"mac": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"linux": {
+				"label": "Ubuntu Linux",
+				"shortLabel": "Ubuntu",
+				"supported": "Ubuntu 14.04 LTS, 16.04 LTS"
+			},
+			"macos": {
+				"label": "Mac OS",
+				"supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
+			},
+			"ios": {
+				"label": "iOS",
+				"shortLabel": "iOS"
+			},
+			"android": {
+				"label": "Android",
+				"shortLabel": "Android"
+			},
+			"arm": {
+				"label": "ARM",
+				"shortLabel": "ARM",
+				"supported": "Debian/Ubuntu based"
+			},
+			"sdk": {
+				"label": "SDK",
+				"shortLabel": "SDK",
+				"supported": "SDK multi-plateformes C ++"
+			}
+		},
+		"platforms": {
+			"win64": "x64",
+			"linux64": "x64",
+			"mac": "X",
+			"bananapi": "Banana Pi",
+			"bpi": "Nx1",
+			"rpi": " Raspberry Pi"
+		},
+		"appTypes": {
+			"client": "Client seulement",
+			"server": "Server seulement",
+			"bundle": "Client et serveur",
+			"servertool": "Outil de configuration",
+			"package": "Paquet"
+		},
+		"releasesTypes": {
+			"beta": "Beta",
+			"betas": "Betas",
+			"rc": "Version Candidate (RC)",
+			"release": "Version",
+			"releases": "Versions",
+			"patch": "Patch",
+			"patches": "Patchs"
+		}
+	},
+	"ipvd": {
+		"count": "Nombre",
+		"vendor": "Fabricant",
+		"model": "Modèle",
+		"hardwareType": "Type",
+		"maxResolution": "Résolution max",
+		"maxFps": "Max FPS",
+		"primaryCodec": "Codec",
+		"isAudioSupported": "Audio",
+		"isTwAudioSupported": "Audio bidirectionnel",
+		"isPtzSupported": "PTZ",
+		"isAptzSupported": "PTZ avancé",
+		"isAptzSupportedShort": "Adv. PTZ",
+		"isFisheye": "Fisheye",
+		"isMdSupported": "Mouvement",
+		"isIoSupported": "E/S",
+		"isH265": "H.265",
+		"isMultiSensor": "Multi capteur",
+		"camera": "Caméra",
+		"multiSensorCamera": "Caméra multi-capteur",
+		"encoder": "Encodeur",
+		"dvr": "DVR",
+		"other": "Autre",
+		"PTZ cameras": "Caméras PTZ",
+		"Advanced PTZ cameras": "Caméras PTZ avancées",
+		"Fisheye Cameras": "Caméras Fisheye",
+		"Cameras supporting H.265": "Caméras supportant H.265",
+		"I / O modules": "Modules d'E / S",
+		"Multisensor Cameras": "Caméras multicapteurs",
+		"Cameras with 2-way audio": "Caméras avec audio bidirectionnel",
+		"Extra high resolution cameras": "Caméras extra haute résolution",
+		"feedback": {
+			"a_Please": "S.V.P.",
+			"b_Link": "soumettre une requête",
+			"c_Info": "pour questions/préoccupations supplémentaires concernant les périphériques pris en charge."
+		}
+	},
+	"integration": {
+		"previewRibbonText": "Cette page est un aperçu des dernières modifications et ne correspond pas à la version publique.",
+		"backToEditText": "Retour aux interfaces d'édition",
+		"Access Control": "Contrôle d'accès",
+		"Connector": "Connecteur",
+		"Data Analytics": "Analyse de données",
+		"Drone": "Drone",
+		"Health Monitor": "Moniteur de santé",
+		"Storage": "Stockage"
+	},
+	"messageDialogPlaceholders": {
+		"feedback": "Assurez-vous d'inclure le modèle et le fabricant de votre caméra..."
+	},
+	"pageTitles": {
+		"supportedDevices": "Supported Devices",
+		"integrations": "Integrations"
+	},
+	"dialogs": {
+		"merge": {
+			"connectToCloud": "Connect System you want to merge with this one to <strong>{{cloudName}}</strong> or merge locally using <strong>{{vmsName}}</strong> Client.",
+			"mergeConfirmation": "You are about to merge systems <strong>{{primarySystem}}</strong> and <strong>{{secondarySystem}}</strong>. Settings and the name will be taken from the <strong>{{primarySystem}}</strong>.",
+			"primaryCannotMerge": "System {{targetSystem}} has a newer software version that is incompatible with the current system. Update the current system to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the {{targetSystem}} System.",
+			"primarySystemOffline": "System {{primarySystem}} is offline and cannot be merged with System {{targetSystem}}.",
+			"secondaryCannotMerge": "System {{targetSystem}} has an older software version that is incompatible with the current system. Update {{targetSystem}} to the <a href=\"/download\" target=\"_blank\" translate>latest build</a> to merge it with the current one.",
+			"systemOffline": "System {{targetSystem}} is offline and cannot be merged with the current one.",
+			"systemUnavailable": "System {{targetSystem}} is currently unreachable. Try again in a few minutes or contact"
+		}
+	}
+}

@@ -19,11 +19,13 @@ namespace nx::network::http {
  * - If ResultCode is different from nx::network::http::StatusCode, then following method MUST be
  * defined too:
  * <pre><code>
- * template<typename Output>
- * auto getResultCode(
- *     SystemError::ErrorCode systemErrorCode,
- *     const network::http::Response* response,
- *     const Output&... output);
+ * public:
+ *     template<typename... Output>
+ *     static auto getResultCode(
+ *         SystemError::ErrorCode systemErrorCode,
+ *         const network::http::Response* response,
+ *         const network::http::FusionRequestResult& fusionRequestResult,
+ *         const Output&... output);
  * </code></pre>
  */
 template<typename ApiResultCodeDescriptor>
@@ -40,6 +42,8 @@ public:
     virtual void bindToAioThread(
         network::aio::AbstractAioThread* aioThread) override;
 
+    void setRequestTimeout(std::chrono::milliseconds timeout);
+
 protected:
     virtual void stopWhileInAioThread() override;
 
@@ -48,6 +52,13 @@ protected:
      */
     template<typename OutputData, typename CompletionHandler, typename... InputArgs>
     void makeAsyncCall(
+        const std::string& requestPath,
+        CompletionHandler completionHandler,
+        InputArgs... inputArgs);
+
+    template<typename OutputData, typename CompletionHandler, typename... InputArgs>
+    void makeAsyncCall(
+        const network::http::Method::ValueType& method,
         const std::string& requestPath,
         CompletionHandler completionHandler,
         InputArgs... inputArgs);
@@ -69,6 +80,7 @@ private:
     };
 
     const utils::Url m_baseApiUrl;
+    std::optional<std::chrono::milliseconds> m_requestTimeout;
     std::map<network::aio::BasicPollable*, Context> m_activeRequests;
     QnMutex m_mutex;
 
@@ -77,9 +89,9 @@ private:
         const std::string& requestPath,
         InputArgs... inputArgs);
 
-    template<typename CompletionHandler, typename... Output>
+    template<typename Request, typename CompletionHandler, typename... Output>
     void processResponse(
-        network::aio::BasicPollable* requestPtr,
+        Request* requestPtr,
         CompletionHandler handler,
         SystemError::ErrorCode error,
         const network::http::Response* response,
@@ -92,6 +104,7 @@ private:
     auto getResultCode(
         SystemError::ErrorCode systemErrorCode,
         const network::http::Response* response,
+        const network::http::FusionRequestResult& fusionRequestResult,
         const Output&... output) const;
 
     template<typename Output, typename ResultTuple, typename... InputArgs>
@@ -112,6 +125,13 @@ template<typename ApiResultCodeDescriptor>
 GenericApiClient<ApiResultCodeDescriptor>::~GenericApiClient()
 {
     pleaseStopSync();
+}
+
+template<typename ApiResultCodeDescriptor>
+void GenericApiClient<ApiResultCodeDescriptor>::setRequestTimeout(
+    std::chrono::milliseconds timeout)
+{
+    m_requestTimeout = timeout;
 }
 
 template<typename ApiResultCodeDescriptor>
@@ -147,6 +167,27 @@ void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCall(
     request->execute(
         [this, request, handler = std::move(handler)](
             auto&&... args) mutable
+        {
+            this->processResponse(request, std::move(handler), std::move(args)...);
+        });
+}
+
+template<typename ApiResultCodeDescriptor>
+template<typename Output, typename CompletionHandler, typename ...InputArgs>
+inline void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCall(
+    const network::http::Method::ValueType& method,
+    const std::string& requestPath,
+    CompletionHandler handler,
+    InputArgs ...inputArgs)
+{
+    auto request = createHttpClient<Output>(
+        requestPath,
+        std::move(inputArgs)...);
+
+    request->execute(
+        method,
+        [this, request, handler = std::move(handler)](
+            auto&& ... args) mutable
         {
             this->processResponse(request, std::move(handler), std::move(args)...);
         });
@@ -196,6 +237,9 @@ auto GenericApiClient<ApiResultCodeDescriptor>::createHttpClient(
             std::move(inputArgs)...);
     httpClient->bindToAioThread(getAioThread());
 
+    if (m_requestTimeout)
+        httpClient->setRequestTimeout(*m_requestTimeout);
+
     auto httpClientPtr = httpClient.get();
     {
         QnMutexLocker lock(&m_mutex);
@@ -206,9 +250,9 @@ auto GenericApiClient<ApiResultCodeDescriptor>::createHttpClient(
 }
 
 template<typename ApiResultCodeDescriptor>
-template<typename CompletionHandler, typename... Output>
+template<typename Request, typename CompletionHandler, typename... Output>
 void GenericApiClient<ApiResultCodeDescriptor>::processResponse(
-    network::aio::BasicPollable* requestPtr,
+    Request* requestPtr,
     CompletionHandler handler,
     SystemError::ErrorCode error,
     const network::http::Response* response,
@@ -216,9 +260,10 @@ void GenericApiClient<ApiResultCodeDescriptor>::processResponse(
 {
     Context context = takeContextOfRequest(requestPtr);
 
-    const auto resultCode = getResultCode(error, response, output...);
+    const auto resultCode =
+        getResultCode(error, response, requestPtr->lastFusionRequestResult(), output...);
 
-    handler(resultCode, std::move(output)...);
+    handler(std::move(resultCode), std::move(output)...);
 }
 
 template<typename ApiResultCodeDescriptor>
@@ -240,6 +285,7 @@ template<typename... Output>
 auto GenericApiClient<ApiResultCodeDescriptor>::getResultCode(
     [[maybe_unused]] SystemError::ErrorCode systemErrorCode,
     const network::http::Response* response,
+    const network::http::FusionRequestResult& fusionRequestResult,
     const Output&... output) const
 {
     if constexpr (std::is_same<
@@ -256,6 +302,7 @@ auto GenericApiClient<ApiResultCodeDescriptor>::getResultCode(
         return ApiResultCodeDescriptor::getResultCode(
             systemErrorCode,
             response,
+            fusionRequestResult,
             output...);
     }
 }

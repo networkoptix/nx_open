@@ -223,7 +223,7 @@ nx::utils::Subscription<std::string>& ListeningPeerPool::peerDisconnectedSubscri
 std::string ListeningPeerPool::convertHostnameToInternalFormat(
     const std::string& hostname) const
 {
-    auto reversed = utils::reverseWords(hostname, ".");
+    auto reversed = utils::reverseWords(hostname, '.');
     nx::utils::to_lower(&reversed);
     return reversed;
 }
@@ -288,7 +288,7 @@ void ListeningPeerPool::giveAwayConnection(
 {
     auto connectionWatcherPtr = connectionContext->connectionWatcher.get();
 
-    connectionWatcherPtr->startTunnel(
+    connectionWatcherPtr->openTunnel(
         clientInfo,
         [this,
             clientInfo,
@@ -311,7 +311,7 @@ void ListeningPeerPool::giveAwayConnection(
             completionHandler(
                 relay::api::ResultCode::ok,
                 std::move(connection),
-                nx::utils::reverseWords(peerName, "."));
+                nx::utils::reverseWords(peerName, '.'));
         });
 }
 
@@ -319,7 +319,7 @@ void ListeningPeerPool::monitoringConnectionForClosure(
     const std::string& peerName,
     ConnectionContext* connectionContext)
 {
-    connectionContext->connectionWatcher->start(
+    connectionContext->connectionWatcher->startMonitoringConnection(
         [this, peerName, connectionContext](SystemError::ErrorCode errorCode)
         {
             return closeConnection(peerName, connectionContext, errorCode);

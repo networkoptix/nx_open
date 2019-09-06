@@ -1,0 +1,12 @@
+Dobrý den,
+
+You have been invited to %CLOUD_NAME%.
+{{#message.message}}
+
+{{ message.message }}
+
+{{/message.message}}
+Please create account on %CLOUD_NAME%
+pomocí aktuální e-mailové adresy a postupujte podle dalších pokynů.
+
+Registrujte svůj účet pomocí tohoto odkazu: {{ config.portal_url }}/register/{{ message.code }}

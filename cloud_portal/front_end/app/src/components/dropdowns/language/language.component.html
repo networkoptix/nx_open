@@ -23,8 +23,10 @@
                (click)="show = false; change(lang.language);"
                [ngClass]="{'active': lang.language === activeLanguage.language}">
 
-                <span class="lang-sm" lang="{{lang.language}}"></span>
-                <span>{{lang.name}}</span>
+                <span>
+                    <span class="lang-sm" lang="{{lang.language}}"></span>
+                    <span>{{lang.name}}</span>
+                </span>
             </a>
         </li>
     </ul>
@@ -41,8 +43,10 @@
                            (click)="show = false; change(lang.language);"
                            [ngClass]="{'selected': lang.language === activeLanguage.language}">
 
-                            <span class="lang-sm" lang="{{lang.language}}"></span>
-                            <span>{{lang.name}}</span>
+                            <span>
+                                <span class="lang-sm" lang="{{lang.language}}"></span>
+                                <span>{{lang.name}}</span>
+                            </span>
                         </a>
                     </li>
                 </ul>
@@ -55,8 +59,10 @@
                            [ngClass]="{'selected': lang.language === activeLanguage.language}"
                            (click)="show = false; change(lang.language);">
 
-                            <span class="lang-sm" lang="{{lang.language}}"></span>
-                            <span>{{lang.name}}</span>
+                            <span>
+                                <span class="lang-sm" lang="{{lang.language}}"></span>
+                                <span>{{lang.name}}</span>
+                            </span>
                         </a>
                     </li>
                 </ul>

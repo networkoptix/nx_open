@@ -19,7 +19,7 @@ bool LoggerSettings::parse(const QString& str)
     const auto params = parseNameValuePairs<std::multimap>(
         str.toUtf8(),
         ',',
-        GroupToken::doubleQuotes | GroupToken::squareBraces);
+        GroupToken::doubleQuotes | GroupToken::squareBrackets);
     for (const auto& param: params)
     {
         if (param.first == "file")

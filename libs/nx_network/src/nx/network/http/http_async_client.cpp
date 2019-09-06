@@ -20,8 +20,6 @@
 
 #include <nx/fusion/model_functions.h>
 
-using std::make_pair;
-
 namespace {
 
 static bool logTraffic()
@@ -35,30 +33,7 @@ namespace nx {
 namespace network {
 namespace http {
 
-static const size_t RESPONSE_BUFFER_SIZE = 16 * 1024;
-
-constexpr const std::chrono::milliseconds AsyncClient::Timeouts::kDefaultSendTimeout;
-constexpr const std::chrono::milliseconds AsyncClient::Timeouts::kDefaultResponseReadTimeout;
-constexpr const std::chrono::milliseconds AsyncClient::Timeouts::kDefaultMessageBodyReadTimeout;
-
-AsyncClient::Timeouts::Timeouts(
-    std::chrono::milliseconds send,
-    std::chrono::milliseconds recv,
-    std::chrono::milliseconds msgBody)
-:
-    sendTimeout(send),
-    responseReadTimeout(recv),
-    messageBodyReadTimeout(msgBody)
-{
-}
-
-
-bool AsyncClient::Timeouts::operator==(const Timeouts& rhs) const
-{
-    return sendTimeout == rhs.sendTimeout
-        && responseReadTimeout == rhs.responseReadTimeout
-        && messageBodyReadTimeout == rhs.messageBodyReadTimeout;
-}
+static constexpr size_t RESPONSE_BUFFER_SIZE = 16 * 1024;
 
 AsyncClient::AsyncClient():
     m_state(State::sInit),
@@ -72,9 +47,6 @@ AsyncClient::AsyncClient():
     m_totalRequestsSentViaCurrentConnection(0),
     m_totalRequestsSent(0),
     m_contentEncodingUsed(true),
-    m_sendTimeout(Timeouts::kDefaultSendTimeout),
-    m_responseReadTimeout(Timeouts::kDefaultResponseReadTimeout),
-    m_msgBodyReadTimeout(0),
     m_authType(AuthType::authBasicAndDigest),
     m_awaitedMessageNumber(0),
     m_lastSysErrorCode(SystemError::noError),
@@ -225,6 +197,15 @@ void AsyncClient::doPost(
 
 void AsyncClient::doPost(
     const nx::utils::Url& url,
+    std::unique_ptr<AbstractMsgBodySource> body,
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    m_onDone = std::move(completionHandler);
+    doPost(url, std::move(body));
+}
+
+void AsyncClient::doPost(
+    const nx::utils::Url& url,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
     m_onDone = std::move(completionHandler);
@@ -242,6 +223,15 @@ void AsyncClient::doPut(
 {
     setRequestBody(std::move(body));
     doPut(url);
+}
+
+void AsyncClient::doPut(
+    const nx::utils::Url& url,
+    std::unique_ptr<AbstractMsgBodySource> body,
+    nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    m_onDone = std::move(completionHandler);
+    doPut(url, std::move(body));
 }
 
 void AsyncClient::doPut(
@@ -359,6 +349,9 @@ void AsyncClient::doRequest(
     composeRequest(method);
     if (m_requestBody)
         addBodyToRequest();
+
+    if (m_customRequestPrepareFunc)
+        m_customRequestPrepareFunc(&m_request);
 
     initiateHttpMessageDelivery();
 }
@@ -532,19 +525,24 @@ void AsyncClient::setDisablePrecalculatedAuthorization(bool val)
 
 void AsyncClient::setSendTimeout(std::chrono::milliseconds sendTimeout)
 {
-    m_sendTimeout = sendTimeout;
+    m_timeouts.sendTimeout = sendTimeout;
 }
 
 void AsyncClient::setResponseReadTimeout(
     std::chrono::milliseconds _responseReadTimeout)
 {
-    m_responseReadTimeout = _responseReadTimeout;
+    m_timeouts.responseReadTimeout = _responseReadTimeout;
 }
 
 void AsyncClient::setMessageBodyReadTimeout(
     std::chrono::milliseconds messageBodyReadTimeout)
 {
-    m_msgBodyReadTimeout = messageBodyReadTimeout;
+    m_timeouts.messageBodyReadTimeout = messageBodyReadTimeout;
+}
+
+void AsyncClient::setTimeouts(const Timeouts& timeouts)
+{
+    m_timeouts = timeouts;
 }
 
 void AsyncClient::stopWhileInAioThread()
@@ -645,7 +643,7 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
 
     m_state = m_expectOnlyBody ? State::sReadingMessageBody : State::sReceivingResponse;
     m_responseBuffer.resize(0);
-    if (!m_socket->setRecvTimeout(m_responseReadTimeout))
+    if (!m_socket->setRecvTimeout(m_timeouts.responseReadTimeout))
     {
         const auto sysErrorCode = SystemError::getLastOSErrorCode();
 
@@ -653,7 +651,7 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
             return;
 
         NX_DEBUG(this, lm("Url %1. Error setting receive timeout to %2. %3")
-            .arg(m_contentLocationUrl).arg(m_responseReadTimeout)
+            .arg(m_contentLocationUrl).arg(m_timeouts.responseReadTimeout)
             .arg(SystemError::toString(sysErrorCode)));
         m_state = State::sFailed;
         const auto requestSequenceBak = m_requestSequence;
@@ -845,8 +843,8 @@ void AsyncClient::initiateTcpConnection()
     m_connectionClosed = false;
 
     if (!m_socket->setNonBlockingMode(true) ||
-        !m_socket->setSendTimeout(m_sendTimeout) ||
-        !m_socket->setRecvTimeout(m_responseReadTimeout))
+        !m_socket->setSendTimeout(m_timeouts.sendTimeout) ||
+        !m_socket->setRecvTimeout(m_timeouts.responseReadTimeout))
     {
         m_socket->post(
             std::bind(
@@ -1136,7 +1134,7 @@ AsyncClient::Result AsyncClient::startReadingMessageBody(bool* const continueRec
     {
         // Reading more data.
         m_responseBuffer.resize(0);
-        if (!m_socket->setRecvTimeout(m_msgBodyReadTimeout))
+        if (!m_socket->setRecvTimeout(m_timeouts.messageBodyReadTimeout))
         {
             NX_DEBUG(this, lm("Failed to read (1) response body from %1. %2")
                 .arg(m_contentLocationUrl).arg(SystemError::getLastOSErrorText()));
@@ -1429,7 +1427,7 @@ void AsyncClient::addBodyToRequest()
             StringType::number((qulonglong)*m_requestBody->contentLength()));
     }
     // TODO: #ak Support chunked encoding & compression.
-    m_request.headers.insert(make_pair("Content-Encoding", "identity"));
+    m_request.headers.insert(std::make_pair("Content-Encoding", "identity"));
 
     // TODO: #ak Add support for any body.
     NX_CRITICAL(
@@ -1466,6 +1464,11 @@ void AsyncClient::addRequestHeaders(const HttpHeaders& headers)
 {
     for (HttpHeaders::const_iterator itr = headers.begin(); itr != headers.end(); ++itr)
         m_additionalHeaders.emplace(itr->first, itr->second);
+}
+
+void AsyncClient::setCustomRequestPrepareFunc(CustomRequestPrepareFunc func)
+{
+    m_customRequestPrepareFunc = std::move(func);
 }
 
 void AsyncClient::serializeRequest()

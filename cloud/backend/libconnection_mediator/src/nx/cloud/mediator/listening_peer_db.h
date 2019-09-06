@@ -2,6 +2,8 @@
 
 #include <nx/clusterdb/map/embedded_database.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/network/cloud/mediator/api/connection_speed.h>
+#include <nx/utils/subscription.h>
 
 #include "mediator_endpoint.h"
 #include "mediator_selector.h"
@@ -13,31 +15,47 @@ namespace conf {
 class Settings;
 struct ListeningPeerDb;
 
-}
+} // namespace conf
+
+struct ListeningPeerStatus
+{
+    std::string systemId;
+    std::string serverId;
+
+    // The list of Mediators that a listeningPeer is connected to.
+    std::vector<MediatorEndpoint> connectedEndpoints;
+    // The listeningPeers uplink speed.
+    nx::hpm::api::ConnectionSpeed uplinkSpeed;
+};
 
 /**
  * Associates peer domains (e.g. mediaserverid.systemid) with a mediator instance domain
- * discovering other mediator instances and synchronizing with their
- * ListeningPeerDbs.
+ * discovering other mediator instances and synchronizing with their ListeningPeerDbs.
  */
 class ListeningPeerDb
 {
 public:
     ListeningPeerDb(const conf::Settings& settings);
+    ~ListeningPeerDb();
 
     /**
      * Initializes the underlying database.
+     * NOTE: Any async call made before initialize() returns successfully will be done in the same
+     * thread as the calling function.
      */
     bool initialize();
 
     /**
-     * stops the underlying database.
+     * Stops the underlying database. All further async calls will return immediately in the same
+     * thread as the calling function until initialize is called again.
      */
     void stop();
 
+    void setThisMediatorEndpoint(const MediatorEndpoint& endpoint);
+
     /**
-    * Get this mediator instance's endpoint.
-    */
+     * Get this mediator instance's endpoint.
+     */
     const MediatorEndpoint& thisMediatorEndpoint() const;
 
     /**
@@ -64,7 +82,28 @@ public:
         const std::string& peerDomainName,
         nx::utils::MoveOnlyFunc<void(MediatorEndpoint)> handler);
 
-    /*
+    /**
+     * Adds or updates the connectionSpeed for the given peerId (serverId[.systemId]).
+     * handler receives true if successful, false otherwise.
+     */
+    void addUplinkSpeed(
+        const std::string& peerId,
+        const nx::hpm::api::ConnectionSpeed& uplinkSpeed,
+        nx::utils::MoveOnlyFunc<void(bool)> handler);
+
+    /**
+     * Get the status of the listening peer specified by peerId ([serverId.]systemId])
+     * Optionally, if only systemId is given, the map will contain the ListeningPeerStatus for all
+     * peers with that systemId. if serverId is given and present, the map returned will contain
+     * one entry.
+     * @param peerId either serverId.systemId or systemId.
+     * NOTE: the peerId key for each entry in the map is lower case.
+     * NOTE: the peerId key is always serverId.systemId, needed to uniquely identify each peer.
+     */
+    std::map<std::string, ListeningPeerStatus> getListeningPeerStatus(
+        const std::string& peerId) const;
+
+    /**
      * Starts discovery of other mediator instances and synchronizes
      * their ListeningPeerDb entries.
      *
@@ -80,8 +119,11 @@ public:
      */
     std::string nodeId() const;
 
+    nx::utils::SubscriptionId subscribeToUplinkSpeedUpdated(
+        nx::utils::MoveOnlyFunc<void(nx::hpm::api::PeerConnectionSpeed)> handler);
+    void unsubscribeFromUplinkSpeedUpdated(nx::utils::SubscriptionId id);
+
 private:
-    void setThisMediatorEndpoint(const MediatorEndpoint& endpoint);
 
     std::string toInternalStorageFormat(const std::string& peerId) const;
 
@@ -96,6 +138,9 @@ private:
     MediatorEndpoint m_mediatorEndpoint;
     std::string m_mediatorEndpointString;
     nx::utils::Url m_syncEngineUrl;
+
+    nx::utils::Subscription<nx::hpm::api::PeerConnectionSpeed> m_uplinkSpeedUpdated;
+    std::atomic_bool m_stopped = true;
 };
 
 } // namespace nx::hpm

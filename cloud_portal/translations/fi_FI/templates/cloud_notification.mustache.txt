@@ -1,0 +1,3 @@
+Hei, {{message.userFullName}}
+
+{{message.text_body}}

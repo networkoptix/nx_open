@@ -1,4 +1,3 @@
-
 <nx-pre-loader type="page" *ngIf="!list"></nx-pre-loader>
 
 <div class="col text-placeholder d-flex align-items-center"
@@ -8,18 +7,18 @@
 </div>
 
 <div class="row p-0 m-0" *ngIf="list && list.length">
-    <div *ngFor="let plugin of list" class="list col-12 col-md-6 col-lg-4 col-xl-3 p-2">
+    <div *ngFor="let plugin of list" class="list col-12 col-md-6 col-lg-4 col-xxl-3 p-2">
 
         <a class="plugin m-0"
-           [routerLink]="['/integrations', plugin.id]">
+           [href]="plugin.link">
 
-            <nx-block fixed-height hoverable>
+            <nx-block fixed-height hoverable header-style="extended">
                 <header>
                     <div class="card--header-logo"
                          [style.backgroundImage]="'url(' + plugin.information.logo + ')'">
                     </div>
                     <div class="card--header-info">
-                        <div class="version">v. {{ plugin.information.version }}</div>
+                        <div class="version" [innerHTML]="plugin.versionDetails.version"></div>
                         <div class="platforms">
                             <div *ngFor="let icon of plugin.information.platforms.icons">
                                 <img [src]="icon.src">
@@ -35,7 +34,10 @@
 
                 <footer>
                     <h3 class="float-left m-0 mt-1 mr-1" *ngIf="plugin.pending">
-                        <span class="badge badge-danger">In Review</span>
+                        <span class="badge badge-danger" translate>In Review</span>
+                    </h3>
+                    <h3 class="float-left m-0 mt-1 mr-1" *ngIf="plugin.draft">
+                        <span class="badge badge-danger" translate>Draft</span>
                     </h3>
                     <h3 class="float-left m-0 mt-1 mr-1" *ngFor="let type of plugin.information.type">
                         <span class="badge">{{type}}</span>
@@ -43,7 +45,6 @@
                 </footer>
             </nx-block>
         </a>
-
     </div>
 </div>
 

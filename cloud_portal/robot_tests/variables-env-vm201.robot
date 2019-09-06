@@ -38,7 +38,6 @@ ${TEST LAST NAME}                     testLastName
 
 #Related to Auto Tests system
 ${AUTO TESTS}                         Auto Tests
-${AUTO_TESTS SYSTEM ID}                     8a7f3d2a-83cd-46e8-8e38-908707f90885
 ${AUTO TESTS TITLE}                   //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']//h2[text()='Auto Tests']
 ${AUTO TESTS USER}                    //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']//h2[text()='Auto Tests']/following-sibling::span[contains(@class,'user-name')]
 ${AUTO TESTS OPEN NX}                 //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']//h2[text()='Auto Tests']/..//button[@ng-click='checkForm()']
@@ -50,6 +49,5 @@ ${NOT OWNER IN SYSTEM}                //div[@process-loading='gettingSystemUsers
 ${AUTO TESTS 2}                       Auto Tests 2
 ${AUTOTESTS OFFLINE}                  //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']//h2[contains(text(),'Auto Tests 2')]/following-sibling::span[contains(text(), "${AUTOTESTS OFFLINE TEXT}")]
 ${AUTOTESTS OFFLINE OPEN NX}          //div[@ng-repeat='system in systems | filter:searchSystems as filtered track by system.id']//h2[contains(text(),'Auto Tests 2')]/..//button[@ng-click='checkForm()']
-${AUTOTESTS OFFLINE SYSTEM ID}                cef0bff6-76d9-418e-8a64-1154a554277f
 
 ${OUTLINE ERROR COLOR}                rgb(217, 42, 42)

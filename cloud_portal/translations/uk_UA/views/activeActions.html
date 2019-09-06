@@ -23,7 +23,7 @@
 
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>Ви зареєстровані в %PRODUCT_NAME%</h1>
+            <h1>You have registered in %CLOUD_NAME%</h1>
             <p>Ми надіслали вам лист з посиланням на активацію до {{data.email}}<br> Будь ласка, активуйте свій обліковий запис, відвідавши це посилання.</p>
         </div>
         <h1 ng-if="!data.email">Активувати обліковий запис</h1>
@@ -43,7 +43,7 @@
                 <div class="col-sm-4">
                     <span class="help-block input-error"
                           ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> Електронна пошта обов'язкова </span> <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Будь ласка, введіть дійсну електронну адресу</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Будь ласка, введіть дійсну електронну скриню </span>
                 </div>
             </div>
             <div class="form-group">
@@ -79,7 +79,7 @@
                 <div class="col-sm-4">
                     <span class="help-block input-error"
                           ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> Електронна пошта обов'язкова </span> <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Будь ласка, введіть дійсну електронну скриню </span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Будь ласка, введіть дійсну електронну адресу</span>
                 </div>
             </div>
             <div class="form-group">
@@ -91,12 +91,14 @@
             </div>
         </form>
     </div>
-    <div ng-if="data.restoreCode">
-        <h1 class="process-success" ng-if="change.success || changeSuccess" translate>
-            Пароль змінено успішно
-        </h1>
-        <div class="process-success d-flex justify-content-center" ng-if="change.success || changeSuccess">
-            <a class="btn btn-default" href="/login" translate>Увійти</a>
+    <div ng-if="data.restoreCode || changeSuccess">
+        <div ng-if="change.success || changeSuccess">
+            <h1 class="process-success"  translate>
+                Пароль змінено успішно
+            </h1>
+            <div class="process-success d-flex justify-content-center">
+                <a class="btn btn-default" href="/login" translate>Увійти</a>
+            </div>
         </div>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess"

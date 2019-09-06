@@ -27,11 +27,13 @@ export class NxConfigService {
             openClientTimeout: 20 * 1000, // 20 seconds we wait for client to open
 
             openMobileClientTimeout: 300, // 300ms for mobile browsers
+            timelineMouseEventTimeout: 300, // milliseconds
 
             alertTimeout       : 3 * 1000,  // Alerts are shown for 3 seconds
             alertsMaxCount     : 5,
             minSystemsToSearch : 9, // We need at least 9 system to enable search
             maxSystemsForHeader: 6, // Dropdown at the top is limited in terms of number of cameras to display
+            maxServers: 100, // The maximum amount of server that can be in a system
 
             redirectAuthorised  : '/systems', // Page for redirecting all authorised users
             redirectUnauthorised: '/', // Page for redirecting all unauthorised users by default
@@ -159,74 +161,39 @@ export class NxConfigService {
                         os  : 'Android'
                     }
                 ],
-                groups: [
-                    {
-                        name      : 'windows',
-                        os        : 'Windows',
-                        installers: [
-                            {
-                                platform: 'win64',
-                                appType : 'client'
-                            },
-                            {
-                                platform: 'win64',
-                                appType : 'server'
-                            },
-                            {
-                                platform: 'win64',
-                                appType : 'bundle'
-                            },
-                            {
-                                platform: 'win86',
-                                appType : 'client'
-                            },
-                            {
-                                platform: 'win86',
-                                appType : 'server'
-                            },
-                            {
-                                platform: 'win86',
-                                appType : 'bundle'
-                            }
-                        ]
+                groups: {
+                    windows: {
+                        name: 'windows',
+                        os: 'windows',
+                        appTypes: ['bundle', 'client', 'server'],
                     },
-                    {
-                        name      : 'linux',
-                        os        : 'Linux',
-                        installers: [
-                            {
-                                platform: 'linux64',
-                                appType : 'client'
-                            },
-                            {
-                                platform: 'linux64',
-                                appType : 'server'
-                            },
-                            {
-                                platform: 'linux86',
-                                appType : 'client'
-                            },
-                            {
-                                platform: 'linux86',
-                                appType : 'server'
-                            }
-                        ]
+                    linux: {
+                        name: 'linux',
+                        os: 'linux',
+                        appTypes: ['bundle', 'client', 'server']
                     },
-                    {
-                        name      : 'macos',
-                        os        : 'MacOS',
-                        installers: [
-                            {
-                                platform: 'mac',
-                                appType : 'client'
-                            }
-                        ]
+                    macos: {
+                        name: 'macos',
+                        os: 'MacOS',
+                        appTypes: ['client']
+                    },
+                    arm: {
+                        name: 'arm',
+                        os: '',
+                        appTypes: ['client', 'server']
+                    },
+                    sdk: {
+                        name: 'sdk',
+                        os: '',
+                        appTypes: []
                     }
-                ]
+                }
             },
             icons : {
                 default : '/static/icons/integration_tile_preview_plugin.svg',
                 platforms : [
+                    { name: 'mac', src: '/static/icons/integration_tile_os_mac.svg' },
+                    { name: 'android', src: '/static/icons/integration_tile_os_android.svg' },
                     { name: 'arm', src: '/static/icons/integration_tile_os_arm.svg' },
                     { name: 'linux', src: '/static/icons/integration_tile_os_linux.svg' },
                     { name: 'windows', src: '/static/icons/integration_tile_os_windows.svg' }
@@ -257,11 +224,15 @@ export class NxConfigService {
                 chunksToCheckFatal: 30, // This is used in short cache when requesting chunks for jumpToPosition in timeline directive
                 skipFramesRenderingTimeline: true
             },
+            messageTopics: {
+                integration: ['contact_sales', 'contact_support'],
+                ipvd_feedback_page: ['ipvd_feedback_page'],
+                ipvd_feedback_device: ['ipvd_feedback_device']
+            },
             messageType: {
                 ipvd_page: 'ipvd_feedback_page',
                 ipvd_device: 'ipvd_feedback_device',
-                inquiry: 'sales_inquiry',
-                support: 'request_support',
+                integration: 'integration',
                 unknown: 'unknown'
             },
             permissions                   : {
@@ -283,25 +254,24 @@ export class NxConfigService {
                 },
                 youtube : {
                     link: 'https://www.youtube.com/embed/',
-                    regex: '^https?:\\/\\/(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)([\\w]+)$'
+                    regex: '^https?:\\/\\/(?:www\\.youtube\\.com\\/(?:embed\\/|watch\\?v=)|youtu\\.be\\/)([\\w\-]+)$'
                 }
             },
             defaultPlatformNames                 : {
                 'arm-file'        : 'Arm',
                 'linux-x64-file'  : 'Linux x64',
-                'linux-x86-file'  : 'Linux x86',
                 'macos-file'      : 'Mac OS',
                 'rpi-file'        : 'Raspberry Pi',
                 'windows-x64-file': 'Windows x64',
-                'windows-x86-file': 'Windows x86'
+                'downloadableInstructions': 'Instructions / Manual'
             },
             animation: {
                 carouselImageEnter: '0.25s ease-in',
                 carouselImageLeave: '0.25s ease-out'
             },
-            campage: {
-                vendorGroups: 4,
-                pagerMaxSize: 4
+            ipvd: {
+                pagerMaxSize: 4,
+                firmwaresToShow: 5
             },
             search: {
                 maxLength   : 200,

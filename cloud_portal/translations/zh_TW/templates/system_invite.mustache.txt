@@ -1,11 +1,11 @@
-歡迎使用 %PRODUCT_NAME%
+Welcome to %CLOUD_NAME%
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) is inviting you to join %PRODUCT_NAME% and shared the system {{message.system_name}} with you.
+{{message.sharer_name}} ({{message.sharer_email}}) is inviting you to join %CLOUD_NAME% and shared the system {{message.system_name}} with you.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-您被邀請加入 %PRODUCT_NAME%.
+You are invited you to join %CLOUD_NAME%.
 您已被授予對{{message.system_name}}的存取權限.
 {{/message.sharer_name}}
 

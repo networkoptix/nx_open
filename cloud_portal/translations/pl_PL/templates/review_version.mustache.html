@@ -1,6 +1,6 @@
-<h1>Jest dostępna nowa wersja {{ message.product }}</h1>
+<h1>There is a new version for {{ message.product }} ({{ message.product_type }}) to review</h1>
 <p>Kliknij link, aby przejrzeć opis wersji {{ message.id }} dla {{ message.product }}</p>
-<a class="btn" href="{{ config.portal_url }}/admin/cms/version/{{ message.id }}/">Przejrzyj opis wersji</a>
+<a class="btn" href="{{ config.portal_url }}/admin/cms/productcustomizationreview/{{ message.id }}/change/">Przejrzyj opis wersji</a>
 <h4>Na tej stronie możesz</h4>
 <ul>
 	<li>Przejrzeć najnowsze zmiany.</li>

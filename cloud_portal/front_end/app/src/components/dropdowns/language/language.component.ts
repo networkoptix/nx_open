@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject, ViewEncapsulation, Input, Output, EventEmitter } from '@angular/core';
 import { TranslateService }                                                          from '@ngx-translate/core';
+import { NxUtilsService }                                                            from '../../../services/utils.service';
 
 @Component({
     selector: 'nx-language-select',
@@ -76,17 +77,15 @@ export class NxLanguageDropdown implements OnInit {
             .getLanguages()
             .then((data: any) => {
                 this.languages = data.data;
+                this.languages.sort(NxUtilsService.byParam((lang) => {
+                    return lang.language;
+                }, NxUtilsService.sortASC));
+
                 this.splitLanguages();
 
-                const browserLang = this.translate.getBrowserCultureLang().replace('-', '_');
-
                 this.activeLanguage = this.languages.find(lang => {
-                    return (lang.language === (this.language.lang.language || browserLang));
+                    return (lang.language === this.language.lang.language);
                 });
-
-                if (!this.activeLanguage) {
-                    this.activeLanguage = this.languages[0];
-                }
             });
     }
 }

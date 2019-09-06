@@ -230,7 +230,7 @@ public:
     /** Have to introduce this method because we do not use exceptions. */
     bool init();
 
-    void setStatisticsCollector(StatisticsCollector* statisticsCollector);
+    const StatisticsCollector& statisticsCollector() const;
 
     void reserveConnections(int count);
 
@@ -300,7 +300,7 @@ private:
     nx::utils::thread m_dropConnectionThread;
     nx::utils::SyncQueue<std::unique_ptr<detail::BaseQueryExecutor>> m_connectionsToDropQueue;
     bool m_terminated;
-    StatisticsCollector* m_statisticsCollector;
+    StatisticsCollector m_statisticsCollector;
 
     detail::QueryQueue m_cursorTaskQueue;
     std::vector<std::unique_ptr<CursorProcessorContext>> m_cursorProcessorContexts;
@@ -344,8 +344,7 @@ private:
             std::move(completionHandler),
             queryAggregationKey);
 
-        if (m_statisticsCollector)
-            executor->setStatisticsCollector(m_statisticsCollector);
+        executor->setStatisticsCollector(&m_statisticsCollector);
 
         m_queryQueue.push(std::move(executor));
     }

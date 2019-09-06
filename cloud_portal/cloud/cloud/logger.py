@@ -1,9 +1,9 @@
+import traceback
+from django.conf import settings
 from django.http import HttpResponse
 from django.utils.log import AdminEmailHandler
-import md5, traceback
+from hashlib import md5
 from rest_framework import status
-
-from cloud.settings import DEBUG
 
 import logging
 logger = logging.getLogger(__name__)
@@ -16,8 +16,8 @@ class LimitAdminEmailHandler(AdminEmailHandler):
     COUNTER_CACHE_KEY = "email_admins_counter_"
 
     def increment_counter(self, record):
-        key_postfix = record.message[:self.KEY_LENGTH]
-        key_postfix = md5.md5(key_postfix).hexdigest()
+        key_postfix = record.message[:self.KEY_LENGTH].encode('utf-8')
+        key_postfix = md5.update(key_postfix).hexdigest()
         from django.core.cache import cache
         try:
             cache.incr(self.COUNTER_CACHE_KEY + key_postfix)
@@ -25,11 +25,12 @@ class LimitAdminEmailHandler(AdminEmailHandler):
             cache.set(self.COUNTER_CACHE_KEY + key_postfix, 1, self.PERIOD_LENGTH_IN_SECONDS)
         return cache.get(self.COUNTER_CACHE_KEY + key_postfix)
 
+    # noinspection PyBroadException
     def emit(self, record):
         try:
             counter = self.increment_counter(record)
         except Exception:
-            print (traceback.format_exc())
+            print(traceback.format_exc())
         else:
             if counter > self.MAX_EMAILS_IN_PERIOD:
                 return
@@ -43,10 +44,11 @@ class CatchExceptionMiddleware(object):
     def __call__(self, request):
         return self.get_response(request)
 
-    def process_exception(self, request, exception):
+    @staticmethod
+    def process_exception(request, exception):
         logging.info(request)
         logging.critical("{}: {}\nCall Stack:\n{}".format(exception.__class__.__name__,
-                                                          exception.message,
+                                                          exception,
                                                           traceback.format_exc().replace("Traceback", "")))
-        if not DEBUG:
+        if not settings.DEBUG:
             return HttpResponse("Error with request", status=status.HTTP_500_INTERNAL_SERVER_ERROR)

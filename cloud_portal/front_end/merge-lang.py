@@ -1,31 +1,18 @@
 import json
-from shutil import copyfile
-
-
-def sortdict(dct):
-    kys = dct.keys()
-    kys.sort()
-    from collections import OrderedDict
-    d = OrderedDict()
-    for x in kys:
-        for k, v in dct.iteritems():
-            if (k == x):
-                d[k] = v
-    return d
 
 
 def merge_two_json(x, y):
     z = x.copy()  # start with x's keys and values
     z.update(y)   # modifies z with y's keys and values & returns None
 
-    return sortdict(z)
+    return z
 
 
-base_file = json.load(open('app/language_i18n.json', 'r'))
-static_file = json.load(open('app/language_i18n_static.json', 'r'))
+with open('app/language_i18n.json', 'r') as auto_language:
+    base_file = json.load(auto_language)
 
-with open("./app/language_i18n.json", "wb") as outfile:
-    json.dump(merge_two_json(base_file, static_file), outfile, indent=4)
+with open('app/language_i18n_static.json', 'r') as static_language:
+    static_file = json.load(static_language)
 
-# update EN lang so we can test on cloud-dev before Boris updates translations
-copyfile('./app/language_i18n.json', '../translations/en_US/language_i18n.json')
+with open("./app/language_i18n.json", "w") as outfile:
+    json.dump(merge_two_json(base_file, static_file), outfile, indent=4, sort_keys=True, separators=(',', ': '))

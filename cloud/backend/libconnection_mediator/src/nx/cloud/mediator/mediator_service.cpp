@@ -147,6 +147,8 @@ void MediatorProcess::registerThisInstanceNameInCluster(const conf::Settings& se
     assignPort(httpsEndpoints(), &endpoint.httpsPort);
     assignPort(stunUdpEndpoints(), &endpoint.stunUdpPort);
 
+    m_controller->listeningPeerDb().setThisMediatorEndpoint(endpoint);
+
     if (settings.listeningPeerDb().map.synchronizationSettings.discovery.enabled)
     {
         m_controller->listeningPeerDb().startDiscovery(

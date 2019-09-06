@@ -5,14 +5,14 @@
 namespace nx::clusterdb::map {
 
 void EventProvider::subscribeToRecordInserted(
-    InsertTriggerHandler insertTriggerHandler,
+    RecordInsertedHandler insertTriggerHandler,
     nx::utils::SubscriptionId* const subscriptionId)
 {
     m_recordInserted.subscribe(std::move(insertTriggerHandler), subscriptionId);
 }
 
 void EventProvider::subscribeToRecordRemoved(
-    RemoveTriggerhandler removeTriggerHandler,
+    RecordRemovedHandler removeTriggerHandler,
     nx::utils::SubscriptionId * const subscriptionId)
 {
     m_recordRemoved.subscribe(std::move(removeTriggerHandler), subscriptionId);

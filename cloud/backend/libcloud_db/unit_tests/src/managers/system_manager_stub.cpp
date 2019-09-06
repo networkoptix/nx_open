@@ -3,6 +3,14 @@
 namespace nx::cloud::db {
 namespace test {
 
+void SystemManagerStub::getSystems(
+    const AuthorizationInfo& /*authzInfo*/,
+    data::DataFilter /*filter*/,
+    std::function<void(api::Result, api::SystemDataExList)> completionHandler)
+{
+    completionHandler(api::ResultCode::notImplemented, {});
+}
+
 boost::optional<api::SystemData> SystemManagerStub::findSystemById(const std::string& id) const
 {
     const auto it = m_systems.find(id);

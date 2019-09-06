@@ -35,16 +35,17 @@ window.L = {};
             'cloudApp.templates'
 
         ])
-        .factory('httpResponseInterceptor', ['$q', '$rootScope', function($q, $rootScope) {
-            return {
-                responseError: function(error) {
-                    if (error.status === 401) {
-                        // Session expired - try to trigger browser reload
-                        $rootScope.session.loginState = undefined;
+        .factory('httpResponseInterceptor', ['$q', '$rootScope',
+            function($q, $rootScope) {
+                return {
+                    responseError: function(error) {
+                        if (error.status === 401 && $rootScope.session.loginState !== undefined) {
+                            // Session expired - try to trigger browser reload
+                            $rootScope.session.loginState = undefined;
+                        }
+                        return $q.reject(error);
                     }
-                    return $q.reject(error);
-                }
-            };
+                };
         }])
         .config(['$httpProvider', function ($httpProvider) {
             $httpProvider.defaults.xsrfCookieName = 'csrftoken';
@@ -93,20 +94,29 @@ window.L = {};
                     appState.companyLink = response.companyLink;
                     appState.companyName = response.companyName;
                     appState.copyrightYear = response.copyrightYear;
+                    appState.feedbackEnabled = response.feedbackEnabled;
                     appState.footerItems = response.footerItems ? JSON.parse(response.footerItems) : {};
+                    appState.integrationFilterItems = response.integrationFilterItems ? JSON.parse(response.integrationFilterItems) : {};
+                    appState.integrationStoreEnabled = response.integrationStoreEnabled;
                     appState.publicDownloads = response.publicDownloads;
                     appState.publicReleases = response.publicReleases;
                     appState.trafficRelayHost = response.trafficRelayHost;
                     appState.supportLink = response.supportLink;
-                    appState.productName = response.productName;
+                    appState.privacyLink = response.privacyLink;
+                    appState.cloudName = response.cloudName;
                     appState.vmsName = response.vmsName;
+
+                    if (response.cloudMerge) {
+                        appState.cloudMerge = response.cloudMerge;
+                    }
                     
                     angular.extend(CONFIG, appState);
                     
-                    CONFIG.campage.sortSupportedDevices = response.sortSupportedDevices;
-                    CONFIG.campage.supportedResolutions = response.supportedResolutions;
-                    CONFIG.campage.supportedHardwareTypes = response.supportedHardwareTypes;
-                    CONFIG.campage.searchTags = response.searchTags;
+                    CONFIG.ipvd.sortSupportedDevicesByPopularity = response.sortSupportedDevicesByPopularity;
+                    CONFIG.ipvd.supportedResolutions = response.supportedResolutions;
+                    CONFIG.ipvd.supportedHardwareTypes = response.supportedHardwareTypes;
+                    CONFIG.ipvd.searchTags = response.searchTags;
+                    CONFIG.ipvd.vendorsShown = +response.vendorsShown;
                 });
 
                 $.ajax({
@@ -163,7 +173,6 @@ window.L = {};
 
                         $routeProvider
                             .when('/register/success', {
-                                title: lang.pageTitles.registerSuccess,
                                 templateUrl: CONFIG.viewsDir + 'regActions.html',
                                 controller: 'RegisterCtrl',
                                 resolve: {
@@ -173,7 +182,6 @@ window.L = {};
                                 }
                             })
                             .when('/register/successActivated', {
-                                title: lang.pageTitles.registerSuccess,
                                 templateUrl: CONFIG.viewsDir + 'regActions.html',
                                 controller: 'RegisterCtrl',
                                 resolve: {
@@ -184,17 +192,14 @@ window.L = {};
                                 }
                             })
                             .when('/register/:code', {
-                                title: lang.pageTitles.register,
                                 templateUrl: CONFIG.viewsDir + 'regActions.html',
                                 controller: 'RegisterCtrl'
                             })
                             .when('/register', {
-                                title: lang.pageTitles.register,
                                 templateUrl: CONFIG.viewsDir + 'regActions.html',
                                 controller: 'RegisterCtrl'
                             })
                             .when('/account/password', {
-                                title: lang.pageTitles.changePassword,
                                 templateUrl: CONFIG.viewsDir + 'account.html',
                                 controller: 'AccountCtrl',
                                 resolve: {
@@ -204,7 +209,6 @@ window.L = {};
                                 }
                             })
                             .when('/account', {
-                                title: lang.pageTitles.account,
                                 templateUrl: CONFIG.viewsDir + 'account.html',
                                 controller: 'AccountCtrl',
                                 resolve: {
@@ -214,12 +218,10 @@ window.L = {};
                                 }
                             })
                             .when('/systems', {
-                                title: lang.pageTitles.systems,
                                 templateUrl: CONFIG.viewsDir + 'systems.html',
                                 controller: 'SystemsCtrl'
                             })
                             .when('/systems/:systemId', {
-                                title: lang.pageTitles.system,
                                 templateUrl: CONFIG.viewsDir + 'system.html',
                                 controller: 'SystemCtrl'
                             })
@@ -234,17 +236,14 @@ window.L = {};
                                 }
                             })
                             .when('/systems/:systemId/view', {
-                                title: lang.pageTitles.view,
                                 templateUrl: CONFIG.viewsDir + 'view.html',
                                 controller: 'ViewPageCtrl'
                             })
                             .when('/systems/:systemId/view/:cameraId', {
-                                title: lang.pageTitles.view,
                                 templateUrl: CONFIG.viewsDir + 'view.html',
                                 controller: 'ViewPageCtrl'
                             })
                             .when('/embed/:systemId/view/:cameraId', {
-                                title      : lang.pageTitles.view,
                                 templateUrl: CONFIG.viewsDir + 'view.html',
                                 controller : 'ViewPageCtrl',
                                 resolve: {
@@ -254,7 +253,6 @@ window.L = {};
                                 }
                             })
                             .when('/activate', {
-                                title: lang.pageTitles.activate,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl',
                                 resolve: {
@@ -264,7 +262,6 @@ window.L = {};
                                 }
                             })
                             .when('/activate/success', {
-                                title: lang.pageTitles.activateSuccess,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl',
                                 resolve: {
@@ -274,12 +271,10 @@ window.L = {};
                                 }
                             })
                             .when('/activate/:activateCode', {
-                                title: lang.pageTitles.activateCode,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl'
                             })
                             .when('/restore_password', {
-                                title: lang.pageTitles.restorePassword,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl',
                                 resolve: {
@@ -289,7 +284,6 @@ window.L = {};
                                 }
                             })
                             .when('/restore_password/sent', {
-                                title: lang.pageTitles.restorePassword,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl',
                                 resolve: {
@@ -299,7 +293,6 @@ window.L = {};
                                 }
                             })
                             .when('/restore_password/success', {
-                                title: lang.pageTitles.restorePasswordSuccess,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl',
                                 resolve: {
@@ -309,7 +302,6 @@ window.L = {};
                                 }
                             })
                             .when('/restore_password/:restoreCode', {
-                                title: lang.pageTitles.restorePasswordCode,
                                 templateUrl: CONFIG.viewsDir + 'activeActions.html',
                                 controller: 'ActivateRestoreCtrl'
                             })
@@ -319,20 +311,20 @@ window.L = {};
                                 controller: 'StaticCtrl'
                             })
                             .when('/debug', {
-                                title: lang.pageTitles.debug,
                                 templateUrl: CONFIG.viewsDir + 'debug.html',
                                 controller: 'DebugCtrl'
                             })
                             .when('/login', {
-                                template: '<landing-component></landing-component>'
-                                // title: lang.pageTitles.login,
-                                // templateUrl: CONFIG.viewsDir + 'startPage.html',
-                                // controller: 'StartPageCtrl',
-                                // resolve: {
-                                //     test: ['$route', function ($route) {
-                                //         $route.current.params.callLogin = true;
-                                //     }]
-                                // }
+                                // TODO: revert when account service is moved to A7
+                                // template: '<landing-component></landing-component>'
+                                title: lang.pageTitles.login,
+                                templateUrl: CONFIG.viewsDir + 'startPage.html',
+                                controller: 'StartPageCtrl',
+                                resolve: {
+                                    test: ['$route', function ($route) {
+                                        $route.current.params.callLogin = true;
+                                    }]
+                                }
                             })
                             .when('/admin', {
                                 resolve: {
@@ -372,13 +364,16 @@ window.L = {};
                             .when('/browser', {
                                 template: '<non-supported-browser></non-supported-browser>'
                             })
-                            .when('/campage', {
+                            .when('/ipvd', {
                                 template: ''
                             })
                             .when('/sandbox', {
                                 template: ''
                             })
-                            .when('/integrations/:plugin?', {
+                            .when('/integrations/:id?', {
+                                template: ''
+                            })
+                            .when('/integrations/:id/:section', {
                                 template: ''
                             })
                             .when('/new-content', {
@@ -396,10 +391,15 @@ window.L = {};
                                 template: ''
                             })
                             .when('/', {
-                                template: '<landing-component></landing-component>'
+                                // TODO: revert when account service is moved to A7
+                                // template: '<landing-component></landing-component>'
+                                title: ''/*lang.pageTitles.startPage*/,
+                                templateUrl: CONFIG.viewsDir + 'startPage.html',
+                                controller: 'StartPageCtrl'
                             })
                             .otherwise({
                                 title: lang.pageTitles.pageNotFound,
+                                controller: '404Ctrl',
                                 templateUrl: CONFIG.viewsDir + '404.html'
                             });
                     });

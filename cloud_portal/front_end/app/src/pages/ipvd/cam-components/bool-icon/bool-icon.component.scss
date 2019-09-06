@@ -1,0 +1,39 @@
+@import '../../../../../styles/theme_palette';
+@import '../../../../../styles/theme_variables';
+
+
+.icon-additional {
+    font-family : $font-family-medium;
+    font-size   : rem(10px);
+    float       : left;
+    margin-left : 2px;
+}
+
+
+.icon-positive {
+    line-height     : 1rem;
+    font-size       : 1.5rem;
+    display         : flex;
+    justify-content : center;
+    margin-top      : -2px;
+    margin-left     : -2px;
+}
+
+.icon-negative {
+    line-height     : 1rem;
+    font-size       : 1.5rem;
+    color           : $light10;
+    display         : flex;
+    justify-content : center;
+    margin-top      : -5px;
+    margin-left     : -2px;
+}
+
+.icon-unknown {
+    line-height     : 1rem;
+    font-size       : rem(13px);
+    font-family     : $font-family-medium;
+    display         : flex;
+    justify-content : center;
+    margin-left     : 1px;
+}

@@ -1,8 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
+Suite Setup       Open Browser and go to URL    ${url}
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Reset DB and Open New Browser On Failure
-Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 Force Tags        system
 
@@ -17,17 +17,16 @@ Log in to Auto Tests System
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${email}    ${password}    None
     Validate Log In
-    Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
+    Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}    ${MERGE BUTTON SYSTEM}
     Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
 Check System Text
     [arguments]    ${user}
     Log Out
-    Validate Log Out
     Log in to Auto Tests System    ${user}
-    Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']    //a[.='${EMAIL OWNER}']
-    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
+    Wait Until Elements Are Visible    //h2[text()\='${OWNER TEXT}']    //a[text()\='${EMAIL OWNER}']
+    Wait Until Element Is Not Visible    //h2[text()='${YOUR SYSTEM TEXT}']
 
 Reset DB and Open New Browser On Failure
     Close Browser
@@ -57,10 +56,11 @@ should confirm, if owner deletes system (You are going to disconnect your system
     Log in to Auto Tests System    ${EMAIL OWNER}
     Click Button    ${DISCONNECT FROM NX}
     Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}
+    Click Element    ${DISCONNECT FORM}
     Click Button    ${DISCONNECT FORM CANCEL}
     Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 
-should confirm, if not owner deletes system (You will loose access to this system)
+should confirm, if not owner deletes system (You will lose access to this system)
     [tags]    Threaded
     Log In To Auto Tests System    ${EMAIL NOT OWNER}
     Validate Log In
@@ -68,6 +68,7 @@ should confirm, if not owner deletes system (You will loose access to this syste
     Click Button    ${DISCONNECT FROM MY ACCOUNT}
     Wait Until Element Is Visible    ${DISCONNECT MODAL WARNING}
     Click Element    ${DISCONNECT MODAL WARNING}
+    Sleep    .5
     Click Button    ${DISCONNECT MODAL CANCEL}
     Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 
@@ -93,6 +94,7 @@ Cancel should cancel disconnection and disconnect should remove it when not owne
     Validate Log In
     Go To    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Wait Until Element Is Visible    ${SHARE BUTTON SYSTEMS}
+    Run Keyword And Expect Error    *    Wait Until Element Is Visible    ${NOT OWNER IN SYSTEM}
     Click Button    ${SHARE BUTTON SYSTEMS}
     Wait Until Elements Are Visible    ${SHARE EMAIL}    ${SHARE BUTTON MODAL}
     Input Text    ${SHARE EMAIL}    ${EMAIL NOT OWNER}
@@ -104,13 +106,14 @@ correct items are shown for owner
     [tags]    C41560    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${USERS LIST}
-#    Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']
-    Wait Until Elements Are Visible    //h2[.='${YOUR SYSTEM TEXT}']    ${RENAME SYSTEM}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
+#    Wait Until Elements Are Visible    //h2[text()\='${OWNER TEXT}']
+    Wait Until Elements Are Visible    //h2[text()\='${YOUR SYSTEM TEXT}']    ${RENAME SYSTEM}    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}
 
 correct items are shown for admin
     [tags]    C41561    Threaded
     Log in to Auto Tests System    ${EMAIL ADMIN}
-    Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OWNER NAME}    ${OWNER EMAIL}
+    Wait Until Element Is Visible    ${USERS LIST}
+    Wait Until Elements Are Visible    ${RENAME SYSTEM}    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OWNER LABEL}    ${OWNER NAME}    ${OWNER EMAIL}    ${YOUR PERMISSIONS}    ${YOUR PERMISSIONS}/b[contains(text(), ${ADMIN TEXT})]
 
 correct items are shown for advanced viewer and below
     [tags]    C41562    Threaded
@@ -118,16 +121,15 @@ correct items are shown for advanced viewer and below
     ${users text}    Set Variable    ${ADV VIEWER TEXT}    ${VIEWER TEXT}     ${LIVE VIEWER TEXT}    ${CUSTOM TEXT}
     :FOR    ${user}  ${text}  IN ZIP  ${users}  ${users text}
     \    Log in to Auto Tests System    ${user}
-    \    Log     ${text}
-    \    Wait Until Elements Are Visible    ${OWNER NAME}    ${OWNER EMAIL}    ${YOUR PERMISSIONS}    ${YOUR PERMISSIONS}/b[contains(text(),"${text}")]
+    \    Wait Until Elements Are Visible    ${OWNER NAME}    ${OWNER LABEL}    ${OWNER EMAIL}    ${YOUR PERMISSIONS}    ${YOUR PERMISSIONS}/b[contains(text(),"${text}")]
+    \    Element Should Be Enabled    ${DISCONNECT FROM MY ACCOUNT}
     \    Element Should Not Be Visible    ${RENAME SYSTEM}
     \    Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     \    Element Should Not Be Visible    ${USERS LIST}
     \    Log Out
-    \    Validate Log Out
 
 does not display edit and remove for owner row
-    [tags]    Threaded
+    [tags]    Threaded    C41905
     Log in to Auto Tests System    ${EMAIL ADMIN}
     Wait Until Element Is Visible    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]
     Mouse Over    //tr[@ng-repeat='user in system.users']//td[contains(text(), '${EMAIL OWNER}')]
@@ -166,7 +168,7 @@ clicking 'X' closes rename dialog without rename
     Wait Until Page Does Not Contain Element    ${BACKDROP}
     Verify In System    Auto Tests
 
-clicking save with no input in rename dialoge throws error
+clicking save with no input in rename dialog throws error
     [tags]    C41880    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}
@@ -227,12 +229,12 @@ should open System page by link not authorized user, and show alert if logs in a
     Log In    ${EMAIL NOPERM}    ${password}    None
     Wait Until Element Is Visible    ${SYSTEM NO ACCESS}
 
-should display same user data as user provided during registration (stress to cyrillic)
+should display same user data as user provided during registration
     [tags]    email    Threaded
 #create user
     ${random email}    Get Random Email    ${BASE EMAIL}
     Go To    ${url}/register
-    Register    ${CYRILLIC TEXT}    ${CYRILLIC TEXT}    ${random email}    ${password}
+    Register    ${COMBO TEXT}    ${COMBO TEXT}    ${random email}    ${password}
     Activate    ${random email}
 #share system with new user
     Log in to Auto Tests System    ${EMAIL OWNER}
@@ -241,7 +243,7 @@ should display same user data as user provided during registration (stress to cy
 
 #verify user was added with appropriate name
     Log In    ${random email}    ${password}
-    Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]
+    Wait Until Element Is Visible    //td[contains(text(),'${COMBO TEXT} ${COMBO TEXT}')]
 
 #remove new user from system
     Log Out
@@ -251,7 +253,7 @@ should display same user data as user provided during registration (stress to cy
     Delete All Emails
     Close Mailbox
 
-should display same user data as showed in user account (stress to cyrillic)
+should display same user data as showed in user account
     [tags]    email    C41573    C41842    Threaded
 #create user
     ${random email}    Get Random Email    ${BASE EMAIL}
@@ -271,18 +273,17 @@ should display same user data as showed in user account (stress to cyrillic)
     # sometimes the text field refills itself if I don't wait a second
     sleep    1
     Clear Element Text    ${ACCOUNT FIRST NAME}
-    Input Text    ${ACCOUNT FIRST NAME}    ${CYRILLIC TEXT}
+    Input Text    ${ACCOUNT FIRST NAME}    ${COMBO TEXT}
     Clear Element Text    ${ACCOUNT LAST NAME}
-    Input Text    ${ACCOUNT LAST NAME}    ${CYRILLIC TEXT}
+    Input Text    ${ACCOUNT LAST NAME}    ${COMBO TEXT}
     sleep    .15
     Wait Until Element Is Visible    ${ACCOUNT SAVE}
     Click Button    ${ACCOUNT SAVE}
     Check For Alert    ${YOUR ACCOUNT IS SUCCESSFULLY SAVED}
     Log Out
-    Validate Log Out
 
     Log in to Auto Tests System    ${email}
-    Wait Until Element Is Visible    //td[contains(text(),'${CYRILLIC TEXT} ${CYRILLIC TEXT}')]
+    Wait Until Element Is Visible    //td[contains(text(),'${COMBO TEXT} ${COMBO TEXT}')]
 
     #remove new user from system
     Log Out
@@ -295,7 +296,7 @@ should display same user data as showed in user account (stress to cyrillic)
 should show (your system) for owner and (owner's name) for non-owners
     [tags]    Threaded
     Log in to Auto Tests System    ${EMAIL OWNER}
-    Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']
-    Wait Until Element Is Not Visible    //h2[.='${OWNER TEXT}']
+    Wait Until Element Is Visible    //h2[text()='${YOUR SYSTEM TEXT}']
+    Wait Until Element Is Not Visible    //h2[text()='${OWNER TEXT}']
     :FOR    ${user}    IN    @{EMAILS LIST}
     \  Run Keyword Unless    "${user}"=="${EMAIL OWNER}"    Check System Text    ${user}

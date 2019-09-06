@@ -1,0 +1,6 @@
+Xin chào, {{ message.userFullName }}
+{{ message.sender_name}} ({{ message.sender_email }}) đã đưa ra phản hồi sau cho {{ message.product }}:
+<pre>{{ message.message }}</pre>
+
+------------------------------------------
+Người dùng có thể liên lạc: {{ message.sender_to_be_contacted}}

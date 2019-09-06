@@ -14,8 +14,32 @@
 
 {% block content%}
 <div>
+    <h3>Download package for product</h3>
     <p><a href="{% url 'download_package' product.id %}" download>Download package (zip)</a></p>
     <p><a href="{% url 'download_package' product.id %}?draft" download>Download package draft (zip)</a></p>
+    <p><a href="{% url 'download_structure_from_db' product.id %}" download>Download structure (json)</a></p>
+</div>
+<h3>Update Product</h3>
+<div>
+Notice root level directory will be ignored. The expected format is :<br>
+<pre style="margin: 5px 0 0 5px; width: 500px">
+    Parent dir / static content dir(s)
+               / structure.json
+</pre>
+<br>
+Example for vms
+<pre style="margin: 5px 0 0 5px; width: 500px">
+    default /client-dmg
+            /icons
+            /mediaserver_core
+            /mobile_client
+            /nx_client_desktop
+            /wixsetup
+            /customization.cmake
+            /license.html
+            /<b>structure.json</b>
+</pre>
+<br>
 </div>
 <form id="productForm" action="{% url 'product_settings' product.id %}"
       method="post" class="aligned" enctype="multipart/form-data">
@@ -44,17 +68,19 @@
             The check cookie function keeps checking the cookies until it a changed.
             Afterwards it reloads the page so that the user can see any error messages with the file upload
          */
+        var cookieCheckInterval = undefined;
         var checkCookie = function () {
             var lastCookie = document.cookie;
             return function () {
                 var currentCookie = document.cookie;
                 if (currentCookie != lastCookie) {
-                    window.location.reload()
+                    clearInterval(cookieCheckInterval);
+                    window.location.reload();
                 }
             };
         }();
         function cookieInterval() {
-            window.setInterval(checkCookie, 100);
+            cookieCheckInterval = setInterval(checkCookie, 100);
         }
     </script>
 

@@ -4,5 +4,5 @@ Xin chào {{message.userFullName}},
 
 {{config.portal_url}}/activate/{{message.code}}
 
-Nếu bạn không đăng ký ở %PRODUCT_NAME%, Hãy bỏ qua email này.
+If you didn't register in %CLOUD_NAME%, just ignore this email.
 Không chia sẻ thông điệp hoặc liên kết với bất cứ ai.

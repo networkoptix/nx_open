@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='message',
             name='customization',
-            field=models.CharField(default=b'default', max_length=255),
+            field=models.CharField(default='default', max_length=255),
         ),
     ]

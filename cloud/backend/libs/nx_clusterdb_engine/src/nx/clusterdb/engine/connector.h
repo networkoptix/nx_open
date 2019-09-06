@@ -20,7 +20,14 @@ class SynchronizationSettings;
 
 namespace transport { class TransportManager; }
 
-class Connector:
+using OnConnectCompletedSubscription =
+    nx::utils::Subscription<const nx::utils::Url&, const transport::ConnectResult&>;
+
+/**
+ * Connects local node to other nodes, specified by URLs and makes sure
+ * the connection is restored after being broken.
+ */
+class NX_DATA_SYNC_ENGINE_API Connector:
     public nx::network::aio::BasicPollable
 {
 public:
@@ -33,12 +40,14 @@ public:
     ~Connector();
 
     void addNodeUrl(
-        const std::string& systemId,
+        const std::string& clusterId,
         const nx::utils::Url& url);
 
     void removeNodeUrl(
-        const::std::string& systemId,
+        const::std::string& clusterId,
         const nx::utils::Url& url);
+
+    OnConnectCompletedSubscription& onConnectCompletedSubscription();
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -46,8 +55,10 @@ protected:
 private:
     struct NodeContext
     {
-        std::string systemId;
+        std::string clusterId;
         std::string connectionId;
+        std::string nodeId;
+        nx::utils::Url url;
         std::unique_ptr<transport::AbstractTransactionTransportConnector> connector;
         std::unique_ptr<nx::network::aio::Timer> retryTimer;
         nx::utils::SubscriptionId connectionClosedSubscriptionId =
@@ -61,12 +72,15 @@ private:
     ConnectionManager* m_connectionManager = nullptr;
     std::map<nx::utils::Url, NodeContext> m_nodes;
     std::atomic<int> m_connectionSequence{0};
+    OnConnectCompletedSubscription m_onConnectCompletedSubscription;
 
     void connectToNodeAsync(const nx::utils::Url& url);
 
+    void scheduleConnectRetry(NodeContext* nodeContext);
+
     void onConnectCompletion(
         const nx::utils::Url& url,
-        transport::ConnectResultDescriptor result,
+        transport::ConnectResult result,
         std::unique_ptr<transport::AbstractConnection> connection);
 
     void registerConnection(

@@ -48,11 +48,6 @@ class RadassResourceManagerTest:
     public ::testing::Test,
     public nx::utils::test::TestWithTemporaryDirectory
 {
-public:
-    RadassResourceManagerTest():
-        TestWithTemporaryDirectory("nx_vms_client_desktop/radass_resource_manager")
-    {}
-
 protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()

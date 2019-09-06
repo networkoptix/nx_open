@@ -191,8 +191,8 @@
                         //     }
                         // }).result;
                     },
-                    merge: function (system) {
-                        return NxDialogsService.merge(system);
+                    merge: function (system, systems, user) {
+                        return NxDialogsService.merge(system, systems, user);
 
                         // var title = lang.system.mergeSystemTitle;
                         //
@@ -212,8 +212,8 @@
                     noClientDetected: function () {
                         // message, title, actionLabel, actionType
                         return this
-                            .confirm(lang.downloads.noClientDetectedMessage, lang.downloads.noClientDetectedTitle,
-                                lang.downloads.action, 'btn-primary',
+                            .confirm(lang.errorCodes.cantOpenClient, lang.dialogs.noClientDetectedTitle,
+                                lang.dialogs.download, 'btn-primary',
                                 lang.dialogs.cancelButton)
                             .then((result) => {
                                 if (result) {

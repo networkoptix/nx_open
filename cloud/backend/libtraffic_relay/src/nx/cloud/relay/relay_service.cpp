@@ -3,6 +3,7 @@
 #include "controller/controller.h"
 #include "libtraffic_relay_app_info.h"
 #include "model/model.h"
+#include "model/remote_relay_peer_pool.h"
 #include "settings.h"
 #include "statistics_provider.h"
 #include "view/view.h"
@@ -62,10 +63,19 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
     View view(settings, &model, &controller);
     m_view = &view;
 
+    const auto remoteRelayPeerPool =
+        dynamic_cast<const model::RemoteRelayPeerPool*>(&model.remoteRelayPeerPool());
+
     auto statisticsProvider = StatisticsProviderFactory::instance().create(
         model.listeningPeerPool(),
         view.httpServer(),
-        controller.trafficRelay());
+        controller.trafficRelay(),
+        remoteRelayPeerPool && remoteRelayPeerPool->peerDb()
+            ? &remoteRelayPeerPool->peerDb()->synchronizationEngine().statisticsProvider()
+            : nullptr,
+        remoteRelayPeerPool && remoteRelayPeerPool->sqlQueryExecutor()
+            ? &remoteRelayPeerPool->sqlQueryExecutor()->statisticsCollector()
+            : nullptr);
     view.registerStatisticsApiHandlers(*statisticsProvider);
 
     if (!registerThisInstanceNameInCluster(settings))

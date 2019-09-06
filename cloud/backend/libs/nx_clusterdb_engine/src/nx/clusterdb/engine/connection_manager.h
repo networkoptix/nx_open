@@ -25,16 +25,12 @@
 #include "transport/command_transport_header.h"
 #include "transport/abstract_command_transport.h"
 
-namespace nx {
-namespace network {
-namespace http {
+namespace nx::network::http {
 
 class HttpServerConnection;
 class MessageDispatcher;
 
-} // namespace nx
-} // namespace network
-} // namespace http
+} // namespace nx::network::http
 
 namespace nx::clusterdb::engine {
 
@@ -55,19 +51,19 @@ struct NodeStatusDescriptor
 
 struct FullPeerName
 {
-    std::string systemId;
+    std::string clusterId;
     std::string peerId;
 
     bool operator<(const FullPeerName& rhs) const
     {
-        return systemId != rhs.systemId
-            ? systemId < rhs.systemId
+        return clusterId != rhs.clusterId
+            ? clusterId < rhs.clusterId
             : peerId < rhs.peerId;
     }
 
     std::string toString() const
     {
-        return peerId + "." + systemId;
+        return peerId + "." + clusterId;
     }
 };
 
@@ -78,7 +74,7 @@ struct NodeDescriptor
 
 struct ConnectionInfo
 {
-    std::string systemId;
+    std::string clusterId;
     std::string nodeId;
     nx::network::SocketAddress peerEndpoint;
     std::string userAgent;
@@ -130,17 +126,21 @@ public:
      * Dispatches transaction to corresponding peers.
      */
     void dispatchTransaction(
-        const std::string& systemId,
+        const std::string& clusterId,
         std::shared_ptr<const SerializableAbstractCommand> transactionSerializer);
 
     std::vector<ConnectionInfo> getConnections() const;
     std::size_t getConnectionCount() const;
-    bool isSystemConnected(const std::string& systemId) const;
+    bool isClusterConnected(const std::string& clusterId) const;
 
-    unsigned int getConnectionCountBySystemId(const std::string& systemId) const;
+    bool isNodeConnected(
+        const std::string& clusterId,
+        const std::string& nodeId) const;
 
-    void closeConnectionsToSystem(
-        const std::string& systemId,
+    unsigned int getConnectionCountByClusterId(const std::string& clusterId) const;
+
+    void closeConnectionsToCluster(
+        const std::string& clusterId,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     ClusterStatusChangedSubscription& clusterStatusChangedSubscription();
@@ -155,7 +155,7 @@ private:
                 ConnectionContext,
                 std::string,
                 &ConnectionContext::connectionId>>,
-            // Indexing by (systemId, peerId).
+            // Indexing by (clusterId, peerId).
             boost::multi_index::ordered_unique<boost::multi_index::member<
                 ConnectionContext,
                 FullPeerName,
@@ -183,13 +183,13 @@ private:
         const QnMutexLockerBase& lk,
         const ConnectionContext& context);
 
-    bool isOneMoreConnectionFromSystemAllowed(
+    bool isOneMoreConnectionFromClusterAllowed(
         const QnMutexLockerBase& lk,
         const ConnectionContext& context) const;
 
-    unsigned int getConnectionCountBySystemId(
+    unsigned int getConnectionCountByClusterId(
         const QnMutexLockerBase& lk,
-        const std::string& systemId) const;
+        const std::string& clusterId) const;
 
     template<int connectionIndexNumber, typename ConnectionKeyType>
         void removeExistingConnection(
@@ -203,7 +203,7 @@ private:
         Iterator connectionIterator,
         CompletionHandler completionHandler);
 
-    void sendSystemOfflineNotificationIfNeeded(const CommandTransportHeader& transportHeader);
+    void sendClusterOfflineNotificationIfNeeded(const CommandTransportHeader& transportHeader);
 
     void onGotTransaction(
         const std::string& connectionId,

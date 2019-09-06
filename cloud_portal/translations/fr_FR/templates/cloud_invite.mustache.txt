@@ -1,0 +1,12 @@
+Bonjour,
+
+You have been invited to %CLOUD_NAME%.
+{{#message.message}}
+
+{{ message.message }}
+
+{{/message.message}}
+Please create account on %CLOUD_NAME%
+en utilisant votre courriel actuel et suivez les instructions.
+
+Inscrivez votre compte en utilisant ce lien: {{ config.portal_url }}/register/{{ message.code }}

@@ -18,17 +18,17 @@
 
                 <ul ng-if="active.integrations" class="nav navbar-nav d-none d-sm-flex">
                     <li class="active">
-                        <a class="inset" href=1>Integrations</a>
+                        <a class="inset" href=1>Integraciones</a>
                     </li>
                 </ul>
 
-                <ul ng-if="active.campage" class="nav navbar-nav d-none d-sm-flex">
+                <ul ng-if="active.ipvd" class="nav navbar-nav d-none d-sm-flex">
                     <li class="active">
-                        <a class="inset" href=1>Supported IP Video Devices</a>
+                        <a class="inset" href=1>Dispositivos de video IP soportados</a>
                     </li>
                 </ul>
 
-                <ul ng-if="activeSystem && !active.integrations && !active.campage"
+                <ul ng-if="activeSystem && !active.integrations && !active.ipvd"
                     class="nav navbar-nav auth-visible d-none d-sm-flex">
 
                     <li ng-class="{ 'active' :active.view }">
@@ -54,7 +54,7 @@
 
                 <ul class="nav navbar-nav navbar-right auth-visible">
                     <li ng-if="singleSystem" class="no-hover collapse-second hidden-collapse">
-                        <a href="/systems" class="m-0 border-0">
+                        <a href =1 class="m-0 border-0">
                             <span class="glyphicon glyphicon-home"></span>
                             <span class="ellipsis">{{activeSystem.name}}</span>
                         </a>
@@ -71,7 +71,7 @@
                     <li class="vertical-bar"></li>
 
                     <li class="collapse-first">
-                        <nx-account-settings-select [account]="account"></nx-account-settings-select>
+                        <nx-account-settings-select></nx-account-settings-select>
                     </li>
                 </ul>
             </div>
