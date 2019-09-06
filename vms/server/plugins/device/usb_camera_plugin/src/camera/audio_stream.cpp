@@ -99,6 +99,7 @@ int AudioStream::initializeInput()
     inputFormat->setEntry(kAudioBufferSizeKey, kAudioBufferSizeValue);
 #endif // _WIN32
 
+    NX_DEBUG(this, "open audio device: [%1]", ffmpegUrlPlatformDependent());
     result = inputFormat->open(ffmpegUrlPlatformDependent().c_str());
     if (result < 0)
         return result;

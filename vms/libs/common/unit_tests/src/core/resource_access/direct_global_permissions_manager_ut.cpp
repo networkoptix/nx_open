@@ -14,6 +14,7 @@
 #include <test_support/resource/camera_resource_stub.h>
 
 #include <nx/fusion/model_functions.h>
+#include <core/resource_access/resource_access_subject.h>
 
 class QnDirectGlobalPermissionsManagerTest: public testing::Test, protected QnResourcePoolTestHelper
 {

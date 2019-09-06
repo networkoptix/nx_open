@@ -29,4 +29,10 @@ public:
 
 private:
     nx::utils::MoveOnlyFunc<void()> m_onTriggeredCallback;
+    std::optional<QList<QnUuid>> m_participants;
+    std::optional<qint64> m_updateInstallTime;
+
+    void setNewUpdateState(const QList<QnUuid>& participants);
+    void storeUpdateState();
+    void restoreUpdateState();
 };

@@ -10,6 +10,8 @@
 #include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/data/camera_data_ex.h>
+#include <nx/utils/random_qt_device.h>
+//nx::utils::random::QtDevice
 
 std::chrono::milliseconds kMinStartInterval{100};
 std::chrono::milliseconds kMaxStartInterval{10000};
@@ -155,7 +157,7 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
     int64_t position = DATETIME_NOW;
     if (!live)
     {
-        std::random_device rd;
+        nx::utils::random::QtDevice rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(60, 3600);
         position = QDateTime::currentMSecsSinceEpoch() * 1000 - dis(gen) * 1000000;

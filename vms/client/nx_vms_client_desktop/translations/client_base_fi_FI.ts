@@ -946,11 +946,11 @@ nähdäksesi lisää kirjanmerkkejä</translation>
     </message>
     <message>
       <source>Pin Calendar</source>
-      <translation type="unfinished">Pin Calendar</translation>
+      <translation>Kiinnitä kalenteri</translation>
     </message>
     <message>
       <source>Unpin Calendar</source>
-      <translation type="unfinished">Unpin Calendar</translation>
+      <translation>Poista kalenteri</translation>
     </message>
   </context>
   <context>
@@ -2045,8 +2045,8 @@ nähdäksesi lisää kirjanmerkkejä</translation>
       <translation>Mikä tahansa kamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Pakotettu kuittaus toimii vain yleisissä tapahtumissa, jos kameran modifikaattoreita käytetään yleisessä tapahtuman URL-osoitteessa</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
     </message>
   </context>
   <context>
@@ -5596,12 +5596,6 @@ to %1</source>
       <translation>Mitä tehdä nykyisten analyysitietojen kanssa?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Nykyisiä analyysitietoja ei siirretä automaattisesti toiseen paikkaan ja ne eivät ole käytettävissä. Voit säilyttää sen ja siirtää sen manuaalisesti myöhemmin tai poistaa pysyvästi.
-Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä tukeen ennen jatkamista.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Poista</translation>
     </message>
@@ -5612,6 +5606,12 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>Cancel</source>
       <translation>Peruuta</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Nykyisiä analyysitietoja ei siirretä automaattisesti toiseen paikkaan ja ne eivät ole käytettävissä. Voit säilyttää sen ja siirtää sen manuaalisesti myöhemmin tai poistaa pysyvästi.
+Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä tukeen ennen jatkamista.</translation>
     </message>
   </context>
   <context>
@@ -7359,7 +7359,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Unknown track</source>
-      <translation type="unfinished">Unknown track</translation>
+      <translation>Tuntematon jälki</translation>
     </message>
   </context>
   <context>
@@ -7594,7 +7594,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>Liikkeen tunnistusvirta on poistettu käytöstä</translation>
     </message>
   </context>
   <context>
@@ -7732,6 +7732,14 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>Plugins</source>
       <translation>Liitännäiset</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Liiketunnistus on poistettu käytöstä, kaikki aikataulutietueet &quot;Motion&quot; ja &quot;Motion + Lo-Res&quot; vaihdetaan arvoon &quot;Always&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Monisuoratoisto on poistettu käytöstä, kaikki aikataulutietueet &quot;Motion + Lo-Res&quot; vaihdetaan arvoon &quot;Always&quot;</translation>
     </message>
   </context>
   <context>
@@ -8058,10 +8066,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
         <numerusform>%n tapahtumaa</numerusform>
         <numerusform>%n tapahtumaa</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>nimettömän analytiikan alusta</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8452,7 +8456,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>Hakuprosessia ei voida käynnistää</translation>
     </message>
   </context>
   <context>
@@ -8565,6 +8569,58 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Jotkin palvelimet ovat offline-tilassa ja niitä ei päivitetä. Ohita ne?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Client-sovelluksen ja %n palvelimen päivityspaketti puuttuu</numerusform>
+        <numerusform>Client-sovelluksen ja %n palvelimen päivityspaketti puuttuu</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Client-sovelluksen päivityspaketti puuttuu</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Ei yhteydessä olevia palvelimia päivitettäväksi.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Peruuta päivitys ja poista kaikki ladatut tiedot?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Joidenkin komponenttien käyttöjärjestelmän versioita ei enää tueta. Poista ne järjestelmästä tai päivitä käyttöjärjestelmä tuettuun versioon.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Asiakkaan käyttöjärjestelmän versiota ei enää tueta. Päivitä sen käyttöjärjestelmä tuettuun versioon.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Päivityksen käynnistäminen epäonnistui</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Päivityksen peruuttaminen epäonnistui</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Asennuksen aloittaminen epäonnistui</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Joidenkin palvelintent päivitykset eivät ole valmiit. Viimeistele ne joka tapauksessa?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 käynnistetään uudelleen päivitettyyn versioon.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Joidenkin komponenttien päivityspakettien lataaminen epäonnistui</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Jos ongelma jatkuu, ota yhteyttä asiakastukeen.</translation>
@@ -8582,16 +8638,48 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <translation>Päivitys suoritettu</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client käynnistetään uudelleen päivitetyllä versiolla.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Päivitys on valmis, mutta jotkin komponentit eivät ole päivittyneet</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Päivitä %1 manuaalisesti käyttämällä asennuspakettia.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 käynnistetään uudelleen päivitettyyn versioon.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Päivitysten asennuksessa tapahtui virhe:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Ladataan päivityksiä...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Viimeistele päivitys</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Peruuta</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>Viimeisin versio on jo asennettu</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Tämä versio on jo asennettu</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Asenna päivitys</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8610,12 +8698,12 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <translation>Lataa ja asenna</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Valitse Toinen Versio</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Selaa toista tiedostoa...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Valitse Toinen Versio</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8638,6 +8726,10 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <translation>Client-sovellusta päivitetään...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Päivityksen aloittaminen ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Päivitetään ...</translation>
     </message>
@@ -8646,12 +8738,24 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <translation>Valmis päivittämään</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Asenna päivitys</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Järjestelmä päivitetty</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Joillakin palvelimilla ei ole saatavana päivityspaketteja.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Jotkut palvelimet ovat havainneet sisäisen virheen.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Ota yhteyttä asiakastukeen.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Jotkin palvelimet ovat menneet offline-tilaan. Odota, kunnes niihin voidaan muodostaa taas yhteys.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8660,6 +8764,10 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>Continue in Background</source>
       <translation>Jatka taustalla</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Viimeisin saatavilla oleva päivitys</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8672,109 +8780,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>Update from mediaservers</source>
       <translation>Päivitä mediapalvelimista</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Viimeisin saatavilla oleva päivitys</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Client-sovelluksen ja %n palvelimen päivityspaketti puuttuu</numerusform>
-        <numerusform>Client-sovelluksen ja %n palvelimen päivityspaketti puuttuu</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Client-sovelluksen päivityspaketti puuttuu</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Viimeistele päivitys</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Peruuta</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>Viimeisin versio on jo asennettu</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Tämä versio on jo asennettu</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Ei yhteydessä olevia palvelimia päivitettäväksi.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Peruuta päivitys ja poista kaikki ladatut tiedot?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Päivitysten asennuksessa tapahtui virhe:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Jotkin palvelimet ovat menneet offline-tilaan. Odota, kunnes niihin voidaan muodostaa taas yhteys.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Päivitys on valmis, mutta jotkin komponentit eivät ole päivittyneet</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Päivitä %1 manuaalisesti käyttämällä asennuspakettia.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 käynnistetään uudelleen päivitettyyn versioon.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Joidenkin komponenttien päivityspakettien lataaminen epäonnistui</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Joidenkin komponenttien käyttöjärjestelmän versioita ei enää tueta. Poista ne järjestelmästä tai päivitä käyttöjärjestelmä tuettuun versioon.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>Asiakkaan käyttöjärjestelmän versiota ei enää tueta. Päivitä sen käyttöjärjestelmä tuettuun versioon.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Päivityksen käynnistäminen epäonnistui</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Päivityksen aloittaminen ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Päivityksen peruuttaminen epäonnistui</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Asennuksen aloittaminen epäonnistui</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation type="unfinished">Some servers have no update packages available.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation type="unfinished">Some servers have encountered an internal error.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation type="unfinished">Please please contact Customer Support.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -8853,7 +8858,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>Joillakin käyttäjillä ei ole pääsyä valittuun asetteluun. Toiminto ei toimi heillä.</translation>
     </message>
   </context>
   <context>
@@ -9060,11 +9065,11 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>Liikkeentunnistus on poistettu käytöstä tai sitä ei tueta</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>Monisuoratoisto on poistettu käytöstä tai sitä ei tueta</translation>
     </message>
   </context>
   <context>
@@ -9191,7 +9196,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>Ei yhteyttä palvelimeen.</translation>
     </message>
     <message>
       <source>Network error.</source>
@@ -9199,7 +9204,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>Server error.</source>
-      <translation type="unfinished">Server error.</translation>
+      <translation>Palvelinvirhe.</translation>
     </message>
   </context>
   <context>
@@ -9415,6 +9420,14 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Tiedosto oli vioittunut palvelimeen ladattaessa</translation>
+    </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>Etä tiedosto &quot;%1&quot; on vioittunut</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>Palvelimella on jo tämä tiedosto &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9823,7 +9836,7 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Kaikki tuettu</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9927,14 +9940,14 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Salasanan vaihtaminen epäonnistui %n kamerassa, joissa on %1</numerusform>
+        <numerusform>Salasanan vaihtaminen epäonnistui %n kamerassa, joissa on %1</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Varoitus! Tämä versio on tarkoitettu vain testaustarkoituksiin.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
@@ -9945,18 +9958,22 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <translation>OK</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+      <source>the largest available partition</source>
+      <translation type="unfinished">the largest available partition</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation type="unfinished">The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</translation>
     </message>
   </context>
   <context>

@@ -5,6 +5,8 @@
 #include <rest/server/json_rest_result.h>
 #include <api/model/storage_space_reply.h>
 
+using namespace nx::vms::server;
+
 namespace detail {
 
 void checkUpdateStatusRemotely(
@@ -99,27 +101,30 @@ void getStoragesDataRemotely(
         reply->push_back(nx::update::storage::ServerToStorages(p.first, p.second));
 }
 
-IfParticipantPredicate makeIfParticipantPredicate(nx::CommonUpdateManager* updateManager)
+IfParticipantPredicate makeIfParticipantPredicate(UpdateManager* updateManager)
 {
-    QnUuidList participants;
-    if (!updateManager->participants(&participants))
+    try
+    {
+        const auto updateInfo = updateManager->updateInformation(
+            UpdateManager::InformationCategory::target);
+
+        return
+            [updateInfo](
+                const QnUuid& id,
+                const nx::vms::api::SoftwareVersion& version)
+            {
+                if (!updateInfo.participants.isEmpty() && !updateInfo.participants.contains(id))
+                    return ParticipationStatus::notInList;
+
+                return version <= nx::vms::api::SoftwareVersion(updateInfo.version)
+                    ? ParticipationStatus::participant : ParticipationStatus::incompatibleVersion;
+            };
+    }
+    catch (const std::exception& e)
+    {
+        NX_DEBUG(nx::utils::log::Tag(QString("makeIfParticipantPredicate")), e.what());
         return nullptr;
-
-    const auto targetVersion = updateManager->targetVersion();
-    if (targetVersion.isNull())
-        return nullptr;
-
-    return
-        [participants = QSet<QnUuid>::fromList(participants), targetVersion](
-            const QnUuid& id,
-            const nx::vms::api::SoftwareVersion& version)
-        {
-            if (!participants.isEmpty() && !participants.contains(id))
-                return ParticipationStatus::notInList;
-
-            return version <= targetVersion
-                ? ParticipationStatus::participant : ParticipationStatus::incompatibleVersion;
-        };
+    }
 }
 
 } // namespace detail

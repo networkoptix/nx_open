@@ -95,8 +95,10 @@ signals:
 private:
     QnResourceTreeModelNodePtr node(const QModelIndex& index) const;
 
-    /** Calculate real children as node's children() method does not return bastard nodes. */
-    QList<QnResourceTreeModelNodePtr> children(const QnResourceTreeModelNodePtr& node) const;
+    /**
+     * Calculate all real children as node's children() method does not return bastard nodes.
+     */
+    QSet<QnResourceTreeModelNodePtr> children(const QnResourceTreeModelNodePtr& node) const;
 
     QnResourceTreeModelNodePtr ensureResourceNode(const QnResourcePtr& resource);
     QnResourceTreeModelNodePtr ensureItemNode(

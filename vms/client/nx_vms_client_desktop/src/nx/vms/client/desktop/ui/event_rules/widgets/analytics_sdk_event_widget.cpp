@@ -97,7 +97,7 @@ void AnalyticsSdkEventWidget::paramsChanged()
 
     model()->setEventParams(createEventParameters(
         ui->sdkEventTypeComboBox->currentData(
-            AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>(),
+            AnalyticsSdkEventModel::EngineIdRole).value<QnUuid>(),
         ui->sdkEventTypeComboBox->currentData(
             AnalyticsSdkEventModel::EventTypeIdRole).value<QString>()));
 }
@@ -133,7 +133,7 @@ void AnalyticsSdkEventWidget::updateSelectedEventType()
             ui->sdkEventTypeComboBox->setCurrentIndex(selectableItems.front());
 
             engineId = ui->sdkEventTypeComboBox->currentData(
-                AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>();
+                AnalyticsSdkEventModel::EngineIdRole).value<QnUuid>();
 
             eventTypeId = ui->sdkEventTypeComboBox->currentData(
                 AnalyticsSdkEventModel::EventTypeIdRole).value<QString>();

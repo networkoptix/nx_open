@@ -9,11 +9,11 @@
     </message>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>Phân tích camera sẽ chỉ hoạt động khi camera đang được xem. Cho phép ghi âm để làm cho nó hoạt động tất cả các thời gian.</translation>
     </message>
     <message>
       <source>This is the built-in functionality</source>
-      <translation type="unfinished">This is the built-in functionality</translation>
+      <translation>Đây là chức năng tích hợp</translation>
     </message>
   </context>
   <context>
@@ -72,7 +72,7 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>Không có plugin nào được cài đặt</translation>
     </message>
     <message>
       <source>Server is offline</source>

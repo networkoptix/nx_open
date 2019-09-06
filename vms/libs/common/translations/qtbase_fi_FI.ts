@@ -1138,7 +1138,7 @@ Haluatko silti poistaa sen?</translation>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation>Mitä&apos;s Tämä on?</translation>
+      <translation>Mikä&apos;s Tämä on?</translation>
     </message>
   </context>
   <context>

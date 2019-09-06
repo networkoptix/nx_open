@@ -129,6 +129,10 @@ struct CameraSettingsDialog::Private: public QObject
                 CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
                 if (advancedSettingsWidget->hasChanges())
                     advancedSettingsWidget->submitToResource();
+
+                for (const auto& camera: cameras)
+                    camera->updatePreferredServerId();
+
                 resetChanges();
             };
 
@@ -227,7 +231,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
 {
     ui->setupUi(this);
     setButtonBox(ui->buttonBox);
-    ui->alertBar->setReservedSpace(false);
+    ui->scheduleAlertBar->setReservedSpace(false);
 
     d->store = new CameraSettingsDialogStore(this);
 
@@ -509,6 +513,34 @@ void CameraSettingsDialog::updateButtonsAvailability()
         applyButton->setEnabled(d->hasChanges());
 }
 
+void CameraSettingsDialog::updateScheduleAlert()
+{
+    const auto& state = d->store->state();
+    if (!state.scheduleAlert)
+    {
+        ui->scheduleAlertBar->setText({});
+    }
+    else
+    {
+        switch (*state.scheduleAlert)
+        {
+            case CameraSettingsDialogState::ScheduleAlert::scheduleChangeDueToNoMotion:
+                ui->scheduleAlertBar->setText(tr("Motion detection is disabled, all schedule "
+                    "records \"Motion\" and \"Motion + Lo-Res\" will be changed to \"Always\""));
+                break;
+
+            case CameraSettingsDialogState::ScheduleAlert::scheduleChangeDueToNoDualStreaming:
+                ui->scheduleAlertBar->setText(tr("Dual streaming is disabled, all schedule "
+                    "records \"Motion + Lo-Res\" will be changed to \"Always\""));
+                break;
+
+            default:
+                NX_ASSERT(false);
+                ui->scheduleAlertBar->setText({});
+        }
+    }
+}
+
 void CameraSettingsDialog::updateState(const CameraSettingsDialogState& state)
 {
     static const QString kWindowTitlePattern = lit("%1 - %2");
@@ -529,6 +561,7 @@ void CameraSettingsDialog::updateState(const CameraSettingsDialogState& state)
     setWindowTitle(kWindowTitlePattern.arg(caption).arg(description));
 
     updateButtonsAvailability();
+    updateScheduleAlert();
 
     // TODO: #vkutin #gdm Ensure correct visibility/enabled state.
     // Legacy code has more complicated conditions.

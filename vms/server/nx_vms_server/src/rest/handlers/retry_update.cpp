@@ -1,6 +1,6 @@
 #include "retry_update.h"
 
-#include <nx/vms/server/server_update_manager.h>
+#include <nx/vms/server/update/update_manager.h>
 #include <media_server/media_server_module.h>
 
 #include "update_status_rest_handler.h"

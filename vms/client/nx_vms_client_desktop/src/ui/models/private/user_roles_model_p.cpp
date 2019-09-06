@@ -10,6 +10,8 @@
 
 #include <nx/utils/string.h>
 
+#include <core/resource_access/resource_access_subject.h>
+
 namespace {
 
 bool lessRoleByName(const nx::vms::api::UserRoleData& r1, const nx::vms::api::UserRoleData& r2)

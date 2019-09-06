@@ -36,7 +36,8 @@ Source QnSharedLayoutItemAccessProvider::baseSource() const
 }
 
 bool QnSharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& resource) const
+    const QnResourcePtr& resource,
+    GlobalPermissions globalPermissions) const
 {
     if (!isMediaResource(resource))
         return false;

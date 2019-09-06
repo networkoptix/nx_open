@@ -3,10 +3,11 @@
 #include <nx/utils/uuid.h>
 
 #include "basic_event.h" // EventPtr
+#include "field.h"
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API ActionField: public QObject
+class NX_VMS_RULES_API ActionField: public Field
 {
     Q_OBJECT
 

@@ -92,7 +92,7 @@
      <!-- a repetition of 0 or more of the following -->
 
      <!-- tt__RotateOptions *Rotate -->
-     <tt:Rotate>
+     <tt:Rotate Reboot="false">
       <!-- std::vector<tt__RotateMode> Mode -->
       <!-- a repetition of 1 or more of the following -->
       <tt:Mode>OFF</tt:Mode>

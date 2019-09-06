@@ -1,6 +1,5 @@
 {
     "settings": {
-        "updateFeedUrl":      "${updateFeedUrl}",
-        "backgroundImage":    ${backgroundImage}
+        "updateFeedUrl": "${updateFeedUrl}"
     }
 }

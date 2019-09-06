@@ -18,4 +18,5 @@ public:
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
     virtual void wheelEvent(QWheelEvent* event) override;
+    virtual void changeEvent(QEvent* event) override;
 };

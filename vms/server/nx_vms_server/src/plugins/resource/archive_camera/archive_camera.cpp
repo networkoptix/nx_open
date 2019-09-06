@@ -35,7 +35,7 @@ QList<QnResourcePtr> QnArchiveCamResourceSearcher::checkHostAddr(const nx::utils
 QnArchiveCamResource::QnArchiveCamResource(QnMediaServerModule* serverModule, const QnResourceParams& params):
     nx::vms::server::resource::Camera(serverModule)
 {
-    setId(params.resID);
+    setIdUnsafe(params.resID);
     setUrl(params.url);
     setVendor(params.vendor);
 }

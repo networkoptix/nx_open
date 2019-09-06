@@ -17,14 +17,15 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#include <nx/analytics/descriptor_manager.h>
-#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/client/desktop/analytics/analytics_events_tree.h>
 #include <nx/vms/client/desktop/common/widgets/selectable_text_button.h>
 #include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/strings_helper.h>
+
 #include <nx/utils/string.h>
+#include <nx/utils/std/algorithm.h>
 
 namespace nx::vms::client::desktop {
 
@@ -239,90 +240,70 @@ void EventSearchWidget::Private::updateAnalyticsMenu()
     NX_ASSERT(m_analyticsEventsSubmenuAction && m_analyticsEventsSingleAction);
 
     auto analyticsMenu = m_analyticsEventsSubmenuAction->menu();
-    NX_ASSERT(analyticsMenu);
 
     const QString currentSelection = m_eventModel->selectedSubType();
     bool currentSelectionStillAvailable = false;
 
-    if (analyticsMenu)
-    {
-        using namespace nx::vms::event;
-
-        nx::analytics::EventTypeDescriptorManager eventTypeDescriptorManager(q->commonModule());
-        nx::analytics::EngineDescriptorManager engineDescriptorManager(q->commonModule());
-        const auto eventTypeDescriptors = eventTypeDescriptorManager.descriptors();
-        const auto engineDescriptors = engineDescriptorManager.descriptors();
-
-        WidgetUtils::clearMenu(analyticsMenu);
-
-        QSet<QnUuid> enabledEngines;
-        const auto cameras = q->resourcePool()->getResources<QnVirtualCameraResource>();
-        for (const auto& camera: cameras)
-            enabledEngines += camera->enabledAnalyticsEngines();
-
-        if (!eventTypeDescriptors.empty())
+    auto addItemRecursive = nx::utils::y_combinator(
+        [this, currentSelection, &currentSelectionStillAvailable]
+        (auto addItemRecursive, auto parent, auto root) -> void
         {
-            addMenuAction(analyticsMenu, tr("Any analytics event"),
-                EventType::analyticsSdkEvent, {});
+            using NodeType = AnalyticsEventsTreeBuilder::NodeType;
 
-            analyticsMenu->addSeparator();
-
-            QHash<QnUuid, EngineInfo> engineById;
-            for (const auto& [engineId, engineDescriptor]: engineDescriptors)
+            for (auto node: root->children)
             {
-                if (enabledEngines.contains(engineId))
-                    engineById[engineId].name = engineDescriptor.name;
-            }
-
-            for (const auto& [eventTypeId, eventTypeDescriptor]: eventTypeDescriptors)
-            {
-                if (eventTypeDescriptor.isHidden())
-                    continue;
-
-                for (const auto& scope: eventTypeDescriptor.scopes)
+                // Leaf node - event type.
+                if (node->nodeType == NodeType::eventType)
                 {
-                    if (enabledEngines.contains(scope.engineId))
-                    {
-                        engineById[scope.engineId].eventTypes
-                            .emplace(eventTypeId, eventTypeDescriptor);
-                    }
-                }
-            }
-
-            QList<EngineInfo> engines;
-            for (const auto& engineInfo: engineById)
-                engines.push_back(engineInfo);
-
-            std::sort(engines.begin(), engines.end());
-            const bool multipleEnginesArePresent = engines.size() > 1;
-
-            QMenu* currentMenu = analyticsMenu;
-            for (const auto& engine: engines)
-            {
-                if (multipleEnginesArePresent)
-                {
-                    const auto engineName = engine.name.isEmpty()
-                        ? QString("<%1>").arg(tr("unnamed analytics engine"))
-                        : engine.name;
-
-                    currentMenu->setWindowFlags(
-                        currentMenu->windowFlags() | Qt::BypassGraphicsProxyWidget);
-                    currentMenu = analyticsMenu->addMenu(engineName);
-                }
-
-                for (const auto& [eventTypeId, eventTypeDescriptor]: engine.eventTypes)
-                {
-                    addMenuAction(currentMenu,
-                        eventTypeDescriptor.name,
-                        EventType::analyticsSdkEvent, eventTypeDescriptor.id);
+                    addMenuAction(parent, node->text, EventType::analyticsSdkEvent,
+                        node->eventTypeId);
 
                     if (!currentSelectionStillAvailable
-                        && currentSelection == eventTypeDescriptor.getId())
+                        && currentSelection == node->eventTypeId)
                     {
                         currentSelectionStillAvailable = true;
                     }
                 }
+                else
+                {
+                    NX_ASSERT(!node->children.empty());
+                    auto menu = parent->addMenu(node->text);
+                    q->fixMenuFlags(menu);
+
+                    // TODO: Implement search by the analytics events groups: VMS-14877.
+                    // if (child->nodeType == NodeType::group)
+                    // {
+                    //     addMenuAction(menu, child->name, EventType::analyticsSdkEvent,
+                    //         groupId);
+                    //     menu->addSeparator();
+                    //  }
+
+                    addItemRecursive(menu, node);
+                }
             }
+        });
+
+    if (NX_ASSERT(analyticsMenu))
+    {
+        using namespace nx::vms::event;
+        using namespace nx::analytics;
+
+        AnalyticsEventsTreeBuilder eventsTreeBuilder(q->commonModule());
+        const auto root = eventsTreeBuilder.compatibleTreeUnion(
+            q->resourcePool()->getAllCameras({}, /*ignoreDesktopCameras*/ true));
+
+        WidgetUtils::clearMenu(analyticsMenu);
+
+        if (!root->children.empty())
+        {
+            addMenuAction(
+                analyticsMenu,
+                tr("Any analytics event"),
+                EventType::analyticsSdkEvent,
+                {});
+
+            analyticsMenu->addSeparator();
+            addItemRecursive(analyticsMenu, root);
         }
     }
 

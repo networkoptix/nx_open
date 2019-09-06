@@ -132,7 +132,7 @@
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Služba %1 není k dispozici. Prosím, zkuste to později.</translation>
+      <translation>Služba není k dispozici. Prosím, zkuste to později.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
@@ -159,7 +159,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Nelze inicializovat audio enkodér.</translation>
+      <translation>Nelze inicializovat zvukový enkodér.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>

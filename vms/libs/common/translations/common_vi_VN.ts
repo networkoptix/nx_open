@@ -805,7 +805,7 @@
     <message numerus="yes">
       <source>%n Cameras</source>
       <translation>
-        <numerusform>%n Camera</numerusform>
+        <numerusform>%n camera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1010,7 +1010,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Lỗi không rõ.</translation>
+      <translation>Lỗi không xác định.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>

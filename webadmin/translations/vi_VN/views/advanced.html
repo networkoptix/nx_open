@@ -1,5 +1,5 @@
 <div class="container">
-    <h1><a href="#/metrics/">New: System health report</a></h1>
+    <h1><a href="#/metrics/">Mới: Báo cáo sức khỏe hệ thống</a></h1>
 </div>
 <div class="container">
     <h1>Cài đặt máy chủ nâng cao</h1>
@@ -113,14 +113,14 @@
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Sửa chữa tất cả các cài đặt được đánh dấu để lưu nó</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >tiết kiệm</button>
-        <button class="btn btn-warning" ng-click="cancel()">hủy bỏ</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Tiết kiệm</button>
+        <button class="btn btn-warning" ng-click="cancel()">Hủy bỏ</button>
     </form>
 
     <h2>Cài đặt nhật ký</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} log level</label>
+            <label class="col-sm-4">{{name}} Nhật ký cấp</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
                     <option value="none">Không có: Đăng nhập bị vô hiệu.</option>
@@ -128,17 +128,17 @@
                     <option value="error">Lỗi: Duy nhất lỗi đăng nhập.</option>
                     <option value="warning">Cảnh báo: Đăng nhập cảnh báo và lỗi.</option>
                     <option value="info">Thông tin: Ghi lỗi, cảnh báo tất cả các thông điệp.</option>
-                    <option value="debug">Debug: Log every System message and debug information.</option>
-                    <option value="verbose">Verbose: Log all information available.</option>
+                    <option value="debug">Gỡ lỗi: Ghi nhật ký mọi thông báo hệ thống và thông tin gỡ lỗi.</option>
+                    <option value="verbose">Verbose: Đăng nhập tất cả các thông tin có sẵn.</option>
                 </select>
             </div>
         </div>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >tiết kiệm</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Tiết kiệm</button>
         </div>
     </form>
 
-    <h1>Advanced System settings</h1>
+    <h1>Thiết lập hệ thống nâng cao</h1>
     <div class="alert alert-danger" role="alert">
         <b> Cảnh báo! </b> Bất kỳ thay đổi nào trên trang này có thể khiến máy chủ hoạt động không chính xác.
     </div>
@@ -180,7 +180,7 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >tiết kiệm</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Tiết kiệm</button>
         </div>
 
     </form>

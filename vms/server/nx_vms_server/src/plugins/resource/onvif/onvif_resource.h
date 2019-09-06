@@ -748,6 +748,7 @@ private:
     mutable QnConstResourceVideoLayoutPtr m_videoLayout;
     mutable QnOnvifServiceUrls m_serviceUrls;
     nx::utils::AsyncOperationGuard m_asyncConnectGuard;
+
 protected:
     nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnPlOnvifResource> m_advancedParametersProvider;
     nx::vms::server::resource::OnvifMulticastParametersProvider m_primaryMulticastParametersProvider;

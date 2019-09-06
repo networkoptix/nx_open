@@ -42,7 +42,7 @@ protected:
     QnLayoutResourcePtr createLayout(Qn::ResourceFlags flags, bool locked = false, const QnUuid &parentId = QnUuid())
     {
         QnLayoutResourcePtr layout(new QnLayoutResource());
-        layout->setId(QnUuid::createUuid());
+        layout->setIdUnsafe(QnUuid::createUuid());
         layout->addFlags(flags);
         layout->setLocked(locked);
 

@@ -2044,8 +2044,8 @@ to view more bookmarks</source>
       <translation>Cualquier cámara</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Forzar acuse de recibo solo funcionará para eventos genéricos si se usan modificadores de cámara en la URL de evento genérico</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Forzar el reconocimiento sólo funcionará para eventos genéricos si los identificadores de cámara se utilizan en la URL del evento genérico</translation>
     </message>
   </context>
   <context>
@@ -5596,12 +5596,6 @@ a %1</translation>
       <translation>¿Qué hacer con los datos analíticos actuales?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Los datos de análisis actuales no se moverán automáticamente a otra ubicación y se volverán inaccesibles. Puede mantenerlos y moverlos manualmente más tarde, o eliminarlos permanentemente.
-Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, por favor contacte con el soporte antes de continuar.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Borrar</translation>
     </message>
@@ -5612,6 +5606,12 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>Cancel</source>
       <translation>Cancelar</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Los datos analíticos actuales no se moverán automáticamente a otra ubicación y serán inaccesibles. Puede conservarlo y moverlo manualmente más tarde, o eliminarlo permanentemente.
+Si tenía la intención de mover los datos analíticos a otra ubicación de almacenamiento, póngase en contacto con el soporte antes de continuar.</translation>
     </message>
   </context>
   <context>
@@ -7594,7 +7594,7 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation type="unfinished">Motion detection stream is disabled</translation>
+      <translation>El flujo de detección de movimiento está deshabilitado</translation>
     </message>
   </context>
   <context>
@@ -7732,6 +7732,14 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>Plugins</source>
       <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Detección de movimiento desactivada, todos los registros de programación &quot;Motion&quot; y &quot;Motion + Lo-Res&quot; se cambiarán a &quot;Siempre&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>La transmisión dual está desactivada, todos los registros de programación &quot;Motion + Lo-Res&quot; se cambiarán a &quot;Siempre&quot;</translation>
     </message>
   </context>
   <context>
@@ -8058,10 +8066,6 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
         <numerusform>%n eventos</numerusform>
         <numerusform>%n eventos</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>motor analítico sin nombre</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8452,7 +8456,7 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     </message>
     <message>
       <source>Can not start the search process</source>
-      <translation type="unfinished">Can not start the search process</translation>
+      <translation>No se puede iniciar el proceso de búsqueda</translation>
     </message>
   </context>
   <context>
@@ -8565,6 +8569,58 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Algunos servidores están fuera de línea y no se actualizarán. Omitirlos?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Falta el paquete de actualización para el cliente y %n servidores</numerusform>
+        <numerusform>Falta el paquete de actualización para el cliente y %n servidores</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Falta el paquete de actualización para el cliente</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>No hay servidores en línea para actualizar.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>¿Cancelar actualización y eliminar todos los datos descargados?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Las versiones del sistema operativo de algunos componentes ya no son compatibles. Por favor, eliminarlos del sistema o actualizar su sistema operativo a una versión compatible.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>La versión del sistema operativo del cliente ya no es compatible. Por favor, actualice su sistema operativo a una versión compatible.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Error al iniciar la actualización</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Error al cancelar la actualización</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Error al iniciar la instalación</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Algunos servidores no han completado el proceso de actualización. ¿Terminar de todos modos?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 se reiniciará a la versión actualizada.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Error al descargar los paquetes a algunos componentes</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Si el problema persiste, póngase en contacto con el servicio de atención al cliente.</translation>
@@ -8582,16 +8638,48 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>Actualización completada</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client se reiniciará a la versión actualizada.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Actualización finalizada, pero algunos componentes han fallado en una actualización</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Actualice %1 manualmente utilizando un paquete de instalación.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 se reiniciará a la versión actualizada.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Se ha producido un error al instalar las actualizaciones:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Descargando Actualización...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Finalizar actualización</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Cancelar</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>La última versión ya está instalada</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Esta versión ya está instalada</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Instalar actualización</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8610,12 +8698,12 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>Descargar &amp; Instalar</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Seleccione otro Build</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Buscar otro archivo...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Seleccione otro Build</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8638,6 +8726,10 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>Instalando actualizaciones de cliente...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Iniciando actualización a ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Actualizando a ...</translation>
     </message>
@@ -8646,12 +8738,24 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>Listo para actualizar a</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Instalar actualización</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Sistema actualizado a</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Algunos servidores no tienen paquetes de actualización disponibles.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Algunos servidores han encontrado un error interno.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Póngase en contacto con el servicio técnico.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Algunos servidores se han desconectado. Por favor, espere hasta que estén en línea para continuar.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8660,6 +8764,10 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>Continue in Background</source>
       <translation>Continuar en el fondo</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>La última Actualización disponible</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8672,109 +8780,6 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>Update from mediaservers</source>
       <translation>Actualizar desde servidores</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>La última Actualización disponible</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Falta el paquete de actualización para el cliente y %n servidores</numerusform>
-        <numerusform>Falta el paquete de actualización para el cliente y %n servidores</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Falta el paquete de actualización para el cliente</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Finalizar actualización</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Cancelar</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>La última versión ya está instalada</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Esta versión ya está instalada</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>No hay servidores en línea para actualizar.</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>¿Cancelar actualización y eliminar todos los datos descargados?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Se ha producido un error al instalar las actualizaciones:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Algunos servidores se han desconectado. Por favor, espere hasta que estén en línea para continuar.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Actualización finalizada, pero algunos componentes han fallado en una actualización</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Actualice %1 manualmente utilizando un paquete de instalación.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 se reiniciará a la versión actualizada.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Error al descargar los paquetes a algunos componentes</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Las versiones del sistema operativo de algunos componentes ya no son compatibles. Por favor, eliminarlos del sistema o actualizar su sistema operativo a una versión compatible.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>La versión del sistema operativo del cliente ya no es compatible. Por favor, actualice su sistema operativo a una versión compatible.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Error al iniciar la actualización</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Iniciando actualización a ...</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation>Error al cancelar la actualización</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation>Error al iniciar la instalación</translation>
-    </message>
-    <message>
-      <source>Some servers have no update packages available.</source>
-      <translation>Algunos servidores no tienen paquetes de actualización disponibles.</translation>
-    </message>
-    <message>
-      <source>Some servers have encountered an internal error.</source>
-      <translation>Algunos servidores han encontrado un error interno.</translation>
-    </message>
-    <message>
-      <source>Please please contact Customer Support.</source>
-      <translation>Por favor, póngase en contacto con el servicio de atención al cliente.</translation>
-    </message>
-    <message>
-      <source>Some servers have not completed the update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers have not completed the update process. Finish it anyway?</translation>
     </message>
   </context>
   <context>
@@ -8853,7 +8858,7 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
-      <translation type="unfinished">Some users do not have access to the selected layout. Action will not work for them.</translation>
+      <translation>Algunos usuarios no tienen acceso al diseño seleccionado. La acción no funcionará para ellos.</translation>
     </message>
   </context>
   <context>
@@ -9060,11 +9065,11 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>La detección de movimiento está deshabilitada o no es compatible</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>El streaming dual está desactivado o no es compatible</translation>
     </message>
   </context>
   <context>
@@ -9415,6 +9420,14 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>File was corrupted while being uploaded to the server</source>
       <translation>El archivo se corrompió mientras se cargaba en el servidor</translation>
+    </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>El archivo remoto &quot;%1&quot; está dañado</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>El servidor ya tiene este archivo &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9945,18 +9958,22 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>OK</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>Confirmar ubicación de almacenamiento para almacenar datos analíticos en &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>Confirme la ubicación de almacenamiento para los datos analíticos en &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>La base de datos analítica debe almacenarse en un almacenamiento local y puede ocupar hasta cien gigabytes.
-Una vez que se selecciona la ubicación para almacenar los datos analíticos, no se puede cambiar fácilmente sin perder los datos existentes. Recomendamos elegir la ubicación con cuidado y no usar la partición del sistema para evitar un mal funcionamiento grave del sistema.
-Por defecto, los datos analíticos se almacenarán en el directorio de instalación de mediaserver&apos;.
-Puede cambiar la ubicación de almacenamiento en la pestaña &quot;Storage Management&quot; en el cuadro de diálogo Configuración del servidor.</translation>
+      <source>the largest available partition</source>
+      <translation>la partición más grande disponible</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation>La base de datos de analíticossólo debe almacenarse en una unidad local y puede tomar grandes cantidades de espacio.
+Una vez que se selecciona una ubicación para almacenar datos analíticos, no se puede cambiar fácilmente sin perder datos existentes. Recomendamos elegir la ubicación cuidadosamente y evitar usar la partición del sistema ya que puede causar una mala función del sistema.
+Por defecto los datos analíticos se almacenarán en %1.
+Puede seleccionar otra ubicación de almacenamiento en la pestaña &quot;Administración de Almacenamiento&quot; de la ventana de Configuración del servidor.</translation>
     </message>
   </context>
   <context>

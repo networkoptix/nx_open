@@ -23,6 +23,8 @@
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/media_server_resource.h>
 
+#include <client/client_app_info.h>
+
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/resource_views/functional_delegate_utilities.h>
 
@@ -133,14 +135,6 @@ void QnAboutDialog::generateServersReport()
 
     m_serverListModel->setResources(servers);
     ui->serversGroupBox->setVisible(!servers.empty());
-
-    const bool hasArmServers = std::any_of(servers.cbegin(), servers.cend(),
-		[](const QnMediaServerResourcePtr& server)
-        {
-            return QnMediaServerResource::isArmServer(server);
-        });
-    ui->armSupportLabel->setVisible(hasArmServers);
-    ui->armSupportTitleLabel->setVisible(hasArmServers);
 }
 
 void QnAboutDialog::retranslateUi()
@@ -206,14 +200,6 @@ void QnAboutDialog::retranslateUi()
         supportLink = makeHref(supportAddress);
 
     ui->customerSupportLabel->setText(supportLink);
-
-    QnCloudUrlHelper cloudUrlHelper(
-        nx::vms::utils::SystemUri::ReferralSource::DesktopClient,
-        nx::vms::utils::SystemUri::ReferralContext::SettingsDialog);
-
-    ui->armSupportLabel->setText(makeHref(
-        cloudUrlHelper.armPolicyUrl().toDisplayString(QUrl::RemoveQuery),
-        cloudUrlHelper.armPolicyUrl()));
 }
 
 // -------------------------------------------------------------------------- //

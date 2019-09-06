@@ -824,7 +824,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I / O-Modul</translation>
+      <translation>I / O-modul</translation>
     </message>
     <message>
       <source>I/O module</source>
