@@ -131,7 +131,7 @@
 
     </tt:AudioSourceConfiguration>
     <!-- tt__VideoEncoderConfiguration *VideoEncoderConfiguration -->
-    <tt:VideoEncoderConfiguration token="">
+    <tt:VideoEncoderConfiguration GuaranteedFrameRate="false" token="">
      <!-- std::string Name -->
      <tt:Name></tt:Name>
      <!-- int UseCount -->

@@ -43,6 +43,7 @@
 #include <nx/network/http/http_types.h>
 
 #include <nx/fusion/model_functions.h>
+#include <core/resource_access/resource_access_subject.h>
 
 using namespace nx;
 
@@ -198,7 +199,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     QnBusinessTypesComparator lexComparator(true);
     for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::user))
     {
-        if (eventType == EventType::pluginEvent)
+        if (eventType == EventType::pluginDiagnosticEvent)
         {
             /** Show it only for users who have at least one plugin installed. */
             const auto pirs =
@@ -307,9 +308,11 @@ QVariant QnBusinessRuleViewModel::data(Column column, const int role) const
             return qVariantFromValue(m_actionType);
         case Qn::ActionResourcesRole:
         {
-            auto ids = m_actionType != ActionType::showPopupAction
-                ? filterActionResources(this, m_actionResources, m_actionType)
-                : filterSubjectIds(m_actionParams.additionalResources);
+            auto ids = (
+                m_actionType != ActionType::showPopupAction
+                && m_actionType != ActionType::openLayoutAction)
+                    ? filterActionResources(this, m_actionResources, m_actionType)
+                    : filterSubjectIds(m_actionParams.additionalResources);
 
             if (m_actionParams.allUsers)
                 ids.insert(kAllUsersId);
@@ -365,6 +368,7 @@ bool QnBusinessRuleViewModel::setData(Column column, const QVariant& value, int 
 
             switch (m_actionType)
             {
+                case ActionType::openLayoutAction:
                 case ActionType::showPopupAction:
                 {
                     auto params = m_actionParams;
@@ -492,7 +496,7 @@ void QnBusinessRuleViewModel::setEventType(const vms::api::EventType value)
 
         switch (m_eventType)
         {
-            case EventType::pluginEvent:
+            case EventType::pluginDiagnosticEvent:
             {
                 using namespace nx::vms::api;
                 EventLevels levels = 0;
@@ -582,6 +586,7 @@ QIcon QnBusinessRuleViewModel::iconForAction() const
             return qnResIconCache->icon(QnResourceIconCache::Users);
         }
 
+        case vms::event::ActionType::openLayoutAction:
         case vms::event::ActionType::showPopupAction:
         {
             if (m_actionParams.allUsers)
@@ -1255,6 +1260,7 @@ QString QnBusinessRuleViewModel::getTargetText(bool detailed) const
                 detailed,
                 m_actionParams.emailAddress);
         }
+        case ActionType::openLayoutAction:
         case ActionType::showPopupAction:
         {
             if (m_actionParams.allUsers)

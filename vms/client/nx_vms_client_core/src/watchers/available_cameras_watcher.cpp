@@ -3,6 +3,7 @@
 
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource_access/resource_access_subject.h>
 
 class QnAvailableCamerasWatcherPrivate
 {

@@ -539,15 +539,24 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createRtpEncoder(
     QnAbstractMediaData::DataType dataType)
 {
     Q_D(QnRtspConnectionProcessor);
+
     QnConstAbstractMediaDataPtr mediaHigh = getCameraData(dataType, MEDIA_Quality_High);
-    QnConstAbstractMediaDataPtr mediaLow = getCameraData(dataType, MEDIA_Quality_Low);
+    QnConstAbstractMediaDataPtr mediaLow;
+
+    QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(d->mediaRes->toResource());
+    if (camRes && camRes->hasDualStreaming())
+        mediaLow = getCameraData(dataType, MEDIA_Quality_Low);
+
     QnConstAbstractMediaDataPtr media =
         d->quality == MEDIA_Quality_High || d->quality == MEDIA_Quality_ForceHigh
         ? mediaHigh
         : mediaLow;
 
     if (!media)
+    {
+        NX_WARNING(this, "Failed to get media data to create RTP encoder");
         return nullptr;
+    }
 
     AVCodecID dstCodec = AV_CODEC_ID_NONE;
     if (media->dataType == QnAbstractMediaData::VIDEO)
@@ -571,6 +580,7 @@ AbstractRtspEncoderPtr QnRtspConnectionProcessor::createRtpEncoder(
         rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
 
     QnUniversalRtpEncoder::Config config;
+    config.transcoderConfig.decoderConfig.mtDecodePolicy = d->serverModule->settings().multiThreadDecodePolicy();
     config.absoluteRtcpTimestamps = d->serverModule->settings().absoluteRtcpTimestamps();
     config.useRealTimeOptimization = d->serverModule->settings().ffmpegRealTimeOptimization();
     config.addOnvifHeaderExtension = d->params.onvifReplay();
@@ -596,50 +606,73 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
     QnAbstractMediaData::DataType dataType, MediaQuality quality)
 {
     Q_D(QnRtspConnectionProcessor);
-    QnConstAbstractMediaDataPtr result;
 
     // 1. Check the packet in the GOP keeper.
     // Do not check the audio for the live point if the client is not proprietary.
     bool canCheckLive = (dataType == QnAbstractMediaData::VIDEO) || (d->startTime == DATETIME_NOW);
     if (canCheckLive)
     {
-        nx::vms::server::VideoCameraPtr camera;
+        QnSharedResourcePointer<nx::vms::server::VideoCamera> camera;
         const nx::vms::api::StreamIndex streamIndex =
             (quality == MEDIA_Quality_High || quality == MEDIA_Quality_ForceHigh)
             ? nx::vms::api::StreamIndex::primary
             : nx::vms::api::StreamIndex::secondary;
-        if (getResource())
-            camera = d->serverModule->videoCameraPool()->getVideoCamera(getResource()->toResourcePtr());
+
+        if (const auto resource = getResource())
+        {
+            camera = d->serverModule->videoCameraPool()->getVideoCamera(resource->toResourcePtr())
+                .dynamicCast<nx::vms::server::VideoCamera>();
+        }
 
         if (camera)
         {
+            QnConstAbstractMediaDataPtr result;
             if (dataType == QnAbstractMediaData::VIDEO)
-                result =  camera->getLastVideoFrame(streamIndex, /*channel*/ 0);
+                result = camera->getLastVideoFrameRtsp(streamIndex, /*channel*/ 0);
             else
-                result = camera->getLastAudioFrame(streamIndex);
+                result = camera->getLastAudioFrameRtsp(streamIndex);
+
             if (result)
                 return result;
+        }
+        else
+        {
+            NX_DEBUG(this, "Camera not found, archive will be checked");
         }
     }
 
     // 2. Find a packet inside the archive.
     QnServerArchiveDelegate archive(d->serverModule, quality);
     if (!archive.open(getResource()->toResourcePtr(), d->serverModule->archiveIntegrityWatcher()))
-        return result;
+    {
+        NX_WARNING(this, "Failed to get camera data, couldn't open archive, quality: %1", quality);
+        return nullptr;
+    }
     if (d->startTime != DATETIME_NOW)
         archive.seek(d->startTime, true);
+
     if (archive.getAudioLayout()->channelCount() == 0 && dataType == QnAbstractMediaData::AUDIO)
-        return result;
+    {
+        NX_WARNING(this, "Failed to get audio camera data, no audio stream found");
+        return nullptr;
+    }
 
     for (int i = 0; i < 40; ++i)
     {
         QnConstAbstractMediaDataPtr media = archive.getNextData();
         if (!media)
-            return result;
+        {
+            NX_WARNING(this,
+                "Failed to get camera data, couldn't read archive, quality: %1", quality);
+            return nullptr;
+        }
+
         if (media->dataType == dataType)
             return media;
     }
-    return result;
+    NX_WARNING(this,
+        "Failed to get camera data, the data is not found neither in archive nor in the gop keeper");
+    return nullptr;
 }
 
 QnConstMediaContextPtr QnRtspConnectionProcessor::getAudioCodecContext(int audioTrackIndex) const
@@ -914,6 +947,18 @@ void QnRtspConnectionProcessor::at_camera_parentIdChanged(const QnResourcePtr & 
     }
 }
 
+void QnRtspConnectionProcessor::waitForResourceInitializing(const QnNetworkResourcePtr& resource)
+{
+    constexpr std::chrono::milliseconds kSleepInterval(100);
+    constexpr std::chrono::seconds kWaitTimeout(4);
+    std::chrono::milliseconds overallWait(0);
+    while(!m_needStop && !resource->isInitialized() && overallWait < kWaitTimeout)
+    {
+        std::this_thread::sleep_for(kSleepInterval);
+        overallWait += kSleepInterval;
+    }
+}
+
 void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
@@ -952,11 +997,16 @@ void QnRtspConnectionProcessor::createDataProvider()
     if (d->mediaRes) {
         camera = d->serverModule->videoCameraPool()->getVideoCamera(d->mediaRes->toResourcePtr());
         QnNetworkResourcePtr cameraRes = d->mediaRes.dynamicCast<QnNetworkResource>();
-        if (cameraRes && !cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner))
+        if (cameraRes && !cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner) &&
+            d->playbackMode == PlaybackMode::Live)
         {
-            NX_VERBOSE(this,
-                "Trying to initialise resource if it was not initialised for some unknown reason");
+            NX_DEBUG(this,
+                "Trying to initialize resource if it was not initialized for some unknown reason");
             cameraRes->initAsync(true);
+
+            // Wait for camera initializing.
+            if (!d->useProprietaryFormat)
+                waitForResourceInitializing(cameraRes);
         }
     }
     if (camera && d->playbackMode == PlaybackMode::Live)
@@ -1062,10 +1112,11 @@ void QnRtspConnectionProcessor::checkQuality()
 
 QnRtspFfmpegEncoder* QnRtspConnectionProcessor::createRtspFfmpegEncoder(bool isVideo)
 {
-    Q_D(const QnRtspConnectionProcessor);
+    Q_D(QnRtspConnectionProcessor);
 
-    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder(
-        DecoderConfig(), commonModule()->metrics());
+    DecoderConfig config;
+    config.mtDecodePolicy = d->serverModule->settings().multiThreadDecodePolicy();
+    QnRtspFfmpegEncoder* result = new QnRtspFfmpegEncoder(config, commonModule()->metrics());
     if (isVideo && !d->transcodeParams.empty())
         result->setDstResolution(d->transcodeParams.resolution, d->transcodeParams.codecId);
     return result;
@@ -1110,8 +1161,10 @@ void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayou
     }
 
     RtspServerTrackInfoPtr aTrack(new RtspServerTrackInfo());
+    DecoderConfig config;
+    config.mtDecodePolicy = d->serverModule->settings().multiThreadDecodePolicy();
     aTrack->setEncoder(AbstractRtspEncoderPtr(new QnRtspFfmpegEncoder(
-        DecoderConfig(),
+        config,
         commonModule()->metrics())));
     aTrack->clientPort = trackNum*2;
     aTrack->clientRtcpPort = trackNum*2+1;
@@ -1139,24 +1192,32 @@ StreamDataFilters QnRtspConnectionProcessor::streamFilterFromHeaders(
     StreamDataFilters oldFilters) const
 {
     Q_D(const QnRtspConnectionProcessor);
-    QString deprecatedSendMotion = nx::network::http::getHeaderValue(
-        d->request.headers, kSendMotionHeaderName);
     QString dataFilterStr = nx::network::http::getHeaderValue(
         d->request.headers, Qn::RTSP_DATA_FILTER_HEADER_NAME);
 
-    StreamDataFilters filter = oldFilters ? oldFilters : StreamDataFilter::media;
+    // New filters setup format.
+    if (!dataFilterStr.isEmpty())
+        return QnLexical::deserialized<StreamDataFilters>(dataFilterStr);
+
+    // Support for the old modile clients.
+    QString deprecatedSendMotion = nx::network::http::getHeaderValue(
+        d->request.headers, kSendMotionHeaderName);
+
+    StreamDataFilters filters = oldFilters ? oldFilters : StreamDataFilter::media;
     if (deprecatedSendMotion == "1" || deprecatedSendMotion == "true")
-        filter.setFlag(StreamDataFilter::motion, true);
-    else
-        filter = QnLexical::deserialized<StreamDataFilters>(dataFilterStr);
-    return filter;
+        filters.setFlag(StreamDataFilter::motion, true);
+
+    return filters;
 }
 
 nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
 {
     Q_D(QnRtspConnectionProcessor);
     if (d->mediaRes == 0)
+    {
+        NX_WARNING(this, "Failed to play rtsp session, media resource not found");
         return nx::network::http::StatusCode::notFound;
+    }
 
     d->playbackMode = getStreamingMode();
 
@@ -1221,7 +1282,10 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
         addResponseRangeHeader();
 
     if (!currentDP)
-        return nx::network::http::StatusCode::notFound;
+    {
+        NX_WARNING(this, "Failed to play rtsp session, resource not initialized");
+        return nx::network::http::StatusCode::serviceUnavailable;
+    }
 
     Qn::ResourceStatus status = getResource()->toResource()->getStatus();
     d->dataProcessor->setLiveMode(d->playbackMode == PlaybackMode::Live);
@@ -1229,7 +1293,10 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
     {
         auto camera = d->serverModule->videoCameraPool()->getVideoCamera(getResource()->toResourcePtr());
         if (!camera)
+        {
+            NX_WARNING(this, "Failed to play rtsp session, camera not found");
             return nx::network::http::StatusCode::notFound;
+        }
 
         QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
         int copySize = 0;
@@ -1357,6 +1424,8 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeSetParamete
 
     if (!d->mediaRes)
         return nx::network::http::StatusCode::notFound;
+    if (!d->dataProcessor)
+        return nx::network::http::StatusCode::notFound; //< SetParameter without play or describe.
 
     QList<QByteArray> parameters = d->requestBody.split('\n');
     for(const QByteArray& parameter: parameters)

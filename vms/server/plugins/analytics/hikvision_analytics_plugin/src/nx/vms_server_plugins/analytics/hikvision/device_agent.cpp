@@ -4,8 +4,11 @@
 
 #include <chrono>
 
+#include <nx/sdk/helpers/plugin_diagnostic_event.h>
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
+#include <nx/sdk/helpers/error.h>
+
 #include <nx/utils/log/log_main.h>
 #include <nx/fusion/model_functions.h>
 
@@ -29,35 +32,41 @@ DeviceAgent::~DeviceAgent()
     stopFetchingMetadata();
 }
 
-void DeviceAgent::setSettings(const IStringMap* /*settings*/)
+void DeviceAgent::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-IStringMap* DeviceAgent::pluginSideSettings() const
+void DeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
-Error DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
+void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     handler->addRef();
     m_handler.reset(handler);
-    return Error::noError;
 }
 
-Error DeviceAgent::setNeededMetadataTypes(const IMetadataTypes* metadataTypes)
+void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
-    if (metadataTypes->isEmpty())
+    const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
+    if (const char* const kMessage = "Event type id list is null";
+        !NX_ASSERT(eventTypeIds, kMessage))
     {
-        stopFetchingMetadata();
-        return Error::noError;
+        *outResult = error(ErrorCode::internalError, kMessage);
+        return;
     }
 
-    return startFetchingMetadata(metadataTypes);
+    stopFetchingMetadata();
+
+    if (eventTypeIds->count() != 0)
+        *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
-Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
 {
     auto monitorHandler =
         [this](const HikvisionEventList& events)
@@ -73,7 +82,7 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
                 if (wrongChannel)
                     return;
 
-                auto eventMetadata = makePtr<nx::sdk::analytics::EventMetadata>();
+                auto eventMetadata = makePtr<EventMetadata>();
                 NX_VERBOSE(this, lm("Got event: %1 %2 Channel %3")
                     .args(hikvisionEvent.caption, hikvisionEvent.description, m_channelNumber));
 
@@ -96,9 +105,12 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
     NX_ASSERT(m_engine);
     std::vector<QString> eventTypes;
 
-    nx::sdk::Ptr<const nx::sdk::IStringList> eventTypeIdList(metadataTypes->eventTypeIds());
-    if (!NX_ASSERT(eventTypeIdList, "Event type id list is nullptr"))
-        return Error::unknownError;
+    const auto eventTypeIdList = metadataTypes->eventTypeIds();
+    if (const char* const kMessage = "Event type id list is null";
+        !NX_ASSERT(eventTypeIdList, kMessage))
+    {
+        return error(ErrorCode::internalError, kMessage);
+    }
 
     for (int i = 0; i < eventTypeIdList->count(); ++i)
         eventTypes.push_back(eventTypeIdList->at(i));
@@ -115,7 +127,7 @@ Error DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
     m_monitor->addHandler(m_uniqueId, monitorHandler);
     m_monitor->startMonitoring();
 
-    return Error::noError;
+    return {};
 }
 
 void DeviceAgent::stopFetchingMetadata()
@@ -128,16 +140,12 @@ void DeviceAgent::stopFetchingMetadata()
     m_monitor = nullptr;
 }
 
-const IString* DeviceAgent::manifest(Error* error) const
+void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
     if (m_deviceAgentManifest.isEmpty())
-    {
-        *error = Error::unknownError;
-        return nullptr;
-    }
-
-    *error = Error::noError;
-    return new nx::sdk::String(m_deviceAgentManifest);
+        *outResult = error(ErrorCode::otherError, "DeviceAgent manifest is empty");
+    else
+        *outResult = new nx::sdk::String(m_deviceAgentManifest);
 }
 
 void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)

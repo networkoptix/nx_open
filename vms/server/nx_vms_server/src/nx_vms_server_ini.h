@@ -25,9 +25,6 @@ struct Ini: public nx::kit::IniConfig
         "libtegra_video.so bug).");
 
     NX_INI_FLAG(0, forceLiteClient, "Force Lite Client for this server.");
-	
-    NX_INI_FLAG(0, allowMtDecoding,
-        "Allow multithreading decoding of video when software motion detection is enabled.");
 
     #define NX_VMS_SERVER_INI_LIVE_STREAM_CACHE_HELP \
         "Live Stream Cache allows Desktop Client's Right Panel receive adequate thumbnails of\n" \
@@ -54,6 +51,10 @@ struct Ini: public nx::kit::IniConfig
         "Override the detected OS variant value (e.g. \"ubuntu\").");
     NX_INI_STRING("", currentOsVariantVersionOverride,
         "Override the detected OS variant version value (e.g. \"16.04\").");
+
+    NX_INI_INT(60000, autoUpdateInstallationDelayMs,
+        "After this delay server will start update installation automatically if detects that\n"
+        "it was supposed to install the update.");
 };
 
 inline Ini& ini()

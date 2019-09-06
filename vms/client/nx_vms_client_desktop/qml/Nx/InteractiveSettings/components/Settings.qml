@@ -4,40 +4,25 @@ import Nx.Controls 1.0
 
 import "private"
 
-ScrollView
+Scrollable
 {
-    id: scrollView
+    id: control
 
     property string name: ""
-    property Item childrenItem: column
-    property alias contentEnabled: column.enabled
-    property ScrollBar verticalScrollBar: null
+    property Item childrenItem: contentItem
+    property bool contentEnabled: column.enabled
 
-    onVerticalScrollBarChanged: updateScrollBar()
-    Component.onCompleted: updateScrollBar()
-
-    function updateScrollBar()
+    contentItem: AlignedColumn
     {
-        if (verticalScrollBar)
-            ScrollBar.vertical = verticalScrollBar
-    }
+        id: column
 
-    Flickable
-    {
-        boundsBehavior: Flickable.StopAtBounds
-
-        clip: true
-
-        AlignedColumn
+        width:
         {
-            id: column
-            width: 
-            {
-                if (scrollView.ScrollBar.vertical && scrollView.ScrollBar.vertical.parent === scrollView)
-                    return Math.min(scrollView.width, scrollView.ScrollBar.vertical.x)
-
-                return scrollView.width
-            }
+            var scrollBar = control.scrollView.ScrollBar.vertical
+            return scrollBar && scrollBar.parent === control.scrollView
+                ? Math.min(control.scrollView.width, scrollBar.x)
+                : control.scrollView.width
         }
     }
 }
+

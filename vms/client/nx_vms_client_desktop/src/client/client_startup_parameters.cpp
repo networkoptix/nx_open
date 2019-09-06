@@ -85,6 +85,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     addParserParam(commandLineParser, &result.hiDpiDisabled,        "--no-hidpi");
     addParserParam(commandLineParser, &result.selfUpdateMode,       kSelfUpdateKey);
     addParserParam(commandLineParser, &result.ipVersion,            "--ip-version");
+    addParserParam(commandLineParser, &result.scriptFile,           "--script-file");
 
     /* Persistent settings override. */
     addParserParam(commandLineParser, &result.logLevel, "--log-level");

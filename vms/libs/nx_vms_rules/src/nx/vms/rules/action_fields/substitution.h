@@ -13,6 +13,8 @@ class NX_VMS_RULES_API Substitution: public ActionField
 public:
     Substitution();
 
+    QString metatype() const final override { return "nx.substitution"; }
+
     virtual QVariant build(const EventPtr& event) const override;
 
 private:

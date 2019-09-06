@@ -12,7 +12,6 @@
 #include <nx/vms/api/data/software_version.h>
 #include <ui/customization/customized.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <nx/update/common_update_manager.h>
 #include "peer_state_tracker.h"
 
 namespace nx::vms::client::desktop {
@@ -41,7 +40,7 @@ public:
 
     enum Roles
     {
-        UpdateItemRole = Qn::RoleCount,
+        UpdateItemRole = Qn::ItemDataRoleCount,
     };
 
     explicit ServerUpdatesModel(

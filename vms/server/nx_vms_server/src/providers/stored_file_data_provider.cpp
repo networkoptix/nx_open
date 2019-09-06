@@ -57,7 +57,7 @@ void QnStoredFileDataProvider::prepareIODevice()
 
 }
 
-void QnStoredFileDataProvider::at_fileLoaded(const QByteArray& fileData, bool status)
+void QnStoredFileDataProvider::at_fileLoaded(const QByteArray& fileData, bool /*status*/)
 {
     m_fileData = fileData;
     m_resource = QnResourcePtr(new LocalAudioFileResource());

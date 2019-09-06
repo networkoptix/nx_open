@@ -5,8 +5,6 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/abstract_save_state_manager.h>
 
-#include <api/abstract_reply_processor.h>
-
 #include <client/client_globals.h>
 
 #include <ui/workbench/workbench_layout_snapshot.h>
@@ -24,9 +22,9 @@ class QnWorkbenchLayoutSnapshotManager;
  *
  * It also provides some functions for layout and snapshot manipulation.
  */
-class QnWorkbenchLayoutSnapshotManager:
+class NX_VMS_CLIENT_DESKTOP_API QnWorkbenchLayoutSnapshotManager:
     public QnAbstractSaveStateManager,
-    public QnWorkbenchContextAware
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -61,7 +59,6 @@ private:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_layout_changed(const QnLayoutResourcePtr &resource);
-    void at_layout_itemChanged(const QnLayoutResourcePtr &resource);
     void at_resource_changed(const QnResourcePtr &resource);
 
 private:

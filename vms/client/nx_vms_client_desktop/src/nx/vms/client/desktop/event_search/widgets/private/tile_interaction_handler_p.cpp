@@ -8,6 +8,7 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/resource.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
@@ -20,6 +21,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/utils/range_adapters.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -63,7 +65,8 @@ TileInteractionHandler::TileInteractionHandler(EventRibbon* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_ribbon(parent),
-    m_showPendingMessages(new nx::utils::PendingOperation())
+    m_showPendingMessages(new nx::utils::PendingOperation()),
+    m_navigateDelayed(new nx::utils::PendingOperation())
 {
     NX_ASSERT(m_ribbon);
     if (!m_ribbon)
@@ -79,6 +82,8 @@ TileInteractionHandler::TileInteractionHandler(EventRibbon* parent):
             m_pendingMessages.clear();
         });
 
+    m_navigateDelayed->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
+
     connect(m_ribbon.data(), &EventRibbon::linkActivated, this,
         [this](const QModelIndex& index, const QString& link)
         {
@@ -91,19 +96,41 @@ TileInteractionHandler::TileInteractionHandler(EventRibbon* parent):
             if (button == Qt::LeftButton && !modifiers.testFlag(Qt::ControlModifier))
             {
                 if (!m_ribbon->model()->setData(index, QVariant(), Qn::DefaultNotificationRole))
-                    navigateToSource(index);
+                {
+                    if (isSyncOn())
+                    {
+                        navigateToSource(index, /*instantMessages*/ false);
+                    }
+                    else
+                    {
+                        m_navigateDelayed->setInterval(doubleClickInterval()); //< Restart timer.
+                        m_navigateDelayed->setCallback(
+                            [this, index = QPersistentModelIndex(index)]()
+                            {
+                                navigateToSource(index, /*instantMessages*/ true);
+                            });
+
+                        m_navigateDelayed->requestOperation();
+                    }
+                }
             }
             else if ((button == Qt::LeftButton && modifiers.testFlag(Qt::ControlModifier))
                 || button == Qt::MiddleButton)
             {
-                openSource(index, true /*inNewTab*/);
+                openSource(index, /*inNewTab*/ true, /*fromDoubleClick*/ false);
             }
         });
 
     connect(m_ribbon.data(), &EventRibbon::doubleClicked, this,
         [this](const QModelIndex& index)
         {
-            openSource(index, false /*inNewTab*/);
+            openSource(index, /*inNewTab*/ false, /*fromDoubleClick*/ true);
+        });
+
+    connect(m_ribbon.data(), &EventRibbon::openRequested, this,
+        [this](const QModelIndex& index, bool inNewTab)
+        {
+            openSource(index, inNewTab, /*fromDoubleClick*/ false);
         });
 
     connect(m_ribbon.data(), &EventRibbon::dragStarted,
@@ -129,7 +156,8 @@ TileInteractionHandler::TileInteractionHandler(EventRibbon* parent):
             }));
 }
 
-void TileInteractionHandler::navigateToSource(const QModelIndex& index)
+void TileInteractionHandler::navigateToSource(
+    const QPersistentModelIndex& index, bool instantMessages)
 {
     // Obtain requested time.
     const auto timestamp = index.data(Qn::TimestampRole);
@@ -139,6 +167,15 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
     // Obtain requested camera list.
     const auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>()
         .filtered(&isMediaResource);
+
+    const auto showMessage =
+        [this](const QString& message, bool instant)
+        {
+            if (instant)
+                this->showMessage(message);
+            else
+                showMessageDelayed(message, doubleClickInterval());
+        };
 
     QnResourceList openResources;
 
@@ -158,7 +195,7 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
         const auto message = tr("Double click to add cameras to the current layout "
             "or ctrl+click to open in a new tab", "", resourceList.size());
 
-        showMessageDelayed(message, doubleClickInterval());
+        showMessage(message, instantMessages);
     }
 
     // Single-select first of opened requested cameras.
@@ -180,16 +217,8 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
     if (!navigator()->isTimelineRelevant()
         || !timelineRange.contains(duration_cast<milliseconds>(navigationTime)))
     {
-        showMessageDelayed(tr("No available archive"), doubleClickInterval());
+        showMessage(tr("No available archive"), instantMessages);
         return;
-    }
-
-    // In case of requested time within the last minute, navigate to live instead.
-    if (const bool lastMinute = navigationTime > (timelineRange.endTime() - 1min);
-        lastMinute && std::all_of(resourceList.cbegin(), resourceList.cend(),
-            [](const QnResourcePtr& resource) { return resource->hasFlags(Qn::network); }))
-    {
-        navigationTime = microseconds(DATETIME_NOW);
     }
 
     const auto playbackStarter = scopedPlaybackStarter(navigationTime != microseconds(DATETIME_NOW)
@@ -200,28 +229,64 @@ void TileInteractionHandler::navigateToSource(const QModelIndex& index)
         Parameters().withArgument(Qn::TimestampRole, navigationTime));
 }
 
-void TileInteractionHandler::openSource(const QModelIndex& index, bool inNewTab)
+QHash<int, QVariant> TileInteractionHandler::setupDropActionParameters(
+    const QnResourceList& resources, const QVariant& timestamp) const
 {
-    const auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>()
+    QHash<int, QVariant> parameters;
+    parameters[Qn::SelectOnOpeningRole] = true;
+
+    parameters[Qn::ItemTimeRole] = QVariant::fromValue<qint64>(timestamp.canConvert<microseconds>()
+        ? duration_cast<milliseconds>(timestamp.value<microseconds>()).count()
+        : milliseconds(DATETIME_NOW).count());
+
+    if (resources.size() == 1 && navigator()->currentResource() == resources[0])
+    {
+        parameters[Qn::ItemSliderWindowRole] = QVariant::fromValue(navigator()->timelineWindow());
+
+        parameters[Qn::ItemSliderSelectionRole] =
+            QVariant::fromValue(navigator()->timelineSelection());
+
+        if (auto widget = navigator()->currentMediaWidget())
+        {
+            parameters[Qn::ItemMotionSelectionRole] = QVariant::fromValue(widget->motionSelection());
+            parameters[Qn::ItemAnalyticsSelectionRole] = widget->analyticsFilterRect();
+        }
+    }
+
+    return parameters;
+}
+
+void TileInteractionHandler::openSource(
+    const QModelIndex& index, bool inNewTab, bool fromDoubleClick)
+{
+    auto resourceList = index.data(Qn::ResourceListRole).value<QnResourceList>()
         .filtered(&isMediaResource);
+
+    const auto currentLayout = workbench()->currentLayout();
+    if (fromDoubleClick && currentLayout && NX_ASSERT(!inNewTab) && isSyncOn())
+    {
+        resourceList = resourceList.filtered(
+            [currentLayout](const QnResourcePtr& resource)
+            {
+                // Add only resources not opened on the current layout.
+                return currentLayout->items(resource).empty();
+            });
+    }
 
     if (resourceList.empty())
         return;
 
-    Parameters parameters(resourceList);
-    parameters.setArgument(Qn::SelectOnOpeningRole, true);
-
-    const auto timestamp = index.data(Qn::TimestampRole);
-    if (timestamp.canConvert<microseconds>())
-    {
-        parameters.setArgument(Qn::ItemTimeRole,
-            duration_cast<milliseconds>(timestamp.value<microseconds>()).count());
-    }
-
     hideMessages();
+    m_navigateDelayed->setCallback({});
 
     const auto playbackStarter = scopedPlaybackStarter(!inNewTab
         && ini().startPlaybackOnTileNavigation);
+
+    Parameters parameters(resourceList);
+    const auto arguments = setupDropActionParameters(resourceList, index.data(Qn::TimestampRole));
+
+    for (const auto& param: nx::utils::keyValueRange(arguments))
+        parameters.setArgument(param.first, param.second);
 
     const auto action = inNewTab ? OpenInNewTabAction : DropResourcesAction;
     menu()->trigger(action, parameters);
@@ -240,17 +305,9 @@ void TileInteractionHandler::performDragAndDrop(
     if (!baseMimeData)
         return;
 
-    QHash<int, QVariant> arguments;
-    arguments[Qn::SelectOnOpeningRole] = true;
-
-    const auto timestamp = index.data(Qn::TimestampRole);
-    arguments[Qn::ItemTimeRole] = QVariant::fromValue<qint64>(timestamp.canConvert<microseconds>()
-        ? duration_cast<milliseconds>(timestamp.value<microseconds>()).count()
-        : milliseconds(DATETIME_NOW).count());
-
     MimeData data(baseMimeData.get(), nullptr);
     data.setResources(resourceList);
-    data.setArguments(arguments);
+    data.setArguments(setupDropActionParameters(resourceList, index.data(Qn::TimestampRole)));
 
     QScopedPointer<QDrag> drag(new QDrag(this));
     drag->setMimeData(data.createMimeData());
@@ -340,7 +397,7 @@ void TileInteractionHandler::showMessage(const QString& text)
 void TileInteractionHandler::showMessageDelayed(const QString& text, milliseconds delay)
 {
     m_pendingMessages.push_back(text);
-    m_showPendingMessages->setInterval(delay);
+    m_showPendingMessages->setInterval(delay); //< Restart timer.
     m_showPendingMessages->requestOperation();
 }
 
@@ -366,6 +423,11 @@ utils::Guard TileInteractionHandler::scopedPlaybackStarter(bool baseCondition)
             navigator()->setSpeed(1.0);
             navigator()->setPlaying(true);
         });
+}
+
+bool TileInteractionHandler::isSyncOn() const
+{
+    return navigator()->syncIsForced() || action(ui::action::ToggleSyncAction)->isChecked();
 }
 
 } // namespace nx::vms::client::desktop

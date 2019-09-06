@@ -19,7 +19,7 @@ namespace analytics {
 class ICompoundMetadataPacket: public Interface<ICompoundMetadataPacket, IMetadataPacket>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::ICompoundMetadataPacket"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::ICompoundMetadataPacket"); }
 
     /**
      * @return Validity duration of the metadata in the packet, or 0 if irrelevant.
@@ -31,9 +31,9 @@ public:
 
     /**
      * @return Element at the zero-based index, or null if the index is invalid.
-     * ATTENTION: The item's reference counter is incremented by this call.
      */
-    virtual const IMetadata* at(int index) const = 0;
+    protected: virtual const IMetadata* getAt(int index) const = 0;
+    public: Ptr<const IMetadata> at(int index) const { return toPtr(getAt(index)); }
 };
 
 } // namespace analytics

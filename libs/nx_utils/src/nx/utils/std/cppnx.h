@@ -30,5 +30,21 @@ constexpr std::array<std::common_type_t<Ts...>, sizeof...(Ts)> make_array(Ts&&..
     return {std::forward<Ts>(ts)...};
 }
 
+/**
+ * Containers like vector of non-copyble types can not be initialized by initializer list (
+ * it required a copy constructor), but the can be initialized by:
+ * ```
+ *     auto vector = make_container<std::vector<std::unique_ptr<Data>>>(
+ *         std::make_unique<Data>(1), std::make_unique<Data>(2), std::make_unique<Data>(2));
+ * ```
+ */
+template<typename Container, typename... Args>
+Container make_container(Args... args)
+{
+    Container container;
+    (container.push_back(std::forward<Args>(args)), ...);
+    return container;
+}
+
 }   //namespace utils
 }   //namespace nx

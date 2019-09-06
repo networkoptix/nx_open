@@ -142,7 +142,7 @@ QString QnStorageResource::urlWithoutCredentials(const QString& url)
     return result.toString();
 }
 
-float QnStorageResource::getAvarageWritingUsage() const
+float QnStorageResource::getAverageWritingUsage() const
 {
     return 0.0;
 }
@@ -181,8 +181,11 @@ void QnStorageResource::updateInternal(const QnResourcePtr &other, Qn::NotifierL
 void QnStorageResource::setUrl(const QString& value)
 {
     QnResource::setUrl(value);
-    if (getId().isNull() && !getParentId().isNull())
-        setId(fillID(getParentId(), value));
+}
+
+void QnStorageResource::fillID()
+{
+    setIdUnsafe(fillID(getParentId(), getUrl()));
 }
 
 QnUuid QnStorageResource::fillID(const QnUuid& mserverId, const QString& url)

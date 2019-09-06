@@ -49,7 +49,9 @@ struct QnResourceSearchQuery
 /**
  * A resource search filtering model.
  */
-class QnResourceSearchProxyModel: public QSortFilterProxyModel, protected QnResourceCompareHelper
+class QnResourceSearchProxyModel:
+    public QSortFilterProxyModel,
+    protected QnResourceCompareHelper
 {
     Q_OBJECT
     using base_type = QSortFilterProxyModel;

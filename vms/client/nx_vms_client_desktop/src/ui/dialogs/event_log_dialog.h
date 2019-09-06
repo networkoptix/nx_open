@@ -7,6 +7,8 @@
 
 #include <api/server_rest_connection_fwd.h>
 
+#include <nx/analytics/types.h>
+
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/abstract_event.h>
 
@@ -75,7 +77,7 @@ private:
     void query(qint64 fromMsec,
         qint64 toMsec,
         nx::vms::api::EventType eventType,
-        const QString& eventSubtype,
+        const nx::analytics::EventTypeId& analyticsEventTypeId,
         nx::vms::api::ActionType actionType);
 
 private:

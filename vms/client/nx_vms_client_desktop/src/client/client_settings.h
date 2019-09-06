@@ -50,6 +50,7 @@ public:
         LAST_SCREENSHOT_DIR,
         LAST_RECORDING_DIR,
         LAST_EXPORT_DIR,
+        LAST_DOWNLOAD_DIR,
 
         LAST_USED_CONNECTION,
         CUSTOM_CONNECTIONS,
@@ -70,7 +71,7 @@ public:
 
 
         /** Latest known update info. */
-        LATEST_UPDATE_INFO,
+        UPDATE_DELIVERY_INFO,
 
         /** Estimated update delivery date (in msecs since epoch). */
         UPDATE_DELIVERY_DATE,
@@ -208,6 +209,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     lastScreenshotDir,      setLastScreenshotDir,       LAST_SCREENSHOT_DIR,        QString())
         QN_DECLARE_RW_PROPERTY(QString,                     lastRecordingDir,       setLastRecordingDir,        LAST_RECORDING_DIR,         QString())
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportDir,          setLastExportDir,           LAST_EXPORT_DIR,            QString())
+        QN_DECLARE_RW_PROPERTY(QString,                     lastDownloadDir,        setLastDownloadDir,         LAST_DOWNLOAD_DIR,          QString())
         QN_DECLARE_RW_PROPERTY(QnWorkbenchStateList,        workbenchStates,        setWorkbenchStates,         WORKBENCH_STATES,           QnWorkbenchStateList())
         QN_DECLARE_RW_PROPERTY(QnLicenseWarningStateHash,   licenseWarningStates,   setLicenseWarningStates,    LICENSE_WARNING_STATES,     QnLicenseWarningStateHash())
         QN_DECLARE_RW_PROPERTY(QnConnectionData,            lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData())
@@ -220,7 +222,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     updateCombineUrl,       setUpdateCombinerUrl,       UPDATE_COMBINER_URL,        QString())
         QN_DECLARE_RW_PROPERTY(QVariantList,                alternativeUpdateServers,   setAlternativeUpdateServers,    ALTERNATIVE_UPDATE_SERVERS, QVariantList())
         QN_DECLARE_RW_PROPERTY(nx::vms::api::SoftwareVersion, ignoredUpdateVersion, setIgnoredUpdateVersion,    IGNORED_UPDATE_VERSION,     {})
-        QN_DECLARE_RW_PROPERTY(nx::update::Information,     latestUpdateInfo,       setLatestUpdateInfo,        LATEST_UPDATE_INFO,         nx::update::Information())
+        QN_DECLARE_RW_PROPERTY(nx::update::UpdateDeliveryInfo, updateDeliveryInfo,       setUpdateDeliveryInfo, UPDATE_DELIVERY_INFO,         nx::update::UpdateDeliveryInfo())
         QN_DECLARE_RW_PROPERTY(qint64,                      updateDeliveryDate,     setUpdateDeliveryDate,      UPDATE_DELIVERY_DATE,       0)
 
         QN_DECLARE_RW_PROPERTY(int,                         tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
@@ -244,7 +246,7 @@ private:
         QN_DECLARE_RW_PROPERTY(ExportLayoutSettings,        exportLayoutSettings,   setExportLayoutSettings,    EXPORT_LAYOUT_SETTINGS,     ExportLayoutSettings())
         QN_DECLARE_RW_PROPERTY(ExportMediaSettings,         exportBookmarkSettings, setExportBookmarkSettings,  EXPORT_BOOKMARK_SETTINGS,   ExportMediaSettings({nx::vms::client::desktop::ExportOverlayType::bookmark}))
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportMode,         setLastExportMode,          LAST_EXPORT_MODE,           lit("media"))
-        QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())
+        QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage::defaultBackground())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
         QN_DECLARE_R_PROPERTY(bool,                         stickReconnectToServer,                             STICKY_RECONNECT,           false)
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))

@@ -11,16 +11,16 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
-#include <api/media_server_connection.h>
+#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
+#include <server/server_storage_manager.h>
 #include <ui/customization/customized.h>
 #include <ui/delegates/recording_stats_item_delegate.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -141,6 +141,10 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
     connect(m_selectAllAction, &QAction::triggered,
         this, [this]() { currentTable()->selectAll(); });
 
+    auto storageManager = commonModule()->instance<QnServerStorageManager>();
+    connect(storageManager, &QnServerStorageManager::storageSpaceRecieved,
+        this, &QnStorageAnalyticsWidget::atReceivedSpaceInfo);
+
     setHelpTopic(this, Qn::ServerSettings_StorageAnalitycs_Help);
 
     // TODO: #GDM move to std texts
@@ -167,6 +171,13 @@ TableView* QnStorageAnalyticsWidget::currentTable() const
     return ui->tabWidget->currentWidget() == ui->statsTab
         ? ui->statsTable
         : ui->forecastTable;
+}
+
+TableView* QnStorageAnalyticsWidget::currentTotalsTable() const
+{
+    return ui->tabWidget->currentWidget() == ui->statsTab
+        ? ui->statsTotalsTable
+        : ui->forecastTotalsTable;
 }
 
 qint64 QnStorageAnalyticsWidget::currentForecastAveragingPeriod()
@@ -299,20 +310,22 @@ void QnStorageAnalyticsWidget::querySpaceFromServer()
     if (!m_server || m_server->getStatus() != Qn::Online)
         return;
 
-    // If next call fails, it will return -1 meaning "no request".
-    m_spaceRequestHandle = m_server->apiConnection()->getStorageSpaceAsync(false,
-        this, SLOT(atReceivedSpaceInfo(int, const QnStorageSpaceReply&, int)));
+    auto storageManager = commonModule()->instance<QnServerStorageManager>();
+    // If next call fails, it will return 0 meaning "no request".
+    m_spaceRequestHandle = storageManager->requestStorageSpace(m_server);
 }
 
-void QnStorageAnalyticsWidget::atReceivedSpaceInfo(int status, const QnStorageSpaceReply& data,
-    int requestNum)
+void QnStorageAnalyticsWidget::atReceivedSpaceInfo(QnMediaServerResourcePtr server,
+    bool success, int handle, const QnStorageSpaceReply& data)
 {
-    if (m_spaceRequestHandle != requestNum)
+    if (server != m_server)
+        return;
+    if (m_spaceRequestHandle != handle)
         return;
 
     m_spaceRequestHandle = -1;
 
-    if (status == 0)
+    if (success)
         m_availableStorages = data.storages;
 
     processRequestFinished();
@@ -328,25 +341,31 @@ void QnStorageAnalyticsWidget::queryStatsFromServer(qint64 bitrateAveragingPerio
     const auto index = bitrateAveragingPeriodMs == kDefaultBitrateAveragingPeriod ? 0 : 1;
     // If next call fails, it will return -1 meaning "no request".
     m_statsRequest[index].averagingPeriod = bitrateAveragingPeriodMs;
-    m_statsRequest[index].handle = m_server->apiConnection()->getRecordingStatisticsAsync(
-        bitrateAveragingPeriodMs, this, SLOT(atReceivedStats(int, const QnRecordingStatsReply&, int)));
+    auto storageManager = commonModule()->instance<QnServerStorageManager>();
+    m_statsRequest[index].handle = storageManager->requestRecordingStatistics(
+        m_server, bitrateAveragingPeriodMs,
+        [tool=QPointer(this)](bool success, int handle, const QnRecordingStatsReply& data)
+        {
+            if (tool)
+                tool->atReceivedStats(success, handle, data);
+        });
 }
 
-void QnStorageAnalyticsWidget::atReceivedStats(int status, const QnRecordingStatsReply& data,
-    int requestNum)
+void QnStorageAnalyticsWidget::atReceivedStats(
+    bool success, int handle, const QnRecordingStatsReply& data)
 {
     StatsRequest* request;
     // There could be 2 simultaneous requests, select the correct one.
-    if (m_statsRequest[0].handle == requestNum)
+    if (m_statsRequest[0].handle == handle)
         request = &(m_statsRequest[0]);
-    else if (m_statsRequest[1].handle == requestNum)
+    else if (m_statsRequest[1].handle == handle)
         request = &(m_statsRequest[1]);
     else
         return;
 
     request->handle = -1;
 
-    if (status == 0)
+    if (success)
     {
         m_recordingsStatData[request->averagingPeriod] = {};
 
@@ -424,12 +443,50 @@ void QnStorageAnalyticsWidget::atEventsGrid_customContextMenuRequested(const QPo
 
 void QnStorageAnalyticsWidget::atExportAction_triggered()
 {
-    QnTableExportHelper::exportToFile(currentTable(), true, this, tr("Export selected events to file"));
+    const auto model = currentTable()->model();
+    const auto totalsModel = currentTotalsTable()->model();
+    const auto selectionModel = currentTable()->selectionModel();
+    const bool isAllRowsSelected = selectionModel->selectedRows().size() == model->rowCount();
+
+    if (isAllRowsSelected)
+    {
+        QnTableExportCompositeModel compositeModel({model, totalsModel});
+        QnTableExportHelper::exportToFile(
+            &compositeModel,
+            QnTableExportHelper::getAllIndexes(&compositeModel),
+            this,
+            tr("Export selected events to file"));
+    }
+    else
+    {
+        QnTableExportHelper::exportToFile(
+            currentTable()->model(),
+            currentTable()->selectionModel()->selectedIndexes(),
+            this,
+            tr("Export selected events to file"));
+    }
 }
 
 void QnStorageAnalyticsWidget::atClipboardAction_triggered()
 {
-    QnTableExportHelper::copyToClipboard(currentTable());
+    const auto model = currentTable()->model();
+    const auto totalsModel = currentTotalsTable()->model();
+    const auto selectionModel = currentTable()->selectionModel();
+    const bool isAllRowsSelected = selectionModel->selectedRows().size() == model->rowCount();
+
+    if (isAllRowsSelected)
+    {
+        QnTableExportCompositeModel compositeModel({model, totalsModel});
+        QnTableExportHelper::copyToClipboard(
+            &compositeModel,
+            QnTableExportHelper::getAllIndexes(&compositeModel));
+    }
+    else
+    {
+        QnTableExportHelper::copyToClipboard(
+            currentTable()->model(),
+            currentTable()->selectionModel()->selectedIndexes());
+    }
 }
 
 void QnStorageAnalyticsWidget::atMouseButtonRelease(QObject*, QEvent* event)

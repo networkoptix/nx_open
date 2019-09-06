@@ -46,7 +46,7 @@ LivePlaylistManager::~LivePlaylistManager()
     m_mediaStreamCache->keyFrameFoundSubscription().removeSubscription(m_onKeyFrameSubscriptionId);
 }
 
-size_t LivePlaylistManager::generateChunkList(
+CameraDiagnostics::Result LivePlaylistManager::generateChunkList(
     std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
     bool* const endOfStreamReached) const
 {
@@ -78,7 +78,7 @@ size_t LivePlaylistManager::generateChunkList(
     std::copy(m_chunks.begin(), m_chunks.end(), std::back_inserter(*chunkList));
     if (endOfStreamReached)
         *endOfStreamReached = false;
-    return m_chunks.size();
+    return CameraDiagnostics::Result(CameraDiagnostics::ErrorCode::noError);
 }
 
 int LivePlaylistManager::getMaxBitrate() const

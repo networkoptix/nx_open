@@ -64,7 +64,7 @@ protected:
         m_manager.reset(new RadassResourceManager());
         m_manager->setCacheDirectory(testDataDir());
         m_layout.reset(new QnLayoutResource());
-        m_layout->setId(QnUuid::createUuid());
+        m_layout->setIdUnsafe(QnUuid::createUuid());
         resourcePool()->addResource(m_layout);
     }
 

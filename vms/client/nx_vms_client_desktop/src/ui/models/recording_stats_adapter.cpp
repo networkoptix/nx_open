@@ -134,7 +134,7 @@ QnCameraStatsData QnRecordingStats::forecastFromStatsToModel(const QnRecordingSt
         const auto& cameraResource =
             resourcePool->getResourceByUniqueId<QnSecurityCamResource>(cameraStats.uniqueId);
 
-        if (isActive(cameraResource, cameraStats))
+        if (isActive(cameraResource, cameraStats) && isOwnCamera(cameraResource, server))
         {
             CameraRecordingSettings camera;
             camera.uniqueId = cameraStats.uniqueId;
@@ -143,9 +143,7 @@ QnCameraStatsData QnRecordingStats::forecastFromStatsToModel(const QnRecordingSt
             camera.averageDensity = qMax(0ll, cameraStats.averageDensity);
 
             cameras.push_back(std::move(camera)); //< Add camera for forecast.
-
-            if (isOwnCamera(cameraResource, server))
-                filteredStats << cameraStats; //< Add camera to model.
+            filteredStats << cameraStats; //< Add camera to model.
         }
     }
 

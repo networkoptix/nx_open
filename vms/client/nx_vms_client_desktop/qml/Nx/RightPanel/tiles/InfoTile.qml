@@ -2,11 +2,15 @@ import QtQuick 2.6
 import QtQuick.Controls.impl 2.4
 import QtQuick.Layouts 1.11
 
+import Nx.Controls 1.0
+
+import "private"
+
 TileBase
 {
     id: tile
 
-    property int maxDisplayedResourceCount: 3
+    readonly property bool isCloseable: (model && model.isCloseable) || false
 
     signal closeRequested()
 
@@ -21,12 +25,12 @@ TileBase
 
             width: 20
             height: 20
-            fillMode: Image.Pad
+            sourceSize: Qt.size(width, height)
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
 
             readonly property string decorationPath: (model && model.decorationPath) || ""
             source: decorationPath.length ? ("qrc:/skin/" + decorationPath) : ""
-            color: (model && model.foregroundColor) || tile.palette.light
+            color: caption.color
         }
 
         ColumnLayout
@@ -48,10 +52,10 @@ TileBase
                     Layout.alignment: Qt.AlignLeft | Qt.AlignTop
                     Layout.fillWidth: true
                     wrapMode: Text.Wrap
-                    color: icon.color
+                    color: (model && model.foregroundColor) || tile.palette.light
                     font { pixelSize: 13; weight: Font.Medium }
 
-                    rightPadding: (model.isCloseable && !timestamp.text.length)
+                    rightPadding: (isCloseable && !timestamp.text.length)
                         ? closeButton.width
                         : 0
 
@@ -67,45 +71,57 @@ TileBase
 
                     topPadding: 2
                     color: tile.palette.windowText
-                    visible: text.length && !tile.hovered
+                    visible: implicitWidth && implicitHeight && !closeButton.visible
                     font { pixelSize: 11; weight: Font.Normal }
 
                     text: (model && model.timestamp) || ""
                 }
             }
 
-            ColumnLayout
+            ResourceList
             {
                 id: resourceList
+                resourceNames: model && model.resourceList
+            }
 
-                spacing: 0
-                readonly property var lines: model.resourceList
-                readonly property int count: Math.min(lines.length, maxDisplayedResourceCount)
-                readonly property int remainder: lines.length - count
+            Preview
+            {
+                id: preview
 
-                Repeater
-                {
-                    model: resourceList.count
+                Layout.fillWidth: true
 
-                    delegate: Text
-                    {
-                        color: tile.palette.light
-                        elide: Text.ElideRight
-                        text: resourceList.lines[index]
-                        font { pixelSize: 11; weight: Font.Medium }
-                    }
-                }
+                previewId: (model && model.previewId) || ""
+                previewState: (model && model.previewState) || 0
+                previewAspectRatio: (model && model.previewAspectRatio) || 1
+                visible: (model && model.previewResource) || false
+            }
 
-                Text
-                {
-                    id: andMore
+            Text
+            {
+                id: description
 
-                    color: tile.palette.windowText
-                    text: qsTr("...and %n more", "", resourceList.remainder)
-                    visible: resourceList.remainder > 0
-                    topPadding: 4
-                    font { pixelSize: 11; weight: Font.Normal }
-                }
+                Layout.fillWidth: true
+                wrapMode: Text.Wrap
+                color: tile.palette.light
+                font { pixelSize: 11; weight: Font.Normal }
+                visible: implicitWidth && implicitHeight
+                textFormat: Text.RichText
+
+                text: (model && model.description) || ""
+            }
+
+            Text
+            {
+                id: footer
+
+                Layout.fillWidth: true
+                wrapMode: Text.Wrap
+                color: tile.palette.light
+                font { pixelSize: 11; weight: Font.Normal }
+                visible: implicitWidth && implicitHeight
+                textFormat: Text.RichText
+
+                text: (model && model.additionalText) || ""
             }
         }
     }
@@ -114,7 +130,7 @@ TileBase
     {
         id: closeButton
 
-        visible: tile.hovered && model.isCloseable
+        visible: isCloseable && tile.hovered
 
         anchors.right: parent.right
         anchors.rightMargin: 2

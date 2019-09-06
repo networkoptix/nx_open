@@ -90,6 +90,7 @@ QString AbstractEventListModel::timestampText(microseconds timestamp) const
 
     if (qnSyncTime->currentDateTime().date() != dateTime.date())
         return datetime::toString(dateTime.date());
+
     return datetime::toString(dateTime.time());
 }
 

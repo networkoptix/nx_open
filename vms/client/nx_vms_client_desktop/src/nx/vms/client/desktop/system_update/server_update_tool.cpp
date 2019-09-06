@@ -23,13 +23,13 @@
 #include <core/resource/fake_media_server.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
-#include <network/system_helpers.h>
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/update/update_check.h>
 #include <nx/vms/client/desktop/utils/upload_manager.h>
+#include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
@@ -106,13 +106,9 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
 
     connect(this, &ServerUpdateTool::moduleInformationReceived,
         m_stateTracker.get(), &PeerStateTracker::setVersionInformation);
-    m_updatesModel.reset(new ServerUpdatesModel(m_stateTracker, this));
 
-    m_downloader.reset(new Downloader(m_outputDir, commonModule()));
-
-    // This object is managed by shared_ptr. So we must sure there is no parent, or this instance
-    // can be deleted twice.
-    setParent(nullptr);
+    m_downloader.reset(new Downloader(
+        m_outputDir, commonModule(), {new InternetOnlyPeerManager()}));
 
     connect(m_downloader.get(), &Downloader::fileStatusChanged,
         this, &ServerUpdateTool::atDownloaderStatusChanged);
@@ -125,6 +121,12 @@ ServerUpdateTool::ServerUpdateTool(QObject* parent):
 
     connect(m_downloader.get(), &Downloader::downloadFailed,
         this, &ServerUpdateTool::atDownloadFailed);
+
+    connect(m_downloader.get(), &Downloader::downloadFinished,
+        this, &ServerUpdateTool::atDownloadFinished);
+
+    connect(m_downloader.get(), &Downloader::downloadStalledChanged,
+        this, &ServerUpdateTool::atDownloadStalled);
 }
 
 ServerUpdateTool::~ServerUpdateTool()
@@ -135,46 +137,65 @@ ServerUpdateTool::~ServerUpdateTool()
     NX_VERBOSE(this) << "~ServerUpdateTool() done";
 }
 
-void ServerUpdateTool::resumeTasks()
+void ServerUpdateTool::onConnectToSystem(QnUuid systemId)
 {
-    m_downloader->startDownloads();
+    m_systemId = systemId;
     loadInternalState();
+    m_downloader->startDownloads();
 }
 
 // We serialize state of the uploader using this struct.
 struct StoredState
 {
     QString file;
-    int state;
+    int state = 0;
+    bool wasPushingManualPackages = false;
+    // Update version we have initiated update for.
+    QString version;
+    // Id of the system we have initiated update for.
+    QnUuid systemId;
 };
 
-#define StoredState_Fields (file)(state)
+#define StoredState_Fields (file)(state)(wasPushingManualPackages)(version)(systemId)
 QN_FUSION_DECLARE_FUNCTIONS(StoredState, (json))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(StoredState, (json), StoredState_Fields)
 
 void ServerUpdateTool::loadInternalState()
 {
-    if (m_offlineUpdaterState != OfflineUpdateState::initial)
-        return;
+    // The following assert causes a lot of problems
+    //NX_ASSERT(m_offlineUpdaterState == OfflineUpdateState::initial);
+    NX_ASSERT(!m_systemId.isNull());
 
     QString raw = qnSettings->systemUpdaterState();
     StoredState stored;
     if (QJson::deserialize(raw, &stored))
     {
-        auto state = (OfflineUpdateState)stored.state;
-        switch(state)
+        m_initiatedUpdate = stored.systemId == m_systemId;
+        if (m_initiatedUpdate)
         {
-            case OfflineUpdateState::done:
-            case OfflineUpdateState::push:
-                // We have no idea whether update files are still good on server.
-                // The most simple solution - to restart upload process.
-                // TODO: Check if we really need more robust state restoration.
-                NX_DEBUG(this, "loadInternalState() - restoring offline update from %1", stored.file);
-                m_checkFileUpdate = checkUpdateFromFile(stored.file);
-                break;
-            default:
-                NX_DEBUG(this, "loadInternalState() - got state %1, going to 'initial'", state);
-                m_offlineUpdaterState = OfflineUpdateState::initial;
+            NX_VERBOSE(this, "loadInternalState() we have initiated update to this system.");
+            auto state = (OfflineUpdateState)stored.state;
+            switch(state)
+            {
+                case OfflineUpdateState::ready:
+                case OfflineUpdateState::done:
+                case OfflineUpdateState::push:
+                    // We have no idea whether update files are still good on server.
+                    // The most simple solution - to restart upload process.
+                    // TODO: Check if we really need more robust state restoration.
+                    NX_DEBUG(this, "loadInternalState() - restoring offline update from %1", stored.file);
+                    m_checkFileUpdate = checkUpdateFromFile(stored.file);
+                    break;
+                default:
+                    NX_DEBUG(this, "loadInternalState() - got state %1, going to 'initial'", state);
+                    m_offlineUpdaterState = OfflineUpdateState::initial;
+            }
+        }
+        else
+        {
+            NX_DEBUG(this,
+                "loadInternalState() - stored systemID=%1 is different from current systemID=%2",
+                stored.systemId, m_systemId);
         }
     }
     else
@@ -189,10 +210,30 @@ void ServerUpdateTool::saveInternalState()
     StoredState stored;
     stored.file = m_localUpdateFile;
     stored.state = (int)m_offlineUpdaterState;
+    stored.wasPushingManualPackages = m_wasPushingManualPackages;
+    if (m_initiatedUpdate)
+    {
+        stored.systemId = m_systemId;
+        stored.version = m_remoteUpdateManifest.version;
+    }
+    else
+    {
+        stored.systemId = {};
+    }
 
     QByteArray raw;
     QJson::serialize(stored, &raw);
     qnSettings->setSystemUpdaterState(raw);
+}
+
+bool ServerUpdateTool::hasInitiatedThisUpdate() const
+{
+    return m_initiatedUpdate;
+}
+
+void ServerUpdateTool::onDisconnectFromSystem()
+{
+    saveInternalState();
 }
 
 std::future<nx::update::UpdateContents> ServerUpdateTool::checkUpdateFromFile(const QString& file)
@@ -241,7 +282,8 @@ std::future<nx::update::UpdateContents> ServerUpdateTool::checkMediaserverUpdate
                         if (tool)
                         {
                             tool->m_timeStartedInstall = contents.info.lastInstallationRequestTime;
-                            tool->m_serversAreInstalling = contents.info.participants.toSet();
+                            if (contents.info.lastInstallationRequestTime > 0)
+                                tool->m_serversAreInstalling = contents.info.participants.toSet();
                         }
                     }
                 }
@@ -401,6 +443,15 @@ QDir ServerUpdateTool::getDownloadDir() const
     return m_outputDir;
 }
 
+uint64_t ServerUpdateTool::getAvailableSpace() const
+{
+    auto downloadDir = getDownloadDir();
+    QStorageInfo storageInfo(downloadDir);
+    uint64_t space = storageInfo.bytesAvailable();
+    uint64_t spaceReserved = nx::update::reservedSpacePadding();
+    return spaceReserved > space ? 0 : space - spaceReserved;
+}
+
 void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
 {
     NX_ASSERT(m_downloader);
@@ -417,25 +468,26 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
         info.url = package.url;
 
         NX_ASSERT(info.isValid());
+        m_issuedDownloads.insert(package.file);
+        m_activeDownloads.insert(std::make_pair(package.file, 0));
+        // NOTE: It can emit signals like 'downloadFinished'. So we be sure we have filled in
+        // m_activeDownloads and m_issuedDownloads
         auto code = m_downloader->addFile(info);
+        QString file =  m_downloader->filePath(package.file);
+        package.localFile = file;
         m_downloader->startDownloads();
         using Code = vms::common::p2p::downloader::ResultCode;
-        QString file =  m_downloader->filePath(package.file);
-        m_issuedDownloads.insert(package.file);
-        package.localFile = file;
 
         switch (code)
         {
             case Code::ok:
                 NX_VERBOSE(this, "startManualDownloads() - downloading package %1 from url %2",
                     info.name, package.url);
-                m_activeDownloads.insert(std::make_pair(package.file, 0));
                 break;
             case Code::fileAlreadyExists:
             case Code::fileAlreadyDownloaded:
             {
                 auto fileInfo = m_downloader->fileInformation(package.file);
-                m_activeDownloads.insert(std::make_pair(package.file, 0));
                 atDownloaderStatusChanged(fileInfo);
                 break;
             }
@@ -446,7 +498,8 @@ void ServerUpdateTool::startManualDownloads(const UpdateContents& contents)
                 NX_VERBOSE(this,
                     "startManualDownloads() - failed start downloading package %1: %2",
                     info.name, error);
-                m_failedDownloads.insert(file);
+                m_activeDownloads.erase(package.file);
+                emit atDownloadFailed(package.file);
                 break;
             }
         }
@@ -487,9 +540,12 @@ int ServerUpdateTool::uploadPackage(
 
     UploadState config;
     config.source = storageDir.absoluteFilePath(localFile);
-    config.destination = package.file;
     // Updates should land to updates/publication_key/file_name.
-    config.ttl = -1; //< This should mean 'infinite time'
+    config.destination = package.file;
+    // This should mean 'infinite time'.
+    config.ttl = -1;
+    // Server should create file by itself.
+    config.allowFileCreation = false;
 
     for (const auto& serverId: targets)
     {
@@ -510,13 +566,15 @@ int ServerUpdateTool::uploadPackage(
 
         if (!id.isEmpty())
         {
+            NX_INFO(this, "uploadPackage(%1) - started uploading file to server %2",
+                package.file, serverId);
             m_uploadStateById[id] = config;
             m_activeUploads.insert(id);
             toUpload++;
         }
         else
         {
-            NX_VERBOSE(this, "uploadPackage(%1) - failed to start uploading file=%2 reason=%3",
+            NX_WARNING(this, "uploadPackage(%1) - failed to start uploading file=%2 reason=%3",
                 package.file, localFile, config.errorMessage);
             m_completedUploads.insert(id);
         }
@@ -541,10 +599,10 @@ void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& s
             markUploadCompleted(state.id);
             break;
         case UploadState::Uploading:
-            NX_VERBOSE(this) << "atUploadWorkerState() uploading file="
-                << state.destination << "bytes"
-                << state.uploaded << "of" << state.size
-                << "server:" << serverId;
+            //NX_VERBOSE(this) << "atUploadWorkerState() uploading file="
+            //    << state.destination << "bytes"
+            //    << state.uploaded << "of" << state.size
+            //    << "server:" << serverId;
             break;
         case UploadState::Error:
             NX_VERBOSE(this) << "atUploadWorkerState() error with file="
@@ -639,9 +697,13 @@ bool ServerUpdateTool::verifyUpdateManifest(
 
     ClientVerificationData clientData;
     clientData.fillDefault();
-    clientData.clientId = checkClient ? m_stateTracker->getClientPeerId() : QnUuid();
+    clientData.clientId = checkClient
+        ? m_stateTracker->getClientPeerId(commonModule())
+        : QnUuid();
     clientData.installedVersions = clientVersions;
-    return verifyUpdateContents(commonModule(), contents, activeServers, clientData);
+    VerificationOptions options;
+    options.commonModule = commonModule();
+    return verifyUpdateContents(contents, activeServers, clientData, options);
 }
 
 void ServerUpdateTool::calculateManualDownloadProgress(ProgressInfo& progress)
@@ -724,9 +786,17 @@ bool ServerUpdateTool::requestStopAction()
             {
                 NX_VERBOSE(this, "requestStopAction() - success=%1", success);
                 if (success)
+                {
                     m_remoteUpdateManifest = nx::update::Information();
+                    if (m_offlineUpdaterState == OfflineUpdateState::push
+                        || m_offlineUpdaterState == OfflineUpdateState::done)
+                    {
+                        changeUploadState(OfflineUpdateState::ready);
+                    }
+                }
                 m_requestingStop = false;
                 auto error = success ? InternalError::noError : InternalError::networkError;
+
                 emit cancelUpdateComplete(success, toString(error));
             }), thread());
 
@@ -805,7 +875,6 @@ bool ServerUpdateTool::requestFinishUpdate(bool skipActivePeers)
 
                 emit finishUpdateComplete(success, toString(error));
             }), thread());
-        m_stateTracker->clearState();
         return true;
     }
 
@@ -840,6 +909,11 @@ bool ServerUpdateTool::requestStartUpdate(
         auto callback = [this](bool success, rest::Handle /*requestId*/)
             {
                 auto error = success ? InternalError::noError : InternalError::networkError;
+                if (success)
+                {
+                    m_initiatedUpdate = true;
+                    saveInternalState();
+                }
                 emit startUpdateComplete(success, toString(error));
             };
         connection->updateActionStart(info, nx::utils::guarded(this, callback));
@@ -865,6 +939,15 @@ bool ServerUpdateTool::requestInstallAction(
             servers.insert(id);
     }
 
+    if (servers.empty())
+    {
+        NX_VERBOSE(this, "requestInstallAction() it is client-only update");
+        // Seems like it is client-only update. There is no need to send
+        // POST ec2/installUpdate request.
+        emit startInstallComplete(true, toString(InternalError::noError));
+        return true;
+    }
+
     m_remoteUpdateStatus = {};
 
     m_timeStartedInstall = qnSyncTime->currentMSecsSinceEpoch();
@@ -881,12 +964,13 @@ bool ServerUpdateTool::requestInstallAction(
                 if (!success)
                 {
                     error = InternalError::networkError;
+                    tool->m_serversAreInstalling = {};
                 }
                 else if (result.error != QnRestResult::NoError)
                 {
                     success = false;
                     error = InternalError::serverError;
-                    NX_ERROR(tool.data(), "requestInstallAction() - server responded with %1",
+                    NX_ERROR(tool.data(), "requestInstallAction() - server responded with \"%1\"",
                         result.errorString);
                 }
 
@@ -1013,7 +1097,10 @@ void ServerUpdateTool::requestRemoteUpdateStateAsync()
                     if (tool->m_skippedRequests.contains((handle)))
                         return;
                     tool->m_remoteUpdateManifest = response.data;
-                    tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
+                    if (response.data.lastInstallationRequestTime > 0)
+                        tool->m_serversAreInstalling = QSet<QnUuid>::fromList(response.data.participants);
+                    else
+                        tool->m_serversAreInstalling = {};
                 }
             }, thread());
         m_activeRequests.insert(handle);
@@ -1063,11 +1150,6 @@ QString ServerUpdateTool::getServerAuthString() const
         serverUrl.setScheme(nx::network::http::urlSheme(connectionInfo.allowSslConnections));
 
     return QnStartupParameters::createAuthenticationString(serverUrl, connectionInfo.version);
-}
-
-std::shared_ptr<ServerUpdatesModel> ServerUpdateTool::getModel()
-{
-    return m_updatesModel;
 }
 
 std::shared_ptr<PeerStateTracker> ServerUpdateTool::getStateTracker()
@@ -1131,23 +1213,17 @@ void ServerUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
                 << ") - status changed to " << fileInformation.status;
             emit packageDownloadFailed(*package, "Update file is not found");
             m_activeDownloads.erase(it);
-            m_failedDownloads.insert(it->first);
             break;
         case FileInformation::Status::uploading:
             break;
         case FileInformation::Status::downloaded:
-            NX_VERBOSE(this) << "atDownloaderStatusChanged("<< fileInformation.name
-                << ") - finally downloaded it to" << m_downloader->filePath(fileInformation.name);
-            m_activeDownloads.erase(it);
-            m_completeDownloads.insert(it->first);
-            emit packageDownloaded(*package);
+            atDownloadFinished(fileInformation.name);
             break;
         case FileInformation::Status::corrupted:
             NX_VERBOSE(this) << "atDownloaderStatusChanged("<< fileInformation.name
                 << ") - status changed to " << fileInformation.status;
-            emit packageDownloadFailed(*package, "Update file is corrupted");
             m_activeDownloads.erase(it);
-            m_failedDownloads.insert(it->first);
+            emit packageDownloadFailed(*package, "Update file is corrupted");
             break;
         case FileInformation::Status::downloading:
             it->second = fileInformation.calculateDownloadProgress();
@@ -1169,15 +1245,44 @@ void ServerUpdateTool::atDownloadFailed(const QString& fileName)
     auto package = findPackageForFile(fileName);
     if (package)
     {
-        NX_ERROR(this)
-            << "atDownloadFailed(" << fileName << ") - failed to download update package.";
+        NX_ERROR(this, "atDownloadFailed(%1) - failed to download update package.", fileName);
+        emit packageDownloadFailed(*package, "Update file is corrupted");
     }
     else
     {
-        NX_ERROR(this)
-            << "atDownloadFailed(" << fileName << ") - did not found a package for a file."
-            << "Why were we downloading this file?";
+        NX_ERROR(this, "atDownloadFailed(%1) - did not found a package for a file. "
+            "Why were we downloading this file?", fileName);
     }
+}
+
+void ServerUpdateTool::atDownloadFinished(const QString& fileName)
+{
+    auto it = m_activeDownloads.find(fileName);
+    if (it == m_activeDownloads.end())
+    {
+        NX_ERROR(this, "atDownloadFinished(%1) - Did not found a file in m_activeDownloads",
+            fileName);
+        return;
+    }
+
+    for (auto& package: m_manualPackages)
+    {
+        if (package.file == fileName)
+        {
+            m_activeDownloads.erase(it);
+            m_completeDownloads.insert(it->first);
+            QString file =  m_downloader->filePath(fileName);
+            package.localFile = file;
+
+            emit packageDownloaded(package);
+            return;
+        }
+    }
+}
+
+void ServerUpdateTool::atDownloadStalled(const QString& fileName, bool stalled)
+{
+    NX_ERROR(this, "atDownloadStalled(%1) - stalled=%2", fileName, stalled);
 }
 
 nx::utils::Url getServerUrl(QnCommonModule* commonModule, QString path)
@@ -1229,62 +1334,17 @@ std::future<ServerUpdateTool::UpdateContents> ServerUpdateTool::checkSpecificCha
     auto engineVersion = commonModule()->engineVersion();
 
     return std::async(
-        [this, updateUrl, connection, engineVersion, changeset]() -> UpdateContents
+        [updateUrl, connection, engineVersion, changeset]() -> UpdateContents
         {
-            UpdateContents contents;
-
-            contents.changeset = changeset;
-            contents.info = nx::update::updateInformation(updateUrl, engineVersion,
-                changeset, &contents.error);
+            auto contents = nx::update::checkSpecificChangesetProxied(
+                connection, engineVersion, updateUrl, changeset);
             if (changeset == kLatestChangeset)
                 contents.sourceType = nx::update::UpdateSourceType::internet;
             else
                 contents.sourceType = nx::update::UpdateSourceType::internetSpecific;
-            contents.source = lit("%1 by serverUpdateTool for build=%2").arg(updateUrl, changeset);
-
-            if (contents.error == nx::update::InformationError::networkError && connection)
-            {
-                NX_WARNING(NX_SCOPE_TAG, "Checking for updates using mediaserver as proxy");
-                auto promise = std::make_shared<std::promise<bool>>();
-                contents.source = lit("%1 by serverUpdateTool for build=%2 proxied by mediaserver").arg(updateUrl, changeset);
-                contents.info = {};
-                auto proxyCheck = promise->get_future();
-                connection->checkForUpdates(changeset,
-                    [this, promise = std::move(promise), &contents](bool success,
-                        rest::Handle /*handle*/, rest::UpdateInformationData response)
-                    {
-                        if (success)
-                        {
-                            if (response.error != QnRestResult::NoError)
-                            {
-                                NX_DEBUG(
-                                    this,
-                                    lm("checkSpecificChangeset: An error in response to the /ec2/updateInformation request: %1")
-                                        .args(response.errorString));
-
-                                QnLexical::deserialize(response.errorString, &contents.error);
-                            }
-                            else
-                            {
-                                contents.error = nx::update::InformationError::noError;
-                                contents.info = response.data;
-                            }
-                        }
-                        else
-                        {
-                            contents.error = nx::update::InformationError::networkError;
-                        }
-
-                        promise->set_value(success);
-                    });
-
-                proxyCheck.wait();
-            }
-
             return contents;
         });
 }
-
 
 nx::utils::SoftwareVersion getCurrentVersion(
     const nx::vms::api::SoftwareVersion& engineVersion,
@@ -1307,19 +1367,24 @@ QUrl generateUpdatePackageUrl(
     QnResourcePool* resourcePool)
 {
     bool useLatest = contents.sourceType == nx::update::UpdateSourceType::internet;
-    auto changeset = contents.info.version;
+    auto changeset = contents.changeset;
     nx::utils::SoftwareVersion targetVersion = useLatest
         ? nx::utils::SoftwareVersion()
         : contents.getVersion();
     bool noFullVersion = false;
     // Checking if version has only build number.
     contents.info.version.toInt(&noFullVersion);
+    noFullVersion |= contents.info.version.isEmpty();
 
     QUrlQuery query;
+    // Query with 'version=latest' can have no password
+    // Query with 'version=29646' should have a password
 
-    if (targetVersion.isNull())
+    if (changeset == "latest" && targetVersion.isNull())
     {
-        query.addQueryItem("version", "latest");
+        // We are here if we have failed to check update in the internet.
+        // Changeset will contain requested build number in this case, or 'latest'.
+        query.addQueryItem("version", changeset);
         query.addQueryItem("current", getCurrentVersion(engineVersion, resourcePool).toString());
     }
     else

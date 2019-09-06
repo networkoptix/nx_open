@@ -15,7 +15,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <api/abstract_connection.h>
 #include <api/app_server_connection.h>
-#include <api/session_manager.h>
 #include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
 #include <utils/common/synctime.h>
@@ -495,8 +494,6 @@ bool QnConnectionManagerPrivate::doConnect(
 
             qnMobileClientMessageProcessor->init(ec2Connection);
 
-            commonModule()->sessionManager()->start();
-
             connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged,
                 this, [this, ec2Connection](const QnPeerRuntimeInfo& info)
                 {
@@ -597,7 +594,6 @@ void QnConnectionManagerPrivate::doDisconnect()
 
     qnMobileClientMessageProcessor->init(nullptr);
     QnAppServerConnectionFactory::setEc2Connection(nullptr);
-    commonModule()->sessionManager()->stop();
 
     setSystemName(QString());
     connectionVersion = {};

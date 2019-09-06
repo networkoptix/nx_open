@@ -15,7 +15,6 @@
 #include <api/global_settings.h>
 #include <api/network_proxy_factory.h>
 #include <api/runtime_info_manager.h>
-#include <api/session_manager.h>
 
 #include <common/common_module.h>
 #include <common/static_common_module.h>
@@ -85,7 +84,6 @@
 #include <core/storage/file_storage/qtfile_storage_resource.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 
-#include <nx/vms/client/desktop/analytics/camera_metadata_analytics_controller.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
 
 #include <server/server_storage_manager.h>
@@ -230,8 +228,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     QObject(parent),
     m_startupParameters(startupParams)
 {
-    ini().reload();
-
 #if defined(Q_OS_WIN)
     // Enable full crash dumps if needed. Do not disable here as it can be enabled elsewhere.
     if (ini().profilerMode)
@@ -243,9 +239,7 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initApplication();
 
     // Skip some modules initialization for unit tests.
-    const bool isFullApplicationMode = (qApp != nullptr);
-
-    if (isFullApplicationMode)
+    if (!isTestingEnvironment())
         initExternalResources();
 
     initSingletons();
@@ -257,15 +251,14 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
     initNetwork();
 
     // Initialize application UI.
-    if (isFullApplicationMode)
+    if (!isTestingEnvironment())
         initSkin();
 
     initLocalResources();
     initSurfaceFormat();
 
     // WebKit initialization must occur only once per application run. Actual for ActiveX module.
-    static bool isWebKitInitialized = false;
-    if (!isWebKitInitialized)
+    if (!isTestingEnvironment())
     {
         const auto settings = QWebSettings::globalSettings();
         settings->setAttribute(QWebSettings::PluginsEnabled, ini().enableWebKitPlugins);
@@ -273,8 +266,6 @@ QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject
 
         if (ini().enableWebKitDeveloperExtras)
             settings->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-
-        isWebKitInitialized = true;
     }
 }
 
@@ -399,8 +390,9 @@ void QnClientModule::initSingletons()
     // Depends on QnClientSettings.
     auto clientInstanceManager = std::make_unique<QnClientInstanceManager>();
 
-    // Log initialization depends on QnClientInstanceManager.
-    initLog();
+    // Log initialization depends on QnClientInstanceManager. Skipped in testing environment.
+    if (!isTestingEnvironment())
+        initLog();
 
     const auto clientPeerType = m_startupParameters.videoWallGuid.isNull()
         ? nx::vms::api::PeerType::desktopClient
@@ -469,7 +461,6 @@ void QnClientModule::initSingletons()
     commonModule->store(new QnGlobals());
 
     m_radassController = commonModule->store(new RadassController());
-    commonModule->store(new MetadataAnalyticsController());
 
     commonModule->store(new QnPlatformAbstraction());
 
@@ -513,7 +504,8 @@ void QnClientModule::initSingletons()
 
     commonModule->store(new QnQtbugWorkaround());
 
-    commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
+    if (!isTestingEnvironment())
+        commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
 
     m_cameraDataManager = commonModule->store(new QnCameraDataManager(commonModule));
 
@@ -607,7 +599,7 @@ void QnClientModule::initLog()
         ? ("client_log" + logFileNameSuffix)
         : logFile;
     logSettings.updateDirectoryIfEmpty(
-        QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/log");
 
     setMainLogger(
         buildLogger(logSettings, qApp->applicationName(), qApp->applicationFilePath()));
@@ -626,7 +618,7 @@ bool QnClientModule::initLogFromFile(const QString& filename, const QString& suf
 
     return nx::utils::log::initializeFromConfigFile(
         logConfigFile,
-        QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation) + "/log",
         qApp->applicationName(),
         qApp->applicationFilePath(),
         suffix);
@@ -651,7 +643,8 @@ void QnClientModule::initNetwork()
     if (!m_startupParameters.videoWallGuid.isNull())
         commonModule->setVideowallGuid(m_startupParameters.videoWallGuid);
 
-    commonModule->moduleDiscoveryManager()->start();
+    if (!isTestingEnvironment())
+        commonModule->moduleDiscoveryManager()->start();
 
     commonModule->instance<QnSystemsFinder>();
     commonModule->store(new QnForgottenSystemsManager());
@@ -703,13 +696,15 @@ void QnClientModule::initLocalResources()
     resourceDiscoveryManager->setReady(true);
     commonModule->store(new QnSystemsWeightsManager());
     commonModule->store(new QnLocalResourceStatusWatcher());
-    if (!m_startupParameters.skipMediaFolderScan && !m_startupParameters.acsMode)
+    if (!m_startupParameters.skipMediaFolderScan && !m_startupParameters.acsMode
+        && !isTestingEnvironment())
     {
-        auto localFilesSearcher = commonModule->store(new ResourceDirectoryBrowser());
         QStringList paths;
         paths.append(qnSettings->mediaFolder());
         paths.append(qnSettings->extraMediaFolders());
-        localFilesSearcher->setLocalResourcesDirectories(paths);
+
+        m_resourceDirectoryBrowser.reset(new ResourceDirectoryBrowser());
+        m_resourceDirectoryBrowser->setLocalResourcesDirectories(paths);
     }
 }
 
@@ -753,6 +748,12 @@ VideoCache* QnClientModule::videoCache() const
     return m_videoCache;
 }
 
+nx::vms::client::desktop::ResourceDirectoryBrowser*
+    QnClientModule::resourceDirectoryBrowser() const
+{
+    return m_resourceDirectoryBrowser.data();
+}
+
 void QnClientModule::initLocalInfo()
 {
     auto commonModule = m_clientCoreModule->commonModule();
@@ -779,4 +780,9 @@ void QnClientModule::registerResourceDataProviders()
     #if defined(Q_OS_WIN)
         factory->registerResourceType<QnWinDesktopResource>();
     #endif
+}
+
+bool QnClientModule::isTestingEnvironment() const
+{
+    return qobject_cast<QGuiApplication*>(qApp) == nullptr;
 }

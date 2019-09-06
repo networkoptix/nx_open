@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <nx/core/resource/device_mock.h>
+#include <nx/core/resource/server_mock.h>
+#include <nx/core/access/access_types.h>
 
 #include <nx/analytics/test_merge_executor.h>
 #include <nx/analytics/test_descriptor_storage_factory.h>
@@ -10,6 +11,10 @@
 #include <nx/utils/data_structures/map_helper.h>
 #include <nx/fusion/model_functions.h>
 
+#include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+
 namespace nx::analytics {
 
 using namespace nx::utils::data_structures;
@@ -17,6 +22,8 @@ using namespace nx::utils::data_structures;
 namespace {
 
 using Map = MapHelper::NestedMap<std::map, QString, QString, TestDescriptor>;
+
+const QnUuid kDefaultModuleGuid = QnUuid::fromArbitraryData(QString("DefaultModuleGuid"));
 
 static const QString kPropertyName("testDescriptors");
 
@@ -101,12 +108,12 @@ protected:
 protected:
     virtual void SetUp() override
     {
-        m_ownResource = makeResource();
-        m_resourceList = makeResourceList();
+        m_commonModule = makeCommonModule();
         m_container = std::make_unique<Container>(
-            Factory(kPropertyName),
-            m_resourceList,
-            m_ownResource);
+            m_commonModule.get(),
+            Factory(kPropertyName));
+
+        addResources();
     }
 
 protected:
@@ -125,27 +132,48 @@ protected:
         return basicMap;
     }
 
-private:
-    static QnResourcePtr makeResource()
+    QnResourceList allResourcesExceptOwn() const
     {
-        QnResourcePtr resource(new nx::core::resource::DeviceMock());
-        resource->setId(QnUuid::createUuid());
+        return m_commonModule->resourcePool()->getResources(
+            [this](QnResourcePtr resource)
+            {
+                return m_ownResource->getId() != resource->getId();
+            });
+    }
+
+private:
+    std::unique_ptr<QnCommonModule> makeCommonModule()
+    {
+        auto result = std::make_unique<QnCommonModule>(
+            /*clientMode*/ false,
+            nx::core::access::Mode::direct,
+            /*parent*/ nullptr);
+
+        result->setModuleGUID(kDefaultModuleGuid);
+        return result;
+    }
+
+    QnResourcePtr makeResource(QnUuid resourceId = QnUuid())
+    {
+        QnResourcePtr resource(new nx::core::resource::ServerMock(m_commonModule.get()));
+        resource->setIdUnsafe(resourceId.isNull() ? QnUuid::createUuid() : resourceId);
         return resource;
     }
 
-    static QnResourceList makeResourceList()
+    void addResources()
     {
         QnResourceList resourceList;
         for (auto i = 0; i < 10; ++i)
-            resourceList.push_back(makeResource());
+            m_commonModule->resourcePool()->addResource(makeResource());
 
-        return resourceList;
+        m_ownResource = makeResource(kDefaultModuleGuid);
+        m_commonModule->resourcePool()->addResource(m_ownResource);
     }
 
 protected:
-    QnResourcePtr m_ownResource;
-    QnResourceList m_resourceList;
+    std::unique_ptr<QnCommonModule> m_commonModule;
     std::unique_ptr<Container> m_container;
+    QnResourcePtr m_ownResource;
 };
 
 TEST_F(MultiresourceDescriptorContainerTest, settingDescriptors)
@@ -153,7 +181,7 @@ TEST_F(MultiresourceDescriptorContainerTest, settingDescriptors)
     Map testMap = makeBasicMap();
     m_container->setDescriptors(testMap);
     ASSERT_EQ(fromProperty(m_ownResource), testMap);
-    for (const auto& resource: m_resourceList)
+    for (const auto& resource: allResourcesExceptOwn())
         ASSERT_EQ(fromProperty(resource), Map());
 
     Map testMap2;
@@ -164,7 +192,7 @@ TEST_F(MultiresourceDescriptorContainerTest, settingDescriptors)
 
     m_container->setDescriptors(testMap2);
     ASSERT_EQ(fromProperty(m_ownResource), testMap2);
-    for (const auto& resource: m_resourceList)
+    for (const auto& resource: allResourcesExceptOwn())
         ASSERT_EQ(fromProperty(resource), Map());
 }
 
@@ -173,7 +201,7 @@ TEST_F(MultiresourceDescriptorContainerTest, addingDescriptors)
     Map testMap = makeBasicMap();
     m_container->mergeWithDescriptors(testMap);
     ASSERT_EQ(fromProperty(m_ownResource), testMap);
-    for (const auto& resource: m_resourceList)
+    for (const auto& resource: allResourcesExceptOwn())
         ASSERT_EQ(fromProperty(resource), Map());
 
     Map testMap2;
@@ -194,7 +222,7 @@ TEST_F(MultiresourceDescriptorContainerTest, addingDescriptors)
 
     m_container->mergeWithDescriptors(testMap2);
     ASSERT_EQ(fromProperty(m_ownResource), expectedResult2);
-    for (const auto& resource: m_resourceList)
+    for (const auto& resource: allResourcesExceptOwn())
         ASSERT_EQ(fromProperty(resource), Map());
 
     Map testMap3;
@@ -212,7 +240,7 @@ TEST_F(MultiresourceDescriptorContainerTest, addingDescriptors)
 
     m_container->mergeWithDescriptors(testMap3);
     ASSERT_EQ(fromProperty(m_ownResource), expectedResult3);
-    for (const auto& resource: m_resourceList)
+    for (const auto& resource: allResourcesExceptOwn())
         ASSERT_EQ(fromProperty(resource), Map());
 }
 
@@ -224,13 +252,13 @@ TEST_F(MultiresourceDescriptorContainerTest, removingDescriptors)
         {
             auto serialized = QString::fromUtf8(QJson::serialized(descriptors));
             m_ownResource->setProperty(kPropertyName, serialized);
-            for (auto& resource: m_resourceList)
+            for (auto& resource: allResourcesExceptOwn())
                 resource->setProperty(kPropertyName, serialized);
         };
 
     init(testMap);
     m_container->removeDescriptors("group0");
-    for (const auto& resource: m_resourceList)
+    for (const auto& resource: allResourcesExceptOwn())
         ASSERT_EQ(fromProperty(resource), testMap);
 
     Map expectedResult;
@@ -242,7 +270,7 @@ TEST_F(MultiresourceDescriptorContainerTest, removingDescriptors)
 
     init(testMap);
     m_container->removeDescriptors("group0", "subgroup1");
-    for (const auto& resource: m_resourceList)
+    for (const auto& resource: allResourcesExceptOwn())
         ASSERT_EQ(fromProperty(resource), testMap);
 
     Map expectedResult2;
@@ -261,14 +289,14 @@ TEST_F(MultiresourceDescriptorContainerTest, gettingDescriptors)
         kPropertyName,
         QString::fromUtf8(QJson::serialized(makeDescriptorsForResource(m_ownResource))));
 
-    for (auto& resource : m_resourceList)
+    for (auto& resource: allResourcesExceptOwn())
     {
         resource->setProperty(
             kPropertyName,
             QString::fromUtf8(QJson::serialized(makeDescriptorsForResource(resource))));
     }
 
-    for (const auto& resource : m_resourceList)
+    for (const auto& resource: allResourcesExceptOwn())
     {
         ASSERT_EQ(
             makeDescriptorsForResource(resource),
@@ -284,7 +312,7 @@ TEST_F(MultiresourceDescriptorContainerTest, gettingDescriptors)
         *m_container->descriptors(m_ownResource->getId()));
 
     MapHelper::Wrapper<Map>::wrap<QnUuid> allDescriptors;
-    for (const auto& resource : m_resourceList)
+    for (const auto& resource: allResourcesExceptOwn())
         allDescriptors[resource->getId()] = makeDescriptorsForResource(resource);
 
     allDescriptors[m_ownResource->getId()] = makeDescriptorsForResource(m_ownResource);
@@ -301,7 +329,7 @@ TEST_F(MultiresourceDescriptorContainerTest, gettingMergedDescriptors)
     MapHelper::merge(&expectedResult, descriptors, ReplacementMergeExecutor<TestDescriptor>());
     m_ownResource->setProperty(kPropertyName, QString::fromUtf8(QJson::serialized(descriptors)));
 
-    for (auto& resource: m_resourceList)
+    for (auto& resource: allResourcesExceptOwn())
     {
         descriptors = makeUniqueDescriptorsForResource(resource);
         MapHelper::merge(&expectedResult, descriptors, ReplacementMergeExecutor<TestDescriptor>());

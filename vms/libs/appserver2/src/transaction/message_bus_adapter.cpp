@@ -85,7 +85,7 @@ void TransactionMessageBusAdapter::dropConnections()
     m_bus->dropConnections();
 }
 
-QVector<QnTransportConnectionInfo> TransactionMessageBusAdapter::connectionsInfo() const
+ConnectionInfoList TransactionMessageBusAdapter::connectionsInfo() const
 {
     return m_bus->connectionsInfo();
 }

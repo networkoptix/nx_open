@@ -1,8 +1,8 @@
 #pragma once
 
-namespace nx {
-namespace cdb {
-namespace client {
+#include <string>
+
+namespace nx::cloud::db::client {
 
 int fetchData(
     const std::string& cdbUrl,
@@ -10,6 +10,4 @@ int fetchData(
     const std::string& password,
     const std::string& fetchRequest);
 
-} // namespace client
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db::client

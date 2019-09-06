@@ -41,7 +41,11 @@ public:
     Message args(const Values& ... values) const
     {
         using ::toString;
-        return m_str.arg(toString(values) ...);
+        // Double toString() call is needed because some of toString() implementations (e.g. some
+        // SDK toString() that convert their arguments to an std::string) don't return a QString
+        // directly but something that can be converted to a QString with the second toString()
+        // call.
+        return m_str.arg(toString(toString(values)) ...);
     }
 
     template<typename ... Arguments>
@@ -51,6 +55,7 @@ public:
     }
 
     // QString number format compatibility.
+    Message arg(const std::string& s) const { return arg(s.c_str()); };
     Message arg(int value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
     Message arg(uint value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
     Message arg(long value, int width = 0, int base = 10, const QChar& fill = kSpace) const;

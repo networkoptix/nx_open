@@ -12,6 +12,8 @@
 #include <ui/models/storage_model_info.h>
 
 struct QnStorageStatusReply;
+class QnServerStorageManager;
+
 namespace nx::vms::client::desktop { class BusyIndicatorButton; }
 namespace Ui { class StorageUrlDialog; }
 
@@ -21,7 +23,8 @@ class QnStorageUrlDialog: public QnSessionAwareButtonBoxDialog
     using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    QnStorageUrlDialog(const QnMediaServerResourcePtr& server, QWidget* parent = nullptr, Qt::WindowFlags windowFlags = 0);
+    QnStorageUrlDialog(const QnMediaServerResourcePtr& server, QnServerStorageManager* storageManager,
+        QWidget* parent = nullptr, Qt::WindowFlags windowFlags = 0);
     virtual ~QnStorageUrlDialog();
 
     QSet<QString> protocols() const;
@@ -58,11 +61,15 @@ private slots:
     void updateComboBox();
 
     void at_protocolComboBox_currentIndexChanged();
+    void atStorageStatusReply(bool success, int handle, const QnStorageStatusReply& reply);
     QString normalizePath(QString path);
 
 private:
     QScopedPointer<Ui::StorageUrlDialog> ui;
+    QnServerStorageManager* m_storageManager;
     QnMediaServerResourcePtr m_server;
+    QnStorageStatusReply m_reply;
+    bool m_replySuccess = false;
     QSet<QString> m_protocols;
     QList<ProtocolDescription> m_descriptions;
     QHash<QString, QString> m_urlByProtocol;

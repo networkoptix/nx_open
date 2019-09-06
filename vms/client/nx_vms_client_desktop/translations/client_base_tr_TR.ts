@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="tr" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Her tip</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Alan seç</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Videodaki bazı alanları seçin...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Seçilen alanda</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Eklenti eylemi yürütülemedi</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Parametre girin</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Aksiyon için bazı parametrelerin doldurulması gereklidir.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -943,6 +974,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>Nesne Çerçeveleri ve Bilgi...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Takvimi Tuttur</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Takvimi Bırak</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1004,6 +1043,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Lütfen %1 düzeni için şifreyi tekrar girin:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Sunucu olayları</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Analitik olayları</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Herhangi bir etkinlik</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Herhangi bir cihaz sorunu</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Herhangi bir kamera sorunu</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Herhangi bir sunucu etkinliği</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Cihaz sorunları</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Kamera sorunları</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Herhangi bir analitik olayı</translation>
     </message>
   </context>
   <context>
@@ -1643,24 +1721,12 @@ to view more bookmarks</source>
       <translation>Sunucu Güncellendi</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>İş Kuralları Güncellendi</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Sunucu Kaldırıldı</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>İş Kuralları Kaldırıldı</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Kullanıcı Kaldırıldı</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>İş Kuralları Sıfırlandı</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1756,6 +1822,18 @@ to view more bookmarks</source>
         <numerusform>%n işlemler</numerusform>
         <numerusform>%n işlemler</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>Etkinlik kuralı değişti</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>Etkinlik kuralı kaldırıldı</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>Etkinlik kuralları varsayılana sıfırlandı</translation>
     </message>
   </context>
   <context>
@@ -2036,8 +2114,8 @@ to view more bookmarks</source>
       <translation>Herhangi bir kamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Zorla Onaylama, yalnızca Genel Olay URL'sinde kamera tanımlayıcıları kullanılıyorsa çalışır</translation>
     </message>
   </context>
   <context>
@@ -4240,6 +4318,10 @@ to %1</source>
       <source>Virtual Camera %1</source>
       <translation>Sanal Kamera %1</translation>
     </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Sanal Kamera&quot;, sisteminizdeki herhangi bir sunucuya yüklenebilen ve herhangi bir kullanıcı tarafından erişilebilen video dosyaları için sanal bir depolamadır.</translation>
+    </message>
   </context>
   <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -5581,12 +5663,6 @@ to %1</source>
       <translation>Mevcut analiz verileriyle ne yapmalı?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Mevcut analitik verileri otomatik olarak başka bir yere taşınmayacak ve erişilemez hale gelecektir. Onu daha sonra manuel olarak hareket ettirebilir veya kalıcı olarak silebilirsiniz.
-Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam etmeden önce lütfen desteğe başvurun.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Sil</translation>
     </message>
@@ -5597,6 +5673,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Cancel</source>
       <translation>İptal</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Mevcut analitik verileri otomatik olarak başka bir yere taşınmayacak ve erişilemez hale gelecektir. Onu daha sonra manuel olarak hareket ettirebilir veya kalıcı olarak silebilirsiniz.
+Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam etmeden önce lütfen desteğe başvurun.</translation>
     </message>
   </context>
   <context>
@@ -5740,7 +5822,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Eklentiler</translation>
     </message>
   </context>
   <context>
@@ -5919,10 +6001,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Kişisel bilgiler içermez ve tamamen anonimdir.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Failover sunucusu bu ayardan bağımsız olarak kamera durum güncellemelerini isteyebilir.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Cihazların ve sunucuların otomatik aranmasını ve cihaz durum kontrollerini etkinleştir</translation>
     </message>
@@ -5933,6 +6011,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Etkinleştirildiğinde sistem sürekli yeni kamera ve sunucuları arar ayrıca durum güncellemesi için kameralarla iletişim kurar.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Failover sunucusu bu ayardan bağımsız olarak kamera durum güncellemelerini isteyebilir.</translation>
     </message>
   </context>
   <context>
@@ -5952,44 +6034,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Spread Sheet (CSV) Dosyası</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Sunucu</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Uzaklık</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Gün</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Zaman dilimi</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Zaman</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Hiçbir sunucunun İnternet erişimi yok. Zaman senkronize edilmiyor.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>VMS zamanı internet üzerinden senkronize edilmektedir ve yerel zaman sunucusuna bağlı değildir.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>VMS zamanı seçilen suncular için yerel zaman sunucusundan senkronize edilmektedir ve diğer sunucular yerel zaman sunucusuna bağlı değildir.</translation>
     </message>
   </context>
   <context>
@@ -7124,6 +7168,34 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Sonuçları filtrelemek için videodan bir alan seçin</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>Seçilen alanda</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Seçilen kamera</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Seçilen cihazlar</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Seçilen medya</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>hiçbiri</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7339,12 +7411,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>Bilinmeyen obje</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation>silinen kamera</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation>Bilinmeyen parça</translation>
     </message>
   </context>
   <context>
@@ -7363,38 +7435,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
         <numerusform>%n nesneler</numerusform>
         <numerusform>%n nesneler</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Any type</source>
-      <translation>Her tip</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Alan seç</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Videodaki bazı alanları seçin...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Seçilen alanda</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>isim verilmemiş analitik motoru</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>Eklenti eylemi yürütülemedi</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Parametre girin</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>Aksiyon için bazı parametrelerin doldurulması gereklidir.</translation>
     </message>
   </context>
   <context>
@@ -7438,17 +7478,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Applying changes...</source>
       <translation>Değişiklikleri Uygula...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>I/O modülünün gelişmiş ayarları mevcut değil</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Kameranın gelişmiş ayarları mevcut değil</translation>
     </message>
   </context>
   <context>
@@ -7576,6 +7605,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>This action cannot be undone.</source>
       <translation>Bu işlem geri alınamaz.</translation>
+    </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation>Hareket algılama devre dışı</translation>
     </message>
   </context>
   <context>
@@ -7712,7 +7745,15 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Eklentiler</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Hareket algılama devre dışı, tüm program kayıtları &quot;Hareket&quot; ve &quot;Motion + Lo-Res&quot; &quot;Her Zaman&quot;olarak değiştirilecek</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>İkili akış devre dışı bırakıldı, tüm program kayıtları &quot;Motion + Lo-Res&quot; &quot;Her Zaman&quot;olarak değiştirilecek</translation>
     </message>
   </context>
   <context>
@@ -7994,42 +8035,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation>Sunucu olayları</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Analitik olayları</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Herhangi bir cihaz sorunu</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Herhangi bir kamera sorunu</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Herhangi bir sunucu etkinliği</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Cihaz sorunları</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Kamera sorunları</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Herhangi bir etkinlik</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Herhangi bir analitik olayı</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>Olay yok</translation>
     </message>
@@ -8039,10 +8044,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
         <numerusform>%n etkinlik</numerusform>
         <numerusform>%n etkinlik</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>isim verilmemiş analitik motoru</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8432,8 +8433,8 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Belirtilen Adres Dizisi 255'ten Fazla Adres İçeriyor.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>Can&apos;t işlemini aramaya başlar</translation>
+      <source>Can not start the search process</source>
+      <translation>Arama işlemi başlatılamıyor</translation>
     </message>
   </context>
   <context>
@@ -8546,6 +8547,53 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Bazı sunucular çevrimdışıdır ve güncellenmez. Onları atla?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Client ve %n sunucuları için güncelleme paketleri kayıp</numerusform>
+        <numerusform>Client ve %n sunucuları için güncelleme paketleri kayıp</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Client için güncelleme paketi eksik</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Güncelleme yapılacak çevrimiçi sunucu yok.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Güncellemeyi iptal et ve tüm indirilmiş verileri sil?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Bazı bileşenlerin işletim sistemi sürümleri artık desteklenmemektedir. Lütfen bunları Sistemden kaldırın veya işletim sistemlerini desteklenen bir sürüme güncelleyin.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>İstemcinin işletim sistemi sürümü artık desteklenmiyor. Lütfen işletim sisteminizi desteklenen bir sürüme güncelleyin.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Güncelleme yüklenemedi</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Güncelleyici başlatılamadı</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Yükleme başlatılamadı</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Bazı sunucular güncelleme işlemini tamamlamadı. Yine de sonlandırılsın mı?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Güncelleme paketinin bazı bileşenleri indirilemedi</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Eğer problem devam ederse Müşteri Hizmetleri ile iletişime geçin.</translation>
@@ -8563,16 +8611,48 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Güncelleştirme tamamlandı</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client'ı güncellenen versiyonda yeniden başlatılacak.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Güncelleme tamamlandı ancak bazı sunucular güncellenemedi</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Lütfen %1 i yükleme dosyası kullanarak güncelleyin.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 güncellenmiş versiyonda yeniden başlatılacak.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>TAMAM</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Güncelleme yüklenirken bir hata oluştu {0}:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Güncellemeker indiriliyor...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Güncellemeyi Bitir</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>İptal</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>En son versiyon zaten yüklü</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Bu versiyon zaten yüklü</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Güncellemeyi yükle</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8591,12 +8671,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>İndir &amp;&amp; Yükle</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Başka Yapı Seçin</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Başka Dosyaya Göz At...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Başka Yapı Seçin</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8619,6 +8699,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Client güncellemesi yükleniyor...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>İçin güncelleme başlatılıyor ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Güncelleniyor ...</translation>
     </message>
@@ -8627,12 +8711,24 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Güncellemeye hazır</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Güncellemeyi yükle</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Sistem güncellenecek</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Bazı sunucuların güncelleme paketi yok.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Bazı sunucular dahili bir hatayla karşılaştı.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Lütfen Destek Birimiyle İletişime Geçin.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Bazı sunucular çevrimdışı oldu. Lütfen devam etmek için çevrimiçi olana kadar bekleyin.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8641,6 +8737,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Continue in Background</source>
       <translation>Arka planda devam et</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Kullanılabilir Son Güncelleme</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8653,101 +8753,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Update from mediaservers</source>
       <translation>Mediaserverdan güncelleme</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Kullanılabilir Son Güncelleme</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Client ve %n sunucuları için güncelleme paketleri kayıp</numerusform>
-        <numerusform>Client ve %n sunucuları için güncelleme paketleri kayıp</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Client için güncelleme paketi eksik</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Güncellemeyi Bitir</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>İptal</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>En son versiyon zaten yüklü</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Bu versiyon zaten yüklü</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Güncelleme yapılacak çevrimiçi sunucu yok.</translation>
-    </message>
-    <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Bazı sunucular güncelleme işlemini tamamlamadı. Yine de sonlandırılsın mı?</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Güncellemeyi iptal et ve tüm indirilmiş verileri sil?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Güncelleme yüklenirken bir hata oluştu {0}:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Bazı sunucular çevrimdışı oldu. Lütfen devam etmek için çevrimiçi olana kadar bekleyin.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Güncelleme tamamlandı ancak bazı sunucular güncellenemedi</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Lütfen %1 i yükleme dosyası kullanarak güncelleyin.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 güncellenmiş versiyonda yeniden başlatılacak.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Güncelleme paketinin bazı bileşenleri indirilemedi</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
-    </message>
-    <message>
-      <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
     </message>
   </context>
   <context>
@@ -8805,10 +8810,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Bazı kullanıcılar don&apos;t seçilen düzeni erişebilir. Eylem onlar için çalışmayacak.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Seçilen kullanıcıların hiçbiri seçilen yerleşime erişemez. Eylem çalışmayacak.</translation>
     </message>
@@ -8827,6 +8828,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Seçilen kullanıcı rollerinden hiçbiri kullanıcı içermiyor. Eylem işe yaramayacak.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation>Seçilen kullanıcıların hiçbiri seçilen yerleşime erişemez. Eylem çalışmayacak.</translation>
     </message>
   </context>
   <context>
@@ -8862,10 +8867,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Failed to download update</source>
       <translation>Güncelleme indirme başarısız</translation>
-    </message>
-    <message>
-      <source>Failed to install update</source>
-      <translation>Güncelleme yüklenemedi</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
@@ -8917,15 +8918,19 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>Güncelleme dosyası bulunamadı.</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>Güncelleme dosyalarını indirmek için yeterli alan yok.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Yerel sunucu hatası.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation>Bu işletim sistemi artık desteklenmiyor.</translation>
     </message>
   </context>
   <context>
@@ -9032,28 +9037,12 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Daha Fazla Ayar</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Bu kamera için birden fazla akış desteklenmiyor</translation>
-    </message>
-    <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Bu kamera için birden fazla akış ve hareket algılama desteklenmiyor</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Hareket algılama devre dışı</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Etkinleştirmek ve ayarlamak için kamera ayarlarında &quot;hareket&quot; algılama sekmesine gidin</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
+      <source>Motion detection is disabled or not supported</source>
       <translation>Hareket algılama devre dışı veya desteklenmiyor</translation>
     </message>
     <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Kamera ayarlarında &quot;haraket&quot; algılama sekmesine gidin. Kameranın desteklediğine emin olun ve aktif hale getirin.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation>Çift akış devre dışı bırakıldı veya desteklenmiyor</translation>
     </message>
   </context>
   <context>
@@ -9081,6 +9070,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>Oturumlar belirtilen süreyi aşarsa kullanıcıların otomatik olarak oturumu kapatılır.</translation>
     </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation>Filigranlar, yalnızca yönetici olmayan kullanıcılar için canlı, arşivlenmiş ve dışa aktarılan videolar üzerinden gösterilir. Siz ve diğer yöneticiler onları görmeyeceksiniz.</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
@@ -9098,51 +9091,55 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>hata yok</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>kütüphane dosyası yüklenemiyor</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>geçersiz veya uyumsuz bir eklenti kütüphanesi</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>eklenti kütüphanesi başlatılamadı</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>eklentisi hatalı bildirim döndürdü</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>bu işletim sistemi artık desteklenmiyor</translation>
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>bilinmeyen hata</translation>
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>Yüklü değil</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>Yüklendi</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>eklentisi kara listede</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Durum</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>eklentisi isteğe bağlıdır ve beyaz listede değildir</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>dahili hata</translation>
     </message>
   </context>
   <context>
@@ -9172,11 +9169,15 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>Sunucuya bağlantı yok.</translation>
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Bağlantı hatası.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation>Sunucu Hatası.</translation>
     </message>
   </context>
   <context>
@@ -9220,14 +9221,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Sonuçları filtrelemek için videodan bir alan seçin</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>Seçilen alanda</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Hareket yok</translation>
     </message>
@@ -9241,23 +9234,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
         <numerusform>%n hareket etkinliği</numerusform>
         <numerusform>%n hareket etkinliği</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Seçilen kamera</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Seçilen cihaz</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Seçilen medya</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>hiçbiri</translation>
     </message>
   </context>
   <context>
@@ -9392,6 +9368,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Sunucuya yüklenirken dosya bozulmuş</translation>
+    </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>Uzak dosya &quot;%1&quot; bozuk</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>Sunucu zaten bu dosyada &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9596,14 +9580,14 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation>Herhangi bir eklenti</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation>Etkinlik, yalnızca girilen anahtar kelimelerden herhangi biriyle açıklama başlığında eşleşme varsa tetiklenecektir.</translation>
@@ -9922,17 +9906,21 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>TAMAM</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>Analytics verilerini depolamak için depolama konumunu onaylayın</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>Analytics verilerini depolamak için depolama konumunu onaylayın &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <source>the largest available partition</source>
+      <translation>mevcut en büyük bölüm</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
       <translation>Analytics veritabanı yerel bir depolama biriminde depolanmalı ve yüz gigabayt'ı kaplayabilir.
 
-Analitik verilerini depolamak için konum seçildiğinde, çıkış verilerini kaybetmeden kolayca değiştirilemez. Konumun dikkatlice seçilmesi ve ciddi sistem arızalarının önlenmesi için sistem bölümünün kullanılmaması önerilir.
+Analitik verilerini depolamak için konum seçildiğinde, çıkış verilerini kaybetmeden kolayca değiştirilemez. Konumun dikkatlice seçilmesi ve ciddi sistem arızalarının önlenmesi için sistem bölümünün kullanılmaması önerilir.%1.
 
 Depolama yerini, Sunucu Ayarları iletişim kutusundaki &quot;Depolama Yönetimi&quot; sekmesinden değiştirebilirsiniz.</translation>
     </message>

@@ -2,6 +2,7 @@
 #define QN_CAM_DISPLAY_H
 
 #include <chrono>
+#include <map>
 
 #include <QtCore/QTime>
 
@@ -16,11 +17,12 @@
 #include <decoders/video/abstract_video_decoder.h>
 
 #include "video_stream_display.h"
-#include <map>
 
 // TODO: #GDM use forward declaration
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
 #include <nx/utils/elapsed_timer.h>
+
+#include <nx/vms/client/desktop/camera/abstract_video_display.h>
 
 class QnAbstractRenderer;
 class QnVideoStreamDisplay;
@@ -50,7 +52,10 @@ private:
 /**
   * Stores QnVideoStreamDisplay for each channel/sensor
   */
-class QnCamDisplay : public QnAbstractDataConsumer, public QnlTimeSource
+class QnCamDisplay:
+    public QnAbstractDataConsumer,
+    public QnlTimeSource,
+    public nx::vms::client::desktop::AbstractVideoDisplay
 {
     Q_OBJECT
 public:
@@ -64,7 +69,7 @@ public:
     void addMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
     void removeMetadataConsumer(const nx::media::AbstractMetadataConsumerPtr& metadataConsumer);
 
-    virtual bool processData(const QnAbstractDataPacketPtr& data);
+    virtual bool processData(const QnAbstractDataPacketPtr& data) override ;
 
     virtual void pleaseStop() override;
 
@@ -77,7 +82,7 @@ public:
     bool doDelayForAudio(QnConstCompressedAudioDataPtr ad, float speed);
     bool isAudioBuffering() const;
     void playAudio(bool play);
-    float getSpeed() const;
+    virtual float getSpeed() const override; //< From AbstractVideoDisplay
 
     // schedule to clean up buffers all;
     // schedule - coz I do not want to introduce mutexes
@@ -97,8 +102,8 @@ public:
     QSize getFrameSize(int channel) const;
     QImage getScreenshot(const QnLegacyTranscodingSettings& imageProcessingParams, bool anyQuality);
     QImage getGrayscaleScreenshot(int channel);
-    QSize getVideoSize() const;
-    bool isRealTimeSource() const;
+    virtual QSize getVideoSize() const override; //< From AbstractVideoDisplay
+    virtual bool isRealTimeSource() const override; //< From AbstractVideoDisplay
 
     void setExternalTimeSource(QnlTimeSource* value);
 
@@ -107,17 +112,17 @@ public:
     bool isEOFReached() const;
     bool isStillImage() const;
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
-    QSize getMaxScreenSize() const;
+    virtual QSize getMaxScreenSize() const override; //< From AbstractVideoDisplay
     QnArchiveStreamReader* getArchiveReader() const;
-    bool isFullScreen() const;
-    bool isZoomWindow() const;
+    virtual bool isFullScreen() const override; //< From AbstractVideoDisplay
+    virtual bool isZoomWindow() const override; //< From AbstractVideoDisplay
     void setFullScreen(bool fullScreen);
 
-    bool isFisheyeEnabled() const;
+    virtual bool isFisheyeEnabled() const override; //< From AbstractVideoDisplay
     void setFisheyeEnabled(bool fisheyeEnabled);
 
-    int getAvarageFps() const;
-    virtual bool isBuffering() const override;
+    virtual int getAverageFps() const;
+    virtual bool isBuffering() const override; //< From AbstractVideoDisplay & QnlTimeSource
 
     QnAspectRatio overridenAspectRatio() const;
     void setOverridenAspectRatio(QnAspectRatio aspectRatio);
@@ -135,6 +140,22 @@ public:
 
     bool isForcedBufferingEnabled() const;
 
+    virtual QString getName() const override;
+    virtual bool isRadassSupported() const override;
+
+    virtual CameraID getCameraID() const override;
+    // Forwarded to reader
+    virtual MediaQuality getQuality() const override;
+    virtual void setQuality(MediaQuality quality, bool fastSwitch) override;
+    virtual bool isPaused() const override;
+    virtual bool isMediaPaused() const override;
+
+    // Forwarded to QnAbstractDataConsumer
+    virtual int dataQueueSize() const override;
+    virtual int maxDataQueueSize() const override;
+
+    virtual void setCallbackForStreamChanges(std::function<void()> callback) override;
+
 public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);
@@ -150,6 +171,7 @@ public slots:
 signals:
     void liveMode(bool value);
     void stillImageChanged();
+
 protected:
     void setSingleShotMode(bool single);
     virtual void setSpeed(float speed) override;
@@ -295,7 +317,7 @@ protected:
 
     std::chrono::microseconds m_forcedVideoBufferLength = std::chrono::microseconds::zero();
     qint64 m_lastQueuedVideoTime;
-    int m_liveBufferSize;
+    int m_liveBufferSizeMkSec;
     bool m_liveMaxLenReached;
     bool m_hasVideo;
     Qn::MediaStreamEvent m_lastMediaEvent = Qn::MediaStreamEvent::NoEvent;
@@ -304,6 +326,8 @@ protected:
     mutable QnMutex m_metadataConsumersHashMutex;
     QMultiMap<MetadataType, QWeakPointer<nx::media::AbstractMetadataConsumer>>
         m_metadataConsumerByType;
+    QVector<bool> m_gotKeyDataInfo;
+    std::function<void()> m_streamsChangedCallback;
 };
 
 #endif //QN_CAM_DISPLAY_H

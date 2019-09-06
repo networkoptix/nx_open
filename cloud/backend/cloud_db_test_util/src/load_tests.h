@@ -1,26 +1,29 @@
 #pragma once
 
 #include <chrono>
+#include <ostream>
 #include <string>
 
-namespace nx {
-namespace cdb {
-namespace client {
+#include <nx/utils/argument_parser.h>
 
-int establishManyConnections(
-    const std::string& cdbUrl,
-    const std::string& login,
-    const std::string& password,
-    int connectionCount,
-    std::chrono::milliseconds maxDelayBeforeConnect);
+namespace nx::cloud::db::client {
 
-int makeApiRequests(
-    const std::string& cdbUrl,
-    const std::string& login,
-    const std::string& password,
-    int connectionCount,
-    std::chrono::milliseconds maxDelayBeforeConnect);
+class LoadTest
+{
+public:
+    static int establishManyConnections(
+        const std::string& cdbUrl,
+        const std::string& login,
+        const std::string& password,
+        const nx::utils::ArgumentParser& args);
 
-} // namespace client
-} // namespace cdb
-} // namespace nx
+    static int makeApiRequests(
+        const std::string& cdbUrl,
+        const std::string& login,
+        const std::string& password,
+        int connectionCount);
+
+    static void printHelp(std::ostream& os);
+};
+
+} // namespace nx::cloud::db::client

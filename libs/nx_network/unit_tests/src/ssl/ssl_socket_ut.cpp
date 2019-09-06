@@ -1,3 +1,5 @@
+#include <thread>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/aio/async_channel_reflector.h>
@@ -136,7 +138,7 @@ public:
 
     void start()
     {
-        m_ioThread = nx::utils::thread(
+        m_ioThread = std::thread(
             std::bind(&SynchronousReflector::ioThreadMain, this));
     }
 
@@ -150,7 +152,7 @@ public:
     }
 
 private:
-    nx::utils::thread m_ioThread;
+    std::thread m_ioThread;
     std::unique_ptr<AbstractStreamSocket> m_streamSocket;
     std::atomic<bool> m_terminated;
 

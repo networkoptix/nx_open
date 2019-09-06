@@ -5,7 +5,7 @@
 #include <vector>
 
 #include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 
 namespace nx {
@@ -18,12 +18,14 @@ public:
     virtual int64_t timestampUs() const override;
     virtual int64_t durationUs() const override;
     virtual int count() const override;
-    virtual const IObjectMetadata* at(int index) const override;
 
     void setTimestampUs(int64_t timestampUs);
     void setDurationUs(int64_t durationUs);
     void addItem(const IObjectMetadata* object);
     void clear();
+
+protected:
+    virtual const IObjectMetadata* getAt(int index) const override;
 
 private:
     int64_t m_timestampUs = -1;

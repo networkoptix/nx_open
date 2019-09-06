@@ -13,11 +13,11 @@ namespace nx::vms_server_plugins::utils::analytics {
  * fields are not included in this class to be able to be implemented using classes derived from
  * the original field types.
  */
-struct NX_PLUGIN_UTILS_API EngineManifestBase
+struct EngineManifestBase
 {
     nx::vms::api::analytics::EngineManifest::Capabilities capabilities;
 };
 #define EngineManifestBase_Fields (capabilities)
-QN_FUSION_DECLARE_FUNCTIONS(EngineManifestBase, (json), NX_PLUGIN_UTILS_API)
+QN_FUSION_DECLARE_FUNCTIONS(EngineManifestBase, (json))
 
 } // namespace nx::vms_server_plugins::utils::analytics

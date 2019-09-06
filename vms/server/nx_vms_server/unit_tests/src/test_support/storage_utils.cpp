@@ -28,87 +28,79 @@ namespace nx::vms::server::test::test_support {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Test storage
 
-static void waitForStorageToAppear(MediaServerLauncher* server, const QString& storagePath)
+namespace {
+
+class TestFileStorage: public QnFileStorageResource
 {
-    while (true)
+public:
+    using QnFileStorageResource::QnFileStorageResource;
+
+    static QnStorageResourcePtr create(MediaServerLauncher* server, const QString& path)
     {
-        const auto allStorages = server->serverModule()->normalStorageManager()->getStorages();
+        QnStorageResourcePtr storage(new TestFileStorage(server->serverModule()));
 
-        const auto testStorageIt = std::find_if(
-            allStorages.cbegin(), allStorages.cend(),
-            [&storagePath](const auto& storage) { return storage->getUrl() == storagePath; });
+        storage->setName("Test storage");
+        storage->setParentId(server->commonModule()->moduleGUID());
+        storage->setUrl(path);
+        storage->setSpaceLimit(0);
+        storage->setStorageType("local");
+        storage->setUsedForWriting(
+            storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
+        storage->setIdUnsafe(QnUuid::createUuid());
 
-        if (testStorageIt == allStorages.cend())
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            continue;
-        }
+        NX_ASSERT(storage->isUsedForWriting());
 
-        while (true) //< Waiting for initialization
-        {
-            const auto storage = *testStorageIt;
-            const auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
-            NX_ASSERT(fileStorage);
-            fileStorage->setMounted(true);
-            server->serverModule()->normalStorageManager()->initDone();
+        QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
+        if (resType)
+            storage->setTypeId(resType->getId());
 
-            if (!(storage->isWritable() && storage->isOnline() && storage->isUsedForWriting()))
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            else
-                break;
-        }
-
-        break;
+        return storage;
     }
-}
 
-void addStorage(MediaServerLauncher* server, const QString& storagePath)
+private:
+    virtual bool isMounted() const override { return true; }
+};
+
+static bool storagePresent(MediaServerLauncher* server, const QString& storagePath)
 {
-    NX_ASSERT(!storagePath.isEmpty());
-
     const auto existingStorages =
         server->serverModule()->resourcePool()->getResources<QnStorageResource>();
+
     const auto existingIt = std::find_if(
-        existingStorages.cbegin(), existingStorages.cend(),
-        [&storagePath](const auto& storage) { return storage->getUrl() == storagePath; });
+        existingStorages.cbegin(),
+        existingStorages.cend(),
+        [&storagePath](const auto& storage)
+        {
+            return storage->getUrl() == storagePath;
+        });
 
     if (existingIt != existingStorages.cend())
-        return;
+        return true;
 
-    QnStorageResourcePtr storage(server->serverModule()->storagePluginFactory()->createStorage(
-        server->commonModule(), "ufile"));
+    return false;
+}
 
-    storage->setName("Test storage");
-    storage->setParentId(server->commonModule()->moduleGUID());
-    storage->setUrl(storagePath);
-    storage->setSpaceLimit(0);
-    storage->setStorageType("local");
-    storage->setUsedForWriting(
-        storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
+} // namespace
 
-    NX_ASSERT(storage->isUsedForWriting());
-
-    QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
-    if (resType)
-        storage->setTypeId(resType->getId());
-
-    QList<QnStorageResourcePtr> storages{storage};
-    nx::vms::api::StorageDataList apiStorages;
-    ec2::fromResourceListToApi(QList<QnStorageResourcePtr>{storage}, apiStorages);
-
-    const auto ec2Connection = server->serverModule()->ec2Connection();
-    const auto saveResult =
-        ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages);
-
-    NX_ASSERT(ec2::ErrorCode::ok == saveResult);
-
-    for (const auto& storage: storages)
+void addStorage(MediaServerLauncher* server, const QString& path)
+{
+    NX_ASSERT(!path.isEmpty());
+    if (storagePresent(server, path))
     {
-        server->serverModule()->commonModule()->messageProcessor()->updateResource(
-            storage, ec2::NotificationSource::Local);
+        NX_DEBUG(
+            typeid(TestFileStorage),
+            "Storage %1 is already present. Won't be added second time",
+            path);
     }
 
-    waitForStorageToAppear(server, storagePath);
+    server->serverModule()->normalStorageManager()->onNewResource(
+        TestFileStorage::create(server, path));
+    server->serverModule()->normalStorageManager()->initDone();
+
+    NX_DEBUG(
+        typeid(TestFileStorage),
+        "Storage %1 has been successfully added to the mediaserver's storage pool",
+        path);
 }
 
 class StorageFixtureResource: public QnStorageResource
@@ -123,7 +115,7 @@ public:
     {
         setSpaceLimit(spaceLimit);
         setUsedForWriting(isUsedForWriting);
-        setId(QnUuid::createUuid());
+        setIdUnsafe(QnUuid::createUuid());
     }
 
     virtual QIODevice* open(const QString& /*fileName*/, QIODevice::OpenMode /*openMode*/) override
@@ -131,7 +123,7 @@ public:
         return nullptr;
     }
 
-    virtual float getAvarageWritingUsage() const override
+    virtual float getAverageWritingUsage() const override
     {
         return 0.0;
     }

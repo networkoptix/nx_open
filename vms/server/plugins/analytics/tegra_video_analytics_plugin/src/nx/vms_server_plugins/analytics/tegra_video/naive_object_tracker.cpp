@@ -204,7 +204,7 @@ void NaiveObjectTracker::addNonExpiredObjectsFromCache(
         }
 
         objectMetadata->setBoundingBox(toSdkRect(cached.rect));
-        objectMetadata->setId(cached.id);
+        objectMetadata->setTrackId(cached.id);
         objectMetadata->setConfidence(1);
         objectMetadata->setTypeId(m_objectTypeId);
 

@@ -115,7 +115,8 @@ struct ResourceThumbnailProvider::Private
         return {ProviderType::none, {}};
     }
 
-    void updateRequest(ResourceThumbnailProvider* q, const nx::api::ResourceImageRequest& value)
+    void updateRequest(ResourceThumbnailProvider* q, const nx::api::ResourceImageRequest& value,
+        bool resetStatus)
     {
         const auto [providerType, placeholderIconPath] = getRequiredProvider(value.resource);
         request = value;
@@ -242,9 +243,10 @@ nx::api::ResourceImageRequest ResourceThumbnailProvider::requestData() const
     return d->request;
 }
 
-void ResourceThumbnailProvider::setRequestData(const nx::api::ResourceImageRequest& request)
+void ResourceThumbnailProvider::setRequestData(
+    const nx::api::ResourceImageRequest& request, bool resetStatus)
 {
-    d->updateRequest(this, request);
+    d->updateRequest(this, request, resetStatus);
 }
 
 QImage ResourceThumbnailProvider::image() const
@@ -271,6 +273,11 @@ void ResourceThumbnailProvider::doLoadAsync()
 {
     if (d->baseProvider)
         d->baseProvider->loadAsync();
+}
+
+QnResourcePtr ResourceThumbnailProvider::resource() const
+{
+    return d->request.resource;
 }
 
 std::chrono::microseconds ResourceThumbnailProvider::timestamp() const

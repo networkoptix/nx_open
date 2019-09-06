@@ -11,10 +11,7 @@ namespace analytics {
 class ITimestampedObjectMetadata: public Interface<ITimestampedObjectMetadata, IObjectMetadata>
 {
 public:
-    static auto interfaceId()
-    {
-        return InterfaceId("nx::sdk::analytics::ITimestampedObjectMetadata");
-    }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::ITimestampedObjectMetadata"); }
 
     virtual int64_t timestampUs() const = 0;
 };

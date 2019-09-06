@@ -25,9 +25,10 @@ protected:
         const QnLiveStreamParams& params) override;
 
 private:
-    nx::utils::Url buildHikvisionStreamUrl(
+    nx::utils::Url makeStreamUrl(
         const hikvision::ChannelProperties& properties) const;
-    nx::utils::Url hikvisionRequestUrlFromPath(const QString& path) const;
+    nx::utils::Url makeApiUrl(const QString& path) const;
+    nx::utils::Url makeStreamApiUrl(const QString& requestTemplate) const;
 
     QSize chooseResolution(
         const hikvision::ChannelCapabilities& channelCapabilities,

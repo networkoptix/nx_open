@@ -423,7 +423,8 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                 connectionInfo, parentWidget, engineVersion));
 
             //starting installation
-            installationDialog->exec();
+            if (installationDialog->exec() == QDialog::Rejected)
+                return Qn::IncompatibleVersionConnectionResult;
             // Possible scenarios: cancel, failed, success
             auto result = installationDialog->installationResult();
             if (result == Dialog::InstallResult::complete)
@@ -433,8 +434,13 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
             }
             else
             {
+                QString errorString = installationDialog->errorString();
+                if (!errorString.isEmpty())
+                    errorString = QString("%1\n%2").arg(errorString, extras);
+                else
+                    errorString = extras;
                 QnMessageBox dialog(QnMessageBoxIcon::Critical,
-                    tr("Failed to enter compatibility mode for version %1").arg(versionString), extras,
+                    tr("Failed to enter compatibility mode for version %1").arg(versionString), errorString,
                     QDialogButtonBox::Ok, QDialogButtonBox::NoButton, parentWidget);
                 dialog.exec();
                 return Qn::IncompatibleVersionConnectionResult;

@@ -130,6 +130,7 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
             const auto actionType = m_rules[index.row()]->actionType();
             if (vms::event::requiresCameraResource(actionType)
                     || vms::event::requiresUserResource(actionType)
+                    || actionType == vms::api::ActionType::openLayoutAction
                     || actionType == vms::api::ActionType::showPopupAction
                     || actionType == vms::api::ActionType::playSoundAction
                     || actionType == vms::api::ActionType::playSoundOnceAction

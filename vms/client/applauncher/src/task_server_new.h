@@ -4,6 +4,8 @@
 
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/ipc/named_pipe_server.h>
+#include <nx/utils/signature_extractor.h>
+#include <nx/vms/applauncher/api/applauncher_api.h>
 
 namespace nx::vms::applauncher {
 
@@ -46,13 +48,30 @@ public:
      * Add a subscriber to a specified channel.
      * Will return false if specified channel is already occupied
      * or empty name or callback is provided.
+     * Example usage:
+     * ```
+     * auto callback = [](const SomeRequest& req, SomeResponse& rep)
+     *     {
+     *         ...
+     *     };
+     * taskServer.subscribe("request1", callback);
+     * ```
      */
-    template<class RequestType, class ResponseType>
-    bool subscribe(
-        const QByteArray& name,
-        std::function<void (const RequestType&, ResponseType&)>&& callback)
+    template<class CallbackType>
+    bool subscribe(const QByteArray& name, CallbackType&& callback)
     {
-        return subscribe(name,
+        using RequestType = typename nx::utils::FunctionArgumentType<CallbackType, 0>::RawType;
+        static_assert(std::is_base_of<nx::vms::applauncher::api::BaseTask, RequestType>::value,
+            "First argument should be a subclass of a BaseTask class");
+        using ResponseType = typename nx::utils::FunctionArgumentType<CallbackType, 1>::RawType;
+        static_assert(std::is_base_of<nx::vms::applauncher::api::Response, ResponseType>::value,
+            "Second argument should be a subclass of a Response class");
+        /*
+         * TODO: Though there are static_assert for type checking, there will be lots of other
+         * compile errors in a lambda below. I could add some magic to prevent code below from
+         * compiling at all, so user will see only errors from static assert.
+         */
+        return subscribeImpl(name,
             [callback](
                 Channel& /*channel*/,
                 const QByteArray& requestRawData,
@@ -69,14 +88,14 @@ public:
     }
 
     /** Adds a simple 'responseless' subscriber. */
-    bool subscribe(const QByteArray& name, std::function<bool (const QByteArray& name)> callback);
+    bool subscribeSimple(const QByteArray& name, std::function<bool ()> callback);
 
 protected:
     virtual void run() override;
 
 private:
     void processNewConnection(NamedPipeSocket* clientConnection);
-    bool subscribe(const QByteArray& name, Channel::Callback&& callback);
+    bool subscribeImpl(const QByteArray& name, Channel::Callback&& callback);
 
 private:
     NamedPipeServer m_server;

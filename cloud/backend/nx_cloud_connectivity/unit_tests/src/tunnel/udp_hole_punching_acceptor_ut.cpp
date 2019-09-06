@@ -8,6 +8,7 @@
 #include <nx/network/stun/udp_server.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
 #include <nx/utils/test_support/sync_queue.h>
+#include <nx/utils/random_qt_device.h>
 
 namespace nx {
 namespace network {
@@ -309,7 +310,7 @@ TEST_F(UdpHolePunchingTunnelAcceptorTest, UdtConnectTimeout)
 TEST_F(UdpHolePunchingTunnelAcceptorTest, ConnectPleaseStop)
 {
     manualAcceptorStop = true;
-    std::random_device device;
+    nx::utils::random::QtDevice device;
     std::mt19937 generator(device());
     std::uniform_int_distribution<int64_t> distribution(0, kUdpRetryTimeout.count() * 2);
     for (size_t i = 0; i < kPleaseStopRunCount; ++i)

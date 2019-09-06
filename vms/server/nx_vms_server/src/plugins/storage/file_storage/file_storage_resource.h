@@ -36,7 +36,7 @@ public:
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
     QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode, int bufferSize);
 
-    virtual float getAvarageWritingUsage() const override;
+    virtual float getAverageWritingUsage() const override;
 
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
     virtual qint64 getFileSize(const QString& url) const override;
@@ -71,9 +71,8 @@ private:
     QString removeProtocolPrefix(const QString& url);
     Qn::StorageInitResult initOrUpdateInternal();
     Qn::StorageInitResult updatePermissions(const QString& url) const;
-    bool checkWriteCap() const;
     bool isStorageDirMounted() const;
-    bool checkDBCap() const;
+    bool readyForSqlDB() const;
 #if defined(Q_OS_WIN)
     Qn::StorageInitResult updatePermissionsHelper(
         LPWSTR userName,
@@ -92,8 +91,10 @@ private:
     bool testWriteCapInternal() const;
 
     void setLocalPathSafe(const QString &path);
-    QString getLocalPathSafe() const;
-    bool isMounted() const;
+    QString localPath() const;
+    void updateCapabilities();
+
+    virtual bool isMounted() const;
     nx::vms::server::RootFileSystem* rootTool() const;
 
 public:
@@ -104,16 +105,12 @@ public:
 
 private:
     mutable std::atomic<bool> m_valid;
-    mutable boost::optional<bool> m_dbReady;
-
-private:
-    mutable QnMutex     m_mutexCheckStorage;
-    mutable int         m_capabilities;
-    QString     m_localPath;
-
+    mutable QnMutex m_mutexCheckStorage;
+    mutable int m_capabilities;
+    QString m_localPath;
     mutable qint64 m_cachedTotalSpace;
     mutable boost::optional<bool> m_writeCapCached;
-    mutable QnMutex      m_writeTestMutex;
+    mutable QnMutex m_writeTestMutex;
     bool m_isSystem;
     bool m_isMounted = true;
     QnMediaServerModule* m_serverModule = nullptr;

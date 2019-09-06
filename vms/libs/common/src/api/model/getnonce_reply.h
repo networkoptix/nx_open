@@ -9,6 +9,6 @@ struct QnGetNonceReply
 };
 #define QnGetNonceReply_Fields (nonce)(realm)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnGetNonceReply, (json))
+QN_FUSION_DECLARE_FUNCTIONS(QnGetNonceReply, (json)(ubjson))
 Q_DECLARE_METATYPE(QnGetNonceReply);
 

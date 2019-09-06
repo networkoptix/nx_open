@@ -709,7 +709,10 @@ void QnWorkbenchVideoWallHandler::sendMessage(const QnVideoWallControlMessage& m
     {
         apiMessage.videowallGuid = index.videowall()->getId();
         apiMessage.instanceGuid = index.uuid();
-        NX_VERBOSE(this, "SENDER: sending message %1 to %2", message, apiMessage.instanceGuid);
+        NX_VERBOSE(this, "SENDER: sending message %1: %2 to %3",
+            m_controlMode.sequence,
+            message,
+            apiMessage.instanceGuid);
         connection()->sendControlMessage(apiMessage, this, [] {});
     }
 }
@@ -1358,7 +1361,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(
         sourceLayout->clone() :
         QnLayoutResourcePtr(new QnLayoutResource());
 
-    layout->setId(m_uuidPool->getFreeId());
+    layout->setIdUnsafe(m_uuidPool->getFreeId());
     layout->addFlags(Qn::local); // TODO: #Elric #EC2
 
     if (!sourceLayout)
@@ -1489,7 +1492,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
     };
 
     QnVideoWallResourcePtr videoWall(new QnVideoWallResource());
-    videoWall->setId(QnUuid::createUuid());
+    videoWall->setIdUnsafe(QnUuid::createUuid());
     videoWall->setName(proposedName);
     videoWall->setAutorun(true);
 
@@ -1598,7 +1601,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
             continue;
 
         QnResourcePtr proxyResource(new QnResource());
-        proxyResource->setId(index.uuid());
+        proxyResource->setIdUnsafe(index.uuid());
         proxyResource->setName(index.item().name);
         qnResIconCache->setKey(proxyResource, QnResourceIconCache::VideoWallItem);
         resources.append(proxyResource);
@@ -1785,6 +1788,9 @@ void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered()
 
 void QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered()
 {
+    if (!canStartControlMode())
+        return;
+
     const auto parameters = menu()->currentParameters(sender());
 
     QnWorkbenchLayout *layout = NULL;
@@ -1841,7 +1847,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
 
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnVideowallReviewLayoutResource(videoWall));
-    layout->setId(QnUuid::createUuid());
+    layout->setIdUnsafe(QnUuid::createUuid());
     if (context()->user())
         layout->setParentId(videoWall->getId());
     if (accessController()->hasGlobalPermission(GlobalPermission::controlVideowall))
@@ -2148,7 +2154,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
             continue;
 
         QnResourcePtr proxyResource(new QnResource());
-        proxyResource->setId(matrix.uuid());
+        proxyResource->setIdUnsafe(matrix.uuid());
         proxyResource->setName(matrix.videowall()->matrices()->getItem(matrix.uuid()).name);
         qnResIconCache->setKey(proxyResource, QnResourceIconCache::VideoWallMatrix);
         resources.append(proxyResource);
@@ -2344,11 +2350,10 @@ void QnWorkbenchVideoWallHandler::at_videoWall_pcAdded(
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_pcChanged(
-    const QnVideoWallResourcePtr& videoWall,
-    const QnVideoWallPcData& pc)
+    [[maybe_unused]] const QnVideoWallResourcePtr& videoWall,
+    [[maybe_unused]] const QnVideoWallPcData& pc)
 {
-    // TODO: #GDM #VW implement screen size changes handling
-    nx::utils::unused(videoWall, pc);
+    // TODO: #GDM #VW implement screen size changes handling.
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved(
@@ -2564,7 +2569,7 @@ void QnWorkbenchVideoWallHandler::at_widget_dewarpingParamsChanged()
     QnVideoWallControlMessage message(QnVideoWallControlMessage::MediaDewarpingParamsChanged);
     message[uuidKey] = widget->item()->uuid().toString();
     message[valueKey] = QString::fromUtf8(QJson::serialized(widget->dewarpingParams()));
-    sendMessage(message);
+    sendMessage(message, /*cached*/ true);
 }
 
 void QnWorkbenchVideoWallHandler::at_workbench_currentLayoutAboutToBeChanged()
@@ -2603,15 +2608,38 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode(QnWor
     if (!m_controlMode.active)
         return;
 
-    QnVideoWallControlMessage message(QnVideoWallControlMessage::LayoutItemAdded);
-    message[uuidKey] = item->uuid().toString();
-    message[resourceKey] = item->resource()->getUniqueId();
-    message[geometryKey] = QString::fromUtf8(QJson::serialized(item->geometry()));
-    message[zoomRectKey] = QString::fromUtf8(QJson::serialized(item->zoomRect()));
-    message[rotationKey] = QString::fromUtf8(QJson::serialized(item->rotation()));
-    message[checkedButtonsKey] = QString::fromUtf8(QJson::serialized(
-        item->data(Qn::ItemCheckedButtonsRole).toInt()));
-    sendMessage(message);
+    const auto itemUuid = item->uuid().toString();
+
+    {
+        QnVideoWallControlMessage message(QnVideoWallControlMessage::LayoutItemAdded);
+        message[uuidKey] = itemUuid;
+        message[resourceKey] = item->resource()->getUniqueId();
+        message[geometryKey] = QString::fromUtf8(QJson::serialized(item->geometry()));
+        message[zoomRectKey] = QString::fromUtf8(QJson::serialized(item->zoomRect()));
+        message[rotationKey] = QString::fromUtf8(QJson::serialized(item->rotation()));
+        message[checkedButtonsKey] = QString::fromUtf8(QJson::serialized(
+            item->data(Qn::ItemCheckedButtonsRole).toInt()));
+        sendMessage(message);
+    }
+
+    if (const auto mediaResource = item->resource().dynamicCast<QnMediaResource>())
+    {
+        QnVideoWallControlMessage message(QnVideoWallControlMessage::MediaDewarpingParamsChanged);
+        message[uuidKey] = itemUuid;
+        message[valueKey] = QString::fromUtf8(QJson::serialized(mediaResource->getDewarpingParams()));
+        sendMessage(message, /*cached*/ true);
+    }
+
+    const auto itemDewarpingData = item->data(Qn::ItemImageDewarpingRole)
+        .value<nx::vms::api::DewarpingData>();
+    if (itemDewarpingData.enabled)
+    {
+        QnVideoWallControlMessage message(QnVideoWallControlMessage::LayoutItemDataChanged);
+        message[roleKey] = QString::number(Qn::ItemImageDewarpingRole);
+        message[uuidKey] = itemUuid;
+        message[valueKey] = QString::fromUtf8(QJson::serialized(itemDewarpingData));
+        sendMessage(message, /*cached*/ true);
+    }
 }
 
 void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemRemoved_controlMode(QnWorkbenchItem* item)

@@ -26,8 +26,7 @@ bool matchAdditionData(
     {
         if (values.empty())
             return true;
-        return std::any_of(values.begin(), values.end(),
-            [&](const int64_t& data) { return data == value; });
+        return std::binary_search(values.begin(), values.end(), value);
 
     };
 
@@ -39,6 +38,10 @@ bool matchAdditionData(
 
 QnTimePeriodList AnalyticsArchive::matchPeriod(const AnalyticsFilter& filter)
 {
+    NX_ASSERT_HEAVY_CONDITION(
+        std::is_sorted(filter.allAttributesHash.begin(), filter.allAttributesHash.end()));
+    NX_ASSERT_HEAVY_CONDITION(
+        std::is_sorted(filter.objectTypes.begin(), filter.objectTypes.end()));
     return base_type::matchPeriodInternal(filter, matchAdditionData);
 }
 
@@ -46,6 +49,11 @@ AnalyticsArchive::MatchObjectsResult  AnalyticsArchive::matchObjects(
     const AnalyticsFilter& filter)
 {
     MatchObjectsResult result;
+
+    NX_ASSERT_HEAVY_CONDITION(
+        std::is_sorted(filter.allAttributesHash.begin(), filter.allAttributesHash.end()));
+    NX_ASSERT_HEAVY_CONDITION(
+        std::is_sorted(filter.objectTypes.begin(), filter.objectTypes.end()));
 
     auto matchExtraData =
         [&result](int64_t timestampMs,
@@ -55,7 +63,7 @@ AnalyticsArchive::MatchObjectsResult  AnalyticsArchive::matchObjects(
             if (isMatched)
             {
                 BinaryRecordEx* recordEx = (BinaryRecordEx*)data;
-                result.data.push_back({recordEx->objectsGroupId(), timestampMs});
+                result.data.push_back({recordEx->trackGroupId(), timestampMs});
             }
             return isMatched;
     };
@@ -88,7 +96,7 @@ template <typename RectType>
 bool AnalyticsArchive::saveToArchive(
     std::chrono::milliseconds startTime,
     const std::vector<RectType>& data,
-    uint32_t objectsGroupId,
+    uint32_t trackGroupId,
     uint32_t objectType,
     int64_t allAttributesHash)
 {
@@ -98,7 +106,7 @@ bool AnalyticsArchive::saveToArchive(
     packet->m_duration = std::chrono::microseconds(kAggregationInterval).count();
 
     BinaryRecordEx* recordEx = (BinaryRecordEx*)(packet->data() + QnMetaDataV1::kMotionDataBufferSize);
-    recordEx->setObjectsGroupId(objectsGroupId);
+    recordEx->setTrackGroupId(trackGroupId);
     recordEx->setObjectType(objectType);
     recordEx->setAttributesHash(allAttributesHash);
 
@@ -111,14 +119,14 @@ bool AnalyticsArchive::saveToArchive(
 template bool AnalyticsArchive::saveToArchive<QRect>(
     std::chrono::milliseconds startTime,
     const std::vector<QRect>& data,
-    uint32_t objectsGroupId,
+    uint32_t trackGroupId,
     uint32_t objectType,
     int64_t allAttributesHash);
 
 template bool AnalyticsArchive::saveToArchive<QRectF>(
     std::chrono::milliseconds startTime,
     const std::vector<QRectF>& data,
-    uint32_t objectsGroupId,
+    uint32_t trackGroupId,
     uint32_t objectType,
     int64_t allAttributesHash);
 

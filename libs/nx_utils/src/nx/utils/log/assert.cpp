@@ -9,8 +9,6 @@
 
 #include "log.h"
 
-#include <nx/utils/unused.h>
-
 namespace nx::utils {
 
 /** Change to see more or less records at the end of execution */
@@ -93,7 +91,7 @@ static void handleQtMessage(
             break;
 
         default: // QtCriticalMsg, QtFatalMsg and all unknown.
-            // Skip some known messages.
+            // WebEngine thinks it's critical.
             if (message.contains("Refused to prefetch"))
             {
                 NX_WARNING(&context, message);

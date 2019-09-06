@@ -1,13 +1,16 @@
 #include "action_builder.h"
 
+#include <QScopedValueRollback>
+
 #include "action_field.h"
 
 namespace nx::vms::rules {
 
 using namespace std::chrono;
 
-ActionBuilder::ActionBuilder(const QnUuid& id, const ActionConstructor& ctor):
+ActionBuilder::ActionBuilder(const QnUuid& id, const QString& actionType, const ActionConstructor& ctor):
     m_id(id),
+    m_actionType(actionType),
     m_constructor(ctor)
 {
     m_timer.setSingleShot(true);
@@ -19,14 +22,28 @@ ActionBuilder::~ActionBuilder()
     qDeleteAll(m_fields);
 }
 
- bool ActionBuilder::addField(const QString& name, ActionField* field)
- {
-    if (m_fields.contains(name))
-        return false;
+QnUuid ActionBuilder::id() const
+{
+    return m_id;
+}
 
+QString ActionBuilder::actionType() const
+{
+    return m_actionType;
+}
+
+void ActionBuilder::addField(const QString& name, ActionField* field)
+{
+    // TODO: assert?
+    delete m_fields.value(name, nullptr);
     m_fields[name] = field;
-    return true;
- }
+    updateState();
+}
+
+const QHash<QString, ActionField*>& ActionBuilder::fields() const
+{
+   return m_fields;
+}
 
 void ActionBuilder::process(const EventPtr& event)
 {
@@ -56,11 +73,6 @@ void ActionBuilder::process(const EventPtr& event)
     }
 }
 
-QnUuid ActionBuilder::id() const
-{
-    return m_id;
-}
-
 void ActionBuilder::setAggregationInterval(seconds interval)
 {
     m_interval = interval;
@@ -69,6 +81,7 @@ void ActionBuilder::setAggregationInterval(seconds interval)
     m_timer.setInterval(m_interval);
     if (m_interval.count())
         m_timer.start();
+    updateState();
 }
 
 seconds ActionBuilder::aggregationInterval() const
@@ -76,9 +89,29 @@ seconds ActionBuilder::aggregationInterval() const
     return m_interval;
 }
 
+void ActionBuilder::connectSignals()
+{
+    for (auto& field: m_fields)
+    {
+        field->connectSignals();
+        connect(field, &Field::stateChanged, this, &ActionBuilder::updateState);
+    }
+}
+
 void ActionBuilder::onTimeout()
 {
     // emit aggregated action
+}
+
+void ActionBuilder::updateState()
+{
+    //TODO: #spanasenko Update derived values (error messages, etc.)
+
+    if (m_updateInProgress)
+        return;
+
+    QScopedValueRollback<bool> guard(m_updateInProgress, true);
+    emit stateChanged();
 }
 
 } // namespace nx::vms::rules

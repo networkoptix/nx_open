@@ -8,6 +8,7 @@
 #include <translation/datetime_formatter.h>
 
 #include <client/client_settings.h>
+#include <nx/vms/client/desktop/common/utils/current_date_monitor.h>
 
 #include <core/resource/media_server_resource.h>
 
@@ -20,6 +21,7 @@ constexpr int kMillisecondsInSeconds = 1000;
 constexpr int kMillisecondsInDay = 60 * 60 * 24 * 1000;
 constexpr int kDefaultDaysOffset = -7;
 
+using CurrentDateMonitor = nx::vms::client::desktop::CurrentDateMonitor;
 
 QDate defaultStartDate()
 {
@@ -38,7 +40,7 @@ QDate maxAllowedDate()
     return QDate::currentDate().addDays(1);
 }
 
-}
+} // namespace
 
 QnDateRangeWidget::QnDateRangeWidget(QWidget* parent):
     base_type(parent),
@@ -56,6 +58,10 @@ QnDateRangeWidget::QnDateRangeWidget(QWidget* parent):
         &QnDateRangeWidget::updateRange);
     connect(ui->dateEditTo, &QDateEdit::userDateChanged, this,
         &QnDateRangeWidget::updateRange);
+
+    auto currentDateMonitor = new CurrentDateMonitor(this);
+    connect(currentDateMonitor, &CurrentDateMonitor::currentDateChanged,
+        this, &QnDateRangeWidget::updateAllowedRange);
 }
 
 QnDateRangeWidget::~QnDateRangeWidget()

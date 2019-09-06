@@ -1,10 +1,6 @@
-/**********************************************************
-* 04 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "wildcard_match.h"
-
 
 template<class CharType>
 bool wildcardMatch( const CharType* mask, const CharType* str )
