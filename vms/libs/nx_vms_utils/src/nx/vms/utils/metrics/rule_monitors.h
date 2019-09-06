@@ -21,6 +21,7 @@ class NX_VMS_UTILS_API ExtraValueMonitor: public ValueMonitor
 public:
     ExtraValueMonitor(ValueGenerator formula);
     api::metrics::Value current() const override;
+    void forEach(Duration maxAge, const ValueIterator& iterator) const override;
 
 private:
     const ValueGenerator m_formula;

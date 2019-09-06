@@ -1,5 +1,7 @@
 #include "rule_monitors.h"
 
+#include <QtCore/QJsonObject>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/string_template.h>
@@ -89,54 +91,14 @@ public:
             });
     }
 
-    template<typename Operation> //< Value(std::vector<TimedValue<Value>>)
-    ValueGenerator durationOperation(int valueI, int durationI, Operation operation) const
+    ValueGenerator getBinaryOperation() const
     {
-        return
-            [operation, monitor = monitor(valueI), getDuration = value(durationI)]
-            {
-                const auto durationStr = getDuration().toVariant().toString();
-                const auto duration = nx::utils::parseTimerDuration(durationStr);
-                if (duration.count() <= 0)
-                    return api::metrics::Value("ERROR: Wrong duration: " + durationStr);
-
-                auto values = monitor->last(duration);
-                if (values.empty())
-                    return api::metrics::Value(); // No value if duration does not contain any data.
-
-                return api::metrics::Value(operation(std::move(values)));
-            };
-    }
-
-    ValueGenerator buildArithmetic() const
-    {
-        if (function() == "+" || function() == "add") // first second
+        if (function() == "+" || function() == "add")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 + v2; });
 
-        if (function() == "-" || function() == "sub") // first second
+        if (function() == "-" || function() == "sub")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 - v2; });
 
-        if (function() == "count") // value duration
-            return durationOperation(1, 2, [](auto values) { return (double) values.size(); });
-
-        if (function() == "countValues") // value duration expected
-        {
-            return durationOperation(
-                1, 2,
-                [getExpected = value(3)](auto values)
-                {
-                    const auto expected = getExpected();
-                    size_t count = 0;
-                    for (const auto& v: values) if (v.value == expected) count++;
-                    return (double) count;
-                });
-        }
-
-        return nullptr;
-    }
-
-    ValueGenerator buildConditional() const
-    {
         if (function() == "=" || function() == "equal")
             return binaryOperation(1, 2, [](auto v1, auto v2) { return v1 == v2; });
 
@@ -158,15 +120,79 @@ public:
         return nullptr;
     }
 
+    template<typename Operation> //< Value(std::vector<TimedValue<Value>>)
+    ValueGenerator durationOperation(int valueI, int durationI, Operation operation) const
+    {
+        return
+            [operation, monitor = monitor(valueI), getDuration = value(durationI)]
+            {
+                const auto durationStr = getDuration().toVariant().toString();
+                const auto duration = nx::utils::parseTimerDuration(durationStr);
+                if (duration.count() <= 0)
+                    return api::metrics::Value("ERROR: Wrong duration: " + durationStr);
+
+                return api::metrics::Value(operation(
+                    [&monitor, &duration](const auto& action) { monitor->forEach(duration, action); }
+                ));
+            };
+    }
+
+    ValueGenerator getDurationOperation() const
+    {
+        if (function() == "history") // value duration
+        {
+            return durationOperation(
+                1, 2,
+                [](const auto& forEach)
+                {
+                    QJsonObject items;
+                    forEach(
+                        [&](const auto& value, auto interval)
+                        {
+                            const auto s = std::chrono::duration_cast<std::chrono::seconds>(interval);
+                            items[QString::number(s.count())] = value;
+                        });
+                    return items;
+                });
+        }
+
+        if (function() == "count") // value duration
+        {
+            return durationOperation(
+                1, 2,
+                [](const auto& forEach)
+                {
+                    size_t count = 0;
+                    forEach([&](const auto&, auto) { count++; });
+                    return (double) count;
+                });
+        }
+
+        if (function() == "countValues") // value duration expected
+        {
+            return durationOperation(
+                1, 2,
+                [getExpected = value(3)](const auto& forEach)
+                {
+                    const auto expected = getExpected();
+                    size_t count = 0;
+                    forEach([&](const auto& value, auto) { count += (value == expected) ? 1 : 0; });
+                    return (double) count;
+                });
+        }
+
+        return nullptr;
+    }
+
     ValueGenerator build() const
     {
         if (function() == "const")
             return value(1);
 
-        if (auto generator = buildArithmetic())
+        if (auto generator = getBinaryOperation())
             return generator;
 
-        if (auto generator = buildConditional())
+        if (auto generator = getDurationOperation())
             return generator;
 
         throw std::domain_error("Unsupported function: " + function().toStdString());
@@ -227,6 +253,11 @@ ExtraValueMonitor::ExtraValueMonitor(ValueGenerator formula):
 api::metrics::Value ExtraValueMonitor::current() const
 {
     return m_formula();
+}
+
+void ExtraValueMonitor::forEach(Duration maxAge, const ValueIterator& iterator) const
+{
+    iterator(current(), maxAge);
 }
 
 AlarmMonitor::AlarmMonitor(

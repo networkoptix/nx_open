@@ -96,7 +96,7 @@ TEST_F(MetricsValueGenerator, Binary)
     EXPECT_EQ(parseFormulaOrThrow("notEqual %a hello", monitors)(), api::metrics::Value(false));
 }
 
-TEST_F(MetricsValueGenerator, Durations)
+TEST_F(MetricsValueGenerator, Duration)
 {
     nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
 
@@ -126,6 +126,11 @@ TEST_F(MetricsValueGenerator, Durations)
     EXPECT_EQ(count7(), api::metrics::Value(1));
     EXPECT_EQ(countHello(), api::metrics::Value(1));
 
+    timeShift.applyAbsoluteShift(std::chrono::minutes(50));
+    resource.update("a", "hello");
+    EXPECT_EQ(count(), api::metrics::Value(2));
+    EXPECT_EQ(count7(), api::metrics::Value(1));
+    EXPECT_EQ(countHello(), api::metrics::Value(1));
     // TODO: Check period expirations.
 }
 
