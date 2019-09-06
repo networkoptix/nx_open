@@ -232,7 +232,7 @@ elif platform.system() == 'Windows':
                 #    'sh'
                 #]
             else:
-                self._ssh_command = ['plink', '-batch', f"-p{port}", f"{login}@{host}" if login else host, 'sh']
+                self._ssh_command = ['plink', '-batch', '-P', str(port), f"{login}@{host}" if login else host, 'sh']
 
             self.host_key = None
             self.ip = None
@@ -247,7 +247,7 @@ elif platform.system() == 'Windows':
             self.is_root = self.eval('id -u') == '0'
 
         def ssh_command(self):
-            res = self.ssh_command.copy()
+            res = self._ssh_command.copy()
             if self.host_key:
                 res.insert(2, '-hostkey')
                 res.insert(3, self.host_key)
@@ -265,7 +265,7 @@ elif platform.system() == 'Windows':
                 opts['stderr'] = subprocess.PIPE
             command_wrapped = command if self.is_root or not su else f"sudo -n {command}"
             try:
-                proc = subprocess.Popen(self.ssh_command, **opts)
+                proc = subprocess.Popen(self.ssh_command(), **opts)
                 out, err = proc.communicate(f"{command_wrapped}\n".encode('UTF-8'), timeout)
                 proc.stdin.close()
             except subprocess.TimeoutExpired:
