@@ -11,6 +11,7 @@
 #include <nx/network/url/url_builder.h>
 
 #include "get_listening_peer_list_handler.h"
+#include "update_connection_speed_handler.h"
 #include "../controller.h"
 #include "../statistics/statistics_provider.h"
 
@@ -186,6 +187,14 @@ void Server::registerApiHandlers(const PeerRegistrator& peerRegistrator)
             return std::make_unique<InitiateConnectionRequestHandler>(
                 m_holePunchingProcessor,
                 m_listeningPeerDb);
+        },
+        network::http::Method::post);
+
+    m_httpMessageDispatcher.registerRequestProcessor<UpdateConnectionSpeedHandler>(
+        network::url::joinPath(api::kMediatorApiPrefix, api::kConnectionSpeedUplinkPath).c_str(),
+        [this]()
+        {
+            return std::make_unique<UpdateConnectionSpeedHandler>(m_listeningPeerDb);
         },
         network::http::Method::post);
 

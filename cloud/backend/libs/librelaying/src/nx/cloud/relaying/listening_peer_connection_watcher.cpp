@@ -27,7 +27,7 @@ void ListeningPeerConnectionWatcher::bindToAioThread(
     m_keepAliveProbeTimer.bindToAioThread(aioThread);
 }
 
-void ListeningPeerConnectionWatcher::start(
+void ListeningPeerConnectionWatcher::startMonitoringConnection(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
     post(
@@ -41,7 +41,7 @@ void ListeningPeerConnectionWatcher::start(
         });
 }
 
-void ListeningPeerConnectionWatcher::startTunnel(
+void ListeningPeerConnectionWatcher::openTunnel(
     const ClientInfo& clientInfo,
     OpenTunnelHandler handler)
 {
@@ -56,7 +56,7 @@ void ListeningPeerConnectionWatcher::startTunnel(
             cancelKeepAlive();
 
             if (!peerSupportsKeepAliveProbe() || m_firstKeepAliveSent)
-                return startTunnel(std::move(notification), std::move(handler));
+                return openTunnel(std::move(notification), std::move(handler));
 
             sendKeepAliveProbe(
                 [this, notification = std::move(notification), handler = std::move(handler)](
@@ -65,7 +65,7 @@ void ListeningPeerConnectionWatcher::startTunnel(
                     if (resultCode != SystemError::noError)
                         return nx::utils::swapAndCall(handler, resultCode, nullptr);
 
-                    startTunnel(std::move(notification), std::move(handler));
+                    openTunnel(std::move(notification), std::move(handler));
                 });
         });
 }
@@ -124,7 +124,7 @@ void ListeningPeerConnectionWatcher::sendKeepAliveProbe(
         });
 }
 
-void ListeningPeerConnectionWatcher::startTunnel(
+void ListeningPeerConnectionWatcher::openTunnel(
     relay::api::OpenTunnelNotification notification,
     OpenTunnelHandler handler)
 {
@@ -139,7 +139,6 @@ void ListeningPeerConnectionWatcher::startTunnel(
 }
 
 template<typename Notification, typename Handler>
-// requires std::is_void<std::invoke_result_t<handler, SystemError::ErrorCode>::type>::value
 void ListeningPeerConnectionWatcher::sendNotification(
     Notification notification,
     Handler handler)

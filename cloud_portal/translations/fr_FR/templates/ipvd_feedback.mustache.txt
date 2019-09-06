@@ -1,0 +1,6 @@
+Bonjour {{ message.userFullName }},
+{{ message.sender_name}} ({{ message.sender_email }}) a donné le retour suivant pour {{ message.product }}:
+<pre>{{ message.message }}</pre>
+
+------------------------------------------
+L'usager peut-il être contacté: {{ message.sender_to_be_contacted}}

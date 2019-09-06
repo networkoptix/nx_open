@@ -86,6 +86,8 @@ import * as angular from 'angular';
                 this.getMySystems = function (currentUserEmail, currentSystemId) {
                     return this.systems.filter((system) => {
                         return system.ownerAccountEmail === currentUserEmail && system.id !== currentSystemId;
+                    }).sort((a, b) => {
+                        return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
                     });
                 };
 

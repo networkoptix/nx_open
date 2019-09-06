@@ -1,6 +1,6 @@
-<h1>Доступна нова версія для {{ message.product }}</h1>
+<h1>There is a new version for {{ message.product }} ({{ message.product_type }}) to review</h1>
 <p>Натисніть на посилання, щоб переглянути чернетку {{ message.id }} для {{ message.product }}</p>
-<a class="btn" href="{{ config.portal_url }}/admin/cms/version/{{ message.id }}/">Огляд версії</a>
+<a class="btn" href="{{ config.portal_url }}/admin/cms/productcustomizationreview/{{ message.id }}/change/">Огляд версії</a>
 <h4>На цій сторінці ви можете</h4>
 <ul>
 	<li>Створити попередній перегляд, щоб переглянути останні зміни.</li>

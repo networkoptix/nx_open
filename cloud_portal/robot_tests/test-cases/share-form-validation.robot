@@ -1,9 +1,9 @@
 *** Settings ***
 Resource          ../resource.robot
 Suite Setup       Open Share Dialog
-Suite Teardown    Close Browser
-Test Teardown     Run Keyword If Test Failed    Restart
 Test Template     Test Email Invalid
+Test Teardown     Run Keyword If Test Failed    Restart
+Suite Teardown    Close Browser
 Force Tags        email    form    Threaded File
 
 *** Variables ***
@@ -59,8 +59,9 @@ Open Share Dialog
     Open Browser and go to URL    ${url}/systems/${AUTO TESTS SYSTEM ID}
     Log In    ${email}    ${password}    None
     Validate Log In
-    Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}    //div[@ng-if='gettingSystem.success']//h2[@class='card-title']
-    Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}    //div[@ng-if='gettingSystem.success']
+
+    Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}    //div[@ng-if\='gettingSystem.success']//h2[@class\='card-title']
+    Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}    //div[@ng-if\='gettingSystem.success']
     Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
     Wait Until Element Is Enabled    ${SHARE BUTTON SYSTEMS}
     Click Button    ${SHARE BUTTON SYSTEMS}

@@ -14,8 +14,7 @@ class DbRequestExecutor:
     using base_type = nx::sql::test::BaseDbTest;
 
 public:
-    DbRequestExecutor():
-        base_type(kModuleName)
+    DbRequestExecutor()
     {
         initializeDatabase();
 

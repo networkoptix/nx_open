@@ -32,68 +32,84 @@
         }
     }
     
-    .icon-search {
-        position : absolute;
-        margin   : 10px 0 0 10px;
-    }
+    .search-group {
+        flex-shrink : 20;
+        position    : relative;
+        width       : 100%;
+        
+        .icon-search {
+            position : absolute;
+            margin   : 10px 0 0 14px;
+        }
     
-    .search-input {
-        width         : 200px;
-        height        : 40px;
-        padding-left  : 48px;
-        padding-right : 40px;
-        font-size     : 15px;
-        font-family   : $font-family-regular;
-        color         : $light16;
-        border-radius : 2px;
-        border        : 1px solid $light6;
-        background    : transparent;
+        .search-input {
+            height        : 40px;
+            padding-left  : 48px;
+            padding-right : 40px;
+            font-size     : 15px;
+            font-family   : $font-family-regular;
+            color         : $light16;
+            border-radius : 2px;
+            border        : 1px solid $light6;
+            background    : transparent;
         
-        &:placeholder-shown {
-            @include placeholder();
-        }
-        
-        &:active, &:focus, &.non-empty {
-            background-color : $light1;
-            color            : $dark9;
-            border           : 1px solid $brand_core;
-        }
-        
-        &:hover:not(:active):not(:focus) {
-            border : 1px solid $light8;
-        }
-        
-        &:-webkit-autofill,
-        &:-webkit-autofill:hover,
-        &:-webkit-autofill:active,
-        &:-webkit-autofill:focus {
-            background-color        : $light1 !important;
-            color                   : $dark9 !important;
-            -webkit-box-shadow      : 0 0 0 1000px $light1 inset !important;
-            -webkit-text-fill-color : $dark9 !important;
-        }
-    }
-    
-    .search-clear {
-        position    : absolute;
-        right       : 2px;
-        top         : 0;
-        bottom      : 0;
-        line-height : 40px;
-        margin      : auto;
-        cursor      : pointer;
-        width       : rem(36px);
-        height      : rem(36px);
-        padding     : 0;
-    }
-    
-    .drop {
-        &:last-of-type {
-            @include media-breakpoint-up(lg) {
-                padding-right : 0 !important;
+            &:placeholder-shown {
+                @include placeholder();
             }
-            @include media-breakpoint-up(xxl) {
-                padding-right : 1rem !important;
+        
+            &:active, &:focus, &.non-empty {
+                background-color : $light1;
+                color            : $dark9;
+                border           : 1px solid $brand_core;
+            }
+        
+            &:hover:not(:active):not(:focus) {
+                border : 1px solid $light8;
+            }
+        
+            &:-webkit-autofill,
+            &:-webkit-autofill:hover,
+            &:-webkit-autofill:active,
+            &:-webkit-autofill:focus {
+                background-color        : $light1 !important;
+                color                   : $dark9 !important;
+                -webkit-box-shadow      : 0 0 0 1000px $light1 inset !important;
+                -webkit-text-fill-color : $dark9 !important;
+            }
+        }
+    
+        .search-clear {
+            position    : absolute;
+            right       : 0;
+            top         : 0;
+            bottom      : 0;
+            line-height : 40px;
+            margin      : auto;
+            cursor      : pointer;
+            width       : 40px;
+            height      : 40px;
+            padding     : 0;
+        }
+    }
+    
+    .drop-container {
+        @include media-breakpoint-up(md) {
+            max-width: $collapse-second-width; // medium break point
+        }
+        
+        .drop {
+            
+            padding : 0 1rem 0 0;
+            @include media-breakpoint-down(sm) {
+                padding-right : 0;
+            }
+        
+            &:last-of-type {
+                padding-right : 0;
+                
+                @include media-breakpoint-up(xxl) {
+                    padding-right : 1rem;
+                }
             }
         }
     }

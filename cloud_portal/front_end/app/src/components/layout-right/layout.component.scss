@@ -21,6 +21,11 @@
             width: 100%;
             columns: 1;
         }
+    
+        .right-sidemenu {
+            border-top : 1px solid transparent; // equalize section header
+        }
+        
         @include media-breakpoint-up(sm) {
             width   : 66.66667%; // col-8
             columns : 1;         // overwrite default Bootstrap value

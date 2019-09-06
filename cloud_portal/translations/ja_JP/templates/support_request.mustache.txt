@@ -1,0 +1,3 @@
+こんにちは、{{ message.userFullName }}
+{{ message.sender_name}} （{{ message.sender_email }}）には次の質問があります
+<pre>{{ message.message }}</pre>

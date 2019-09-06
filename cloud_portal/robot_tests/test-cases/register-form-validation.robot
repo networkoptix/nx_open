@@ -1,9 +1,9 @@
 *** Settings ***
 Resource          ../resource.robot
 Suite Setup       Open Browser and go to URL    ${url}/register
-Suite Teardown    Close Browser
-Test Teardown     Run Keyword If Test Failed    Restart
 Test Template     Test Register Invalid
+Test Teardown     Run Keyword If Test Failed    Restart
+Suite Teardown    Close Browser
 Force Tags        form    Threaded File
 
 *** Variables ***
@@ -69,6 +69,10 @@ Leading Space Password                    mark        hamill      ${valid email}
     [tags]    C41860
 Trailing Space Password                   mark        hamill      ${valid email}            ${BASE PASSWORD}${SPACE}    True
     [tags]    C41860
+Fair Password                             mark        hamill      ${EMPTY}                  ${symbol password}          True
+    [tags]    C41860
+Good Password                             mark        hamill      ${EMPTY}                  ${BASE PASSWORD}            True
+    [tags]    C41860
 Middle Space Password qweasd 123          mark        hamill      ${valid email}            ${BASE PASSWORD}            True
     [tags]    C41862
 Empty Password                            mark        hamill      ${valid email}            ${EMPTY}                    True
@@ -131,8 +135,8 @@ Check Password Badge
     ...    ELSE IF    '''${pass}'''=='''${no upper password}''' or '''${pass}'''=='''${weak password}'''    Element Should Be Visible    ${PASSWORD IS WEAK BADGE}
     ...    ELSE IF    '''${pass}'''=='''${common password}'''    Element Should Be Visible    ${PASSWORD TOO COMMON BADGE}
     ...    ELSE IF    '''${pass}'''=='''${CYRILLIC TEXT}''' or '''${pass}'''=='''${SMILEY TEXT}''' or '''${pass}'''=='''${GLYPH TEXT}''' or '''${pass}'''=='''${TM TEXT}''' or '''${pass}'''=='''${SPACE}${BASE PASSWORD}''' or '''${pass}'''=='''${BASE PASSWORD}${SPACE}'''    Element Should Be Visible    ${PASSWORD INCORRECT BADGE}
-    ...    ELSE IF    '''${pass}'''=='''${fair password}''' or '''${pass}'''=='''${symbol password}'''   Element Should Be Visible    ${PASSWORD IS FAIR BADGE}
-    ...    ELSE IF    '''${pass}'''=='''${BASE PASSWORD}'''    Element Should Be Visible    ${PASSWORD IS GOOD BADGE}
+    ...    ELSE IF    '''${pass}'''=='''${symbol password}'''   Move focus and check badge    ${PASSWORD IS FAIR BADGE}
+    ...    ELSE IF    '''${pass}'''=='''${BASE PASSWORD}'''    Move focus and check badge    ${PASSWORD IS GOOD BADGE}
 
 Check Email Outline
     [Arguments]    ${email}
@@ -162,3 +166,9 @@ Check Last Name Outline
 
 Check Terms and Conditions Error
     Wait Until Element Is Visible    ${TERMS AND CONDITIONS ERROR}
+
+Move focus and check badge
+    [Arguments]    ${badge}
+    Element Should Be Visible    ${badge}
+    Click Element    ${REGISTER FORM}
+    Element Should Be Visible    ${badge}

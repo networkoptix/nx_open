@@ -1,0 +1,6 @@
+你好，{{ message.userFullName }}
+{{ message.sender_name}} ({{ message.sender_email }}) 给出了以下回馈 {{ message.product }} :
+<pre>{{ message.message }}</pre>
+
+------------------------------------------
+可与用户联系: {{ message.sender_to_be_contacted}}

@@ -7,7 +7,7 @@ angular.module('cloudApp')
             title:function(title, clean){
                 $timeout(function(){
                     if(title){
-                        if(clean || title.indexOf(L.productName)>=0){
+                        if(clean || title.indexOf(L.cloudName)>=0){
                             $rootScope.pageTitle = title;
                         }else{
                             $rootScope.pageTitle = L.pageTitles.template.replace('{{title}}',title);

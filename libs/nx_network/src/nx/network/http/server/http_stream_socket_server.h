@@ -5,13 +5,15 @@
 #include "abstract_authentication_manager.h"
 #include "http_message_dispatcher.h"
 #include "http_server_connection.h"
+#include "http_statistics.h"
 
 namespace nx {
 namespace network {
 namespace http {
 
 class NX_NETWORK_API HttpStreamSocketServer:
-    public nx::network::server::StreamSocketServer<HttpStreamSocketServer, HttpServerConnection>
+    public nx::network::server::StreamSocketServer<HttpStreamSocketServer, HttpServerConnection>,
+    public nx::network::http::server::AbstractHttpStatisticsProvider
 {
     using base_type =
         nx::network::server::StreamSocketServer<HttpStreamSocketServer, HttpServerConnection>;
@@ -36,6 +38,8 @@ public:
 
     void setPersistentConnectionEnabled(bool value);
 
+    virtual server::HttpStatistics httpStatistics() const override;
+
 protected:
     virtual std::shared_ptr<HttpServerConnection> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) override;
@@ -44,6 +48,9 @@ private:
     nx::network::http::server::AbstractAuthenticationManager* const m_authenticationManager;
     nx::network::http::AbstractMessageDispatcher* const m_httpMessageDispatcher;
     bool m_persistentConnectionEnabled;
+
+    mutable QnMutex m_mutex;
+    nx::network::http::server::RequestStatisticsCalculator m_statsCalculator;
 };
 
 class NX_NETWORK_API StreamConnectionHolder:

@@ -214,6 +214,9 @@ import * as angular from 'angular';
                 });
             },
             sendMessage: function(type, productId, message, userName?, userEmail?, contact?) {
+                if (typeof(contact) === 'undefined') {
+                    contact = false;
+                }
                 return $http.post(apiBase + '/feedback', {
                     message, productId, type, userName, userEmail, contact
                 });

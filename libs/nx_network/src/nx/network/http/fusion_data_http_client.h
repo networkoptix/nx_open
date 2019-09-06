@@ -12,6 +12,7 @@
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/network/http/server/fusion_request_result.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/url.h>
 
@@ -39,42 +40,6 @@ bool deserializeFromHeaders(
     T* /*what*/)
 {
     return false;
-}
-
-template<typename OutputData>
-void processHttpResponse(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, const nx::network::http::Response*, OutputData)> handler,
-    SystemError::ErrorCode errCode,
-    const nx::network::http::Response* response,
-    nx::network::http::BufferType msgBody)
-{
-    if (errCode != SystemError::noError ||
-        !response ||
-        !nx::network::http::StatusCode::isSuccessCode(response->statusLine.statusCode))
-    {
-        handler(errCode, response, OutputData());
-        return;
-    }
-
-    OutputData outputData;
-
-    if (!msgBody.isEmpty())
-    {
-        bool success = false;
-        outputData = QJson::deserialized<OutputData>(msgBody, OutputData(), &success);
-        if (!success)
-        {
-            handler(SystemError::invalidData, response, OutputData());
-            return;
-        }
-    }
-    else
-    {
-        // Trying to read response data from HTTP headers.
-        deserializeFromHeaders(response->headers, &outputData);
-    }
-
-    handler(SystemError::noError, response, std::move(outputData));
 }
 
 template<typename HandlerFunc>
@@ -173,13 +138,79 @@ public:
         return m_httpClient;
     }
 
+    const nx::network::http::FusionRequestResult& lastFusionRequestResult() const
+    {
+        return m_lastFusionRequestResult;
+    }
+
 protected:
     nx::utils::Url m_url;
     nx::network::http::StringType m_requestContentType;
     nx::network::http::BufferType m_requestBody;
     nx::utils::MoveOnlyFunc<HandlerFunc> m_handler;
+    FusionRequestResult m_lastFusionRequestResult;
 
     virtual void requestDone(nx::network::http::AsyncClient* client) = 0;
+
+    void deserializeFusionRequestResult(
+        SystemError::ErrorCode errCode,
+        const nx::network::http::Response* response,
+        const nx::network::http::BufferType& msgBody)
+    {
+        if (errCode != SystemError::noError ||
+            !response ||
+            !StatusCode::isSuccessCode(response->statusLine.statusCode))
+        {
+            bool ok = false;
+            m_lastFusionRequestResult = QJson::deserialized(msgBody, FusionRequestResult(), &ok);
+            // The message body has already been fetched to try and deserialize this structure.
+            // If it failed, there may still be an error message in the body that should be saved.
+            if (!ok)
+                m_lastFusionRequestResult.errorText = msgBody;
+        }
+    }
+
+    template<typename OutputData>
+    void processHttpResponse(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode,
+            const nx::network::http::Response*,
+            OutputData)> handler,
+        SystemError::ErrorCode errCode,
+        const nx::network::http::Response* response,
+        nx::network::http::BufferType msgBody)
+    {
+        using namespace nx::network::http;
+
+        if (errCode != SystemError::noError ||
+            !response ||
+            !StatusCode::isSuccessCode(response->statusLine.statusCode))
+        {
+            deserializeFusionRequestResult(errCode, response, msgBody);
+            handler(errCode, response, OutputData());
+            return;
+        }
+
+        OutputData outputData;
+
+        if (!msgBody.isEmpty())
+        {
+            bool success = false;
+            outputData = QJson::deserialized<OutputData>(msgBody, OutputData(), &success);
+            if (!success)
+            {
+                handler(SystemError::invalidData, response, OutputData());
+                return;
+            }
+        }
+        else
+        {
+            // Trying to read response data from HTTP headers.
+            deserializeFromHeaders(response->headers, &outputData);
+        }
+
+        handler(SystemError::noError, response, std::move(outputData));
+    }
 
 private:
     nx::network::http::AsyncClient m_httpClient;
@@ -239,7 +270,7 @@ private:
     {
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);
-        detail::processHttpResponse(
+        this->processHttpResponse(
             std::move(handler),
             client->failed() ? client->lastSysErrorCode() : SystemError::noError,
             client->response(),
@@ -269,7 +300,7 @@ private:
     {
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);
-        detail::processHttpResponse(
+        this->processHttpResponse(
             std::move(handler),
             client->failed() ? client->lastSysErrorCode() : SystemError::noError,
             client->response(),
@@ -304,6 +335,11 @@ public:
 private:
     virtual void requestDone(nx::network::http::AsyncClient* client) override
     {
+        deserializeFusionRequestResult(
+            client->lastSysErrorCode(),
+            client->response(),
+            client->fetchMessageBodyBuffer());
+
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);
         handler(
@@ -332,6 +368,11 @@ public:
 private:
     virtual void requestDone(nx::network::http::AsyncClient* client) override
     {
+        deserializeFusionRequestResult(
+            client->lastSysErrorCode(),
+            client->response(),
+            client->fetchMessageBodyBuffer());
+
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);
         handler(

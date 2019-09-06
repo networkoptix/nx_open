@@ -29,7 +29,6 @@ static MediatorEndpoint lookupMediatorEndpointSync(
 } //namespace
 
 MediatorCluster::MediatorCluster(const nx::utils::Url& discoveryServiceUrl):
-    base_type("hpm_mediator_cluster", QString()),
     m_discoveryServiceUrl(discoveryServiceUrl)
 {
 }

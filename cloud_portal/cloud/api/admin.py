@@ -34,9 +34,9 @@ class CustomizationFilter(SimpleListFilter):
             }
 
     def queryset(self, request, queryset):
-        customization_name = Customization.objects.filter(id=self.value())
-        if self.value() and customization_name.exists():
-            return queryset.filter(customization=customization_name[0].name)
+        customization_name = Customization.objects.filter(id=self.value()).first()
+        if self.value() and customization_name:
+            return queryset.filter(customization=customization_name.name)
 
         if self.value() is None:
             return queryset.filter(customization=self.default_customization.name)
@@ -63,15 +63,15 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
                     'is_staff', 'language', 'customization', 'user_groups')
     # forbid changing all fields which can be edited by user in cloud portal except sub
     readonly_fields = ('email', 'first_name', 'last_name', 'created_date', 'activated_date', 'last_login',
-                       'subscribe', 'language', 'customization')
+                       'language', 'customization')
 
     exclude = ("user_permissions",)
 
-    list_filter = ('subscribe', 'is_staff', 'created_date', 'last_login', CustomizationFilter, GroupFilter, )
+    list_filter = ('is_staff', 'created_date', 'last_login', CustomizationFilter, GroupFilter, )
     search_fields = ('email', 'first_name', 'last_name', 'customization', 'language', 'groups__name')
 
     csv_fields = ('email', 'first_name', 'last_name', 'created_date', 'last_login',
-                  'subscribe', 'is_staff', 'language', 'customization')
+                  'is_staff', 'language', 'customization')
 
     change_list_template = "api/account_changelist.html"
     form = AccountAdminForm
@@ -90,14 +90,23 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
     def get_queryset(self, request):  # show only users for current customization
         qs = super(AccountAdmin, self).get_queryset(request)  # Basic check from CMSAdmin
         if not request.user.is_superuser:  # only superuser can watch full accounts list
-            qs = qs.filter(customization=settings.CUSTOMIZATION)
+            show_customizations = request.user.customizations_with_permission(permission='api.change_account')
+            qs = qs.filter(customization__in=show_customizations).distinct()
         return qs
 
     def has_add_permission(self, request):  # Only superuser can add users
         return False
 
+    def has_change_permission(self, request, obj=None):
+        return UserGroupsToProductPermissions.\
+            check_customization_change_account(request.user, settings.CUSTOMIZATION)
+
     def has_delete_permission(self, request, obj=None):  # No deleting users at all
         return False
+
+    def has_view_permission(self, request, obj=None):
+        return UserGroupsToProductPermissions.\
+            check_customization_change_account(request.user, settings.CUSTOMIZATION)
 
     def get_urls(self):
         urls = super(AccountAdmin, self).get_urls()
@@ -126,7 +135,8 @@ class AccountAdmin(CMSAdmin, CSVExportAdmin):
                                                  self.get_prepopulated_fields(request))
         return render(request, 'api/invite_form.html', context)
 
-    def user_groups(self, obj):
+    @staticmethod
+    def user_groups(obj):
         return [group.name for group in obj.groups.all()]
 
 

@@ -86,12 +86,6 @@ class Service:
     public ::testing::Test,
     public TestWithTemporaryDirectory
 {
-public:
-    Service():
-        TestWithTemporaryDirectory("nx_utils_ut", QString())
-    {
-    }
-
 protected:
     void givenStartedService()
     {

@@ -1,0 +1,29 @@
+#pragma once
+
+#include <string_view>
+
+namespace nx::cloud::storage::client {
+
+enum class ResultCode
+{
+    ok = 0,
+    ioError,
+    notImplemented,
+};
+
+constexpr std::string_view toString(ResultCode code)
+{
+    switch (code)
+    {
+        case ResultCode::ok:
+            return "ok";
+        case ResultCode::ioError:
+            return "ioError";
+        case ResultCode::notImplemented:
+            return "notImplemented";
+    }
+
+    return "unknown";
+}
+
+} // namespace nx::cloud::storage::client

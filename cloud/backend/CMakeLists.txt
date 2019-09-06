@@ -18,6 +18,7 @@ if(withClouds)
     add_subdirectory(traffic_relay)
     add_subdirectory(time_server)
     add_subdirectory(cloud_connect_test_util)
+    add_subdirectory(storage)
     add_subdirectory(cloud_db_test_util)
 
     if(withTests)
@@ -25,4 +26,4 @@ if(withClouds)
     endif()
 endif()
 
-add_custom_target(cloud-backend DEPENDS cloud_db_client connection_mediator cloud_db traffic_relay time_server cloud_connect_test_util)
+add_custom_target(cloud-backend DEPENDS cloud_db_client connection_mediator cloud_db traffic_relay time_server cloud_connect_test_util cloud_storage_backend)

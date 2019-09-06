@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/utils/sync_call.h>
@@ -165,7 +166,7 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
     const auto system1 = addRandomSystem();
 
     //emulating local mediaserver
-    MediaServerEmulator mserverEmulator(stunUdpEndpoint(), stunTcpEndpoint(), system1);
+    MediaServerEmulator mserverEmulator(stunUdpEndpoint(), stunTcpBaseUrl(), system1);
     ASSERT_TRUE(mserverEmulator.start());
     ASSERT_EQ(api::ResultCode::ok, mserverEmulator.bind());
 

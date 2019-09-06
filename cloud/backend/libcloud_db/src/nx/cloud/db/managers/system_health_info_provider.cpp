@@ -36,7 +36,7 @@ SystemHealthInfoProvider::~SystemHealthInfoProvider()
 bool SystemHealthInfoProvider::isSystemOnline(
     const std::string& systemId) const
 {
-    return m_ec2ConnectionManager->isSystemConnected(systemId);
+    return m_ec2ConnectionManager->isClusterConnected(systemId);
 }
 
 void SystemHealthInfoProvider::getSystemHealthHistory(

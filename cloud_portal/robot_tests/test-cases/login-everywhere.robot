@@ -1,8 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
+Suite Setup       Open Browser and go to URL    ${url}
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Open New Browser On Failure
-Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 Force Tags        Threaded
 
@@ -121,7 +121,7 @@ works at restore password page with password input - after submit error
     Go To    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
     ${link}    Get Email Link    ${random email}    activate
-    Go To    ${link}[1]
+    Go To    ${link}
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${random email}
@@ -145,7 +145,7 @@ works at restore password page with password input - after submit success
     Go To    ${url}/register
     Register    mark    hamill    ${random email}    ${password}
     ${link}    Get Email Link    ${random email}    activate
-    Go To    ${link}[1]
+    Go To    ${link}
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${random email}

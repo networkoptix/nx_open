@@ -32,12 +32,12 @@ public:
     void disconnectFrom(const Peer& other);
 
     Customer addRandomData();
-    
+
     void addRandomDataAsync(
         nx::utils::MoveOnlyFunc<void(ResultCode, Customer)> completionHandler);
-    
+
     bool hasData(const std::vector<Customer>& data);
-    
+
     Customer modifyRandomly(const Customer& data);
 
     void setOutgoingCommandFilter(const OutgoingCommandFilterConfiguration& filter);

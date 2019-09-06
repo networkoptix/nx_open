@@ -1,8 +1,8 @@
-יש גרסה חדשה עבור {{ message.product }}
+There is a new version for {{ message.product }}({{message.product_type}}) to review.
 
 לחץ על הקישור כדי לבדוק את הטיוטה {{ message.id }} עבור {{ message.product }}
 
-קישור לבדיקה: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
+Link to review: {{ config.portal_url }}/admin/cms/productcustomizationreview/{{ message.id }}/change/
 
 בדף זה אתה יכול
 1) ליצור תצוגה מקדימה כדי לראות את השינויים האחרונים.

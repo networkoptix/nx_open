@@ -3,6 +3,7 @@
 #include <nx/network/address_resolver.h>
 #include <nx/network/app_info.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/kit/ini_config.h>
 #include <nx/utils/argument_parser.h>
 #include <nx/utils/std/cpp14.h>
@@ -12,8 +13,10 @@
 #include "cloud_connect_settings.h"
 #include "mediator_address_publisher.h"
 #include "mediator_connector.h"
+#include "mediator/api/mediator_api_client.h"
 #include "tunnel/connector_factory.h"
 #include "tunnel/outgoing_tunnel_pool.h"
+#include "speed_test/uplink_speed_reporter.h"
 
 namespace nx {
 namespace network {
@@ -28,6 +31,7 @@ struct CloudConnectControllerImpl
     MediatorAddressPublisher addressPublisher;
     OutgoingTunnelPool outgoingTunnelPool;
     CloudConnectSettings settings;
+    speed_test::UplinkSpeedReporter uplinkSpeedReporter;
 
     CloudConnectControllerImpl(
         const QString& customCloudHost,
@@ -40,7 +44,8 @@ struct CloudConnectControllerImpl
         mediatorConnector(cloudHost.toStdString()),
         addressPublisher(
             mediatorConnector.systemConnection(),
-            &mediatorConnector)
+            &mediatorConnector),
+        uplinkSpeedReporter(&mediatorConnector)
     {
     }
 

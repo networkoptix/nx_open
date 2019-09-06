@@ -300,7 +300,7 @@ private:
         // For the response introducing a soft check: we may send an empty response body.
         // So, Output=void is allowed to be used with a method that may produce a response body.
         //constexpr bool isResponseMsgBodySuggested = !std::is_same_v<Output, void>;
-        //if (isResponseMsgBodySuggested && 
+        //if (isResponseMsgBodySuggested &&
         //    !Method::isMessageBodyAllowedInResponse(this->m_requestMethod, StatusCode::ok))
         //{
         //    return false;
@@ -318,7 +318,7 @@ private:
     {
         if (!this->getInputFormat(request, error))
             return false;
-        
+
         // Parsing request message body using fusion.
         if (!this->template parseAnyFusionFormat<LocalInput>(
                 this->inputFormat(),

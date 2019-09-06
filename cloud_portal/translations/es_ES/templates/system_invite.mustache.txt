@@ -1,11 +1,11 @@
-Bienvenido/a a %PRODUCT_NAME%
+Welcome to %CLOUD_NAME%
 
 {{#message.sharer_name}}
-{{message.sharer_name}} ({{message.sharer_email}}) is inviting you to join %PRODUCT_NAME% and shared the system {{message.system_name}} with you.
+{{message.sharer_name}} ({{message.sharer_email}}) is inviting you to join %CLOUD_NAME% and shared the system {{message.system_name}} with you.
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-Es invitado a unirse %PRODUCT_NAME%.
+You are invited you to join %CLOUD_NAME%.
 Se les ha concedido acceso a {{message.system_name}}.
 {{/message.sharer_name}}
 

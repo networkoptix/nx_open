@@ -312,7 +312,7 @@ private:
 
         if (m_authenticator)
         {
-            m_httpServer->setAuthenticationEnabled(true);
+            m_httpServer->enableAuthentication(".*");
             m_httpServer->registerUserCredentials(
                 m_authenticator->user().toUtf8(),
                 m_authenticator->password().toUtf8());

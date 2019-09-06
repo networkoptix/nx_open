@@ -4,6 +4,8 @@
 
 int main(int argc, char* argv[])
 {
+    nx::utils::TestOptions::setModuleName("nx_discovery_api_client_ut");
+
     return nx::network::test::runTest(
         argc, argv,
         [](const nx::utils::ArgumentParser&)

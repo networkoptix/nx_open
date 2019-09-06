@@ -7,10 +7,10 @@ def ping():
     while True:
         try:
             response = requests.get(url, timeout=5)
-            print response
+            print (response)
             break
         except requests.exceptions.ConnectionError:
-            print "Server not responding", datetime.datetime.now()
+            print ("Server not responding", datetime.datetime.now())
     return response
 
 if __name__ == '__main__':

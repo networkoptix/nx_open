@@ -3,6 +3,7 @@
 #include <chrono>
 #include <functional>
 #include <string>
+#include <vector>
 
 #include "result_code.h"
 #include "system_data.h"
@@ -61,6 +62,69 @@ public:
     }
 };
 
+class UserAuthorization
+{
+public:
+    /**
+     * HTTP method from the user request.
+     */
+    std::string requestMethod;
+
+    /**
+     * The "Authorization" header value from the user request. E.g., see [rfc7616] for the spec.
+     */
+    std::string requestAuthorization;
+};
+
+enum class ObjectType
+{
+    none = 0,
+    account,
+    system,
+};
+
+constexpr static const char* toString(ObjectType type)
+{
+    switch (type)
+    {
+        case ObjectType::account:
+            return "account";
+
+        case ObjectType::system:
+            return "system";
+
+        case ObjectType::none:
+            return "none";
+    }
+
+    return "unknown";
+}
+
+class CredentialsDescriptor
+{
+public:
+    api::ResultCode status = api::ResultCode::ok;
+    ObjectType objectType = ObjectType::none;
+
+    /**
+     * email for account. Id for a system.
+     */
+    std::string objectId;
+};
+
+class SystemAccess
+{
+public:
+    SystemAccessRole accessRole = SystemAccessRole::none;
+};
+
+class SystemAccessLevelRequest
+{
+public:
+    std::string systemId;
+    api::UserAuthorization authorization;
+};
+
 /**
  * Provides some temporary hashes which can be used by mediaserver
  *   to authenticate requests using cloud account credentials.
@@ -80,14 +144,32 @@ public:
     virtual void getCdbNonce(
         const std::string& systemId,
         std::function<void(api::ResultCode, api::NonceData)> completionHandler) = 0;
-    
+
     /**
      * NOTE: If authRequest.realm value is unknown to CDB, request will fail.
      */
     virtual void getAuthenticationResponse(
         const api::AuthRequest& authRequest,
         std::function<void(api::ResultCode, api::AuthResponse)> completionHandler) = 0;
+
+    virtual void resolveUserCredentials(
+        const api::UserAuthorization& authorization,
+        std::function<void(api::ResultCode, api::CredentialsDescriptor)> completionHandler) = 0;
+
+    virtual void getSystemAccessLevel(
+        const std::string& systemId,
+        const api::UserAuthorization& authorization,
+        std::function<void(api::ResultCode, api::SystemAccess)> completionHandler) = 0;
+
+    /**
+     * @param completionHandler The order of system access corresponds to that of requests.
+     */
+    virtual void getSystemAccessLevel(
+        const std::vector<api::SystemAccessLevelRequest>& requests,
+        std::function<void(api::ResultCode, std::vector<api::SystemAccess>)> completionHandler) = 0;
 };
+
+//-------------------------------------------------------------------------------------------------
 
 class AuthInfoRecord
 {

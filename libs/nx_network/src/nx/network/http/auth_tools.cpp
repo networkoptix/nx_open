@@ -4,6 +4,10 @@
 
 #include <QtCore/QCryptographicHash>
 
+#include <nx/utils/random.h>
+#include <nx/utils/random_cryptographic_device.h>
+#include <nx/utils/uuid.h>
+
 namespace nx {
 namespace network {
 namespace http {
@@ -432,6 +436,33 @@ BufferType calcResponseFromIntermediate(
     response.resize(MD5_DIGEST_LENGTH);
     MD5_Final(reinterpret_cast<unsigned char*>(response.data()), &md5Ctx);
     return response.toHex();
+}
+
+StringType generateNonce(const StringType& eTag)
+{
+    static constexpr int secretDataLength = 7;
+
+    StringType nonce;
+    auto now = std::chrono::high_resolution_clock::now();
+    nonce += QString::number(now.time_since_epoch().count()).toUtf8() + ":";
+    nonce += eTag.isEmpty() ? QnUuid::createUuid().toSimpleByteArray() : eTag + ":";
+    nonce += nx::utils::random::generateName(
+        nx::utils::random::CryptographicDevice::instance(),
+        secretDataLength);
+
+    return nonce;
+}
+
+header::WWWAuthenticate generateWwwAuthenticateHeader(
+    const StringType& nonce,
+    const StringType& realm)
+{
+    header::WWWAuthenticate wwwAuthenticate;
+    wwwAuthenticate.authScheme = header::AuthScheme::digest;
+    wwwAuthenticate.params.emplace("nonce", nonce);
+    wwwAuthenticate.params.emplace("realm", realm);
+    wwwAuthenticate.params.emplace("algorithm", "MD5");
+    return wwwAuthenticate;
 }
 
 } // namespace nx

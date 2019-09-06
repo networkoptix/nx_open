@@ -28,6 +28,16 @@ TEST(StdFilesystem, filename)
         ( path("."), path("") ), path("/var/local/").filename());
     ASSERT_EQ(path("tmp"), path("c:\\tmp").filename());
     ASSERT_EQ(path("tmp"), path("tmp").filename());
+
+    ASSERT_EQ("bar.txt", path("/foo/bar.txt").filename());
+    ASSERT_EQ(".bar", path("/foo/.bar").filename());
+    ASSERT_EQ("", path("/foo/bar/").filename());
+    ASSERT_EQ(".", path("/foo/.").filename());
+    ASSERT_EQ("..", path("/foo/..").filename());
+    ASSERT_EQ(".", path(".").filename());
+    ASSERT_EQ("..", path("..").filename());
+    ASSERT_EQ("", path("/").filename());
+    //ASSERT_EQ("host", path("//host").filename());
 }
 
 } // namespace filesystem

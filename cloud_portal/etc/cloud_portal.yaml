@@ -3,7 +3,7 @@ customization: 'default'
 host: '$CLOUD_PORTAL_HOST'
 
 cloud_database:
-    host: 'localhost'
+    host: '0.0.0.0'
     port: '3306'
     username: 'root'
     password: ''
@@ -18,6 +18,8 @@ cloud_portal:
 
 trafficRelay:
     host: 'relay-bur.vmsproxy.hdw.mx'
+
+bucket: 'cloud-portal'
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'

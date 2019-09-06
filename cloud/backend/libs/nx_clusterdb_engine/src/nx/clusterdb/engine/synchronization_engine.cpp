@@ -196,7 +196,7 @@ void SynchronizationEngine::onSystemDeleted(const std::string& systemId)
 {
     // New connections will not be authorized since system is deleted,
     // but existing ones have to be closed.
-    m_connectionManager.closeConnectionsToSystem(
+    m_connectionManager.closeConnectionsToCluster(
         systemId.c_str(),
         [this, systemId, locker = m_startedAsyncCallsCounter.getScopedIncrement()]()
         {

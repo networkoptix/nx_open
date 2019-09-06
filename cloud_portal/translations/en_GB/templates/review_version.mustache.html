@@ -1,6 +1,6 @@
-<h1>There is a new revision for {{ message.product }}</h1>
+<h1>There is a new version for {{ message.product }} ({{ message.product_type }}) to review</h1>
 <p>Click on the link to review draft {{ message.id }} for {{ message.product }}</p>
-<a class="btn" href="{{ config.portal_url }}/admin/cms/version/{{ message.id }}/">Review Version</a>
+<a class="btn" href="{{ config.portal_url }}/admin/cms/productcustomizationreview/{{ message.id }}/change/">Review Version</a>
 <h4>On this page you can</h4>
 <ul>
 	<li>Create a preview to see the most recent changes.</li>

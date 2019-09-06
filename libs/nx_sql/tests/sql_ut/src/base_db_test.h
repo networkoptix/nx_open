@@ -22,7 +22,7 @@ class BasicFixture:
     public nx::utils::test::TestWithTemporaryDirectory
 {
 public:
-    BasicFixture(const std::string& testModuleName);
+    BasicFixture();
 
 protected:
     virtual bool initializeQueryExecutor(const ConnectionOptions& connectionOptions) = 0;

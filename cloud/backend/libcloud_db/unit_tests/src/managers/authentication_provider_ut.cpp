@@ -55,8 +55,10 @@ public:
             m_settingsLoader.settings(),
             &queryExecutor(),
             &m_accountManager,
+            nullptr, // system manager
             &m_systemSharingManager,
             m_temporaryAccountPasswordManager,
+            std::vector<AbstractAuthenticationDataProvider*>(),
             &m_vmsP2pCommandBusStub);
     }
 

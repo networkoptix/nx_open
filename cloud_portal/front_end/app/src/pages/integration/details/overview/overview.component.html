@@ -1,0 +1,48 @@
+<div class="row m-0 pl-2 pr-2 pt-0">
+    <div class="col-12 col-lg-9">
+        <nx-block first-element *ngIf="plugin && (plugin.information || plugin.overview)">
+            <header translate>
+                How it works
+            </header>
+
+            <nx-section *ngIf="plugin.overview && plugin.overview.overviewVideo">
+                <nx-external-video [src]="plugin.overview.overviewVideo"></nx-external-video>
+            </nx-section>
+
+            <nx-section *ngIf="plugin.overview && plugin.overview.description">
+                <div [innerHtml]="plugin.overview.description"></div>
+            </nx-section>
+
+            <nx-section *ngIf="plugin.overview && plugin.overview.screenshots">
+                <nx-carousel [screenshots]="plugin.overview.screenshots"></nx-carousel>
+            </nx-section>
+        </nx-block>
+    </div>
+
+    <div class="col-12 mt-3 col-lg-3 mt-lg-0">
+        <nx-block side-element type="gray" *ngIf="plugin && plugin.company && plugin.company.companyName">
+            <header>
+                {{plugin.company.companyName}}
+            </header>
+
+            <nx-section *ngIf="plugin.company.companyInfo || plugin.company.companyLogo || plugin.company.companyWeb || plugin.information && plugin.information.logo">
+                <div class="card--body-logo mb-2" *ngIf="plugin.company.companyLogo"
+                     [style.backgroundImage]="'url(' + plugin.company.companyLogo + ')'"
+                     [style.maxWidth]="'100%'">
+                </div>
+                <div class="card--body-logo mb-2" *ngIf="!plugin.company.companyLogo && plugin.information.logo"
+                     [style.backgroundImage]="'url(' + plugin.information.logo + ')'"
+                     [style.maxWidth]="'100%'">
+                </div>
+                <div *ngIf="plugin.company.companyInfo" [innerHtml]="plugin.company.companyInfo"></div>
+                <div *ngIf="plugin.company.companyWeb">
+                    <a [href]="plugin.company.companyWeb"
+                       target="_blank"
+                       [innerHtml]="plugin.company.companyWebTitle || plugin.company.companyWeb"></a>
+                </div>
+            </nx-section>
+        </nx-block>
+    </div>
+
+</div>
+

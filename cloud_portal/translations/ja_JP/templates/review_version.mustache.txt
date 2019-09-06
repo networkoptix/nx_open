@@ -1,8 +1,8 @@
-{{ message.product }}の新しいリビジョンがあります
+There is a new version for {{ message.product }}({{message.product_type}}) to review.
 
 リンクをクリックして、{{ message.product }}のドラフト{{ message.id }}を確認してください
 
-レビューへのリンク：{{ config.portal_url }}/admin/cms/version/{{ message.id }}
+Link to review: {{ config.portal_url }}/admin/cms/productcustomizationreview/{{ message.id }}/change/
 
 このページでは
 1) 最近の変更を表示するプレビューを作成します

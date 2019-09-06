@@ -11,6 +11,7 @@
 
 #include "literal.h"
 #include "qnbytearrayref.h"
+#include "std_string_utils.h"
 
 namespace nx::utils {
 
@@ -104,14 +105,6 @@ K, M, G suffix are supported.
 NX_UTILS_API uint64_t stringToBytes(const QString& str, bool* isOk = nullptr);
 NX_UTILS_API uint64_t stringToBytes(const QString& str, uint64_t defaultValue);
 NX_UTILS_API uint64_t stringToBytesConst(const char* str);
-
-enum GroupToken
-{
-    doubleQuotes = 1,
-    squareBraces = 2,
-    roundBraces = 4,
-    singleQuotes = 8,
-};
 
 /**
  * Splits src string to substring using separator.
@@ -315,27 +308,11 @@ size_t find_last_of(
     return BufferNpos;
 }
 
-template<template<typename...> class String, typename CharType>
-// requires Random_access_iterator<typename String<Char>::iterator>
-String<CharType> maxPrefix(const String<CharType>& one, const String<CharType>& two)
-{
-    auto oneIter = one.begin();
-    auto twoIter = two.begin();
-
-    while ((oneIter != one.end()) && (twoIter != two.end()) && (*oneIter == *twoIter))
-    {
-        ++oneIter;
-        ++twoIter;
-    }
-
-    return String<CharType>(one.begin(), oneIter);
-}
-
 /**
  * Format Json string with indentation to make it human-readable.
  */
 NX_UTILS_API QByteArray formatJsonString(const QByteArray& data);
 
-NX_UTILS_API int stricmp(const std::string& left, const std::string& right);
+NX_UTILS_API int stricmp(const QByteArray& left, const QByteArray& right);
 
 } // namespace nx::utils

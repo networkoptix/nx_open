@@ -94,7 +94,7 @@ protected:
 
         m_ownerAccount = addActivatedAccount2();
 
-        m_vmsGatewayEmulator.setAuthenticationEnabled(true);
+        m_vmsGatewayEmulator.enableAuthentication(".*");
         m_vmsGatewayEmulator.registerUserCredentials(
             m_ownerAccount.email.c_str(),
             m_ownerAccount.password.c_str());

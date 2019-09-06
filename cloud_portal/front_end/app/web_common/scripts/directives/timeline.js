@@ -434,6 +434,10 @@
                                 timelineActions.animateScroll(scope.scaleManager.getScrollTarget(mouseXOverTimeline));
                             }
                         }
+    
+                        const tapInterval = CONFIG.timelineMouseEventTimeout;
+                        var waitingSecondTap = false;
+                        var initialTap;
                         
                         function viewportClick(event) {
                             updateMouseCoordinate(event);
@@ -443,6 +447,21 @@
                             }
                             if (mouseOverElements.timeline) {
                                 timelineClick(mouseXOverTimeline);
+                            }
+                            
+                            // out own "dblclick" acing as dbltouch on iOS devices
+                            if (window.jscd.os === window.jscd.supportedOS.ios) {
+                                if (!waitingSecondTap) {
+                                    waitingSecondTap = true;
+        
+                                    initialTap = $timeout(function() {
+                                        waitingSecondTap = false;
+                                    }, tapInterval);
+                                } else {
+                                    $timeout.cancel(initialClick);
+                                    timelineActions.fullZoomOut();
+                                    waitingSecondTap = false;
+                                }
                             }
                         }
                         

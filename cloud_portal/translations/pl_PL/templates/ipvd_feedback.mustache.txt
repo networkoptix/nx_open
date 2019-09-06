@@ -1,0 +1,6 @@
+Witaj {{ message.userFullName }}
+{{ message.sender_name}} ({{ message.sender_email }}) przesłał następującą opinię o {{ message.product }}:
+<pre>{{ message.message }}</pre>
+
+------------------------------------------
+Zgoda na kontakt z użytkownikiem: {{ message.sender_to_be_contacted}}

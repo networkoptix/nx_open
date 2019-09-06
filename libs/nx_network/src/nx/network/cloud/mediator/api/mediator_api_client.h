@@ -6,6 +6,7 @@
 #include <nx/network/cloud/data/connect_data.h>
 #include <nx/network/http/generic_api_client.h>
 
+#include "connection_speed.h"
 #include "listening_peer.h"
 #include "../../data/result_code.h"
 
@@ -33,10 +34,15 @@ public:
         const ConnectRequest& request,
         nx::utils::MoveOnlyFunc<void(ResultCode, ConnectResponse)> completionHandler);
 
+	void reportUplinkSpeed(
+		const PeerConnectionSpeed& connectionSpeed,
+		nx::utils::MoveOnlyFunc<void(ResultCode)> completionHandler);
+
     template <typename... Output>
     static ResultCode getResultCode(
         SystemError::ErrorCode systemErrorCode,
         const network::http::Response* response,
+        const network::http::FusionRequestResult& /*fusionRequestResult*/,
         const Output&...)
     {
         if (systemErrorCode != SystemError::noError)

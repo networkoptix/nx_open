@@ -1,15 +1,18 @@
 import {
-    Component, EventEmitter, forwardRef, Input, OnInit, Output
-}                                 from '@angular/core';
+    Component, forwardRef, Input, OnChanges, OnInit, SimpleChanges, ViewEncapsulation
+} from '@angular/core';
 import { NxConfigService }        from '../../services/nx-config';
 import { NG_VALUE_ACCESSOR }      from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute }         from '@angular/router';
+import { NxUriService }           from '../../services/uri.service';
+import { TranslateService }       from '@ngx-translate/core';
+import { NxUtilsService }         from '../../services/utils.service';
 
 /* USAGE
  <nx-vendor-list
-         vendors=[]
-         cameras=[]
-        [(ngModel)]="filterModel">
+ vendors=[]
+ cameras=[]
+ [(ngModel)]="filterModel">
  </nx-vendor-list>
  */
 
@@ -17,61 +20,128 @@ import { ActivatedRoute, Router } from '@angular/router';
     selector   : 'nx-vendor-list',
     templateUrl: 'vendor-list.component.html',
     styleUrls  : ['vendor-list.component.scss'],
-    providers: [{
+    encapsulation: ViewEncapsulation.None,
+    providers  : [{
         provide    : NG_VALUE_ACCESSOR,
         useExisting: forwardRef(() => NxVendorListComponent),
         multi      : true
     }]
 })
-export class NxVendorListComponent implements OnInit {
+export class NxVendorListComponent implements OnInit, OnChanges {
     @Input() vendors: any;
     @Input() cameras: any;
 
     CONFIG: any;
-    arrGridColumns: number[];
 
+    public debug: boolean;
+    public filters: any = [];
+    public remainingVendors: number;
+
+    private lang: any = {};
+    private uriPath: string;
     private filter: any = {};
+    private ASC = true;
+    private DESC = false;
 
     constructor(CONFIG: NxConfigService,
-                private _router: Router,
+                private translate: TranslateService,
+                private uri: NxUriService,
                 private _route: ActivatedRoute) {
 
         this.CONFIG = CONFIG.getConfig();
+        this.debug = false;
+        this.uriPath = '/' + this._route.snapshot.url[0].path;
+        this.lang = this.translate.translations[this.translate.currentLang];
 
-        this.arrGridColumns = Array.apply(undefined, Array(this.CONFIG.campage.vendorGroups)).map((x, i) => i);
+        this.filters = [
+            {
+                label: this.lang.cameraFilters.highRes,
+                select: {id: 'resolution', value: '8mp'},
+                multiselect: { id: 'hardwareTypes', value: 'camera' }
+            },
+            {
+                label: this.lang.cameraFilters.aptz,
+                tagId: 'isAptzSupported',
+                multiselect: { id: 'hardwareTypes', value: 'camera' }
+            },
+            {
+                label: this.lang.cameraFilters.ptz,
+                tagId: 'isPtzSupported',
+                multiselect: { id: 'hardwareTypes', value: 'camera' }
+            },
+            {
+                label: this.lang.cameraFilters.audio,
+                tagId: 'isAudioSupported',
+                multiselect: {id: 'hardwareTypes', value: 'camera'}
+            },
+            {
+                label: this.lang.cameraFilters.H265,
+                tagId: 'isH265',
+                multiselect: { id: 'hardwareTypes', value: 'camera' }
+            },
+            {
+                label: this.lang.cameraFilters.encoder,
+                multiselect: { id: 'hardwareTypes', value: 'encoder' }
+            },
+            {
+                label: this.lang.cameraFilters.TwWayAudio,
+                tagId: 'isTwAudioSupported'
+            },
+            {
+                label: this.lang.cameraFilters.multiSensor,
+                multiselect: { id: 'hardwareTypes', value: 'multiSensorCamera' }
+            },
+            {
+                label: this.lang.cameraFilters.fisheye,
+                tagId: 'isFisheye',
+                multiselect: { id: 'hardwareTypes', value: 'camera' }
+            },
+            {
+                label: this.lang.cameraFilters.IO,
+                tagId: 'isIoSupported',
+                multiselect: { id: 'hardwareTypes', value: 'other' }
+            }
+        ];
     }
 
-    ngOnInit() {}
-
-    vendorGroup(n) {
-        function nstart(m) {
-            if (m === 0) {
-                return 0;
-            }
-
-            return nstart(m - 1) + ncol(m - 1);
-        }
-
-        function ncol(m) {
-            return m < (cols - (M * cols - total)) ? M : (M - 1);
-        }
-
-        const total = this.vendors.length,
-              cols  = this.CONFIG.campage.vendorGroups,
-              M     = Math.ceil(total / cols),
-              n1    = nstart(n),
-              n2    = ncol(n);
-
-        return { start: n1, end: n1 + n2 };
+    ngOnInit() {
+        this.uri
+            .getURI()
+            .subscribe(params => {
+                if (params.debug !== undefined) {
+                    this.debug = true;
+                }
+            });
     }
 
     // Form control functions
     // The method set in registerOnChange to emit changes back to the form
-    private propagateChange = (_: any) => {};
+    private propagateChange = (_: any) => {
+    };
 
     writeValue(value: any) {
         if (value) {
             this.filter = value;
+        }
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes.vendors) {
+
+            const byCountDESC = NxUtilsService.byParam((elm) => {
+                return elm.count;
+            }, NxUtilsService.sortDESC);
+
+            const byNameASC = NxUtilsService.byParam((elm) => {
+                return elm.name.toLowerCase();
+            }, NxUtilsService.sortASC);
+
+            this.remainingVendors = changes.vendors.currentValue.length - this.CONFIG.ipvd.vendorsShown;
+            this.vendors = changes.vendors
+                    .currentValue
+                    .sort(byCountDESC)
+                    .slice(0, this.CONFIG.ipvd.vendorsShown)
+                    .sort(byNameASC);
         }
     }
 
@@ -90,7 +160,51 @@ export class NxVendorListComponent implements OnInit {
     registerOnTouched(fn: () => void): void {
     }
 
-    setVendor(value) {
+    setFilter(filter) {
+        interface Params {
+            [key: string]: any;
+        }
+
+        const queryParams: Params = {};
+
+        if (filter.select) {
+            this.filter.selects.find((select) => {
+                if (select.id === filter.select.id) {
+                    select.selected = select.items.find(item => {
+                        return item.name === filter.select.value;
+                    });
+                    queryParams.resolution = select.selected.name;
+                }
+            });
+        }
+
+        if (filter.tagId) {
+            queryParams.tags = filter.tagId;
+            this.filter.tags.find(tag => {
+                if (tag.id === filter.tagId) {
+                    tag.value = true;
+                }
+            });
+        }
+
+        if (filter.multiselect) {
+            this.filter.multiselects.find((select) => {
+                if (select.id === filter.multiselect.id) {
+                    select.selected.push(select.items.find(item => item.id === filter.multiselect.value).id);
+                    queryParams.hardwareTypes = select.selected;
+                }
+            });
+        }
+
+        this.uri.updateURI('/ipvd', queryParams);
+
+        // Propagate component's value attribute (model)
+        this.propagateChange({ ...this.filter });
+
+        return false;
+    }
+
+    setVendor(vendor) {
         interface Params {
             [key: string]: any;
         }
@@ -99,24 +213,17 @@ export class NxVendorListComponent implements OnInit {
 
         this.filter.multiselects.find((select) => {
             if (select.id === 'vendors') {
-                select.selected.push(value);
+                select.selected.push(vendor.name);
 
                 queryParams[select.id] = select.selected;
 
-                // changes the route without moving from the current view or
-                // triggering a navigation event,
-                this._router.navigate(['/campage'], {
-                    queryParams,
-                    relativeTo: this._route,
-                    replaceUrl: true,
-                    queryParamsHandling: 'merge',
-                    // do not trigger navigation
-                    // skipLocationChange : true
-                });
+                this.uri.updateURI(this.uriPath, queryParams);
             }
         });
-        // Propagate component's value attribute (model)
-        this.propagateChange({...this.filter});
-    }
 
+        // Propagate component's value attribute (model)
+        this.propagateChange({ ...this.filter });
+
+        return false;
+    }
 }

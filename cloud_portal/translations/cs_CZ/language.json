@@ -1,28 +1,38 @@
 {
   "language": "cs_CZ",
   "language_name": "Čeština",
-  "productName": "%PRODUCT_NAME%",
+  "cloudName": "%CLOUD_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "OK",
     "cancelButton": "Zrušit",
-    "loginTitle": "Přihlaste se k %PRODUCT_NAME%",
+    "loginTitle": "Log in to %CLOUD_NAME%",
     "loginButton": "Přihlásit se",
     "logoutAuthorisedTitle": "Již jste přihlášen",
     "logoutAuthorisedContinueButton": "Pokračovat",
     "logoutAuthorisedLogoutButton": "Odhlásit se",
     "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageSent": "Message has been sent.",
+    "noClientDetectedTitle": "Pro zobrazení Vašeho systému nainstalujte %VMS_NAME%",
+    "download": "Stáhnout %VMS_NAME%"
   },
-  "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+  "messageDialog": {
+    "title": {
+      "integration": "Email for {{product}}",
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}"
+    },
+    "topic": {
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}",
+      "contact_sales": "Contact sales for {{product}}",
+      "contact_support": "Contact support for {{product}}"
+    }
   },
   "pageTitles": {
-    "template": "{{title}} %PRODUCT_NAME%",
-    "default": "%PRODUCT_NAME%",
+    "template": "{{title}} %CLOUD_NAME%",
+    "default": "%CLOUD_NAME%",
     "registerSuccess": "Vítejte v",
     "register": "Vytvořit účet v",
     "changePassword": "Změnit heslo -",
@@ -46,7 +56,8 @@
   },
   "systemStatuses": {
     "activated": "aktivováno",
-    "merging": "merging",
+    "incompatible": "Nekompatibilní",
+    "merging": "#merging",
     "notActivated": "neaktivováno",
     "online": "online",
     "offline": "offline",
@@ -71,7 +82,7 @@
     },
     "Advanced Viewer": {
       "label": "Pokročilý prohlížeč",
-      "description": "Can view live video, browse the archive, control PTZ etc"
+      "description": "Lze sledovat živé video, procházet archiv, ovládat PTZ atd"
     },
     "Administrator": {
       "label": "Administrátor",
@@ -124,12 +135,12 @@
     "cantChangePasswordPrefix": "Heslo nelze uložit",
     "cantActivatePrefix": "Váš účet nelze aktivovat",
     "cantSendConfirmationPrefix": "Nelze odeslat potvrzovací email",
-    "cloudInvalidResponse": "Databáze cloudu vrátila neočekávanou odpověď",
     "notAuthorized": "Chybné heslo",
     "brokenAccount": "Neočekávaný problém s účtem. <a href=\"/restore_password\">Obnovení účtu</a>",
     "wrongParameters": "Některé parametry ve formuláři jsou nesprávné",
     "wrongCode": "Účet je již aktivován, nebo potvrzovací kód je nesprávný",
     "wrongCodeRestore": "Potvrzovací kód je již použit nebo nesprávný",
+    "wrongAuthCode": "Code is expired or incorrect",
     "forbidden": "K provedení této akce nemáte oprávnění",
     "accountNotActivated": "Tento účet není ještě aktivován. <a href=\"/activate\">Odeslat znovu aktivační odkaz</a>",
     "accountBlocked": "Tento účet je dočasně zablokován. Zkuste to prosím znovu za pár minut.",
@@ -147,21 +158,28 @@
     "lostConnection": "Připojení k {{systemName}} se ztratilo",
     "thisSystem": "systém",
     "oldSafariNotSupported": "Verze Safari starší než 10 není podporována",
-    "DUPLICATE_MEDIASERVER_FOUND": "Duplicate servers were found on one of the systems.<br>Remove old servers from each system that you are trying to merge and try again.",
-    "mergedSystemIsOffline": "One of the systems being merged is offline. Make sure they are online and try again.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "Některé serverové seznamy se mohou zobrazovat jako existující v obou systémech - ve vybraném i v aktuálním.<br>Ze systému odeberte offline a nekompatibilní servery a opakujte akci.",
+    "mergedSystemIsOffline": "Systém <strong>{{failedSystem}}</strong> je offline.",
+    "INCOMPATIBLE": "Systémy mají různé verze softwaru. Prosím aktualizujte oba na <a href=\"/download\">nejnovější verzi</a>.",
+    "FAIL": "Systém <strong>{{failedSystem}}</strong> je momentálně nedostupný.<br>zkuste to znovu za okamžik nebo se obraťte na podporu <a href=\"%SUPPORT_LINK%\" target=\"_blank\"></a>.",
+    "unknownMergeError": "Unknown error. You can try to refresh the page and repeat attempt. If the problem persists – please contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Spojení systémů selhalo",
+    "commonText": "Nelze sloučit systémy <strong>{{primarySystem}}</strong> a <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
     "good": "dobré",
     "fair": "dostatečné",
-    "minLength": "too short",
+    "fairMessage": "Aby bylo vaše heslo silnější, použijte čísla, velká a malá písmena a speciální znaky",
+    "minLength": "příliš krátké",
     "minLengthMessage": "Heslo musí obsahovat nejméně 8 znaků",
     "required": "nesprávné",
     "requiredMessage": "Používejte pouze latinskou abecedu, číslice a symboly na klávesnici, vyhněte se použití mezery na počátku a konci",
     "weak": "slabé",
     "weakMessage": "Aby bylo vaše heslo silnější, použijte čísla, velká a malá písmena a speciální znaky",
     "strongMessage": "Silné heslo!",
-    "common": "too common",
+    "common": "příliš časté",
     "commonMessage": "Toto heslo je v seznamu nejoblíbenějších heslech na světě",
     "missingMessage": "Heslo je vyžadováno"
   },
@@ -185,7 +203,7 @@
     "confirmRenameTitle": "Název systému",
     "confirmRenameAction": "Uložit",
     "successRename": "Název systému byl uložen",
-    "confirmDisconnectTitle": "Odpojit systém od %PRODUCT_NAME%?",
+    "confirmDisconnectTitle": "Disconnect System from %CLOUD_NAME%?",
     "confirmDisconnectAction": "Odpojit",
     "confirmUnshareFromMe": "Chystáte se odpojit systém od Vašeho účtu. K tomuto systému již nebudete mít přístup. Přejete si pokračovat?",
     "confirmUnshareFromMeTitle": "Odpojit systém?",
@@ -193,11 +211,13 @@
     "confirmUnshare": "Tento uživatel nebude mít přístup k systému. Přejete si pokračovat?",
     "confirmUnshareTitle": "Smazat uživatele?",
     "confirmUnshareAction": "Smazat",
-    "successDisconnected": "Systém byl úspěšně odpojen od %PRODUCT_NAME%",
+    "successDisconnected": "System is successfully disconnected from %CLOUD_NAME%",
     "successDeleted": "Systém {{systemName}} byl úspěšně odstraněna z Vašeho účtu",
-    "successMerge": "System merge completed",
+    "mergeFailed": "Spojení systémů selhalo",
+    "mergeStart": "Systémy se spojují",
+    "mergeSuccess": "System merge completed",
     "permissionsRemoved": "Oprávnění byla odstraněna z adresy {{email}}",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Neznámý název systému (problém s cloudovým spojením)"
   },
   "account": {
     "accountSavedSuccess": "Váš účet byl úspěšně uložen",
@@ -206,72 +226,6 @@
     "changePassword": "Změnit heslo",
     "newPasswordLabel": "Nové heslo",
     "saveChanges": "Uložit"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Pro zobrazení Vašeho systému nainstalujte %VMS_NAME%",
-    "action": "Stáhnout %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Pouze klient",
-      "server": "Pouze server",
-      "bundle": "Klient a server",
-      "servertool": "Nástroj konfigurace"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "Znovu poslat aktivační odkaz",
@@ -298,7 +252,8 @@
       "copyActiveText": "zkopírováno do schránky"
     },
     "systemOffline": "Systém je offline",
-    "systemHasNoCameras": "NO CAMERAS",
+    "systemHasNoCameras": "ŽÁDNÉ KAMERY",
+    "systemUnreachable": "SYSTEM IS UNREACHABLE",
     "cameraStates": {
       "offline": "Offline",
       "error": "Chyba",
@@ -334,5 +289,10 @@
       "stop listening": "zastavení poslech",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "Doporučujeme konzultaci s",
+    "b_support": "podpora",
+    "c_proceeding": "než budete pokračovat."
   }
 }

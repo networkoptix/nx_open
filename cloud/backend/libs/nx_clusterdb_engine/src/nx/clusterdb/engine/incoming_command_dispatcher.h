@@ -27,6 +27,11 @@ public:
         const CommandTransportHeader&,
         const CommandHeader&>;
 
+    template<typename DbFunc, typename DataArg>
+    using DbFuncResult = typename std::invoke_result_t<
+        DbFunc,
+        nx::sql::QueryContext*, std::string, DataArg>;
+
     IncomingCommandDispatcher(CommandLog* const transactionLog);
     virtual ~IncomingCommandDispatcher();
 
@@ -41,10 +46,14 @@ public:
     /**
      * Register processor function by command type.
      */
-    template<typename CommandDescriptor>
+    template<typename CommandDescriptor, typename DbFunc>
     void registerCommandHandler(
-        typename CommandProcessor<CommandDescriptor>::
-            ProcessEc2TransactionFunc processTranFunc)
+        DbFunc processTranFunc,
+        typename std::enable_if_t<
+            std::is_same_v<
+                DbFuncResult<DbFunc, Command<typename CommandDescriptor::Data>>,
+                nx::sql::DBResult>,
+        DbFunc>* = nullptr)
     {
         using SpecificCommandProcessor = CommandProcessor<CommandDescriptor>;
 
@@ -56,6 +65,30 @@ public:
         m_commandProcessors.emplace(
             CommandDescriptor::code,
             std::move(context));
+    }
+
+    /**
+     * DbFunc must have the signature: void(nx::sql::QueryContext*, std::string, CommandDescriptor::Data)
+     *
+     * @param clusterId if non-empty and not matching the clusterId supplied with the transaction,
+     * dbFunc is not invoked. If empty, dbFunc is always invoked.
+     */
+    template<typename CommandDescriptor, typename DbFunc>
+    void registerCommandHandler(
+        DbFunc processTranFunc,
+        typename std::enable_if_t<
+            std::is_same_v<DbFuncResult<DbFunc, typename CommandDescriptor::Data>, void>,
+            DbFunc>* = nullptr)
+    {
+        registerCommandHandler<CommandDescriptor>(
+            [processTranFunc = std::move(processTranFunc)](
+                auto queryContext,
+                auto clusterId,
+                auto command) -> nx::sql::DBResult
+            {
+                processTranFunc(queryContext, std::move(clusterId), std::move(command.params));
+                return nx::sql::DBResult::ok;
+            });
     }
 
     /**

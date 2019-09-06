@@ -1,0 +1,47 @@
+{
+  "cameraLinks": {
+    "highStream": "High stream",
+    "lowStream": "Low stream",
+    "transcoding": "Transkoodaus",
+    "unknown": "Tuntematon",
+    "copyToClipboard": "Kopioi leikepöydälle",
+    "copyDefaultText": "Kopioi",
+    "copyActiveText": "Kopioitu leikepöydälle"
+  },
+  "systemOffline": "Järjestelmään ei saada yhteyttä",
+  "cameraStates": {
+    "offline": "Offline-tilassa",
+    "error": "Virhe",
+    "unauthorized": "Tunnistus vaaditaan",
+    "noData": "Ei dataa",
+    "iosVideoTooLarge": "iOS ei tue videota, joka on suurempi kuin fullHD (2MP: 1920x1080).",
+    "flashRequired": "Siirry<a href='https://get.adobe.com/flashplayer/' target='_blank'>Asenna Adobe Flash</a> videoiden toistamiseen.",
+    "flashOrWebmRequired": "Ota <a href='https://get.adobe.com/flashplayer/' target='_blank'>Asenna Adobe Flash</a> tai<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM koodekin</a> videon toistamiseen Internet Explorer.",
+    "noArmSupport": "Tämä selain tai laite ei tue videotoistoa ARM-pohjaisista palvelimista.",
+    "noFormat": "Tämä selain ei tue videon toistoa tästä kamerasta.",
+    "ieNoWebm": "Asenna <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM-koodekki</a> Internet Exploreriin.",
+    "ieWin10": "Käytä Microsoft Edgen tai Google Chromen selaimia.",
+    "ubuntuNX": "Tämä selain ei tue ARM-pohjaisia palvelimia. Käytä sen sijaan Chromium-selainta."
+  },
+  "searchCamPlaceholder": "Etsi",
+  "resolution": {
+    "auto": "Automaattinen",
+    "high": "Korkea",
+    "low": "Matala"
+  },
+  "chromeCastWarning": "Chromecast on resursseja kuormittava ja saattaa aiheuttaa ongelmia palvelimellasi.",
+  "voiceCommands": {
+    "play": "Toista",
+    "pause": "Tauko",
+    "live": "go to live | show me live",
+    "view": "view + [camera name]",
+    "search": "find + [text for searchbar]",
+    "clear search": "Tyhjennä haku",
+    "expand server": "expand server + [server name]",
+    "collapse server": "collapse server + [server name]",
+    "expand all servers": "laajenna kaikki palvelimet",
+    "collapse all servers": "Kokoa kaikki palvelimet",
+    "stop listening": "Lopeta kuuntelu",
+    "help": "help | show commands"
+  }
+}

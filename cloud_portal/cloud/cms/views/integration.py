@@ -1,13 +1,14 @@
 import json
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from cloud import settings
 from api.helpers.exceptions import api_success, handle_exceptions
 
-from cms.controllers.filldata import process_context_structure
+from cms.controllers.filldata import global_contexts_to_dict, process_context_structure
 from cms.models import Context, DataStructure, Product, ProductCustomizationReview, ProductType,\
-    UserGroupsToProductPermissions, get_cloud_portal_product
+    UserGroupsToProductPermissions, cloud_portal_customization_cache
 
 CLOUD_PORTAL = ProductType.PRODUCT_TYPES.cloud_portal
 INTEGRATION = ProductType.PRODUCT_TYPES.integration
@@ -15,7 +16,7 @@ ACCEPTED = ProductCustomizationReview.REVIEW_STATES.accepted
 PENDING = ProductCustomizationReview.REVIEW_STATES.pending
 
 
-def make_integrations_json(integrations, contexts=[], show_pending=False):
+def make_integrations_json(integrations, contexts=None, show_pending=False, show_drafts=False):
     integrations_json = []
 
     if not contexts:
@@ -23,17 +24,33 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
 
     global_contexts = Context.objects.filter(product_type__type=CLOUD_PORTAL, is_global=True)
     cloud_portal = Product.objects.filter(product_type__type=CLOUD_PORTAL,
-                                          customizations__name__in=[settings.CUSTOMIZATION])
-    if cloud_portal.exists():
-        cloud_portal = cloud_portal.first()
+                                          customizations__name__in=[settings.CUSTOMIZATION]).first()
+
+    if cloud_portal:
+        global_contexts_dict = global_contexts_to_dict(global_contexts, cloud_portal)
 
         for integration in integrations:
             integration_dict = {}
             current_version = integration.version_id()
+
             if show_pending:
-                current_version = ProductCustomizationReview.objects.filter(version__product=integration,
-                                                                            state=PENDING).latest('id').version.id
-                integration_dict['pending'] = True
+                pending_version = ProductCustomizationReview.objects.filter(version__id__gt=current_version,
+                                                                            version__product=integration,
+                                                                            customization__name=settings.CUSTOMIZATION,
+                                                                            state=PENDING).last()
+
+                if not pending_version:
+                    continue
+                current_version = pending_version.version.id
+
+            if show_drafts:
+                if integration.preview_status != Product.PREVIEW_STATUS.draft:
+                    continue
+                current_version = None
+
+            if show_drafts or show_pending:
+                integration_dict['pending'] = show_pending
+                integration_dict['draft'] = show_drafts
 
             if current_version == 0:
                 continue
@@ -41,8 +58,6 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
             for context in contexts:
                 # Make context json friendly
                 context_name = context.name
-                context_name = context_name[0].lower() + context_name[1:]
-                context_name = context_name.replace(' ', '')
 
                 context_dict = {}
                 for datastructure in context.datastructure_set.all():
@@ -52,7 +67,7 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
 
                     record_value = datastructure.find_actual_value(product=integration,
                                                                    version_id=current_version,
-                                                                   draft=show_pending)
+                                                                   draft=show_pending or show_drafts)
 
                     if not record_value:
                         continue
@@ -69,18 +84,18 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
 
                 if context_dict:
                     integration_dict[context_name] = context_dict
-                    if context.name == "Download Files":
+                    if context.name == "downloadFiles":
                         downloads_order = {}
                         for datastructure in context.datastructure_set.all():
                             downloads_order[datastructure.name] = datastructure.order
-                        integration_dict[context_name+'Order'] = downloads_order
+                        integration_dict[f"{context_name}Order"] = downloads_order
 
             if not integration_dict:
                 continue
 
             for global_context in global_contexts:
-                process_context_structure(cloud_portal, global_context, integration_dict,
-                                          None, current_version, False, False)
+                process_context_structure(cloud_portal, global_context, integration_dict, None,
+                                          current_version, False, False, context_dict=global_contexts_dict)
 
             integration_dict['id'] = integration.id
             integrations_json.append(integration_dict)
@@ -88,37 +103,73 @@ def make_integrations_json(integrations, contexts=[], show_pending=False):
     return integrations_json
 
 
+def check_integration_store_enabled():
+    return cloud_portal_customization_cache(settings.CUSTOMIZATION, 'config')['integration_store_enabled']
+
+
 @api_view(("GET", ))
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def get_integration(request, product_id=None):
-    products = Product.objects.filter(product_type__type=INTEGRATION,
-                                      customizations__name__in=[settings.CUSTOMIZATION])
+    draft = "draft" in request.GET
+    review = "pending" in request.GET
+    if not product_id:
+        return api_success("Integration not found.", status_code=status.HTTP_404_NOT_FOUND)
 
-    return api_success(make_integrations_json([products.get(id=product_id)]))
+    product_id = int(product_id)
+    integration = Product.objects.filter(product_type__type=INTEGRATION,
+                                         customizations__name__in=[settings.CUSTOMIZATION],
+                                         id=product_id).last()
+
+    if not integration:
+        return api_success("Integration not found.", status_code=status.HTTP_404_NOT_FOUND)
+
+    if draft:
+        if integration.id not in request.user.products:
+            return api_success("You do not have permission to view this draft", status_code=status.HTTP_403_FORBIDDEN)
+
+        if integration.preview_status != Product.PREVIEW_STATUS.draft:
+            return api_success("Draft does not exist for this integration", status_code=status.HTTP_404_NOT_FOUND)
+
+    return api_success(make_integrations_json([integration], show_pending=review, show_drafts=draft))
 
 
 @api_view(("GET", ))
 @permission_classes((AllowAny, ))
 def get_integrations(request):
+    is_enabled = check_integration_store_enabled()
     integrations = Product.objects.filter(product_type__type=INTEGRATION,
                                           customizations__name__in=[settings.CUSTOMIZATION])
 
     if not integrations.exists():
         return api_success([])
     integration_list = []
-    drafts = Product.objects.\
-        filter(product_type__type=INTEGRATION,
-               contentversion__productcustomizationreview__state=PENDING,
-               contentversion__productcustomizationreview__customization__name=settings.CUSTOMIZATION)
 
-    if not request.user.is_anonymous():
-        # Users with manager permissions all accepted products and pending drafts
-        if UserGroupsToProductPermissions.\
+    # Only known users can see Drafts and reviews
+    if not request.user.is_anonymous:
+        drafts = Product.objects. \
+            filter(product_type__type=INTEGRATION,
+                   contentversion__productcustomizationreview__customization__name=settings.CUSTOMIZATION).distinct()
+
+        # Users without manager permissions will see only their integration (accepted, reviews, drafts).
+        if not UserGroupsToProductPermissions.\
                 check_customization_permission(request.user, settings.CUSTOMIZATION, 'cms.publish_version'):
-            integration_list = make_integrations_json(drafts, show_pending=True)
-        elif drafts.filter(created_by=request.user).exists():
-            integration_list = make_integrations_json(drafts.filter(created_by=request.user), show_pending=True)
+            drafts = drafts.filter(id__in=request.user.products).distinct()
+            integration_list = make_integrations_json(drafts.filter(preview_status=Product.PREVIEW_STATUS.draft),
+                                                      show_drafts=True)
+            # If the integration store is disabled show developers their approved integrations
+            if not is_enabled:
+                integration_list.extend(make_integrations_json(drafts))
 
-    integration_list.extend(make_integrations_json(integrations))
+        # If the integration store is disabled Manager level users will see all accepted and pending integrations
+        elif not is_enabled:
+            integration_list.extend(make_integrations_json(integrations))
+
+        # Shows pending reviews. If the users is not a manager they will only see their pending reviews
+        # Otherwise they will see all of the pending reviews
+        drafts = drafts.filter(contentversion__productcustomizationreview__state=PENDING)
+        integration_list.extend(make_integrations_json(drafts, show_pending=True))
+
+    if is_enabled:
+        integration_list.extend(make_integrations_json(integrations))
     return api_success({'data': integration_list})

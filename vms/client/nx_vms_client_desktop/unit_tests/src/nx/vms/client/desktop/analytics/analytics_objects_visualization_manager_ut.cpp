@@ -48,11 +48,6 @@ class AnalyticsObjectsVisualizationManagerTest:
     public ::testing::Test,
     public nx::utils::test::TestWithTemporaryDirectory
 {
-public:
-    AnalyticsObjectsVisualizationManagerTest():
-        TestWithTemporaryDirectory("nx_vms_client_desktop/analytics_objects_visualization_manager")
-    {}
-
 protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()

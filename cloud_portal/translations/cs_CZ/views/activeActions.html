@@ -23,9 +23,8 @@
 
     <div ng-if="reactivating" class="text-center">
         <div ng-if='data.email'>
-            <h1>Zaregistrovali jste se v %PRODUCT_NAME%</h1>
-            <p>We've sent you a letter with activation link to {{data.email}}.<br>
-                Please activate your account by visiting this link.</p>
+            <h1>You have registered in %CLOUD_NAME%</h1>
+            <p>Poslali jsme vám zprávu s aktivačním odkazem na {{data.email}}. <br>Prosím aktivujte svůj účet pomocí tohoto odkazu.</p>
         </div>
         <h1 ng-if="!data.email">Prosím, aktivujte si váš účet</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
@@ -43,9 +42,9 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required"> Je vyžadován e-mail </span>
                     <span class="help-block input-error"
-                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email</span>
+                          ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email"> Zadejte prosím platný e-mail </span>
                 </div>
             </div>
             <div class="form-group">
@@ -80,9 +79,9 @@
                 </div>
                 <div class="col-sm-4">
                     <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required</span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.required"> Je vyžadován e-mail </span>
                     <span class="help-block input-error"
-                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email</span>
+                          ng-if="restorePassword.email.$touched && restorePassword.email.$error.email"> Zadejte prosím platný e-mail </span>
                 </div>
             </div>
             <div class="form-group">
@@ -94,12 +93,14 @@
             </div>
         </form>
     </div>
-    <div ng-if="data.restoreCode">
-        <h1 class="process-success" ng-if="change.success || changeSuccess" translate>
-            Heslo bylo úspěšně uloženo
-        </h1>
-        <div class="process-success d-flex justify-content-center" ng-if="change.success || changeSuccess">
-            <a class="btn btn-default" href="/login" translate>Přihlásit se</a>
+    <div ng-if="data.restoreCode || changeSuccess">
+        <div ng-if="change.success || changeSuccess">
+            <h1 class="process-success"  translate>
+                Heslo bylo úspěšně uloženo
+            </h1>
+            <div class="process-success d-flex justify-content-center">
+                <a class="btn btn-default" href="/login" translate>Přihlásit se</a>
+            </div>
         </div>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess"

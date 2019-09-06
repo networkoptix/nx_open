@@ -1,15 +1,17 @@
-
 <div class="card card-condensed" ng-if="system.isMine">
     <div class="card-body">
         <h2 class="mb-3">Ваша система</h2>
         <p>
             <button ng-disabled="currentlyMerging && !isMaster" class="btn btn-default" ng-click="rename()">Перейменувати систему</button>
         </p>
-        <p>
-            <button ng-disabled="currentlyMerging" class="btn btn-default" ng-if="canMerge || debugMode" ng-click="mergeSystems()">Об’єднати з іншою системою</button>
+        <p ng-if="systems.length > 1 && system.canMerge || configCanMerge || debugMode || betaMode">
+            <button class="btn btn-default"
+                    ng-disabled="(currentlyMerging || !system.isOnline || !system.isAvailable) && !(debugMode || betaMode)"
+                    ng-click="mergeSystems()">Об’єднати з іншою системою</button>
         </p>
         <hr />
-        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Від’єднатися від <span class="product-name">&nbsp;%PRODUCT_NAME%</span></button>
+        <button ng-disabled="currentlyMerging" class="btn btn-default" ng-click="disconnect()">Disconnect from
+            <span class="product-name">&nbsp;%CLOUD_NAME%</span></button>
     </div>
 </div>
 <div class="card card-condensed" ng-if="!system.isMine">
@@ -34,21 +36,27 @@
             <placeholder class="preloader-small" preloader="true"></placeholder>
         </div>
         <br>
-        <div><strong>{{mergeTargetSystem.name}}</strong> об'єднатися із цією системою</div>
-        <hr />
-        <div class="merge-info-text">Залежно від розміру бази даних це може зайняти до декількох годин</div>
+        <div ng-if="mergeTargetSystem.name" >
+            <div><strong>{{mergeTargetSystem.name}}</strong> об'єднатися із цією системою</div>
+            <hr />
+            <div class="merge-info-text light-text">Залежно від розміру бази даних це може зайняти до декількох годин</div>
+        </div>
+        <div ng-if="!mergeTargetSystem.name">Об’єднання систем завершується</div>
     </div>
     <div class="card-body" ng-if="!isMaster || !system.isMine">
         <div class="float-left position-relative">
             <placeholder class="preloader-small" preloader="true"></placeholder>
         </div>
         <br>
-        <div>Ця система об'єднується в <strong>{{mergeTargetSystem.name}}</strong></div>
-        <hr />
-        <div class="merge-info-text">
-            <p>Залежно від розміру бази даних це може зайняти до декількох годин.</p>
-            <p>Поки не завершиться об’єднання, ви можете увійти до цієї системи та подивитися відео, але не зможете змінити будь-які налаштування.</p>
-            <p>Після завершення об’єднання всі користувачі та камери із цієї системи стануть доступними  в<span class="merge-system-name">{{mergeTargetSystem.name}}</span>, а ця система буде видалена.</p>
+        <div ng-if="mergeTargetSystem.name">
+            <div>Ця система об'єднується в <strong>{{mergeTargetSystem.name}}</strong></div>
+            <hr />
+            <div class="merge-info-text light-text">
+                <p>Залежно від розміру бази даних це може зайняти до декількох годин.</p>
+                <p>Поки не завершиться об’єднання, ви можете увійти до цієї системи та подивитися відео, але не зможете змінити будь-які налаштування.</p>
+                <p>Після завершення об’єднання всі користувачі та камери із цієї системи стануть доступними  в<strong>{{mergeTargetSystem.name}}</strong>, а ця система буде видалена.</p>
+            </div>
         </div>
+        <div ng-if="!mergeTargetSystem.name">Об’єднання систем завершується</div>
     </div>
 </div>

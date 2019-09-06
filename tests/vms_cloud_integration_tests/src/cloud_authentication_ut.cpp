@@ -329,14 +329,14 @@ protected:
 
 private:
     nx::utils::test::ModuleLauncher<CloudNode> m_cloudNode;
-    nx::utils::SyncQueue<nx::clusterdb::engine::transport::ConnectResultDescriptor> m_connectResults;
+    nx::utils::SyncQueue<nx::clusterdb::engine::transport::ConnectResult> m_connectResults;
     std::unique_ptr<nx::clusterdb::engine::transport::p2p::websocket::Connector> m_connector;
 
     void saveConnectCompletion(
-        nx::clusterdb::engine::transport::ConnectResultDescriptor connectResultDescriptor,
+        nx::clusterdb::engine::transport::ConnectResult connectResult,
         std::unique_ptr<nx::clusterdb::engine::transport::AbstractConnection> /*connection*/)
     {
-        m_connectResults.push(std::move(connectResultDescriptor));
+        m_connectResults.push(std::move(connectResult));
     }
 };
 
