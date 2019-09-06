@@ -25,7 +25,6 @@ enum Format
     MMM,
     yyyy,
 
-    dd_MM,
     MMMM_yyyy,
     dd_MM_yyyy, // ~=QLocale::Date::ShortFormat
     d_MMMM_yyyy,
@@ -43,6 +42,8 @@ using FormatterPtr = QSharedPointer<Formatter>;
 class Formatter
 {
 public:
+    Formatter(const QLocale& locale, bool is24HoursFormat);
+
     static FormatterPtr system();
     static FormatterPtr custom(const QLocale& locale, bool is24HoursTimeFormat);
 
@@ -61,8 +62,6 @@ public:
     QString getFormatString(Format format) const;
 
 private:
-    Formatter(const QLocale& locale, bool is24HoursFormat);
-
     struct Private;
     QScopedPointer<Private> d;
 };
