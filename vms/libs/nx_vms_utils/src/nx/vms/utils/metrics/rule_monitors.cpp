@@ -46,7 +46,7 @@ public:
         if (const auto it = m_monitors.find(id); it != m_monitors.end())
             return it->second.get();
 
-        throw std::domain_error("Unknown parameter: " + id.toStdString());
+        throw std::domain_error("Unknown value id: " + id.toStdString());
     }
 
     ValueGenerator value(int index) const { return value(part(index)); }
@@ -123,12 +123,12 @@ public:
         {
             return durationOperation(
                 1, 2,
-                [condition = value(3)](auto values)
+                [getExpected = value(3)](auto values)
                 {
-                    const auto expected = condition();
+                    const auto expected = getExpected();
                     size_t count = 0;
                     for (const auto& v: values) if (v.value == expected) count++;
-                    return (double) values.size();
+                    return (double) count;
                 });
         }
 
