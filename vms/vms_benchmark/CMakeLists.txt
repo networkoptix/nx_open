@@ -35,6 +35,7 @@ if(targetDevice STREQUAL "linux-x64")
         COMMAND ${CMAKE_COMMAND} -E copy ${build_dir}/dist/vms_benchmark ${stage_dir}/
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/distrib/.vms_benchmark.ini ${stage_dir}/
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/distrib/vms_benchmark.conf ${stage_dir}/
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/readme.md ${stage_dir}/
 
         COMMAND ${CMAKE_COMMAND} -E echo
             "  Zipping VMS Benchmark - see ${zip_log}"

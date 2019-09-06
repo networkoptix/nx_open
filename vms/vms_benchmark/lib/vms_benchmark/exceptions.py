@@ -1,5 +1,7 @@
 class VmsBenchmarkError(Exception):
-    pass
+    def __init__(self, message, original_exception=None):
+        super(VmsBenchmarkError, self).__init__(message)
+        self.original_exception = original_exception
 
 
 class TestCameraStreamingError(VmsBenchmarkError):
@@ -7,6 +9,10 @@ class TestCameraStreamingError(VmsBenchmarkError):
 
 
 class DeviceStateError(VmsBenchmarkError):
+    pass
+
+
+class DeviceCommandError(VmsBenchmarkError):
     pass
 
 
@@ -19,6 +25,18 @@ class ServerApiError(VmsBenchmarkError):
 
 
 class TestCameraError(VmsBenchmarkError):
+    pass
+
+
+class HostPrerequisiteFailed(VmsBenchmarkError):
+    pass
+
+
+class DevicePrerequisiteFailed(VmsBenchmarkError):
+    pass
+
+
+class SshHostKeyObtainingFailed(VmsBenchmarkError):
     pass
 
 

@@ -3,7 +3,6 @@
 import unittest
 import sys
 import traceback
-from pprint import pprint
 from io import StringIO
 from os import path as osp
 

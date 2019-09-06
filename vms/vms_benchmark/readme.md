@@ -5,8 +5,8 @@
 ---------------------------------------------------------------------------------------------------
 ## Introduction
 
-VMS Benchmark is a command-line tool which allows a partner/customer to assess the ability to run
-VMS on a Linux-based device. The tool runs on a host PC, connects to the device, collects system
+VMS Benchmark is a command-line tool which allows a partner/customer to assess the ability to run VMS
+on a certain device. The tool runs on a host PC, connects to the device, collects system
 information such as CPU type and RAM size, and then starts the VMS Server, feeds it test video
 streams from virtual cameras, and creates a detailed report about potential performance issues.
 
@@ -20,8 +20,8 @@ The following prerequisites should be assured before running the tool:
 
 * Linux host: `ssh` and `sshpass` tools should be installed on the host in case of Linux.
 * VMS Server should be installed on the box and VMS System should be set up.
-* The box Linux user should be in sudoers and `sudo -i` should not require typing a password.
-* The box should be in "known_hosts" on the host - `ssh <box>` should not ask for a confirmation.
+* Two customizations on the single box is not supported.
+* If the box Linux user is not root, it should be in sudoers and `sudo echo Test` should not require typing a password.
 
 ---------------------------------------------------------------------------------------------------
 ## Usage

@@ -74,6 +74,23 @@ class ServerApi:
 
         return None
 
+    def get_events(self, ts_from):
+        request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/getEvents?from={ts_from}")
+        credentials = f"{self.user}:{self.password}"
+        encoded_credentials = base64.b64encode(credentials.encode('ascii'))
+        request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
+        response = urllib.request.urlopen(request)
+
+        result = self.Response(response.code)
+
+        if 200 <= response.code < 300:
+            result.payload = json.loads(response.read())
+            if int(result.payload['error']) != 0:
+                return None
+            return result.payload['reply']
+
+        return None
+
     def activate_license(self, license):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/addLicense")
         credentials = f"{self.user}:{self.password}"
