@@ -24,6 +24,9 @@ using namespace nx::cloud::storage::service::api;
 namespace {
 
 static constexpr char kStorageType[] = "awss3";
+static constexpr char kAddSystem[] = "Add System";
+static constexpr char kRemoveSystem[] = "Remove System";
+
 
 static const std::map<std::string, nx::geo_ip::Geopoint> kAwsGeopoints = {
     {"us-east-1", {39, -78}},
@@ -61,17 +64,17 @@ R"json({"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":["s3:GetO
 
 static std::string buildStorageAccessPolicy(const Storage& storage)
 {
-    static constexpr char kArnTemplate[] = R"("arn:aws:s3:::%1/%2/*")";
+    const auto bucketName =
+        [](const auto& item) { return service::utils::bucketName(item.dataUrl); };
+    const auto storageFolder =
+        [](const auto& item) { return service::utils::storageFolder(item.dataUrl); };
 
-    QStringList arns;
-    for (const auto& ioDevice: storage.ioDevices)
-    {
-        arns.append(lm(kArnTemplate).args(
-            service::utils::bucketName(ioDevice.dataUrl),
-            service::utils::storageFolder(ioDevice.dataUrl)));
-    }
+    auto arn = nx::utils::join(
+        storage.ioDevices.begin(), storage.ioDevices.end(),
+        ',',
+        "arn:aws:s3:::", bucketName, "/", storageFolder, "/*");
 
-    return lm(kStorageAccessPolicyTemplate).args(arns.join(",")).toStdString();
+    return lm(kStorageAccessPolicyTemplate).arg(arn).toStdString();
 }
 
 } // namespace
@@ -249,11 +252,11 @@ void StorageManager::addSystem(
     nx::utils::MoveOnlyFunc<void(Result, System)> handler)
 {
     modifySystemStorageRelation(
-        "Add System",
+		kAddSystem,
         authInfo,
         storageId,
         request.id,
-        std::bind(&AbstractStorageDao::addSystem, m_storageDao, _1, _2),
+		std::bind(&AbstractStorageDao::addSystem, m_storageDao, _1, _2),
         std::move(handler));
 }
 
@@ -264,7 +267,7 @@ void StorageManager::removeSystem(
     nx::utils::MoveOnlyFunc<void(Result)> handler)
 {
     modifySystemStorageRelation(
-        "Remove System",
+		kRemoveSystem,
         authInfo,
         storageId,
         systemId,
@@ -651,7 +654,7 @@ Result StorageManager::prepareRemoveStorageResult(
 
 template<typename DbFunc, typename Handler>
 void StorageManager::modifySystemStorageRelation(
-    const char* operation,
+	const char* operation,
     const nx::utils::stree::ResourceContainer& authInfo,
     const std::string& storageId,
     const std::string& systemId,

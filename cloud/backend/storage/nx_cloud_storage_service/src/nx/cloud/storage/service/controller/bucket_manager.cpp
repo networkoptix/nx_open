@@ -14,7 +14,6 @@
 
 namespace nx::cloud::storage::service::controller {
 
-using namespace std::placeholders;
 using namespace model::dao;
 using namespace nx::cloud::storage::service::api;
 
