@@ -1,11 +1,14 @@
 #include "calendar_model.h"
 
+#include <QtQml/QtQml>
 #include <QtCore/QLocale>
 #include <QtCore/QTimeZone>
 
 #include <functional>
 
-#include "camera/camera_chunk_provider.h"
+#include <nx/client/core/time/time_constants.h>
+#include <nx/client/core/media/chunk_provider.h>
+#include <nx/client/core/media/time_periods_store.h>
 
 namespace {
 
@@ -79,16 +82,18 @@ bool Month::containsDay(const Day& day) const
 
 //--------------------------------------------------------------------------------------------------
 
-struct QnCalendarModel::Private
+namespace nx::client::core {
+
+struct CalendarModel::Private
 {
-    Private(QnCalendarModel* owner);
+    Private(CalendarModel* owner);
     QDate getFirstCalendarDate(int year, int month) const;
     void resetDaysModelData();
     void updateArchiveInfo();
     void handleCurrentPositionChanged();
     void clearArchiveMarks(int dayIndex = 0);
 
-    QnCalendarModel* const q;
+    CalendarModel* const q;
 
     qint64 currentPosition = 0;
     qint64 displayOffset = 0;
@@ -96,16 +101,16 @@ struct QnCalendarModel::Private
     QList<Day> days;
     QLocale locale;
 
-    QnCameraChunkProvider* chunkProvider = nullptr;
+    TimePeriodsStore* periodsStore = nullptr;
     bool populated = false;
 };
 
-QnCalendarModel::Private::Private(QnCalendarModel* owner):
+CalendarModel::Private::Private(CalendarModel* owner):
     q(owner)
 {
 }
 
-QDate QnCalendarModel::Private::getFirstCalendarDate(int year, int month) const
+QDate CalendarModel::Private::getFirstCalendarDate(int year, int month) const
 {
     auto date = createDate(year, month);
     int dayOfWeek = date.dayOfWeek();
@@ -116,7 +121,7 @@ QDate QnCalendarModel::Private::getFirstCalendarDate(int year, int month) const
     return date;
 }
 
-void QnCalendarModel::Private::resetDaysModelData()
+void CalendarModel::Private::resetDaysModelData()
 {
     q->beginResetModel();
 
@@ -145,15 +150,15 @@ void QnCalendarModel::Private::resetDaysModelData()
     q->endResetModel();
 }
 
-void QnCalendarModel::Private::updateArchiveInfo()
+void CalendarModel::Private::updateArchiveInfo()
 {
-    if (!chunkProvider)
+    if (!periodsStore)
     {
         clearArchiveMarks();
         return;
     }
 
-    QnTimePeriodList timePeriods = chunkProvider->timePeriods(Qn::RecordingContent);
+    const auto timePeriods = periodsStore->periods(Qn::RecordingContent);
 
     const int firstMonthDayPosition =
         [this]() -> int
@@ -192,12 +197,12 @@ void QnCalendarModel::Private::updateArchiveInfo()
     }
 }
 
-void QnCalendarModel::Private::handleCurrentPositionChanged()
+void CalendarModel::Private::handleCurrentPositionChanged()
 {
-    emit q->dataChanged(q->index(0), q->index(q->rowCount() - 1), {QnCalendarModel::IsCurrentRole});
+    emit q->dataChanged(q->index(0), q->index(q->rowCount() - 1), {CalendarModel::IsCurrentRole});
 }
 
-void QnCalendarModel::Private::clearArchiveMarks(int dayIndex)
+void CalendarModel::Private::clearArchiveMarks(int dayIndex)
 {
     for (int i = dayIndex; i != days.size(); ++i)
         days[i].hasArchive = false;
@@ -205,22 +210,27 @@ void QnCalendarModel::Private::clearArchiveMarks(int dayIndex)
 
 //--------------------------------------------------------------------------------------------------
 
-QnCalendarModel::QnCalendarModel(QObject* parent):
+void CalendarModel::registerQmlType()
+{
+    qmlRegisterType<nx::client::core::CalendarModel>("Nx.Core", 1, 0, "CalendarModel");
+}
+
+CalendarModel::CalendarModel(QObject* parent):
     base_type(parent),
     d(new Private(this))
 {
 }
 
-QnCalendarModel::~QnCalendarModel()
+CalendarModel::~CalendarModel()
 {
 }
 
-int QnCalendarModel::rowCount(const QModelIndex& /*parent*/) const
+int CalendarModel::rowCount(const QModelIndex& /*parent*/) const
 {
     return d->days.size();
 }
 
-QVariant QnCalendarModel::data(const QModelIndex& index, int role) const
+QVariant CalendarModel::data(const QModelIndex& index, int role) const
 {
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
@@ -241,7 +251,7 @@ QVariant QnCalendarModel::data(const QModelIndex& index, int role) const
     return QVariant();
 }
 
-QHash<int, QByteArray> QnCalendarModel::roleNames() const
+QHash<int, QByteArray> CalendarModel::roleNames() const
 {
     QHash<int, QByteArray> roleNames = QAbstractListModel::roleNames();
     roleNames[DayStartTimeRole] = "dayStartTime";
@@ -250,15 +260,17 @@ QHash<int, QByteArray> QnCalendarModel::roleNames() const
     return roleNames;
 }
 
-int QnCalendarModel::year() const
+int CalendarModel::year() const
 {
     return d->currentMonth.year;
 }
 
-void QnCalendarModel::setYear(int year)
+void CalendarModel::setYear(int year)
 {
+    year = std::clamp(year, TimeConstants::kMinYear, TimeConstants::kMaxYear);
     if (year == d->currentMonth.year)
         return;
+
 
     d->currentMonth.updateMonthTo(year, d->currentMonth.month, d->displayOffset);
     emit yearChanged();
@@ -266,13 +278,14 @@ void QnCalendarModel::setYear(int year)
     d->resetDaysModelData();
 }
 
-int QnCalendarModel::month() const
+int CalendarModel::month() const
 {
     return d->currentMonth.month;
 }
 
-void QnCalendarModel::setMonth(int month)
+void CalendarModel::setMonth(int month)
 {
+    month = std::clamp(month, TimeConstants::kMinMonth, TimeConstants::kMaxMonth);
     if (month == d->currentMonth.month)
         return;
 
@@ -282,62 +295,68 @@ void QnCalendarModel::setMonth(int month)
     d->resetDaysModelData();
 }
 
-QnCameraChunkProvider* QnCalendarModel::chunkProvider() const
+
+TimePeriodsStore* CalendarModel::periodsStore() const
 {
-    return d->chunkProvider;
+    return d->periodsStore;
 }
 
-void QnCalendarModel::setChunkProvider(QnCameraChunkProvider* chunkProvider)
+void CalendarModel::setPeriodsStore(TimePeriodsStore* store)
 {
-    if (d->chunkProvider == chunkProvider)
+    if (d->periodsStore == store)
         return;
 
-    if (d->chunkProvider)
-        disconnect(d->chunkProvider, nullptr, this, nullptr);
+    if (d->periodsStore)
+        disconnect(d->periodsStore, nullptr, this, nullptr);
 
-    d->chunkProvider = chunkProvider;
-
+    d->periodsStore = store;
 
     const auto updateArchiveInfoInternal =
-        [this]()
+        [this](Qn::TimePeriodContent type)
         {
+            if (type != Qn::RecordingContent)
+                return;
             d->updateArchiveInfo();
             emit dataChanged(index(0), index(rowCount() - 1), {HasArchiveRole});
         };
 
-    if (d->chunkProvider)
+    if (d->periodsStore)
     {
-        connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated,
+        connect(d->periodsStore, &TimePeriodsStore::periodsUpdated,
             this, updateArchiveInfoInternal);
     }
 
-    updateArchiveInfoInternal();
-    emit chunkProviderChanged();
+    updateArchiveInfoInternal(Qn::RecordingContent);
+    emit periodsStoreChanged();
 }
 
-qint64 QnCalendarModel::currentPosition() const
+qint64 CalendarModel::position() const
 {
     return d->currentPosition;
 }
 
-void QnCalendarModel::setCurrentPosition(qint64 value)
+void CalendarModel::setPosition(qint64 value)
 {
+    value = std::clamp<qint64>(value, 0, std::numeric_limits<qint64>().max());
     if (d->currentPosition == value)
         return;
 
     d->currentPosition = value;
-    emit currentPositionChanged();
+    emit positionChanged();
 
     d->handleCurrentPositionChanged();
 }
 
-qint64 QnCalendarModel::displayOffset() const
+qint64 CalendarModel::displayOffset() const
 {
     return d->displayOffset;
 }
 
-void QnCalendarModel::setDisplayOffset(qint64 value)
+void CalendarModel::setDisplayOffset(qint64 value)
 {
+    value = std::clamp<qint64>(
+        value, TimeConstants::kMinDisplayOffset, TimeConstants::kMaxDisplayOffset);
+
     if (d->displayOffset == value)
         return;
 
@@ -347,12 +366,12 @@ void QnCalendarModel::setDisplayOffset(qint64 value)
     d->resetDaysModelData();
 }
 
-QLocale QnCalendarModel::locale() const
+QLocale CalendarModel::locale() const
 {
     return d->locale;
 }
 
-void QnCalendarModel::setLocale(const QLocale& locale)
+void CalendarModel::setLocale(const QLocale& locale)
 {
     if (d->locale == locale)
         return;
@@ -362,3 +381,5 @@ void QnCalendarModel::setLocale(const QLocale& locale)
 
     d->resetDaysModelData();
 }
+
+} // namespace nx::client::core

@@ -17,9 +17,9 @@
 #include "timeline_text_helper.h"
 #include "timeline_zoom_level.h"
 #include "timeline_chunk_painter.h"
-#include "camera/camera_chunk_provider.h"
 
 #include <nx/utils/math/fuzzy.h>
+#include <nx/client/core/media/chunk_provider.h>
 #include <nx/client/core/animation/kinetic_helper.h>
 #include <utils/math/color_transformations.h>
 
@@ -178,7 +178,7 @@ public:
 
     QStringList suffixList;
 
-    QnCameraChunkProvider* chunkProvider = nullptr;
+    nx::client::core::ChunkProvider* chunkProvider = nullptr;
 
 public:
     QnTimelinePrivate(QnTimeline* parent):
@@ -702,12 +702,12 @@ qint64 QnTimeline::positionAtX(qreal x) const
     return d->pixelPosToTime(x);
 }
 
-QnCameraChunkProvider* QnTimeline::chunkProvider() const
+nx::client::core::ChunkProvider* QnTimeline::chunkProvider() const
 {
     return d->chunkProvider;
 }
 
-void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
+void QnTimeline::setChunkProvider(nx::client::core::ChunkProvider* chunkProvider)
 {
     if (d->chunkProvider == chunkProvider)
         return;
@@ -720,19 +720,16 @@ void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
     if (d->chunkProvider)
     {
         auto handleTimePeriodsUpdated =
-            [this]()
+            [this](Qn::TimePeriodContent type)
             {
-                for (const auto contentType: {Qn::RecordingContent, Qn::MotionContent})
-                {
-                    auto& periods = d->timePeriods[contentType];
-                    periods = d->chunkProvider->timePeriods(contentType);
-                    periods.detach();
-                }
+                auto& data = d->timePeriods[type];
+                data = d->chunkProvider->periods(type);
+                data.detach();
                 d->highlightArchiveChunks = false;
                 update();
             };
 
-        connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated,
+        connect(d->chunkProvider, &nx::client::core::ChunkProvider::periodsUpdated,
             this, handleTimePeriodsUpdated);
 
         const auto handleLoadingMotionChanged =
@@ -741,10 +738,11 @@ void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
                 d->loadingMotion = chunkProvider->isLoadingMotion();
                 d->updateLoadingState();
             };
-        connect(d->chunkProvider, &QnCameraChunkProvider::loadingMotionChanged,
+        connect(d->chunkProvider, &nx::client::core::ChunkProvider::loadingMotionChanged,
             this, handleLoadingMotionChanged);
 
-        handleTimePeriodsUpdated();
+        for (const auto type: {Qn::RecordingContent, Qn::MotionContent})
+            handleTimePeriodsUpdated(type);
     }
 
     emit chunkProviderChanged();

@@ -149,7 +149,7 @@ Item
         Screen.onPrimaryOrientationChanged: updateNavigatorPosition()
     }
 
-    QnCameraChunkProvider
+    ChunkProvider
     {
         id: cameraChunkProvider
 
@@ -803,7 +803,7 @@ Item
     {
         id: calendarPanel
 
-        currentPosition: timeline.position
+        position: timeline.position
         displayOffset: controller.resourceHelper.displayOffset
         chunkProvider: cameraChunkProvider
 

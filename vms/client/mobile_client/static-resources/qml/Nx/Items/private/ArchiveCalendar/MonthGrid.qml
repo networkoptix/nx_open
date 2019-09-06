@@ -1,17 +1,17 @@
 import QtQuick 2.6
 import Nx 1.0
-import com.networkoptix.qml 1.0
+import Nx.Core 1.0
 
 Item
 {
     id: control
 
-    property alias currentPosition: calendarModel.currentPosition
+    property alias position: calendarModel.position
     property alias displayOffset: calendarModel.displayOffset
     property alias locale: calendarModel.locale
     property alias year: calendarModel.year
     property alias month: calendarModel.month
-    property alias chunkProvider: calendarModel.chunkProvider
+    property alias periodsStore: calendarModel.periodsStore
 
     signal picked(real position)
 
@@ -29,7 +29,7 @@ Item
         {
             id: repeater
 
-            model: QnCalendarModel
+            model: CalendarModel
             {
                 id: calendarModel
             }

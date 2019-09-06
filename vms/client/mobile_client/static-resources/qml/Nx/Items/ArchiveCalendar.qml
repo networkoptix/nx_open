@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtQuick.Window 2.0
 import QtQuick.Controls 2.4
 import Nx 1.0
+import Nx.Core 1.0
 import com.networkoptix.qml 1.0
 
 import "private/ArchiveCalendar"
@@ -10,9 +11,9 @@ Pane
 {
     id: control
 
-    property real currentPosition: 0
+    property real position: 0
     property real displayOffset: 0
-    property QnCameraChunkProvider chunkProvider: null
+    property ChunkProvider chunkProvider: null
     property bool horizontal: mainWindow.width > 540
 
     signal picked(real position)
@@ -20,7 +21,7 @@ Pane
 
     function resetToCurrentPosition()
     {
-        d.monthData = d.createMonthDataFromPosition(control.currentPosition, control.displayOffset)
+        d.monthData = d.createMonthDataFromPosition(control.position, control.displayOffset)
         monthsModel.clear()
         monthsModel.append(d.prevMonthData(d.monthData))
         monthsModel.append(d.monthData)
@@ -197,7 +198,7 @@ Pane
         {
             id: calendarMonth
 
-            currentPosition: control.currentPosition
+            position: control.position
             displayOffset: control.displayOffset
             width: d.ui.monthsList.width
             height: d.ui.monthsList.height
@@ -205,7 +206,7 @@ Pane
             month: model.month
             onPicked: control.picked(position)
             locale: control.locale
-            chunkProvider: control.chunkProvider
+            periodsStore: control.chunkProvider
         }
     }
 

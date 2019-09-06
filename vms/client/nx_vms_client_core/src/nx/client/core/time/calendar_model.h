@@ -6,9 +6,11 @@
 
 #include <nx/utils/impl_ptr.h>
 
-class QnCameraChunkProvider;
+namespace nx::client::core {
 
-class QnCalendarModel: public QAbstractListModel
+class TimePeriodsStore;
+
+class CalendarModel: public QAbstractListModel
 {
     Q_OBJECT
     using base_type = QAbstractListModel;
@@ -19,10 +21,10 @@ class QnCalendarModel: public QAbstractListModel
         NOTIFY monthChanged)
     Q_PROPERTY(QLocale locale READ locale WRITE setLocale
         NOTIFY localeChanged)
-    Q_PROPERTY(QnCameraChunkProvider* chunkProvider READ chunkProvider WRITE setChunkProvider
-        NOTIFY chunkProviderChanged)
-    Q_PROPERTY(qint64 currentPosition READ currentPosition WRITE setCurrentPosition
-        NOTIFY currentPositionChanged)
+    Q_PROPERTY(nx::client::core::TimePeriodsStore* periodsStore READ periodsStore WRITE setPeriodsStore
+        NOTIFY periodsStoreChanged)
+    Q_PROPERTY(qint64 position READ position WRITE setPosition
+        NOTIFY positionChanged)
     Q_PROPERTY(qint64 displayOffset READ displayOffset WRITE setDisplayOffset
         NOTIFY displayOffsetChanged)
 
@@ -34,8 +36,10 @@ public:
         HasArchiveRole
     };
 
-    QnCalendarModel(QObject* parent = nullptr);
-    virtual ~QnCalendarModel() override;
+    static void registerQmlType();
+
+    CalendarModel(QObject* parent = nullptr);
+    virtual ~CalendarModel() override;
 
 public: // Properties and invokables.
     int year() const;
@@ -47,11 +51,11 @@ public: // Properties and invokables.
     QLocale locale() const;
     void setLocale(const QLocale& locale);
 
-    QnCameraChunkProvider* chunkProvider() const;
-    void setChunkProvider(QnCameraChunkProvider* chunkProvider);
+    TimePeriodsStore* periodsStore() const;
+    void setPeriodsStore(TimePeriodsStore* store);
 
-    qint64 currentPosition() const;
-    void setCurrentPosition(qint64 value);
+    qint64 position() const;
+    void setPosition(qint64 value);
 
     qint64 displayOffset() const;
     void setDisplayOffset(qint64 value);
@@ -65,12 +69,14 @@ public: // Overrides section.
 signals:
     void yearChanged();
     void monthChanged();
-    void chunkProviderChanged();
+    void periodsStoreChanged();
     void localeChanged();
-    void currentPositionChanged();
+    void positionChanged();
     void displayOffsetChanged();
 
 private:
     struct Private;
     nx::utils::ImplPtr<Private> d;
 };
+
+} // namespace nx::client::core
