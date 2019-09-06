@@ -4,6 +4,8 @@
 #include <cctype>
 #include <iostream>
 
+#include <QtGlobal> // For platform defines.
+
 namespace nx {
 namespace system_commands {
 
@@ -121,6 +123,14 @@ std::string MountHelper::makeCommandString(
     const std::string& password)
 {
     std::ostringstream ss;
+#ifdef Q_OS_MAC
+    Q_UNUSED(ver);
+    ss << "mount -t smbfs '//";
+    if (!domain.empty())
+        ss << escapeSingleQuotes(domain) << ";";
+    ss << escapeSingleQuotes(username) << ":" << escapeSingleQuotes(password)
+       << "@" << m_url.substr(2) << "' '" << m_directory << "'";
+#else // Q_OS_MAC
     ss << "mount -t cifs '" << m_url << "' '" << m_directory << "'"
        << " -o username='" << escapeSingleQuotes(username)
        << "',password='" << escapeSingleQuotes(password) << "'";
@@ -130,7 +140,7 @@ std::string MountHelper::makeCommandString(
 
     if (!ver.empty())
         ss << ",vers=" << ver;
-
+#endif // Q_OS_MAC
     return ss.str();
 }
 

@@ -1,4 +1,7 @@
 #include "multiserver_update_request_helpers.h"
+
+#include <unordered_map>
+
 #include <nx/update/update_information.h>
 #include <media_server/media_server_module.h>
 #include <common/common_module.h>

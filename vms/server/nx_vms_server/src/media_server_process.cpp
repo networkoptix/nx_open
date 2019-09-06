@@ -747,7 +747,7 @@ QString getComputerName()
     DWORD  tmpBufferSize = sizeof(tmpBuffer);
     if (GetComputerName((LPTSTR) tmpBuffer, &tmpBufferSize))
         return QString::fromUtf16(tmpBuffer);
-#elif defined(Q_OS_LINUX)
+#elif defined(Q_OS_UNIX)
     char tmpBuffer[1024];
     if (gethostname(tmpBuffer, sizeof(tmpBuffer)) == 0)
         return QString::fromUtf8(tmpBuffer);

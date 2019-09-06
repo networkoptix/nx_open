@@ -4,13 +4,11 @@
 
 #ifdef _WIN32
 #   include <Windows.h>
-#elif __linux__
+#else
 #   include <sys/types.h>
 #   include <dirent.h>
 #   include <sys/stat.h>
 #   include <errno.h>
-#else
-#   error "Unsupported platform"
 #endif
 
 #include <cstring>
@@ -18,6 +16,10 @@
 #include <list>
 
 #include "wildcard_match.h"
+
+#ifdef __APPLE__
+#define stat64 stat
+#endif
 
 namespace FsEntryType
 {
@@ -49,7 +51,7 @@ public:
     list<string> dirQueue;
 #ifdef _WIN32
     HANDLE hSearch;             // Search handle returned by FindFirstFile
-#elif __linux__
+#else
     DIR* dp;
 #endif
 
@@ -65,7 +67,7 @@ public:
         entryTypeMask( 0 ),
 #ifdef _WIN32
         hSearch( INVALID_HANDLE_VALUE ),
-#elif __linux__
+#else
         dp( NULL ),
 #endif
         entryType( FsEntryType::etOther ),
@@ -81,7 +83,7 @@ public:
             FindClose( hSearch );
             hSearch = INVALID_HANDLE_VALUE;
         }
-#elif __linux__
+#else
         if( dp != NULL )
         {
             closedir( dp );
@@ -176,7 +178,7 @@ public:
         }
     }
 
-#elif __linux__
+#else
 
     bool next()
     {
@@ -337,13 +339,13 @@ FsEntryType::Value DirIterator::entryType() const
 
 uint64_t DirIterator::entrySize() const
 {
-#ifdef __linux__
+#ifndef _WIN32
     if( m_impl->entrySize == (uint64_t)-1 )
     {
-        //performing stat here, because unneeded stat64 call can greately slow down directory traversal
+        //performing stat here, because unneeded stat call can greately slow down directory traversal
         struct stat64 st;
         memset( &st, 0, sizeof(st) );
-        if( stat64( (m_impl->dir + "/" + m_impl->entryPath).c_str(), &st ) )
+        if( ::stat64( (m_impl->dir + "/" + m_impl->entryPath).c_str(), &st ) )
             return 0;
         m_impl->entrySize = st.st_size;
     }

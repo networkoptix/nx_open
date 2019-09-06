@@ -201,7 +201,7 @@ public:
     void resize(size_t size);
     bool empty() const;
     bool operator==(const ChunksDeque& other);
-
+    friend void swap(ProxyChunk c1, ProxyChunk c2) { c1.swap(c2); }
 private:
     mutable std::unordered_map<int, int64_t> m_archivePresence;
     std::deque<Chunk> m_deque;
