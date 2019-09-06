@@ -184,6 +184,7 @@ QString Formatter::Private::getLocalizedHours(const QTime& value)
         return value.toString(QStringLiteral("hh"));
 
     const auto hours = value.hour() % 12;
+    // Am/PM notation suppose that 0 am(pm) time should be shown as 12 am(pm).
     return QString::number(hours ? hours : 12);
 }
 
