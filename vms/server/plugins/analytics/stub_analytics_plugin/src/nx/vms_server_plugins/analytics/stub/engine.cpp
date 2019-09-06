@@ -434,12 +434,16 @@ static std::string timestampedObjectMetadataToString(
         {
             const Ptr<const IAttribute> attribute = metadata->attribute(i);
             if (!attribute)
-                continue;
-
-            attributeString += "        "
-                + nx::kit::utils::toString(attribute->name())
-                + ": "
-                + nx::kit::utils::toString(attribute->value());
+            {
+                attributeString += "null";
+            }
+            else
+            {
+                attributeString += "        "
+                    + nx::kit::utils::toString(attribute->name())
+                    + ": "
+                    + nx::kit::utils::toString(attribute->value());
+            }
 
             if (i < metadata->attributeCount() - 1)
                 attributeString += "\n";
