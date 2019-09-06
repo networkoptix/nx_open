@@ -252,8 +252,10 @@ int DiscoveryManager::fromMDNSData(
     {
         for (const QnMdnsPacket::ResourceRecord& record: recordSet)
         {
-            switch (record.recordType) {
-                case QnMdnsPacket::kSrvRecordType: {
+            switch (record.recordType)
+            {
+                case QnMdnsPacket::kSrvRecordType:
+                {
                     if (!record.recordName.endsWith("_http._tcp.local."))
                         break;
                     QnMdnsSrvData srvData;
@@ -262,7 +264,8 @@ int DiscoveryManager::fromMDNSData(
                         break;
                     port = srvData.port;
                 }
-                case QnMdnsPacket::kTextRecordType: {
+                case QnMdnsPacket::kTextRecordType:
+                {
                     QnMdnsTextData textData;
                     textData.decode(record.data);
                     const auto pathAttribute = textData.getAttribute("path");
