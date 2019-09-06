@@ -180,6 +180,75 @@ public:
         return true;
     }
 
+    bool readJsonValue(QJsonValue *target) {
+        NX_ASSERT(target);
+
+        auto marker = peekMarker();
+        switch (marker) {
+        case QnUbjson::TrueMarker:
+        case QnUbjson::FalseMarker: {
+            bool tmp;
+            readBool(&tmp);
+            *target = tmp;
+            break;
+        }
+        case QnUbjson::UInt8Marker: {
+            quint8 tmp;
+            readUInt8(&tmp);
+            *target = tmp;
+            break;
+        }
+        case QnUbjson::Int8Marker: {
+            qint8 tmp;
+            readInt8(&tmp);
+            *target = tmp;
+            break;
+        }
+        case QnUbjson::Int16Marker: {
+            qint16 tmp;
+            readInt16(&tmp);
+            *target = tmp;
+            break;
+        }
+        case QnUbjson::Int32Marker: {
+            qint32 tmp;
+            readInt32(&tmp);
+            *target = tmp;
+            break;
+        }
+        case QnUbjson::Int64Marker: {
+            qint64 tmp;
+            readInt64(&tmp);
+            *target = tmp;
+            break;
+        }
+        case QnUbjson::FloatMarker: {
+            float tmp;
+            readFloat(&tmp);
+            *target = tmp;
+            break;
+        }
+        case QnUbjson::DoubleMarker: {
+            double tmp;
+            readDouble(&tmp);
+            *target = tmp;
+            break;
+        }
+        case QnUbjson::Utf8StringMarker: {
+            QString tmp;
+            readUtf8String(&tmp);
+            *target = tmp;
+            break;
+        }
+        default:
+            NX_ASSERT(false, "Unsupported QJsonValue type?");
+            *target = {};
+            return false;
+        }
+
+        return true;
+    }
+
     bool readArrayStart(int *size = NULL, QnUbjson::Marker *type = NULL) {
         return readContainerStartInternal<AtArrayStart, AtArrayElement, AtSizedArrayElement, AtTypedSizedArrayElement, AtArrayEnd>(QnUbjson::ArrayStartMarker, size, type);
     }
