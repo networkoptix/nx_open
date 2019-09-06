@@ -517,7 +517,7 @@ QSet<QnUuid> ServerUpdateTool::getTargetsForPackage(const nx::update::Package& p
     return package.targets;
 }
 
-int ServerUpdateTool::uploadPackage(
+int ServerUpdateTool::uploadPackageToRecipients(
     const nx::update::Package& package,
     const QDir& storageDir)
 {
@@ -538,15 +538,6 @@ int ServerUpdateTool::uploadPackage(
 
     NX_INFO(this, "uploadPackage(%1) - going to upload package to servers", localFile);
 
-    UploadState config;
-    config.source = storageDir.absoluteFilePath(localFile);
-    // Updates should land to updates/publication_key/file_name.
-    config.destination = package.file;
-    // This should mean 'infinite time'.
-    config.ttl = -1;
-    // Server should create file by itself.
-    config.allowFileCreation = false;
-
     for (const auto& serverId: targets)
     {
         auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
@@ -556,31 +547,54 @@ int ServerUpdateTool::uploadPackage(
             continue;
         }
 
-        auto callback = [tool = QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
+        if (uploadPackageToServer(serverId, package, storageDir))
+            toUpload++;
+    }
+
+    return toUpload;
+}
+
+bool ServerUpdateTool::uploadPackageToServer(const QnUuid& serverId,
+    const nx::update::Package& package, QDir storageDir)
+{
+    QString localFile = package.localFile;
+    UploadState config;
+    config.source = storageDir.absoluteFilePath(localFile);
+    // Updates should land to updates/publication_key/file_name.
+    config.destination = package.file;
+    // This should mean 'infinite time'.
+    config.ttl = -1;
+    // Server should create file by itself.
+    config.allowFileCreation = false;
+
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
+    if (!server)
+    {
+        NX_ERROR(this, "uploadPackageToServer(%1) - lost server %2 for upload", localFile, serverId);
+        return false;
+    }
+
+    auto callback =
+        [tool = QPointer<ServerUpdateTool>(this), serverId](const UploadState& state)
         {
             if (tool)
                 tool->atUploadWorkerState(serverId, state);
         };
 
-        auto id = m_uploadManager->addUpload(server, config, this, callback);
+    auto id = m_uploadManager->addUpload(server, config, this, callback);
 
-        if (!id.isEmpty())
-        {
-            NX_INFO(this, "uploadPackage(%1) - started uploading file to server %2",
-                package.file, serverId);
-            m_uploadStateById[id] = config;
-            m_activeUploads.insert(id);
-            toUpload++;
-        }
-        else
-        {
-            NX_WARNING(this, "uploadPackage(%1) - failed to start uploading file=%2 reason=%3",
-                package.file, localFile, config.errorMessage);
-            m_completedUploads.insert(id);
-        }
+    if (!id.isEmpty())
+    {
+        NX_INFO(this, "uploadPackageToServer(%1) - started uploading file to server %2",
+            package.file, serverId);
+        m_uploadStateById[id] = config;
+        m_activeUploads.insert(id);
+        return true;
     }
-
-    return toUpload;
+    NX_WARNING(this, "uploadPackageToServer(%1) - failed to start uploading file=%2 reason=%3",
+        package.file, localFile, config.errorMessage);
+    m_completedUploads.insert(id);
+    return false;
 }
 
 void ServerUpdateTool::atUploadWorkerState(QnUuid serverId, const UploadState& state)
@@ -630,9 +644,9 @@ void ServerUpdateTool::markUploadCompleted(const QString& uploadId)
     }
 }
 
-bool ServerUpdateTool::startUpload(const UpdateContents& contents)
+bool ServerUpdateTool::startUpload(const UpdateContents& contents, bool cleanExisting)
 {
-    NX_VERBOSE(this) << "startUpload()";
+    NX_VERBOSE(this, "startUpload() clean=%1", cleanExisting);
     QnMediaServerResourceList recipients = getServersForUpload();
 
     if (recipients.empty())
@@ -641,12 +655,15 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
         return false;
     }
 
-    for (const auto& id: m_activeUploads)
-        m_uploadManager->cancelUpload(id);
+    if (cleanExisting)
+    {
+        for (const auto& id: m_activeUploads)
+            m_uploadManager->cancelUpload(id);
 
-    m_activeUploads.clear();
-    m_completedUploads.clear();
-    m_uploadStateById.clear();
+        m_activeUploads.clear();
+        m_completedUploads.clear();
+        m_uploadStateById.clear();
+    }
 
     int toUpload = 0;
     if (contents.filesToUpload.isEmpty())
@@ -658,7 +675,7 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
         for (const auto& package: contents.info.packages)
         {
             if (package.isServer())
-                toUpload += uploadPackage(package, contents.storageDir);
+                toUpload += uploadPackageToRecipients(package, contents.storageDir);
         }
     }
 
@@ -672,7 +689,7 @@ bool ServerUpdateTool::startUpload(const UpdateContents& contents)
     return true;
 }
 
-void ServerUpdateTool::stopUpload()
+void ServerUpdateTool::stopAllUploads()
 {
     if (m_offlineUpdaterState != OfflineUpdateState::push)
         return;
@@ -685,6 +702,47 @@ void ServerUpdateTool::stopUpload()
     m_uploadStateById.clear();
     NX_VERBOSE(this) << "stopUpload()";
     changeUploadState(OfflineUpdateState::ready);
+}
+
+void ServerUpdateTool::startUploadsToServer(const UpdateContents& contents, const QnUuid &peer)
+{
+    bool started = false;
+
+    for (const auto& package: contents.info.packages)
+    {
+        if (package.targets.contains(peer))
+        {
+            started = uploadPackageToServer(peer, package, contents.storageDir);
+            break;
+        }
+    }
+    if (started)
+        NX_VERBOSE(this, "startUploadsToServer(%1) - started uploading", peer);
+    else
+        NX_VERBOSE(this, "startUploadsToServer(%1) - not uploading anything", peer);
+}
+
+void ServerUpdateTool::stopUploadsToServer(const QnUuid &peer)
+{
+    QStringList idsToRemove;
+    for (const auto& record: m_uploadStateById)
+    {
+        if (record.second.uuid == peer)
+            idsToRemove.push_back(record.first);
+    }
+
+    if (idsToRemove.empty())
+        NX_VERBOSE(this, "stopUploadsToServer(%1) no uploads to stop", peer);
+    else
+        NX_VERBOSE(this, "stopUploadsToServer(%1) stopping %2 uploads", peer, idsToRemove.size());
+
+    for (const auto& id: idsToRemove)
+    {
+        m_uploadManager->cancelUpload(id);
+        m_completedUploads.erase(id);
+        m_activeUploads.erase(id);
+        m_uploadStateById.erase(id);
+    }
 }
 
 bool ServerUpdateTool::verifyUpdateManifest(

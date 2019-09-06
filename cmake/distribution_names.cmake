@@ -31,7 +31,7 @@ function(set_distribution_names)
     if(beta)
         set(beta_suffix "-beta")
         set(suffix "${distribution_platform}${beta_suffix}-${cloudGroup}")
-        set(boxToolSuffix "${distribution_platform}${beta_suffix}")
+        set(vmsBenchmarkSuffix "${distribution_platform}${beta_suffix}")
         set(sdkSuffix "universal${beta_suffix}")
         if(targetDevice STREQUAL "linux_arm32")
             set(suffix_rpi "rpi${beta_suffix}-${cloudGroup}")
@@ -40,7 +40,7 @@ function(set_distribution_names)
     else()
         set(beta_suffix)
         set(suffix "${distribution_platform}")
-        set(boxToolSuffix "${distribution_platform}")
+        set(vmsBenchmarkSuffix "${distribution_platform}")
         set(sdkSuffix "universal")
         if(targetDevice STREQUAL "linux_arm32")
             set(suffix_rpi "rpi")
@@ -96,8 +96,8 @@ function(set_distribution_names)
         "${prefix}-camera_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
     set(storage_sdk_distribution_name
         "${prefix}-storage_sdk-${releaseVersion.full}-${sdkSuffix}" PARENT_SCOPE)
-    set(box_tool_distribution_name
-        "${prefix}-box_tool-${releaseVersion.full}-${boxToolSuffix}" PARENT_SCOPE)
+    set(vms_benchmark_distribution_name
+        "${prefix}-vms_benchmark-${releaseVersion.full}-${vmsBenchmarkSuffix}" PARENT_SCOPE)
     set(ssc_analytics_plugin_distribution_name
         "${prefix}-ssc_analytics_plugin-${releaseVersion.full}-${suffix}" PARENT_SCOPE)
     set(product_distribution_name

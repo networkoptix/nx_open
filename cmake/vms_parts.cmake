@@ -1,5 +1,5 @@
 set(_withMediaServer ON)
-set(_withBoxTool OFF)
+set(_supportVmsBenchmark OFF)
 set(_withMediaDbUtil OFF)
 set(_withTrayTool OFF)
 set(_withNxTool OFF)
@@ -31,7 +31,7 @@ if("${platform}" STREQUAL "linux")
         set(_withClouds OFF)
     elseif("${arch}" STREQUAL "x64")
         set(_withClouds ON)
-        set(_withBoxTool ON)
+        set(_supportVmsBenchmark ON)
     endif()
 endif()
 
@@ -48,7 +48,7 @@ if("${platform}" STREQUAL "macosx")
 endif()
 
 if(WINDOWS)
-    set(_withBoxTool ON)
+    set(_supportVmsBenchmark ON)
     set(_withTrayTool ON)
     set(_withNxTool ${build_nxtool})
     if("${arch}" STREQUAL "x64")
@@ -81,7 +81,6 @@ option(withTests "Enable unit tests" ${_withTests})
 option(withCassandraTests "Enable cassandra related tests" ${_withCassandraTests})
 option(withMiniLauncher "Enable minilauncher" ${_withMiniLauncher})
 option(withVmsTools "Enable utility VMS tools" OFF)
-option(withBoxTool "Enable nx_box_tool build" ${_withBoxTool})
 nx_option(withRootTool "Enable root tool" ${_withRootTool})
 nx_option(
     withP2PConnectionTestingUtility
@@ -100,6 +99,11 @@ cmake_dependent_option(withSdk "Enable nx_*_sdk build"
     ON
 )
 
+cmake_dependent_option(withVmsBenchmark "Enable vms_benchmark build"
+    ON "_supportVmsBenchmark"
+    OFF
+)
+
 cmake_dependent_option(withUnitTestsArchive "Enable unit tests archive generation"
     OFF "withTests"
     OFF
@@ -112,7 +116,7 @@ if(enableHanwha OR developerBuild AND NOT targetDevice STREQUAL "edge1")
     set(enable_hanwha true)
 endif()
 
-unset(_withBoxTool)
+unset(_supportVmsBenchmark)
 unset(_withMediaServer)
 unset(_withMediaDbUtil)
 unset(_withNxTool)
