@@ -105,7 +105,15 @@ bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
         return true;
     }
 
-    return m_deviceAgent->setNeededMetadataTypes(neededMetadataTypes());
+    auto neededMetadataTypes = this->neededMetadataTypes();
+    if (neededMetadataTypes == m_lastMetadataTypes)
+        return true;
+
+    const bool result = m_deviceAgent->setNeededMetadataTypes(neededMetadataTypes);
+    if (result)
+        m_lastMetadataTypes = std::move(neededMetadataTypes);
+
+    return result;
 }
 
 bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
@@ -164,6 +172,7 @@ void DeviceAnalyticsBinding::stopAnalyticsUnsafe()
     if (!m_deviceAgent)
         return;
 
+    m_lastMetadataTypes = sdk_support::MetadataTypes();
     m_deviceAgent->setNeededMetadataTypes(sdk_support::MetadataTypes());
 }
 
@@ -384,6 +393,7 @@ sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
 
     NX_DEBUG(this, "Filtered needed event types list for resource %1 (%2): %3",
         m_device->getUserDefinedName(), m_device->getId(), containerToString(result.eventTypeIds));
+
     return result;
 }
 
