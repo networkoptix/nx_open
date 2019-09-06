@@ -173,7 +173,10 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
 
     setSettingsInternal(settings);
     if (!m_started)
+    {
+        m_lastMetadataTypes = sdk_support::MetadataTypes();
         m_started = m_deviceAgent->setNeededMetadataTypes(neededMetadataTypes());
+    }
 
     return m_started;
 }
