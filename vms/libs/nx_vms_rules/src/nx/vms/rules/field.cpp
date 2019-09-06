@@ -2,10 +2,13 @@
 
 #include <QDebug>
 #include <QEvent>
+#include <QJsonValue>
 #include <QMetaProperty>
 #include <QScopedValueRollback>
 
 namespace nx::vms::rules {
+
+const QString kMetatype = "metatype";
 
 Field::Field()
 {
@@ -31,6 +34,25 @@ void Field::connectSignals()
     }
 
     m_connected = true;
+}
+
+QMap<QString, QJsonValue> Field::serializedProperties() const
+{
+    QMap<QString, QJsonValue> serialized;
+
+    auto meta = metaObject();
+    for (int i = meta->propertyOffset(); i < meta->propertyCount(); ++i)
+    {
+        const auto& propName = meta->property(i).name();
+        serialized.insert(propName, this->property(propName).toJsonValue());
+    }
+
+    for (const auto& propName: this->dynamicPropertyNames())
+    {
+        serialized.insert(propName, this->property(propName).toJsonValue());
+    }
+
+    return serialized;
 }
 
 bool Field::event(QEvent* ev)

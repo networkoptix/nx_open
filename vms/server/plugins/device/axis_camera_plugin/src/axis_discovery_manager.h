@@ -1,10 +1,6 @@
-/**********************************************************
-* 2 apr 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef AXIS_DISCOVERY_MANAGER_H
-#define AXIS_DISCOVERY_MANAGER_H
+#pragma once
 
 #include <camera/camera_plugin.h>
 
@@ -54,5 +50,3 @@ public:
 private:
     nxpt::CommonRefManager m_refManager;
 };
-
-#endif  //AXIS_DISCOVERY_MANAGER_H

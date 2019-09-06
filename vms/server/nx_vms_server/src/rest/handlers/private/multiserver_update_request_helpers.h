@@ -26,6 +26,7 @@ void getStoragesDataRemotely(
     nx::update::storage::ServerToStoragesList* reply,
     QnMultiserverRequestContext<QnEmptyRequestData>* context);
 
-IfParticipantPredicate makeIfParticipantPredicate(nx::vms::server::UpdateManager* updateManager);
+IfParticipantPredicate makeIfParticipantPredicate(
+    nx::vms::server::UpdateManager* updateManager, const QList<QnUuid>& forcedParticipants = {});
 
 } // namespace detail

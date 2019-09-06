@@ -344,7 +344,7 @@
     </message>
     <message>
       <source>Internal server error. %1</source>
-      <translation>Interní chyba serveru.</translation>
+      <translation>Interní chyba serveru. %1</translation>
     </message>
   </context>
   <context>
@@ -889,7 +889,7 @@
     <message numerus="yes">
       <source>%n Cameras</source>
       <translation type="unfinished">
-        <numerusform>Kamery</numerusform>
+        <numerusform>%n Kamera</numerusform>
         <numerusform>%n Cameras</numerusform>
         <numerusform>%n Cameras</numerusform>
       </translation>
@@ -897,7 +897,7 @@
     <message numerus="yes">
       <source>%n cameras</source>
       <translation type="unfinished">
-        <numerusform>kamery</numerusform>
+        <numerusform>%n kamera</numerusform>
         <numerusform>%n cameras</numerusform>
         <numerusform>%n cameras</numerusform>
       </translation>
@@ -905,7 +905,7 @@
     <message numerus="yes">
       <source>%n I/O Modules</source>
       <translation type="unfinished">
-        <numerusform>%n I/O Modul(y</numerusform>
+        <numerusform>%n I/O Modul</numerusform>
         <numerusform>%n I/O Moduly</numerusform>
         <numerusform>%n I/O Modules</numerusform>
         <numerusform>%n I/O Modules</numerusform>
@@ -1102,7 +1102,7 @@
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation>Nelze otevřít soubor pro zápis</translation>
+      <translation>Nelze otevřít soubor pro zápis.</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
@@ -1114,7 +1114,7 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation>Extrahování bylo zrušeno</translation>
+      <translation>Extrahování bylo zrušeno.</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
@@ -1641,7 +1641,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation>Použití času z kamery se nepodařilo vynutit - přílišné zpoždění. BUde použit systémový čas</translation>
+      <translation>Použití času z kamery se nepodařilo vynutit - přílišné zpoždění. Bude použit systémový čas</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>

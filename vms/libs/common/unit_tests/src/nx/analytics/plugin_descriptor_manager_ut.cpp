@@ -133,10 +133,9 @@ protected:
 
     void givenPluginsWithManifests(const std::set<int>& pluginIndices)
     {
-        PluginDescriptorManager pluginDescriptorManager(m_commonModule.get());
         for (auto pluginIndex: pluginIndices)
         {
-            pluginDescriptorManager.updateFromPluginManifest(
+            m_commonModule->analyticsPluginDescriptorManager()->updateFromPluginManifest(
                 makePluginManifest(pluginIndex, kUpdatedPluginPostfix));
         }
 
@@ -145,7 +144,6 @@ protected:
     void makeSureAllDescriptorsAreAccessible(
         const ServerDescriptorConfigMap& descriptorConfigsPerServer)
     {
-        PluginDescriptorManager descriptorManager(m_commonModule.get());
         for (const auto& [serverIndex, descriptorConfig]: descriptorConfigsPerServer)
         {
             const bool serverIndexIsValid = serverIndex < m_servers.size();
@@ -157,7 +155,8 @@ protected:
                 i <= descriptorConfig.descriptorRangeEnd;
                 ++i)
             {
-                const auto descriptor = descriptorManager.descriptor(makePluginId(i));
+                const auto descriptor = m_commonModule->analyticsPluginDescriptorManager()
+                    ->descriptor(makePluginId(i));
                 ASSERT_TRUE(descriptor.has_value());
                 ASSERT_EQ(*descriptor, makePluginDescriptor(i));
             }
@@ -167,10 +166,10 @@ protected:
     void makeSureAllDescriptorsAreAccessible(
         const std::vector<DescriptorsToCheck>& descriptorsToCheck)
     {
-        PluginDescriptorManager descriptorManager(m_commonModule.get());
         for (const auto& testCase: descriptorsToCheck)
         {
-            const auto descriptors = descriptorManager.descriptors(testCase.toPluginIds());
+            const auto descriptors = m_commonModule->analyticsPluginDescriptorManager()
+                ->descriptors(testCase.toPluginIds());
             ASSERT_TRUE(testCase.isCorrectResult(descriptors));
         }
     }
@@ -190,10 +189,10 @@ protected:
             }
         }
 
-        PluginDescriptorManager pluginDescriptorManager(m_commonModule.get());
         for (const auto pluginIndex: allIndices)
         {
-            const auto descriptor = pluginDescriptorManager.descriptor(makePluginId(pluginIndex));
+            const auto descriptor = m_commonModule->analyticsPluginDescriptorManager()
+                ->descriptor(makePluginId(pluginIndex));
             ASSERT_TRUE(descriptor.has_value());
 
             const auto expectedDescriptor = pluginIndices.find(pluginIndex) == pluginIndices.cend()

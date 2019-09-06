@@ -61,6 +61,7 @@ bool UrlParams::parse(const QUrlQuery& query)
         const int streamIndex = streamIndexStr.toInt();
         switch (streamIndex)
         {
+        case -1: //< Default value. Same as the primary stream.
         case 0:
             quality = MEDIA_Quality_High;
             break;

@@ -58,3 +58,4 @@ add_subdirectory(analytics)
 
 add_subdirectory(device)
 
+add_subdirectory(storage)

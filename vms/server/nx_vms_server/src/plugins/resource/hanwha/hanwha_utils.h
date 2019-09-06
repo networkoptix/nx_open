@@ -55,13 +55,14 @@ static const std::map<AVCodecID, int> kHanwhaCodecCoefficients = {
     {AV_CODEC_ID_MJPEG, 1}
 };
 
-template<typename T>
+template<typename Response>
 CameraDiagnostics::Result error(
-    const T& response,
+    const Response& response,
     const CameraDiagnostics::Result& authorizedResult)
 {
-    auto statusCode = response.statusCode();
-    bool unauthorizedResponse = statusCode == nx::network::http::StatusCode::unauthorized
+    const auto statusCode = response.statusCode();
+    const bool unauthorizedResponse =
+        statusCode == nx::network::http::StatusCode::unauthorized
         || statusCode == nx::network::http::StatusCode::notAllowed
         || statusCode == kHanwhaBlockedHttpCode;
 
@@ -108,7 +109,7 @@ boost::optional<int> extractPropertyChannel(const QString& fullPropertyName);
 nx::core::resource::DeviceType fromHanwhaToNxDeviceType(HanwhaDeviceType hanwhaDeviceType);
 
 template<typename T>
-T fromHanwhaString(const QString& str)
+T fromHanwhaString(const QString& /*str*/)
 {
     static_assert(std::is_same<T, bool>::value
         || std::is_same<T, AVCodecID>::value
@@ -124,7 +125,7 @@ T fromHanwhaString(const QString& str)
 }
 
 template<typename T>
-T fromHanwhaString(const QString& str, bool* outSuccess)
+T fromHanwhaString(const QString& /*str*/, bool* /*outSuccess*/)
 {
     static_assert(std::is_same<T, int>::value, "No specialization for type");
 }

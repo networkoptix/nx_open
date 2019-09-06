@@ -25,7 +25,7 @@
                     <description>
                         Open RTSP video stream from a camera.
                         It is not exactly an API method but rather a URL format which may contain
-                        any camera id (can be obtained from "id", "physicalId" or "logicalId" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+                        any camera id (can be obtained from "id", "physicalId" or "logicalId" field via /ec2/getCamerasEx) or MAC address (not
                         supported for certain cameras).
                         Example:
                         rtsp://&lt;server_ip&gt;:&lt;port&gt;/12AB42FD5912?pos=1235631&amp;resolution=240p</description>
@@ -111,7 +111,7 @@
                     <description>
                         Open HTTP video stream from a camera.
                         It is not exactly an API method but rather a URL format which may contain
-                        any camera id (can be obtained from "id", "physicalId" or "logicalId" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+                        any camera id (can be obtained from "id", "physicalId" or "logicalId" field via /ec2/getCamerasEx) or MAC address (not
                         supported for certain cameras).
                         Codec and stream format can be specified in URL parameters. Live stream and
                         archive can be downloaded. If required and possible, media stream
@@ -168,7 +168,7 @@
                     <description>
                         Open HTTP Live Streaming (HLS) video stream from a camera.
                         It is not exactly an API method but rather a URL format which may contain
-                        any camera id (can be obtained from "id", "physicalId" or "logicalId" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+                        any camera id (can be obtained from "id", "physicalId" or "logicalId" field via /ec2/getCamerasEx) or MAC address (not
                         supported for certain cameras).
                         This protocol is supported by iOS-based devices (iPhone, iPad).
                         Example:
@@ -204,7 +204,7 @@
                         Download fragment of a camera archive, identified by its start time and
                         duration.
                         It is not exactly an API method but rather a URL format which may contain
-                        any camera id (can be obtained from "id", "physicalId" or "logicalId" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or MAC address (not
+                        any camera id (can be obtained from "id", "physicalId" or "logicalId" field via /ec2/getCamerasEx) or MAC address (not
                         supported for certain cameras).
                         Fragment can be downloaded in mpeg-2/ts (.ts) or Matroska (.mkv) format.
                         No transcoding is performed. Stream format can be one of following: ts, mkv.

@@ -105,7 +105,15 @@ std::set<int64_t> AttributesDao::lookupCombinedAttributes(
 	        (SELECT docid FROM attributes_text_index WHERE content MATCH ?)
     )sql");
 
-    query->addBindValue(text);
+    // Adding * to every word.
+    auto words = text.split(L' ', QString::SkipEmptyParts);
+    for (auto& word: words)
+    {
+        if (!word.endsWith("*"))
+            word += "*";
+    }
+
+    query->addBindValue(words.join(L' '));
     query->exec();
 
     std::set<int64_t> attributesIds;

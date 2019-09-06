@@ -1,4 +1,5 @@
 #include "mount_helper.h"
+#include "escape_quotes.h"
 #include <sstream>
 #include <cctype>
 #include <iostream>
@@ -19,9 +20,7 @@ MountHelper::MountHelper(
         m_invalidUsername = true;
 }
 
-SystemCommands::MountCode MountHelper::mount(
-    const std::string& url,
-    const std::string& directory)
+SystemCommands::MountCode MountHelper::mount(const std::string& url, const std::string& directory)
 {
     if (!m_delegates.isPathAllowed(directory))
         return SystemCommands::MountCode::otherError;
@@ -29,7 +28,7 @@ SystemCommands::MountCode MountHelper::mount(
     if (m_invalidUsername)
         return SystemCommands::MountCode::otherError;
 
-    m_url = url;
+    m_url = escapeSingleQuotes(url);
     m_directory = directory;
 
     if (m_url.size() < 3 || m_url[0] != '/' || m_url[1] != '/' || !isalnum(m_url[2]))
@@ -107,7 +106,7 @@ std::string MountHelper::makeCommandString(
         << " -o credentials=" << credentialFile;
 
     if (!domain.empty())
-        ss << ",domain=" << domain;
+        ss << ",domain='" << escapeSingleQuotes(domain) << "'";
 
     if (!ver.empty())
         ss << ",vers=" << ver;
@@ -123,10 +122,11 @@ std::string MountHelper::makeCommandString(
 {
     std::ostringstream ss;
     ss << "mount -t cifs '" << m_url << "' '" << m_directory << "'"
-        << " -o username='" << username << "',password='" << password << "'";
+       << " -o username='" << escapeSingleQuotes(username)
+       << "',password='" << escapeSingleQuotes(password) << "'";
 
     if (!domain.empty())
-        ss << ",domain=" << domain;
+        ss << ",domain='" << escapeSingleQuotes(domain) << "'";
 
     if (!ver.empty())
         ss << ",vers=" << ver;

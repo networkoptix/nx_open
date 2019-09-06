@@ -7,6 +7,7 @@
 
 #include <analytics/db/config.h>
 
+#include "attributes_dao.h"
 #include "object_type_dao.h"
 #include "serializers.h"
 
@@ -153,21 +154,28 @@ AnalyticsArchiveDirectory::ObjectTrackMatchResult
     return result;
 }
 
-ArchiveFilter AnalyticsArchiveDirectory::prepareArchiveFilter(
+std::optional<ArchiveFilter> AnalyticsArchiveDirectory::prepareArchiveFilter(
+    nx::sql::QueryContext* queryContext,
     const db::Filter& filter,
-    const ObjectTypeDao& objectTypeDao)
+    const ObjectTypeDao& objectTypeDao,
+    AttributesDao* attributesDao)
 {
     ArchiveFilter archiveFilter;
 
     if (!filter.objectTypeId.empty())
     {
-        std::transform(
-            filter.objectTypeId.begin(), filter.objectTypeId.end(),
-            std::back_inserter(archiveFilter.objectTypes),
-            [&objectTypeDao](const auto& objectType)
-            {
-                return objectTypeDao.objectTypeIdFromName(objectType);
-            });
+        for (const auto& name: filter.objectTypeId)
+        {
+            const auto id = objectTypeDao.objectTypeIdFromName(name);
+            if (id != -1)
+                archiveFilter.objectTypes.push_back(id);
+        }
+
+        if (archiveFilter.objectTypes.empty())
+        {
+            NX_DEBUG(typeid(AnalyticsArchiveDirectory), "No valid object type was specified");
+            return std::nullopt;
+        }
     }
 
     if (filter.boundingBox)
@@ -177,6 +185,28 @@ ArchiveFilter AnalyticsArchiveDirectory::prepareArchiveFilter(
     archiveFilter.sortOrder = filter.sortOrder;
     if (filter.maxObjectTracksToSelect > 0)
         archiveFilter.limit = filter.maxObjectTracksToSelect;
+
+    if (!filter.freeText.isEmpty())
+    {
+        nx::utils::ElapsedTimer timer;
+        timer.restart();
+
+        const auto attributeGroups =
+            attributesDao->lookupCombinedAttributes(queryContext, filter.freeText);
+        if (attributeGroups.empty())
+        {
+            NX_DEBUG(typeid(AnalyticsArchiveDirectory),
+                "%1 text did not match anything", filter.freeText);
+            return std::nullopt;
+        }
+
+        NX_DEBUG(typeid(AnalyticsArchiveDirectory),
+            "Text '%1' lookup completed in %2", filter.freeText, timer.elapsed());
+
+        std::copy(
+            attributeGroups.begin(), attributeGroups.end(),
+            std::back_inserter(archiveFilter.allAttributesHash));
+    }
 
     return archiveFilter;
 }

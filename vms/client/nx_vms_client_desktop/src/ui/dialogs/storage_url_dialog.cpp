@@ -225,7 +225,7 @@ void QnStorageUrlDialog::accept()
         return;
     }
 
-    if (!(m_replySuccess == 0
+    if (!(m_replySuccess
             && initStatus == Qn::StorageInit_Ok
             && m_storage.isWritable
             && m_storage.isExternal))

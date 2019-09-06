@@ -592,6 +592,7 @@ void ServerMessageBus::resubscribePeers(
                 shortValues.push_back(connectionContext->encode(id));
 
             NX_ASSERT(newValue.contains(connection->remotePeer()));
+            NX_ASSERT(!newValue.contains(localPeer()));
             auto sequences = m_db->transactionLog()->getTransactionsState(newValue);
 
             if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))

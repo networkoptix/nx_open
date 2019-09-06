@@ -12,7 +12,6 @@
 
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/id.h>
-#include <utils/common/ldap_fwd.h>
 #include <utils/email/email_fwd.h>
 
 #include <core/ptz/ptz_fwd.h>
@@ -39,8 +38,6 @@ public:
 
     int pingSystemAsync(const nx::utils::Url& url, const QString& getKey, QObject* target, const char* slot);
     int getNonceAsync(const nx::utils::Url& url, QObject* target, const char* slot);
-    // It expects (int status, const QnLdapUsers& users, int handle, const QString& errorString) slot.
-    int testLdapSettingsAsync(const QnLdapSettings& settings, QObject* target, const char* slot);
 
 protected:
     virtual nx::utils::Url url() const override;

@@ -49,6 +49,8 @@ protected:
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
     virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
+    virtual bool sceneEvent(QEvent* event) override;
+
 private:
     bool ensurePixmap(const QSize& logicalSize, int devicePixelRatio); //< returns true if pixmap was changed
     void renderWidgetRect(const QRect& logicalRect, int devicePixelRatio);

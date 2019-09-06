@@ -13,9 +13,8 @@
 #include <nx/sdk/uuid.h>
 
 #include <nx/sdk/helpers/ref_countable.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/log_utils.h>
-#include <nx/sdk/helpers/result_aliases.h>
 
 namespace nx {
 namespace sdk {
@@ -40,12 +39,8 @@ protected:
 protected:
     /**
      * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
-     * @param printPrefix Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from libName.
      */
-    Engine(
-        IPlugin* plugin,
-        bool enableOutput,
-        const std::string& printPrefix = "");
+    Engine(bool enableOutput);
 
     virtual std::string manifestString() const = 0;
 
@@ -54,7 +49,7 @@ protected:
      * Should perform any required (re)initialization. Called even if the settings model is empty.
      * @return Error messages per setting (if any), as in IEngine::setSettings().
      */
-    virtual StringMapResult settingsReceived() { return nullptr; }
+    virtual Result<const IStringMap*> settingsReceived() { return nullptr; }
 
     /**
      * Provides access to the Engine global settings stored by the Server.
@@ -77,15 +72,13 @@ protected:
      * @param outActionUrl If set by this call, Client will open this URL in an embedded browser.
      * @param outMessageToUser If set by this call, Client will show this text to the user.
      */
-    virtual Result<void> executeAction(
+    virtual Result<IAction::Result> executeAction(
         const std::string& /*actionId*/,
         Uuid /*objectTrackId*/,
         Uuid /*deviceId*/,
         int64_t /*timestampUs*/,
         Ptr<IObjectTrackInfo> /*trackInfo*/,
-        const std::map<std::string, std::string>& /*params*/,
-        std::string* /*outActionUrl*/,
-        std::string* /*outMessageToUser*/)
+        const std::map<std::string, std::string>& /*params*/)
     {
         return {};
     }
@@ -100,44 +93,32 @@ protected:
         std::string caption,
         std::string description);
 
-    /**
-     * Intended to be called from a method of a derived class overriding plugin().
-     * @return Parent Plugin, casted to the specified type.
-     */
-    template<typename DerivedPlugin>
-    DerivedPlugin* pluginCasted() const
-    {
-        const auto plugin = dynamic_cast<DerivedPlugin*>(m_plugin);
-        assertPluginCasted(plugin);
-        return plugin;
-    }
-
     IHandler* handler() const { return m_handler.get(); }
 
 public:
     virtual ~Engine() override;
-
-    virtual IPlugin* plugin() const override { return m_plugin; }
 
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by a descendant.
 
 public:
     virtual void setEngineInfo(const IEngineInfo* engineInfo) override;
-    virtual StringMapResult setSettings(const IStringMap* settings) override;
-    virtual SettingsResponseResult pluginSideSettings() const override;
-    virtual StringResult manifest() const override;
-    virtual Result<void> executeAction(IAction* action) override;
     virtual void setHandler(IEngine::IHandler* handler) override;
     virtual bool isCompatible(const IDeviceInfo* deviceInfo) const override;
 
-private:
-    void assertPluginCasted(void* plugin) const;
+protected:
+    virtual void doSetSettings(
+        Result<const IStringMap*>* outResult, const IStringMap* settings) override;
+
+    virtual void getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const override;
+
+    virtual void getManifest(Result<const IString*>* outResult) const override;
+
+    virtual void doExecuteAction(
+        Result<IAction::Result>* outResult, const IAction* action) override;
 
 private:
     mutable std::mutex m_mutex;
-    IPlugin* const m_plugin;
-    const std::string m_overridingPrintPrefix;
     std::map<std::string, std::string> m_settings;
     Ptr<IEngine::IHandler> m_handler;
 };

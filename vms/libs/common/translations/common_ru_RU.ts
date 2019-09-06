@@ -1120,7 +1120,7 @@
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation>Распаковщик занят</translation>
+      <translation>Распаковщик занят.</translation>
     </message>
   </context>
   <context>

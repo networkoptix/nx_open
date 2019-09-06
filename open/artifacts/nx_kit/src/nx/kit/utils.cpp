@@ -102,13 +102,15 @@ const std::vector<std::string>& getProcessCmdLineArgs()
     return args;
 }
 
+template<int sizeOfChar> struct HexFormatString {};
+template<> struct HexFormatString<1> { static constexpr const char* value = "%02X"; };
+template<> struct HexFormatString<2> { static constexpr const char* value = "%04X"; };
+template<> struct HexFormatString<4> { static constexpr const char* value = "%08X"; };
+
 template<typename Char>
 static std::string hexFormatString()
 {
-    static_assert(sizeof(Char) <= 4, "Char type is too large");
-    constexpr int kHexDigitsPerByte = 2;
-    const auto numberOfHexDigitsAsString = std::string(1, '0' + kHexDigitsPerByte * sizeof(Char));
-    return std::string("%0") + numberOfHexDigitsAsString + "X";
+    return HexFormatString<sizeof(Char)>::value;
 }
 
 template<typename Char>

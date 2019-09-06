@@ -34,26 +34,30 @@ void Rule::addActionBuilder(ActionBuilder* builder)
 
 void Rule::insertEventFilter(int index, EventFilter* filter)
 {
-    // TODO: assert, emit
+    // TODO: assert
     m_filters.insert(index, filter);
+    updateState();
 }
 
 void Rule::insertActionBuilder(int index, ActionBuilder* builder)
 {
-    // TODO: assert, emit
+    // TODO: assert
     m_builders.insert(index, builder);
+    updateState();
 }
 
 EventFilter* Rule::takeEventFilter(int index)
 {
-    // TODO: assert, emit
+    // TODO: assert
     return m_filters.takeAt(index);
+    updateState();
 }
 
 ActionBuilder* Rule::takeActionBuilder(int index)
 {
-    // TODO: assert, emit
+    // TODO: assert
     return m_builders.takeAt(index);
+    updateState();
 }
 
 const QList<EventFilter*> Rule::eventFilters() const
@@ -69,7 +73,7 @@ const QList<ActionBuilder*> Rule::actionBuilders() const
 void Rule::setComment(const QString& comment)
 {
     m_comment = comment;
-    // TODO: #spanasenko emit?
+    updateState();
 }
 
 QString Rule::comment() const
@@ -80,7 +84,7 @@ QString Rule::comment() const
 void Rule::setEnabled(bool isEnabled)
 {
     m_enabled = isEnabled;
-    // TODO: #spanasenko emit?
+    updateState();
 }
 
 bool Rule::enabled() const
@@ -91,7 +95,7 @@ bool Rule::enabled() const
 void Rule::setSchedule(const QByteArray& schedule)
 {
     m_schedule = schedule;
-    // TODO: #spanasenko emit?
+    updateState();
 }
 
 QByteArray Rule::schedule() const

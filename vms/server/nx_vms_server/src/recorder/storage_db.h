@@ -17,6 +17,7 @@
 #include "device_file_catalog.h"
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/utils/timer_manager.h>
+#include <core/resource/abstract_storage_resource.h>
 
 struct QStringHasher
 {
@@ -64,13 +65,14 @@ private:
     int m_storageIndex;
     std::unique_ptr<QIODevice> m_ioDevice;
     std::unique_ptr<nx::media_db::MediaDbWriter> m_dbWriter;
-    QString m_dbFileName;
+    QnAbstractStorageResource::FileInfo m_dbFileInfo;
     UuidToHash m_uuidToHash;
     std::chrono::seconds m_vacuumInterval;
     nx::utils::StandaloneTimerManager m_vacuumTimer;
 
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
-    void addCatalogFromMediaFolder(const QString& postfix,
+    void addCatalogFromMediaFolder(
+        const QString& postfix,
         QnServer::ChunksCatalog catalog,
         QVector<DeviceFileCatalogPtr>& result);
     bool openDbFile();
@@ -100,8 +102,11 @@ private:
         QVector<DeviceFileCatalogPtr> *data = nullptr);
     void onVacuumFinished(bool success);
     bool readDbHeader() const;
-    QStringList allDbFiles(const QString& basePath) const;
+    QnAbstractStorageResource::FileInfoList allDbFiles(const QString& basePath) const;
     QString baseFileName(int64_t seqId);
+    void removeFiles(
+        const QnAbstractStorageResource::FileInfoList& toRemove,
+        const QnAbstractStorageResource::FileInfo& except);
 };
 
 typedef std::shared_ptr<QnStorageDb> QnStorageDbPtr;

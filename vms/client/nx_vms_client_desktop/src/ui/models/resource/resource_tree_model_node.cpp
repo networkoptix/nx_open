@@ -32,7 +32,6 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
@@ -1162,16 +1161,21 @@ QnResourceTreeModel* QnResourceTreeModelNode::model() const
 
 bool QnResourceTreeModelNode::isVisible() const
 {
-    if (!isValid())
+    if (!isValid() || !m_model)
         return false;
+
+    const auto root = m_model->rootNode(m_model->rootNodeTypeForScope());
 
     for (auto node = this; node != nullptr; node = node->parent().get())
     {
         if (node->isBastard())
             return false;
+
+        if (node == root)
+            return true;
     }
 
-    return true;
+    return false; //< The node isn't under current scope root.
 }
 
 void QnResourceTreeModelNode::handlePermissionsChanged()
@@ -1316,7 +1320,7 @@ void QnResourceTreeModelNode::removeChildInternal(const QnResourceTreeModelNodeP
     NX_ASSERT(child->parent() == this);
     NX_ASSERT(m_children.contains(child));
 
-    if (m_model && isVisible())
+    if (isVisible())
     {
         QModelIndex index = createIndex(Qn::NameColumn);
         int row = m_children.indexOf(child);
@@ -1347,7 +1351,7 @@ void QnResourceTreeModelNode::addChildInternal(const QnResourceTreeModelNodePtr&
 {
     NX_ASSERT(child->parent() == this);
 
-    if (m_model && isVisible())
+    if (isVisible())
     {
         QModelIndex index = createIndex(Qn::NameColumn);
         int row = m_children.size();
@@ -1371,7 +1375,7 @@ void QnResourceTreeModelNode::addChildInternal(const QnResourceTreeModelNodePtr&
 
 void QnResourceTreeModelNode::changeInternal()
 {
-    if (!m_model || !isVisible())
+    if (!isVisible())
         return;
 
     const auto index = createIndex(Qn::NameColumn);

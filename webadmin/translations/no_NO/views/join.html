@@ -57,9 +57,9 @@
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
             <p>Nåværende system er i ferd med å bli slått sammen <b>{{systems.systemName}}</b> med system <b>{{systems.joinSystemName}}</b></p>
             <p>
-                Det nye systemet vil ha passord og navn fra følgende system: <0 />
-                <label> <2 /> {{systems.systemName}} (nåværende) </label> <0 />
-                <label ng-if="!systems.remoteSystemIsNew"> <4 /> {{systems.joinSystemName}}</label>
+                Det nye systemet vil ha passord og navn fra følgende system:<br/>
+                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/>{{systems.systemName}} (nåværende)</label><br/>
+                <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/>{{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>

@@ -8,10 +8,10 @@ namespace nx::vms::rules {
 
 enum class ActionType
 {
-    Instant = 0,
-    ActAtStart = 1 << 0,
-    ActAtEnd = 1 << 1,
-    Prolonged = ActAtStart | ActAtEnd
+    instant = 0,
+    actAtStart = 1 << 0,
+    actAtEnd = 1 << 1,
+    prolonged = actAtStart | actAtEnd
 };
 
 class NX_VMS_RULES_API BasicAction: public QObject

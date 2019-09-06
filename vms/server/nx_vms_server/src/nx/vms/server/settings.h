@@ -8,6 +8,7 @@
 #include <network/system_helpers.h>
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
+#include <server/server_globals.h>
 
 
 // Type specific parsers
@@ -297,6 +298,9 @@ public:
     };
     Option<int> maxConnections{this, "maxConnections", 2000, ""};
     Option<bool> noInitStoragesOnStartup{this, "noInitStoragesOnStartup", false, ""};
+    Option<int> serverStartedEventTimeoutMs{this,
+        QString::fromStdString(QnServer::serverStartedEventTimeoutMsName),
+        3000, "Delay before generate serverStarted event on startup"};
     Option<bool> noPlugins{this, "noPlugins", false, "Turn off all plugins"};
     Option<QString> ipVersion{this, "ipVersion", "", ""};
     Option<QString> rtspTransport{this, "rtspTransport", "automatic", ""};
@@ -306,7 +310,7 @@ public:
         "media data absolute timestamps"
     };
     Option<MultiThreadDecodePolicy> multiThreadDecodePolicy{this, "multiThreadDecodePolicy",
-        MultiThreadDecodePolicy::disabled,
+        MultiThreadDecodePolicy::autoDetect,
         "Multiple thread decoding policy {auto, disabled, enabled}, used for RTSP streaming with "
         "transcoding and motion estimation"
     };

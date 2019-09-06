@@ -45,6 +45,16 @@ namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; }}}
 namespace nx::network::http { class ClientPool; }
 
+namespace nx::analytics {
+
+class PluginDescriptorManager;
+class EventTypeDescriptorManager;
+class EngineDescriptorManager;
+class GroupDescriptorManager;
+class ObjectTypeDescriptorManager;
+
+} // namespace nx::analytics;
+
 struct BeforeRestoreDbData
 {
     void saveToSettings(QSettings* settings);
@@ -177,6 +187,31 @@ public:
     nx::vms::event::RuleManager* eventRuleManager() const
     {
         return m_eventRuleManager;
+    }
+
+    nx::analytics::PluginDescriptorManager* analyticsPluginDescriptorManager() const
+    {
+        return m_analyticsPluginDescriptorManager;
+    }
+
+    nx::analytics::EventTypeDescriptorManager* analyticsEventTypeDescriptorManager() const
+    {
+        return m_analyticsEventTypeDescriptorManager;
+    }
+
+    nx::analytics::EngineDescriptorManager* analyticsEngineDescriptorManager() const
+    {
+        return m_analyticsEngineDescriptorManager;
+    }
+
+    nx::analytics::GroupDescriptorManager* analyticsGroupDescriptorManager() const
+    {
+        return m_analyticsGroupDescriptorManager;
+    }
+
+    nx::analytics::ObjectTypeDescriptorManager* analyticsObjectTypeDescriptorManager() const
+    {
+        return m_analyticsObjectTypeDescriptorManager;
     }
 
     void setNeedToStop(bool value) { m_needToStop = value; }
@@ -350,6 +385,12 @@ private:
     QnAuditManager* m_auditManager = nullptr;
     CameraDriverRestrictionList* m_cameraDriverRestrictionList = nullptr;
     QnResourceDataPool* m_resourceDataPool = nullptr;
+
+    nx::analytics::PluginDescriptorManager* m_analyticsPluginDescriptorManager = nullptr;
+    nx::analytics::EventTypeDescriptorManager* m_analyticsEventTypeDescriptorManager = nullptr;
+    nx::analytics::EngineDescriptorManager* m_analyticsEngineDescriptorManager = nullptr;
+    nx::analytics::GroupDescriptorManager* m_analyticsGroupDescriptorManager = nullptr;
+    nx::analytics::ObjectTypeDescriptorManager* m_analyticsObjectTypeDescriptorManager = nullptr;
 
     QnUuid m_videowallGuid;
     bool m_standaloneMode = false;

@@ -34,7 +34,7 @@ public:
 class DummyTranscoder: public QnTranscoder
 {
 public:
-    DummyTranscoder(): QnTranscoder(nullptr) {}
+    DummyTranscoder(): QnTranscoder(DecoderConfig(), nullptr) {}
 
     virtual int setContainer(const QString& /*value*/) override
     {

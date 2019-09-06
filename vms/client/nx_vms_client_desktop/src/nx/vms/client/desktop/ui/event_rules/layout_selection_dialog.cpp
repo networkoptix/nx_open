@@ -25,40 +25,6 @@
 
 namespace nx::vms::client::desktop {
 
-CustomizableItemDelegate* makeRadioButtonDelegate(QObject* parent)
-{
-    auto delegate = new CustomizableItemDelegate(parent);
-
-    delegate->setCustomPaint(
-        [](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index)
-        {
-            const QWidget* widget = option.widget;
-            QStyle* style = widget ? widget->style() : QApplication::style();
-
-            QStyleOptionButton button;
-            button.rect = option.rect;
-            button.state = QStyle::State_Enabled;
-            button.palette = option.palette;
-
-            bool parseOk = false;
-            int state = index.data(Qt::CheckStateRole).toInt(&parseOk);
-            if (option.checkState == Qt::Checked || state == Qt::Checked)
-                button.state |= QStyle::State_On;
-
-            style->drawControl(QStyle::CE_RadioButton, &button, painter);
-        });
-
-    delegate->setCustomSizeHint(
-        [](const QStyleOptionViewItem& option, const QModelIndex& index)
-        {
-            const QWidget* widget = option.widget;
-            QStyle* style = widget ? widget->style() : QApplication::style();
-            QSize result = style->sizeFromContents(QStyle::CT_CheckBox, &option, QSize(5, 5), widget);
-            return result;
-        });
-    return delegate;
-}
-
 // It makes everything red.
 CustomizableItemDelegate* makeRedDelegate(QObject* parent)
 {
@@ -66,7 +32,7 @@ CustomizableItemDelegate* makeRedDelegate(QObject* parent)
     delegate->setCustomInitStyleOption(
         [](QStyleOptionViewItem* item, const QModelIndex& /*index*/)
         {
-            setWarningStyle(&item->palette);
+            setWarningStyle(&item->palette);            
         });
     return delegate;
 }
@@ -93,8 +59,6 @@ LayoutSelectionDialog::LayoutSelectionDialog(
     m_sharedLayoutsModel->setHasCheckboxes(true);
     m_sharedLayoutsModel->setSinglePick(m_singlePick);
 
-    auto radioButtonDelegate = makeRadioButtonDelegate(this);
-
     // Making a filtered model for local layouts.
     auto filterLocalLayouts = std::make_shared<QSortFilterProxyModel>(m_localLayoutsModel);
     filterLocalLayouts->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -110,7 +74,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(
     ui->sharedTreeView->setModel(filterSharedLayouts.get());
 
     const auto setupTreeView =
-        [singlePick, radioButtonDelegate](TreeView* treeView)
+        [singlePick](TreeView* treeView)
         {
             const QnIndents kIndents(1, 0);
             treeView->header()->setStretchLastSection(false);
@@ -122,10 +86,7 @@ LayoutSelectionDialog::LayoutSelectionDialog(
             treeView->setDefaultSpacePressIgnored(true);
             item_view_utils::autoToggleOnRowClick(treeView, QnResourceListModel::CheckColumn);
             if (singlePick)
-            {
-                treeView->setItemDelegateForColumn(
-                    QnResourceListModel::CheckColumn, radioButtonDelegate);
-            }
+                treeView->setProperty(style::Properties::kItemViewRadioButtons, true);
         };
 
     setupTreeView(ui->localTreeView);

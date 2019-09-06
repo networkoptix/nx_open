@@ -43,7 +43,7 @@ QnPlC2pCameraResourceSearcher::QnPlC2pCameraResourceSearcher(QnMediaServerModule
 }
 
 QnResourcePtr QnPlC2pCameraResourceSearcher::createResource(
-    const QnUuid &/*resourceTypeId*/, const QnResourceParams& /*params*/)
+    const QnUuid& /*resourceTypeId*/, const QnResourceParams& /*params*/)
 {
     return QnC2pCameraResourcePtr();
 }
@@ -64,8 +64,8 @@ QList<QnResourcePtr> QnPlC2pCameraResourceSearcher::checkHostAddr(
     QList<QnResourcePtr> result;
     if (url.scheme().toLower() == kC2pScheme && url.isValid())
     {
-        QnC2pCameraResourcePtr resource(new QnC2pCameraResource(serverModule()));
-        QnUuid resourceTypeId = qnResTypePool->getResourceTypeId(
+        const QnC2pCameraResourcePtr resource(new QnC2pCameraResource(serverModule()));
+        const QnUuid resourceTypeId = qnResTypePool->getResourceTypeId(
             kManufacturer /*manufacturer*/,
             QnResourceTypePool::kC2pCameraTypeId /*name*/);
         resource->setTypeId(resourceTypeId);

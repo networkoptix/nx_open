@@ -3,63 +3,52 @@
 
 #include <map>
 
+#include <nx/utils/log/log.h>
+
 #include "device/device_data.h"
 #include "device/video/windows/dshow_utils.h"
 
 namespace nx::usb_cam::device::audio::detail {
 
-void fillCameraAuxiliaryData(nxcip::CameraInfo* cameras, int cameraCount)
+void selectAudioDevices(std::vector<DeviceData>& devices)
 {
-    std::vector<video::detail::AudioDeviceDescriptor> devices =
+    std::vector<video::detail::AudioDeviceDescriptor> audioDevices =
         video::detail::getAudioDeviceList();
-    if (devices.empty())
+    if (audioDevices.empty())
         return;
 
     std::vector<video::detail::AudioDeviceDescriptor*> defaults;
     std::map<video::detail::AudioDeviceDescriptor*, bool> audioTaken;
-    for (int i = 0; i < devices.size(); ++i)
+    for (int i = 0; i < audioDevices.size(); ++i)
     {
-        if (devices[i].isDefault())
-            defaults.push_back(&devices[i]);
+        NX_DEBUG(NX_SCOPE_TAG, "Found audio device, name [%1], path: %2",
+            audioDevices[i].data.name, audioDevices[i].data.path);
+        if (audioDevices[i].isDefault())
+            defaults.push_back(&audioDevices[i]);
 
-        audioTaken.emplace(&devices[i], false);
+        audioTaken.emplace(&audioDevices[i], false);
     }
 
-    std::vector<nxcip::CameraInfo*> muteCameras;
-    for (auto camera = cameras; camera < cameras + cameraCount; ++camera)
+    for (auto& device: devices)
     {
         bool mute = true;
-        for (auto device = devices.data(); device < devices.data() + devices.size(); ++device)
+        for (auto audioDevice = audioDevices.data(); audioDevice < audioDevices.data() + audioDevices.size(); ++audioDevice)
         {
-            if (audioTaken[device])
+            if (audioTaken[audioDevice])
                 continue;
 
-            if (device->data.name.find(camera->modelName) != std::string::npos)
+            if (audioDevice->data.name.find(device.name) != std::string::npos)
             {
                 mute = false;
-                audioTaken[device] = true;
-
-                strncpy(
-                    camera->auxiliaryData,
-                    device->data.path.c_str(),
-                    sizeof(camera->auxiliaryData) - 1);
-
+                audioTaken[audioDevice] = true;
+                device.audioPath = audioDevice->data.path;
                 break;
             }
         }
-        if (mute)
-            muteCameras.push_back(camera);
-    }
+        if (mute && !defaults.empty())
+            device.audioPath = defaults[0]->data.path;
 
-    if (!muteCameras.empty() && !defaults.empty())
-    {
-        for (const auto & muteCamera : muteCameras)
-        {
-            strncpy(
-                muteCamera->auxiliaryData,
-                defaults[0]->data.name.c_str(),
-                sizeof(muteCamera->auxiliaryData) - 1);
-        }
+        NX_DEBUG(NX_SCOPE_TAG, "Selected audio device: [%1]", device.toString());
     }
 }
 

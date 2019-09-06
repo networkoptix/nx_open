@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>MMMM yyyy</source>
-      <translation>Мммм рррр</translation>
+      <translation type="unfinished">MMMM yyyy</translation>
     </message>
   </context>
   <context>
@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
-      <translation>Цей користувач не має дозволів для запитуваної операції.</translation>
+      <translation>Цей користувач не має доступу для запитуваної операції.</translation>
     </message>
     <message>
       <source>Cannot create database backup.</source>
@@ -44,11 +44,11 @@
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation>Будуть об'єднані системи з ліцензіями Starter.</translation>
+      <translation>Ви збираєтеся об'єднати Системи з ліцензіями Starter.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation>В системі дозволяється використовувати тільки одну Starter ліцензію, тому друга ліцензія буде деактивовано.</translation>
+      <translation>В системі дозволяється використовувати тільки одну Starter ліцензію, тому друга ліцензія буде деактивована.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
@@ -61,26 +61,26 @@
     <message>
       <source>The discovered System %1 has an incompatible version %2.</source>
       <comment>%1 is name of System, %2 is version information</comment>
-      <translation>Виявлена ​​система %1, яка несумісна з версію %2.</translation>
+      <translation>Виявлена ​​Система %1, яка несумісна з версію %2.</translation>
     </message>
     <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
-      <translation>Виявлена ​​система %1 знаходиться в безпечному режимі.</translation>
+      <translation>Виявлена ​​Система %1 знаходиться в безпечному режимі.</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
-      <translation>Не вдається налаштувати віддалену систему %1.</translation>
+      <translation>Не вдається налаштувати віддалену Систему %1.</translation>
     </message>
     <message>
       <source>New System</source>
-      <translation>Нова система</translation>
+      <translation>Нова Система</translation>
     </message>
     <message>
       <source>The discovered System %1 is incompatible with the current System.</source>
       <comment>%1 is name of System</comment>
-      <translation>Виявлена ​​система %1 несумісна з поточною.</translation>
+      <translation>Виявлена ​​Система %1 несумісна з поточною Системою.</translation>
     </message>
     <message>
       <source>Cannot connect to the other System because current System is already connected to %1.</source>
@@ -117,7 +117,7 @@
     <message>
       <source>System Event</source>
       <comment>Shows that the bookmark was created by a system event</comment>
-      <translation>Системна подія</translation>
+      <translation>Системна Подія</translation>
     </message>
   </context>
   <context>
@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
-      <translation>Потік підключений, але дані не надходять.</translation>
+      <translation>Медiа потік підключений, але дані не надходять.</translation>
     </message>
     <message>
       <source>Unknown error. Please contact support.</source>
@@ -152,19 +152,19 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation>Отримано помилкову відповідь від сервера %1: &quot;%2&quot;.</translation>
+      <translation>Отримано помилку з Сервера %1: &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
-      <translation>Переконайтеся, що сервер запущений і має правильну версію.</translation>
+      <translation>Переконайтеся, що Сервер запущений і має правильну версію.</translation>
     </message>
     <message>
       <source>Cannot connect to http port %1.</source>
-      <translation>Неможливо підключитися до http-порту %1.</translation>
+      <translation>Неможливо підключитися до http порту %1.</translation>
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation>Спробуйте оновити прошивку камери. Якщо проблема залишиться, зв'яжіться з технічною підтримкою.</translation>
+      <translation>Спробуйте оновити програмне забезпечення камери. Якщо проблема залишиться, будь ласка, зв'яжіться з технічною підтримкою.</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
@@ -176,7 +176,7 @@
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation>Помилка вводу-виводу. Повідомлення ОС: &quot;%1&quot;.</translation>
+      <translation>Помилка вводу-виводу. Повідомлення Операційної Системи: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -184,15 +184,15 @@
     </message>
     <message>
       <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-      <translation>Будь ласка, спробуйте перезавантажити пристрій, а потім відновити заводські настройки на веб-сторінці.</translation>
+      <translation>Будь ласка, спробуйте перезавантажити пристрій, а потім відновити заводські налаштування на веб-сторінці.</translation>
     </message>
     <message>
       <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-      <translation>Будь ласка, спробуйте перезавантажити камеру, а потім відновити заводські настройки на веб-сторінці.</translation>
+      <translation>Будь ласка, спробуйте перезавантажити камеру, а потім відновити заводські налаштування на веб-сторінці.</translation>
     </message>
     <message>
       <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-      <translation>Переконайтеся, що пристрій підключено до мережі. Спробуйте перезавантажити його.</translation>
+      <translation>Переконайтеся, що пристрій підключено до мережі. Спробуйте перезавантажити пристрій.</translation>
     </message>
     <message>
       <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
@@ -200,39 +200,39 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>Запит пристрою &quot;%1&quot; повернув помилку &quot;%2&quot;.</translation>
+      <translation>Запит пристрою &quot;%1&quot; не вдалий та видає помилку &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>Запит на камеру &quot;%1&quot; повернув помилку &quot;%2&quot;.</translation>
+      <translation>Запит камери &quot;%1&quot; не вдалий та видає помилку &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
-      <translation>Невідома проблема з пристроєм.</translation>
+      <translation>Не відома помилка з пристроєм.</translation>
     </message>
     <message>
       <source>Unknown camera issue.</source>
-      <translation>Невідома проблема з камерою.</translation>
+      <translation>Невідома помилка з камерою.</translation>
     </message>
     <message>
       <source>Invalid data was received from the device %1.</source>
-      <translation>Неправильні дані отримані з пристрою %1.</translation>
+      <translation>Недійсні дані отримані з пристрою %1.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera %1.</source>
-      <translation>Неправильні дані отримані з камери %1.</translation>
+      <translation>Недійсні дані отримані з камери %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation>Занадто багато помилок медіа. Відкрийте діалог помилок пристрою для подробиць.</translation>
+      <translation>Занадто багато медіа помилок. Відкрийте діалог помилок пристрою для отримання детальної інформації.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation>Занадто багато помилок медіа. Відкрийте діалог помилок камери для подробиць.</translation>
+      <translation>Занадто багато помилок медіа. Відкрийте діалог помилок камери для отримання детальної інформації.</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-      <translation>Будь ласка, спробуйте перезавантажити модуль вводу-виводу, а потім відновити заводські настройки на веб-сторінці.</translation>
+      <translation>Будь ласка, спробуйте перезавантажити модуль вводу-виводу, а потім відновити заводські налаштування на веб-сторінці.</translation>
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
@@ -240,31 +240,31 @@
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>Запит модуля вводу-виводу &quot;%1&quot; не вдалося з помилкою &quot;%2&quot;.</translation>
+      <translation>Запит модуля вводу-виводу &quot;%1&quot; не вдалий та видає помилку &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation>Невідома проблема з модулем введення / виводу.</translation>
+      <translation>Невідома помилка з модулем введення / виводу.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module %1.</source>
-      <translation>Модуль введення / виведення %1 повернув некоректні дані.</translation>
+      <translation>Недійсні дані були отримані з модуля вводу/виводу %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation>Занадто багато помилок медіа. Відкрийте діалог помилок пристрою для подробиць.</translation>
+      <translation>Занадто багато медіа помилок. Відкрийте діалог помилок пристрою для отримання детальної інформації.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
-      <translation>Пристрій в процесі ініціалізації.</translation>
+      <translation>Триває процес ініціалізації пристрою.</translation>
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation>Камера в процесі ініціалізації.</translation>
+      <translation>Триває процес ініціалізації камери.</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
-      <translation>Модуль вводу/виводу в процесі ініціалізації.</translation>
+      <translation>Триває процес ініціалізації модуля вводу / виводу.</translation>
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
@@ -284,55 +284,55 @@
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-      <translation>Неможливо відкрити медіа посилання %1. Помилка підключення до медіа порту %2.</translation>
+      <translation>Неможливо відкрити медіа URL посилання %1. Помилка підключення до медіа порту %2.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation>Неможливо відкрити медіа посилання %1. Підключення до порту %2 скасовано.</translation>
+      <translation>Неможливо відкрити медіа URL посилання %1. Підключення до порту %2 скасовано.</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation>Не вдається проаналізувати відповідь пристрою. URL %1, ім'я запиту %2.</translation>
+      <translation>Не вдається проаналізувати відповідь пристрою. URL посилання %1, ім'я запиту %2.</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation>Не вдалося проаналізувати відповідь камери. URL %1, ім'я запиту %2.</translation>
+      <translation>Не вдалося проаналізувати відповідь камери. URL посилання %1, ім'я запиту %2.</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation>Не вдалося проаналізувати відповідь модуля вводу / виводу. URL %1, ім'я запиту %2.</translation>
+      <translation>Не вдалося проаналізувати відповідь модуля вводу / виводу. URL посилання %1, ім'я запиту %2.</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation>Немає підтримуваних медіа-треків по посиланню %1.</translation>
+      <translation>Не має підтримуваних медіа-треків за URL посиланням %1.</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation>Не авторизований. URL %1.</translation>
+      <translation>Не авторизований. URL посилання %1.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation>Неможливо відкрити медіа посилання %1. Непідтримуваний протокол %2.</translation>
+      <translation>Неможливо відкрити медіа URL посилання %1. Непідтримуваний протокол %2.</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation>Камера була відновлена ​​з архіву. Видаліть камеру та додайте її знову, щоб переглянути відео в реальному часі.</translation>
+      <translation>Камера була відновлена ​​з архіву. Видаліть камеру та додайте її знову, щоб переглянути он-лайн відео.</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>Спочатку спробуйте включити запис (якщо він відключений) і знизити частоту кадрів в налаштуваннях пристрою (помилка &quot;%1&quot;).</translation>
+      <translation>Спочатку спробуйте активувати запис (якщо він відключений) і знизити частоту кадрів в налаштуваннях пристрою (помилка &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>Спочатку спробуйте включити запис (якщо він відключений) і знизити частоту кадрів в налаштуваннях камери (помилка &quot;%1&quot;).</translation>
+      <translation>Спочатку спробуйте активувати запис (якщо він відключений) і знизити частоту кадрів в налаштуваннях камери (помилка &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>Спочатку спробуйте включити запис (якщо він відключений) і знизити частоту кадрів в налаштуваннях модуля вводу/виводу (помилка &quot;%1&quot;).</translation>
+      <translation>Спочатку спробуйте активувати запис (якщо він відключений) і знизити частоту кадрів в налаштуваннях модуля вводу/виводу (помилка &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation>Будь ласка, оновіть прошивку. Мінімальна підтримувана версія - %1. Поточна версія - %2</translation>
+      <translation>Будь ласка, оновіть прошивку. Мінімальна підтримувана версія %1. Поточна версія %2</translation>
     </message>
     <message>
       <source>Plugin error. %1</source>
@@ -351,7 +351,7 @@
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
-      <translation>Аудіопоток не визначено.</translation>
+      <translation>Аудіо потік не визначено.</translation>
     </message>
     <message>
       <source>Could not find encoder for codec %1.</source>
@@ -363,7 +363,7 @@
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
-      <translation>Помилка ініціалізації кодувальника звуку.</translation>
+      <translation>Не вдалося ініціалізувати аудіо декодер.</translation>
     </message>
     <message>
       <source>Could not find decoder for codec %1.</source>
@@ -402,7 +402,7 @@
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>Неможливо виконати копію прямого потоку, оскільки розмір кадру не визначено.</translation>
+      <translation>Не вдалось виконати копію прямого потоку, оскільки розмір кадру не визначений.</translation>
     </message>
     <message>
       <source>Could not find codec %1.</source>

@@ -113,6 +113,20 @@ QString OnvifResourceSearcher::manufacturer() const
 
 int OnvifResourceSearcher::autoDetectDevicePort(const nx::utils::Url& url)
 {
+    // First try default http port (synchronously).
+    DeviceSoapWrapper soapWrapper(
+        SoapTimeouts(serverModule()->settings().onvifTimeouts()),
+        QString("http://%1/onvif/device_service").arg(url.host()).toStdString(),
+        /*login*/ QString(),
+        /*password*/ QString(),
+        /*timeDrift*/ 0);
+    _onvifDevice__GetSystemDateAndTime request;
+    _onvifDevice__GetSystemDateAndTimeResponse response;
+    const int soapResult = soapWrapper.GetSystemDateAndTime(request, response);
+    if (soapResult == SOAP_OK)
+        return kDefaultOnvifPort;
+
+    // If not default port, try auxiliary ports (asynchronously).
     typedef GSoapAsyncCallWrapper <
         DeviceSoapWrapper,
         _onvifDevice__GetSystemDateAndTime,

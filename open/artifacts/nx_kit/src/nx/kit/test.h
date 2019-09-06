@@ -23,26 +23,46 @@ namespace test {
 
 extern bool NX_KIT_API verbose; //< Use to control additional output of the unit test framework.
 
-#define TEST(TEST_CASE, TEST_NAME) \
+ /**
+  * Main macro for defining a test function. Calls a helper macro - such trick allows to comment
+  * out all tests except one by redefining TEST to DISABLED_TEST, and changing that one test to use
+  * ENABLED_TEST instead of TEST.
+  *
+  * Usage:
+  * ```
+  *     TEST(MySuite, myTest)
+  *     {
+  *         int var = 42;
+  *         ASSERT_EQ(42, var);
+  *     }
+  * ```
+  */
+#define TEST(TEST_CASE, TEST_NAME) ENABLED_TEST(TEST_CASE, TEST_NAME)
+
+#define ENABLED_TEST(TEST_CASE, TEST_NAME) \
     static void test_##TEST_CASE##_##TEST_NAME(); \
     int unused_##TEST_CASE##_##TEST_NAME /* Not `static const` to suppress "unused" warning. */ = \
         ::nx::kit::test::detail::regTest( \
             {#TEST_CASE, #TEST_NAME, #TEST_CASE "." #TEST_NAME, test_##TEST_CASE##_##TEST_NAME, \
                 /*tempDir*/ ""}); \
     static void test_##TEST_CASE##_##TEST_NAME()
-    // Function body follows the TEST macro.
+    // Function body follows the DEFINE_TEST macro.
+
+#define DISABLED_TEST(TEST_CASE, TEST_NAME) \
+    static void disabled_test_##TEST_CASE##_##TEST_NAME() /* The function will be unused. */
+    // Function body follows the DISABLED_TEST macro.
 
 #define ASSERT_TRUE(CONDITION) \
     ::nx::kit::test::detail::assertBool(true, !!(CONDITION), #CONDITION, __FILE__, __LINE__)
 
 #define ASSERT_TRUE_AT_LINE(LINE, CONDITION) \
-    ::nx::kit::test::detail::assertBool(true, !!(CONDITION), #CONDITION, __FILE__, (LINE))
+    ::nx::kit::test::detail::assertBool(true, !!(CONDITION), #CONDITION, __FILE__, LINE, __LINE__)
 
 #define ASSERT_FALSE(CONDITION) \
     ::nx::kit::test::detail::assertBool(false, !!(CONDITION), #CONDITION, __FILE__, __LINE__)
 
 #define ASSERT_FALSE_AT_LINE(LINE, CONDITION) \
-    ::nx::kit::test::detail::assertBool(false, !!(CONDITION), #CONDITION, __FILE__, (LINE))
+    ::nx::kit::test::detail::assertBool(false, !!(CONDITION), #CONDITION, __FILE__, LINE, __LINE__)
 
 #define ASSERT_EQ(EXPECTED, ACTUAL) \
     ::nx::kit::test::detail::assertEq( \
@@ -50,7 +70,7 @@ extern bool NX_KIT_API verbose; //< Use to control additional output of the unit
 
 #define ASSERT_EQ_AT_LINE(LINE, EXPECTED, ACTUAL) \
     ::nx::kit::test::detail::assertEq( \
-        (EXPECTED), #EXPECTED, (ACTUAL), #ACTUAL, __FILE__, (LINE))
+        (EXPECTED), #EXPECTED, (ACTUAL), #ACTUAL, __FILE__, LINE, __LINE__)
 
 #define ASSERT_STREQ(EXPECTED, ACTUAL) \
     ::nx::kit::test::detail::assertStrEq( \
@@ -60,7 +80,7 @@ extern bool NX_KIT_API verbose; //< Use to control additional output of the unit
 #define ASSERT_STREQ_AT_LINE(LINE, EXPECTED, ACTUAL) \
     ::nx::kit::test::detail::assertStrEq( \
         ::nx::kit::test::detail::toCStr(EXPECTED), #EXPECTED, \
-        ::nx::kit::test::detail::toCStr(ACTUAL), #ACTUAL, __FILE__, (LINE))
+        ::nx::kit::test::detail::toCStr(ACTUAL), #ACTUAL, __FILE__, LINE, __LINE__)
 
 /**
  * Should be called for regular tests, from the TEST() body.
@@ -111,7 +131,7 @@ namespace detail {
 NX_KIT_API void failEq(
     const char* expectedValue, const char* expectedExpr,
     const char* actualValue, const char* actualExpr,
-    const char* file, int line);
+    const char* file, int line, int actualLine = -1);
 
 typedef std::function<void()> TestFunc;
 
@@ -127,27 +147,28 @@ struct Test
 NX_KIT_API int regTest(const Test& test);
 
 NX_KIT_API void assertBool(
-    bool expected, bool condition, const char* conditionStr, const char* file, int line);
+    bool expected, bool condition, const char* conditionStr,
+    const char* file, int line, int actualLine = -1);
 
 template<typename Expected, typename Actual>
 void assertEq(
     const Expected& expected, const char* expectedExpr,
     const Actual& actual, const char* actualExpr,
-    const char* file, int line)
+    const char* file, int line, int actualLine = -1)
 {
     if (!(expected == actual)) //< Require only operator==().
     {
         detail::failEq(
             utils::toString(expected).c_str(), expectedExpr,
             utils::toString(actual).c_str(), actualExpr,
-            file, line);
+            file, line, actualLine);
     }
 }
 
 NX_KIT_API void assertStrEq(
     const char* expectedValue, const char* expectedExpr,
     const char* actualValue, const char* actualExpr,
-    const char* file, int line);
+    const char* file, int line, int actualLine = -1);
 
 inline const char* toCStr(const std::string& s)
 {
