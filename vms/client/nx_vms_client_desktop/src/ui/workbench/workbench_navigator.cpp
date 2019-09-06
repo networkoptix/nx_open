@@ -792,10 +792,29 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget)
 
     connect(syncedResource->toResourcePtr(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
-    if(auto loader = m_cameraDataManager->loader(syncedResource))
-        loader->setEnabled(true);
-    else
-        NX_ASSERT(false);
+    if (auto loader = m_cameraDataManager->loader(syncedResource))
+    {
+        QnCachingCameraDataLoader::AllowedContent content =
+            {Qn::RecordingContent, Qn::MotionContent};
+        if (ini().limitAnalyticsTimePeriodsLoading)
+        {
+            if (selectedExtraContent() == Qn::AnalyticsContent
+                && m_currentMediaWidget
+                && m_currentMediaWidget->resource() == syncedResource)
+            {
+                content.insert(Qn::AnalyticsContent);
+                // If the widget with the same resource is already present, we must not modify
+                // it's loader at all.
+                NX_ASSERT(loader->allowedContent() == content);
+            }
+        }
+        else
+        {
+            content.insert(Qn::AnalyticsContent);
+        }
+
+        loader->setAllowedContent(content);
+    }
 
     updateCurrentWidget();
     if (workbench() && !workbench()->isInLayoutChangeProcess())
@@ -840,7 +859,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget)
         if (auto loader = m_cameraDataManager->loader(syncedResource, false))
         {
             loader->setMotionRegions({});
-            loader->setEnabled(false);
+            loader->setAllowedContent({});
         }
     }
 
@@ -1138,6 +1157,19 @@ void QnWorkbenchNavigator::updateCurrentWidget()
     if (m_currentWidget == widget)
         return;
 
+    if (ini().limitAnalyticsTimePeriodsLoading)
+    {
+        if (selectedExtraContent() == Qn::AnalyticsContent)
+        {
+            if (auto loader = loaderByWidget(m_currentMediaWidget, /*createIfNotExists*/ false))
+            {
+                auto allowedContent = loader->allowedContent();
+                allowedContent.erase(Qn::AnalyticsContent);
+                loader->setAllowedContent(allowedContent);
+            }
+        }
+    }
+
     QnMediaResourceWidget* mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
 
     const auto previousResource = currentResource();
@@ -1193,6 +1225,19 @@ void QnWorkbenchNavigator::updateCurrentWidget()
             &QnResource::nameChanged,
             this,
             &QnWorkbenchNavigator::updateLines);
+    }
+
+    if (ini().limitAnalyticsTimePeriodsLoading)
+    {
+        if (m_currentMediaWidget && selectedExtraContent() == Qn::AnalyticsContent)
+        {
+            if (auto loader = loaderByWidget(m_currentMediaWidget, /*createIfNotExists*/ true))
+            {
+                auto allowedContent = loader->allowedContent();
+                allowedContent.insert(Qn::AnalyticsContent);
+                loader->setAllowedContent(allowedContent);
+            }
+        }
     }
 
     m_pausedOverride = false;
@@ -2747,6 +2792,20 @@ void QnWorkbenchNavigator::setSelectedExtraContent(Qn::TimePeriodContent value)
 {
     if (m_timeSlider)
         m_timeSlider->setSelectedExtraContent(value);
+
+    if (ini().limitAnalyticsTimePeriodsLoading)
+    {
+        auto loader = loaderByWidget(m_currentMediaWidget);
+        if (loader)
+        {
+            auto allowedContent = loader->allowedContent();
+            if (value == Qn::AnalyticsContent)
+                allowedContent.insert(Qn::AnalyticsContent);
+            else
+                allowedContent.erase(Qn::AnalyticsContent);
+            loader->setAllowedContent(allowedContent);
+        }
+    }
 
     if (value != Qn::RecordingContent)
         updateCurrentPeriods(value);
