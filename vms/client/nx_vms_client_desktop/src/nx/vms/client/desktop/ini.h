@@ -48,7 +48,7 @@ struct Ini: nx::kit::IniConfig
         "from the nearest past. The metadata with timestamps that are older than the\n"
         "(currentTime - analyticsVideoBufferLengthMs) is ignored (not shown in the Client).");
     NX_INI_FLAG(0, hideEnhancedVideo, "Hides enhanced video from the scene.");
-    NX_INI_FLAG(1, enableDetectedObjectsInterpolation,
+    NX_INI_FLAG(1, enableObjectMetadataInterpolation,
         "Allows the interpolation of the trajectories of the Analytics Objects between frames.\n"
         "\n"
         "If enabled, bounding boxes around the Analytics Objects are moving more smoothly.");
@@ -58,10 +58,10 @@ struct Ini: nx::kit::IniConfig
         "Allows to see the Analytics Objects details in the Desktop Client. Use \"all\" to\n"
         "display all available metadata. More precise filtering is available by combining the\n"
         "following options:\n"
-        " * \"id\" - Object id,\n"
+        " * \"id\" - Track id,\n"
         " * \"delay\" - Delay between actual timestamp and object timestamp in milliseconds,\n"
         " * \"actual_ts\" - Current timestamp,\n"
-        " * \"actual_rect\" - Interpolated rect if \"enableDetectedObjectsInterpolation\" is on,\n"
+        " * \"actual_rect\" - Interpolated rect if \"enableObjectMetadataInterpolation\" is on,\n"
         " * \"object_ts\" - Original object timestamp,\n"
         " * \"object_rect\" - Original object rect,\n"
         " * \"future_ts\" - Future object timestamp,\n"
@@ -104,16 +104,8 @@ struct Ini: nx::kit::IniConfig
         "timeline.\n"
         "\n"
         "Is currently used for demo purposes only (does not work in some specific scenarios).");
-    NX_INI_FLAG(1, enableWatermark,
-        "Enables watermarks preview and setup.");
-    NX_INI_FLAG(1, enableCaseExport,
-        "Enables case export.");
-    NX_INI_FLAG(1, enableSessionTimeout,
-        "Enables admin-configurable absolute session timeout.");
     NX_INI_STRING("press", passwordPreviewActivationMode,
         "Specifies one of password preview activation modes: \"press\", \"hover\" or \"toggle\".");
-    NX_INI_FLAG(1, redesignedTimeSynchronization,
-        "Enables redesigned time synchronization widget in the System Adminstration dialog.");
     NX_INI_FLAG(1, automaticFilterByTimelineSelection,
         "Allows to automatically switch Right Panel time selection to \"Selected on Timeline\"\n"
         "mode when such selection exists.");
@@ -171,7 +163,8 @@ struct Ini: nx::kit::IniConfig
         "Global live video cache length, in seconds. Set to zero to use built-in value.");
     NX_INI_INT(180000, connectTimeoutMs,
         "Timeout (in milliseconds) for waiting initial resources message from the server.\n"
-        "If exceeded then connections is dropped to avoid infinite UI \"Loading...\" state. 0 means disabled.");
+        "If exceeded then connections is dropped to avoid infinite UI \"Loading...\" state.\n"
+        "0 means disabled.");
     NX_INI_STRING("", dumpGeneratedIconsTo,
         "Dump icons, generated from svg, to a given folder.");
     NX_INI_FLAG(0, enableVSyncWorkaround,
@@ -188,6 +181,12 @@ struct Ini: nx::kit::IniConfig
         "Override detected OS variant value (e.g. \"ubuntu\").");
     NX_INI_STRING("", currentOsVariantVersionOverride,
         "Override detected OS variant version value (e.g. \"16.04\").");
+
+    NX_INI_INT(0, tileHideOptions,
+        "Hide system tiles on welcome screen, bitwise combination of flags:\n"
+        " * 1 - Incompatible systems.\n"
+        " * 2 - Not connectable cloud systems.\n"
+        " * 4 - Compatible systems which require compatibility mode.\n");
 };
 
 inline Ini& ini()

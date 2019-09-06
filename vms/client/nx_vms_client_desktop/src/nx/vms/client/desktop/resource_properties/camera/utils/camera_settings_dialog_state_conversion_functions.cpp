@@ -92,16 +92,12 @@ void setCustomAspectRatio(
 
 void setSchedule(const QnScheduleTaskList& schedule, const Cameras& cameras)
 {
-    QnScheduleTaskList scheduleTasks;
-    for (const auto& data: schedule)
-        scheduleTasks << data;
-
     for (const auto& camera: cameras)
     {
         if (camera->isDtsBased())
             continue;
 
-        camera->setScheduleTasks(scheduleTasks);
+        camera->setScheduleTasks(schedule);
     }
 }
 
@@ -321,6 +317,25 @@ void setCustomMediaPort(int value, const Cameras& cameras)
         camera->setMediaPort(value);
 }
 
+bool fixupSchedule(QnScheduleTaskList& schedule, bool motionSupported, bool motionPlusLQSupported)
+{
+    if (motionSupported && motionPlusLQSupported)
+        return false;
+
+    int changed = schedule.size();
+    for (auto& task: schedule)
+    {
+        if (task.recordingType == Qn::RecordingType::motionAndLow && !motionPlusLQSupported)
+            task.recordingType = Qn::RecordingType::always;
+        else if (task.recordingType == Qn::RecordingType::motionOnly && !motionSupported)
+            task.recordingType = Qn::RecordingType::always;
+        else
+            --changed;
+    }
+
+    return changed > 0;
+}
+
 } // namespace
 
 void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
@@ -336,7 +351,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
 
         if (state.devicesDescription.hasMotion == CombinedValue::All)
         {
-            camera->setMotionType(state.singleCameraSettings.enableMotionDetection()
+            camera->setMotionType(state.enableMotionDetection()
                 ? camera->getDefaultMotionType()
                 : Qn::MotionType::MT_NoMotion);
 
@@ -392,8 +407,29 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
     if (state.recording.enabled.hasValue())
         setRecordingEnabled(state.recording.enabled(), cameras);
 
+    const bool motionSupported = state.isMotionDetectionEnabled();
+    const bool motionPlusLQSupported = state.supportsMotionPlusLQ();
+
     if (state.recording.schedule.hasValue())
-        setSchedule(state.recording.schedule(), cameras);
+    {
+        auto schedule = state.recording.schedule();
+        if (!motionSupported || !motionPlusLQSupported)
+            fixupSchedule(schedule, motionSupported, motionPlusLQSupported);
+
+        setSchedule(schedule, cameras);
+    }
+    else if (!motionSupported || !motionPlusLQSupported)
+    {
+        for (const auto& camera: cameras)
+        {
+            if (camera->isDtsBased())
+                continue;
+
+            auto schedule = camera->getScheduleTasks();
+            if (fixupSchedule(schedule, motionSupported, motionPlusLQSupported))
+                setSchedule(schedule, {camera});
+        }
+    }
 
     if (state.recording.thresholds.beforeSec.hasValue())
         setRecordingBeforeThreshold(state.recording.thresholds.beforeSec(), cameras);

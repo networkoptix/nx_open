@@ -288,18 +288,41 @@ TEST_F(CameraSettingsDialogStateReducerTest, disableMotionBrushIfDualStreamingIs
     CameraResourceStubPtr camera(new CameraResourceStub());
     camera->setHasDualStreaming(true);
 
-    State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), { camera });
-    ASSERT_TRUE(initial.hasMotion());
-    ASSERT_TRUE(initial.hasDualStreaming());
+    State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), {camera});
+    ASSERT_EQ(initial.devicesDescription.supportsMotionStreamOverride, CombinedValue::All);
+    ASSERT_TRUE(initial.isMotionDetectionEnabled());
+    ASSERT_TRUE(initial.isDualStreamingEnabled());
 
-    State disabledDualStreaming = Reducer::setDualStreamingDisabled(std::move(initial), true);
-    ASSERT_FALSE(disabledDualStreaming.hasMotion());
-    ASSERT_FALSE(disabledDualStreaming.hasDualStreaming());
+    State setMotionAndLowBrush = Reducer::setScheduleBrushRecordingType(
+        std::move(initial), Qn::RecordingType::motionAndLow);
+    ASSERT_EQ(setMotionAndLowBrush.recording.brush.recordingType, Qn::RecordingType::motionAndLow);
+
+    State forcedPrimaryMotionStream = Reducer::setForcedMotionStreamType(
+        std::move(setMotionAndLowBrush), nx::vms::api::StreamIndex::primary);
+    ASSERT_TRUE(initial.isMotionDetectionEnabled());
+    ASSERT_TRUE(initial.isDualStreamingEnabled());
+    ASSERT_EQ(setMotionAndLowBrush.recording.brush.recordingType, Qn::RecordingType::motionAndLow);
+
+    State disabledDualStreaming = Reducer::setDualStreamingDisabled(
+        std::move(forcedPrimaryMotionStream), true);
+    ASSERT_TRUE(disabledDualStreaming.isMotionDetectionEnabled());
+    ASSERT_FALSE(disabledDualStreaming.isDualStreamingEnabled());
+    ASSERT_EQ(disabledDualStreaming.recording.brush.recordingType, Qn::RecordingType::always);
+
+    State setMotionOnlyBrush = Reducer::setScheduleBrushRecordingType(
+        std::move(disabledDualStreaming), Qn::RecordingType::motionOnly);
+    ASSERT_EQ(setMotionOnlyBrush.recording.brush.recordingType, Qn::RecordingType::motionOnly);
+
+    State forcedNoMotionStream = Reducer::setForcedMotionStreamType(
+        std::move(setMotionOnlyBrush), nx::vms::api::StreamIndex::undefined);
+    ASSERT_FALSE(forcedNoMotionStream.isMotionDetectionEnabled());
+    ASSERT_FALSE(forcedNoMotionStream.isDualStreamingEnabled());
+    ASSERT_EQ(forcedNoMotionStream.recording.brush.recordingType, Qn::RecordingType::always);
 
     State enabledDualStreaming = Reducer::setDualStreamingDisabled(
-        std::move(disabledDualStreaming), false);
-    ASSERT_TRUE(enabledDualStreaming.hasMotion());
-    ASSERT_TRUE(enabledDualStreaming.hasDualStreaming());
+        std::move(forcedNoMotionStream), false);
+    ASSERT_TRUE(enabledDualStreaming.isMotionDetectionEnabled());
+    ASSERT_TRUE(enabledDualStreaming.isDualStreamingEnabled());
 }
 
 // "Motion" and "Motion + Lo-Res" recording type must always be available if camera settings
@@ -313,18 +336,18 @@ TEST_F(CameraSettingsDialogStateReducerTest, enableMotionBrushIfDeviceOptimizati
     camera->setHasDualStreaming(true);
 
     State initial = Reducer::loadCameras(std::move(enableDeviceOptimization), { camera });
-    ASSERT_TRUE(initial.hasMotion());
-    ASSERT_TRUE(initial.hasDualStreaming());
+    ASSERT_TRUE(initial.isMotionDetectionEnabled());
+    ASSERT_TRUE(initial.isDualStreamingEnabled());
 
     State disabledDualStreaming = Reducer::setDualStreamingDisabled(std::move(initial), true);
-    ASSERT_FALSE(disabledDualStreaming.hasMotion());
-    ASSERT_FALSE(disabledDualStreaming.hasDualStreaming());
+    ASSERT_FALSE(disabledDualStreaming.isMotionDetectionEnabled());
+    ASSERT_FALSE(disabledDualStreaming.isDualStreamingEnabled());
 
     State disableDeviceOptimization = Reducer::setSettingsOptimizationEnabled(
         std::move(disabledDualStreaming), false);
 
-    ASSERT_TRUE(disableDeviceOptimization.hasMotion());
-    ASSERT_TRUE(disableDeviceOptimization.hasDualStreaming());
+    ASSERT_TRUE(disableDeviceOptimization.isMotionDetectionEnabled());
+    ASSERT_TRUE(disableDeviceOptimization.isDualStreamingEnabled());
 }
 
 // "Motion" recording type must be available if user forces MD on the primary stream.
@@ -340,11 +363,11 @@ TEST_F(CameraSettingsDialogStateReducerTest, disableMotionIfSecondaryStreamDisab
     ASSERT_EQ(initial.devicesDescription.supportsMotionStreamOverride, CombinedValue::All);
 
     State disabledDualStreaming = Reducer::setDualStreamingDisabled(std::move(initial), true);
-    ASSERT_FALSE(disabledDualStreaming.hasMotion());
+    ASSERT_FALSE(disabledDualStreaming.isMotionDetectionEnabled());
 
     State forcedMdOnPrimaryStream = Reducer::setForcedMotionStreamType(
         std::move(disabledDualStreaming), nx::vms::api::StreamIndex::primary);
-    ASSERT_TRUE(forcedMdOnPrimaryStream.hasMotion());
+    ASSERT_TRUE(forcedMdOnPrimaryStream.isMotionDetectionEnabled());
 }
 
 } // namespace test

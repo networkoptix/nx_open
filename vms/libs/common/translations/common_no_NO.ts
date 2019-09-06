@@ -520,29 +520,29 @@
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n Time Licenses</numerusform>
-        <numerusform>%n Demolisenser</numerusform>
+      <translation>
+        <numerusform>%n Tidslisenser</numerusform>
+        <numerusform>%n Tidslisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
       <translation>
-        <numerusform>%n Enkoder lisens</numerusform>
-        <numerusform>%n Enkoder lisenser</numerusform>
+        <numerusform>%n Analog lisens</numerusform>
+        <numerusform>%n Analoge lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
       <translation>
         <numerusform>%n Pro lisens</numerusform>
-        <numerusform>%n Pro lisenser</numerusform>
+        <numerusform>%n/ Pro lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
       <translation>
-        <numerusform>%n Edge-lisens</numerusform>
+        <numerusform>%n Edge-lisenser</numerusform>
         <numerusform>%n Edge-lisenser</numerusform>
       </translation>
     </message>
@@ -602,8 +602,8 @@
     <message numerus="yes">
       <source>%n Free Licenses</source>
       <translation>
-        <numerusform>%n Gratis lisens</numerusform>
-        <numerusform>%n Gratis lisenser</numerusform>
+        <numerusform>%n Demo lisens</numerusform>
+        <numerusform>%n Demo lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -682,8 +682,8 @@
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Gratis lisens</numerusform>
-        <numerusform>%n/%1 Gratis lisenser</numerusform>
+        <numerusform>%n/%1 Demo lisens</numerusform>
+        <numerusform>%n/%1 Demo lisenser</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -824,7 +824,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I / O-Modul</translation>
+      <translation>I / O-modul</translation>
     </message>
     <message>
       <source>I/O module</source>
@@ -847,14 +847,14 @@
     <message numerus="yes">
       <source>%n I/O Modules</source>
       <translation>
-        <numerusform>%n I/O-modul</numerusform>
-        <numerusform>%n I/O-moduler</numerusform>
+        <numerusform>%n I / O-modul</numerusform>
+        <numerusform>%n I / O-moduler</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
       <translation>
-        <numerusform>%n I/O-moduler</numerusform>
+        <numerusform>%n I/O-modul</numerusform>
         <numerusform>%n I/O-moduler</numerusform>
       </translation>
     </message>

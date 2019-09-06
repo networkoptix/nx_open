@@ -20,7 +20,7 @@ public:
 
 #define QnCameraListReply_Fields (uniqueIdList)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraListReply, (json))
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraListReply, (json)(ubjson))
 Q_DECLARE_METATYPE(QnCameraListReply)
 
 #endif  //QN_CAMERA_LIST_REPLY_H

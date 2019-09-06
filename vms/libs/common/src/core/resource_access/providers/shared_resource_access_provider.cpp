@@ -34,7 +34,8 @@ Source QnSharedResourceAccessProvider::baseSource() const
 }
 
 bool QnSharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& resource) const
+    const QnResourcePtr& resource,
+    GlobalPermissions globalPermissions) const
 {
     NX_ASSERT(acceptable(subject, resource));
     if (!acceptable(subject, resource))
@@ -56,7 +57,7 @@ bool QnSharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubje
         return false;
     }
 
-    bool result = sharedResourcesManager()->sharedResources(subject).contains(resource->getId());
+    bool result = sharedResourcesManager()->hasSharedResource(subject, resource->getId());
 
     NX_DEBUG(QnLog::PERMISSIONS_LOG.join(this), lit("update access %1 to %2: %3")
         .arg(subject.name())

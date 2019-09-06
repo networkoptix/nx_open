@@ -943,6 +943,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>Oggetti Frame e Info...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Calendario appuntato</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Sblocca calendario</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -2036,8 +2044,8 @@ to view more bookmarks</source>
       <translation>Qualsiasi telecamera</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>La notifica forzato funziona solo per gli eventi generici se i modificatori della telecamera vengono utilizzati nell'URL dell'evento generico</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
     </message>
   </context>
   <context>
@@ -4241,6 +4249,10 @@ to %1</source>
       <source>Virtual Camera %1</source>
       <translation>Telecamera virtuale</translation>
     </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Telecamera virtuale&quot; è una memoria virtuale per file video, che può essere caricata su qualsiasi server del sistema e accessibile da qualsiasi utente.</translation>
+    </message>
   </context>
   <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -5583,12 +5595,6 @@ to %1</source>
       <translation>Cosa fare con i dati analitici correnti?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>I dati di analisi attuali non verranno automaticamente spostati in un'altra posizione e diventeranno inaccessibili. E' possibile mantenerli e muoverli manualmente in un secondo momento o eliminarli definitivamente.
-Se si intende spostare i dati di analisi in un'altra posizione di memoria, contattare l'assistenza prima di procedere.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Elimina</translation>
     </message>
@@ -5599,6 +5605,12 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Cancel</source>
       <translation>Annulla</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>I dati di analisi attuali non verranno automaticamente spostati in un'altra posizione e diventeranno inaccessibili. E' possibile mantenerli e muoverli manualmente in un secondo momento o eliminarli definitivamente.
+Se si intende spostare i dati di analisi in un'altra posizione di memoria, contattare l'assistenza prima di procedere.</translation>
     </message>
   </context>
   <context>
@@ -5742,7 +5754,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
     </message>
   </context>
   <context>
@@ -7341,12 +7353,12 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>Oggetto sconosciuto</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation>telecamera rimossa</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation>Traccia sconosciuta</translation>
     </message>
   </context>
   <context>
@@ -7579,6 +7591,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <source>This action cannot be undone.</source>
       <translation>Questa azione non può essere annullata.</translation>
     </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation>Il flusso di rilevamento del movimento è disabilitato</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
@@ -7714,7 +7730,15 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Il rilevamento del movimento è disabilitato, tutte le pianificazioni registrate &quot;Motion&quot; e &quot;Motion + Lo-Res&quot; saranno modificati in &quot;Sempre&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Lo streaming doppio è disabilitato, tutte le registrazioni programmate &quot;Motion + Lo-Res&quot; saranno cambiate in &quot;Sempre&quot;</translation>
     </message>
   </context>
   <context>
@@ -8041,10 +8065,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
         <numerusform>%n eventi</numerusform>
         <numerusform>%n eventi</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>motore analisi senza nome</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8434,8 +8454,8 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>L'intervallo di indirizzi IP specificato ha più di 255 indirizzi.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>Può t&apos;avviare processo di ricerca</translation>
+      <source>Can not start the search process</source>
+      <translation>Impossibile avviare il processo di ricerca</translation>
     </message>
   </context>
   <context>
@@ -8548,6 +8568,58 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Alcuni server sono offline e non verranno aggiornati. Saltarli?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Pacchetto di aggiornamento mancante per il client e %n server</numerusform>
+        <numerusform>Pacchetto di aggiornamento mancante per il client e %n server</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Pacchetto di aggiornamento mancante per il client</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Non ci sono server online da aggiornare.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Annulla l'aggiornamento ed elimina tutti i dati scaricati?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Le versioni del sistema operativo di alcuni componenti non sono più supportate. Si prega di rimuoverli dal sistema o aggiornare il loro sistema operativo a una versione supportata.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>La versione del sistema operativo del client non è più supportata. Si prega di aggiornare il suo OS ad una versione supportata.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Impossibile installare l'aggiornamento</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Impossibile annullare l'aggiornamento</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Impossibile avviare l'installazione</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Alcuni server non hanno completato il processo di aggiornamento. Finirlo comunque?</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <comment>Application name will be substituted</comment>
+      <translation>%1 verrà riavviato alla versione aggiornata.</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Impossibile scaricare i pacchetti di aggiornamento su alcuni moduli</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Se il problema persiste, contattare l'assistenza clienti.</translation>
@@ -8565,16 +8637,48 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Aggiornamento completato</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client verrà riavviato alla versione aggiornata.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Aggiornamento completato, ma alcuni server hanno fallito l'aggiornamento</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Per favore aggiornare %1 manualmente usando un pacchetto di installazione.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 verrà riavviato alla versione aggiornata.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>Ok</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Si è verificato un errore durante l'installazione degli aggiornamenti:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Download degli aggiornamenti...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Fine aggiornamento</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annulla</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>L'ultima versione è già installata</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>L'ultima versione è già installata</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Installa l'aggiornamento</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8593,12 +8697,12 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Scarica ed installa</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Seleziona un altro file</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Cerca il file aggiornato...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Seleziona un altro file</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8621,6 +8725,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Installazione dell'aggiornamento del client...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Avvio aggiornamento...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Aggiornamento a...</translation>
     </message>
@@ -8629,12 +8737,24 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Pronto per l'aggiornamento</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Installa l'aggiornamento</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Aggiornamenti di sistema</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Alcuni server non hanno pacchetti di aggiornamento disponibili.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Alcuni server hanno riscontrato un errore interno.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Si prega di contattare l'assistenza clienti.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Alcuni server sono offline. Per favore attendi fino a quando non saranno online per continuare.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8643,6 +8763,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Continue in Background</source>
       <translation>Continua in background</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Ultimo aggiornamento disponibile</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8655,101 +8779,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Update from mediaservers</source>
       <translation>Aggiornamento da parte dei mediaserver</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Ultimo aggiornamento disponibile</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Pacchetto di aggiornamento mancante per il client e %n server</numerusform>
-        <numerusform>Pacchetto di aggiornamento mancante per il client e %n server</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Pacchetto di aggiornamento mancante per il client</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Fine aggiornamento</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Annulla</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>L'ultima versione è già installata</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>L'ultima versione è già installata</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>Non ci sono server online da aggiornare.</translation>
-    </message>
-    <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Alcuni server non hanno completato il processo di aggiornamento di&apos;t. Finirlo comunque?</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>Annulla l'aggiornamento ed elimina tutti i dati scaricati?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Si è verificato un errore durante l'installazione degli aggiornamenti:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Alcuni server sono offline. Per favore attendi fino a quando non saranno online per continuare.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Aggiornamento completato, ma alcuni server hanno fallito l'aggiornamento</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Per favore aggiornare %1 manualmente usando un pacchetto di installazione.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 verrà riavviato alla versione aggiornata.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Impossibile scaricare i pacchetti di aggiornamento su alcuni moduli</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Le versioni del sistema operativo di alcuni componenti non sono più supportate. Si prega di rimuoverli dal sistema o aggiornare il loro sistema operativo a una versione supportata.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>La versione del sistema operativo del client non è più supportata. Si prega di aggiornare il suo OS ad una versione supportata.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Impossibile installare l'aggiornamento</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Avvio aggiornamento...</translation>
-    </message>
-    <message>
-      <source>Some servers have no package available</source>
-      <translation>Alcuni server non hanno alcun pacchetto disponibile</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
     </message>
   </context>
   <context>
@@ -8807,10 +8836,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Alcuni utenti non&apos; hanno accesso al layout selezionato. L'azione non funzionerà per loro.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Nessuno degli utenti selezionati ha accesso al layout selezionato. L'azione non funzionerà.</translation>
     </message>
@@ -8829,6 +8854,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Nessuno dei ruoli utente selezionati contiene utenti. L'azione non funzionerà.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation>Alcuni utenti non hanno accesso al layout selezionato. L'azione non funzionerà per loro.</translation>
     </message>
   </context>
   <context>
@@ -8864,10 +8893,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Failed to download update</source>
       <translation>Impossibile scaricare il pacchetto di aggiornamento</translation>
-    </message>
-    <message>
-      <source>Failed to install update</source>
-      <translation>Impossibile installare l'aggiornamento</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
@@ -8923,11 +8948,15 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>Non c'è abbastanza spazio per installare l'aggiornamento.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Errore interno del server.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation>Questa versione del sistema operativo non è più supportata.</translation>
     </message>
   </context>
   <context>
@@ -9034,28 +9063,12 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Più configurazioni</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Dual-Streaming non supportato per questa telecamera</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation>Il rilevamento del movimento è disabilitato o non supportato</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Dual-Streaming e motion detection non supportati per questa telecamera</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Rilevazione del movimento disabilitata</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Per abilitarlo o regolarlo, vai alla scheda &quot;Motion&quot; di configurazione della telecamera</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>Rilevamento del movimento disabilitato o non supportato</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Per assicurarti che sia supportato e per abilitarlo, vai su &quot;Movimento&quot; scheda in Impostazioni telecamera.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation>Dual-streaming è disabilitato o non supportato</translation>
     </message>
   </context>
   <context>
@@ -9082,6 +9095,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>Gli utenti verranno automaticamente disconnessi se la loro sessione supera la durata specificata.</translation>
+    </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation>I Watermarks saranno visualizzati su live, archivi e video esportati solo per gli utenti non amministratori. Per tutti gli amministratori non sara' possibile visualizzarli.</translation>
     </message>
   </context>
   <context>
@@ -9146,6 +9163,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <source>plugin is optional and is not in the white list</source>
       <translation>il plugin è opzionale e non è nella lista bianca</translation>
     </message>
+    <message>
+      <source>internal error</source>
+      <translation>errore interno</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
@@ -9174,11 +9195,15 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>Nessuna connessione al server.</translation>
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Errore di rete.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation>Errore del server.</translation>
     </message>
   </context>
   <context>
@@ -9395,6 +9420,14 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Il file è stato danneggiato durante il caricamento sul server</translation>
     </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>Il file remoto &quot;%1&quot; è danneggiato</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>Il server ha già questo file &quot;%1&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
@@ -9598,17 +9631,17 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
       <translation>Qualsiasi plugin</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>L'evento verrà attivato solo se sono presenti corrispondenze nella didascalia con una qualsiasi delle parole chiave immesse.</translation>
+      <translation>L'evento verrà attivato solo se sono presenti nella descrizione con una qualsiasi delle parole chiave immesse.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
@@ -9620,7 +9653,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
-      <translation>L'evento verrà attivato solo se sono presenti corrispondenze in didascalia con una qualsiasi delle parole chiave immesse.</translation>
+      <translation>L'evento verrà attivato solo se sono presenti nella descrizione con una qualsiasi delle parole chiave immesse.</translation>
     </message>
   </context>
   <context>
@@ -9924,18 +9957,22 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Ok</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
       <translation>Confermare la posizione di archiviazione per memorizzare i dati di analisi</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
+      <source>the largest available partition</source>
+      <translation>la più grande partizione disponibile</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
       <translation>Il database dei dati di analisi, deve essere memorizzato su una memoria locale e può occupare fino a centinaia di gigabyte.
 
 Una volta selezionata la posizione in cui archiviare i dati di analisi, non è possibile modificarli facilmente senza perdere i dati esistenti. Raccomandiamo di scegliere con cura la posizione e di non utilizzare la partizione di sistema per evitare gravi malfunzionamenti del sistema.
-L'impostazione iniziale dei dati di analisi e' all'interno della cartella d'installazione mediaserver&apos;s
+L'impostazione della posizione iniziale dei dati di analisi e' all'interno della cartella %1.
 È possibile modificare la posizione di archiviazione nella scheda &quot;Gestione archiviazione&quot; nella finestra di dialogo Impostazioni server.</translation>
     </message>
   </context>

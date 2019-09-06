@@ -304,7 +304,7 @@
         <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Usuario" required>
+                   placeholder="Nombre del usuario" required>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
@@ -362,7 +362,7 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Volver a intentar</button>
+        <button class="btn btn-default" ng-click="retry()">Vuelva a intentarlo</button>
     </p>
 </div>
 
@@ -455,7 +455,7 @@
     <p class="master-description">Algo ha fallado. <br> Descripción del error: {{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Volver a intentar</button>
+        <button class="btn btn-default" ng-click="retry()">Vuelva a intentarlo</button>
     </p>
 </div>
 

@@ -23,6 +23,7 @@
 #include <api/model/analytics_actions.h>
 #include <api/model/audit/audit_record.h>
 #include <api/model/camera_diagnostics_reply.h>
+#include <api/model/camera_list_reply.h>
 #include <api/model/manual_camera_seach_reply.h>
 #include <api/model/test_email_settings_reply.h>
 #include <api/model/time_reply.h>
@@ -312,6 +313,16 @@ public:
         QThread* targetThread = nullptr);
 
     /**
+     * Check the list of cameras for discovery. Forms a new list which contains only accessible
+     * cameras.
+     * @return Request handle.
+     */
+    int checkCameraList(
+        const QnNetworkResourceList& cameras,
+        Result<QnCameraListReply>::type callback,
+        QThread* targetThread = nullptr);
+
+    /**
      * Adds a new wearable camera to this server.
      *
      * @param name                      Name of the camera.
@@ -387,7 +398,7 @@ public:
     /** Get statistics for server health monitor. */
     Handle getStatistics(GetCallback callback, QThread* targetThread = nullptr);
 
-    Handle lookupDetectedObjects(
+    Handle lookupObjectTracks(
         const nx::analytics::db::Filter& request,
         bool isLocal,
         Result<nx::analytics::db::LookupResult>::type callback,

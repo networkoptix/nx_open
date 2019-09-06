@@ -654,7 +654,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->addFlags(Qn::local);
-    layout->setId(QnUuid::createUuid());
+    layout->setIdUnsafe(QnUuid::createUuid());
     layout->setName(tr("Audit trail replay"));
     if(context()->user())
         layout->setParentId(context()->user()->getId());
@@ -991,7 +991,13 @@ void QnAuditLogDialog::retranslateUi()
 void QnAuditLogDialog::at_exportAction_triggered()
 {
     if (currentGridView())
-        QnTableExportHelper::exportToFile(currentGridView(), true, this, tr("Export selected records to a file"));
+    {
+        QnTableExportHelper::exportToFile(
+            currentGridView()->model(),
+            currentGridView()->selectionModel()->selectedIndexes(),
+            this,
+            tr("Export selected records to a file"));
+    }
 }
 
 void QnAuditLogDialog::at_selectAllAction_triggered()
@@ -1003,7 +1009,11 @@ void QnAuditLogDialog::at_selectAllAction_triggered()
 void QnAuditLogDialog::at_clipboardAction_triggered()
 {
     if (currentGridView())
-        QnTableExportHelper::copyToClipboard(currentGridView());
+    {
+        QnTableExportHelper::copyToClipboard(
+            currentGridView()->model(),
+            currentGridView()->selectionModel()->selectedIndexes());
+    }
 }
 
 void QnAuditLogDialog::disableUpdateData()

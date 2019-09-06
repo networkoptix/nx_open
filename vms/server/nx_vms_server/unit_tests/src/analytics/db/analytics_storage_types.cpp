@@ -61,7 +61,7 @@ Filter generateRandomFilter(const AttributeDictionary* attributeDictionary)
         []() { return QnUuid::createUuid().toString(); });
 
     if (nx::utils::random::number<bool>())
-        filter.objectAppearanceId = QnUuid::createUuid();
+        filter.objectTrackId = QnUuid::createUuid();
 
     // TODO: timePeriod.
 
@@ -110,27 +110,27 @@ static std::vector<common::metadata::Attribute> getUniqueAttributes(
     return result;
 }
 
-common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
+common::metadata::ObjectMetadataPacketPtr generateRandomPacket(
     int eventCount,
     const AttributeDictionary* attributeDictionary)
 {
     const int minAttributeCount = 0;
     const int maxAttributeCount = 7;
 
-    auto packet = std::make_shared<common::metadata::DetectionMetadataPacket>();
+    auto packet = std::make_shared<common::metadata::ObjectMetadataPacket>();
     packet->deviceId = QnUuid::createUuid();
-    packet->timestampUsec = (nx::utils::random::number<qint64>() / 1000) * 1000;
-    packet->durationUsec = nx::utils::random::number<qint64>(0, 30) * 1000;
+    packet->timestampUs = (nx::utils::random::number<qint64>() / 1000) * 1000;
+    packet->durationUs = nx::utils::random::number<qint64>(0, 30) * 1000;
 
     for (int i = 0; i < eventCount; ++i)
     {
-        common::metadata::DetectedObject detectedObject;
-        detectedObject.objectTypeId = QnUuid::createUuid().toString();
-        detectedObject.objectId = QnUuid::createUuid();
-        detectedObject.boundingBox = generateRandomRectf();
-        detectedObject.labels.resize(nx::utils::random::number<int>(
+        common::metadata::ObjectMetadata objectMetadata;
+        objectMetadata.objectTypeId = QnUuid::createUuid().toString();
+        objectMetadata.trackId = QnUuid::createUuid();
+        objectMetadata.boundingBox = generateRandomRectf();
+        objectMetadata.attributes.resize(nx::utils::random::number<int>(
             minAttributeCount, maxAttributeCount));
-        for (auto& attribute: detectedObject.labels)
+        for (auto& attribute: objectMetadata.attributes)
         {
             attribute = attributeDictionary
                 ? attributeDictionary->getRandomAttribute()
@@ -139,10 +139,10 @@ common::metadata::DetectionMetadataPacketPtr generateRandomPacket(
                     QString::fromUtf8(nx::utils::random::generateName(7))};
         }
 
-        detectedObject.labels = getUniqueAttributes(
-            std::exchange(detectedObject.labels, {}));
+        objectMetadata.attributes = getUniqueAttributes(
+            std::exchange(objectMetadata.attributes, {}));
 
-        packet->objects.push_back(std::move(detectedObject));
+        packet->objectMetadataList.push_back(std::move(objectMetadata));
     }
 
     return packet;
@@ -153,10 +153,10 @@ QRectF generateRandomRectf()
     QRectF rect;
     // NOTE: Leaving some space to the right & down so that the rect is not empty.
     rect.setTopLeft(QPointF(
-        nx::utils::random::number<float>(0, 0.95),
-        nx::utils::random::number<float>(0, 0.95)));
-    rect.setWidth(nx::utils::random::number<float>(0, 1 - rect.topLeft().x()));
-    rect.setHeight(nx::utils::random::number<float>(0, 1 - rect.topLeft().y()));
+        nx::utils::random::number<float>(0.0F, 0.95F),
+        nx::utils::random::number<float>(0.0F, 0.95F)));
+    rect.setWidth(nx::utils::random::number<float>(0.0F, 1 - rect.topLeft().x()));
+    rect.setHeight(nx::utils::random::number<float>(0.0F, 1 - rect.topLeft().y()));
     return rect;
 }
 

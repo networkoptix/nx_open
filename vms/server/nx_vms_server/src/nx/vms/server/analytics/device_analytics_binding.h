@@ -29,11 +29,11 @@ namespace nx::vms::server::analytics {
 class DeviceAnalyticsBinding:
     public QnAbstractDataConsumer,
     public /*mixin*/ nx::vms::server::ServerModuleAware
-
 {
     using base_type = QnAbstractDataConsumer;
     using Engine = nx::sdk::analytics::IEngine;
     using DeviceAgent = nx::sdk::analytics::IDeviceAgent;
+
 public:
     DeviceAnalyticsBinding(
         QnMediaServerModule* serverModule,
@@ -81,6 +81,8 @@ private:
     void setSettingsInternal(const nx::sdk::Ptr<nx::sdk::IStringMap>& settingsFromUser);
 
     void logIncomingFrame(nx::sdk::analytics::IDataPacket* frame);
+
+    bool updatePluginInfo() const;
 
 private:
     mutable QnMutex m_mutex;

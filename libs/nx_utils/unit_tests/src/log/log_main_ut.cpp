@@ -10,7 +10,6 @@
 #include <nx/utils/log/log_settings.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/test_options.h>
-#include <nx/utils/unused.h>
 
 #include <QtCore/QSize>
 
@@ -234,9 +233,9 @@ TEST_F(LogMainTest, LevelReducerWithStream)
 } while (0)
 
 /** Used to test logging from a global function. */
-static /*dummyValue*/ std::string* globalFunction(int dummyInt, char dummyChar)
+static /*dummyValue*/ std::string* globalFunction(
+    [[maybe_unused]] int dummyInt, [[maybe_unused]] char dummyChar)
 {
-    nx::utils::unused(dummyInt, dummyChar);
     TEST_NX_SCOPE_TAG("globalFunction");
     return nullptr;
 }
@@ -245,9 +244,9 @@ static /*dummyValue*/ std::string* globalFunction(int dummyInt, char dummyChar)
 template<typename T, char c>
 struct StructTemplate
 {
-    static T staticFunction(T dummyT, char dummyChar = c)
+    static T staticFunction(
+        [[maybe_unused]] T dummyT, [[maybe_unused]] char dummyChar = c)
     {
-        nx::utils::unused(dummyT, dummyChar);
         TEST_NX_SCOPE_TAG("StructTemplate::staticFunction");
         return []()
         {
@@ -269,9 +268,8 @@ struct DummyStruct
 
 /** Used to test logging from a function template, and from a lambda. */
 template<typename T, short (DummyStruct::*p)(char)>
-T functionTemplate(T dummyT, char dummyChar = 'c')
+T functionTemplate([[maybe_unused]] T dummyT, [[maybe_unused]] char dummyChar = 'c')
 {
-    nx::utils::unused(dummyT, dummyChar);
     TEST_NX_SCOPE_TAG("functionTemplate");
     return []()
     {

@@ -9,9 +9,25 @@
 #include <rest/server/json_rest_result.h>
 #include <audit/audit_manager.h>
 
+#include <QStringLiteral>
+
 namespace nx {
 namespace vms {
 namespace utils {
+
+namespace {
+
+static const auto kIgnoreKey = QStringLiteral("ignore");
+
+static QSet<QString> ignoredKeysFromParams(const QnRequestParams& params)
+{
+    if (!params.contains(kIgnoreKey))
+        return QSet<QString>();
+
+    return params[kIgnoreKey].trimmed().split(",", QString::SplitBehavior::SkipEmptyParts).toSet();
+}
+
+} // namespace
 
 SystemSettingsProcessor::SystemSettingsProcessor(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
@@ -37,16 +53,13 @@ nx::network::http::StatusCode::Value SystemSettingsProcessor::updateSettings(
 
     QnRequestParams filteredParams(params);
     filteredParams.remove(lit("auth"));
+    const auto ignoredKeys = ignoredKeysFromParams(filteredParams);
+    filteredParams.remove(kIgnoreKey);
 
     namespace ahlp = ec2::access_helpers;
 
     for (QnAbstractResourcePropertyAdaptor* setting: settings)
     {
-        bool readAllowed = ahlp::kvSystemOnlyFilter(
-            ahlp::Mode::read,
-            accessRights,
-            setting->key());
-
         bool writeAllowed = ec2::access_helpers::kvSystemOnlyFilter(
             ahlp::Mode::write,
             accessRights,
@@ -75,14 +88,17 @@ nx::network::http::StatusCode::Value SystemSettingsProcessor::updateSettings(
             auditManager()->notifySettingsChanged(authSession, setting->key());
         }
 
-        if (readAllowed)
+        const bool readAllowed =
+            ahlp::kvSystemOnlyFilter(ahlp::Mode::read, accessRights, setting->key());
+
+        if (readAllowed && !ignoredKeys.contains(setting->key()))
             reply.settings.insert(setting->key(), setting->serializedValue());
     }
+
     if (dirty)
         commonModule()->globalSettings()->synchronizeNow();
 
     result->setReply(std::move(reply));
-
     return nx::network::http::StatusCode::ok;
 }
 

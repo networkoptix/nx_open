@@ -802,7 +802,22 @@ Handle ServerConnection::changeCameraPassword(
     return handle;
 }
 
-Handle ServerConnection::lookupDetectedObjects(
+int ServerConnection::checkCameraList(const QnNetworkResourceList& cameras,
+    Result<QnCameraListReply>::type callback,
+    QThread* targetThread)
+{
+    QnCameraListReply camList;
+    for (const QnResourcePtr& c: cameras)
+        camList.uniqueIdList << c->getUniqueId();
+
+    const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+
+    return executePost("/api/checkDiscovery", QnRequestParamList(),
+        contentType, QJson::serialized(camList), callback,  targetThread);
+}
+
+
+Handle ServerConnection::lookupObjectTracks(
     const nx::analytics::db::Filter& request,
     bool isLocal,
     Result<nx::analytics::db::LookupResult>::type callback,
@@ -813,7 +828,7 @@ Handle ServerConnection::lookupDetectedObjects(
     queryParams.insert(lit("isLocal"), isLocal? lit("true") : lit("false"));
 
     return executeGet(
-        lit("/ec2/analyticsLookupDetectedObjects"),
+        lit("/ec2/analyticsLookupObjectTracks"),
         queryParams,
         callback,
         targetThread);

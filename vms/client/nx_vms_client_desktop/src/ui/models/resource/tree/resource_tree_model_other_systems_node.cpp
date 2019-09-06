@@ -43,7 +43,7 @@ void QnResourceTreeModelOtherSystemsNode::initialize()
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnResourceTreeModelOtherSystemsNode::handleResourceRemoved);
 
-    connect(context(), &QnWorkbenchContext::userChanged, this,
+    connect(model(), &QnResourceTreeModel::userChanged, this,
         &QnResourceTreeModelOtherSystemsNode::rebuild);
     connect(qnGlobalSettings, &QnGlobalSettings::autoDiscoveryChanged, this,
          &QnResourceTreeModelOtherSystemsNode::rebuild);
@@ -56,7 +56,7 @@ void QnResourceTreeModelOtherSystemsNode::initialize()
 void QnResourceTreeModelOtherSystemsNode::deinitialize()
 {
     qnGlobalSettings->disconnect(this);
-    context()->disconnect(this);
+    model()->disconnect(this);
     resourcePool()->disconnect(this);
     qnSystemsFinder->disconnect(this);
 
@@ -207,7 +207,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelOtherSystemsNode::ensureFakeServer
 
 bool QnResourceTreeModelOtherSystemsNode::canSeeFakeServers() const
 {
-    bool isOwner = context()->user() && context()->user()->isOwner();
+    bool isOwner = model()->user() && model()->user()->isOwner();
     bool isAutoDiscoveryEnabled = qnGlobalSettings->isAutoDiscoveryEnabled();
 
     return isOwner && isAutoDiscoveryEnabled;
@@ -215,7 +215,7 @@ bool QnResourceTreeModelOtherSystemsNode::canSeeFakeServers() const
 
 bool QnResourceTreeModelOtherSystemsNode::canSeeCloudSystem(const QnSystemDescriptionPtr& system) const
 {
-    return context()->user()
+    return model()->user()
         && system->isCloudSystem()
         && system->id() != qnGlobalSettings->cloudSystemId();
 }

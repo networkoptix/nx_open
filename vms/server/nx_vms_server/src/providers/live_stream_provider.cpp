@@ -76,12 +76,16 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1),
     m_metadataReceptor(new MetadataDataReceptor())
 {
+    QnMotionEstimation::Config config;
+    if (serverModule())
+        config.decoderConfig.mtDecodePolicy = serverModule()->settings().multiThreadDecodePolicy();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
+        m_motionEstimation.emplace_back(std::make_unique<QnMotionEstimation>(config));
         m_motionMaskBinData[i] =
             (simd128i*) qMallocAligned(Qn::kMotionGridWidth * Qn::kMotionGridHeight/8, 32);
         memset(m_motionMaskBinData[i], 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight/8);
-        m_motionEstimation[i].setChannelNum(i);
+        m_motionEstimation[i]->setChannelNum(i);
     }
 
     QnAbstractStreamDataProvider::setRole(Qn::CR_LiveVideo);
@@ -251,7 +255,7 @@ void QnLiveStreamProvider::updateSoftwareMotion()
     for (int i = 0; i < m_videoChannels; ++i)
     {
         QnMotionRegion region = m_cameraRes->getMotionRegion(i);
-        m_motionEstimation[i].setMotionMask(region);
+        m_motionEstimation[i]->setMotionMask(region);
     }
 
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
@@ -338,7 +342,7 @@ bool QnLiveStreamProvider::needMetadata()
         {
             for (int i = 0; i < m_videoChannels; ++i)
             {
-                bool rez = m_motionEstimation[i].existsMetadata();
+                bool rez = m_motionEstimation[i]->existsMetadata();
                 if (rez)
                 {
                     m_softMotionLastChannel = i;
@@ -455,16 +459,16 @@ void QnLiveStreamProvider::onGotVideoFrame(
     {
         NX_VERBOSE(this, "Analyzing motion (Role: [%1]); needUncompressedFrame: %2",
             getRole(), needUncompressedFrame);
-        if (motionEstimation.analyzeFrame(compressedFrame,
+        if (motionEstimation->analyzeFrame(compressedFrame,
             needUncompressedFrame ? &uncompressedFrame : nullptr))
         {
-            updateStreamResolution(channel, motionEstimation.videoResolution());
+            updateStreamResolution(channel, motionEstimation->videoResolution());
         }
     }
     else if (needUncompressedFrame)
     {
         NX_VERBOSE(this) << lm("Decoding frame for metadata plugins");
-        uncompressedFrame = motionEstimation.decodeFrame(compressedFrame);
+        uncompressedFrame = motionEstimation->decodeFrame(compressedFrame);
         if (!uncompressedFrame)
         {
             NX_WARNING(this) << "Unable to decode frame for metadata plugins, timestamp:"
@@ -528,7 +532,7 @@ QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
     }
 
     if (m_cameraRes->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
-        return m_motionEstimation[m_softMotionLastChannel].getMotion();
+        return m_motionEstimation[m_softMotionLastChannel]->getMotion();
     else
         return getCameraMetadata();
 }

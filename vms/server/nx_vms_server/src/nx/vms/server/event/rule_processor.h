@@ -19,6 +19,7 @@
 #include <nx/vms/server/server_module_aware.h>
 
 class EmailManagerImpl;
+namespace nx::vms::server::resource { class Camera; }
 
 namespace nx {
 namespace vms::server {
@@ -132,7 +133,7 @@ protected slots:
     */
     virtual bool executeActionInternal(const vms::event::AbstractActionPtr& action);
 
-private slots:
+private:
     void at_broadcastActionFinished(int handle, ec2::ErrorCode errorCode);
     void at_actionDelivered(const vms::event::AbstractActionPtr& action);
     void at_actionDeliveryFailed(const vms::event::AbstractActionPtr& action);
@@ -141,7 +142,7 @@ private slots:
     void at_ruleRemoved(QnUuid id);
     void at_rulesReset(const vms::event::RuleList& rules);
 
-    void toggleInputPortMonitoring(const QnResourcePtr& resource, bool on);
+    void at_resourceMonitor(const QnResourcePtr& resource, bool isAdded);
 
     void at_timer();
 
@@ -188,7 +189,7 @@ private:
     bool popProlongedActionStartTime(
         const vms::event::AbstractActionPtr& action,
         qint64& startTimeUsec);
-    void ruleModificationFinishedUnsafe();
+
 protected:
     mutable QnMutex m_mutex;
 
@@ -227,8 +228,11 @@ private:
 
     QHash<QnUuid, qint64> m_runningBookmarkActions;
 
-    QnWaitCondition m_ruleUpdateCond;
-    std::atomic<int> m_updatingRulesCnt{0};
+    QnWaitCondition m_ruleUpdateCondition;
+    std::atomic<int> m_updatingRulesCount{0};
+
+    std::map<nx::vms::server::resource::Camera*, QWeakPointer<nx::vms::server::resource::Camera>>
+        m_knownCameras;
 };
 
 } // namespace event

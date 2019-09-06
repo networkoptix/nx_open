@@ -102,6 +102,7 @@ TEST(Ptr, basic)
     Data::s_destructorCalled = false;
     {
         const Ptr<Data> data = makePtr<Data>(42);
+        ASSERT_EQ(sizeof(Data*), sizeof(data)); //< Ptr layout should be the same as a raw pointer.
         ASSERT_EQ(data->number(), 42);
         ASSERT_EQ(1, data->refCount());
         ASSERT_TRUE(static_cast<bool>(data)); //< operator bool()
@@ -112,6 +113,23 @@ TEST(Ptr, basic)
         ASSERT_FALSE(data == nullptr);
         ASSERT_TRUE(nullptr != data);
         ASSERT_TRUE(data != nullptr);
+
+        ASSERT_FALSE(Data::s_destructorCalled);
+    } //< data destroyed
+    ASSERT_TRUE(Data::s_destructorCalled);
+}
+
+TEST(Ptr, inheritance)
+{
+    Data::s_destructorCalled = false;
+    {
+        const Ptr<Data> data = makePtr<Data>(42);
+
+        const IBase* tmp = data.get();
+
+        Ptr<const IBase> base(toPtr(tmp));
+        ASSERT_EQ(1, data->refCount());
+        base.releasePtr();
 
         ASSERT_FALSE(Data::s_destructorCalled);
     } //< data destroyed

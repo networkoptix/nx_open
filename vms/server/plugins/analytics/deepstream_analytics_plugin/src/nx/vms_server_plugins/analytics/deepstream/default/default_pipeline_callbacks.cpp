@@ -149,7 +149,7 @@ gboolean handleDefaultMetadata(GstBuffer* buffer, GstMeta** meta, gpointer userD
             trackingMapper->addMapping(roiMeta.tracking_id, uuid);
         }
 
-        detectedObject->setId(uuid);
+        detectedObject->setTrackId(uuid);
         detectedObject->setBoundingBox(rectangle);
         detectedObject->setConfidence(1.0);
 

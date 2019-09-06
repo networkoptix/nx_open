@@ -52,7 +52,7 @@
   <onvifMedia2:GetVideoEncoderConfigurationOptionsResponse>
    <!-- std::vector<tt__VideoEncoder2ConfigurationOptions *> Options -->
    <!-- a repetition of 1 or more of the following -->
-   <onvifMedia2:Options GovLengthRange="" FrameRatesSupported="" ProfilesSupported="" ConstantBitRateSupported="false">
+   <onvifMedia2:Options GovLengthRange="" FrameRatesSupported="" ProfilesSupported="" ConstantBitRateSupported="false" GuaranteedFrameRateSupported="false">
     <!-- std::string Encoding -->
     <tt:Encoding></tt:Encoding>
     <!-- tt__FloatRange *QualityRange -->

@@ -7,7 +7,6 @@
 #include <client_core/connection_context_aware.h>
 #include <core/resource/resource_fwd.h>
 
-#include <nx/update/common_update_manager.h>
 #include <nx/update/update_check.h>
 #include <nx/update/update_information.h>
 
@@ -167,6 +166,9 @@ public:
      * ServerUpdateTool can download server packages for the servers without internet.
      */
     QDir getDownloadDir() const;
+
+    /** Get available space in downloads folder. */
+    uint64_t getAvailableSpace() const;
 
     /**
      * Report-like object to describe a progress for a current action.

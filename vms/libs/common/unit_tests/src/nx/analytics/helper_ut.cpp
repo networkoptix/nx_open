@@ -67,7 +67,7 @@ QSet<QString> extractEventTypeIds(const ScopedEventTypeIds& scopedEventTypeIds)
 QnMediaServerResourcePtr makeServer(QnCommonModule* commonModule)
 {
     QnMediaServerResourcePtr server(new nx::core::resource::ServerMock(commonModule));
-    server->setId(QnUuid::createUuid());
+    server->setIdUnsafe(QnUuid::createUuid());
     server->setResourcePool(commonModule->resourcePool());
     server->setStatus(Qn::Online);
     return server;
@@ -528,7 +528,7 @@ protected:
     QnVirtualCameraResourcePtr makeDevice()
     {
         QnVirtualCameraResourcePtr device(new nx::core::resource::DeviceMock());
-        device->setId(QnUuid::createUuid());
+        device->setIdUnsafe(QnUuid::createUuid());
         device->setCommonModule(m_commonModule.get());
 
         return device;

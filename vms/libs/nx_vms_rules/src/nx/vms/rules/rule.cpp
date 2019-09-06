@@ -1,5 +1,7 @@
 #include "rule.h"
 
+#include <QScopedValueRollback>
+
 #include "event_filter.h"
 #include "action_builder.h"
 
@@ -95,6 +97,32 @@ void Rule::setSchedule(const QByteArray& schedule)
 QByteArray Rule::schedule() const
 {
     return m_schedule;
+}
+
+
+void Rule::connectSignals()
+{
+    for (auto& filter: m_filters)
+    {
+        filter->connectSignals();
+        connect(filter, &EventFilter::stateChanged, this, &Rule::updateState);
+    }
+    for (auto& builder: m_builders)
+    {
+        builder->connectSignals();
+        connect(builder, &ActionBuilder::stateChanged, this, &Rule::updateState);
+    }
+}
+
+void Rule::updateState()
+{
+    //TODO: #spanasenko Update derived values (error messages, etc.)
+
+    if (m_updateInProgress)
+        return;
+
+    QScopedValueRollback<bool> guard(m_updateInProgress, true);
+    emit stateChanged();
 }
 
 } // namespace nx::vms::rules

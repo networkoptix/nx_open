@@ -420,6 +420,56 @@ bool isDefaultExpertSettings(const State& state)
         && state.expert.rtpTransportType() == vms::api::RtpTransportType::automatic;
 }
 
+Qn::RecordingType fixupRecordingType(const State& state)
+{
+    if ((state.recording.brush.recordingType == Qn::RecordingType::motionAndLow
+        && !state.supportsMotionPlusLQ())
+        || (state.recording.brush.recordingType == Qn::RecordingType::motionOnly
+            && !state.isMotionDetectionEnabled()))
+    {
+        return Qn::RecordingType::always;
+    }
+
+    return state.recording.brush.recordingType;
+}
+
+std::optional<State::ScheduleAlert> calculateScheduleAlert(const State& state)
+{
+    if (state.supportsMotionPlusLQ())
+        return {};
+
+    const bool hasMotion = state.isMotionDetectionEnabled();
+    if (state.recording.schedule.hasValue())
+    {
+        for (const auto& task: state.recording.schedule())
+        {
+            switch (task.recordingType)
+            {
+                case Qn::RecordingType::motionOnly:
+                    if (!hasMotion)
+                        return State::ScheduleAlert::scheduleChangeDueToNoMotion;
+                    break;
+
+                case Qn::RecordingType::motionAndLow:
+                    return hasMotion
+                        ? State::ScheduleAlert::scheduleChangeDueToNoDualStreaming
+                        : State::ScheduleAlert::scheduleChangeDueToNoMotion;
+
+                default:
+                    break;
+            }
+        }
+
+        return {};
+    }
+    else
+    {
+        return hasMotion
+            ? State::ScheduleAlert::scheduleChangeDueToNoDualStreaming
+            : State::ScheduleAlert::scheduleChangeDueToNoMotion;
+    }
+}
+
 std::optional<State::RecordingAlert> updateArchiveLengthAlert(const State& state)
 {
     const bool warning = state.recording.minDays.automatic.hasValue()
@@ -466,6 +516,8 @@ State CameraSettingsDialogStateReducer::setReadOnly(State state, bool value)
 State CameraSettingsDialogStateReducer::setSettingsOptimizationEnabled(State state, bool value)
 {
     state.settingsOptimizationEnabled = value;
+    state.recording.brush.recordingType = fixupRecordingType(state);
+    state.scheduleAlert = calculateScheduleAlert(state);
     return state;
 }
 
@@ -520,6 +572,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.motionAlert = {};
     state.analytics.enabledEngines = {};
     state.analytics.settingsValuesByEngineId = {};
+    state.enableMotionDetection = {};
 
     state.deviceType = firstCamera
         ? QnDeviceDependentStrings::calculateDeviceType(firstCamera->resourcePool(), cameras)
@@ -622,8 +675,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
         state.recording.customBitrateAvailable = true;
 
-        state.singleCameraSettings.enableMotionDetection.setBase(
-            isMotionDetectionEnabled(firstCamera));
+        fetchFromCameras<bool>(state.enableMotionDetection, cameras, &isMotionDetectionEnabled);
 
         auto regionList = firstCamera->getMotionRegionList();
         const int channelCount = firstCamera->getVideoLayout()->channelCount();
@@ -815,6 +867,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
             });
     }
 
+    state.recording.brush.recordingType = fixupRecordingType(state);
+    state.scheduleAlert = calculateScheduleAlert(state);
     return state;
 }
 
@@ -850,10 +904,8 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
     State state,
     Qn::RecordingType value)
 {
-    NX_ASSERT(value != Qn::RecordingType::motionOnly || state.hasMotion());
-    NX_ASSERT(value != Qn::RecordingType::motionAndLow
-        || (state.hasMotion()
-            && state.devicesDescription.hasDualStreamingCapability == CombinedValue::All));
+    NX_ASSERT(value != Qn::RecordingType::motionOnly || state.isMotionDetectionEnabled());
+    NX_ASSERT(value != Qn::RecordingType::motionAndLow || state.supportsMotionPlusLQ());
 
     state.recording.brush.recordingType = value;
     if (value == Qn::RecordingType::motionAndLow)
@@ -1043,7 +1095,7 @@ State CameraSettingsDialogStateReducer::setMaxRecordingDaysValue(State state, in
 
 State CameraSettingsDialogStateReducer::setRecordingBeforeThresholdSec(State state, int value)
 {
-    NX_ASSERT(state.hasMotion());
+    NX_ASSERT(state.isMotionDetectionEnabled());
     state.hasChanges = true;
     state.recording.thresholds.beforeSec.setUser(value);
     return state;
@@ -1051,7 +1103,7 @@ State CameraSettingsDialogStateReducer::setRecordingBeforeThresholdSec(State sta
 
 State CameraSettingsDialogStateReducer::setRecordingAfterThresholdSec(State state, int value)
 {
-    NX_ASSERT(state.hasMotion());
+    NX_ASSERT(state.isMotionDetectionEnabled());
     state.hasChanges = true;
     state.recording.thresholds.afterSec.setUser(value);
     return state;
@@ -1115,8 +1167,13 @@ State CameraSettingsDialogStateReducer::setAudioEnabled(State state, bool value)
 
 State CameraSettingsDialogStateReducer::setMotionDetectionEnabled(State state, bool value)
 {
+    if (!NX_ASSERT(state.isSingleCamera()))
+        return state;
+
     state.hasChanges = true;
-    state.singleCameraSettings.enableMotionDetection.setUser(value);
+    state.enableMotionDetection.setUser(value);
+    state.recording.brush.recordingType = fixupRecordingType(state);
+    state.scheduleAlert = calculateScheduleAlert(state);
     return state;
 }
 
@@ -1199,6 +1256,8 @@ State CameraSettingsDialogStateReducer::setDualStreamingDisabled(State state, bo
 
     state.expert.dualStreamingDisabled.setUser(value);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.recording.brush.recordingType = fixupRecordingType(state);
+    state.scheduleAlert = calculateScheduleAlert(state);
     state.hasChanges = true;
     return state;
 }
@@ -1288,6 +1347,8 @@ State CameraSettingsDialogStateReducer::setForcedMotionStreamType(
         : CombinedValue::All;
 
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
+    state.recording.brush.recordingType = fixupRecordingType(state);
+    state.scheduleAlert = calculateScheduleAlert(state);
     state.hasChanges = true;
     return state;
 }

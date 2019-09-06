@@ -1136,7 +1136,7 @@ Do you want to delete it anyway?</source>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation>นี้คืออะไร</translation>
+      <translation>นี้คืออะไร&apos;s</translation>
     </message>
   </context>
   <context>

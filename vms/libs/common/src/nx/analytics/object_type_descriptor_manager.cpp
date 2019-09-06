@@ -137,16 +137,24 @@ ScopedObjectTypeIds ObjectTypeDescriptorManager::compatibleObjectTypeIds(
     ScopedObjectTypeIds result;
     for (const auto& engine: compatibleEngines)
     {
-        const auto objectTypeDescriptors = engine->analyticsObjectTypeDescriptors();
-        for (const auto& [objectTypeId, objectTypeDescriptor]: objectTypeDescriptors)
+        const bool engineIsEnabled =
+            device->enabledAnalyticsEngines().contains(engine->getId());
+
+        if (engineIsEnabled || engine->isDeviceDependent())
         {
-            for (const auto& scope: objectTypeDescriptor.scopes)
-                result[scope.engineId][scope.groupId].insert(objectTypeId);
+            auto supported = supportedObjectTypeIds(device);
+            MapHelper::merge(&result, supported, mergeObjectTypeIds);
+        }
+        else
+        {
+            const auto objectTypeDescriptors = engine->analyticsObjectTypeDescriptors();
+            for (const auto& [objectTypeId, objectTypeDescriptor]: objectTypeDescriptors)
+            {
+                for (const auto& scope: objectTypeDescriptor.scopes)
+                    result[scope.engineId][scope.groupId].insert(objectTypeId);
+            }
         }
     }
-
-    auto supported = supportedObjectTypeIds(device);
-    MapHelper::merge(&result, supported, mergeObjectTypeIds);
 
     return result;
 }

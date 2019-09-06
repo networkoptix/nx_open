@@ -308,7 +308,7 @@ void QnAccessibleResourcesWidget::initControlsModel()
         nx::vms::api::ResourceData::getFixedTypeId(kDummyResourceId)));
     dummy->setName(tr("All Cameras & Resources"));
     /* Create separate dummy resource id for each filter, but once per application run. */
-    dummy->setId(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
+    dummy->setIdUnsafe(QnUuid::createUuidFromPool(guidFromArbitraryData(kDummyResourceId).getQUuid(), m_filter));
     qnResIconCache->setKey(dummy, QnResourceIconCache::Cameras);
     m_controlsModel->setResources({dummy});
     m_controlsModel->setHasCheckboxes(true);

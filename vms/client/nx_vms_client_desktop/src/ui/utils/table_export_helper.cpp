@@ -1,12 +1,8 @@
 #include "table_export_helper.h"
 
 #include <QtCore/QMimeData>
-#include <QtCore/QAbstractItemModel>
-
-#include <QtGui/QClipboard>
-
-#include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QApplication>
+#include <QtGui/QClipboard>
 
 #include <client/client_settings.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
@@ -15,7 +11,11 @@
 
 #include <utils/common/html.h>
 
-void QnTableExportHelper::exportToFile(QAbstractItemView* grid, bool onlySelected, QWidget* parent, const QString& caption)
+void QnTableExportHelper::exportToFile(
+    const QAbstractItemModel* tableModel,
+    const QModelIndexList& indexes,
+    QWidget* parent,
+    const QString& caption)
 {
     QString previousDir = qnSettings->lastExportDir();
     if (previousDir.isEmpty())
@@ -68,26 +68,27 @@ void QnTableExportHelper::exportToFile(QAbstractItemView* grid, bool onlySelecte
     }
     qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
 
-
     QString textData;
     QString htmlData;
-    getGridData(grid, onlySelected, L';', &textData, &htmlData);
+    getGridData(tableModel, indexes, L';', textData, htmlData);
 
-    QFile f(fileName);
-    if (f.open(QFile::WriteOnly))
+    QFile file(fileName);
+    if (file.open(QFile::WriteOnly | QFile::Truncate))
     {
         if (fileName.endsWith(lit(".html")) || fileName.endsWith(lit(".htm")))
-            f.write(htmlData.toUtf8());
+            file.write(htmlData.toUtf8());
         else
-            f.write(textData.toUtf8());
+            file.write(textData.toUtf8());
     }
 }
 
-void QnTableExportHelper::copyToClipboard(QAbstractItemView* grid, bool onlySelected)
+void QnTableExportHelper::copyToClipboard(
+    const QAbstractItemModel* tableModel,
+    const QModelIndexList& indexes)
 {
     QString textData;
     QString htmlData;
-    getGridData(grid, onlySelected, L'\t', &textData, &htmlData);
+    getGridData(tableModel, indexes, L'\t', textData, htmlData);
 
     QMimeData* mimeData = new QMimeData();
     mimeData->setText(textData);
@@ -95,14 +96,15 @@ void QnTableExportHelper::copyToClipboard(QAbstractItemView* grid, bool onlySele
     QApplication::clipboard()->setMimeData(mimeData);
 }
 
-void QnTableExportHelper::getGridData(QAbstractItemView* grid, bool onlySelected, const QChar& textDelimiter, QString* textData, QString* htmlData)
+void QnTableExportHelper::getGridData(
+    const QAbstractItemModel* tableModel,
+    const QModelIndexList& indexes,
+    const QChar& textDelimiter,
+    QString& textData,
+    QString& htmlData)
 {
-    QAbstractItemModel *model = grid->model();
-    QModelIndexList list = onlySelected
-        ? grid->selectionModel()->selectedIndexes()
-        : getAllIndexes(model);
-
-    std::sort(list.begin(), list.end());
+    QModelIndexList sortedIndexes = indexes;
+    std::sort(sortedIndexes.begin(), sortedIndexes.end());
 
     QString textResult;
     QString htmlResult;
@@ -113,11 +115,12 @@ void QnTableExportHelper::getGridData(QAbstractItemView* grid, bool onlySelected
 
         { /* Creating header. */
             QnHtmlTag rowGuard("tr", htmlResult);
-            for (int i = 0; i < list.size() && list[i].row() == list[0].row(); ++i)
+            for (int i = 0;
+                i < sortedIndexes.size() && sortedIndexes[i].row() == sortedIndexes[0].row(); ++i)
             {
-                int column = list[i].column();
+                int column = sortedIndexes[i].column();
 
-                QString header = model->headerData(column, Qt::Horizontal).toString();
+                QString header = tableModel->headerData(column, Qt::Horizontal).toString();
                 QnHtmlTag thTag("th", htmlResult, QnHtmlTag::NoBreaks);
                 htmlResult.append(header);
 
@@ -132,11 +135,11 @@ void QnTableExportHelper::getGridData(QAbstractItemView* grid, bool onlySelected
             QScopedPointer<QnHtmlTag> rowTag;
 
             int prevRow = -1;
-            for (int i = 0; i < list.size(); ++i)
+            for (int i = 0; i < sortedIndexes.size(); ++i)
             {
-                if (list[i].row() != prevRow)
+                if (sortedIndexes[i].row() != prevRow)
                 {
-                    prevRow = list[i].row();
+                    prevRow = sortedIndexes[i].row();
                     textResult.append(lit("\n"));
                     rowTag.reset();   /*< close tag before opening new. */
                     rowTag.reset(new QnHtmlTag("tr", htmlResult));
@@ -146,23 +149,24 @@ void QnTableExportHelper::getGridData(QAbstractItemView* grid, bool onlySelected
                     textResult.append(textDelimiter);
                 }
 
-                QString textData = model->data(list[i], Qt::DisplayRole).toString();
+                QString textData = tableModel->data(sortedIndexes[i], Qt::DisplayRole).toString();
                 textResult.append(textData);
 
-                QString htmlData = model->data(list[i], Qn::DisplayHtmlRole).toString();
-                if (htmlData.isEmpty())
-                    htmlData = escapeHtml(textData);
+                QString dataString =
+                    tableModel->data(sortedIndexes[i], Qn::DisplayHtmlRole).toString();
+                if (dataString.isEmpty())
+                    dataString = escapeHtml(textData);
 
                 QnHtmlTag cellTag("td", htmlResult, QnHtmlTag::NoBreaks);
-                htmlResult.append(htmlData);
+                htmlResult.append(dataString);
             }
         }
 
         textResult.append(lit("\n"));
     }
 
-    *textData = textResult;
-    *htmlData = htmlResult;
+    textData = textResult;
+    htmlData = htmlResult;
 }
 
 QModelIndexList QnTableExportHelper::getAllIndexes(QAbstractItemModel* model)
@@ -177,4 +181,79 @@ QModelIndexList QnTableExportHelper::getAllIndexes(QAbstractItemModel* model)
         }
     }
     return result;
+}
+
+QnTableExportCompositeModel::QnTableExportCompositeModel(
+    QList<QAbstractItemModel*> models,
+    QObject* parent)
+    :
+    QAbstractItemModel(parent),
+    m_models(models)
+{
+}
+
+int QnTableExportCompositeModel::rowCount(const QModelIndex& parent) const
+{
+    if (m_models.isEmpty() || parent.isValid())
+        return 0;
+    return std::accumulate(m_models.cbegin(), m_models.cend(), 0,
+        [](int sum, QAbstractItemModel* model) { return sum + model->rowCount(QModelIndex()); });
+}
+
+int QnTableExportCompositeModel::columnCount(const QModelIndex& parent) const
+{
+    if (m_models.isEmpty() || parent.isValid())
+        return 0;
+    return m_models.first()->columnCount(QModelIndex());
+}
+
+QVariant QnTableExportCompositeModel::data(const QModelIndex& index, int role) const
+{
+    const auto subTableRow = calculateSubTableRow(index.row());
+    const auto subModel = m_models.at(subTableRow.first);
+    if (subModel->columnCount() > index.column())
+        return subModel->data(subModel->index(subTableRow.second, index.column(), QModelIndex()));
+    return QVariant();
+}
+
+QVariant QnTableExportCompositeModel::headerData(
+    int section,
+    Qt::Orientation orientation,
+    int role) const
+{
+    if (orientation == Qt::Horizontal)
+    {
+        return m_models.first()->headerData(section, orientation, role);
+    }
+    else
+    {
+        auto subTableRow = calculateSubTableRow(section);
+        const auto subModel = m_models.at(subTableRow.first);
+        return subModel->headerData(subTableRow.second, orientation, role);
+    }
+}
+
+QModelIndex QnTableExportCompositeModel::index(
+    int row,
+    int column,
+    const QModelIndex& parent) const
+{
+    return createIndex(row, column);
+}
+
+QModelIndex QnTableExportCompositeModel::parent(const QModelIndex& index) const
+{
+    return QModelIndex();
+}
+
+std::pair<int, int> QnTableExportCompositeModel::calculateSubTableRow(int row) const
+{
+    int subTableIndex = 0;
+    int subTableRow = row;
+    while (subTableRow >= m_models.at(subTableIndex)->rowCount(QModelIndex()))
+    {
+        subTableRow -= m_models.at(subTableIndex)->rowCount(QModelIndex());
+        subTableIndex++;
+    }
+    return std::make_pair(subTableIndex, subTableRow);
 }

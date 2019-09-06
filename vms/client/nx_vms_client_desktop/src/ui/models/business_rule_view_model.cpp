@@ -43,6 +43,7 @@
 #include <nx/network/http/http_types.h>
 
 #include <nx/fusion/model_functions.h>
+#include <core/resource_access/resource_access_subject.h>
 
 using namespace nx;
 
@@ -198,7 +199,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     QnBusinessTypesComparator lexComparator(true);
     for (const auto eventType: lexComparator.lexSortedEvents(EventSubType::user))
     {
-        if (eventType == EventType::pluginEvent)
+        if (eventType == EventType::pluginDiagnosticEvent)
         {
             /** Show it only for users who have at least one plugin installed. */
             const auto pirs =
@@ -492,7 +493,7 @@ void QnBusinessRuleViewModel::setEventType(const vms::api::EventType value)
 
         switch (m_eventType)
         {
-            case EventType::pluginEvent:
+            case EventType::pluginDiagnosticEvent:
             {
                 using namespace nx::vms::api;
                 EventLevels levels = 0;

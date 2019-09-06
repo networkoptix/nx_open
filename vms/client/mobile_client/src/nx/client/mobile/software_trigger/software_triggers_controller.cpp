@@ -16,6 +16,7 @@
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/client/core/common/utils/ordered_requests_manager.h>
+#include <core/resource_access/resource_access_subject.h>
 
 namespace nx {
 namespace client {

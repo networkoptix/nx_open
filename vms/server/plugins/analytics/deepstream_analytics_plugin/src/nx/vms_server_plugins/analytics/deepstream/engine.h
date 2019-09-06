@@ -12,6 +12,7 @@
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
+#include <nx/sdk/analytics/helpers/result_aliases.h>
 
 #include <nx/vms_server_plugins/analytics/deepstream/default/object_class_description.h>
 
@@ -30,22 +31,22 @@ public:
     
     virtual void setEngineInfo(const nx::sdk::analytics::IEngineInfo* engineInfo) override;
 
-    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
+    virtual nx::sdk::StringMapResult setSettings(const nx::sdk::IStringMap* settings) override;
 
-    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
+    virtual nx::sdk::SettingsResponseResult pluginSideSettings() const override;
 
-    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
+    virtual nx::sdk::StringResult manifest() const override;
 
-    virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
-        const nx::sdk::IDeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
+    virtual nx::sdk::analytics::MutableDeviceAgentResult obtainDeviceAgent(
+        const nx::sdk::IDeviceInfo* deviceInfo) override;
 
-    virtual void executeAction(nx::sdk::analytics::IAction*, nx::sdk::Error*) override;
+    virtual nx::sdk::Result<void> executeAction(nx::sdk::analytics::IAction*) override;
 
     std::vector<ObjectClassDescription> objectClassDescritions() const;
 
     std::chrono::microseconds currentTimeUs() const;
 
-    nx::sdk::Error setHandler(nx::sdk::analytics::IEngine::IHandler* handler);
+    void setHandler(nx::sdk::analytics::IEngine::IHandler* handler);
 
     virtual bool isCompatible(const nx::sdk::IDeviceInfo* deviceInfo) const override;
 

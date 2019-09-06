@@ -8,6 +8,7 @@
 #include <common/common_module.h>
 
 #include <client/client_module.h>
+#include <client/client_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/layout_tour_manager.h>
@@ -42,6 +43,7 @@
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <core/resource_access/resource_access_subject.h>
 
 namespace {
 
@@ -317,7 +319,7 @@ void StartupActionsHandler::handleAcsModeResources(
         windowStart = maxTime - kAcsModeTimelineWindowSize;
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid());
+    layout->setIdUnsafe(QnUuid::createUuid());
     layout->setParentId(context()->user()->getId());
     layout->setCellSpacing(0);
     resourcePool()->addResource(layout);
@@ -356,7 +358,7 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
     const bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
     if (systemIsCloud)
     {
-        qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
+        qnClientModule->cloudStatusWatcher()->setInitialCredentials(credentials);
         NX_DEBUG(this, "Custom URI: System is cloud, connecting to the cloud first");
     }
 
@@ -415,10 +417,23 @@ bool StartupActionsHandler::connectToSystemIfNeeded(
     if (connectUsingCustomUri(startupParameters.customUri))
         return true;
 
+    // A local file is being opened.
     if (!startupParameters.instantDrop.isEmpty() || haveInputFiles)
         return false;
 
-    return connectUsingCommandLineAuth(startupParameters);
+    if (connectUsingCommandLineAuth(startupParameters))
+        return true;
+
+    // Attempt auto-login, if needed.
+    if (qnSettings->autoLogin() && qnSettings->lastUsedConnection().url.isValid()
+        && !qnSettings->lastUsedConnection().localId.isNull())
+    {
+        menu()->trigger(ConnectAction,
+            Parameters().withArgument(Qn::LogonParametersRole, LogonParameters()));
+        return true;
+    }
+
+    return false;
 }
 
 bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& startupParameters)
@@ -436,7 +451,7 @@ bool StartupActionsHandler::connectToCloudIfNeeded(const QnStartupParameters& st
     const nx::vms::common::Credentials credentials(auth.user, auth.password);
 
     NX_DEBUG(this, "Custom URI: Connecting to cloud as %1", auth.user);
-    qnClientModule->cloudStatusWatcher()->setCredentials(credentials, true);
+    qnClientModule->cloudStatusWatcher()->setInitialCredentials(credentials);
     return true;
 }
 

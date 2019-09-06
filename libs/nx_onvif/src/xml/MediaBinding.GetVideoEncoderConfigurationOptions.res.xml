@@ -51,7 +51,7 @@
   <!-- __onvifMedia__GetVideoEncoderConfigurationOptions(..., _onvifMedia__GetVideoEncoderConfigurationOptionsResponse &onvifMedia__GetVideoEncoderConfigurationOptionsResponse) -->
   <onvifMedia:GetVideoEncoderConfigurationOptionsResponse>
    <!-- tt__VideoEncoderConfigurationOptions *Options -->
-   <onvifMedia:Options>
+   <onvifMedia:Options GuaranteedFrameRateSupported="false">
     <!-- tt__IntRange *QualityRange -->
     <tt:QualityRange>
      <!-- int Min -->

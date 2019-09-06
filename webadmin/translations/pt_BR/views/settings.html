@@ -25,7 +25,7 @@
                             <h3>Porta</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="Porto" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="Porta" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
@@ -87,8 +87,8 @@
 
                     <div ng-if="canMerge" >
                         <form class="form-horizontal" >
-                            <h3>Fundir Sistemas</h3>
-                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Fundir Sistemas</button></p>
+                            <h3>"Merge" dos Sistemas</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">"Merge" dos Sistemas</button></p>
                         </form>
                     </div>
 

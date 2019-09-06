@@ -2,7 +2,7 @@
 
 #include <api/global_settings.h>
 #include <nx/utils/random.h>
-#include <utils/memory/cyclic_allocator.h>
+#include <nx/utils/memory/cyclic_allocator.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <common/common_module.h>
@@ -91,6 +91,7 @@ void GopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
             m_gotIFramesMask |= 1 << video->channelNumber;
             int ch = video->channelNumber;
             m_lastKeyFrame[ch] = video;
+            m_lastKeyFrameRtsp[ch] = video;
             const qint64 removeThreshold = video->timestamp - kKeepIframesInterval;
 
             if (m_lastKeyFrames[ch].empty()
@@ -123,6 +124,7 @@ void GopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
     {
         NX_VERBOSE(this, "%1(%2 us, audio)", __func__, nonConstData->timestamp);
         m_lastAudioData = std::move(audio);
+        m_lastAudioDataRtsp = m_lastAudioData;
     }
     else
     {
@@ -337,6 +339,23 @@ QnConstCompressedAudioDataPtr GopKeeper::getLastAudioFrame() const
 {
     QnMutexLocker lock( &m_queueMtx );
     return m_lastAudioData;
+}
+
+QnConstCompressedVideoDataPtr GopKeeper::getLastVideoFrameRtsp(int channel) const
+{
+    if (channel >= CL_MAX_CHANNELS)
+    {
+        NX_WARNING(this, "Channel number out of range: %1", channel);
+        return nullptr;
+    }
+    QnMutexLocker lock(&m_queueMtx);
+    return m_lastKeyFrameRtsp[channel];
+}
+
+QnConstCompressedAudioDataPtr GopKeeper::getLastAudioFrameRtsp() const
+{
+    QnMutexLocker lock(&m_queueMtx);
+    return m_lastAudioDataRtsp;
 }
 
 void GopKeeper::updateCameraActivity()

@@ -313,7 +313,7 @@ RuleList Rule::getDefaultRules()
         << getSystemRules()
         << getRulesUpd43()
         << getRulesUpd48()
-        << getPluginEventUpdateRules();
+        << getPluginDiagnosticEventUpdateRules();
 
     auto disabledRules = getDisabledRulesUpd43();
 
@@ -366,7 +366,7 @@ RuleList Rule::getDisabledRulesUpd43()
     };
 }
 
-RuleList Rule::getPluginEventUpdateRules()
+RuleList Rule::getPluginDiagnosticEventUpdateRules()
 {
     using namespace nx::vms::api;
     RulePtr rule(new Rule(
@@ -374,7 +374,7 @@ RuleList Rule::getPluginEventUpdateRules()
         /*aggregationPeriod*/ 0,
         /*isSystem*/ false,
         ActionType::showPopupAction,
-        EventType::pluginEvent,
+        EventType::pluginDiagnosticEvent,
         /*subjects*/ {},
         /*allUsers*/ true));
 

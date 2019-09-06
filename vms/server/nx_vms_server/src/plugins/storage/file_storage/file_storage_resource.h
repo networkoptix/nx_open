@@ -93,7 +93,7 @@ private:
 
     void setLocalPathSafe(const QString &path);
     QString getLocalPathSafe() const;
-    bool isMounted() const;
+    virtual bool isMounted() const;
     nx::vms::server::RootFileSystem* rootTool() const;
 
 public:

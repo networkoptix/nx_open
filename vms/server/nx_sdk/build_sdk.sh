@@ -9,7 +9,7 @@ SDK_NAME=nx_sdk
 TARGET_DIR=$SDK_NAME
 VERSION=1.6.0
 SERVER_PLUGINS_DIR=../plugins/device
-NX_SDK_DIR=../../../libs/nx_sdk
+NX_SDK_DIR=../../../vms/libs/nx_sdk
 
 if [ -z "$DOXYCHECK" ]; then
      sudo apt-get install -y doxygen
