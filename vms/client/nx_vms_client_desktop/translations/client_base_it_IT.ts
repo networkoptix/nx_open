@@ -1825,15 +1825,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event rule changed</source>
-      <translation type="unfinished">Event rule changed</translation>
+      <translation>Regola evento modificata</translation>
     </message>
     <message>
       <source>Event rule removed</source>
-      <translation type="unfinished">Event rule removed</translation>
+      <translation>Regola evento rimossa</translation>
     </message>
     <message>
       <source>Event rules reset to default</source>
-      <translation type="unfinished">Event rules reset to default</translation>
+      <translation>Regole eventi ripristinate a default</translation>
     </message>
   </context>
   <context>
@@ -6016,7 +6016,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">If Failover is enabled, server may still request camera status updates regardless of this setting.</translation>
+      <translation>Se il failover è abilitato, il server potrebbe comunque richiedere aggiornamenti sullo stato della telecamera indipendentemente da questa impostazione.</translation>
     </message>
   </context>
   <context>

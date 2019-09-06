@@ -87,6 +87,7 @@ const std::string kThrowPluginDiagnosticEventsFromEngineSetting{
     "throwPluginDiagnosticEventsFromDeviceAgent"};
 const std::string kLeakFrames{"leakFrames"};
 const std::string kAdditionalFrameProcessingDelayMs{"additionalFrameProcessingDelayMs"};
+const std::string kOverallMetadataDelayMsSetting{"overallMetadataDelayMs"};
 
 } // namespace stub
 } // namespace analytics

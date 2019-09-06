@@ -49,6 +49,11 @@ public:
 
     void updateServer(const QnMediaServerResourcePtr& server);
 
+    /**
+     * Debug log representation. Used by toString(const T*).
+     */
+    QString idForToStringFromPtr() const;
+
 signals:
     void periodsChanged(Qn::TimePeriodContent type, qint64 startTimeMs = 0);
     void loadingFailed();
@@ -65,7 +70,6 @@ private:
     void init();
     void initLoaders();
     void updateTimePeriods(Qn::TimePeriodContent dataType, bool forced = false);
-    void trace(const QString& message, Qn::TimePeriodContent periodType = Qn::RecordingContent);
 
     void discardCachedDataType(Qn::TimePeriodContent type);
 

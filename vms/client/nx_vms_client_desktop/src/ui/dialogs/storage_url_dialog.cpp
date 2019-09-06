@@ -5,7 +5,6 @@
 
 #include <QtCore/QCryptographicHash>
 
-#include <api/media_server_connection.h>
 #include <api/runtime_info_manager.h>
 
 #include "common/common_module.h"

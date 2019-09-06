@@ -13,7 +13,6 @@ extern "C"
 }
 
 #include <api/app_server_connection.h>
-#include <api/session_manager.h>
 #include <api/network_proxy_factory.h>
 
 #include <common/common_module.h>

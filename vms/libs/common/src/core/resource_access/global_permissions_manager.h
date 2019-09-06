@@ -29,6 +29,11 @@ public:
     /** Get a set of global permissions that will not work without the given one. */
     static GlobalPermissions dependentPermissions(GlobalPermission value);
 
+    /** Checks if specified permissions contains required one. */
+    static bool containsPermission(
+        GlobalPermissions globalPermissions,
+        GlobalPermission requiredPermission);
+
     /**
     * \param user                      User or role to get global permissions for.
     * \returns                         Global permissions of the given user,

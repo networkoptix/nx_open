@@ -332,7 +332,7 @@ static InformationError parseAndExtractLegacyInformation(
 static InformationError fillUpdateInformation(
     nx::network::http::AsyncClient* httpClient,
     QString publicationKey,
-    nx::vms::api::SoftwareVersion currentVersion,
+    [[maybe_unused]] nx::vms::api::SoftwareVersion currentVersion,
     Information* result,
     QList<AlternativeServerData>* alternativeServers)
 {
@@ -357,8 +357,8 @@ static InformationError fillUpdateInformation(
 
     if (publicationKey == "latest")
     {
-        // Extracting latest version from
-        QString version = currentVersion.toString(nx::vms::api::SoftwareVersion::MinorFormat);
+        // We should take `current_release` and find this version in `releases` table.
+        QString version = customizationInfo.current_release;
         auto it = customizationInfo.releases.find(version);
         if (it == customizationInfo.releases.end())
             return InformationError::noNewVersion;

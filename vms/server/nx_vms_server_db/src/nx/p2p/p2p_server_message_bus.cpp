@@ -577,7 +577,10 @@ void ServerMessageBus::resubscribePeers(
 {
     QMap<P2pConnectionPtr, QVector<vms::api::PersistentIdData>> updatedSubscription;
     for (auto itr = newSubscription.begin(); itr != newSubscription.end(); ++itr)
+    {
         updatedSubscription[itr.value()].push_back(itr.key());
+        NX_ASSERT(itr.key() != localPeer()); //< Subscription on myself is not allowed.
+    }
     for (auto& value : updatedSubscription)
         std::sort(value.begin(), value.end());
     for (auto connection : m_connections.values())

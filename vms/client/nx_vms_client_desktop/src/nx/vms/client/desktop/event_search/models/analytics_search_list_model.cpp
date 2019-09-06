@@ -44,7 +44,7 @@ void AnalyticsSearchListModel::setSelectedObjectType(const QString& value)
 
 bool AnalyticsSearchListModel::isConstrained() const
 {
-    return filterRect().isValid() || !filterText().isEmpty() || base_type::isConstrained();
+    return filterRect().isValid() || !filterText().trimmed().isEmpty() || base_type::isConstrained();
 }
 
 bool AnalyticsSearchListModel::hasAccessRights() const

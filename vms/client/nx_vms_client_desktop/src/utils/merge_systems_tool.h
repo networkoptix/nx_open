@@ -29,7 +29,7 @@ public:
         const nx::utils::Url &url,
         const QAuthenticator& auth);
 
-  signals:
+signals:
     void systemFound(
         utils::MergeSystemsStatus::Value mergeStatus,
         const nx::vms::api::ModuleInformation& moduleInformation,
@@ -39,26 +39,29 @@ public:
         const nx::vms::api::ModuleInformation& moduleInformation,
         int requestHandle);
 
-private slots:
+private:
     void at_pingSystem_finished(
-        int status,
-        const nx::vms::api::ModuleInformation& moduleInformation,
+        bool success,
         int handle,
+        const nx::vms::api::ModuleInformation& moduleInformation,
         const QString& errorString);
+
     void at_mergeSystem_finished(
         bool success,
+        int handle,
         const nx::vms::api::ModuleInformation& moduleInformation,
-        int handle,
         const QString& errorString);
+
     void at_getNonceForMergeFinished(
-        int status,
+        bool success,
+        int handle,
         const QnGetNonceReply& nonce,
-        int handle,
         const QString& errorString);
+
     void at_getNonceForPingFinished(
-        int status,
-        const QnGetNonceReply& nonceReply,
+        bool success,
         int handle,
+        const QnGetNonceReply& nonceReply,
         const QString& errorString);
 
 private:

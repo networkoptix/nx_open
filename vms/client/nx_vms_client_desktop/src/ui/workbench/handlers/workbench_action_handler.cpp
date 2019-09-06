@@ -22,7 +22,6 @@
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
-#include <api/media_server_connection.h>
 
 #include <nx/vms/event/action_parameters.h>
 

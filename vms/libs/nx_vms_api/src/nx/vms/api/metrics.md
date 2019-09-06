@@ -56,29 +56,29 @@ Example:
 {
   "system": {
     "info": {
-      "recommendedServers": { "calculate": "const 100" }
+      "recommendedServers": { "calculate": "const 100" },
       "servers": { "alarms": [{
         "level": "warning",
-        "condition": "gt servers recommendedServers",
-        "text": "The maximum number of {recommendedServers} servers per system is reached. Create another system to use more servers"
+        "condition": "gt %servers %recommendedServers",
+        "text": "The maximum number of %recommendedServers servers per system is reached. Create another system to use more servers"
       }]},
       "recommendedCameraChannels": { "calculate": "const 1000" },
       "cameraChannels": { "alarms": [{
         "level": "warning",
-        "condition": "gt cameraChannels recommendedCameraChannels",
-        "text": "The maximum number of {recommendedCameraChannels} cameras per system is reached. Create another system to use more cameras"
+        "condition": "gt %cameraChannels %recommendedCameraChannels",
+        "text": "The maximum number of %recommendedCameraChannels cameras per system is reached. Create another system to use more cameras"
       }]}
     },
     "licenses": {
       "professional": { "alarms": [
         {
           "level": "danger",
-          "condition": "gt requiredProfessional 0",
-          "text": "{requiredProfessional} Professional License Channels are required"
+          "condition": "gt %requiredProfessional 0",
+          "text": "%requiredProfessional Professional License Channels are required"
         }, {
           "level": "warning",
-          "condition": "gt expiringProfessional 0",
-          "text": "{expiringProfessional} Professional License Channels expiring within ??? days"
+          "condition": "gt %expiringProfessional 0",
+          "text": "expiringProfessional Professional License Channels expiring within 30 days"
         }
       ]},
       ...
@@ -86,14 +86,15 @@ Example:
   },
   "servers": {
     "availability": {
-      "status": { "alarms": [{ "level": "error", "condition": "ne status 'Online'" }]},
-      "offlineEvents": { "alarms": [{ "level": "error", "condition": "gt offlineEvents 0" }]},
+      "status": { "alarms": [{ "level": "danger", "condition": "ne %status Online" }]},
+      "offlineEvents": { "alarms": [{ "level": "warning", "condition": "gt %offlineEvents 0" }]},
     },
     "load": {
-      "recommendedCpuUsageP": [{ "calculate": "eq 95" }],
+      "recommendedCpuUsageP": { "calculate": "const 95" },
       "totalCpuUsageP": { "alarms": [{
         "level": "warning",
-        "condition": "gt totalCpuUsageP recommendedCpuUsageP"
+        "condition": "gt %totalCpuUsageP %recommendedCpuUsageP",
+        "text": "CPU usage is %totalCpuUsageP"
       }]},
       ...
     },
@@ -133,8 +134,8 @@ Format:
   "<resourceTypeGroup>": [ // e.g. systems / servers/ cameras / etc.
     {
       "id": "<groupId>",
-      "name": "<groupName",
-      "parameters": [
+      "name": "<groupName>",
+      "values": [
         {
           "id": "<parameterId>",
           "name": "<parameterName>",
@@ -159,7 +160,8 @@ Example:
     {
       "id": "info",
       "name": "Info",
-      "parameters": [
+      "values": [
+        { "id": "name", "name": "Name", "display": "panel" },
         { "id": "servers", "name": "Servers", "display": "panel" },
         { "id": "offlineServers", "name": "Offline Servers", "display": "panel" },
         { "id": "users", "name": "Users", "display": "panel" },
@@ -170,7 +172,7 @@ Example:
     }, {
       "id": "licenses",
       "name": "Licenses",
-      "parameters": [
+      "values": [
         { "id": "professional", "display": "panel" },
         { "id": "requiredProfessional", "display": "" }, //< May be omitted by compact option.
         { "id": "expiringProfessional", "display": "" }, //< May be omitted by compact option.
@@ -182,7 +184,8 @@ Example:
     {
       "id": "availability",
       "name": "Availability",
-      "parameters": [
+      "values": [
+        { "id": "name", "name": "Name", "display": "table&panel" },
         { "id": "status", "name": "Status", "display": "table&panel" },
         { "id": "offlineEvents", "name": "Offline Events", "display": "table&panel" },
         { "id": "uptime", "name": "Uptime", "unit": "s", "display": "table&panel" },
@@ -190,8 +193,8 @@ Example:
       ],
     }, {
       "id": "load",
-      "id": "Load",
-      "parameters": [
+      "name": "Load",
+      "values": [
         { "id": "totalCpuUsageP", "name": "CPU Usage", "unit": "%", "display": "table&panel" },
         { "id": "serverCpuUsageP", "name": "CPU Usage (VMS Server)", "unit": "%", "display": "table&panel" },
         { "id": "recommendedCpuUsageP", "unit": "%", "display": ""}, //< May be omitted by compact option.
@@ -201,21 +204,22 @@ Example:
       ]
     },
     ...
-    }
   ],
   "cameras": [
     {
       "id": "info",
       "name": "Info",
-      "parameters": [
-      { "id": "type", "name": "IP", "display": "table&panel" },
-      { "id": "ip", "name": "IP", "display": "table&panel" },
-      { "id": "status", "name": "Status", "display": "table&panel" },
+      "values": [
+        { "id": "name", "name": "Name", "display": "table&panel" },
+        { "id": "server", "name": "Server", "display": "table&panel" },
+        { "id": "type", "name": "Type", "display": "table&panel" },
+        { "id": "ip", "name": "IP", "display": "table&panel" },
+        { "id": "status", "name": "Status", "display": "table&panel" },
       ...
     }, {
       "id": "issues",
       "name": "Issues",
-      "parameters": [
+      "values": [
         { "id": "offlineEvents", "name": "Offline Events", "display": "table&panel" },
         { "id": "streamIssues", "name": "Stream Issues (1h)", "display": "table&panel" },
         { "id": "ipConflicts", "name": "IP conflicts (3m)", "display": "panel" }
@@ -224,7 +228,7 @@ Example:
     }, {
       "id": "primaryStream",
       "name": "Primary Stream",
-      "parameters": [
+      "values": [
         { "id": "targetFps", "name": "Target FPS", "unit": "fps", "display": "table&panel" },
         { "id": "actualFps", "name": "Actual FPS", "unit": "fps", "display": "table&panel" },
         { "id": "fpsDrops", "unit": "fps", "display": "" }, //< May be omitted by compact option.
@@ -248,9 +252,9 @@ Format:
 {
   "<resource_type_section>": {
     "<resource_uuid>": {
-      "name": "<resourceName>",
-      "parent": "<resourceId>",
-      "parameters": { "<groupId>": { "<parameterId>": "<parameterValue>" } }
+      "<groupId>": {
+        "<parameterId>": "<parameterValue>"
+      }
     }
   }
 }
@@ -261,75 +265,69 @@ Example:
 {
   "systems": {
     "SYSTEM_UUID_1" : {
-      "name": "System 1",
-      "values": {
+      "info": {
+        "name": "System 1",
         "servers": 105,
         "offlineServers": 0,
         "users": 10,
         "cameraChannels": 100,
-        "licenses": {
-          "professional": 20,
-          "requiredProfessional": 5, //< May be omitted by compact option.
-          "expiringProfessional": 10, //< May be omitted by compact option.
-          ...
-        },
         ...
         "recommendedServers": 100, //< May be omitted by compact option.
         "recommendedCameraChannels": 1000, //< May be omitted by compact option.
-      }
+      },
+      "licenses": {
+        "professional": 20,
+        "requiredProfessional": 5, //< May be omitted by compact option.
+        "expiringProfessional": 10, //< May be omitted by compact option.
+        ...
+      },
+      ...
     }
   },
   "servers": {
     "SERVER_UUID_1": {
-      "name": "Server 1",
-      "parent": "SYSTEM_UUID_1",
-      "values": {
-        "availability": { "status": "Online", "offlineEvents": 0, "uptime": 111111 },
-        "load": {
-          "totalCpuUsageP": 95,
-          "serverCpuUsageP": 90,
-          "ramUsageB": 2222222222,
-          "ramUsageP": 55,
-          "recommendedCpuUsageP": 90, //< May be omitted by compact option.
-          ...
-        },
+      "availability": { "name": "Server 1", "status": "Online", "offlineEvents": 0, "uptime": 111111 },
+      "load": {
+        "totalCpuUsageP": 95,
+        "serverCpuUsageP": 90,
+        "ramUsageB": 2222222222,
+        "ramUsageP": 55,
+        "recommendedCpuUsageP": 90, //< May be omitted by compact option.
         ...
-      }
+      },
+      ...
     },
     "SERVER_UUID_2": {
-      "name": "Server 2",
-      "parent": "SYSTEM_UUID_1",
-      "values": {
-        "availability": { "status": "Offline" }
-        // Most of the values are not present because we can not pull them from the offline server.
-      }
+      "availability": { "name": "Server 2", "status": "Offline" }
+      // Most of the values are not present because we can not pull them from the offline server.
     },
     ...
   },
   "cameras": {
     "CAMERA_UUID_1": {
-      "name": "DWC-112233",
-      "parent": "SERVER_UUID_1",
-      "values": {
-        "type": "camera",
-        "ip": "192.168.0.101",
-        "status": "Online",
-        "issues": { "offlineEvents": 0, "streamIssues": 0, "ipConflicts": 0 },
-        "primaryStream": { "bitrate": 2555555, "targetFps": 30, "actualFps": 25, "fpsDrops": 5 },
-        ...
-      }
+      "info": {
+        "name": "DWC-112233", "server": "Server 1",
+        "type": "camera", "ip": "192.168.0.101", "status": "Online", ...
+      },
+      "issues": { "offlineEvents": 0, "streamIssues": 0, "ipConflicts": 0, ... },
+      "primaryStream": { "bitrate": 2555555, "targetFps": 30, "actualFps": 25, "fpsDrops": 5, ... },
+      ...
     },
     "CAMERA_UUID_2": {
-      "name": "ACTi-456",
-      "parent": "SERVER_UUID_1",
-      "values": {
-        "type": "camera",
-        "ip": "192.168.0.102",
-        "status": "Unauthorized",
-        "issues": { "offlineEvents": 2, "streamIssues": 0, "ipConflicts": 0 },
-        "primaryStream": { "bitrate": 2555555, "targetFps": 30, "actualFps": 25, "fpsDrops": 5 },
-        ...
-      }
+      "info": {
+        "name": "ACTi-456", "server": "Server 1",
+        "type": "camera", "ip": "192.168.0.102", "status": "Unauthorized", ...
+      },
+      "issues": { "offlineEvents": 2, "streamIssues": 0, "ipConflicts": 0, ... },
+      "primaryStream": { "bitrate": 1333333, "targetFps": 15, "actualFps": 15, "fpsDrops": 5, ...},
+      ...
+    },
+    "CAMERA_UUID_3": {
+      "info": {
+        "name": "iqEve-666", "server": "Server 2",
+        "type": "camera", "ip": "192.168.0.103", "status": "Offline", ...
+      },
+      ...
     },
     ...
   },
@@ -360,42 +358,42 @@ Example:
     "resource": "SYSTEM_UUID_1",
     "parameter": "servers",
     "level": "warning",
-    "text": "The maximum number of 100 servers per system is reached. Create another system to use more servers",
+    "text": "The maximum number of 100 servers per system is reached. Create another system to use more servers"
   }, {
     "resource": "SYSTEM_UUID_1",
     "parameter": "licenses.professional",
     "level": "danger",
-    "text": "5 Professional License Channels are required",
+    "text": "5 Professional License Channels are required"
   }, {
     "resource": "SYSTEM_UUID_1",
     "parameter": "licenses.professional",
-    "level": "warning",
-    "text": "10 Professional License Channels expiring within ??? days",
+    "level": "danger",
+    "text": "10 Professional License Channels expiring within ??? days"
   }, {
     "resource": "SERVER_UUID_1",
     "parameter": "load.totalCpuUsageP",
-    "level": "danger",
-    "text": "CPU Usage is 95%",
+    "level": "warning",
+    "text": "CPU Usage is 95%"
   }, {
     "resource": "SERVER_UUID_2",
     "parameter": "availability.status",
     "level": "warning",
-    "text": "Status is Offline",
+    "text": "Status is Offline"
   }, {
     "resource": "CAMERA_UUID_1",
     "parameter": "primaryStream.targetFps",
     "level": "warning",
-    "text": "Actual FPS is 30",
+    "text": "Actual FPS is 30"
   }, {
     "resource": "CAMERA_UUID_2",
     "parameter": "status",
     "level": "warning",
-    "text": "Status is Unauthorized",
+    "text": "Status is Unauthorized"
   }, {
-    "resource": "CAMERA_UUID_2",
+    "resource": "CAMERA_UUID_3",
     "parameter": "issues.offlineEvents",
     "level": "warning",
-    "text": "Offline Events is 2",
+    "text": "Offline Events is 2"
   },
   ...
 ]

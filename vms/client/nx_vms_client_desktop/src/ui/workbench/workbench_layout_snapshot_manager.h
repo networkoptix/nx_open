@@ -5,8 +5,6 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/abstract_save_state_manager.h>
 
-#include <api/abstract_reply_processor.h>
-
 #include <client/client_globals.h>
 
 #include <ui/workbench/workbench_layout_snapshot.h>

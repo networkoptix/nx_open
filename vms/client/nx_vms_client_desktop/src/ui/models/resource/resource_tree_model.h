@@ -77,6 +77,8 @@ public:
 
     QnResourceTreeModelNodePtr rootNode(NodeType nodeType) const;
 
+    bool resetInProgress() const;
+
     // TODO: #vkutin Shouldn't be public
     QnResourceTreeModelNodeManager* nodeManager() const;
     QnResourceTreeModelLayoutNodeManager* layoutNodeManager() const;
@@ -200,6 +202,9 @@ private:
     //Probably turn QnResourceTreeModelUserNodes into such manager too.
     QnResourceTreeModelNodeManager* m_nodeManager = nullptr;
     QnResourceTreeModelLayoutNodeManager* m_layoutNodeManager = nullptr;
+
+    bool m_resetInProgress = false;
+    int m_userChangedDepth = 0;
 };
 
 Q_DECLARE_METATYPE(QnResourceTreeModel::Scope)

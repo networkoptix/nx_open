@@ -368,6 +368,7 @@ bool QnBusinessRuleViewModel::setData(Column column, const QVariant& value, int 
 
             switch (m_actionType)
             {
+                case ActionType::openLayoutAction:
                 case ActionType::showPopupAction:
                 {
                     auto params = m_actionParams;

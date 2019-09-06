@@ -191,7 +191,7 @@ public:
 
 public:
     MetadataType metadataType;
-    qint64 m_duration;
+    qint64 m_duration = 0;
     QnByteArray m_data;
 };
 

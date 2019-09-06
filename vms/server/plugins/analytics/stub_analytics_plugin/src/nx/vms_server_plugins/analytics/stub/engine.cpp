@@ -308,6 +308,14 @@ std::string Engine::manifestString() const
                                 "defaultValue": 30,
                                 "minValue": 1,
                                 "maxValue": 100000
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": ")json" + kOverallMetadataDelayMsSetting + R"json(",
+                                "caption": "Overall metadata delay, ms",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 1000000000
                             }
                         ]
                     },
@@ -338,7 +346,8 @@ std::string Engine::manifestString() const
                         "name": ")json" + kAdditionalFrameProcessingDelayMs + R"json(",
                         "caption": "Additional frame processing delay, ms",
                         "defaultValue": 0,
-                        "value": 0
+                        "minValue": 0,
+                        "maxValue": 1000000000
                     }
                 ]
             },

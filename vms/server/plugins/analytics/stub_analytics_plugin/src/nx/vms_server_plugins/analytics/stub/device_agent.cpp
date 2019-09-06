@@ -215,7 +215,11 @@ void DeviceAgent::processVideoFrame(const IDataPacket* videoFrame, const char* f
     }
 
     ++m_frameCounter;
-    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
+
+    const int64_t frameTimestamp = videoFrame->timestampUs();
+    m_lastVideoFrameTimestampUs = frameTimestamp;
+    if (m_frameTimestampQueue.empty() || m_frameTimestampQueue.back() < frameTimestamp)
+        m_frameTimestampQueue.push_back(frameTimestamp);
 }
 
 bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
@@ -394,6 +398,13 @@ void DeviceAgent::setObjectCount(int objectCount)
     m_objectContexts.resize(objectCount);
 }
 
+void DeviceAgent::cleanUpTimestampQueue()
+{
+    std::unique_lock<std::mutex> lock(m_objectGenerationMutex);
+    m_frameTimestampQueue.clear();
+    m_lastVideoFrameTimestampUs = 0;
+}
+
 IMetadataPacket* DeviceAgent::cookSomeEvents()
 {
     const auto descriptor = kEventsToFire[m_eventContext.currentEventTypeIndex];
@@ -458,11 +469,23 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
     if (m_lastVideoFrameTimestampUs == 0)
         return {};
 
+    if (m_frameTimestampQueue.empty())
+        return {};
+
+    const std::chrono::microseconds delay(
+        m_lastVideoFrameTimestampUs - m_frameTimestampQueue.front());
+
+    if (delay < m_deviceAgentSettings.overallMetadataDelay.load())
+        return {};
+
     if (m_frameCounter % m_deviceAgentSettings.generateObjectsEveryNFrames != 0)
         return {};
 
+    const auto metadataTimestamp = m_frameTimestampQueue.front();
+    m_frameTimestampQueue.pop_front();
+
     auto objectMetadataPacket = new ObjectMetadataPacket();
-    objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
+    objectMetadataPacket->setTimestampUs(metadataTimestamp);
     objectMetadataPacket->setDurationUs(0);
 
     for (auto& context: m_objectContexts)
@@ -494,7 +517,7 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
             const auto size = object->size();
             auto bestShotPacket = makeObjectTrackBestShotPacket(
                 object->id(),
-                m_lastVideoFrameTimestampUs,
+                metadataTimestamp,
                 Rect(position.x, position.y, size.width, size.height));
 
             if (bestShotPacket)
@@ -637,7 +660,10 @@ void DeviceAgent::dumpSomeFrameBytes(
 void DeviceAgent::parseSettings()
 {
     auto assignIntegerSetting =
-        [this](const std::string& parameterName, auto target)
+        [this](
+            const std::string& parameterName,
+            auto target,
+            std::function<void()> onChange = nullptr)
         {
             using namespace nx::kit::utils;
             int result = 0;
@@ -645,7 +671,12 @@ void DeviceAgent::parseSettings()
             if (fromString(parameterValueString, &result))
             {
                 using AtomicValueType = decltype(target->load());
-                target->store(AtomicValueType{result});
+                if (target->load() != AtomicValueType{result})
+                {
+                    target->store(AtomicValueType{ result });
+                    if (onChange)
+                        onChange();
+                }
             }
             else
             {
@@ -678,6 +709,11 @@ void DeviceAgent::parseSettings()
     assignIntegerSetting(
         kAdditionalFrameProcessingDelayMs,
         &m_deviceAgentSettings.additionalFrameProcessingDelay);
+
+    assignIntegerSetting(
+        kOverallMetadataDelayMsSetting,
+        &m_deviceAgentSettings.overallMetadataDelay,
+        [this]() { cleanUpTimestampQueue(); });
 
     assignIntegerSetting(
         kGeneratePreviewAfterNFramesSetting,

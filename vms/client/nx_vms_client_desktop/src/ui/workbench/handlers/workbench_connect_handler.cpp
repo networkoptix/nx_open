@@ -9,7 +9,6 @@
 #include <api/abstract_connection.h>
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
-#include <api/session_manager.h>
 #include <api/global_settings.h>
 #include <api/model/connection_info.h>
 
@@ -553,8 +552,6 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
 
     QnAppServerConnectionFactory::setEc2Connection(connection);
     qnClientMessageProcessor->init(connection);
-
-    commonModule()->sessionManager()->start();
 
     context()->setUserName(
         connectionInfo.effectiveUserName.isEmpty()
@@ -1157,8 +1154,6 @@ void QnWorkbenchConnectHandler::clearConnection()
 
     qnClientMessageProcessor->init(nullptr);
     QnAppServerConnectionFactory::setEc2Connection(nullptr);
-
-    commonModule()->sessionManager()->stop();
     context()->setUserName(QString());
 
     /* Get ready for the next connection. */
