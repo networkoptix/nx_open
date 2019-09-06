@@ -16,7 +16,6 @@ void removeTimezone(QString& source)
     source.remove(" t");
 }
 
-
 QString getShortFormatWithSeconds(const QLocale& locale)
 {
     auto result = locale.dateTimeFormat(QLocale::ShortFormat);
