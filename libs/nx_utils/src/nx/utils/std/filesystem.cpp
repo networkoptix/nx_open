@@ -10,13 +10,23 @@ path::path(const std::string& str):
 {
 }
 
+path::path(const char* str):
+    m_pathStr(str)
+{
+}
+
 path path::filename() const
 {
     const auto separatorPos = m_pathStr.find_last_of("\\/");
     auto result = separatorPos != std::string::npos
         ? m_pathStr.substr(separatorPos+1)
         : m_pathStr;
-    return result.empty() ? "." : result;
+    return result;
+}
+
+bool path::has_filename() const
+{
+    return !filename().empty();
 }
 
 bool path::has_parent_path() const
@@ -38,19 +48,19 @@ path path::parent_path() const
     return m_pathStr.substr(0, separatorPos);
 }
 
-std::string path::string() const
+path::string_type path::string() const
 {
     return m_pathStr;
 }
 
-bool path::operator==(const path& other) const
+bool path::empty() const
 {
-    return m_pathStr == other.m_pathStr;
+    return m_pathStr.empty();
 }
 
-bool path::operator!=(const path& other) const
+const path::string_type& path::native() const
 {
-    return m_pathStr != other.m_pathStr;
+    return m_pathStr;
 }
 
 } // namespace filesystem

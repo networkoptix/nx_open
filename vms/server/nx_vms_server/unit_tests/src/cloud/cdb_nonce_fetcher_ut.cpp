@@ -103,6 +103,31 @@ public:
             nx::cloud::db::api::ResultCode::notImplemented, nx::cloud::db::api::AuthResponse()));
     }
 
+    virtual void resolveUserCredentials(
+        const nx::cloud::db::api::UserAuthorization& /*authorization*/,
+        std::function<void(nx::cloud::db::api::ResultCode, nx::cloud::db::api::CredentialsDescriptor)> completionHandler) override
+    {
+        m_aioObject.post(std::bind(completionHandler,
+            nx::cloud::db::api::ResultCode::notImplemented, nx::cloud::db::api::CredentialsDescriptor()));
+    }
+
+    virtual void getSystemAccessLevel(
+        const std::string& /*systemId*/,
+        const nx::cloud::db::api::UserAuthorization& /*authorization*/,
+        std::function<void(nx::cloud::db::api::ResultCode, nx::cloud::db::api::SystemAccess)> completionHandler) override
+    {
+        m_aioObject.post(std::bind(completionHandler,
+            nx::cloud::db::api::ResultCode::notImplemented, nx::cloud::db::api::SystemAccess()));
+    }
+
+    virtual void getSystemAccessLevel(
+        const std::vector<nx::cloud::db::api::SystemAccessLevelRequest>& /*requests*/,
+        std::function<void(nx::cloud::db::api::ResultCode, std::vector<nx::cloud::db::api::SystemAccess>)> completionHandler) override
+    {
+        m_aioObject.post(std::bind(completionHandler,
+            nx::cloud::db::api::ResultCode::notImplemented, std::vector<nx::cloud::db::api::SystemAccess>()));
+    }
+
     void bindToAioThread(network::aio::AbstractAioThread* aioThread)
     {
         m_aioObject.bindToAioThread(aioThread);

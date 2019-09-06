@@ -2,7 +2,7 @@ from os import system, path, remove, listdir
 import json
 import codecs
 import time
-from queue import threadedTestRun
+from queue import threaded_test_run
 from datetime import datetime
 from check_server import ping
 import sys
@@ -16,8 +16,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'u':
 else:
     loc = path.join('C:\\', 'Users', 'Kyle', 'Desktop', 'robot-outputs')
 # Path I use on my VM for a shared file
-#loc = path.join('/media', 'sf_robot-outputs')
-
+#loc = path.join('/media', 'sf_robot-outputs'
 # Get the list of all langauges, updating the JSON file automatically adds
 # or removes languages
 with codecs.open('language_list.json', 'r', encoding='utf-8-sig') as languages_list:
@@ -47,7 +46,7 @@ def runTest(key, langList):
 
             # run the threading script run, then take the output file, rename
             # it and put it in the proper language folder
-            threadedTestRun(loc, key)
+            threaded_test_run(loc, key)
             system('rebot -o output.xml -d {} -N {}_{} queuedRun.xml'.format(
                 path.join(loc, key), langList[key], key))
             '''

@@ -11,7 +11,7 @@ class NX_SQL_API TestWithDbHelper:
     public utils::test::TestWithTemporaryDirectory
 {
 public:
-    TestWithDbHelper(QString moduleName, QString tmpDir);
+    TestWithDbHelper(QString tmpDir);
     ~TestWithDbHelper();
 
     const nx::sql::ConnectionOptions& dbConnectionOptions() const;

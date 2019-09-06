@@ -4,12 +4,19 @@ from jsonfield import JSONField
 from django.conf import settings
 from django.db.models import Q
 from rest_framework import serializers
-from cms.models import Customization
+from cms.models import Customization, Product
 from api.models import Account
 
 # When cloudportal is ran locally it uses amqp by default. BROKER_TRANSPORT_OPTIONS is related to sqs.
 # This allows cloud notifications to run locally without changing settings to use sqs.
 USE_SQS_FOR_CLOUD_NOTIFICATIONS = hasattr(settings, "BROKER_TRANSPORT_OPTIONS")
+
+
+class MessageTypes(object):
+    contact_sales = "contact_sales"
+    contact_support = "contact_support"
+    ipvd_feedback_page = "ipvd_feedback_page"
+    ipvd_feedback_device = "ipvd_feedback_device"
 
 
 class Event(models.Model):
@@ -47,6 +54,8 @@ class Event(models.Model):
                 event=self
             )
             message.send()
+        self.send_date = timezone.now()
+        self.save()
 
 
 class Subscription(models.Model):
@@ -68,13 +77,12 @@ class Message(models.Model):
     message = JSONField()
     created_date = models.DateTimeField(auto_now_add=True)
     send_date = models.DateTimeField(null=True, blank=True)
-    event = models.ForeignKey(Event, null=True)
+    event = models.ForeignKey(Event, null=True, on_delete=models.CASCADE)
 
     REQUIRED_FIELDS = ['user_email', 'type', 'message']
 
     def send(self):
         self.save()
-        self.send_date = timezone.now()
 
         # TODO: initiate business-logic here
         from .tasks import send_email
@@ -93,9 +101,51 @@ class Message(models.Model):
         self.save()
 
     def delivery_time_interval(self):
-        return (self.created_date - self.send_date).total_seconds()
+        if not self.send_date:
+            return "Message has not been sent yet"
+        return (self.send_date - self.created_date).total_seconds()
 
     delivery_time_interval.short_description = "Delivery Time Interval (sec)"
+
+
+class Feedback(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    message = models.TextField(default='', blank=True)
+    product_name = models.CharField(max_length=255)
+    sender_name = models.CharField(max_length=255)
+    sender_email = models.CharField(max_length=255)
+    sender_to_be_contacted = models.BooleanField()
+    target_product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    type = models.CharField(max_length=255)
+
+    def send(self):
+        self.save()
+        data = {
+            'sender_name': self.sender_name,
+            'sender_email': self.sender_email,
+            'sender_to_be_contacted': self.sender_to_be_contacted,
+            'product': self.product_name,
+            'message': self.message
+        }
+        event = Event.objects.create(type=self.type, object=self.target_product.id, data=data)
+        event.send()
+
+        # Send email to the contact email for an integration.
+        if self.target_product.contact_email:
+            contact_email = self.target_product.contact_email
+
+            contact_customization = Account.objects.filter(email=contact_email).first()
+            if contact_customization:
+                contact_customization = contact_customization.customization
+            else:
+                contact_customization = settings.CUSTOMIZATION
+
+            msg = Message.objects.create(user_email=contact_email,
+                                         type=self.type,
+                                         customization=contact_customization,
+                                         message=data,
+                                         event=event)
+            msg.send()
 
 
 class MessageStatusSerializer(serializers.ModelSerializer):  # model to use when checking on message status
@@ -116,7 +166,7 @@ class CloudNotification(models.Model):
     sent_date = models.DateTimeField(null=True, blank=True)
     sent_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True,
-        related_name='accepted_%(class)s')
+        related_name='accepted_%(class)s', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.subject

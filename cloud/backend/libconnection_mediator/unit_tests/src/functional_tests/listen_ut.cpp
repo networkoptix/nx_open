@@ -294,7 +294,10 @@ TEST_F(ListeningPeer, can_connect_with_http_request)
 {
     givenListeningServer();
     whenConnectToPeerOverHttp();
-    thenConnectSucceeded();
+
+    // TODO: #ak Change to appropriate api::ResultCode::noSuitableConnectionMethod
+    // after completion of CLOUD-3503.
+    thenConnectReported(api::ResultCode::badRequest);
 }
 
 TEST_F(ListeningPeer, connect_to_unknown_peer_through_http_request_results_not_found)

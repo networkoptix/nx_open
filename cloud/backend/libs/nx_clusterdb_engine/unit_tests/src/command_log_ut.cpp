@@ -29,7 +29,7 @@ class BaseDbTest:
 {
 public:
     BaseDbTest():
-        nx::sql::test::TestWithDbHelper("clusterdb_engine_ut", ""),
+        nx::sql::test::TestWithDbHelper(""),
         m_dbController(dbConnectionOptions())
     {
     }

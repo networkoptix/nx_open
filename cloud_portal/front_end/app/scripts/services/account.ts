@@ -100,7 +100,7 @@
 
                                    if (result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
                                        self.setEmail(result.data.email);
-                                       $rootScope.session.loginState = result.data.email; //Forcing changing loginState to reload interface
+                                       $rootScope.session.loginState = result.data.email; // Forcing changing loginState to reload interface
                                    }
                                    return result;
                                });
@@ -120,7 +120,7 @@
                 let self = this;
                 this.get().then(function () {
                     // logoutAuthorisedLogoutButton
-                    dialogs.confirm(null /*L.dialogs.logoutAuthorisedText*/,
+                    dialogs.confirm('',
                         lang.dialogs.logoutAuthorisedTitle,
                         lang.dialogs.logoutAuthorisedContinueButton,
                         null,

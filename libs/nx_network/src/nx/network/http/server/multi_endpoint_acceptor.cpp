@@ -16,6 +16,13 @@ network::server::Statistics MultiEndpointAcceptor::statistics() const
     return m_multiAddressHttpServer->statistics();
 }
 
+HttpStatistics MultiEndpointAcceptor::httpStatistics() const
+{
+    return m_httpStatsProvider
+        ? m_httpStatsProvider->httpStatistics()
+        : HttpStatistics();
+}
+
 void MultiEndpointAcceptor::pleaseStopSync()
 {
     if (m_multiAddressHttpServer)
@@ -54,6 +61,8 @@ bool MultiEndpointAcceptor::bind(
             std::move(regularServer),
             std::move(securedServer));
     }
+
+    initializeHttpStatisticsProvider();
 
     return m_multiAddressHttpServer != nullptr;
 }
@@ -115,6 +124,23 @@ std::unique_ptr<MultiEndpointAcceptor::MultiHttpServer>
         return nullptr;
 
     return multiAddressHttpServer;
+}
+
+void MultiEndpointAcceptor::initializeHttpStatisticsProvider()
+{
+    using namespace network::http::server;
+
+    if (!m_multiAddressHttpServer)
+        return;
+
+    std::vector<const AbstractHttpStatisticsProvider*> providers;
+    m_multiAddressHttpServer->forEachListener(
+        [&providers](const auto& listener)
+        {
+            providers.emplace_back(listener);
+        });
+
+    m_httpStatsProvider = std::make_unique<AggregateHttpStatisticsProvider>(std::move(providers));
 }
 
 } // namespace nx::network::http::server

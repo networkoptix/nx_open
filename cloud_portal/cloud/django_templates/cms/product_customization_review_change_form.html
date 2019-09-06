@@ -4,10 +4,11 @@
 
 {% block extrahead %}
     {{ block.super }}
+    <script>window.$ = django.jQuery;</script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 {% endblock %}
 {% block content %}
-    {% with can_preview=original.version.product.product_type.can_preview version=original.version product=original.version.product %}
+    {% with can_preview=original.can_preview_customization version=original.version product=original.version.product %}
     <div id="alert" style="display:none" class="alert alert-warning"
          title="Preview being generated">Currently making the preview for you. A new tab
         will open shortly.
@@ -24,7 +25,7 @@
                 <table class="table table-condensed">
                     <thead>
                         <tr>
-                            <td><strong>Customization{% if not product.product_type.single_customization %}s{% endif %}</strong></td>
+                            <td><strong>Portal name</strong></td>
                             <td><strong>Status</strong></td>
                             <td><strong>Reviewed by</strong></td>
                             <td><strong>Reviewed on</strong></td>
@@ -34,17 +35,21 @@
                     <tbody>
                     {% for review in customization_reviews %}
                         {% get_review_state review.state as state %}
-                        {% has_permission user 'cms.can_view_customization' review.customization.name as can_view_customization %}
+                        {% has_customization_permission review.version.created_by review.customization.name 'cms.access_customization' as access_customization %}
                         <tr>
-                            <td> {{ review.customization }}</td>
-                            <td><span class="label {% if state == 'Rejected' %} label-danger {% elif state == "Accepted" %} label-success {% else %} label-default{% endif %}">{{ state }}</span></td>
-                            <td> {{ review.reviewed_by }}</td>
-                            <td> {{ review.reviewed_date }}</td>
-                            {% if can_view_customization %}
-                            <td> {{ review.notes | linebreaks }}</td>
-                            {% else %}
-                            <td> {{ review.notes | anon_notes | linebreaks }} </td>
+                            <td>
+                            {% if access_customization %}
+                                {% if review == original %}
+                                <strong>{{ review.customization }}</strong>
+                                {% else %}
+                                <a href="{% url 'admin:cms_productcustomizationreview_change' review.id %}">{{ review.customization }}</a>
+                                {% endif %}
                             {% endif %}
+                            </td>
+                            <td><span class="label {% if state == 'Rejected' %} label-danger {% elif state == "Accepted" %} label-success {% else %} label-default{% endif %}">{{ state }}</span></td>
+                            <td> {% if access_customization %}{{ review.reviewed_by }}{% endif %}</td>
+                            <td> {{ review.reviewed_date }}</td>
+                            <td> {{ review.notes | linebreaks }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -61,7 +66,7 @@
                     <div>
                         {% with context_url=records.0.data_structure.context.url %}
                             {{ context_name }}
-                            {% if context_url and can_preview and version.state == 'in review'%}
+                            {% if can_preview and version.state == 'in review'%}
                                 <a class="float-right preview" href="{% url 'preview' %}"
                                    value="{{records.0.data_structure.context.id}}"
                                    target="_blank">Preview</a>
@@ -71,7 +76,8 @@
                     <ul>
                     {% for record in records %}
                         {% with data_structure=record.data_structure language=record.language %}
-                        <li>
+                        <li class="{% if record.version.id != original.version.id %}muted{% endif %}">
+                            <span>
                             {% if data_structure.label %}
                                 {{ data_structure.label }}:
                             {% else %}
@@ -81,6 +87,7 @@
                             {% if language %}
                                 ({{ language.code }})
                             {% endif %}
+                            </span>
 
                             {% if data_structure.type == DataStructureTypes.image or data_structure.type == DataStructureTypes.external_image  %}
                                 <div><img class="preview-image review-preview"
@@ -94,6 +101,10 @@
                                    download>Download</a>
                             {% elif data_structure.type == DataStructureTypes.external_file %}
                                 <a href="{{ record }}">Download</a>
+                            {% elif data_structure.type == DataStructureTypes.select and 'multi' in data_structure.meta_settings and data_structure.meta_settings.multi %}
+                                <div class="show-html">{{ record|nice_multiselect }}</div>
+                            {% elif data_structure.type == DataStructureTypes.html %}
+                                <div class="preview-html show-html">{{ record|safe }}</div>
                             {% else %}
                                 <div class="show-html">{{ record|safe }}</div>
                             {% endif %}
@@ -112,46 +123,50 @@
         {% else %}
         <div>There are no changes to review</div>
         {% endif %}
-        <h2>Review</h2>
+        <h2>Review Notes {% if customization_name %}for {{ customization_name }}{% endif %}</h2>
+        {{ original.notes|linebreaks }}
     </div>
-    <h1 style="text-align: center">Review for {{ original.customization }}</h1>
+
     <form action="" enctype="multipart/form-data" method="post" novalidate>
         {% csrf_token %}
         <input name="version_id" value="{{ version.id }}" hidden/>
         <input name="review_id" value="{{ original.id }}" hidden/>
-        {% block field_sets %}
-            {% for fieldset in adminform %}
-                {% include "admin/includes/fieldset.html" %}
-            {% endfor %}
-        {% endblock %}
 
-        {% get_review_state original.state as state %}
-        {% if state == 'Pending' or state != 'Rejected' and can_preview and perms.cms.force_update %}
+        {% if allowed.submit_row %}
             <div class="submit-row">
-                {% if state == 'Accepted' %}
+                {% if allowed.delete %}
+                <a href="{% url opts|admin_urlname:'delete' object_id %}" class="btn btn-sm btn-danger pull-left">{% trans "Delete" %}</a>
+                {% endif %}
+
+                {% if allowed.force_update %}
                 <button class="btn btn-sm btn-danger" type="submit" name="force_update">Force Update</button>
                 {% endif %}
-                {% if state == 'Pending' %}
-                    {% if product and False %}
-                    <button class="btn btn-sm btn-default">
-                        <a href="{% url 'download_package' product.id %}?version_id={{ version.id }}"
-                           download>Download</a>
-                    </button>
-                    {% endif %}
-                    {% if perms.cms.publish_version %}
-                    <button class="btn btn-sm btn-danger" data-action="reject" data-name="Reject"
-                            data-toggle="modal" data-target="#addNotes" onclick="return false;">Reject</button>
-                    {% endif %}
-                    <button class="btn btn-sm btn-default" data-action="ask_question" data-name="Ask a question"
-                            data-toggle="modal" data-target="#addNotes" onclick="return false;">Ask a question</button>
-                    {% if perms.cms.publish_version %}
-                    <button class="btn btn-sm btn-success" type="submit" name="publish">
-                            {% if can_preview %}Publish{% else %} Accept {% endif %}
-                    </button>
+
+                {% if product and False %}
+                <button class="btn btn-sm btn-default">
+                    <a href="{% url 'download_package' product.id %}?version_id={{ version.id }}"
+                       download>Download</a>
+                </button>
                 {% endif %}
-            {% endif %}
+
+                {% if allowed.publish or allowed.accept %}
+                <button class="btn btn-sm btn-danger" data-action="reject" data-name="Reject"
+                        data-toggle="modal" data-target="#addNotes" onclick="return false;">Reject</button>
+                {% endif %}
+
+                {% if allowed.question %}
+                <button class="btn btn-sm btn-default" data-action="ask_question" data-name="Ask a question"
+                        data-toggle="modal" data-target="#addNotes" onclick="return false;">Ask a question</button>
+                {% endif %}
+
+                {% if allowed.publish or allowed.accept %}
+                <button class="btn btn-sm btn-success" type="submit" name="publish">
+                        {% if allowed.publish %}Publish{% elif allowed.accept %} Accept {% endif %}
+                </button>
+                {% endif %}
             </div>
         {% endif %}
+
         <div class="modal fade" id="addNotes" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -162,17 +177,21 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-row">
-                            <div>
-                                <label for="id_add">Note</label>
-                                <div id="add">
-                                    <textarea id="id_add" rows="5" style="width:100%" name="addedNote" type="text" required></textarea>
-                                </div>
-                                <label for="can_view_customization">Can View Customization (If selected the user will be able to see this customization)</label>
-                                <div>
-                                    <input id="can_view_customization" name="can_view_customization" type="checkbox">
-                                </div>
+                            <label for="id_add">Note</label>
+                            <div id="add">
+                                <textarea id="id_add" rows="5" style="width:100%" name="addedNote" type="text" required></textarea>
                             </div>
                         </div>
+
+                        {% if allowed.access_customization_checkbox %}
+                        <div class="form-row">
+                            <div class="checbox">
+                                <label>
+                                    <input id="access_customization" name="access_customization" type="checkbox" style="margin-right: 3px;">
+                                    Let developer contact me (he will get permanent permissions to see the email and real customization name)
+                                </label>
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
@@ -183,7 +202,7 @@
         </div>
     </form>
     <script>
-        $(function() {
+        (function() {
             // When a preview tag is clicked make a post request instead of a get request
             var previews = $('.preview');
             var csrf = $('input[name=csrfmiddlewaretoken]')[0];
@@ -221,7 +240,7 @@
                 noteButton.attr('class', button.attr('class'));
             })
 
-        });
+        })();
     </script>
     {% endwith %}
 {% endblock %}

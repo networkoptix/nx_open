@@ -18,7 +18,6 @@ public:
     const AbstractAsyncSqlQueryExecutor& queryExecutor() const;
 
     const StatisticsCollector& statisticsCollector() const;
-    StatisticsCollector& statisticsCollector();
 
     bool initialize();
 
@@ -27,7 +26,6 @@ protected:
 
 private:
     const ConnectionOptions m_dbConnectionOptions;
-    StatisticsCollector m_statisticsCollector;
     std::unique_ptr<AsyncSqlQueryExecutor> m_queryExecutor;
     DbStructureUpdater m_dbStructureUpdater;
 

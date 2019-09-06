@@ -1,0 +1,3 @@
+Buna ziua, {{message.userFullName}}
+
+{{message.text_body}}

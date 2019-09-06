@@ -29,8 +29,8 @@ class Migration(migrations.Migration):
             name='Subscription',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('object', models.CharField(blank=True, default=b'', help_text=b"What's the target? (release type, customization or cloud instance)", max_length=255)),
-                ('type', models.CharField(blank=True, default=b'', help_text=b"What's the event? (submitted_release, published_{{type}}, cloud_...)", max_length=255)),
+                ('object', models.CharField(blank=True, default='', help_text="What's the target? (release type, customization or cloud instance)", max_length=255)),
+                ('type', models.CharField(blank=True, default='', help_text="What's the event? (submitted_release, published_{{type}}, cloud_...)", max_length=255)),
                 ('user_email', models.CharField(max_length=255)),
                 ('created_date', models.DateField(auto_now_add=True)),
                 ('enabled', models.BooleanField(default=True)),

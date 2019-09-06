@@ -45,6 +45,11 @@ QString toString(const std::wstring& value)
     return QString::fromStdWString(value);
 }
 
+QString toString(const std::string_view& value)
+{
+    return QString::fromUtf8(value.data(), value.size());
+}
+
 QString toString(const QChar& value)
 {
     return value;

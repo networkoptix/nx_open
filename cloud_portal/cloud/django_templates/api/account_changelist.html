@@ -3,7 +3,7 @@
 {% load cms_filters %}
 
 {% block object-tools-items %}
-    {% has_permission user 'api.invite_users' as can_invite_user %}
+    {% has_customization_permission user '' 'api.invite_users' as can_invite_user %}
     {% if can_invite_user %}
     <li><a href="{% url 'admin:invite' %}" class="addlink">Invite User</a></li>
     {% endif %}

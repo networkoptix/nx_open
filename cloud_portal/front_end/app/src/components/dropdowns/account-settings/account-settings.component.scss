@@ -7,7 +7,8 @@
 @import '~bootstrap/scss/variables';
 
 .dropdown-menu {
-    width : auto !important;
+    width          : auto !important;
+    padding-bottom : 4px;
 
     @media (max-width : $collapse-first-width) {
         right : 0;
@@ -25,18 +26,46 @@
     }
 }
 
+.dropdown {
+    .arrow {
+        display : none;
+    }
+    
+    &.show {
+        .arrow {
+            display : block;
+        }
+    }
+}
+
 .popup {
     &.arrow {
-        left : 18px;
-
+        bottom              : 0 !important;
+        position            : absolute !important;
+        top                 : auto !important;
+        left                : 18px !important;
+        z-index             : 9999 !important;
+        border-bottom-color : $light6 !important;
+        
+        &::after {
+            border-bottom-color : $light4 !important;
+        }
+        
+        
         @media (max-width : $collapse-first-width) {
             right : 35px;
-            left  : auto;
+            left  : auto !important;
         }
-
+        
+        &.center {
+            @media (min-width : $collapse-first-width) {
+                left : 35% !important;
+            }
+        }
+        
         @media (max-width : $collapse-second-width) {
-            right : 24px;
-            left  : auto;
+            right : 25px !important;
+            left  : auto !important;
         }
     }
 }
@@ -56,6 +85,7 @@
         display : none;
         @media (min-width : $collapse-second-width + 1) {
             display : block;
+            bottom: 14px;
         }
     }
 

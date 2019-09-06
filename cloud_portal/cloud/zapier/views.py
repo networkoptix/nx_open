@@ -1,4 +1,8 @@
-import django, json, base64, urllib, uuid
+import base64
+import django
+import json
+import urllib
+import uuid
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -10,7 +14,7 @@ from django.utils.http import urlencode
 from api.helpers.exceptions import api_success, APINotAuthorisedException, APIException, log_error
 from api.controllers import cloud_api, cloud_gateway
 
-from models import *
+from zapier.models import *
 from cloud import settings
 import logging
 from html_sanitizer import Sanitizer
@@ -76,7 +80,7 @@ def increment_rule(rule):
 def make_rule(rule_type, email, password, system_id, caption="", description="", source="", zapier_trigger=""):
     if rule_type == "Generic Event":
         action_params = json.dumps({"additionalResources": ["{00000000-0000-0000-0000-100000000000}",
-                                                "{00000000-0000-0000-0000-100000000001}"],
+                                                            "{00000000-0000-0000-0000-100000000001}"],
                                     "allUsers": False,
                                     "durationMs": 5000,
                                     "forced": True,
@@ -169,16 +173,16 @@ def make_or_increment_rule(action, email, system_id, caption, password=None,
     rules_query = GeneratedRule.objects.filter(email=email, system_id=system_id, caption=caption)
 
     if action == 'Generic Event':
-        rules_query = rules_query.filter(source=source, direction="Zapier to Nx")
+        rules_query = rules_query.filter(source=source, direction="Zapier to Nx").first()
 
-        if not rules_query.exists():
+        if not rules_query:
             make_rule(action, email, password, system_id,
                       caption=caption, source=source, description=description)
             GeneratedRule(email=email, system_id=system_id, caption=caption,
                           source=source, direction="Zapier to Nx").save()
 
         else:
-            increment_rule(rules_query[0])
+            increment_rule(rules_query)
 
     elif action == 'Http Action':
         rules_query = rules_query.filter(direction="Nx to Zapier")
@@ -188,10 +192,10 @@ def make_or_increment_rule(action, email, system_id, caption, password=None,
                           times_used=0).save()
 
     elif action == 'Hook Fired':
-        rules_query = rules_query.filter(direction="Nx to Zapier")
+        rules_query = rules_query.filter(direction="Nx to Zapier").first()
 
-        if rules_query.exists():
-            increment_rule(rules_query[0])
+        if rules_query:
+            increment_rule(rules_query)
 
 
 @api_view(['GET'])
@@ -207,6 +211,7 @@ def get_systems(request):
             zap_list['systems'].append({'name': system['name'], 'system_id': system['id']})
 
     return api_success(zap_list)
+
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
@@ -236,7 +241,7 @@ def zapier_send_generic_event(request):
 @zapier_exceptions
 def nx_http_action(request):
     if 'caption' not in request.query_params or 'system_id' not in request.query_params:
-        return Response({ 'message': "Caption or System Id are missing from query parameters"}, status=400)
+        return Response({'message': "Caption or System Id are missing from query parameters"}, status=400)
     caption = request.query_params['caption']
     system_id = request.query_params['system_id']
     event = system_id + ' ' + caption
@@ -295,12 +300,12 @@ def unsubscribe_webhook(request):
     user, email, password = authenticate(request)
     target = request.data['target_url']
 
-    user_hooks = ZapHook.objects.filter(user=user, target=target)
-    if not user_hooks.exists():
+    user_hook = ZapHook.objects.filter(user=user, target=target).first()
+    if not user_hook:
         return Response({'message': "Webhook for " + target + " does not exist"}, status=500)
 
-    event = user_hooks[0].event
-    user_hooks.delete()
+    event = user_hook.event
+    user_hook.delete()
     return Response({'message': 'Webhook deleted for ' + event}, status=200)
 
 

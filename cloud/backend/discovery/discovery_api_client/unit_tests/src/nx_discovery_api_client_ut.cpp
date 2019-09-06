@@ -281,6 +281,7 @@ private:
     discovery::Settings settings()
     {
         discovery::Settings settings;
+        settings.enabled = true;
         settings.discoveryServiceUrl = m_server->url();
         settings.roundTripPadding = std::chrono::milliseconds(2);
         settings.registrationErrorDelay = std::chrono::milliseconds(50);

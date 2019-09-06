@@ -39,7 +39,7 @@ public:
     */
     MediaServerEmulator(
         const network::SocketAddress& mediatorUdpEndpoint,
-        const network::SocketAddress& mediatorTcpEndpoint,
+        const nx::utils::Url& mediatorTcpUrl,
         AbstractCloudDataProvider::System systemData,
         nx::String serverName = nx::String());
     virtual ~MediaServerEmulator();
@@ -78,6 +78,11 @@ public:
     hpm::api::MediatorConnector& mediatorConnector();
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection();
 
+    /**
+     * @param mask Bitset of network::cloud::ConnectType enumeration values.
+     */
+    void setCloudConnectionMethodMask(int mask);
+
 private:
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
     nx::network::http::MessageDispatcher m_httpMessageDispatcher;
@@ -95,7 +100,7 @@ private:
     std::unique_ptr<nx::network::UdtStreamServerSocket> m_udtStreamServerSocket;
     std::unique_ptr<network::stun::MessagePipeline> m_stunPipeline;
     ActionToTake m_action;
-    const int m_cloudConnectionMethodMask;
+    int m_cloudConnectionMethodMask;
     std::unique_ptr<network::cloud::MediatorAddressPublisher> m_mediatorAddressPublisher;
     std::optional<nx::String> m_cloudSystemIdForModuleInformation;
     std::optional<nx::String> m_serverIdForModuleInformation;

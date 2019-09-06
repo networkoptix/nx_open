@@ -1,21 +1,38 @@
 {% load i18n admin_urls %}
 {% if not READONLY %}
 <div class="submit-row">
-{% if show_delete_link %}
-    {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
-    <a class="btn btn-danger pull-left" href="{% add_preserved_filters delete_url %}">Delete</a>
-{% endif %}
-{% if show_save_as_new %}
-    <button class="btn" type="submit" value="{% trans 'Save as new' %}" name="_saveasnew">Save as new</button>
+    {% if show_delete_link %}
+        {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
+        <a class="btn btn-danger pull-left" href="{% add_preserved_filters delete_url %}">Delete</a>
     {% endif %}
-{% if show_save_and_add_another %}
-    <button class="btn" type="submit" value="{% trans 'Save and add another' %}" name="_addanother">Save and add another</button>
+    {% if show_clone_asset %}
+        <button class="pull-left btn" style="margin-left: 4px;" type="button" value="Clone Asset" data-toggle="popover"
+                title="Save changes and clone asset" data-html="true" data-placement="right"
+                data-content="
+                {% if user.is_superuser %}
+                <input type='checkbox' value='Copy permissions' name='_clone_copy_perms'>  Copy Permissions
+                <button type='submit' name='_clone' style='margin-left: 10px;' class='btn btn-primary'>Confirm</button>
+                {% else %}
+                <button type='submit' name='_clone' class='btn btn-primary center-block'>Confirm</button>
+                {% endif %}
+                ">Clone Asset</button>
+        <script>
+            $(function () {
+              $('[data-toggle="popover"]').popover();
+            })
+        </script>
     {% endif %}
-{% if show_save_and_continue %}
-    <button class="btn" type="submit" value="{% trans 'Save and continue editing' %}" name="_continue">Save and continue editing</button>
+    {% if show_save_as_new %}
+        <button class="btn" type="submit" value="{% trans 'Save as new' %}" name="_saveasnew">Save as new</button>
+    {% endif %}
+    {% if show_save_and_add_another %}
+        <button class="btn" type="submit" value="{% trans 'Save and add another' %}" name="_addanother">Save and add another</button>
+    {% endif %}
+    {% if show_save_and_continue %}
+        <button class="btn" type="submit" value="{% trans 'Save and continue editing' %}" name="_continue">Save and continue editing</button>
     {% endif %}
     {% if show_save %}
-    <button type="submit" class="btn btn-primary" value="{% trans 'Save' %}" name="_save">Save</button>
+        <button type="submit" class="btn btn-primary" value="{% trans 'Save' %}" name="_save">Save</button>
     {% endif %}
 </div>
 {% endif %}

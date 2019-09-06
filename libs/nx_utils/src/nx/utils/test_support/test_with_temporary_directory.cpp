@@ -10,13 +10,18 @@ namespace nx::utils::test {
 
 namespace {
 
-QString calculateTestDirectory(const QString& moduleName, const QString& tmpDir)
+QString calculateTestDirectory(const QString& tmpDir)
 {
-    // Explitly passed directory has the highest priority.
+    // Explicitly passed directory has the highest priority.
     if (!tmpDir.isEmpty())
         return tmpDir;
 
-    const QString moduleSuffix = QString("/%1_ut.data").arg(moduleName);
+    // Always generating different directories so that multiple
+    // TestWithTemporaryDirectory instances in a single test do not collide.
+    static std::atomic<int> sequence{0};
+
+    const QString moduleSuffix = QString("/%1_ut.data_%2")
+        .arg(TestOptions::moduleName()).arg(++sequence);
 
     // Global temp dir is used if available. Module name is used as a subfolder.
     if (auto globalTmpDir = TestOptions::temporaryDirectoryPath(); !globalTmpDir.isEmpty())
@@ -29,10 +34,9 @@ QString calculateTestDirectory(const QString& moduleName, const QString& tmpDir)
 } // namespace
 
 TestWithTemporaryDirectory::TestWithTemporaryDirectory(
-    const QString& moduleName,
     const QString& tmpDir)
     :
-    m_tmpDir(calculateTestDirectory(moduleName, tmpDir))
+    m_tmpDir(calculateTestDirectory(tmpDir))
 {
     // Auto-clean temporary folder contents before testing.
     m_tmpDir.removeRecursively();

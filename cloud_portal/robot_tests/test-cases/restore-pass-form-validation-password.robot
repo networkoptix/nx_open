@@ -1,9 +1,9 @@
 *** Settings ***
 Resource          ../resource.robot
 Suite Setup       Open Restore Password Dialog With Link
-Suite Teardown    Close Browser
-Test Teardown     Run Keyword If Test Failed    Restart
 Test Template     Test Password Invalid
+Test Teardown     Run Keyword If Test Failed    Restart
+Suite Teardown    Close Browser
 Force Tags        email    form    Threaded File
 
 *** Variables ***
@@ -61,7 +61,7 @@ Open Restore Password Dialog With Link
     Open Browser and go to URL    ${url}/register
     Register    mark    hamill    ${email}    ${password}
     ${link}    Get Email Link    ${email}    activate
-    Go To    ${link}[1]
+    Go To    ${link}
     Go To    ${url}/restore_password
     Wait Until Elements Are Visible    ${RESTORE PASSWORD EMAIL INPUT}    ${RESET PASSWORD BUTTON}
     Input Text    ${RESTORE PASSWORD EMAIL INPUT}    ${email}

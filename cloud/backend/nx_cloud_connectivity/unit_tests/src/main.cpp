@@ -6,6 +6,8 @@
 
 int main(int argc, char** argv)
 {
+    nx::utils::TestOptions::setModuleName("nx_cloud_connectivity_ut");
+
     QCoreApplication application(argc, argv);
 
     return nx::network::test::runTest(

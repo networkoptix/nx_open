@@ -9,13 +9,13 @@
             <ngb-tab *ngFor="let type of noteTypes"
                      [id]="type">
                 <ng-template ngbTabTitle *ngIf="!hideTabs">
-                    <span class="tab-heading">{{language.lang.downloads.releasesTypes[type] || type.name}}</span>
+                    <span class="tab-heading">{{lang.downloads.releasesTypes[type] || type.name}}</span>
                 </ng-template>
                 <ng-template ngbTabContent>
                     <div class="card card-default">
                         <div class="card-body" *ngIf="activeBuilds">
                             <div *ngFor="let release of activeBuilds">
-                                <nx-release [release]="release" [linkbase]="linkbase"></nx-release>
+                                <nx-release [lang]="lang" [linkbase]="linkbase" [release]="release"></nx-release>
                             </div>
                         </div>
                     </div>

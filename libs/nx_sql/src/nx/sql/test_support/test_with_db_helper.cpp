@@ -4,6 +4,7 @@
 
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/std/optional.h>
+#include <nx/utils/test_support/test_options.h>
 
 #include "../db_connection_holder.h"
 #include "../sql_query_execution_helper.h"
@@ -12,8 +13,8 @@ namespace nx::sql::test {
 
 std::optional<nx::sql::ConnectionOptions> TestWithDbHelper::sDbConnectionOptions;
 
-TestWithDbHelper::TestWithDbHelper(QString moduleName, QString tmpDir):
-    utils::test::TestWithTemporaryDirectory(moduleName, tmpDir)
+TestWithDbHelper::TestWithDbHelper(QString tmpDir):
+    utils::test::TestWithTemporaryDirectory(tmpDir)
 {
     m_dbConnectionOptions.driverType = RdbmsDriverType::sqlite;
 
@@ -23,8 +24,9 @@ TestWithDbHelper::TestWithDbHelper(QString moduleName, QString tmpDir):
 
     if (m_dbConnectionOptions.dbName.isEmpty() && m_dbConnectionOptions.driverType == RdbmsDriverType::sqlite)
     {
+        static std::atomic<int> sequence{0};
         m_dbConnectionOptions.dbName =
-            QString("%1/%2").arg(testDataDir()).arg(QString("%1_ut.sqlite").arg(moduleName));
+            QString("%1/%2").arg(testDataDir()).arg(QString("%1.db").arg(++sequence));
     }
 
     cleanDatabase();

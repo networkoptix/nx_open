@@ -6,7 +6,7 @@
             (click)="show = !show"
             type="button" data-toggle="dropdown">
 
-        <span [innerHtml]="numSelected"></span>
+        <span [innerHtml]="textSelected"></span>
         <div class="nav-arrow">
             <span></span>
             <span></span>
@@ -50,7 +50,7 @@
                             (click)="change($event, item)">
                     </nx-checkbox>
 
-                    <label for="{{item.id}}">{{item.label}}</label>
+                    <label for="{{item.id}}">{{item.label.name || item.label}}</label>
                 </div>
             </li>
         </ul>

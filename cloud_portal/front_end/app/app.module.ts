@@ -1,6 +1,6 @@
 import { NgModule }                                                       from '@angular/core';
 import { Location, PathLocationStrategy, LocationStrategy, CommonModule } from '@angular/common';
-import { BrowserModule }                                                  from '@angular/platform-browser';
+import { BrowserModule, Title }                                           from '@angular/platform-browser';
 import { BrowserAnimationsModule }                                        from '@angular/platform-browser/animations';
 import { RouterModule, UrlHandlingStrategy, UrlTree }                     from '@angular/router';
 import { HttpClient, HttpClientModule }                                   from '@angular/common/http';
@@ -19,14 +19,17 @@ import {
     localStorageModule, locationProxyModule
 } from './src/ajs-upgrade/ajs-upgraded-providers';
 
-import { AppComponent }     from './app.component';
-import { ComponentsModule } from './src/components/components.module';
-import { DialogsModule }    from './src/dialogs/dialogs.module';
-import { PagesModule }      from './src/pages/pages.module';
-import { DirectivesModule } from './src/directives/directives.module';
-import { NxConfigService }  from './src/services/nx-config';
-import { ServiceModule }    from './src/services/services.module';
-import { LayoutModule }     from '@angular/cdk/layout';
+import { AppComponent }              from './app.component';
+import { ComponentsModule }          from './src/components/components.module';
+import { DialogsModule }             from './src/dialogs/dialogs.module';
+import { PagesModule }               from './src/pages/pages.module';
+import { DirectivesModule }          from './src/directives/directives.module';
+import { NxConfigService }           from './src/services/nx-config';
+import { ServiceModule }             from './src/services/services.module';
+import { LayoutModule }              from '@angular/cdk/layout';
+import { downgradeInjectable }       from '@angular/upgrade/static';
+import { NxLanguageProviderService } from './src/services/nx-language-provider';
+import { NxAppStateService }         from './src/services/nx-app-state.service';
 
 
 
@@ -38,7 +41,7 @@ export function createTranslateLoader(http: HttpClient) {
 class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     shouldProcessUrl(url: UrlTree) {
         return url.toString().startsWith('/sandbox') ||
-            url.toString().startsWith('/campage') ||
+            url.toString().startsWith('/ipvd') ||
             url.toString().startsWith('/main') ||
             url.toString().startsWith('/other') ||
             url.toString().startsWith('/servers') ||
@@ -99,7 +102,12 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
         }),
         DeviceDetectorModule.forRoot(),
         NgbModule.forRoot(),
-        RouterModule.forRoot([], { initialNavigation: true })
+        RouterModule.forRoot([], {
+            initialNavigation: true,
+            scrollPositionRestoration: 'enabled',
+            anchorScrolling          : 'enabled',
+            enableTracing            : false
+        })
     ],
     entryComponents: [
 
@@ -107,6 +115,7 @@ class HybridUrlHandlingStrategy implements UrlHandlingStrategy {
     providers      : [
         NgbModal,
         Location,
+        Title,
         CookieService,
         NxConfigService,
         { provide: LocationStrategy, useClass: PathLocationStrategy },
@@ -122,6 +131,3 @@ export class AppModule {
     ngDoBootstrap() {
     }
 }
-
-
-

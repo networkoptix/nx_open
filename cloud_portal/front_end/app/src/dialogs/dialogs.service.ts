@@ -1,4 +1,5 @@
 import { Inject, Injectable }         from '@angular/core';
+import './../dialogs/dialogs.scss';
 import { NxModalLoginComponent }      from './login/login.component';
 import { NxModalGenericComponent }    from './generic/generic.component';
 import { NxModalShareComponent }      from './share/share.component';
@@ -31,11 +32,12 @@ export class NxDialogsService {
         hold = hold || false;
 
         return this.toast.create({
-            className       : type,
-            content         : message,
-            dismissOnTimeout: !hold,
-            dismissOnClick  : !hold,
-            dismissButton   : hold
+            additionalClasses: 'button-fix',
+            className        : type,
+            content          : message,
+            dismissOnTimeout : !hold,
+            dismissOnClick   : !hold,
+            dismissButton    : hold
         });
     }
 
@@ -61,8 +63,8 @@ export class NxDialogsService {
         return this.renameModal.open(systemId, systemName);
     }
 
-    merge(system) {
-        return this.mergeModal.open(system);
+    merge(system, systems, user) {
+        return this.mergeModal.open(system, systems, user);
     }
 
     message(type, product, productId) {

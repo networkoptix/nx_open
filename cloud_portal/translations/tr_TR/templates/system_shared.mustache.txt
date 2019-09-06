@@ -8,4 +8,4 @@ Merhaba, {{message.userFullName}}
 Video yönetim sistemine "{{message.system_name}}" erişim izni verildi.
 {{/message.sharer_name}}
 
-%PRODUCT_NAME% Portalı'nda görüntüle: {{config.portal_url}} / systems / {{message.system_id}}
+View in %CLOUD_NAME% Portal: {{config.portal_url}}/systems/{{message.system_id}}

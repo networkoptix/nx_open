@@ -6,15 +6,17 @@
         .module('cloudApp')
         .controller('ViewPageCtrl', [ '$rootScope', '$scope', '$window', 'account', 'system', '$routeParams', 'systemAPI', 'dialogs',
             '$location', '$q', '$poll', 'authorizationCheckService', 'camerasProvider',
-            'nxConfigService', 'languageService', 'nxAppStateService',
+            'nxConfigService', 'languageService', 'nxAppStateService', 'nxPageService',
 
             function ($rootScope, $scope, $window, account, system, $routeParams, systemAPI, dialogs,
                       $location, $q, $poll, authorizationCheckService, camerasProvider,
-                      nxConfigService, languageService, nxAppStateService) {
+                      nxConfigService, languageService, nxAppStateService, nxPageService) {
     
                 const CONFIG = nxConfigService.getConfig();
                 const LANG = languageService.lang;
-            
+    
+                nxPageService.setPageTitle(LANG.pageTitles.view);
+                
                 $scope.systemReady = false;
                 $scope.hasCameras = false;
     
@@ -31,7 +33,7 @@
                     });
                 }
 
-                nxAppStateService.setFooterVisibility(false)
+                nxAppStateService.setFooterVisibility(false);
                 
                 // Check if page is displayed inside an iframe
                 $scope.isInIframe = ($window.location !== $window.parent.location);
@@ -45,18 +47,13 @@
                 }
                 
                 function systemError(){
-                    dialogs.notify(LANG.errorCodes.lostConnection.replace('{{systemName}}',
-                        $scope.currentSystem.name || LANG.errorCodes.thisSystem), 'warning');
-    
-                    if ($scope.isInIframe) {
-                        $location.path(CONFIG.viewsDir + '404.html');
-                    } else {
-                        $location.path('/systems');
-                    }
+                    $scope.unreachable = true;
                 }
+                
                 authorizationCheckService
                     .requireLogin()
                     .then(function (account) {
+                        $scope.unreachable = false;
                         $scope.currentSystem = system($routeParams.systemId, account.email);
                         var systemInfoRequest = $scope.currentSystem.getInfo();
                         var systemAuthRequest = $scope.currentSystem.updateSystemAuth();

@@ -4,5 +4,5 @@ Bonjour {{message.userFullName}},
 
 {{config.portal_url}}/activate/{{message.code}}
 
-Si vous n'avez pas enregistré sur %PRODUCT_NAME%, ignorez ce courriel.
+If you didn't register in %CLOUD_NAME%, just ignore this email.
 Ne partagez pas le message ou le lien avec qui que ce soit.

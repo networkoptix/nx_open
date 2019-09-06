@@ -8,4 +8,4 @@ Witaj {{message.userFullName}}
 Masz dostęp do systemu zarządzania wideo "{{message.system_name}}".
 {{/message.sharer_name}}
 
-Wyświetl w portalu %PRODUCT_NAME%: {{config.portal_url}}/systems/{{message.system_id}}
+View in %CLOUD_NAME% Portal: {{config.portal_url}}/systems/{{message.system_id}}

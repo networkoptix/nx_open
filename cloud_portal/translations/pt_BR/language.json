@@ -1,28 +1,38 @@
 {
   "language": "pt_BR",
-  "language_name": "Português (Brazil)",
-  "productName": "%PRODUCT_NAME%",
+  "language_name": "Português (PT)",
+  "cloudName": "%CLOUD_NAME%",
+  "vmsName": "%VMS_NAME%",
   "clientProtocol": "%CLIENT_PROTOCOL%:",
   "dialogs": {
-    "okButton": "Ok",
+    "okButton": "OK",
     "cancelButton": "Cancelar",
-    "loginTitle": "Logar em %PRODUCT_NAME%",
+    "loginTitle": "Log in to %CLOUD_NAME%",
     "loginButton": "Entrar",
     "logoutAuthorisedTitle": "Já tem sessão iniciada",
     "logoutAuthorisedContinueButton": "Continuar",
     "logoutAuthorisedLogoutButton": "Terminar sessão",
-    "messageFailed": "Message has failed to send.",
-    "messageSent": "Message has been sent."
+    "messageFailed": "Falha no envio da mensagem.",
+    "messageSent": "A mensagem foi enviada.",
+    "noClientDetectedTitle": "Instalar %VMS_NAME% para visualizar o seu sistema",
+    "download": "Baixar %VMS_NAME%"
   },
-  "messageType": {
-    "ipvd_feedback": "Feedback about {{product}}",
-    "sales_inquiry": "Inquiry for {{product}}",
-    "request_support": "Request Support for {{product}}",
-    "unknown": "Unknown Message Type"
+  "messageDialog": {
+    "title": {
+      "integration": "Email for {{product}}",
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}"
+    },
+    "topic": {
+      "ipvd_feedback_page": "Feedback for cameras page",
+      "ipvd_feedback_device": "Feedback about {{product}}",
+      "contact_sales": "Contact sales for {{product}}",
+      "contact_support": "Contact support for {{product}}"
+    }
   },
   "pageTitles": {
-    "template": "{{title}} %PRODUCT_NAME%",
-    "default": "%PRODUCT_NAME%",
+    "template": "{{title}} %CLOUD_NAME%",
+    "default": "%CLOUD_NAME%",
     "registerSuccess": "Bem-vindo ao",
     "register": "Criar Conta",
     "changePassword": "Mudar senha -",
@@ -46,7 +56,8 @@
   },
   "systemStatuses": {
     "activated": "ativado",
-    "merging": "merging",
+    "incompatible": "incompatível",
+    "merging": "mesclando",
     "notActivated": "não ativado",
     "online": "online",
     "offline": "desligada",
@@ -71,7 +82,7 @@
     },
     "Advanced Viewer": {
       "label": "Visualizador Avançado",
-      "description": "Pode visualizar vídeo ao vivo, pesquisar os arquivos, configurar câmaras, controlar PTZ etc"
+      "description": "Pode ver vídeo ao vivo, navegar no arquivo, controle PTZ etc"
     },
     "Administrator": {
       "label": "Administrador",
@@ -124,12 +135,12 @@
     "cantChangePasswordPrefix": "Não é possível guardar a senha",
     "cantActivatePrefix": "Não é possível ativar a sua conta",
     "cantSendConfirmationPrefix": "Não é possível enviar o email de confirmação",
-    "cloudInvalidResponse": "A base de dados da Cloud retornou uma resposta inesperada",
     "notAuthorized": "Senha incorreta",
     "brokenAccount": "Problema inesperado com a conta. <a href=\"/restore_password\">Restaurar conta</a>",
     "wrongParameters": "Alguns parâmetros no formulário estão incorretos",
     "wrongCode": "A conta já está ativada ou o código de confirmação está incorreto",
     "wrongCodeRestore": "O código de confirmação já foi usado ou está incorreto",
+    "wrongAuthCode": "Code is expired or incorrect",
     "forbidden": "Não tem permissões para efetuar esta ação",
     "accountNotActivated": "Esta conta ainda não está ativada. <a href=\"/activate\">Enviar link de ativação novamente</a>",
     "accountBlocked": "Esta conta está temporariamente bloqueada. Por favor, tente novamente dentro de alguns minutos.",
@@ -147,21 +158,28 @@
     "lostConnection": "Conexão a {{systemName}} perdida",
     "thisSystem": "o sistema",
     "oldSafariNotSupported": "Versões do Safari anteriores à 10 não são suportadas",
-    "DUPLICATE_MEDIASERVER_FOUND": "Servidores duplicados foram encontrados em um dos sistemas.<br> Remova servidores antigos de cada sistema que você está tentando mesclar e tente novamente.",
-    "mergedSystemIsOffline": "Um dos sistemas que estão sendo mesclados está offline. Verifique se estão online e tente novamente.",
-    "INCOMPATIBLE": "Versions for systems are incompatible. To fix this problem make sure the systems have the same version."
+    "DUPLICATE_MEDIASERVER_FOUND": "Algumas listas de servidores como existentes em ambos os sistemas - no selecionado e no atual.<br>Remova os servidores offline e incompatíveis de cada sistema e tente novamente.",
+    "mergedSystemIsOffline": "O sistema <strong>{{failedSystem}}</strong> está offline.",
+    "INCOMPATIBLE": "Os sistemas têm diferentes versões de software. Por favor, atualize os dois para o <a href=\"/download\">mais recente build</a>.",
+    "FAIL": "O sistema <strong>{{failedSystem}}</strong> está atualmente inacessível.<br>Tente novamente em alguns instantes ou entre em contato com o suporte <a href=\"%SUPPORT_LINK%\" target=\"_blank\"></a>.",
+    "unknownMergeError": "Unknown error. You can try to refresh the page and repeat attempt. If the problem persists – please contact <a href=\"%SUPPORT_LINK%\" target=\"_blank\">support</a>."
+  },
+  "merging": {
+    "mergeFailedTitle": "Falha na fusão de Sistemas",
+    "commonText": "Falha ao mesclar Sistemas <strong>{{primarySystem}}</strong> e <strong>{{secondarySystem}}</strong>."
   },
   "passwordRequirements": {
-    "good": "bom",
+    "good": "boa",
     "fair": "justo",
-    "minLength": "demasiado curta",
+    "fairMessage": "Use números, letras maiúsculas e minúsculas e caracteres especiais para tornar a sua senha mais forte",
+    "minLength": "curto demais",
     "minLengthMessage": "A senha deve conter pelo menos 8 caracteres",
     "required": "incorreta",
     "requiredMessage": "Use apenas letras latinas, números e símbolos do teclado, evite espaços à esquerda e à direita",
     "weak": "fraca",
     "weakMessage": "Use números, letras maiúsculas e minúsculas e caracteres especiais para tornar a sua senha mais forte",
     "strongMessage": "Senha forte!",
-    "common": "demasiado comum",
+    "common": "muito comum",
     "commonMessage": "Esta senha está principais senhas mais populares no mundo",
     "missingMessage": "A senha é necessária"
   },
@@ -185,7 +203,7 @@
     "confirmRenameTitle": "Nome do Sistema",
     "confirmRenameAction": "Gravar",
     "successRename": "Nome do sistema guardado",
-    "confirmDisconnectTitle": "Desconectar o sistema de %PRODUCT_NAME%?",
+    "confirmDisconnectTitle": "Disconnect System from %CLOUD_NAME%?",
     "confirmDisconnectAction": "Desconectar",
     "confirmUnshareFromMe": "Está prestes a desconectar este Sistema da sua conta. Não poderá mais aceder a este Sistema. Tem certeza?",
     "confirmUnshareFromMeTitle": "Desconectar o Sistema?",
@@ -193,11 +211,13 @@
     "confirmUnshare": "Este utilizador não será capaz de aceder ao sistema. Tem certeza?",
     "confirmUnshareTitle": "Apagar utilizador?",
     "confirmUnshareAction": "Apagar",
-    "successDisconnected": "O Sistema foi desconectado de %PRODUCT_NAME% com sucesso",
+    "successDisconnected": "System is successfully disconnected from %CLOUD_NAME%",
     "successDeleted": "O sistema {{systemName}} foi apagado com sucesso da sua conta",
-    "successMerge": "Mesclagem de sistema concluída",
+    "mergeFailed": "Falha na mesclagem do sistema",
+    "mergeStart": "Sistemas começaram a se fundir",
+    "mergeSuccess": "Mesclagem de sistema concluída",
     "permissionsRemoved": "As permissões foram removidas de {{email}}",
-    "unknownName": "Unknown Name for System (Caused by cloud merge)"
+    "unknownName": "Nome desconhecido para o sistema (Causado pela mescla de nuvem)"
   },
   "account": {
     "accountSavedSuccess": "A sua conta foi gravada com sucesso",
@@ -206,72 +226,6 @@
     "changePassword": "Mudar Senha",
     "newPasswordLabel": "Nova senha",
     "saveChanges": "Gravar"
-  },
-  "downloads": {
-    "noClientDetectedTitle": "Instalar %VMS_NAME% para visualizar o seu sistema",
-    "action": "Baixar %VMS_NAME%",
-    "mobile": {
-      "ios": {
-        "link": "%IOS_APPLICATION_LINK%"
-      },
-      "android": {
-        "link": "%ANDROID_APPLICATION_LINK%"
-      }
-    },
-    "groups": {
-      "windows": {
-        "label": "Windows",
-        "supported": "7, 8, 8.1, 10, Server 2008, Server 2012"
-      },
-      "mac": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "linux": {
-        "label": "Ubuntu Linux",
-        "shortLabel": "Ubuntu",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      },
-      "macos": {
-        "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan, OSX 10.12 Sierra, OSX 10.13 High Sierra"
-      },
-      "ios": {
-        "label": "iOS",
-        "shortLabel": "iOS"
-      },
-      "android": {
-        "label": "Android",
-        "shortLabel": "Android"
-      },
-      "arm": {
-        "label": "ARM",
-        "shortLabel": "ARM",
-        "supported": "Ubuntu 14.04 LTS, 16.04 LTS"
-      }
-    },
-    "platforms": {
-      "win64": "x64",
-      "win86": "x86",
-      "linux64": "x64",
-      "linux86": "x86",
-      "mac": "X"
-    },
-    "appTypes": {
-      "client": "Somente cliente",
-      "server": "Somente servidor",
-      "bundle": "Cliente e Servidor",
-      "servertool": "Ferramenta de configuração"
-    },
-    "releasesTypes": {
-      "beta": "Beta",
-      "betas": "Betas",
-      "rc": "Release Candidate",
-      "release": "Release",
-      "releases": "Releases",
-      "patch": "Patch",
-      "patches": "Patches"
-    }
   },
   "activeActions": {
     "sendConfirm": "Reenviar Link de Ativação",
@@ -299,6 +253,7 @@
     },
     "systemOffline": "Sistema Offline",
     "systemHasNoCameras": "SEM CÂMARAS",
+    "systemUnreachable": "SYSTEM IS UNREACHABLE",
     "cameraStates": {
       "offline": "Desligado",
       "error": "Erro",
@@ -334,5 +289,10 @@
       "stop listening": "parar de ouvir",
       "help": "help | show commands"
     }
+  },
+  "recommendSupport": {
+    "a_recommend": "Recomendamos consulta com",
+    "b_support": "suporte",
+    "c_proceeding": "antes de prosseguir."
   }
 }

@@ -157,7 +157,6 @@ BasicTestFixture::BasicTestFixture(
     int relayCount,
     std::optional<std::chrono::seconds> disconnectedPeerTimeout)
     :
-    base_type("cloud_connect_integration"),
     m_staticMsgBody("Hello, hren!"),
     m_unfinishedRequestsLeft(0),
     m_relayCount(relayCount),

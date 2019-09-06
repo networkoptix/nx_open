@@ -5,6 +5,7 @@
 #include <openssl/md5.h>
 
 #include <nx/cloud/db/api/cloud_nonce.h>
+#include <nx/cloud/db/client/data/types.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
@@ -14,7 +15,9 @@
 #include <nx/cloud/db/client/data/auth_data.h>
 #include <nx/clusterdb/engine/command_log.h>
 
+#include "system_manager.h"
 #include "temporary_account_password_manager.h"
+#include "../access_control/authentication_helper.h"
 #include "../dao/user_authentication_data_object_factory.h"
 #include "../settings.h"
 #include "../stree/cdb_ns.h"
@@ -27,16 +30,20 @@ AuthenticationProvider::AuthenticationProvider(
     const conf::Settings& settings,
     nx::sql::AbstractAsyncSqlQueryExecutor* sqlQueryExecutor,
     AbstractAccountManager* accountManager,
+    AbstractSystemManager* systemManager,
     AbstractSystemSharingManager* systemSharingManager,
     const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager,
+    std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
     ec2::AbstractVmsP2pCommandBus* vmsP2pCommandBus)
 :
     m_settings(settings),
     m_sqlQueryExecutor(sqlQueryExecutor),
     m_accountManager(accountManager),
+    m_systemManager(systemManager),
     m_systemSharingManager(systemSharingManager),
     m_temporaryAccountCredentialsManager(temporaryAccountCredentialsManager),
     m_authenticationDataObject(dao::UserAuthenticationDataObjectFactory::instance().create()),
+    m_authDataProviders(std::move(authDataProviders)),
     m_vmsP2pCommandBus(vmsP2pCommandBus)
 {
     m_accountManager->addExtension(this);
@@ -100,7 +107,7 @@ void AuthenticationProvider::getAuthenticationResponse(
     std::string systemId;
     if (!authzInfo.get(attr::authSystemId, &systemId))
         return completionHandler(api::ResultCode::forbidden, api::AuthResponse());
-    if (authRequest.realm != AuthenticationManager::realm())
+    if (authRequest.realm != AuthenticationManager::realm().toStdString())
         return completionHandler(api::ResultCode::unknownRealm, api::AuthResponse());
 
     auto isNonceValid = std::make_shared<bool>(false);
@@ -118,6 +125,66 @@ void AuthenticationProvider::getAuthenticationResponse(
 
             auto response = prepareAuthenticationResponse(systemId, authRequest);
             completionHandler(std::get<0>(response), std::get<1>(response));
+        });
+}
+
+void AuthenticationProvider::resolveUserCredentials(
+    const AuthorizationInfo& /*authzInfo*/,
+    const api::UserAuthorization& authorization,
+    std::function<void(api::Result, api::CredentialsDescriptor)> completionHandler)
+{
+    NX_VERBOSE(this, "Resolving authorization: %1, %2",
+        authorization.requestMethod, authorization.requestAuthorization);
+
+    HttpDigestAuthenticator authenticator(
+        authorization.requestMethod,
+        authorization.requestAuthorization);
+
+    nx::utils::stree::ResourceContainer attributes;
+    const auto authResult = authenticator.authenticateInDataManagers(
+        m_authDataProviders,
+        &attributes);
+
+    api::CredentialsDescriptor response;
+    response.status = authResult;
+
+    if (authResult == api::ResultCode::ok)
+    {
+        fillAuthObjectDescriptor(attributes, &response);
+
+        NX_DEBUG(this, "Authorization: (%1, %2) resolved to %3 %4",
+            authorization.requestMethod, authorization.requestAuthorization,
+            response.objectType, response.objectId);
+    }
+    else
+    {
+        NX_DEBUG(this, "Resolve of authorization: (%1, %2) failed: %3",
+            authorization.requestMethod, authorization.requestAuthorization,
+            QnLexical::serialized(authResult));
+    }
+
+    completionHandler(api::ResultCode::ok, std::move(response));
+}
+
+void AuthenticationProvider::getSystemAccessLevel(
+    const AuthorizationInfo& authzInfo,
+    const std::string& systemId,
+    const api::UserAuthorization& authorization,
+    std::function<void(api::Result, api::SystemAccess)> completionHandler)
+{
+    auto executor = std::make_unique<GetSystemAccessLevelExecutor>(this, m_systemManager);
+    auto executorPtr = executor.get();
+    executorPtr->execute(
+        authzInfo,
+        systemId,
+        authorization,
+        [executor = std::move(executor),
+            completionHandler = std::move(completionHandler),
+            currentRequestIncrement = m_ongoingOperationCounter.getScopedIncrement()](
+                auto&&... args) mutable
+        {
+            executor.reset();
+            completionHandler(std::forward<decltype(args)>(args)...);
         });
 }
 
@@ -465,6 +532,146 @@ void AuthenticationProvider::startCheckForExpiredAuthRecordsTimer(sql::DBResult 
             ? m_settings.auth().continueUpdatingExpiredAuthPeriod
             : m_settings.auth().checkForExpiredAuthPeriod,
         std::bind(&AuthenticationProvider::checkForExpiredAuthRecordsAsync, this));
+}
+
+void AuthenticationProvider::fillAuthObjectDescriptor(
+    const nx::utils::stree::ResourceContainer& attributes,
+    api::CredentialsDescriptor* descriptor)
+{
+    if (auto email = attributes.get<std::string>(attr::authAccountEmail))
+    {
+        descriptor->objectType = api::ObjectType::account;
+        descriptor->objectId = *email;
+    }
+    else if (auto systemId = attributes.get<std::string>(attr::authSystemId))
+    {
+        descriptor->objectType = api::ObjectType::system;
+        descriptor->objectId = *systemId;
+    }
+    else
+    {
+        NX_ASSERT(false);
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+GetSystemAccessLevelExecutor::GetSystemAccessLevelExecutor(
+    AuthenticationProvider* authenticationProvider,
+    AbstractSystemManager* systemManager)
+    :
+    m_authenticationProvider(authenticationProvider),
+    m_systemManager(systemManager)
+{
+}
+
+void GetSystemAccessLevelExecutor::execute(
+    const AuthorizationInfo& authzInfo,
+    const std::string& systemId,
+    const api::UserAuthorization& authorization,
+    CompletionHandler completionHandler)
+{
+    NX_VERBOSE(this, "Fetching authorization (%1, %2) access to system %3",
+        authorization.requestMethod, authorization.requestAuthorization, systemId);
+
+    m_userAuthorization = authorization;
+    m_systemId = systemId;
+    m_completionHandler = std::move(completionHandler);
+
+    m_authenticationProvider->resolveUserCredentials(
+        authzInfo,
+        m_userAuthorization,
+        [this](auto&&... args) { handleResolvedCredentials(std::forward<decltype(args)>(args)...); });
+}
+
+void GetSystemAccessLevelExecutor::handleResolvedCredentials(
+    api::Result result,
+    api::CredentialsDescriptor descriptor)
+{
+    if (result != api::ResultCode::ok)
+    {
+        NX_DEBUG(this, "Failed to authenticate user digest \"%1\" for system %2. %3",
+            m_userAuthorization.requestAuthorization, m_systemId, result);
+
+        return nx::utils::swapAndCall(
+            m_completionHandler,
+            result, api::SystemAccess{api::SystemAccessRole::none});
+    }
+
+    checkSystemAccessLevel(descriptor);
+}
+
+void GetSystemAccessLevelExecutor::checkSystemAccessLevel(
+    const api::CredentialsDescriptor& descriptor)
+{
+    m_credentialsDescriptor = descriptor;
+
+    if (m_credentialsDescriptor.objectType == api::ObjectType::system &&
+        m_credentialsDescriptor.objectId == m_systemId)
+    {
+        NX_VERBOSE(this, "Credentials belong to the desired system %1", m_systemId);
+
+        return nx::utils::swapAndCall(
+            m_completionHandler,
+            api::ResultCode::ok, api::SystemAccess{api::SystemAccessRole::system});
+    }
+
+    m_systemManager->getSystems(
+        prepareAuthorizationInfo(),
+        prepareSystemsFilter(),
+        [this](auto&&... args) { handleSystemAccessResult(std::forward<decltype(args)>(args)...); });
+}
+
+AuthorizationInfo GetSystemAccessLevelExecutor::prepareAuthorizationInfo()
+{
+    nx::utils::stree::ResourceContainer resources;
+    switch (m_credentialsDescriptor.objectType)
+    {
+        case api::ObjectType::account:
+            resources.put(attr::authAccountEmail, m_credentialsDescriptor.objectId.c_str());
+            break;
+
+        case api::ObjectType::system:
+            resources.put(attr::authSystemId, m_credentialsDescriptor.objectId.c_str());
+            break;
+
+        default:
+            NX_ASSERT(false);
+    }
+
+    return AuthorizationInfo(std::move(resources));
+}
+
+data::DataFilter GetSystemAccessLevelExecutor::prepareSystemsFilter()
+{
+    data::DataFilter filter;
+    filter.addFilterValue(attr::systemId, m_systemId.c_str());
+    return filter;
+}
+
+void GetSystemAccessLevelExecutor::handleSystemAccessResult(
+    api::Result result,
+    api::SystemDataExList systems)
+{
+    if (result != api::ResultCode::ok || systems.systems.empty())
+    {
+        NX_DEBUG(this, "Failed to access system %1 on behalf of credentials %2. %3",
+            m_systemId, m_credentialsDescriptor.objectId, result);
+
+        return nx::utils::swapAndCall(
+            m_completionHandler,
+            api::ResultCode::ok, api::SystemAccess{api::SystemAccessRole::none});
+    }
+
+    NX_ASSERT(systems.systems.front().id == m_systemId);
+
+    NX_VERBOSE(this, "%1 %2 has access level %3 to system %4",
+        m_credentialsDescriptor.objectType, m_credentialsDescriptor.objectId,
+        QnLexical::serialized(systems.systems.front().accessRole), m_systemId);
+
+    return nx::utils::swapAndCall(
+        m_completionHandler,
+        api::ResultCode::ok, api::SystemAccess{systems.systems.front().accessRole});
 }
 
 } // namespace nx::cloud::db

@@ -1,0 +1,12 @@
+Xin chào,
+
+You have been invited to %CLOUD_NAME%.
+{{#message.message}}
+
+{{ message.message }}
+
+{{/message.message}}
+Please create account on %CLOUD_NAME%
+sử dụng địa chỉ email hiện tại của bạn và làm theo hướng dẫn thêm.
+
+Đăng ký tài khoản của bạn bằng liên kết này: {{ config.portal_url }}/ đăng ký /{{ message.code }}

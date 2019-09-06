@@ -45,8 +45,7 @@ class CloudModuleUrlProvider:
     public utils::test::TestWithTemporaryDirectory
 {
 public:
-    CloudModuleUrlProvider():
-        utils::test::TestWithTemporaryDirectory("cdb", QString())
+    CloudModuleUrlProvider()
     {
     }
 

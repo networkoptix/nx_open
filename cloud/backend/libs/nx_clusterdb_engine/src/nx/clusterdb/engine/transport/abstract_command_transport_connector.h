@@ -12,25 +12,25 @@ namespace nx::clusterdb::engine::transport {
 class AbstractCommandPipeline;
 class AbstractConnection;
 
-struct ConnectResultDescriptor
+struct ConnectResult
 {
     SystemError::ErrorCode systemResultCode = SystemError::noError;
     nx::network::http::StatusCode::Value httpStatusCode =
         nx::network::http::StatusCode::ok;
 
-    ConnectResultDescriptor() = default;
+    ConnectResult() = default;
 
-    ConnectResultDescriptor(SystemError::ErrorCode systemResultCode):
+    ConnectResult(SystemError::ErrorCode systemResultCode):
         systemResultCode(systemResultCode)
     {
     }
 
-    ConnectResultDescriptor(nx::network::http::StatusCode::Value httpStatusCode):
+    ConnectResult(nx::network::http::StatusCode::Value httpStatusCode):
         httpStatusCode(httpStatusCode)
     {
     }
 
-    ConnectResultDescriptor(
+    ConnectResult(
         SystemError::ErrorCode systemResultCode,
         nx::network::http::StatusCode::Value httpStatusCode)
         :
@@ -65,7 +65,7 @@ class AbstractCommandPipelineConnector:
 {
 public:
     using Handler = nx::utils::MoveOnlyFunc<void(
-        ConnectResultDescriptor connectResultDescriptor,
+        ConnectResult connectResultDescriptor,
         std::unique_ptr<AbstractCommandPipeline> /*connection*/)>;
 
     virtual ~AbstractCommandPipelineConnector() = default;
@@ -80,7 +80,7 @@ class AbstractTransactionTransportConnector:
 {
 public:
     using Handler = nx::utils::MoveOnlyFunc<void(
-        ConnectResultDescriptor connectResultDescriptor,
+        ConnectResult connectResultDescriptor,
         std::unique_ptr<AbstractConnection> /*connection*/)>;
 
     virtual ~AbstractTransactionTransportConnector() = default;

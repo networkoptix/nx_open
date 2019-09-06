@@ -1,0 +1,9 @@
+<h1>Hallo, {{ message.userFullName }}</h1>
+
+<a href="mailto:{{ message.sender_email }}">{{ message.sender_name }}</a>gaf de volgende feedback voor {{ message.product }}:
+<div>{{ message.message }}</div>
+<br />
+<hr />
+<div>
+    De volgende gebruiker kan gecontacteerd worden: {{ message.sender_to_be_contacted}}
+</div>

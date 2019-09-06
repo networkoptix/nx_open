@@ -998,15 +998,15 @@
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation>ターゲットディレクトリが見つかりませんでした</translation>
+      <translation>ターゲットディレクトリが見つかりませんでした.</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation>書き込み用にファイルを開けませんでした</translation>
+      <translation>書き込み用にファイルを開けませんでした.</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation>ディスクに空き容量がありません</translation>
+      <translation>ディスクに空き容量がありません.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -1025,7 +1025,7 @@
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation>暗号化されたストリームサイズが正しくありません</translation>
+      <translation>暗号化されたストリームサイズが正しくありません.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>

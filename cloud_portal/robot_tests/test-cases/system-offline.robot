@@ -1,8 +1,8 @@
 *** Settings ***
 Resource          ../resource.robot
+Suite Setup       Open Browser and go to URL    ${url}
 Test Setup        Restart
 Test Teardown     Run Keyword If Test Failed    Open New Browser On Failure
-Suite Setup       Open Browser and go to URL    ${url}
 Suite Teardown    Close All Browsers
 Force Tags        system
 
@@ -18,7 +18,7 @@ Log in to Autotests 2 System
     Validate Log In
     Run Keyword If    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM NX}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
     Run Keyword If    '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${SHARE BUTTON SYSTEMS}    ${OPEN IN NX BUTTON}    ${RENAME SYSTEM}
-    Run Keyword Unless    '${email}' == '${EMAIL OWNER}' or '${email}' == '${EMAIL ADMIN}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
+    Run Keyword Unless    '${email}' == '${EMAIL OWNER}'    Wait Until Elements Are Visible    ${DISCONNECT FROM MY ACCOUNT}    ${OPEN IN NX BUTTON}
 
 Restart
     Register Keyword To Run On Failure    NONE
@@ -48,13 +48,14 @@ should confirm, if owner deletes system (You are going to disconnect your system
     Click Button    ${DISCONNECT FORM CANCEL}
     Wait Until Page Does Not Contain Element    ${BACKDROP}
 
-should confirm, if not owner deletes system (You will loose access to this system)
+should confirm, if not owner deletes system (You will lose access to this system)
     [tags]    Threaded
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Validate Log In
     Wait Until Element Is Visible    ${DISCONNECT FROM NX}
     Click Button    ${DISCONNECT FROM NX}
     Wait Until Elements Are Visible    ${DISCONNECT FORM}    ${DISCONNECT FORM HEADER}    ${DISCONNECT FORM CANCEL}
+    Click Element    ${DISCONNECT FORM}
     Click Button    ${DISCONNECT FORM CANCEL}
     Wait Until Page Does Not Contain Element    ${DELETE USER MODAL}
 
@@ -70,7 +71,6 @@ open in nx button should be disabled
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${OPEN IN NX BUTTON DISABLED}
     Log Out
-    Validate Log Out
     Log in to Autotests 2 System    ${EMAIL VIEWER}
     Wait Until Element Is Visible    ${OPEN IN NX BUTTON DISABLED}
 
@@ -79,7 +79,6 @@ should show offline next to system name
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${SYSTEM NAME OFFLINE}
     Log Out
-    Validate Log Out
     Log in to Autotests 2 System    ${EMAIL VIEWER}
     Wait Until Element Is Visible    ${SYSTEM NAME OFFLINE}
 
@@ -142,7 +141,7 @@ clicking 'X' closes rename dialog without rename
     Wait Until Page Does Not Contain Element    ${BACKDROP}
     Verify In System    Auto Tests 2
 
-clicking save with no input in rename dialoge throws error
+clicking save with no input in rename dialog throws error
     [tags]    C41880    Threaded
     Log in to Autotests 2 System    ${EMAIL OWNER}
     Wait Until Element Is Visible    ${RENAME SYSTEM}
@@ -168,13 +167,21 @@ does not show Share button to viewer, advanced viewer, live viewer
     \  Element Should Not Be Visible    ${SHARE BUTTON SYSTEMS}
     \  Log Out
 
+Your permissions is shown for non-owners
+    [tags]    Threaded    C41881
+    ${users}         Set Variable    ${EMAIL ADVVIEWER}    ${EMAIL VIEWER}    ${EMAIL LIVEVIEWER}    ${EMAIL CUSTOM}    ${EMAIL ADMIN}
+    ${users text}    Set Variable    ${ADV VIEWER TEXT}    ${VIEWER TEXT}     ${LIVE VIEWER TEXT}    ${CUSTOM TEXT}     ${ADMIN TEXT}
+    :FOR    ${user}  ${text}  IN ZIP  ${users}  ${users text}
+    \    Log in to Auto Tests 2 System    ${user}
+    \    Wait Until Elements Are Visible    ${OWNER NAME}    ${OWNER EMAIL}    ${YOUR PERMISSIONS}    ${YOUR PERMISSIONS}/b[contains(text(),"${text}")]
+    \    Log Out
+
 should show (your system) for owner and (owner's name) for non-owners
     [tags]    C41881    Threaded
     Log in to AutoTests 2 System    ${EMAIL OWNER}
-    Wait Until Element Is Visible    //h2[.='${YOUR SYSTEM TEXT}']
-    Wait Until Element Is Not Visible    //h2[.='${OWNER TEXT}']
+    Wait Until Element Is Visible    //h2[text()='${YOUR SYSTEM TEXT}']
+    Wait Until Element Is Not Visible    //h2[text()='${OWNER TEXT}']
     Log Out
-    Validate Log Out
     Log in to Autotests 2 System    ${EMAIL VIEWER}
-    Wait Until Elements Are Visible    //h2[.='${OWNER TEXT}']    //a[.='${EMAIL OWNER}']
-    Wait Until Element Is Not Visible    //h2[.='${YOUR SYSTEM TEXT}']
+    Wait Until Elements Are Visible    //h2[text()\='${OWNER TEXT}']    //a[text()\='${EMAIL OWNER}']
+    Wait Until Element Is Not Visible    //h2[text()='${YOUR SYSTEM TEXT}']

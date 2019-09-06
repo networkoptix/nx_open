@@ -17,15 +17,16 @@
             <a class="dropdown-item inset"
                [ngClass]="{ 'selected': active.settings}"
                [href]="'/systems/' + activeSystem.id"
-               (click)="show = false; return;"
-               translate>Settings</a>
+               (click)="show = false; return;">
+               <span translate>Settings</span></a>
         </li>
         <li class="dropdown-item-container">
             <a class="dropdown-item inset"
                [ngClass]="{ 'selected': active.view }"
                [href]="'/systems/' + activeSystem.id + '/view'"
-               (click)="show = false; return;"
-               translate>View</a>
+               (click)="show = false; return;">
+               <span translate>View</span>
+            </a>
         </li>
     </ul>
 </div>

@@ -10,7 +10,7 @@ enum class ResultCode
 {
     ok = 0,
     /**
-     * Operation succeeded but not full data has been returned 
+     * Operation succeeded but not full data has been returned
      * (e.g., due to memory usage restrictions).
      * Caller should continue fetching data supplying data offset.
      */
@@ -61,10 +61,15 @@ struct Result
     {
     }
 
+    std::string toString() const
+    {
+        return api::toString(code) + " " + description;
+    }
+
     Result& operator=(ResultCode newCode)
     {
         code = newCode;
-        description = toString(code);
+        description = api::toString(code);
         return *this;
     }
 

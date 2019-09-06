@@ -27,10 +27,11 @@
                    [ngClass]="{ 'selected': system == activeSystem }"
                    [href]="getUrlFor(system.id)"
                    (click)="show = false; return;">
-
-                    <span class="glyphicon glyphicon-home"></span>
-                    <span class="system-name">{{system.name}}</span>
-                    <span class="system-owner">&nbsp;&mdash;&nbsp;{{system.ownerFullName}}</span>
+                    <span>
+                        <span class="glyphicon glyphicon-home"></span>
+                        <span class="system-name">{{system.name}}</span>
+                        <span class="system-owner">&nbsp;&mdash;&nbsp;{{system.ownerFullName}}</span>
+                    </span>
                 </a>
             </li>
         </ul>
@@ -39,9 +40,10 @@
 
             <li class="dropdown-item-container">
                 <a class="dropdown-item inset"
-                   [href]="'/systems'"
-                   (click)="show = false; return;"
-                   translate>All Systems</a>
+                   href="/systems"
+                   (click)="show = false; return;">
+                    <span translate>All Systems</span>
+                </a>
             </li>
         </ul>
     </div>

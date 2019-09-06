@@ -10,6 +10,8 @@
 
 int main(int argc, char** argv)
 {
+    nx::utils::TestOptions::setModuleName("vms_cloud_integration_tests");
+
     QCoreApplication app(argc, argv);
 
     return nx::network::test::runTest(

@@ -30,9 +30,6 @@ class CloudMerge:
 {
 public:
     CloudMerge():
-        nx::utils::test::TestWithTemporaryDirectory(
-            "vms_cloud_integration.cloudMerge",
-            QString()),
         m_systemMergeFixture(testDataDir().toStdString() + "/merge_test.data")
     {
     }

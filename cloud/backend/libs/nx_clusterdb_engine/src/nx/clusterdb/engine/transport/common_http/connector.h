@@ -84,7 +84,7 @@ private:
     Handler m_completionHandler;
 
     void onPipelineConnectCompleted(
-        ConnectResultDescriptor connectResultDescriptor,
+        ConnectResult connectResultDescriptor,
         std::unique_ptr<AbstractCommandPipeline> connection);
 };
 

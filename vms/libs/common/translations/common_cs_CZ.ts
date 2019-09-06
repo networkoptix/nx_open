@@ -892,14 +892,12 @@
         <numerusform>%n Kamera</numerusform>
         <numerusform>%n Cameras</numerusform>
         <numerusform>%n Cameras</numerusform>
-        <numerusform>%n Cameras</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
       <translation type="unfinished">
         <numerusform>%n kamera</numerusform>
-        <numerusform>%n cameras</numerusform>
         <numerusform>%n cameras</numerusform>
         <numerusform>%n cameras</numerusform>
       </translation>

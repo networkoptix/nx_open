@@ -1,8 +1,8 @@
-{{ message.product }}의 새 개정판이 있습니다.
+There is a new version for {{ message.product }}({{message.product_type}}) to review.
 
 {{ message.id }}링크를 선택하여 {{ message.product }}에 대한 내용을 검토를 하세요.
 
-연결확인: {{ config.portal_url }}/admin/cms/version/{{ message.id }}
+Link to review: {{ config.portal_url }}/admin/cms/productcustomizationreview/{{ message.id }}/change/
 
 상기내용은 아래와 같습니다.
 1) 최근변경사항 확인하기
