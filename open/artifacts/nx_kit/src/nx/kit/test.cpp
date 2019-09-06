@@ -30,10 +30,11 @@ struct TestFailure: std::exception
 {
     const char* const file;
     const int line;
+    const int actualLine;
     const std::string message;
 
-    TestFailure(const char* file, int line, std::string message):
-        file(file), line(line), message(std::move(message))
+    TestFailure(const char* file, int line, int actualLine, std::string message):
+        file(file), line(line), actualLine(actualLine), message(std::move(message))
     {
     }
 
@@ -43,9 +44,9 @@ struct TestFailure: std::exception
 void failEq(
     const char* expectedValue, const char* expectedExpr,
     const char* actualValue, const char* actualExpr,
-    const char* const file, int line)
+    const char* const file, int line, int actualLine /*= -1*/)
 {
-    throw TestFailure(file, line,
+    throw TestFailure(file, line, actualLine,
         std::string("    Expected: [") + expectedValue + "] (" + expectedExpr + ")\n" +
         std::string("    Actual:   [") + actualValue + "] (" + actualExpr + ")");
 }
@@ -53,20 +54,20 @@ void failEq(
 void assertStrEq(
     const char* expectedValue, const char* expectedExpr,
     const char* actualValue, const char* actualExpr,
-    const char* file, int line)
+    const char* file, int line, int actualLine /*= -1*/)
 {
     using nx::kit::utils::toString;
 
     if (expectedValue == nullptr)
     {
-        throw TestFailure(file, line,
+        throw TestFailure(file, line, actualLine,
             std::string("    INTERNAL ERROR: Expected string is null: [")
                 + toString(expectedExpr) + "]\n");
     }
 
     if (actualValue == nullptr || strcmp(expectedValue, actualValue) != 0)
     {
-        throw TestFailure(file, line, nx::kit::utils::format(
+        throw TestFailure(file, line, actualLine, nx::kit::utils::format(
             "    Expected: [%s] (%s)\n"
             "    Actual:   [%s] (%s)",
             toString(expectedValue).c_str(), expectedExpr,
@@ -80,11 +81,12 @@ static std::string boolToString(bool value)
 }
 
 void assertBool(
-    bool expected, bool condition, const char* conditionStr, const char* file, int line)
+    bool expected, bool condition, const char* conditionStr,
+    const char* file, int line, int actualLine /*= -1*/)
 {
     if (expected != condition)
     {
-        throw TestFailure(file, line,
+        throw TestFailure(file, line, actualLine,
             "    Expected " + boolToString(expected) + ", but is " + boolToString(condition)
             + ": " + conditionStr);
     }
@@ -268,7 +270,8 @@ static std::string randAsString()
     static bool randomized = false;
     if (!randomized)
     {
-        auto seed = (unsigned int) std::chrono::steady_clock::now().time_since_epoch().count();
+        const auto seed = (unsigned int)
+            std::chrono::steady_clock::now().time_since_epoch().count();
         srand(seed);
         randomized = true;
         if (verbose)
@@ -374,7 +377,9 @@ static bool runTest(Test& test, int testNumber)
     catch (const TestFailure& e)
     {
         std::cerr << std::endl
-            << "Test #" << testNumber << " FAILED at line " << e.line << ", file " << e.file
+            << "Test #" << testNumber << " FAILED at line " << e.line
+            << (e.actualLine < 0 ? "" : nx::kit::utils::format(" (actual line %d)", e.actualLine))
+            << ", file " << e.file
             << std::endl;
         std::cerr << std::endl << e.message << std::endl;
     }

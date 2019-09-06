@@ -13,6 +13,7 @@
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/elided_label.h>
+#include <utils/common/delayed.h>
 #include <utils/common/html.h>
 
 #include <nx/vms/client/desktop/ini.h>
@@ -31,6 +32,8 @@ namespace {
 
 // Delay after which preview is requested again in case of receiving "NO DATA".
 static const milliseconds kPreviewReloadDelay = seconds(ini().rightPanelPreviewReloadDelay);
+
+static const milliseconds kPreviewLoadDelay(qMax(ini().tilePreviewLoadDelayOverrideMs, 0));
 
 static constexpr auto kRoundingRadius = 2;
 
@@ -82,13 +85,6 @@ void setWidgetHolder(QWidget* widget, QWidget* newHolder)
     widget->setHidden(wasHidden);
 }
 
-milliseconds previewLoadDelay()
-{
-    return ini().tilePreviewLoadDelayOverrideMs < 1
-        ? 1ms
-        : milliseconds(ini().tilePreviewLoadDelayOverrideMs);
-}
-
 } // namespace
 
 // ------------------------------------------------------------------------------------------------
@@ -129,7 +125,7 @@ struct EventTile::Private
 
     void handleHoverChanged(bool hovered)
     {
-        const auto showCloseButton = hovered && closeable;
+        const auto showCloseButton = (hovered || q->progressBarVisible()) && closeable;
         q->ui->timestampLabel->setHidden(showCloseButton || q->ui->timestampLabel->text().isEmpty());
         closeButton->setVisible(showCloseButton);
         updateBackgroundRole(hovered);
@@ -230,10 +226,19 @@ struct EventTile::Private
 
     void updatePreview(milliseconds delay)
     {
-        if (isPreviewUpdateRequired())
-            loadPreviewTimer->start(delay);
+        if (delay <= 0ms)
+        {
+            // Still must be delayed.
+            if (isPreviewUpdateRequired())
+                executeLater([this]() { requestPreview(); }, q);
+        }
         else
-            loadPreviewTimer->stop();
+        {
+            if (isPreviewUpdateRequired())
+                loadPreviewTimer->start(delay);
+            else
+                loadPreviewTimer->stop();
+        }
     }
 
     void showDebugPreviewTimestamp()
@@ -416,6 +421,14 @@ void EventTile::setCloseable(bool value)
         return;
 
     d->closeable = value;
+
+    if (progressBarVisible())
+    {
+        QMargins parentMargins = ui->progressBar->parentWidget()->contentsMargins();
+        parentMargins.setRight(d->closeable ? d->closeButton->width() : kMarginsWithHeader.right());
+        ui->progressBar->parentWidget()->setContentsMargins(parentMargins);
+    }
+
     d->handleHoverChanged(underMouse());
 }
 
@@ -536,7 +549,7 @@ void EventTile::setPreview(ImageProvider* value, bool forceUpdate)
 
     d->isPreviewLoadNeeded = false;
     d->forceNextPreviewUpdate = forceUpdate;
-    d->updatePreview(previewLoadDelay());
+    d->updatePreview(kPreviewLoadDelay);
 
     if (ini().showDebugTimeInformationInRibbon)
         d->showDebugPreviewTimestamp();
@@ -580,7 +593,7 @@ void EventTile::setAutomaticPreviewLoad(bool value)
 
     d->automaticPreviewLoad = value;
     d->isPreviewLoadNeeded = d->isPreviewLoadNeeded && !d->automaticPreviewLoad;
-    d->updatePreview(previewLoadDelay());
+    d->updatePreview(kPreviewLoadDelay);
 }
 
 bool EventTile::isPreviewLoadNeeded() const
@@ -763,7 +776,7 @@ void EventTile::setPreviewEnabled(bool value)
     ui->previewWidget->setHidden(!value);
     ui->previewWidget->parentWidget()->setHidden(!value || !ui->previewWidget->imageProvider());
 
-    d->updatePreview(previewLoadDelay());
+    d->updatePreview(kPreviewLoadDelay);
 }
 
 bool EventTile::footerEnabled() const

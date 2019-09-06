@@ -188,10 +188,9 @@ int QnTransactionLog::currentSequenceNoLock() const
 
 ErrorCode QnTransactionLog::updateSequence(const nx::vms::api::UpdateSequenceData& data)
 {
-    detail::QnDbManager::QnDbTransactionLocker
-        locker(dbManager(m_dbManager, Qn::kSystemAccess).getTransaction());
-
-    for(const nx::vms::api::SyncMarkerRecordData& record: data.markers)
+    const auto transaction = dbManager(m_dbManager, Qn::kSystemAccess).getTransaction();
+    detail::QnDbManager::QnDbTransactionLocker locker(transaction, __FILE__, __LINE__);
+    for (const nx::vms::api::SyncMarkerRecordData& record: data.markers)
     {
         NX_DEBUG(QnLog::EC2_TRAN_LOG.join(this),
             lm("update transaction sequence in log. key=%1 dbID=%2 dbSeq=%3"),
@@ -210,9 +209,15 @@ ErrorCode QnTransactionLog::updateSequence(const QnAbstractTransaction& tran, Tr
 {
     std::unique_ptr<detail::QnDbManager::QnAbstractTransactionLocker> locker;
     if (lockType == TransactionLockType::Regular)
-        locker.reset(new detail::QnDbManager::QnDbTransactionLocker(m_dbManager->getTransaction()));
+    {
+        locker.reset(new detail::QnDbManager::QnDbTransactionLocker(
+            m_dbManager->getTransaction(), __FILE__, __LINE__));
+    }
     else
-        locker.reset(new detail::QnDbManager::QnLazyTransactionLocker(m_dbManager->getTransaction()));
+    {
+        locker.reset(new detail::QnDbManager::QnLazyTransactionLocker(
+            m_dbManager->getTransaction(), __FILE__, __LINE__));
+    }
 
     //NX_ASSERT(m_state.values.value(vms::api::PersistentIdData(tran.peerID, tran.persistentInfo.dbID)) <= tran.persistentInfo.sequence);
     if (m_state.values.value(vms::api::PersistentIdData(tran.peerID, tran.persistentInfo.dbID)) >= tran.persistentInfo.sequence)

@@ -5,10 +5,14 @@
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
-#include <nx/sdk/helpers/ptr.h>
-#include <nx/sdk/helpers/to_string.h>
+#include <nx/sdk/ptr.h>
 #include <nx/vms/server/sdk_support/utils.h>
-#include <nx/vms/server/analytics/debug_helpers.h>
+#include <nx/vms/server/sdk_support/to_string.h>
+
+#include <nx/vms/server/analytics/wrappers/plugin.h>
+#include <nx/vms/server/analytics/wrappers/engine.h>
+#include <nx/vms/api/analytics/plugin_manifest.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
@@ -32,6 +36,9 @@ namespace nx::vms::server::analytics {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
+template<typename T>
+using ResultHolder = nx::vms::server::sdk_support::ResultHolder<T>;
+
 class SdkObjectFactory;
 
 namespace {
@@ -40,19 +47,11 @@ const nx::utils::log::Tag kLogTag{typeid(nx::vms::server::analytics::SdkObjectFa
 
 PluginManager* getPluginManager(QnMediaServerModule* serverModule)
 {
-    if (!serverModule)
-    {
-        NX_ASSERT(false, "Can't access the server module");
+    if (!NX_ASSERT(serverModule, "Can't access ServerModule"))
         return nullptr;
-    }
 
-    auto pluginManager = serverModule->pluginManager();
-    if (!pluginManager)
-    {
-        NX_ASSERT(false, "Can't access the plugin manager");
-        return nullptr;
-    }
-
+    const auto pluginManager = serverModule->pluginManager();
+    NX_ASSERT(pluginManager, "Can't access PluginManager");
     return pluginManager;
 }
 
@@ -60,28 +59,28 @@ ec2::AbstractAnalyticsManagerPtr getAnalyticsManager(QnMediaServerModule* server
 {
     if (!serverModule)
     {
-        NX_ASSERT(false, "Can't access the server module");
+        NX_ASSERT(false, "Can't access the ServerModule");
         return nullptr;
     }
 
     const auto commonModule = serverModule->commonModule();
     if (!commonModule)
     {
-        NX_ASSERT(false, "Can't access the common module");
+        NX_ASSERT(false, "Can't access CommonModule");
         return nullptr;
     }
 
     auto ec2Connection = commonModule->ec2Connection();
     if (!ec2Connection)
     {
-        NX_ASSERT(false, "Can't access the ec2 connection");
+        NX_ASSERT(false, "Can't access the Ec2Connection");
         return nullptr;
     }
 
     auto analyticsManager = ec2Connection->getAnalyticsManager(Qn::kSystemAccess);
     if (!analyticsManager)
     {
-        NX_ASSERT(false, "Can't access the analytics manager");
+        NX_ASSERT(false, "Can't access AnalyticsManager");
         return nullptr;
     }
 
@@ -134,22 +133,24 @@ bool SdkObjectFactory::initPluginResources()
     std::map<QnUuid, Ptr<nx::sdk::analytics::IPlugin>> sdkPluginsById;
     for (const auto& analyticsPlugin: analyticsPlugins)
     {
-        const auto pluginManifest = sdk_support::manifest<nx::vms::api::analytics::PluginManifest>(
-            analyticsPlugin,
-            debug_helpers::nameOfFileToDumpOrLoadData(analyticsPlugin.get(), "_manifest.json"),
-            makeLogger(analyticsPlugin.get()));
-
-        if (!pluginManifest)
-        {
-            NX_ERROR(this, "Can't fetch a manifest from the analytics plugin %1",
-                analyticsPlugin->name());
+        const auto pluginInfo = pluginManager->pluginInfo(analyticsPlugin.get());
+        if (!NX_ASSERT(pluginInfo))
             continue;
-        }
+
+        const QString pluginLibName = pluginInfo->libName;
+        const auto pluginWrapper = std::make_shared<wrappers::Plugin>(
+            serverModule(),
+            analyticsPlugin,
+            pluginLibName);
+
+        const auto pluginManifest = pluginWrapper->manifest();
+        if (!pluginManifest)
+            continue;
 
         const auto id = QnUuid::fromArbitraryData(pluginManifest->id);
         sdkPluginsById.emplace(id, analyticsPlugin);
 
-        NX_DEBUG(this, "Creating an analytics plugin resource. Id: %1; Name: %2",
+        NX_DEBUG(this, "Creating an Analytics Plugin resource. Id: %1; Name: %2",
             id, pluginManifest->name);
 
         auto& data = pluginDataById[id];
@@ -163,7 +164,7 @@ bool SdkObjectFactory::initPluginResources()
     const auto resPool = serverModule()->resourcePool();
     if (!resPool)
     {
-        NX_ERROR(this, "Can't access the resource pool");
+        NX_ERROR(this, "Can't access ResourcePool");
         return false;
     }
 
@@ -177,8 +178,8 @@ bool SdkObjectFactory::initPluginResources()
         if (!pluginResource)
         {
             NX_WARNING(this,
-                "Unable to find a plugin resource in the resource pool. "
-                "Plugin name: %1, plugin Id: %2",
+                "Unable to find a Plugin resource in the resource pool. "
+                "Plugin name: %1, Plugin Id: %2",
                 pluginData.name, pluginData.id);
             continue;
         }
@@ -192,17 +193,19 @@ bool SdkObjectFactory::initPluginResources()
             continue;
         }
 
-        pluginResource->setSdkPlugin(sdkPluginItr->second);
-        auto result = pluginResource->init();
-        if (!result)
-        {
-            NX_WARNING(this,
-                "Error while initializing plugin resource: %1. "
-                "Plugin resource name: %2, Plugin resource Id: %3",
-                result, pluginResource->getName(), pluginResource->getId());
+        const auto pluginInfo = pluginManager->pluginInfo(sdkPluginItr->second.get());
+        if (!NX_ASSERT(pluginInfo))
+            continue;
 
+        pluginResource->setSdkPlugin(std::make_shared<wrappers::Plugin>(
+            serverModule(), pluginResource, sdkPluginItr->second, pluginInfo->libName));
+
+        if (!pluginResource->init())
+        {
+            NX_WARNING(this, "Error while initializing the Plugin resource %1", pluginResource);
             continue;
         }
+
         pluginResource->setStatus(Qn::Online);
     }
 
@@ -220,8 +223,7 @@ bool SdkObjectFactory::initEngineResources()
 
     if (errorCode != ec2::ErrorCode::ok)
     {
-        NX_ERROR(this, "Error has occured while retrieving engines from the database: %1",
-            errorCode);
+        NX_ERROR(this, "Error while retrieving Engines from the database: %1", errorCode);
         return false;
     }
 
@@ -248,80 +250,77 @@ bool SdkObjectFactory::initEngineResources()
     std::map<QnUuid, Ptr<IEngine>> sdkEnginesById;
     for (const auto& entry: engineDataByPlugin)
     {
-        const auto& engineList = entry.second;
-        for (const auto& engine: engineList)
+        const auto& engineDataList = entry.second;
+        for (const auto& engineData: engineDataList)
         {
-            analyticsManager->saveSync(engine);
-            auto engineResource = serverModule()->resourcePool()
-                ->getResourceById<resource::AnalyticsEngineResource>(engine.id);
-
-            if (!engineResource)
+            analyticsManager->saveSync(engineData);
+            if (const auto engineResource =
+                serverModule()->resourcePool()->getResourceById<resource::AnalyticsEngineResource>(engineData.id))
+            {
+                if (createEngine(engineResource))
+                    activeEngines.insert(engineResource->getId());
+            }
+            else
             {
                 NX_WARNING(this,
-                    "Unable to find an analytics engine resource in the resource pool. "
-                    "Engine name: %1, engine Id: (%2)",
-                    engine.name, engine.id);
-
-                continue;
+                    "Unable to find an Analytics Engine Resource in Resource Pool "
+                    "for the Engine %1 (%2)",
+                    engineData.name, engineData.id);
             }
-
-            auto parentPlugin = engineResource->plugin()
-                .dynamicCast<resource::AnalyticsPluginResource>();
-
-            if (!parentPlugin)
-            {
-                NX_WARNING(this,
-                    "Unable to find a parent analytics plugin for the engine %1 (%2)",
-                    engineResource->getName(), engineResource->getId());
-
-                continue;
-            }
-
-            auto sdkPlugin = parentPlugin->sdkPlugin();
-            if (!sdkPlugin)
-            {
-                NX_WARNING(this,
-                    "Plugin resource %1 (%2) has no correspondent SDK object",
-                    parentPlugin->getName(), parentPlugin->getId());
-
-                continue;
-            }
-
-            Error error = Error::noError;
-            const auto sdkEngine = toPtr(sdkPlugin->createEngine(&error));
-            if (!sdkEngine)
-            {
-                NX_WARNING(this, "Unable to create a SDK engine %1 (%2)",
-                    engineResource->getName(), engineResource->getId());
-                continue;
-            }
-
-            if (error != Error::noError)
-            {
-                NX_WARNING(this,
-                    "Error '%1' occured while creating a SDK engine. "
-                    "Engine resource name: %2, engine resource Id: %3",
-                    error, engineResource->getName(), engineResource->getId());
-
-                continue;
-            }
-
-            engineResource->setSdkEngine(sdkEngine);
-            const auto result = engineResource->init();
-            if (!result)
-            {
-                NX_WARNING(this,
-                    "Error while initializing engine resource: %1. "
-                    "Engine resource name: %2, engine resource Id: %3",
-                    result, engineResource->getName(), engineResource->getId());
-
-                continue;
-            }
-            activeEngines.insert(engineResource->getId());
         }
     }
 
     updateActiveEngines(std::move(activeEngines));
+    return true;
+}
+
+bool SdkObjectFactory::createEngine(
+    const resource::AnalyticsEngineResourcePtr& engineResource) const
+{
+    const auto error = //< Allows to be called as `return error("%1...", args);`.
+        [this](auto&&... args)
+        {
+            NX_WARNING(this, std::forward<decltype(args)>(args)...);
+            return false;
+        };
+
+    const QString engineRef =
+        lm("Engine %1 (%2)").args(engineResource->getName(), engineResource->getId());
+
+    const auto pluginResource =
+        engineResource->plugin().dynamicCast<resource::AnalyticsPluginResource>();
+
+    if (!pluginResource)
+        return error("Unable to find a parent Analytics Plugin for the %1", engineRef);
+
+    const auto plugin = pluginResource->sdkPlugin();
+    if (!plugin)
+    {
+        return error("Plugin Resource %1 (%2) has no corresponding Plugin object",
+            pluginResource->getName(), pluginResource->getId());
+    }
+
+    const wrappers::EnginePtr engine = plugin->createEngine(engineResource);
+    if (!engine)
+        return false;
+
+    engineResource->setSdkEngine(engine);
+    if (!engineResource->init())
+        return error("Error while initializing %1", engineRef);
+
+    if (engineResource->isDeviceDependent())
+    {
+        const auto pluginManager = getPluginManager(serverModule());
+        if (!pluginManager)
+            return false; //< An assertion already has failed.
+
+        const auto sdkPluginObject = plugin->sdkObject();
+        if (!sdkPluginObject)
+            return error("Unable to access SDK Plugin object of %1", engineRef);
+
+        pluginManager->setIsActive(sdkPluginObject.get(), /*isActive*/ false);
+    }
+
     return true;
 }
 
@@ -350,24 +349,6 @@ nx::vms::api::AnalyticsEngineData SdkObjectFactory::createEngineData(
     engineData.typeId = nx::vms::api::AnalyticsEngineData::kResourceTypeId;
 
     return engineData;
-}
-
-std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogger(
-    resource::AnalyticsPluginResourcePtr pluginResource) const
-{
-    const QString messageTemplate("Error occurred while fetching Plugin manifest: {:error}");
-    return std::make_unique<sdk_support::ManifestLogger>(
-        typeid(*this), //< Using the same tag for all instances.
-        messageTemplate,
-        std::move(pluginResource));
-}
-
-std::unique_ptr<sdk_support::AbstractManifestLogger> SdkObjectFactory::makeLogger(
-    const nx::sdk::analytics::IPlugin* plugin) const
-{
-    return std::make_unique<sdk_support::StartupPluginManifestLogger>(
-        typeid(*this), //< Using the same tag for all instances.
-        plugin);
 }
 
 } // namespace nx::vms::server::analytics

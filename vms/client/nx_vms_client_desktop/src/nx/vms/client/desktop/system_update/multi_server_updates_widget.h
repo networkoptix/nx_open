@@ -14,10 +14,10 @@
 
 #include <utils/common/id.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
-#include <nx/update/common_update_manager.h>
 
 #include "server_update_tool.h"
 #include "client_update_tool.h"
+#include "server_status_delegate.h"
 
 namespace Ui { class MultiServerUpdatesWidget; }
 
@@ -25,7 +25,6 @@ namespace nx::vms::client::desktop {
 
 class ServerUpdatesModel;
 class SortedPeerUpdatesModel;
-class ServerStatusItemDelegate;
 struct UpdateItem;
 
 /**
@@ -73,6 +72,7 @@ public:
         bool hasLatestVersion = false;
         bool checking = false;
         QString version;
+        QString alreadyInstalledMessage;
         /** Status messages. It is displayed under version when something went wrong. */
         QStringList statusMessages;
         /** Modes for displaying version number. */
@@ -87,6 +87,7 @@ public:
         };
 
         VersionMode versionMode = VersionMode::full;
+        bool notEnoughSpace = false;
         enum class HighlightMode
         {
             regular,
@@ -97,11 +98,164 @@ public:
         HighlightMode versionHighlight = HighlightMode::regular;
         HighlightMode statusHighlight = HighlightMode::regular;
 
-        bool isEqual(const VersionReport& another) const;
+        bool operator==(const VersionReport& another) const;
+    };
+
+    /** Incapsulates all the state for control panel. */
+    struct ControlPanelState
+    {
+        bool actionEnabled = true;
+        QString actionCaption;
+        QStringList actionTooltips;
+
+        bool showManualDownload = false;
+        bool cancelEnabled = true;
+        enum class PanelMode
+        {
+            /** Showing 'download, cancel' buttons. */
+            control,
+            /** Showing process panel. */
+            process,
+            /** Showing empty panel. */
+            empty,
+        };
+        PanelMode panelMode = PanelMode::control;
+
+        QString progressCaption;
+        QString cancelProgressCaption;
+        bool cancelProgressEnabled = false;
+        int progressMinimum = 0;
+        int progressMaximum = 0;
+        int progress = 0;
+
+        bool operator==(const ControlPanelState& another) const;
+    };
+
+    /**
+     * Storage wrapper with revision and change tracking.
+     * It addresses the problem of checking whether UI state should be updated after
+     * the changes in internal (half UI) state:
+     *   business logic -> half UI state -> rendered state
+     * It does not address reverse changes from UI state to business logic.
+     *
+     * RevisionStorage requires `operator ==` to be available for the type `Data`.
+     */
+    template<class Data>
+    struct RevisionStorage
+    {
+        RevisionStorage(const Data& data):
+            currentData(data),
+            referenceData(data)
+        {
+        }
+
+        RevisionStorage() = default;
+
+        /** Checks if there are changes to the data. */
+        bool changed() const
+        {
+            return referenceRevision != revision || !(referenceData == currentData);
+        }
+
+        void bumpRevision()
+        {
+            // We do not bump revision if there are changes already.
+            if (referenceRevision == revision)
+                revision++;
+        }
+
+        /** Accept changes to the data. It should be used after new data was rendered to UI. */
+        void acceptChanges()
+        {
+            referenceData = currentData;
+            referenceRevision = revision;
+        }
+
+        /** Rollback the changes. */
+        void rollback()
+        {
+            currentData = referenceData;
+            revision = referenceRevision;
+        }
+
+        operator Data&()
+        {
+            return currentData;
+        }
+
+        operator const Data&() const
+        {
+            return currentData;
+        }
+
+        Data* operator->()
+        {
+            return &currentData;
+        }
+
+        const Data* operator->() const
+        {
+            return &currentData;
+        }
+
+        bool operator==(const Data& other) const
+        {
+            return currentData == other;
+        }
+
+        bool operator!=(const Data& other) const
+        {
+            return currentData != other;
+        }
+
+        Data& operator=(const Data& other)
+        {
+            if (currentData == other)
+                return currentData;
+            currentData = other;
+            revision++;
+            return currentData;
+        }
+
+        template<class Type> bool compareAndSet(Type& to, const Type& from)
+        {
+            /**
+             * If it was python, I would just override __dict__ method instead and bump revision
+             * if data has changed. But it is C++ and there's no way to make it look good.
+             */
+            if (from == to)
+                return false;
+            to = from;
+            bumpRevision();
+            return true;
+        }
+
+        /*
+        template<class Type,
+            typename std::enable_if<std::is_class<Data>::value, Type>::type* = nullptr>
+        bool compareAndSet(Type Data::*to, const Type& from)
+        {
+            Type& value = currentData.*to;
+            if (from == value)
+                return false;
+            value = from;
+            bumpRevision();
+            return true;
+        }*/
+
+    private:
+        Data currentData;
+        Data referenceData;
+        int revision = 1;
+        int referenceRevision = 0;
     };
 
     /** Generates update report for a picked update contents. */
-    static VersionReport calculateUpdateVersionReport(const nx::update::UpdateContents& contents, QnUuid clientId);
+    static VersionReport calculateUpdateVersionReport(
+        const nx::update::UpdateContents& contents,
+        QnUuid clientId);
+
+    bool checkSpaceRequirements(const nx::update::UpdateContents& contents) const;
 
 protected:
     /**
@@ -163,8 +317,6 @@ private:
         startingDownload,
         /** Mediaservers have started downloading update packages. */
         downloading,
-        /** Pushing local update package to the servers. */
-        //pushing,
         /**
          * Waiting server to respond to /ec2/cancelUpdate from 'downloading' or 'pushing'
          * state.
@@ -188,7 +340,6 @@ private:
 
     static QString toString(nx::update::UpdateSourceType mode);
     static QString toString(WidgetUpdateState state);
-    static QString toString(LocalStatusCode stage);
     static QString toString(ServerUpdateTool::OfflineUpdateState state);
 
     /**
@@ -218,9 +369,9 @@ private:
     void syncUpdateCheckToUi();
     void syncRemoteUpdateStateToUi();
     void syncProgress();
-    void syncStatusVisibility();
     void syncVersionInfoVisibility();
 
+    ServerStatusItemDelegate::StatusMode calculateStatusColumnVisibility() const;
     ServerUpdateTool::ProgressInfo calculateActionProgress() const;
 
     bool processRemoteChanges();
@@ -234,6 +385,7 @@ private:
     bool isChecking() const;
     bool hasLatestVersion() const;
     bool hasActiveUpdate() const;
+    bool hasPendingUiChanges() const;
 
     bool processUploaderChanges(bool force = false);
 
@@ -242,7 +394,7 @@ private:
     /** Advances UI FSM towards selected state. */
     void setTargetState(WidgetUpdateState state, const QSet<QnUuid>& targets = {},
         bool runCommands = true);
-    void completeInstallation(bool clientUpdated);
+    void completeClientInstallation(bool clientUpdated);
     static bool stateHasProgress(WidgetUpdateState state);
     void syncDebugInfoToUi();
     /**
@@ -253,6 +405,8 @@ private:
      */
     void setUpdateTarget(const nx::update::UpdateContents& contents, bool activeUpdate);
 
+    QnUuid clientPeerId() const;
+
 private:
     QScopedPointer<Ui::MultiServerUpdatesWidget> ui;
     QScopedPointer<QMenu> m_selectUpdateTypeMenu;
@@ -260,13 +414,10 @@ private:
     QScopedPointer<QMenu> m_manualCheckMenu;
 
     /** UI control flags. We run loadDataToUI periodically and check for this flags. */
-    bool m_updateLocalStateChanged = true;
+    bool m_forceUiStateUpdate = true;
     bool m_updateRemoteStateChanged = true;
-    /** Flag shows that we have an update. */
-    bool m_haveValidUpdate = false;
     bool m_autoCheckUpdate = false;
     bool m_showStorageSettings = false;
-    bool m_gotServerData = false;
 
     /**
      * It will enable additional column for server status
@@ -274,9 +425,7 @@ private:
      */
     bool m_showDebugData = false;
 
-    nx::update::UpdateSourceType m_updateSourceMode = nx::update::UpdateSourceType::internet;
-
-    std::shared_ptr<ServerUpdateTool> m_serverUpdateTool;
+    QPointer<ServerUpdateTool> m_serverUpdateTool;
     std::unique_ptr<ClientUpdateTool> m_clientUpdateTool;
     std::shared_ptr<ServerUpdatesModel> m_updatesModel;
     std::shared_ptr<PeerStateTracker> m_stateTracker;
@@ -294,17 +443,16 @@ private:
      * for offline update package.
      */
     std::future<nx::update::UpdateContents> m_offlineUpdateCheck;
-
     std::future<ServerUpdateTool::RemoteStatus> m_serverStatusCheck;
 
     nx::update::UpdateContents m_updateInfo;
-    VersionReport m_updateReport;
-    nx::utils::SoftwareVersion m_targetVersion;
-
-    WidgetUpdateState m_widgetState = WidgetUpdateState::initial;
-
-    /** Selected changeset from 'specific build' mode. */
-    QString m_targetChangeset;
+    RevisionStorage<nx::update::UpdateSourceType> m_updateSourceMode =
+        nx::update::UpdateSourceType::internet;
+    RevisionStorage<VersionReport> m_updateReport;
+    RevisionStorage<ControlPanelState> m_controlPanelState;
+    RevisionStorage<WidgetUpdateState> m_widgetState = WidgetUpdateState::initial;
+    RevisionStorage<ServerStatusItemDelegate::StatusMode> m_statusColumnMode =
+        ServerStatusItemDelegate::StatusMode::hidden;
 
     /** Watchdog timer for the case when update has taken too long. */
     std::unique_ptr<QTimer> m_longUpdateWarningTimer;

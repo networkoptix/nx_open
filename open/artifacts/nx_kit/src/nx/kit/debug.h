@@ -160,6 +160,11 @@ NX_KIT_API void intentionallyCrash(const char* message);
     ::nx::kit::debug::detail::printHexDump( \
         NX_KIT_DEBUG_DETAIL_PRINT_FUNC, (CAPTION), (const char*) (BYTES), (int) (SIZE))
 
+/**
+ * @param bytesPerLine Used to calculate space padding, 0 means no padding.
+ */
+NX_KIT_API std::string hexDumpLine(const char* bytes, int size, int bytesPerLine = 0);
+
 //-------------------------------------------------------------------------------------------------
 // Time
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <thread>
 
 #include <nx/utils/std/thread.h>
 #include <nx/utils/thread/long_runnable.h>
@@ -37,7 +38,7 @@ protected:
 private:
     std::atomic<ConnectionState> m_state;
     nx::utils::MoveOnlyFunc<void()> m_onClosedHandler;
-    nx::utils::thread m_queryExecutionThread;
+    std::thread m_queryExecutionThread;
     std::atomic<bool> m_terminated;
     int m_numberOfFailedRequestsInARow;
     DbConnectionHolder m_dbConnectionHolder;

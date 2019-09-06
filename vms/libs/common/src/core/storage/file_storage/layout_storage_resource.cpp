@@ -41,7 +41,7 @@ QnLayoutFileStorageResource::QnLayoutFileStorageResource(
     const QString& url)
     : QnLayoutFileStorageResource(commonModule)
 {
-    QnLayoutFileStorageResource::setUrl(getFileName(url));
+    setUrl(getFileName(url));
 }
 
 QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
@@ -98,7 +98,7 @@ void QnLayoutFileStorageResource::setUrl(const QString& value)
 {
     NX_ASSERT(!value.startsWith(kLayoutProtocol), "Only file links must have layout protocol.");
 
-    setId(QnUuid::createUuid());
+    setIdUnsafe(QnUuid::createUuid());
     QnStorageResource::setUrl(value);
 
     readIndexHeader();

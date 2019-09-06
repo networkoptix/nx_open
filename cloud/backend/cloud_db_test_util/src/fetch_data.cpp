@@ -6,9 +6,7 @@
 
 #include <nx/utils/sync_call.h>
 
-namespace nx {
-namespace cdb {
-namespace client {
+namespace nx::cloud::db::client {
 
 int fetchSystems(api::CdbClient* cdbClient)
 {
@@ -50,6 +48,4 @@ int fetchData(
     return 0;
 }
 
-} // namespace client
-} // namespace cdb
-} // namespace nx
+} // namespace nx::cloud::db::client

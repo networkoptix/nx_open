@@ -9,8 +9,12 @@ namespace {
 
 QString removeProtocolPrefix(const QString& url)
 {
-    const int prefix = url.indexOf("://");
-    return prefix == -1 ? url : url.mid(prefix + 3);
+    const int prefixPos = url.indexOf("://");
+    if (prefixPos == -1)
+        return url;
+
+    const auto result = url.midRef(prefixPos + 3);
+    return (result.startsWith('/') ? result.mid(1) : result).toString();
 }
 
 } // namespace

@@ -13,11 +13,12 @@
 QnResourceTreeModelLayoutNodeManager::QnResourceTreeModelLayoutNodeManager(QnResourceTreeModel* model):
     base_type(model)
 {
-    connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::layoutFlagsChanged, this,
-        [this](const QnLayoutResourcePtr& layout)
+    const auto layoutSnapshotManager = model->layoutSnapshotManager();
+    connect(layoutSnapshotManager, &QnWorkbenchLayoutSnapshotManager::layoutFlagsChanged, this,
+        [this, layoutSnapshotManager](const QnLayoutResourcePtr& layout)
         {
             resourceChainCall(layout, &QnResourceTreeModelNode::setModified,
-                snapshotManager()->isModified(layout));
+                layoutSnapshotManager->isModified(layout));
         });
 
     connect(resourceAccessProvider(), &QnResourceAccessProvider::accessChanged, this,

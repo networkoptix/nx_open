@@ -4,11 +4,10 @@
 
 #include <QtCore/QFile>
 
+#include <nx/analytics/frame_info.h>
 #include <nx/streaming/video_data_packet.h>
-#include <nx/utils/uuid.h>
-#include <utils/media/frame_info.h>
-#include <nx/analytics/i_frame_info.h>
-#include <analytics/common/object_detection_metadata.h>
+#include <nx/vms/api/types/motion_types.h>
+#include <analytics/common/object_metadata.h>
 
 namespace nx::analytics {
 
@@ -21,45 +20,52 @@ public:
         QnUuid engineId,
         nx::vms::api::StreamIndex = nx::vms::api::StreamIndex::undefined);
 
+    ~MetadataLogger();
+
     void pushData(
-        const QnConstAbstractMediaDataPtr& data,
+        const QnConstAbstractMediaDataPtr& abstractMediaData,
         const QString& additionalInfo = QString());
 
     void pushFrameInfo(
-        std::unique_ptr<IFrameInfo> frameInfo,
-        const QString& additionalFrameInfo = QString());
+        const FrameInfo& frameInfo,
+        const QString& additionalInfo = QString());
 
     void pushObjectMetadata(
-        nx::common::metadata::DetectionMetadataPacket metadataPacket,
-        const QString& additionalObjectMetadataInfo = QString());
+        const nx::common::metadata::ObjectMetadataPacket& metadataPacket,
+        const QString& additionalInfo = QString());
 
 private:
-    using PlaceholderMap = std::map</*PlaceholderName*/ QString, /*PlaceholderValue*/ QString>;
+    void logLine(QString lineStr);
 
-    PlaceholderMap placeholderMap() const;
-    void doLogging(const QString& logPattern);
-    QString makeLogFileName(
-        const QString& analyticsLoggingPath,
-        const QString& logFilePrefix,
-        QnUuid deviceId,
-        QnUuid engineId,
-        nx::vms::api::StreamIndex streamIndex);
+    QString buildFrameLogString(const FrameInfo& frameInfo, const QString& additionalInfo) const;
+
+    QString buildObjectMetadataLogString(
+        const nx::common::metadata::ObjectMetadataPacket& metadataPacket,
+        const QString& additionalInfo) const;
+
+    void doPushObjectMetadata(
+        const char* func,
+        const nx::common::metadata::ObjectMetadataPacket& metadataPacket,
+        const QString& additionalInfo);
+
+public: //< Intended for unit tests.
+    MetadataLogger(const QString& filename): m_isAlwaysEnabled(true)
+
+    {
+        NX_CRITICAL(!filename.isEmpty());
+        m_outputFile.setFileName(filename);
+        const bool result = m_outputFile.open(QIODevice::WriteOnly);
+        NX_CRITICAL(result);
+    }
 
 private:
+    bool m_isAlwaysEnabled = false;
     QFile m_outputFile;
-    nx::vms::api::StreamIndex m_streamIndex;
 
     bool m_isLoggingBestShot = false;
 
-    nx::common::metadata::DetectionMetadataPacket m_currentObjectMetadataPacket;
-    nx::common::metadata::DetectionMetadataPacket m_prevObjectMetadataPacket;
-
-    nx::common::metadata::DetectionMetadataPacket m_currentBestShotMetadataPacket;
-    QString m_additionalObjectMetadataInfo;
-
-    std::chrono::microseconds m_currentFrameTimestamp{0};
     std::chrono::microseconds m_prevFrameTimestamp{0};
-    QString m_additionalFrameInfo;
+    std::chrono::microseconds m_prevObjectMetadataPacketTimestamp{0};
 };
 
 } // namespace nx::analytics

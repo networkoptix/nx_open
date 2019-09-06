@@ -14,7 +14,7 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout2">
      <property name="spacing">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="leftMargin">
       <number>0</number>
@@ -34,10 +34,10 @@
      <item>
       <widget class="QTabWidget" name="tabWidget"/>
      </item>
+     <item>
+      <widget class="nx::vms::client::desktop::AlertBar" name="scheduleAlertBar" native="true"/>
+     </item>
     </layout>
-   </item>
-   <item>
-    <widget class="nx::vms::client::desktop::AlertBar" name="alertBar" native="true"/>
    </item>
    <item>
     <widget class="Line" name="line">

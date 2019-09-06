@@ -202,21 +202,17 @@ bool HanwhaPtzController::relativeMove(
 }
 
 bool HanwhaPtzController::relativeFocus(
-    qreal relativeMovement,
-    const nx::core::ptz::Options& options)
+    qreal /*relativeMovement*/, const nx::core::ptz::Options& /*options*/)
 {
-    NX_WARNING(
-        this,
-        lm("Relative focus is not implemented for resource %1 (%2)")
-            .args(resource()->getName(), resource()->getId()));
-
+    NX_WARNING(this, lm("Relative focus is not implemented for resource %1 (%2)")
+        .args(resource()->getName(), resource()->getId()));
     return false;
 }
 
 bool HanwhaPtzController::viewportMove(
     qreal aspectRatio,
     const QRectF& viewport,
-    qreal speed,
+    qreal /*speed*/,
     const nx::core::ptz::Options& options)
 {
     if (options.type != nx::core::ptz::Type::operational)
@@ -371,7 +367,7 @@ bool HanwhaPtzController::getAuxiliaryTraits(
 
 bool HanwhaPtzController::runAuxiliaryCommand(
     const QnPtzAuxiliaryTrait& trait,
-    const QString& data,
+    const QString& /*data*/,
     const nx::core::ptz::Options& options)
 {
     if (options.type != nx::core::ptz::Type::operational)
@@ -528,8 +524,7 @@ QString HanwhaPtzController::toHanwhaFocusCommand(qreal speed) const
 }
 
 std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
-    qreal aspectRatio,
-    const QRectF rect) const
+    qreal /*aspectRatio*/, const QRectF rect) const
 {
     std::map<QString, QString> result;
     result.emplace(kHanwhaChannelProperty, channel());
@@ -542,59 +537,52 @@ std::map<QString, QString> HanwhaPtzController::makeViewPortParameters(
 
     result.emplace(lit("Type"), lit("ZoomIn"));
 
-    auto topLeft = rect.topLeft();
-    auto bottomRight = rect.bottomRight();
+    const auto topLeft = rect.topLeft();
+    const auto bottomRight = rect.bottomRight();
 
     QString x1;
     QString y1;
     QString x2;
     QString y2;
 
-    bool toPoint = qFuzzyIsNull(rect.width() - 1.0)
-        && qFuzzyIsNull(rect.height() - 1.0);
+    const bool toPoint = qFuzzyIsNull(rect.width() - 1.0) && qFuzzyIsNull(rect.height() - 1.0);
 
     if (toPoint)
     {
-        x1 = QString::number(
-            qBound(
-                0,
-                qRound(((topLeft.x() + 0.5) * kHanwhaAbsoluteMoveCoefficient)),
-                kHanwhaAbsoluteMoveCoefficient));
+        x1 = QString::number(qBound(
+            0,
+            qRound(((topLeft.x() + 0.5) * kHanwhaAbsoluteMoveCoefficient)),
+            kHanwhaAbsoluteMoveCoefficient));
 
-        y1 = QString::number(
-            qBound(
-                0,
-                qRound(((topLeft.y() + 0.5) * kHanwhaAbsoluteMoveCoefficient)),
-                kHanwhaAbsoluteMoveCoefficient));
+        y1 = QString::number(qBound(
+            0,
+            qRound(((topLeft.y() + 0.5) * kHanwhaAbsoluteMoveCoefficient)),
+            kHanwhaAbsoluteMoveCoefficient));
 
         x2 = x1;
         y2 = y1;
     }
     else
     {
-        x1 = QString::number(
-            qBound(
-                0,
-                (int)(topLeft.x() * kHanwhaAbsoluteMoveCoefficient),
-                kHanwhaAbsoluteMoveCoefficient));
+        x1 = QString::number(qBound(
+            0,
+            (int)(topLeft.x() * kHanwhaAbsoluteMoveCoefficient),
+            kHanwhaAbsoluteMoveCoefficient));
 
-        y1 = QString::number(
-            qBound(
-                0,
-                (int)(topLeft.y() * kHanwhaAbsoluteMoveCoefficient),
-                kHanwhaAbsoluteMoveCoefficient));
+        y1 = QString::number(qBound(
+            0,
+            (int)(topLeft.y() * kHanwhaAbsoluteMoveCoefficient),
+            kHanwhaAbsoluteMoveCoefficient));
 
-        x2 = QString::number(
-            qBound(
-                0,
-                (int)(bottomRight.x() * kHanwhaAbsoluteMoveCoefficient),
-                kHanwhaAbsoluteMoveCoefficient));
+        x2 = QString::number(qBound(
+            0,
+            (int)(bottomRight.x() * kHanwhaAbsoluteMoveCoefficient),
+            kHanwhaAbsoluteMoveCoefficient));
 
-        y2 = QString::number(
-            qBound(
-                0,
-                (int)(bottomRight.y() * kHanwhaAbsoluteMoveCoefficient),
-                kHanwhaAbsoluteMoveCoefficient));
+        y2 = QString::number(qBound(
+            0,
+            (int)(bottomRight.y() * kHanwhaAbsoluteMoveCoefficient),
+            kHanwhaAbsoluteMoveCoefficient));
     }
 
     result.emplace(lit("X1"), x1);

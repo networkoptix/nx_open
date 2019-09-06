@@ -1,6 +1,8 @@
 #include "event_log_dialog.h"
 #include "ui_event_log_dialog.h"
 
+#include <chrono>
+
 #include <QtCore/QMimeData>
 #include <QtGui/QClipboard>
 #include <QtWidgets/QMenu>
@@ -26,6 +28,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
+#include <nx/vms/client/desktop/analytics/analytics_entities_tree.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
@@ -51,22 +54,22 @@
 #include <utils/common/delayed.h>
 
 #include <nx/utils/log/log.h>
-
-#include <nx/analytics/descriptor_manager.h>
-#include <nx/analytics/properties.h>
-#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/utils/pending_operation.h>
+#include <nx/utils/std/algorithm.h>
 
 using namespace nx;
 using namespace nx::vms::event;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 
+using namespace std::chrono;
+
 namespace {
 
 enum EventListRoles
 {
     EventTypeRole = Qt::UserRole + 1,
-    EventSubtypeRole,
+    AnalyticsEventTypeIdRole,
 };
 
 enum ActionListRoles
@@ -89,11 +92,11 @@ EventType eventType(const QModelIndex& index)
         : EventType::undefinedEvent;
 }
 
-QString eventSubtype(const QModelIndex& index)
+nx::analytics::EventTypeId analyticsEventTypeId(const QModelIndex& index)
 {
     return index.isValid()
-        ? index.data(EventSubtypeRole).toString()
-        : QString();
+        ? index.data(AnalyticsEventTypeIdRole).value<nx::analytics::EventTypeId>()
+        : nx::analytics::EventTypeId();
 }
 
 const int kQueryTimeoutMs = 15000;
@@ -237,42 +240,35 @@ QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem,
 
 void QnEventLogDialog::createAnalyticsEventTree(QStandardItem* rootItem)
 {
-    NX_ASSERT(rootItem);
-
-    const nx::analytics::EventTypeDescriptorManager eventTypeDescriptorManager(commonModule());
-    // We don't filter by cameras since we don't know if an event was supported by some device
-    // before.
-    const auto allEventTypes = eventTypeDescriptorManager.descriptors();
-    if (allEventTypes.empty())
-        return;
-
-    const nx::analytics::EngineDescriptorManager engineDescriptorManager(commonModule());
-    auto buildEventTypeName =
-        [this, &engineDescriptorManager](const QnUuid& engineId, const QString& eventTypeName)
+    auto addItem =
+        [this](QStandardItem* parent, AnalyticsEntitiesTreeBuilder::NodePtr node)
         {
-            const auto engineDescriptor = engineDescriptorManager.descriptor(engineId);
-            if (!engineDescriptor)
-                return eventTypeName;
+            auto item = new QStandardItem(node->text);
+            item->setData(EventType::analyticsSdkEvent, EventTypeRole);
+            item->setData(qVariantFromValue(node->entityId), AnalyticsEventTypeIdRole);
+            item->setSelectable(node->nodeType == AnalyticsEntitiesTreeBuilder::NodeType::eventType);
 
-            return lm("%1 - %2").args(engineDescriptor->name, eventTypeName).toQString();
+            if (NX_ASSERT(parent))
+                parent->appendRow(item);
+            return item;
         };
 
-    for (const auto& [eventTypeId, eventTypeDescriptor]: allEventTypes)
-    {
-        if (eventTypeDescriptor.isHidden())
-            continue;
-
-        for (const auto& scope: eventTypeDescriptor.scopes)
+    auto addItemRecursive = nx::utils::y_combinator(
+        [addItem](auto addItemRecursive, auto parent, auto root) -> void
         {
-            auto item = new QStandardItem(
-                buildEventTypeName(scope.engineId, eventTypeDescriptor.name));
-            item->setData(EventType::analyticsSdkEvent, EventTypeRole);
-            item->setData(qVariantFromValue(eventTypeDescriptor.id), EventSubtypeRole);
-            rootItem->appendRow(item);
-        }
-    }
+            for (auto node: root->children)
+            {
+                const auto menuItem = addItem(parent, node);
+                addItemRecursive(menuItem, node);
+            }
+            if (!root->children.empty())
+                parent->sortChildren(0);
+        });
 
-    rootItem->sortChildren(0);
+    auto analyticsEventsSearchTreeBuilder =
+        commonModule()->instance<AnalyticsEventsSearchTreeBuilder>();
+    const auto root = analyticsEventsSearchTreeBuilder->eventTypesTree();
+    addItemRecursive(rootItem, root);
 }
 
 void QnEventLogDialog::updateAnalyticsEvents()
@@ -296,19 +292,19 @@ void QnEventLogDialog::updateAnalyticsEvents()
 
     const auto selectedIndex = ui->eventComboBox->currentIndex();
     const auto selectedEventType = selectedIndex.data(EventTypeRole).toInt();
-    const auto selectedEventSubType = selectedEventType == EventType::analyticsSdkEvent
-        ? selectedIndex.data(EventSubtypeRole).value<QnUuid>()
-        : QnUuid();
+    const auto selectedAnalyticsEventTypeId = selectedEventType == EventType::analyticsSdkEvent
+        ? analyticsEventTypeId(selectedIndex)
+        : nx::analytics::EventTypeId();
 
     item->removeRows(0, item->rowCount());
     createAnalyticsEventTree(item);
 
-    if (!selectedEventSubType.isNull())
+    if (!selectedAnalyticsEventTypeId.isNull())
     {
         const auto newlyCreatedItem = m_eventTypesModel->match(
             m_eventTypesModel->index(0, 0),
-            EventSubtypeRole,
-            /*value*/ qVariantFromValue(selectedEventSubType),
+            AnalyticsEventTypeIdRole,
+            /*value*/ qVariantFromValue(selectedAnalyticsEventTypeId),
             /*hits*/ 1,
             Qt::MatchExactly | Qt::MatchRecursive);
 
@@ -340,31 +336,17 @@ void QnEventLogDialog::initEventsModel()
     m_eventTypesModel->appendRow(rootItem);
     ui->eventComboBox->setModel(m_eventTypesModel);
 
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (!resource->hasFlags(Qn::server) || resource->hasFlags(Qn::fake))
-                return;
+    auto updateAnalyticsSubmenuOperation = new nx::utils::PendingOperation(
+        [this] { updateAnalyticsEvents(); },
+        100ms,
+        this);
+    updateAnalyticsSubmenuOperation->fire();
+    updateAnalyticsSubmenuOperation->setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
 
-            connect(resource, &QnResource::propertyChanged, this,
-                [this](const QnResourcePtr& /*res*/, const QString& key)
-                {
-                    if (key == nx::analytics::kEventTypeDescriptorsProperty)
-                        updateAnalyticsEvents();
-                });
-
-            updateAnalyticsEvents();
-        });
-
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (!resource->hasFlags(Qn::server) || resource->hasFlags(Qn::fake))
-                return;
-
-            resource->disconnect(this);
-            updateAnalyticsEvents();
-        });
+    connect(commonModule()->instance<AnalyticsEventsSearchTreeBuilder>(),
+        &AnalyticsEventsSearchTreeBuilder::eventTypesTreeChanged,
+        updateAnalyticsSubmenuOperation,
+        &nx::utils::PendingOperation::requestOperation);
 }
 
 void QnEventLogDialog::reset()
@@ -401,14 +383,14 @@ void QnEventLogDialog::updateData()
     const auto actionType = ::actionType(m_actionTypesModel->index(
         ui->actionComboBox->currentIndex(), 0));
 
-    const QString eventSubtype = eventType == EventType::analyticsSdkEvent
-        ? ::eventSubtype(ui->eventComboBox->currentIndex())
-        : QString();
+    const auto analyticsEventTypeId = eventType == EventType::analyticsSdkEvent
+        ? ::analyticsEventTypeId(ui->eventComboBox->currentIndex())
+        : nx::analytics::EventTypeId();
 
     query(ui->dateRangeWidget->startTimeMs(),
         ui->dateRangeWidget->endTimeMs(),
         eventType,
-        eventSubtype,
+        analyticsEventTypeId,
         actionType);
 
     // update UI
@@ -432,7 +414,7 @@ void QnEventLogDialog::updateData()
 void QnEventLogDialog::query(qint64 fromMsec,
     qint64 toMsec,
     EventType eventType,
-    const QString& eventSubtype,
+    const nx::analytics::EventTypeId& analyticsEventTypeId,
     ActionType actionType)
 {
     m_requests.clear();
@@ -442,7 +424,7 @@ void QnEventLogDialog::query(qint64 fromMsec,
     request.filter.cameras = cameras(m_filterCameraList);
     request.filter.period = QnTimePeriod(fromMsec, toMsec - fromMsec);
     request.filter.eventType = eventType;
-    request.filter.eventSubtype = eventSubtype;
+    request.filter.eventSubtype = analyticsEventTypeId;
     request.filter.actionType = actionType;
 
     QPointer<QnEventLogDialog> guard(this);
@@ -685,13 +667,18 @@ void QnEventLogDialog::at_eventsGrid_customContextMenuRequested(const QPoint&)
 
 void QnEventLogDialog::at_exportAction_triggered()
 {
-    QnTableExportHelper::exportToFile(ui->gridEvents, true, this,
+    QnTableExportHelper::exportToFile(
+        ui->gridEvents->model(),
+        ui->gridEvents->selectionModel()->selectedIndexes(),
+        this,
         tr("Export selected events to file"));
 }
 
 void QnEventLogDialog::at_clipboardAction_triggered()
 {
-    QnTableExportHelper::copyToClipboard(ui->gridEvents);
+    QnTableExportHelper::copyToClipboard(
+        ui->gridEvents->model(),
+        ui->gridEvents->selectionModel()->selectedIndexes());
 }
 
 void QnEventLogDialog::at_mouseButtonRelease(QObject* sender, QEvent* event)

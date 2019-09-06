@@ -22,7 +22,7 @@ void QnResourceTreeModelLayoutToursNode::initialize()
 {
     base_type::initialize();
 
-    connect(context(), &QnWorkbenchContext::userChanged, this,
+    connect(model(), &QnResourceTreeModel::userChanged, this,
         &QnResourceTreeModelLayoutToursNode::rebuild);
 
     connect(layoutTourManager(), &QnLayoutTourManager::tourAdded, this,
@@ -37,7 +37,7 @@ void QnResourceTreeModelLayoutToursNode::initialize()
 
 void QnResourceTreeModelLayoutToursNode::deinitialize()
 {
-    context()->disconnect(this);
+    model()->disconnect(this);
 
     clean();
     base_type::deinitialize();

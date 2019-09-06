@@ -22,48 +22,46 @@ class Engine: public nx::sdk::analytics::Engine
 {
 public:
     using PixelFormat = nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat;
-    using Plugin = nx::sdk::analytics::Plugin;
 
-    Engine(Plugin* plugin);
+    Engine(nx::sdk::analytics::Plugin* plugin);
+
     virtual ~Engine() override;
-
-    virtual nx::sdk::analytics::IDeviceAgent* obtainDeviceAgent(
-        const nx::sdk::IDeviceInfo* deviceInfo, nx::sdk::Error* outError) override;
 
     // Capabilities.
     bool needUncompressedVideoFrames() const { return m_needUncompressedVideoFrames; }
     PixelFormat pixelFormat() const { return m_pixelFormat; }
 
-    virtual Plugin* plugin() const override { return pluginCasted<Plugin>(); }
+protected:
+    virtual std::string manifestString() const override;
+
+    virtual nx::sdk::Result<const nx::sdk::IStringMap*> settingsReceived() override;
 
 protected:
-    virtual std::string manifest() const override;
+    virtual void doObtainDeviceAgent(
+        nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*>* outResult,
+        const nx::sdk::IDeviceInfo* deviceInfo) override;
 
-    virtual void settingsReceived() override;
-
-    virtual void executeAction(
+    virtual nx::sdk::Result<sdk::analytics::IAction::Result> executeAction(
         const std::string& actionId,
-        nx::sdk::Uuid objectId,
+        nx::sdk::Uuid trackId,
         nx::sdk::Uuid deviceId,
         int64_t timestampUs,
         nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> objectTrackInfo,
-        const std::map<std::string, std::string>& params,
-        std::string* outActionUrl,
-        std::string* outMessageToUser,
-        nx::sdk::Error* error) override;
+        const std::map<std::string, std::string>& params) override;
 
 private:
     void obtainPluginHomeDir();
     void initCapabilities();
-    void generatePluginEvents();
+    void generatePluginDiagnosticEvents();
 
 private:
-    mutable std::mutex m_pluginEventGenerationLoopMutex;
-    mutable std::condition_variable m_pluginEventGenerationLoopCondition;
+    nx::sdk::analytics::Plugin* const m_plugin;
 
-    std::unique_ptr<std::thread> m_pluginEventThread;
+    mutable std::mutex m_pluginDiagnosticEventGenerationLoopMutex;
+    mutable std::condition_variable m_pluginDiagnosticEventGenerationLoopCondition;
+    std::unique_ptr<std::thread> m_pluginDiagnosticEventThread;
     std::atomic<bool> m_terminated{false};
-    std::atomic<bool> m_needToThrowPluginEvents{false};
+    std::atomic<bool> m_needToThrowPluginDiagnosticEvents{false};
 
     std::string m_pluginHomeDir; /**< Can be empty. */
     std::string m_capabilities;
@@ -81,9 +79,15 @@ const std::string kGenerateBicyclesSetting{"generateBicycles"};
 const std::string kGenerateObjectsEveryNFramesSetting{"generateObjectsEveryNFrames"};
 const std::string kNumberOfObjectsToGenerateSetting{"numberOfObjectsToGenerate"};
 const std::string kGeneratePreviewPacketSetting{"generatePreviewPacket"};
-const std::string kThrowPluginEventsFromDeviceAgentSetting{"throwPluginEventsFromDeviceAgent"};
+const std::string kGeneratePreviewAfterNFramesSetting("generatePreviewAfterNFrames");
+const std::string kThrowPluginDiagnosticEventsFromDeviceAgentSetting{
+    "throwPluginDiagnosticEventsFromDeviceAgent"};
 
-const std::string kThrowPluginEventsFromEngineSetting{"throwPluginEventsFromDeviceAgent"};
+const std::string kThrowPluginDiagnosticEventsFromEngineSetting{
+    "throwPluginDiagnosticEventsFromDeviceAgent"};
+const std::string kLeakFrames{"leakFrames"};
+const std::string kAdditionalFrameProcessingDelayMs{"additionalFrameProcessingDelayMs"};
+const std::string kOverallMetadataDelayMsSetting{"overallMetadataDelayMs"};
 
 } // namespace stub
 } // namespace analytics

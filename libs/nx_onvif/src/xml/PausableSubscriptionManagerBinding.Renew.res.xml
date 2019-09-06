@@ -51,9 +51,9 @@
   <!-- __onvifEvents_psmb__Renew(..., _wsnt__RenewResponse &wsnt__RenewResponse) -->
   <wsnt:RenewResponse>
    <!-- time_t TerminationTime -->
-   <wsnt:TerminationTime>2019-06-26T13:17:19Z</wsnt:TerminationTime>
+   <wsnt:TerminationTime>2019-08-15T16:06:01Z</wsnt:TerminationTime>
    <!-- time_t *CurrentTime -->
-   <wsnt:CurrentTime>2019-06-26T13:17:19Z</wsnt:CurrentTime>
+   <wsnt:CurrentTime>2019-08-15T16:06:01Z</wsnt:CurrentTime>
    <!-- std::vector<struct soap_dom_element> __any -->
    <!-- a repetition of 0 or more of the following -->
 

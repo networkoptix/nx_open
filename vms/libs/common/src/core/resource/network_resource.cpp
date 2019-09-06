@@ -159,12 +159,14 @@ QAuthenticator QnNetworkResource::getDefaultAuth() const
 
 QAuthenticator QnNetworkResource::getAuthInternal(const QString& value)
 {
-    const QStringList& credentialsList = value.split(lit(":"));
+    auto delimiterPos = value.indexOf(lit(":"));
     QAuthenticator auth;
-    if( credentialsList.size() >= 1 )
-        auth.setUser( credentialsList[0] );
-    if( credentialsList.size() >= 2 )
-        auth.setPassword( credentialsList[1] );
+    auth.setUser(value);
+    if (delimiterPos >= 0)
+    {
+        auth.setUser(value.left(delimiterPos));
+        auth.setPassword(value.mid(delimiterPos+1));
+    }
     return auth;
 }
 

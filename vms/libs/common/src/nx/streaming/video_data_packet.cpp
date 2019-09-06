@@ -1,6 +1,6 @@
 #include "video_data_packet.h"
 
-#include <utils/memory/cyclic_allocator.h>
+#include <nx/utils/memory/cyclic_allocator.h>
 
 namespace {
 

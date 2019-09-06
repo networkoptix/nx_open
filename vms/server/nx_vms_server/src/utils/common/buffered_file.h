@@ -5,6 +5,7 @@
 #include <list>
 #include <cstdint>
 
+#include <nx/utils/memory/cycle_buffer.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <QtCore/QString>
@@ -13,7 +14,6 @@
 #include "utils/common/threadqueue.h"
 #include "nx/utils/thread/long_runnable.h"
 #include "utils/common/byte_array.h"
-#include "utils/memory/cycle_buffer.h"
 #include <utils/common/connective.h>
 
 class QBufferedFile;
@@ -30,7 +30,7 @@ public:
     /*
     * Returns storage usage in range [0..1]
     */
-    float getAvarageUsage();
+    float getAverageUsage();
     virtual void pleaseStop() override;
 protected:
     virtual void run();

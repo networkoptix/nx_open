@@ -27,24 +27,23 @@ public:
 
     virtual ~DeviceAgent();
 
-    virtual Engine* engine() const override { return m_engine; }
+    virtual void setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
 
-    virtual nx::sdk::Error setHandler(
-        nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
-
-    virtual nx::sdk::Error setNeededMetadataTypes(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes) override;
-
-    virtual const nx::sdk::IString* manifest(nx::sdk::Error* error) const override;
-
-    virtual void setSettings(const nx::sdk::IStringMap* settings) override;
-
-    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
+protected:
+    virtual void doSetSettings(
+        nx::sdk::Result<const nx::sdk::IStringMap*>* outResult,
+        const nx::sdk::IStringMap* settings) override;
+    virtual void getPluginSideSettings(
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
+    virtual void getManifest(nx::sdk::Result<const nx::sdk::IString*>* outResult) const override;
+    virtual void doSetNeededMetadataTypes(
+        nx::sdk::Result<void>* outValue,
+        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
 private:
     void setDeviceInfo(const nx::sdk::IDeviceInfo* deviceInfo);
 
-    nx::sdk::Error startFetchingMetadata(
+    nx::sdk::Result<void> startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);
 
     void stopFetchingMetadata();

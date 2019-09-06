@@ -37,12 +37,12 @@ void BaseDescriptorManagerTest::makeServers()
             new nx::core::resource::ServerMock(m_commonModule.get()));
 
         const bool isOwnServer = i == 0;
-        server->setId(isOwnServer ? m_commonModule->moduleGUID() : QnUuid::createUuid());
+        server->setIdUnsafe(isOwnServer ? m_commonModule->moduleGUID() : QnUuid::createUuid());
         m_commonModule->resourcePool()->addResource(server);
         m_servers.push_back(server);
     }
 
-    m_servers[0]->setId(m_commonModule->moduleGUID());
+    m_servers[0]->setIdUnsafe(m_commonModule->moduleGUID());
 }
 
 } // namespace nx::analytics

@@ -38,11 +38,6 @@
       <source>Customer Support</source>
       <translation>Klantenservice</translation>
     </message>
-    <message>
-      <location/>
-      <source>ARM support policy</source>
-      <translation>ARM ondersteuningsbeleid</translation>
-    </message>
   </context>
   <context>
     <name>AccessibleResourcesWidget</name>
@@ -2051,11 +2046,6 @@
       <source>New Virtual Camera...</source>
       <translation>Nieuwe virtuele camera...</translation>
     </message>
-    <message>
-      <location/>
-      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Virtual Camera&quot; is een virtuele opslag voor videobestanden, die kunnen worden geüpload naar elke server op uw systeem en door elke gebruiker kunnen worden geopend.</translation>
-    </message>
   </context>
   <context>
     <name>OpenLayoutActionWidget</name>
@@ -2099,9 +2089,9 @@
     </message>
   </context>
   <context>
-    <name>PluginEventWidget</name>
+    <name>PluginDiagnosticEventWidget</name>
     <message>
-      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_event_widget.ui"/>
+      <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
       <translation>Bron:</translation>
     </message>
@@ -2778,11 +2768,6 @@
       <source>Limit session duration</source>
       <translation>Beperk sessiegeduur</translation>
     </message>
-    <message>
-      <location/>
-      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>Watermerken worden alleen weergegeven voor live, gearchiveerde en geëxporteerde video's voor niet-beheerdersgebruikers. U en andere beheerders zullen ze niet zien.</translation>
-    </message>
   </context>
   <context>
     <name>SendmailBusinessActionWidget</name>
@@ -3088,8 +3073,8 @@
     </message>
     <message>
       <location/>
-      <source>Analytics data can occupy tens of gigabytes of storage space. We recommend to choose other location for it instead of the system partition.</source>
-      <translation>Analytics-gegevens kunnen tientallen gigabytes aan opslagruimte innemen. We raden aan om een andere locatie te kiezen in plaats van de systeempartitie.</translation>
+      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <translation>Analytics gegevens kunnen grote hoeveelheden ruimte gebruiken. We raden aan om een andere locatie voor te kiezen in plaats van de systeem partitie.</translation>
     </message>
   </context>
   <context>
@@ -3195,19 +3180,6 @@
       <location/>
       <source>Area Width</source>
       <translation>Breedte van het tekstvak</translation>
-    </message>
-  </context>
-  <context>
-    <name>TimeServerSelectionWidget</name>
-    <message>
-      <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
-      <source>Sync time with the Internet</source>
-      <translation>Tijdsynchronisatie met het internet</translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS Time</source>
-      <translation>VMS tijd</translation>
     </message>
   </context>
   <context>

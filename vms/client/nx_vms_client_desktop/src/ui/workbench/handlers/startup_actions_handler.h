@@ -50,6 +50,12 @@ private:
      */
     bool connectToCloudIfNeeded(const QnStartupParameters& startupParameters);
 
+    /**
+     * Evaluates script file, reports any errors to log.
+     * @param path Path to script file.
+     */
+    void handleScriptFile(const QString& path);
+
 private:
     struct Private;
     QScopedPointer<Private> d;

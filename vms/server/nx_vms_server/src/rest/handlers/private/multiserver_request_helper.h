@@ -14,7 +14,7 @@
 #include <media_server/media_server_module.h>
 #include <nx/vms/server/settings.h>
 #include <api/helpers/empty_request_data.h>
-#include <nx/vms/server/server_update_manager.h>
+#include <nx/vms/server/update/update_manager.h>
 #include <rest/server/fusion_rest_handler.h>
 
 namespace detail {
@@ -58,10 +58,15 @@ void requestRemotePeers(
     const MergeFunction& mergeFunction,
     const IfParticipantPredicate& ifPartcipantPredicate = nullptr)
 {
+    static auto kMultiRequestLogTag = nx::utils::log::Tag(QString("MultiRequest"));
     for (const auto& server: participantServers(ifPartcipantPredicate, commonModule))
     {
+        NX_DEBUG(
+            nx::utils::log::Tag(kMultiRequestLogTag), "Sending multiserver request %1 to %2",
+            path, server->getId());
+
         const auto completionFunc =
-            [&outputReply, context, serverId = server->getId(), &mergeFunction](
+            [&outputReply, context, serverId = server->getId(), &mergeFunction, &path](
                 SystemError::ErrorCode /*osErrorCode*/,
                 int statusCode,
                 nx::network::http::BufferType body,
@@ -74,6 +79,11 @@ void requestRemotePeers(
                 if (httpCode == nx::network::http::StatusCode::ok)
                     reply = QJson::deserialized(body, reply, &success);
 
+                NX_DEBUG(
+                    kMultiRequestLogTag,
+                    "Received a response for the multiserver request %1 to %2. "
+                    "Success: %3, reply size: %4", path, serverId, success, body.size());
+
                 const auto updateOutputDataCallback =
                     [&reply, success, &outputReply, context, &serverId, &mergeFunction]()
                     {
@@ -84,11 +94,15 @@ void requestRemotePeers(
                 context->executeGuarded(updateOutputDataCallback);
             };
 
-        const nx::utils::Url apiUrl = getServerApiUrl(path, server, context);
-        runMultiserverDownloadRequest(commonModule->router(), apiUrl, server, completionFunc,
+        runMultiserverDownloadRequest(
+            commonModule->router(),
+            getServerApiUrl(path, server, context),
+            server,
+            completionFunc,
             context);
-        context->waitForDone();
     }
+
+    context->waitForDone();
 }
 
 bool verifyPasswordOrSetError(

@@ -43,13 +43,13 @@
   <String Id="SuccessInstallHeader">Instalação concluída com sucesso</String>
   <String Id="SuccessLaunchButton">Iniciar</String>
   <String Id="SuccessRestartText">Deve reiniciar o computador antes de poder usar o software</String>
-  <String Id="SuccessRestartButton">Restart</String>
+  <String Id="SuccessRestartButton">Reiniciar</String>
   <String Id="SuccessCloseButton">Fechar</String>
   <String Id="FailureHeader">Falha na instalação</String>
   <String Id="FailureHyperlinkLogText">Um ou mais problemas causaram a falha na instalação. Por favor, corrija os problemas e tente novamente a instalação. Para obter mais informações, consulte o</String>
   <String Id="FailureHyperlinkLogTextLink">ficheiro de registo</String>
   <String Id="FailureRestartText">Você deve reiniciar o computador para concluir a reversão do software</String>
-  <String Id="FailureRestartButton">Restart</String>
+  <String Id="FailureRestartButton">Reiniciar</String>
   <String Id="FailureCloseButton">Fechar</String>
   <String Id="WillInstall">[WixBundleName] será instalado no seu dispositivo</String>
   <String Id="FilesInUseHeader">Ficheiros em uso</String>

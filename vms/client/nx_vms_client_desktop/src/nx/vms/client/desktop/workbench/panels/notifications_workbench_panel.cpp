@@ -51,8 +51,8 @@ using namespace ui;
 
 namespace {
 
-static constexpr int kNarrowWidth = 280;
-static constexpr int kWideWidth = 430;
+static constexpr int kNarrowWidth = 283;
+static constexpr int kWideWidth = 433;
 
 static const QSize kToolTipMaxThumbnailSize(240, 180);
 static constexpr int kToolTipShowDelayMs = 250;
@@ -165,7 +165,22 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     // Hide EventPanel widget when the panel is moved out of view.
     // This is required for correct counting of unread notifications.
     connect(item, &QGraphicsWidget::xChanged, this,
-        [this]() { m_eventPanel->setHidden(item->x() >= m_parentWidget->rect().right()); });
+        [this]()
+        {
+            const bool shouldBeHidden = item->x() >= m_parentWidget->rect().right();
+            // Avoid unneeded flickering.
+            if (m_eventPanel->isHidden() == shouldBeHidden)
+                return;
+
+            // Visibility changes should not affect scene focus. Qt impementation automatically
+            // focuses newly appeared graphics item.
+            const auto currentFocusItem = m_parentWidget->scene()->focusItem();
+            m_eventPanel->setHidden(shouldBeHidden);
+            if (shouldBeHidden)
+                m_eventPanel->clearFocus();
+            else
+                m_parentWidget->scene()->setFocusItem(currentFocusItem);
+        });
 
     action(action::PinNotificationsAction)->setChecked(settings.state != Qn::PaneState::Unpinned);
     connect(action(action::PinNotificationsAction), &QAction::toggled, this,
@@ -449,7 +464,10 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
 
     const auto parentWidget = m_eventPanel->graphicsProxyWidget();
     const auto imageProvider = tile->preview();
-    const auto text = tile->toolTip();
+
+    auto text = tile->toolTip();
+    if (text.isEmpty() && imageProvider)
+        text = tile->title();
     if (text.isEmpty())
         return;
 

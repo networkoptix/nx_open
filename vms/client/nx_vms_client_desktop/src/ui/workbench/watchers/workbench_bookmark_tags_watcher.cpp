@@ -1,6 +1,5 @@
 #include "workbench_bookmark_tags_watcher.h"
 
-#include <api/media_server_connection.h>
 #include <api/helpers/bookmark_request_data.h>
 
 #include <common/common_module.h>

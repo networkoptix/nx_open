@@ -55,7 +55,7 @@
 #include <nx/vms/server/command_line_parameters.h>
 #include <nx/vms/server/discovery/discovery_monitor.h>
 #include <system_log/system_event_log_reader.h>
-#include <nx/vms/utils/metrics/controller.h>
+#include <nx/vms/utils/metrics/system_controller.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -140,7 +140,9 @@ private slots:
         nx::vms::api::EventReason reason);
     void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
     void at_archiveBackupFinished(qint64 backedUpToMs, nx::vms::api::EventReason code);
+    void at_checkAnalyticsUsed();
     void at_timer();
+    void writeServerStartedEvent();
     void at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module);
 
     void at_appStarted();
@@ -153,7 +155,6 @@ private slots:
     void at_serverPropertyChanged(const QnResourcePtr& resource, const QString& key);
 
 private:
-    void writeServerStartedEvent();
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraChangesIfNeeded();
     void moveHandlingCameras();
@@ -165,22 +166,20 @@ private:
         QnUniversalTcpListener* tcpListener,
         ec2::TransactionMessageBusAdapter* messageBus);
 
-    /**
-     * This weird name is an apidoctool requirement.
-     */
-    void reg(
+    void registerRestHandler(
         const QString& path,
         nx::network::rest::Handler* handler,
         GlobalPermission permission = GlobalPermission::none);
 
-    void reg(
+    void registerRestHandler(
         const nx::network::http::Method::ValueType& method,
         const QString& path,
         nx::network::rest::Handler* handler,
         GlobalPermission permission = GlobalPermission::none);
 
-    template<class TcpConnectionProcessor, typename... ExtraParam>
-    void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
+    template<class TcpConnectionProcessor, typename... ExtraParams>
+    void registerTcpHandler(
+        const QByteArray& protocol, const QString& path, ExtraParams... extraParams);
 
     bool initTcpListener(
         TimeBasedNonceProvider* timeBasedNonceProvider,
@@ -272,7 +271,9 @@ private:
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     bool m_enableMultipleInstances = false;
     QnMediaServerResourcePtr m_mediaServer;
+    std::unique_ptr<QTimer> m_checkAnalyticsTimer;
     std::unique_ptr<QTimer> m_generalTaskTimer;
+    std::unique_ptr<QTimer> m_serverStartedTimer;
     std::unique_ptr<QTimer> m_udtInternetTrafficTimer;
     std::unique_ptr<QTimer> m_createDbBackupTimer;
     QVector<QString> m_hardwareIdHlist;
@@ -305,7 +306,8 @@ private:
     std::unique_ptr<RaidEventLogReader> m_raidEventLogReader;
     std::unique_ptr<nx::network::upnp::PortMapper> m_upnpPortMapper;
     std::function<void(QnMediaServerModule*)> m_setupModuleCallback;
-    std::unique_ptr<nx::vms::utils::metrics::Controller> m_metricsController;
+    std::unique_ptr<nx::vms::utils::metrics::SystemController> m_metricsController;
 
     std::atomic<bool> m_installUpdateRequestReceived{false};
+    std::atomic<bool> m_storageInitializationDone{false};
 };

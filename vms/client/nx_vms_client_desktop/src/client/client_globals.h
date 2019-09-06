@@ -115,6 +115,8 @@ namespace Qn
         ItemCheckedButtonsRole,                     /**< Role for buttons that are checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
+        ItemMotionSelectionRole,                    /**< Role for motion region selection. Value of type QList<QRegion>. */
+        ItemAnalyticsSelectionRole,                 /**< Role for analytics region selection. Value of type QRectF. */
 
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
@@ -257,7 +259,7 @@ namespace Qn
         DefaultNotificationRole,                    /**< Role to perform default item action (no data). */
         ActivateLinkRole,                           /**< Role to parse and follow hyperlink (QString). */
 
-        RoleCount
+        ItemDataRoleCount
     };
 
     /**
@@ -446,7 +448,6 @@ namespace Qn
 
 } // namespace Qn
 
-Q_DECLARE_METATYPE(Qn::ItemDataRole);
 Q_DECLARE_METATYPE(QValidator::State) //< For Qn::ValidationStateRole QVariant conversion.
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
@@ -455,7 +456,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ImageBehaviour),
+    (Qn::ImageBehaviour)(Qn::ItemDataRole),
     (metatype)(lexical)
     )
 

@@ -1,17 +1,12 @@
-/**********************************************************
-* 12 sep 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef ILP_MOTION_DATA_PICTURE_H
-#define ILP_MOTION_DATA_PICTURE_H
+#pragma once
 
 #include <stdint.h>
 
 #include <camera/camera_plugin.h>
 
 #include <plugins/plugin_tools.h>
-
 
 class MotionDataPicture
 :
@@ -57,5 +52,3 @@ private:
     size_t m_height;
     size_t m_stride;
 };
-
-#endif  //ILP_MOTION_DATA_PICTURE_H

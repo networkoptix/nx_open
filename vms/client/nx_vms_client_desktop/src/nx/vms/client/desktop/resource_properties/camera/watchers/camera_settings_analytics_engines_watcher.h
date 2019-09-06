@@ -21,6 +21,7 @@ public:
 
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
+    void update();
 
 private:
     class Private;

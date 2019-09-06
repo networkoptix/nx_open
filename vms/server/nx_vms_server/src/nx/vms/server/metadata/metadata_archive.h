@@ -15,8 +15,8 @@ namespace nx::vms::server::metadata {
 #pragma pack(push, 1)
     struct IndexRecord
     {
-        quint32 start;    // at ms since epoch + start offset from a file header
-        quint32 duration; // at ms
+        quint32 start;    //< Relative time in milliseconds as an offset from a file header.
+        quint32 duration; //< In milliseconds.
     };
 
     struct IndexHeader

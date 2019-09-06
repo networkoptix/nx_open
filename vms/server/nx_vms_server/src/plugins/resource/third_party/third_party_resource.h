@@ -4,9 +4,6 @@
 
 #include <memory>
 
-#include <QCoreApplication>
-#include <QSharedPointer>
-
 #include <nx/vms/server/resource/camera_advanced_parameters_providers.h>
 #include <nx/vms/server/resource/camera.h>
 #include <plugins/camera_plugin_qt_wrapper.h>
@@ -106,7 +103,6 @@ private:
         QList<nxcip::Resolution> resolutionList;
     };
 
-    // TODO: Migrate to nx::sdk::Ptr.
     nxcip::CameraInfo m_camInfo;
     std::unique_ptr<nxcip_qt::BaseCameraManager> m_camManager;
     nxcip_qt::CameraDiscoveryManager m_discoveryManager;
@@ -116,13 +112,13 @@ private:
     QString m_defaultOutputID;
     int m_encoderCount;
     std::vector<nxcip::Resolution> m_selectedEncoderResolutions;
-    nxcip::BaseCameraManager3* m_cameraManager3;
+    nx::sdk::Ptr<nxcip::BaseCameraManager3> m_cameraManager3;
     nx::vms::server::resource::ApiMultiAdvancedParametersProvider<QnThirdPartyResource> m_advancedParametersProvider;
 
     bool initializeIOPorts();
     nxcip::Resolution getMaxResolution(StreamIndex encoderNumber) const;
     //!Returns resolution with pixel count equal or less than \a desiredResolution
-    nxcip::Resolution getNearestResolution(StreamIndex encoderNumber, 
+    nxcip::Resolution getNearestResolution(StreamIndex encoderNumber,
         const nxcip::Resolution& desiredResolution ) const;
     nxcip::Resolution getSecondStreamResolution() const;
     bool setParam(const char * id, const char * value);

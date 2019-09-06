@@ -22,4 +22,13 @@ function stage()
     cp $SRC_DIR/dist/monitoring_simple-$VERSION-py3-none-any.whl stage
 }
 
+function publish()
+{
+    build
+    stage
+    pack
+    push
+}
+
+
 main $@

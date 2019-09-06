@@ -46,6 +46,19 @@ QString WorkbenchProgressManager::title(const QnUuid& activityId) const
     return m_lookup.value(activityId).title;
 }
 
+void WorkbenchProgressManager::setTitle(const QnUuid& activityId, const QString& value)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto iter = m_lookup.find(activityId);
+    if (iter == m_lookup.end() || iter->title == value)
+        return;
+
+    iter->title = value;
+
+    lock.unlock();
+    emit titleChanged(activityId, value);
+}
+
 QString WorkbenchProgressManager::description(const QnUuid& activityId) const
 {
     QnMutexLocker lock(&m_mutex);
@@ -101,6 +114,24 @@ void WorkbenchProgressManager::setCancellable(const QnUuid& activityId, bool val
 
     lock.unlock();
     emit cancellableChanged(activityId, value);
+}
+
+CommandActionPtr WorkbenchProgressManager::action(const QnUuid& activityId) const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_lookup.value(activityId).action;
+}
+
+void WorkbenchProgressManager::setAction(const QnUuid& activityId, CommandActionPtr value)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto iter = m_lookup.find(activityId);
+    if (iter == m_lookup.end() || iter->action == value)
+        return;
+
+    iter->action = value;
+
+    lock.unlock();
 }
 
 void WorkbenchProgressManager::cancel(const QnUuid& activityId)

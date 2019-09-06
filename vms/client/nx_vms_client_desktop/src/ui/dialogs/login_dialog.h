@@ -20,7 +20,6 @@ class QUrl;
 class QnWorkbenchContext;
 class QnAbstractArchiveStreamReader;
 class QnResourceWidgetRenderer;
-class QnRenderingWidget;
 
 namespace Ui { class LoginDialog; }
 
@@ -42,7 +41,6 @@ public slots:
 protected:
     virtual void changeEvent(QEvent* event) override;
     virtual void showEvent(QShowEvent* event) override;
-    virtual void hideEvent(QHideEvent* event) override;
 
 private:
     /**
@@ -73,6 +71,8 @@ private:
     void at_moduleChanged(nx::vms::discovery::ModuleEndpoint data);
     void at_moduleLost(QnUuid id);
 
+    void setupIntroView();
+
     nx::utils::Url currentUrl() const;
     bool isValid() const;
 
@@ -95,8 +95,6 @@ private:
     QStandardItem* m_autoFoundItem = nullptr;
 
     int m_requestHandle = -1;
-
-    QnRenderingWidget* const m_renderingWidget;
 
     struct QnFoundSystemData
     {

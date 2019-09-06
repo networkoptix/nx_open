@@ -1,15 +1,10 @@
-/**********************************************************
-* 16 sep 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef ELP_EMPTY_PACKET_H
-#define ELP_EMPTY_PACKET_H
+#pragma once
 
 #include <camera/camera_plugin.h>
 
 #include <plugins/plugin_tools.h>
-
 
 class ILPEmptyPacket
 :
@@ -57,5 +52,3 @@ private:
     unsigned int m_flags;
     unsigned int m_cSeq;
 };
-
-#endif  //ELP_EMPTY_PACKET_H

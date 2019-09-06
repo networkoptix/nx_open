@@ -201,7 +201,7 @@ AbstractPeerManager::RequestContextPtr<FileInformation> ResourcePoolPeerManager:
                 setPromiseValueIfEmpty(promise, {});
         };
 
-    const auto handle = connection->fileDownloadStatus(fileName, std::move(handleReply), thread());
+    const auto handle = connection->fileDownloadStatus(fileName, std::move(handleReply));
     if (handle < 0)
         return {};
 
@@ -227,7 +227,7 @@ AbstractPeerManager::RequestContextPtr<QVector<QByteArray>> ResourcePoolPeerMana
                 setPromiseValueIfEmpty(promise, {});
         };
 
-    const auto handle = connection->fileChunkChecksums(fileName, handleReply, thread());
+    const auto handle = connection->fileChunkChecksums(fileName, handleReply);
     if (handle < 0)
         return {};
 
@@ -265,11 +265,11 @@ AbstractPeerManager::RequestContextPtr<QByteArray> ResourcePoolPeerManager::down
     if (d->allowIndirectInternetRequests)
     {
         handle = connection->downloadFileChunkFromInternet(
-            fileName, url, chunkIndex, chunkSize, handleReply, thread());
+            fileName, url, chunkIndex, chunkSize, handleReply);
     }
     else
     {
-        handle = connection->downloadFileChunk(fileName, chunkIndex, handleReply, thread());
+        handle = connection->downloadFileChunk(fileName, chunkIndex, handleReply);
     }
 
     if (handle < 0)

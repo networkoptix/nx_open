@@ -4,8 +4,10 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
-#include <nx/vms/server/server_update_manager.h>
+#include <nx/vms/server/update/update_manager.h>
+#include <rest/server/rest_connection_processor.h>
 #include <api/global_settings.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <nx/vms/server/settings.h>
 #include <nx/update/update_storages_helper.h>
 #include "private/multiserver_update_request_helpers.h"
@@ -25,6 +27,12 @@ int QnStartUpdateRestHandler::executePost(
     QByteArray& /*resultContentType*/,
     const QnRestConnectionProcessor* processor)
 {
+    if (!serverModule()->resourceAccessManager()->hasGlobalPermission(
+            processor->accessRights(), GlobalPermission::admin))
+    {
+        return nx::network::http::StatusCode::forbidden;
+    }
+
     if (!serverModule()->updateManager()->updatePersistentStorageServers(
         nx::update::kTargetKey).manuallySet)
     {

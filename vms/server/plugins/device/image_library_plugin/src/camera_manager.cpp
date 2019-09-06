@@ -1,7 +1,4 @@
-/**********************************************************
-* 03 sep 2013
-* akolesnikov
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "camera_manager.h"
 
@@ -11,13 +8,12 @@
 #include "media_encoder.h"
 #include "time_periods.h"
 
-
 static const int FRAME_DURATION_USEC = 1*1000*1000;
 
 CameraManager::CameraManager( const nxcip::CameraInfo& info )
 :
     m_refManager( this ),
-    m_pluginRef( ImageLibraryPlugin::instance() ),
+    m_pluginRef( nx::sdk::toPtr(ImageLibraryPlugin::instance()) ),
     m_info( info ),
     m_capabilities(
         nxcip::BaseCameraManager::dtsArchiveCapability |
@@ -89,7 +85,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
 //!Implementation of nxcip::BaseCameraManager::getCameraInfo
 int CameraManager::getCameraInfo( nxcip::CameraInfo* info ) const
 {
-    memcpy( info, &m_info, sizeof(m_info) );
+    memcpy( (void*) info, &m_info, sizeof(m_info) );
     return nxcip::NX_NO_ERROR;
 }
 
@@ -143,7 +139,7 @@ int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveR
     return nxcip::NX_NO_ERROR;
 }
 
-int CameraManager::find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::TimePeriods** timePeriods ) const
+int CameraManager::find( nxcip::ArchiveSearchOptions* /*searchOptions*/, nxcip::TimePeriods** timePeriods ) const
 {
     std::unique_ptr<TimePeriods> resTimePeriods( new TimePeriods() );
     resTimePeriods->timePeriods.push_back( std::make_pair( m_dirContentsManager.minTimestamp(), m_dirContentsManager.maxTimestamp() ) );

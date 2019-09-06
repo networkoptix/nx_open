@@ -17,9 +17,9 @@ ObjectTrackBestShotPacket::ObjectTrackBestShotPacket(
 {
 }
 
-Uuid ObjectTrackBestShotPacket::trackId() const
+void ObjectTrackBestShotPacket::getTrackId(Uuid* outValue) const
 {
-    return m_trackId;
+    *outValue = m_trackId;
 }
 
 int64_t ObjectTrackBestShotPacket::timestampUs() const
@@ -27,9 +27,9 @@ int64_t ObjectTrackBestShotPacket::timestampUs() const
     return m_timestampUs;
 }
 
-Rect ObjectTrackBestShotPacket::boundingBox() const
+void ObjectTrackBestShotPacket::getBoundingBox(Rect* outValue) const
 {
-    return m_boundingBox;
+    *outValue = m_boundingBox;
 }
 
 } // namespace analytics

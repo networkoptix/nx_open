@@ -19,6 +19,7 @@
 #include <nx/vms/server/server_module_aware.h>
 
 class EmailManagerImpl;
+namespace nx::vms::server::resource { class Camera; }
 
 namespace nx {
 namespace vms::server {
@@ -123,6 +124,7 @@ public slots:
     */
     void executeAction(const vms::event::AbstractActionPtr& action);
 
+    void waitForRulesUpdate();
 protected:
     virtual void prepareAdditionActionParams(const vms::event::AbstractActionPtr& action) = 0;
 
@@ -132,7 +134,7 @@ protected slots:
     */
     virtual bool executeActionInternal(const vms::event::AbstractActionPtr& action);
 
-private slots:
+private:
     void at_broadcastActionFinished(int handle, ec2::ErrorCode errorCode);
     void at_actionDelivered(const vms::event::AbstractActionPtr& action);
     void at_actionDeliveryFailed(const vms::event::AbstractActionPtr& action);
@@ -141,7 +143,7 @@ private slots:
     void at_ruleRemoved(QnUuid id);
     void at_rulesReset(const vms::event::RuleList& rules);
 
-    void toggleInputPortMonitoring(const QnResourcePtr& resource, bool on);
+    void at_resourceMonitor(const QnResourcePtr& resource, bool isAdded);
 
     void at_timer();
 
@@ -188,13 +190,14 @@ private:
     bool popProlongedActionStartTime(
         const vms::event::AbstractActionPtr& action,
         qint64& startTimeUsec);
-    void ruleModificationFinishedUnsafe();
+
 protected:
     mutable QnMutex m_mutex;
 
 private:
     QList<vms::event::RulePtr> m_rules;
     static RuleProcessor* m_instance;
+    QList<vms::event::AbstractEventPtr> m_delayedEvents;
 
     struct RunningRuleInfo
     {
@@ -216,6 +219,9 @@ private:
      */
     bool checkEventCondition(const vms::event::AbstractEventPtr& event, const vms::event::RulePtr& rule) const;
 
+    void processEventInternal(const vms::event::AbstractEventPtr& event);
+    void processDelayedEvents();
+
     QMap<QString, ProcessorAggregationInfo> m_aggregateActions; // aggregation counter for instant actions
     QMap<QString, QSet<QnUuid>> m_actionInProgress;               // remove duplicates for long actions
     QTimer m_timer;
@@ -227,8 +233,11 @@ private:
 
     QHash<QnUuid, qint64> m_runningBookmarkActions;
 
-    QnWaitCondition m_ruleUpdateCond;
-    std::atomic<int> m_updatingRulesCnt{0};
+    QnWaitCondition m_ruleUpdateCondition;
+    std::atomic<int> m_updatingRulesCount{0};
+
+    std::map<nx::vms::server::resource::Camera*, QWeakPointer<nx::vms::server::resource::Camera>>
+        m_knownCameras;
 };
 
 } // namespace event

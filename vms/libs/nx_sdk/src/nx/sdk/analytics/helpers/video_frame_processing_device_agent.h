@@ -9,7 +9,7 @@
 
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/log_utils.h>
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
@@ -42,23 +42,15 @@ protected:
 protected:
     /**
      * @param enableOutput Enables NX_OUTPUT. Typically, use NX_DEBUG_ENABLE_OUTPUT as a value.
-     * @param printPrefix Prefix for NX_PRINT and NX_OUTPUT. If empty, will be made from Engine's
-     * libName().
      */
-    VideoFrameProcessingDeviceAgent(
-        IEngine* engine,
-        const IDeviceInfo* deviceInfo,
-        bool enableOutput,
-        const std::string& printPrefix = "");
+    VideoFrameProcessingDeviceAgent(const IDeviceInfo* deviceInfo, bool enableOutput);
 
-    virtual std::string manifest() const = 0;
+    virtual std::string manifestString() const = 0;
 
     /**
      * Override to accept next compressed video frame for processing. Should not block the caller
      * thread for long.
-     * @param videoFrame Contains a pointer to the compressed video frame raw bytes. The lifetime
-     *     (validity) of this pointer is the same as of videoFrame. Thus, it can be extended by
-     *     addRef() or queryInterface() inside this method.
+     * @param videoFrame Contains a pointer to the compressed video frame raw bytes.
      */
     virtual bool pushCompressedVideoFrame(const ICompressedVideoPacket* /*videoFrame*/)
     {
@@ -67,9 +59,7 @@ protected:
 
     /**
      * Override to accept next uncompressed video frame for processing.
-     * @param videoFrame Contains a pointer to the compressed video frame raw bytes. The lifetime
-     *     (validity) of this pointer is the same as of videoFrame. Thus, it can be extended by
-     *     addRef() or queryInterface() inside this method.
+     * @param videoFrame Contains a pointer to the compressed video frame raw bytes.
      */
     virtual bool pushUncompressedVideoFrame(const IUncompressedVideoFrame* /*videoFrame*/)
     {
@@ -94,57 +84,50 @@ protected:
     void pushMetadataPacket(IMetadataPacket* metadataPacket);
 
     /**
-     * Sends a PluginEvent to the Server. Can be called from any thread, but if called before
-     * settingsReceived() was called, will be ignored in case setHandler() was not called yet.
+     * Sends a PluginDiagnosticEvent to the Server. Can be called from any thread, but if called
+     * before settingsReceived() was called, will be ignored in case setHandler() was not called
+     * yet.
      */
-    void pushPluginEvent(IPluginEvent::Level level, std::string caption, std::string description);
+    void pushPluginDiagnosticEvent(
+        IPluginDiagnosticEvent::Level level,
+        std::string caption,
+        std::string description);
 
     /**
      * Called when the settings are received from the server (even if the values are not changed).
      * Should perform any required (re)initialization. Called even if the settings model is empty.
+     * @return Error messages per setting (if any), as in IDeviceAgent::setSettings().
      */
-    virtual void settingsReceived() {}
+    virtual nx::sdk::Result<const nx::sdk::IStringMap*> settingsReceived() { return nullptr; }
 
     /**
-     * Provides access to the Manager settings stored by the server for a particular Resource.
+     * Provides access to the DeviceAgent settings stored by the Server for the particular Device.
+     *
      * ATTENTION: If settingsReceived() has not been called yet, it means that the DeviceAgent has
-     * not received its settings from the server yet, and thus this method will yield empty values.
-     * @return Param value, or an empty string if such param does not exist, having logged the
+     * not received its settings from the Server yet, and thus this method will yield empty values.
+     *
+     * @return Setting value, or an empty string if such setting does not exist, having logged the
      *     error.
      */
-    std::string getParamValue(const std::string& paramName);
-
-    virtual Error setNeededMetadataTypes(const IMetadataTypes* metadataTypes) override = 0;
+    std::string settingValue(const std::string& paramName);
 
 public:
     virtual ~VideoFrameProcessingDeviceAgent() override;
-
-    /**
-     * Intended to be called from a method of a derived class overriding engine().
-     * @return Parent Engine, casted to the specified type.
-     */
-    template<typename DerivedEngine>
-    DerivedEngine* engineCasted() const
-    {
-        const auto engine = dynamic_cast<DerivedEngine*>(m_engine);
-        assertEngineCasted(engine);
-        return engine;
-    }
-
-    virtual IEngine* engine() const override { return m_engine; }
 
 //-------------------------------------------------------------------------------------------------
 // Not intended to be used by the descendant.
 
 public:
-    virtual Error setHandler(IDeviceAgent::IHandler* handler) override;
-    virtual Error pushDataPacket(IDataPacket* dataPacket) override;
-    virtual const IString* manifest(Error* error) const override;
-    virtual void setSettings(const IStringMap* settings) override;
-    virtual IStringMap* pluginSideSettings() const override;
+    virtual void setHandler(IHandler* handler) override;
+
+protected:
+    virtual void doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket) override;
+    virtual void doSetSettings(
+        Result<const IStringMap*>* outResult, const IStringMap* settings) override;
+    virtual void getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const override;
+    virtual void getManifest(Result<const IString*>* outResult) const override;
 
 private:
-    void assertEngineCasted(void* engine) const;
     void logMetadataPacketIfNeeded(
         const IMetadataPacket* metadataPacket,
         const std::string& packetIndexName) const;
@@ -153,8 +136,7 @@ private:
 
 private:
     mutable std::mutex m_mutex;
-    IEngine* const m_engine;
-    nx::sdk::Ptr<IDeviceAgent::IHandler> m_handler;
+    Ptr<IDeviceAgent::IHandler> m_handler;
     std::map<std::string, std::string> m_settings;
 };
 

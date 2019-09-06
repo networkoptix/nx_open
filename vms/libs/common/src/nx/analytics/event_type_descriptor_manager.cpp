@@ -7,79 +7,38 @@
 #include <core/resource/camera_resource.h>
 
 #include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/analytics/helpers.h>
 
 namespace nx::analytics {
 
 using namespace nx::vms::api::analytics;
 using namespace nx::utils::data_structures;
 
-namespace {
-
 static const QString kEventTypeDescriptorTypeName = "EventType";
 
-std::optional<std::set<EventTypeId>> mergeEventTypeIds(
-    const std::set<EventTypeId>* first,
-    const std::set<EventTypeId>* second)
-{
-    if (!first && !second)
-        return std::nullopt;
-
-    if (!first)
-        return *second;
-
-    if (!second)
-        return *first;
-
-    std::set<EventTypeId> result = *first;
-    result.insert(second->begin(), second->end());
-    return result;
-}
-
-std::optional<std::set<EventTypeId>> intersectEventTypeIds(
-    const std::set<EventTypeId>* first, const std::set<EventTypeId>* second)
-{
-    if (!first && !second)
-        return std::nullopt;
-
-    if (!first)
-        return *second;
-
-    if (!second)
-        return *first;
-
-    std::set<EventTypeId> result;
-    std::set_intersection(
-        first->begin(), first->end(),
-        second->begin(), second->end(),
-        std::inserter(result, result.end()));
-
-    return result;
-}
-
-} // namespace
-
-EventTypeDescriptorManager::EventTypeDescriptorManager(QnCommonModule* commonModule):
-    base_type(commonModule),
+EventTypeDescriptorManager::EventTypeDescriptorManager(QObject* parent):
+    base_type(parent),
+    QnCommonModuleAware(parent),
     m_eventTypeDescriptorContainer(
-        makeContainer<EventTypeDescriptorContainer>(commonModule, kEventTypeDescriptorsProperty)),
+        makeContainer<EventTypeDescriptorContainer>(commonModule(), kEventTypeDescriptorsProperty)),
     m_engineDescriptorContainer(
-        makeContainer<EngineDescriptorContainer>(commonModule, kEngineDescriptorsProperty)),
+        makeContainer<EngineDescriptorContainer>(commonModule(), kEngineDescriptorsProperty)),
     m_groupDescriptorContainer(
-        makeContainer<GroupDescriptorContainer>(commonModule, kGroupDescriptorsProperty))
+        makeContainer<GroupDescriptorContainer>(commonModule(), kGroupDescriptorsProperty))
 {
 }
 
 std::optional<EventTypeDescriptor> EventTypeDescriptorManager::descriptor(
     const EventTypeId& id) const
 {
-    return fetchDescriptor(m_eventTypeDescriptorContainer, id);
+    return fetchDescriptor(m_eventTypeDescriptorContainer.get(), id);
 }
 
 EventTypeDescriptorMap EventTypeDescriptorManager::descriptors(
     const std::set<EventTypeId>& eventTypeIds) const
 {
     return fetchDescriptors(
-        m_eventTypeDescriptorContainer,
+        m_eventTypeDescriptorContainer.get(),
         eventTypeIds,
         kEventTypeDescriptorTypeName);
 }
@@ -90,16 +49,16 @@ ScopedEventTypeIds EventTypeDescriptorManager::supportedEventTypeIds(
     ScopedEventTypeIds result;
 
     const auto& eventTypeIdsByEngine = device->supportedEventTypes();
+
+    std::set<EngineId> allEngineIds;
+    std::set<EventTypeId> allEventTypeIds;
     for (const auto& [engineId, eventTypeIds]: eventTypeIdsByEngine)
     {
-        for (const auto& eventTypeId: eventTypeIds)
-        {
-            const auto groupId = eventTypeGroupForEngine(engineId, eventTypeId);
-            result[engineId][groupId].insert(eventTypeId);
-        }
+        allEngineIds.insert(engineId);
+        allEventTypeIds.insert(eventTypeIds.begin(), eventTypeIds.end());
     }
 
-    return result;
+    return eventTypeGroupsByEngines(allEngineIds, allEventTypeIds);
 }
 
 ScopedEventTypeIds EventTypeDescriptorManager::supportedEventTypeIdsUnion(
@@ -109,7 +68,7 @@ ScopedEventTypeIds EventTypeDescriptorManager::supportedEventTypeIdsUnion(
     for (const auto& device: devices)
     {
         auto deviceEventTypeIds = supportedEventTypeIds(device);
-        MapHelper::merge(&result, deviceEventTypeIds, mergeEventTypeIds);
+        MapHelper::merge(&result, deviceEventTypeIds, mergeEntityIds);
     }
 
     return result;
@@ -125,7 +84,7 @@ ScopedEventTypeIds EventTypeDescriptorManager::supportedEventTypeIdsIntersection
     for (auto i = 0; i < devices.size(); ++i)
     {
         const auto deviceEventTypeIds = supportedEventTypeIds(devices[i]);
-        MapHelper::intersected(&result, deviceEventTypeIds, intersectEventTypeIds);
+        MapHelper::intersected(&result, deviceEventTypeIds, intersectEntityIds);
     }
 
     return result;
@@ -153,10 +112,13 @@ ScopedEventTypeIds EventTypeDescriptorManager::compatibleEventTypeIds(
     ScopedEventTypeIds result;
     for (const auto& engine: compatibleEngines)
     {
-        if (engine->isDeviceDependent())
+        const bool engineIsEnabled =
+            device->enabledAnalyticsEngines().contains(engine->getId());
+
+        if (engineIsEnabled || engine->isDeviceDependent())
         {
             auto supported = supportedEventTypeIds(device);
-            MapHelper::merge(&result, supported, mergeEventTypeIds);
+            MapHelper::merge(&result, supported, mergeEntityIds);
         }
         else
         {
@@ -179,7 +141,7 @@ ScopedEventTypeIds EventTypeDescriptorManager::compatibleEventTypeIdsUnion(
     for (const auto& device: devices)
     {
         auto deviceEventTypeIds = compatibleEventTypeIds(device);
-        MapHelper::merge(&result, deviceEventTypeIds, mergeEventTypeIds);
+        MapHelper::merge(&result, deviceEventTypeIds, mergeEntityIds);
     }
 
     return result;
@@ -195,7 +157,7 @@ ScopedEventTypeIds EventTypeDescriptorManager::compatibleEventTypeIdsIntersectio
     for (auto i = 0; i < devices.size(); ++i)
     {
         const auto deviceEventTypeIds = compatibleEventTypeIds(devices[i]);
-        MapHelper::intersected(&result, deviceEventTypeIds, intersectEventTypeIds);
+        MapHelper::intersected(&result, deviceEventTypeIds, intersectEntityIds);
     }
 
     return result;
@@ -207,7 +169,7 @@ void EventTypeDescriptorManager::updateFromEngineManifest(
     const QString& engineName,
     const EngineManifest& manifest)
 {
-    m_eventTypeDescriptorContainer.mergeWithDescriptors(
+    m_eventTypeDescriptorContainer->mergeWithDescriptors(
         fromManifestItemListToDescriptorMap<EventTypeDescriptor>(engineId, manifest.eventTypes));
 }
 
@@ -216,25 +178,26 @@ void EventTypeDescriptorManager::updateFromDeviceAgentManifest(
     const EngineId& engineId,
     const DeviceAgentManifest& manifest)
 {
-    m_eventTypeDescriptorContainer.mergeWithDescriptors(
+    m_eventTypeDescriptorContainer->mergeWithDescriptors(
         fromManifestItemListToDescriptorMap<EventTypeDescriptor>(engineId, manifest.eventTypes));
 }
 
-GroupId EventTypeDescriptorManager::eventTypeGroupForEngine(
-    const EngineId& engineId,
-    const EventTypeId& eventTypeId) const
+ScopedEventTypeIds EventTypeDescriptorManager::eventTypeGroupsByEngines(
+    const std::set<EngineId>& engineIds,
+    const std::set<EventTypeId>& eventTypeIds) const
 {
-    const auto descriptor = m_eventTypeDescriptorContainer.mergedDescriptors(eventTypeId);
-    if (!descriptor)
-        return GroupId();
-
-    for (const auto& scope: descriptor->scopes)
+    ScopedEventTypeIds result;
+    const auto descriptors = this->descriptors(eventTypeIds);
+    for (const auto& [eventTypeId, descriptor]: descriptors)
     {
-        if (scope.engineId == engineId)
-            return scope.groupId;
+        for (const auto& scope: descriptor.scopes)
+        {
+            if (engineIds.find(scope.engineId) != engineIds.cend())
+                result[scope.engineId][scope.groupId].insert(eventTypeId);
+        }
     }
 
-    return GroupId();
+    return result;
 }
 
 } // namespace nx::analytics

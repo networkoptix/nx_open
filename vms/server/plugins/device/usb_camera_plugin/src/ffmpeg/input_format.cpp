@@ -7,15 +7,13 @@ namespace nx {
 namespace usb_cam {
 namespace ffmpeg {
 
-namespace {
-
+#if 0 //< Can be useful for debug.
 static std::chrono::milliseconds now()
 {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now().time_since_epoch());
 }
-
-}
+#endif // 0
 
 InputFormat::InputFormat():
     Options()
@@ -101,7 +99,7 @@ const AVInputFormat * InputFormat::inputFormat() const
 
 AVStream * InputFormat::stream(uint32_t index) const
 {
-    if (index < 0 || index >= m_formatContext->nb_streams)
+    if (index >= m_formatContext->nb_streams)
         return nullptr;
     return m_formatContext->streams[index];
 }

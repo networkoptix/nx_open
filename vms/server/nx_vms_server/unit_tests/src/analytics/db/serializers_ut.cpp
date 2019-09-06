@@ -7,7 +7,7 @@
 
 #include <nx/vms/server/analytics/db/serializers.h>
 
-#include "analytics_storage_types.h"
+#include "attribute_dictionary.h"
 
 namespace nx::analytics::db::test {
 
@@ -23,8 +23,8 @@ protected:
         for (auto& position: track)
         {
             position.boundingBox = generateRandomRectf();
-            position.timestampUsec = nx::utils::random::number<long long>();
-            position.durationUsec = nx::utils::random::number<long long>();
+            position.timestampUs = nx::utils::random::number<long long>();
+            position.durationUs = nx::utils::random::number<long long>();
             // TODO: attributes
         }
 

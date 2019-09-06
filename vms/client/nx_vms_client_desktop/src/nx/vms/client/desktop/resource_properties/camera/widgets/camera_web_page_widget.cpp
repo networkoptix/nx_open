@@ -41,6 +41,7 @@ struct CameraWebPageWidget::Private
 
     CameraSettingsDialogState::Credentials credentials;
     QNetworkRequest lastRequest;
+    bool loadNeeded = false;
 
     QnMutex mutex;
 };
@@ -140,6 +141,16 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
                 ? Qt::DefaultContextMenu
                 : Qt::ActionsContextMenu); //< Special context menu for links.
         });
+
+    installEventHandler(parent, QEvent::Show, parent,
+        [this]()
+        {
+            if (!loadNeeded)
+                return;
+
+            webWidget->load(lastRequest);
+            loadNeeded = false;
+        });
 }
 
 CameraWebPageWidget::CameraWebPageWidget(CameraSettingsDialogStore* store, QWidget* parent):
@@ -167,6 +178,7 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
         {
             d->lastRequest = QNetworkRequest();
             d->webWidget->reset();
+            d->loadNeeded = false;
             return;
         }
 
@@ -222,7 +234,10 @@ void CameraWebPageWidget::loadState(const CameraSettingsDialogState& state)
         d->webWidget->reset();
     }
 
-    d->webWidget->load(d->lastRequest);
+    const bool visible = isVisible();
+    d->loadNeeded = !visible;
+    if (visible)
+        d->webWidget->load(d->lastRequest);
 }
 
 } // namespace nx::vms::client::desktop

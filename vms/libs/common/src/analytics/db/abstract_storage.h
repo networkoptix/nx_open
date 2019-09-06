@@ -42,10 +42,15 @@ public:
     virtual bool initialize(const Settings& settings) = 0;
 
     /**
+     * @return true after successful initialization.
+     */
+    virtual bool initialized() const = 0;
+
+    /**
      * Packet is saved asynchronously.
      * To make sure the data is written call AbstractEventsStorage::flush.
      */
-    virtual void save(common::metadata::ConstDetectionMetadataPacketPtr packet) = 0;
+    virtual void save(common::metadata::ConstObjectMetadataPacketPtr packet) = 0;
 
     /**
      * Newly-created cursor points just before the first element.

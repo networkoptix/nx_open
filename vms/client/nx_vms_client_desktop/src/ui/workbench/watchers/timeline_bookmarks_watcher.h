@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include <QtCore/QObject>
+#include <QtCore/QString>
 #include <QtCore/QElapsedTimer>
 
 #include <recording/time_period.h>
@@ -20,49 +21,48 @@ class QnBookmarkQueriesCache;
 class QnCameraBookmarksQuery;
 class QnCameraBookmarkAggregation;
 
-namespace nx { namespace utils { class PendingOperation; } }
+namespace nx::utils { class PendingOperation; }
 
-// @brief Caches specified count of bookmarks for all cameras.
-// Gives access to merged bookmarks for current selected item.
-// Gives access to bookmarks of each layout item.
-class QnTimelineBookmarksWatcher : public Connective<QObject>
-    , public QnWorkbenchContextAware
+/**
+ * Caches specified count of bookmarks (5000) for all cameras. Also monitors current timeline window
+ * and requests 500 bookmarks for it. Results are merged and pushed to the timeline.
+ */
+class QnTimelineBookmarksWatcher: public Connective<QObject>, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef Connective<QObject> base_type;
-
+    using base_type = Connective<QObject>;
     using milliseconds = std::chrono::milliseconds;
 
 public:
-    QnTimelineBookmarksWatcher(QObject *parent = nullptr);
-
+    QnTimelineBookmarksWatcher(QObject* parent = nullptr);
     virtual ~QnTimelineBookmarksWatcher();
 
 public:
-    QnCameraBookmarkList bookmarksAtPosition(milliseconds position,
-        milliseconds msecdsPerDp = milliseconds(0));
+    QnCameraBookmarkList bookmarksAtPosition(
+        milliseconds position, milliseconds msecdsPerDp = milliseconds(0));
 
     QnCameraBookmarkList rawBookmarksAtPosition(
-        const QnVirtualCameraResourcePtr &camera,
-        qint64 positionMs);
+        const QnVirtualCameraResourcePtr& camera, qint64 positionMs);
 
     QString textFilter() const;
     void setTextFilter(const QString& value);
 
 private:
-    void onResourceRemoved(const QnResourcePtr &resource);
+    void onResourceRemoved(const QnResourcePtr& resource);
 
 private:
+    void setupTimelineWindowQuery();
     void updateCurrentCamera();
-    void onBookmarkRemoved(const QnUuid &id);
-    void tryUpdateTimelineBookmarks(const QnVirtualCameraResourcePtr &camera);
-    void onTimelineWindowChanged(milliseconds startTimeMs, milliseconds endTimeMs);
+    void onBookmarkRemoved(const QnUuid& id);
+    void tryUpdateTimelineBookmarks(const QnVirtualCameraResourcePtr& camera);
 
     void setTimelineBookmarks(const QnCameraBookmarkList& bookmarks);
 
 private:
-    void setCurrentCamera(const QnVirtualCameraResourcePtr &camera);
-    void ensureQueryForCamera(const QnVirtualCameraResourcePtr &camera);
+    void setCurrentCamera(const QnVirtualCameraResourcePtr& camera);
+
+    /** Create static query, which will request 5000 bookmarks at once for the given camera. */
+    void ensureStaticQueryForCamera(const QnVirtualCameraResourcePtr& camera);
 
 private:
     typedef QScopedPointer<QTimer> TimerPtr;
@@ -72,12 +72,16 @@ private:
 
     const QnCameraBookmarkAggregationPtr m_aggregation;
     const QnBookmarkMergeHelperPtr m_mergeHelper;
-    const QnBookmarkQueriesCachePtr m_queriesCache;     // Holds queries for hole timeline window
-    QnCameraBookmarksQueryPtr m_timelineQuery;     // Holds query for current selected item
+
+    /** Queries for the whole timeline window. */
+    const QnBookmarkQueriesCachePtr m_queriesCache;
+
+    /** Query for the current selected item and actual zoom level. */
+    QnCameraBookmarksQueryPtr m_timelineWindowQuery;
+    QnCameraBookmarkSearchFilter m_timelineWindowQueryFilter;
+
     QnVirtualCameraResourcePtr m_currentCamera;
 
     TimerPtr m_updateStaticQueriesTimer;
-    nx::utils::PendingOperation* m_updateQueryOperation;
-    QnCameraBookmarkSearchFilter m_timlineFilter;
     QString m_textFilter;
 };

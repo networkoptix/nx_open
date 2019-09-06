@@ -74,7 +74,7 @@ void QnActiveCameraThumbnailLoaderPrivate::refresh(bool force)
     if (!camera)
         return;
 
-    QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
+    const auto server = camera->getParentServer();
     if (!server)
         return;
 

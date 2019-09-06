@@ -1010,7 +1010,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>Lỗi không rõ.</translation>
+      <translation>Lỗi không xác định.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>
@@ -1537,7 +1537,7 @@
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Sự kiện chẩn đoán plugin không xác định</translation>
     </message>
     <message>
       <source>RAID error. %1.</source>

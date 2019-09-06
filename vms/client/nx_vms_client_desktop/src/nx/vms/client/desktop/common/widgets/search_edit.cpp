@@ -306,11 +306,11 @@ void SearchEdit::setupMenuButton()
 void SearchEdit::updateMenuButtonIcon()
 {
     const auto kIcon = isMenuEnabled()
-        ? qnSkin->icon("tree/search_drop.png")
-        : qnSkin->icon("tree/search.png");
+        ? qnSkin->icon("panel/search_drop.png")
+        : qnSkin->icon("panel/search.png");
     const auto kSelectedIcon = isMenuEnabled()
-        ? qnSkin->icon("tree/search_drop_selected.png")
-        : qnSkin->icon("tree/search_selected.png");
+        ? qnSkin->icon("panel/search_drop_selected.png")
+        : qnSkin->icon("panel/search_selected.png");
 
     d->menuButton->setFixedSize(isMenuEnabled() ? QSize(40, 32) : QSize(32, 32));
     d->menuButton->setIcon(d->lineEdit->text().isEmpty() ? kIcon : kSelectedIcon);

@@ -97,7 +97,7 @@ void AnalyticsSdkEventWidget::paramsChanged()
 
     model()->setEventParams(createEventParameters(
         ui->sdkEventTypeComboBox->currentData(
-            AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>(),
+            AnalyticsSdkEventModel::EngineIdRole).value<QnUuid>(),
         ui->sdkEventTypeComboBox->currentData(
             AnalyticsSdkEventModel::EventTypeIdRole).value<QString>()));
 }
@@ -106,7 +106,8 @@ void AnalyticsSdkEventWidget::updateSdkEventTypesModel()
 {
     const auto cameras = resourcePool()->getResourcesByIds<QnVirtualCameraResource>(
         model()->eventResources());
-    m_sdkEventModel->loadFromCameras(cameras);
+
+    m_sdkEventModel->loadFromCameras(cameras, model()->eventParams());
     ui->sdkEventTypeComboBox->setEnabled(m_sdkEventModel->isValid());
     ui->sdkEventTypeComboBox->model()->sort(0);
 }
@@ -133,7 +134,7 @@ void AnalyticsSdkEventWidget::updateSelectedEventType()
             ui->sdkEventTypeComboBox->setCurrentIndex(selectableItems.front());
 
             engineId = ui->sdkEventTypeComboBox->currentData(
-                AnalyticsSdkEventModel::DriverIdRole).value<QnUuid>();
+                AnalyticsSdkEventModel::EngineIdRole).value<QnUuid>();
 
             eventTypeId = ui->sdkEventTypeComboBox->currentData(
                 AnalyticsSdkEventModel::EventTypeIdRole).value<QString>();

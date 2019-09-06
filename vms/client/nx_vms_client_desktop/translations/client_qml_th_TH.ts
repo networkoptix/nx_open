@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>This is the built-in functionality</source>
-      <translation type="unfinished">This is the built-in functionality</translation>
+      <translation>นี่คือฟังก์ชั่นในตัว</translation>
     </message>
   </context>
   <context>
@@ -72,11 +72,11 @@
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>ไม่ได้ติดตั้งปลั๊กอิน</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>เซิร์ฟเวอร์ออฟไลน์</translation>
     </message>
   </context>
   <context>

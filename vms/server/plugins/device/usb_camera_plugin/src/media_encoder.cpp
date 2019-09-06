@@ -303,7 +303,7 @@ int MediaEncoder::getConfiguredLiveStreamReader(
     return nxcip::NX_NO_ERROR;
 }
 
-int MediaEncoder::setMediaUrl(const char url[nxcip::MAX_TEXT_LEN])
+int MediaEncoder::setMediaUrl(const char /*url*/[nxcip::MAX_TEXT_LEN])
 {
     return nxcip::NX_NOT_IMPLEMENTED;
 }

@@ -3,11 +3,14 @@
 #include <QtGui/QFontMetrics>
 #include <QtGui/QPainter>
 
+#include <QtWidgets/QApplication>
+
 namespace nx::vms::client::desktop {
 
 namespace {
 
 static constexpr int kSpacing = 8;
+static constexpr int kAdditionalTitleSpacing = 4;
 
 using Line = QPair<QString, QString>;
 
@@ -36,24 +39,14 @@ HighlightedAreaTextPainter::HighlightedAreaTextPainter()
 {
 }
 
-QFont HighlightedAreaTextPainter::nameFont() const
+HighlightedAreaTextPainter::Fonts HighlightedAreaTextPainter::fonts() const
 {
-    return m_nameFont;
+    return m_fonts;
 }
 
-void HighlightedAreaTextPainter::setNameFont(const QFont& font)
+void HighlightedAreaTextPainter::setFonts(const Fonts& fonts)
 {
-    m_nameFont = font;
-}
-
-QFont HighlightedAreaTextPainter::valueFont() const
-{
-    return m_valueFont;
-}
-
-void HighlightedAreaTextPainter::setValueFont(const QFont& font)
-{
-    m_valueFont = font;
+    m_fonts = fonts;
 }
 
 QColor HighlightedAreaTextPainter::color() const
@@ -71,10 +64,26 @@ QPixmap HighlightedAreaTextPainter::paintText(const QString& text) const
     if (text.isEmpty())
         return QPixmap();
 
-    const auto lines = splitLines(text);
+    auto lines = splitLines(text);
 
-    QFontMetrics nameFontMetrics(m_nameFont);
-    QFontMetrics valueFontMetrics(m_valueFont);
+    const bool hasTitle = lines.size() > 0
+        && !lines[0].first.isEmpty()
+        && lines[0].second.isEmpty();
+
+    const auto title = hasTitle
+        ? lines[0].first
+        : QString();
+
+    if (hasTitle)
+        lines.removeFirst();
+
+    QFontMetrics nameFontMetrics(m_fonts.name);
+    QFontMetrics valueFontMetrics(m_fonts.value);
+    QFontMetrics titleFontMetrics(m_fonts.title);
+
+    const int titleWidth = hasTitle
+        ? titleFontMetrics.width(title)
+        : 0;
 
     int maxNameWidth = 0;
     int maxValueWidth = 0;
@@ -91,14 +100,23 @@ QPixmap HighlightedAreaTextPainter::paintText(const QString& text) const
     const int valueLineSpacing = valueFontMetrics.lineSpacing();
     const int lineSpacing =
         std::max(nameLineSpacing, valueLineSpacing);
+    const int titleSpacing = hasTitle
+        ? titleFontMetrics.lineSpacing() + kAdditionalTitleSpacing
+        : 0;
 
-    QPixmap pixmap(
-        maxNameWidth + maxValueWidth + kSpacing,
-        lineSpacing * lines.size());
+    static const auto ratio = qApp->devicePixelRatio();
+    const auto width = qMax(maxNameWidth + maxValueWidth + kSpacing, titleWidth);
+    const auto height = titleSpacing + lineSpacing * lines.size();
+    const auto baseSize = QSize(width, height);
+    const auto pixmapSize = baseSize * ratio;
+
+    QPixmap pixmap(pixmapSize);
+    pixmap.setDevicePixelRatio(ratio);
     pixmap.fill(Qt::transparent);
 
     QPainter painter(&pixmap);
     painter.setPen(m_color);
+    painter.setRenderHint(QPainter::TextAntialiasing);
 
     int nameYShift = 0;
     int valueYShift = (nameLineSpacing - valueLineSpacing) / 2;
@@ -112,11 +130,19 @@ QPixmap HighlightedAreaTextPainter::paintText(const QString& text) const
 
     int valueX = maxNameWidth + kSpacing;
     int y = 0;
+
+    if (hasTitle)
+    {
+        painter.setFont(m_fonts.title);
+        painter.drawText(0, titleFontMetrics.ascent(), title);
+        y += titleSpacing;
+    }
+
     for (const auto& line: lines)
     {
-        painter.setFont(m_nameFont);
+        painter.setFont(m_fonts.name);
         painter.drawText(0, y + nameYShift, line.first);
-        painter.setFont(m_valueFont);
+        painter.setFont(m_fonts.value);
         painter.drawText(valueX, y + valueYShift, line.second);
         y += lineSpacing;
     }

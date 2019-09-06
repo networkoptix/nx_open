@@ -15,7 +15,7 @@ UtilityProvider::UtilityProvider(PluginManager* pluginManager, const sdk::IPlugi
     NX_ASSERT(pluginManager);
 }
 
-nx::sdk::IRefCountable* UtilityProvider::queryInterface(InterfaceId id)
+nx::sdk::IRefCountable* UtilityProvider::queryInterface(const InterfaceId* id)
 {
     // TODO: When nxpl::TimeProvider is deleted, move the value of its IID here to preserve binary
     // compatibility with old SDK plugins.
@@ -27,12 +27,9 @@ int64_t UtilityProvider::vmsSystemTimeSinceEpochMs() const
     return qnSyncTime->currentMSecsSinceEpoch();
 }
 
-const nx::sdk::IString* UtilityProvider::homeDir() const
+const nx::sdk::IString* UtilityProvider::getHomeDir() const
 {
-    if (const auto pluginInfo = m_pluginManager->pluginInfo(m_plugin))
-        return new nx::sdk::String(pluginInfo->homeDir.toStdString());
-
-    return new nx::sdk::String(""); //< The error is already logged.
+    return new nx::sdk::String(m_pluginManager->pluginInfo(m_plugin)->homeDir.toStdString());
 }
 
 } // namespace nx::vms::server::plugins

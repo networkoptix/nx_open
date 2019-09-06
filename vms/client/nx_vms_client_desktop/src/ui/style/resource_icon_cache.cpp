@@ -146,7 +146,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent):
     m_cache.insert(WebPages, loadIcon("tree/webpages.png"));
     m_cache.insert(WebPage, loadIcon("tree/webpage.png"));
     m_cache.insert(WebPage | Offline, loadIcon("tree/webpage_offline.png"));
-    m_cache.insert(C2P, loadIcon("tree/c2p.png"));
+    m_cache.insert(C2P, loadIcon("tree/c2p.svg"));
 
     // Analytics.
     m_cache.insert(AnalyticsEngine, loadIcon("tree/server.png"));
@@ -334,4 +334,164 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
         status |= ReadOnly;
 
     return Key(key | status);
+}
+
+// That nasty implementation is appeared here due Fusion powerlessness on KeyPart serialization.
+// KeyPart value aggregates two enum values (type and status) and also may contain bit flags (and
+// declared as flags accordingly). We have "LocalResources|Servers|Cameras" instead of "User" etc.
+// TODO: #vbreus Use this implementation to write tests, then refactor KeyPart-related stuff: split
+// it to clear enum and flags parts, which clearly can be serialized lexically by Fusion later.
+QString QnResourceIconCache::keyToString(Key key)
+{
+    const auto type = key & QnResourceIconCache::TypeMask;
+    const auto status = key & QnResourceIconCache::StatusMask;
+
+    QString result;
+
+    switch (type)
+    {
+        case QnResourceIconCache::Unknown:
+            result = "Unknown";
+            break;
+        case QnResourceIconCache::LocalResources:
+            result = "LocalResources";
+            break;
+        case QnResourceIconCache::CurrentSystem:
+            result = "CurrentSystem";
+            break;
+        case QnResourceIconCache::Server:
+            result = "Server";
+            break;
+        case QnResourceIconCache::Servers:
+            result = "Servers";
+            break;
+        case QnResourceIconCache::HealthMonitor:
+            result = "HealthMonitor";
+            break;
+        case QnResourceIconCache::Layout:
+            result = "Layout";
+            break;
+        case QnResourceIconCache::ExportedLayout:
+            result = "ExportedLayout";
+            break;
+        case QnResourceIconCache::ExportedEncryptedLayout:
+            result = "ExportedEncryptedLayout";
+            break;
+        case QnResourceIconCache::SharedLayout:
+            result = "SharedLayout";
+            break;
+        case QnResourceIconCache::Layouts:
+            result = "Layouts";
+            break;
+        case QnResourceIconCache::SharedLayouts:
+            result = "SharedLayouts";
+            break;
+        case QnResourceIconCache::LayoutTour:
+            result = "LayoutTour";
+            break;
+        case QnResourceIconCache::LayoutTours:
+            result = "LayoutTours";
+            break;
+        case QnResourceIconCache::Camera:
+            result = "Camera";
+            break;
+        case QnResourceIconCache::WearableCamera:
+            result = "WearableCamera";
+            break;
+        case QnResourceIconCache::Cameras:
+            result = "Cameras";
+            break;
+        case QnResourceIconCache::Recorder:
+            result = "Recorder";
+            break;
+        case QnResourceIconCache::MultisensorCamera:
+            result = "MultisensorCamera";
+            break;
+        case QnResourceIconCache::Image:
+            result = "Image";
+            break;
+        case QnResourceIconCache::Media:
+            result = "Media";
+            break;
+        case QnResourceIconCache::User:
+            result = "User";
+            break;
+        case QnResourceIconCache::Users:
+            result = "Users";
+            break;
+        case QnResourceIconCache::VideoWall:
+            result = "VideoWall";
+            break;
+        case QnResourceIconCache::VideoWallItem:
+            result = "VideoWallItem";
+            break;
+        case QnResourceIconCache::VideoWallMatrix:
+            result = "VideoWallMatrix";
+            break;
+        case QnResourceIconCache::OtherSystem:
+            result = "OtherSystem";
+            break;
+        case QnResourceIconCache::OtherSystems:
+            result = "OtherSystems";
+            break;
+        case QnResourceIconCache::IOModule:
+            result = "IOModule";
+            break;
+        case QnResourceIconCache::WebPage:
+            result = "WebPage";
+            break;
+        case QnResourceIconCache::WebPages:
+            result = "WebPages";
+            break;
+        case QnResourceIconCache::AnalyticsEngine:
+            result = "AnalyticsEngine";
+            break;
+        case QnResourceIconCache::AnalyticsEngines:
+            result = "AnalyticsEngines";
+            break;
+        case QnResourceIconCache::C2P:
+            result = "C2P";
+            break;
+        case QnResourceIconCache::Client:
+            result = "Client";
+            break;
+        case QnResourceIconCache::CloudSystem:
+            result = "CloudSystem";
+            break;
+        default:
+            NX_ASSERT(false);
+            break;
+    };
+
+    switch (status)
+    {
+        case QnResourceIconCache::Offline:
+            result.append("|Offline");
+            break;
+        case QnResourceIconCache::Unauthorized:
+            result.append("|Unauthorized");
+            break;
+        case QnResourceIconCache::Online:
+            result.append("|Online");
+            break;
+        case QnResourceIconCache::Locked:
+            result.append("|Locked");
+            break;
+        case QnResourceIconCache::Incompatible:
+            result.append("|Incompatible");
+            break;
+        case QnResourceIconCache::Control:
+            result.append("|Control");
+            break;
+        default:
+            // No status is acceptable.
+            break;
+    }
+
+    if (key.testFlag(QnResourceIconCache::ReadOnly))
+        result.append("|ReadOnly");
+    if (key.testFlag(QnResourceIconCache::AlwaysSelected))
+        result.append("|AlwaysSelected");
+
+    return result;
 }

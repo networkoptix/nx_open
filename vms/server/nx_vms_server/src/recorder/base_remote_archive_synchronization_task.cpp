@@ -22,7 +22,6 @@ static const std::chrono::milliseconds kDetalizationLevel(1);
 static const std::chrono::milliseconds kMinChunkDuration(1000);
 static const std::chrono::milliseconds kStartTimestampThreshold(10000);
 static const QString kRecorderThreadName = lit("Edge recorder");
-static const int64_t kMaxRecordingDiffMs = 2000;
 
 } // namespace
 
@@ -367,6 +366,9 @@ bool BaseRemoteArchiveSynchronizationTask::writeTimePeriodToArchive(
 
     {
         QnMutexLocker lock(&m_mutex);
+        if (m_recorder && m_archiveReader)
+            m_archiveReader->removeDataProcessor(m_recorder.get());
+
         createArchiveReaderThreadUnsafe(timePeriod, chunk);
         createStreamRecorderThreadUnsafe(timePeriod);
     }

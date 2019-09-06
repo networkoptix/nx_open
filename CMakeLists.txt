@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.12.0 FATAL_ERROR)
 
+include(cmake/utils.cmake)
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
 
@@ -8,8 +9,9 @@ nx_option(beta "Whether this build is a beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
 set(eulaVersionOverride "" CACHE STRING "Overriden EULA version")
 
-# Remember to reset the in-version protocol number when updating the project version
-set(releaseVersion 4.0.0)
+# Remember to reset the in-version protocol number in (cmake/vms_protocol_version.cmake) when
+# updating the project version.
+set(releaseVersion 4.1.0)
 
 nx_option(developerBuild
     "Disable this option for production builds (Jenkins)"
@@ -58,12 +60,12 @@ nx_rdep_configure()
 include(cmake/vcs_helpers.cmake)
 nx_vcs_changeset(${CMAKE_CURRENT_LIST_DIR} changeSet)
 if(NOT changeSet AND NOT developerBuild)
-    message(FATAL_ERROR "Hg changeset cannot be calculated.")
+    message(FATAL_ERROR "VCS changeset cannot be calculated.")
 endif()
 
 nx_vcs_branch(${CMAKE_CURRENT_LIST_DIR} branch)
 if(NOT branch AND NOT developerBuild)
-    message(FATAL_ERROR "Hg branch cannot be calculated.")
+    message(FATAL_ERROR "VCS branch cannot be calculated.")
 endif()
 
 include(cmake/dependencies.cmake)
@@ -98,7 +100,7 @@ nx_option(codeSigning "Enable code signing" OFF)
 nx_option(notarization "Enable notarization" OFF)
 
 include(target_detection)
-include(utils)
+nx_init_known_files_list()
 include(find_sources)
 include(moc_utils)
 include(qrc_utils)
@@ -110,6 +112,11 @@ include(customization_package)
 
 include(customization/default-values.cmake)
 include(${customization_dir}/customization.cmake)
+
+if(useMetaVersion)
+    set(metaVersion R15)
+endif()
+
 include(properties)
 include(cloud_host)
 include(vms_parts)

@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="es-ES" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Cualquier tipo</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Seleccionar area</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Seleccione un área en el video...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>En area seleccionada</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>No se pudo ejecutar plugin de acción</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Introducir parametros</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>La acción requiere que algunos parámetros sean llenados.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -943,6 +974,14 @@ to view more bookmarks</source>
       <source>Objects Frames and Info...</source>
       <translation>Objetos Marcos e Información...</translation>
     </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Sujete el Calendario</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Desprenda el Calendario</translation>
+    </message>
   </context>
   <context>
     <name>Deactivator</name>
@@ -1004,6 +1043,45 @@ to view more bookmarks</source>
     <message>
       <source>Please re-enter password for layout %1:</source>
       <translation>Por favor vuelva a ingresar la contraseña para el diseño %1:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>Eventos del servidor</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>Eventos analíticos</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Cualquier evento</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Cualquier problema del dispositivo</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Cualquier problema con la cámara</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Cualquier evento del servidor</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Problemas con el dispositivo</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Problemas con la cámara</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Cualquier evento analítico</translation>
     </message>
   </context>
   <context>
@@ -1643,24 +1721,12 @@ to view more bookmarks</source>
       <translation>Servidor actualizado</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Regla de negocio actualizada</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Servidor eliminado</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Regla de negocio eliminada</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Usuario eliminado</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Regla de Negocios se restablecieron</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1756,6 +1822,18 @@ to view more bookmarks</source>
         <numerusform>%n acciones</numerusform>
         <numerusform>%n acciones</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>Regla de evento cambiada</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>Regla de evento eliminada</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>Reglas de eventos restablecidas a las predeterminadas</translation>
     </message>
   </context>
   <context>
@@ -2036,8 +2114,8 @@ to view more bookmarks</source>
       <translation>Cualquier cámara</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation>Forzar acuse de recibo solo funcionará para eventos genéricos si se usan modificadores de cámara en la URL de evento genérico</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Forzar el reconocimiento sólo funcionará para eventos genéricos si los identificadores de cámara se utilizan en la URL del evento genérico</translation>
     </message>
   </context>
   <context>
@@ -3003,17 +3081,17 @@ a %1</translation>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Registro de eventos para el período de %1 a %2 - %n eventos encontrados</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+        <numerusform>Registro de eventos para el período de %1 a %2: %n eventos encontrados</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Registro de eventos para %1 - %n eventos encontrados</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
+        <numerusform>Registro de eventos para %1 - %n eventos encontrados</numerusform>
       </translation>
     </message>
   </context>
@@ -3091,9 +3169,9 @@ a %1</translation>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 (%n cámaras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
+        <numerusform>%1 (%n cámaras)</numerusform>
       </translation>
     </message>
   </context>
@@ -4242,6 +4320,10 @@ a %1</translation>
     <message>
       <source>Virtual Camera %1</source>
       <translation>Camara Virtual %1</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Virtual Camera&quot; es un almacenamiento virtual para archivos de video, que se puede cargar en cualquier servidor de su sistema y que cualquier usuario puede acceder a él.</translation>
     </message>
   </context>
   <context>
@@ -5584,12 +5666,6 @@ a %1</translation>
       <translation>¿Qué hacer con los datos analíticos actuales?</translation>
     </message>
     <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Los datos de análisis actuales no se moverán automáticamente a otra ubicación y se volverán inaccesibles. Puede mantenerlos y moverlos manualmente más tarde, o eliminarlos permanentemente.
-Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, por favor contacte con el soporte antes de continuar.</translation>
-    </message>
-    <message>
       <source>Delete</source>
       <translation>Borrar</translation>
     </message>
@@ -5600,6 +5676,12 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>Cancel</source>
       <translation>Cancelar</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Los datos analíticos actuales no se moverán automáticamente a otra ubicación y serán inaccesibles. Puede conservarlo y moverlo manualmente más tarde, o eliminarlo permanentemente.
+Si tenía la intención de mover los datos analíticos a otra ubicación de almacenamiento, póngase en contacto con el soporte antes de continuar.</translation>
     </message>
   </context>
   <context>
@@ -5922,10 +6004,6 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>No incluye información personal y es completamente anónimo.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation>Las medidas del servidor Failover pueden solicitar actualizaciones de estado de la cámara independientemente de esta configuración.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
       <translation>Habilitar el autodescubrimiento de dispositivos y servidores y la comprobación automática del estado del dispositivo</translation>
     </message>
@@ -5936,6 +6014,10 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
       <translation>Cuando está habilitado, el sistema descubre continuamente nuevas cámaras y servidores, y envía peticiones de descubrimiento a cámaras para actualizar el estado.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>Si Failover está activado, el servidor puede solicitar actualizaciones de estado de la cámara independientemente de esta configuración.</translation>
     </message>
   </context>
   <context>
@@ -5955,44 +6037,6 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>Spread Sheet (CSV) File</source>
       <translation>Archivo de hoja de cálculo (CSV)</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Servidor</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Compensación</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Fecha</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Zona Horaria</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Tiempo</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Ningún servidor tiene acceso a Internet. El tiempo no esta siendo sincronizado.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation>La hora VMS está sincronizada con Internet y no depende de la hora local en los servidores.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation>La hora de VMS se sincroniza con la hora local en el servidor seleccionado y no depende de la hora local de otros servidores.</translation>
     </message>
   </context>
   <context>
@@ -7127,6 +7171,34 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     </message>
   </context>
   <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Seleccione el área en el video para filtrar los resultados</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>En area seleccionada</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Cámara seleccionada</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Dispositivo seleccionado</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Medios seleccionados</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>ninguna</translation>
+    </message>
+  </context>
+  <context>
     <name>StreamQualityStrings</name>
     <message>
       <source>Lowest</source>
@@ -7342,12 +7414,12 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation>Objeto desconocido</translation>
-    </message>
-    <message>
       <source>deleted camera</source>
       <translation>cámara eliminada</translation>
+    </message>
+    <message>
+      <source>Unknown track</source>
+      <translation>Pista desconocida</translation>
     </message>
   </context>
   <context>
@@ -7366,38 +7438,6 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
         <numerusform>%n objetos</numerusform>
         <numerusform>%n objetos</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Any type</source>
-      <translation>Cualquier tipo</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation>Seleccionar area</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation>Seleccione un área en el video...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>En area seleccionada</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>motor analítico sin nombre</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation>No se pudo ejecutar plugin de acción</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation>Introducir parametros</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation>La acción requiere que algunos parámetros sean llenados.</translation>
     </message>
   </context>
   <context>
@@ -7441,17 +7481,6 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>Applying changes...</source>
       <translation>Aplicando los cambios...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>Este módulo no tiene ninguna configuración avanzada</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>Esta cámara no tiene ninguna configuración avanzada</translation>
     </message>
   </context>
   <context>
@@ -7579,6 +7608,10 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>This action cannot be undone.</source>
       <translation>Esta acción no se puede deshacer.</translation>
+    </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation>El flujo de detección de movimiento está deshabilitado</translation>
     </message>
   </context>
   <context>
@@ -7716,6 +7749,14 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>Plugins</source>
       <translation>Plugins</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Detección de movimiento desactivada, todos los registros de programación &quot;Motion&quot; y &quot;Motion + Lo-Res&quot; se cambiarán a &quot;Siempre&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>La transmisión dual está desactivada, todos los registros de programación &quot;Motion + Lo-Res&quot; se cambiarán a &quot;Siempre&quot;</translation>
     </message>
   </context>
   <context>
@@ -7997,42 +8038,6 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
     <message>
-      <source>Server events</source>
-      <translation>Eventos del servidor</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation>Eventos analíticos</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation>Cualquier problema del dispositivo</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation>Cualquier problema con la cámara</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation>Cualquier evento del servidor</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation>Problemas con el dispositivo</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation>Problemas con la cámara</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation>Cualquier evento</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation>Cualquier evento analítico</translation>
-    </message>
-    <message>
       <source>No events</source>
       <translation>No hay eventos</translation>
     </message>
@@ -8042,10 +8047,6 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
         <numerusform>%n eventos</numerusform>
         <numerusform>%n eventos</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation>motor analítico sin nombre</translation>
     </message>
     <message>
       <source>No events occurred</source>
@@ -8435,8 +8436,8 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>Rango de direcciones IP especificado contiene más de 255 direcciones.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation>Puede&apos;t comenzar el proceso de búsqueda</translation>
+      <source>Can not start the search process</source>
+      <translation>No se puede iniciar el proceso de búsqueda</translation>
     </message>
   </context>
   <context>
@@ -8549,6 +8550,53 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <source>Some servers are offline and will not be updated. Skip them?</source>
       <translation>Algunos servidores están fuera de línea y no se actualizarán. Omitirlos?</translation>
     </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Falta el paquete de actualización para el cliente y %n servidores</numerusform>
+        <numerusform>Falta el paquete de actualización para el cliente y %n servidores</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Falta el paquete de actualización para el cliente</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>No hay servidores en línea para actualizar.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>¿Cancelar actualización y eliminar todos los datos descargados?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Las versiones del sistema operativo de algunos componentes ya no son compatibles. Por favor, eliminarlos del sistema o actualizar su sistema operativo a una versión compatible.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>La versión del sistema operativo del cliente ya no es compatible. Por favor, actualice su sistema operativo a una versión compatible.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Error al iniciar la actualización</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Error al cancelar la actualización</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Error al iniciar la instalación</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Algunos servidores no han completado el proceso de actualización. ¿Terminar de todos modos?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Error al descargar los paquetes a algunos componentes</translation>
+    </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
       <translation>Si el problema persiste, póngase en contacto con el servicio de atención al cliente.</translation>
@@ -8566,16 +8614,48 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>Actualización completada</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation>Nx Witness Client se reiniciará a la versión actualizada.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Actualización finalizada, pero algunos componentes han fallado en una actualización</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Actualice %1 manualmente utilizando un paquete de instalación.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 se reiniciará a la versión actualizada.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>OK</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>Se ha producido un error al instalar las actualizaciones:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Descargando Actualización...</translation>
+    </message>
+    <message>
+      <source>Finish Update</source>
+      <translation>Finalizar actualización</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Cancelar</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>La última versión ya está instalada</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Esta versión ya está instalada</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Instalar actualización</translation>
     </message>
     <message>
       <source>Upload</source>
@@ -8594,12 +8674,12 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>Descargar &amp; Instalar</translation>
     </message>
     <message>
-      <source>Select Another Build</source>
-      <translation>Seleccione otro Build</translation>
-    </message>
-    <message>
       <source>Browse for Another File...</source>
       <translation>Buscar otro archivo...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Seleccione otro Build</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8622,6 +8702,10 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>Instalando actualizaciones de cliente...</translation>
     </message>
     <message>
+      <source>Starting update to ...</source>
+      <translation>Iniciando actualización a ...</translation>
+    </message>
+    <message>
       <source>Updating to ...</source>
       <translation>Actualizando a ...</translation>
     </message>
@@ -8630,12 +8714,24 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>Listo para actualizar a</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Instalar actualización</translation>
-    </message>
-    <message>
       <source>System updated to</source>
       <translation>Sistema actualizado a</translation>
+    </message>
+    <message>
+      <source>Some servers have no update packages available.</source>
+      <translation>Algunos servidores no tienen paquetes de actualización disponibles.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>Algunos servidores han encontrado un error interno.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Póngase en contacto con el servicio técnico.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Algunos servidores se han desconectado. Por favor, espere hasta que estén en línea para continuar.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8644,6 +8740,10 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>Continue in Background</source>
       <translation>Continuar en el fondo</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>La última Actualización disponible</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8656,101 +8756,6 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>Update from mediaservers</source>
       <translation>Actualizar desde servidores</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>La última Actualización disponible</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation>
-        <numerusform>Falta el paquete de actualización para el cliente y %n servidores</numerusform>
-        <numerusform>Falta el paquete de actualización para el cliente y %n servidores</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation>Falta el paquete de actualización para el cliente</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation>Finalizar actualización</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Cancelar</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation>La última versión ya está instalada</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation>Esta versión ya está instalada</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation>No hay servidores en línea para actualizar.</translation>
-    </message>
-    <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation>Algunos servidores no han completado el proceso de actualización. ¿Terminarlo de todos modos?</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation>¿Cancelar actualización y eliminar todos los datos descargados?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation>Se ha producido un error al instalar las actualizaciones:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation>Algunos servidores se han desconectado. Por favor, espere hasta que estén en línea para continuar.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation>Actualización finalizada, pero algunos componentes han fallado en una actualización</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Actualice %1 manualmente utilizando un paquete de instalación.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 se reiniciará a la versión actualizada.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation>Error al descargar los paquetes a algunos componentes</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Las versiones del sistema operativo de algunos componentes ya no son compatibles. Por favor, eliminarlos del sistema o actualizar su sistema operativo a una versión compatible.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>La versión del sistema operativo del cliente ya no es compatible. Por favor, actualice su sistema operativo a una versión compatible.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation>Error al iniciar la actualización</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation>Iniciando actualización a ...</translation>
-    </message>
-    <message>
-      <source>Some servers have no package available</source>
-      <translation>Algunos servidores no tienen paquete disponible</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
     </message>
   </context>
   <context>
@@ -8808,10 +8813,6 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>Algunos usuarios don&apos;t tienen acceso al diseño seleccionado. La acción no funcionará para ellos.</translation>
-    </message>
-    <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Ninguno de los usuarios seleccionados tiene acceso al diseño seleccionado. La acción no funcionará.</translation>
     </message>
@@ -8830,6 +8831,10 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
       <translation>Ninguno de los roles de usuario seleccionados contiene usuarios. La acción no funcionará.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation>Algunos usuarios no tienen acceso al diseño seleccionado. La acción no funcionará para ellos.</translation>
     </message>
   </context>
   <context>
@@ -8865,10 +8870,6 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>Failed to download update</source>
       <translation>Error al descargar la actualización</translation>
-    </message>
-    <message>
-      <source>Failed to install update</source>
-      <translation>Error al instalar la actualización</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
@@ -8924,11 +8925,15 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>No hay suficiente espacio para instalar la actualización.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Error de servidor interno.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation>Esta versión del sistema operativo ya no es compatible.</translation>
     </message>
   </context>
   <context>
@@ -9035,28 +9040,12 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>Más configuraciones</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Doble streaming no admitida para esta cámara</translation>
+      <source>Motion detection is disabled or not supported</source>
+      <translation>La detección de movimiento está deshabilitada o no es compatible</translation>
     </message>
     <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Dual-Streaming y detección de movimiento no es compatible para esta cámara</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Detección de movimiento desactivada</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Para habilitarlo o ajustarlo, vaya a la pestaña &quot;Movimiento&quot; en Configuración de la cámara</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
-      <translation>Detección de movimiento desactivada o no compatible</translation>
-    </message>
-    <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Para asegurarse de que esté soportado y para habilitarlo, vaya a la &quot;pestaña &quot; Moción en ajustes de la cámara.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation>El streaming dual está desactivado o no es compatible</translation>
     </message>
   </context>
   <context>
@@ -9083,6 +9072,10 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
       <translation>Los usuarios se desconectarán automáticamente si su sesión excede la duración especificada.</translation>
+    </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation>Las marcas de agua se mostrarán a través de videos en vivo, archivados y exportados para usuarios no administradores. Usted y otros administradores no las verán.</translation>
     </message>
   </context>
   <context>
@@ -9147,6 +9140,10 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <source>plugin is optional and is not in the white list</source>
       <translation>el plugin es opcional y no está en la lista blanca</translation>
     </message>
+    <message>
+      <source>internal error</source>
+      <translation>error interno</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
@@ -9175,11 +9172,15 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>No hay conexión con el servidor.</translation>
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Error de red.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation>Error del servidor.</translation>
     </message>
   </context>
   <context>
@@ -9223,14 +9224,6 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation>Seleccione el área en el video para filtrar los resultados</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation>En area seleccionada</translation>
-    </message>
-    <message>
       <source>No motion</source>
       <translation>Sin movimiento</translation>
     </message>
@@ -9244,23 +9237,6 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
         <numerusform>%n eventos de movimiento</numerusform>
         <numerusform>%n eventos de movimiento</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Cámara seleccionada</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation>Dispositivo seleccionado</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation>Medios seleccionados</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>ninguna</translation>
     </message>
   </context>
   <context>
@@ -9395,6 +9371,14 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     <message>
       <source>File was corrupted while being uploaded to the server</source>
       <translation>El archivo se corrompió mientras se cargaba en el servidor</translation>
+    </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>El archivo remoto &quot;%1&quot; está dañado</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>El servidor ya tiene este archivo &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -9599,25 +9583,25 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation>Cualquier Plugin</translation>
+      <translation>Cualquier plugin</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation>El evento se activará solo si hay coincidencias en el título con cualquiera de las palabras clave ingresadas.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation>Si el campo está vacío, el evento siempre se disparará.</translation>
+      <translation>Si el campo está vacío, el evento siempre se activará.</translation>
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>Este campo es sensible a mayúsculas y minúsculas.</translation>
+      <translation>Este campo distingue entre mayúsculas y minúsculas.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
@@ -9925,18 +9909,22 @@ Si usted pretende mover datos analíticos a otra ubicación de almacenamiento, p
       <translation>OK</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation>Confirmar ubicación de almacenamiento para almacenar datos analíticos en &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>Confirme la ubicación de almacenamiento para los datos analíticos en &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation>La base de datos analítica debe almacenarse en un almacenamiento local y puede ocupar hasta cien gigabytes.
-Una vez que se selecciona la ubicación para almacenar los datos analíticos, no se puede cambiar fácilmente sin perder los datos existentes. Recomendamos elegir la ubicación con cuidado y no usar la partición del sistema para evitar un mal funcionamiento grave del sistema.
-Por defecto, los datos analíticos se almacenarán en el directorio de instalación de mediaserver&apos;.
-Puede cambiar la ubicación de almacenamiento en la pestaña &quot;Storage Management&quot; en el cuadro de diálogo Configuración del servidor.</translation>
+      <source>the largest available partition</source>
+      <translation>la partición más grande disponible</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation>La base de datos de analíticossólo debe almacenarse en una unidad local y puede tomar grandes cantidades de espacio.
+Una vez que se selecciona una ubicación para almacenar datos analíticos, no se puede cambiar fácilmente sin perder datos existentes. Recomendamos elegir la ubicación cuidadosamente y evitar usar la partición del sistema ya que puede causar una mala función del sistema.
+Por defecto los datos analíticos se almacenarán en %1.
+Puede seleccionar otra ubicación de almacenamiento en la pestaña &quot;Administración de Almacenamiento&quot; de la ventana de Configuración del servidor.</translation>
     </message>
   </context>
   <context>

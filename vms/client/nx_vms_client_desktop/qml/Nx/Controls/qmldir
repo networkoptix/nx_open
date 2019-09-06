@@ -12,6 +12,7 @@ GroupBox 1.0 GroupBox.qml
 Panel 1.0 Panel.qml
 ScrollView 1.0 ScrollView.qml
 ScrollBar 1.0 ScrollBar.qml
+Scrollable 1.0 Scrollable.qml
 AlertBar 1.0 AlertBar.qml
 ToolTip 1.0 ToolTip.qml
 TextArea 1.0 TextArea.qml
@@ -24,6 +25,9 @@ DropArea 1.0 DropArea.qml
 CompactTabButton 1.0 CompactTabButton.qml
 TabBar 1.0 TabBar.qml
 Fader 1.0 Fader.qml
+ProgressBar 1.0 ProgressBar.qml
+CloseButton 1.0 CloseButton.qml
+SelectableTextButton 1.0 SelectableTextButton.qml
 
 ArrowIcon 1.0 ArrowIcon.qml
 SwitchIcon 1.0 SwitchIcon.qml

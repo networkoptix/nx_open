@@ -10,10 +10,11 @@ namespace test {
 class HealthMonitoring:
     public Ec2MserverCloudSynchronizationConnection
 {
-public:
-    HealthMonitoring();
+    using base_type = Ec2MserverCloudSynchronizationConnection;
 
 protected:
+    virtual void SetUp() override;
+
     void givenSystemWithSomeHistory();
     void establishConnectionFromMediaserverToCloud();
     void establishConnectionFromMediaserverToCloudReusingPeerId();

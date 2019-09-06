@@ -70,7 +70,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(
             return success ? Value::SuccessNotification : Value::CommonNotification;
         }
 
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
         {
             using namespace nx::vms::api;
             switch (params.metadata.level)

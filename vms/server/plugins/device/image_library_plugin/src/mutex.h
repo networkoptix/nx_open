@@ -1,11 +1,6 @@
-/**********************************************************
-* 10 sep 2013
-* akolesnikov@networkoptix.com
-***********************************************************/
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef MUTEX_H
-#define MUTEX_H
-
+#pragma once
 
 class MutexImpl;
 
@@ -43,5 +38,3 @@ private:
     void lock();
     void unlock();
 };
-
-#endif  //MUTEX_H

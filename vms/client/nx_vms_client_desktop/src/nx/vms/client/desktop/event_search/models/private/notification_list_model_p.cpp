@@ -334,6 +334,8 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
 
     if (!actionHasId)
         m_uuidHashes[action->getRuleId()][resource].insert(eventData.id);
+
+    truncateToMaximumCount();
 }
 
 void NotificationListModel::Private::removeNotification(const vms::event::AbstractActionPtr& action)
@@ -440,7 +442,7 @@ QString NotificationListModel::Private::caption(const nx::vms::event::EventParam
                 ? tr("Generic Event")
                 : parameters.caption;
 
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
             return parameters.caption.isEmpty()
                 ? tr("Unknown Plugin Diagnostic Event")
                 : parameters.caption;
@@ -467,7 +469,7 @@ QString NotificationListModel::Private::description(
     switch (parameters.eventType)
     {
         case EventType::userDefinedEvent:
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
         case EventType::analyticsSdkEvent:
             return parameters.description;
 
@@ -550,12 +552,35 @@ QPixmap NotificationListModel::Private::pixmapForAction(
         case EventType::licenseIssueEvent:
             return qnSkin->pixmap("events/license.png");
 
-        case EventType::pluginEvent:
+        case EventType::pluginDiagnosticEvent:
             return qnSkin->pixmap("events/alert.png");
 
         default:
             return QPixmap();
     }
+}
+
+int NotificationListModel::Private::maximumCount() const
+{
+    return m_maximumCount;
+}
+
+void NotificationListModel::Private::setMaximumCount(int value)
+{
+    if (m_maximumCount == value)
+        return;
+
+    m_maximumCount = value;
+    truncateToMaximumCount();
+}
+
+void NotificationListModel::Private::truncateToMaximumCount()
+{
+    const int rowCount = q->rowCount();
+    const int countToRemove = rowCount - m_maximumCount;
+
+    if (countToRemove > 0)
+        q->removeRows(rowCount - countToRemove, countToRemove);
 }
 
 } // namespace nx::vms::client::desktop

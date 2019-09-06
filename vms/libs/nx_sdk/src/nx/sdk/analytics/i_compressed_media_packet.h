@@ -19,7 +19,7 @@ namespace analytics {
 class ICompressedMediaPacket: public Interface<ICompressedMediaPacket, IDataPacket>
 {
 public:
-    static auto interfaceId() { return InterfaceId("nx::sdk::analytics::ICompressedMediaPacket"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::ICompressedMediaPacket"); }
 
     /**
      * @return Null-terminated ASCII string containing the MIME type corresponding to the packet
@@ -40,7 +40,8 @@ public:
     /**
      * @return Pointer to the codec context, or null if not available.
      */
-    virtual const IMediaContext* context() const = 0;
+    protected: virtual const IMediaContext* getContext() const = 0;
+    public: Ptr<const IMediaContext> context() const { return toPtr(getContext()); }
 
     enum class MediaFlags: uint32_t
     {

@@ -8,8 +8,8 @@
 #include <condition_variable>
 #include <vector>
 #include <string>
+#include <deque>
 
-#include <nx/sdk/uuid.h>
 #include <nx/sdk/analytics/helpers/video_frame_processing_device_agent.h>
 #include <nx/sdk/analytics/helpers/pixel_format.h>
 
@@ -27,15 +27,17 @@ public:
     DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo);
     virtual ~DeviceAgent() override;
 
-    virtual nx::sdk::Error setNeededMetadataTypes(
+protected:
+    virtual void getPluginSideSettings(
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
+
+    virtual void doSetNeededMetadataTypes(
+        nx::sdk::Result<void>* outValue,
         const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
-    virtual nx::sdk::IStringMap* pluginSideSettings() const override;
+    virtual std::string manifestString() const override;
 
-protected:
-    virtual std::string manifest() const override;
-
-    virtual void settingsReceived() override;
+    virtual nx::sdk::Result<const nx::sdk::IStringMap*> settingsReceived() override;
 
     virtual bool pushCompressedVideoFrame(
         const nx::sdk::analytics::ICompressedVideoPacket* videoFrame) override;
@@ -47,8 +49,6 @@ protected:
         std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
 
 private:
-    virtual Engine* engine() const override { return engineCasted<Engine>(); }
-
     nx::sdk::analytics::IMetadataPacket* cookSomeEvents();
     std::vector<nx::sdk::analytics::IMetadataPacket*> cookSomeObjects();
 
@@ -67,16 +67,17 @@ private:
         const nx::sdk::analytics::IUncompressedVideoFrame* frame,
         int plane) const;
 
-    nx::sdk::Error startFetchingMetadata(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+    void startFetchingMetadata(const nx::sdk::analytics::IMetadataTypes* metadataTypes);
 
     void stopFetchingMetadata();
 
     void processEvents();
 
-    void processPluginEvents();
+    void processPluginDiagnosticEvents();
 
     void setObjectCount(int objectCount);
+
+    void cleanUpTimestampQueue();
 
     void parseSettings();
 
@@ -99,12 +100,14 @@ private:
     void updateEventGenerationParameters();
 
 private:
-    std::atomic<bool> m_terminated{ false };
+    Engine* const m_engine;
 
-    std::unique_ptr<std::thread> m_pluginEventThread;
-    std::mutex m_pluginEventGenerationLoopMutex;
-    std::condition_variable m_pluginEventGenerationLoopCondition;
-    std::atomic<bool> m_needToThrowPluginEvents{false};
+    std::atomic<bool> m_terminated{false};
+
+    std::unique_ptr<std::thread> m_pluginDiagnosticEventThread;
+    std::mutex m_pluginDiagnosticEventGenerationLoopMutex;
+    std::condition_variable m_pluginDiagnosticEventGenerationLoopCondition;
+    std::atomic<bool> m_needToThrowPluginDiagnosticEvents{false};
 
     std::unique_ptr<std::thread> m_eventThread;
     std::mutex m_eventGenerationLoopMutex;
@@ -113,6 +116,8 @@ private:
 
     int m_frameCounter = 0;
     std::string m_eventTypeId;
+
+    std::deque<int64_t> m_frameTimestampQueue;
     int64_t m_lastVideoFrameTimestampUs = 0;
 
     struct DeviceAgentSettings
@@ -139,7 +144,16 @@ private:
 
         std::atomic<bool> generatePreviews{true};
 
-        std::atomic<bool> throwPluginEvents{false};
+        std::atomic<bool> throwPluginDiagnosticEvents{false};
+        std::atomic<bool> leakFrames{false};
+
+        std::atomic<std::chrono::milliseconds> additionalFrameProcessingDelay{
+            std::chrono::milliseconds::zero()};
+
+        std::atomic<std::chrono::milliseconds> overallMetadataDelay{
+            std::chrono::milliseconds::zero()};
+
+        std::atomic<int> numberOfFramesBeforePreviewGeneration{30};
     };
 
     DeviceAgentSettings m_deviceAgentSettings;
@@ -155,10 +169,7 @@ private:
     struct ObjectContext
     {
         ObjectContext() = default;
-        ObjectContext(std::unique_ptr<AbstractObject> object):
-            object(std::move(object))
-        {
-        }
+        ObjectContext(std::unique_ptr<AbstractObject> object): object(std::move(object)) {}
 
         ObjectContext& operator=(std::unique_ptr<AbstractObject>&& otherObject)
         {

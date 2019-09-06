@@ -46,7 +46,7 @@ protected:
     QnLayoutResourcePtr createLayout(const QnUuid& id = QnUuid::createUuid())
     {
         QnLayoutResourcePtr layout(new QnLayoutResource());
-        layout->setId(id);
+        layout->setIdUnsafe(id);
         return layout;
     }
 

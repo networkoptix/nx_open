@@ -12,6 +12,7 @@
 #include <nx/fusion/model_functions.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/error.h>
 
 #include <nx/kit/ini_config.h>
 
@@ -276,14 +277,14 @@ void Engine::setEngineInfo(const nx::sdk::analytics::IEngineInfo* /*engineInfo*/
 {
 }
 
-void Engine::setSettings(const IStringMap* settings)
+void Engine::doSetSettings(
+    Result<const IStringMap*>* /*outResult*/, const IStringMap* /*settings*/)
 {
     // There are no DeviceAgent settings for this plugin.
 }
 
-IStringMap* Engine::pluginSideSettings() const
+void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
 {
-    return nullptr;
 }
 
 void Engine::onDataReceived(int index)
@@ -352,29 +353,27 @@ void Engine::unregisterCamera(int cameraLogicalId)
     m_cameraMap.remove(cameraLogicalId);
 }
 
-IDeviceAgent* Engine::obtainDeviceAgent(const IDeviceInfo* deviceInfo, Error* /*outError*/)
+void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
     // We should invent more accurate test.
     if (isCompatible(deviceInfo))
-        return new DeviceAgent(this, deviceInfo, m_typedManifest);
+        *outResult = new DeviceAgent(this, deviceInfo, m_typedManifest);
     else
-        return nullptr;
+        *outResult = error(ErrorCode::invalidParams, "Device is not compatible with the Engine");
 }
 
-const IString* Engine::manifest(Error* error) const
+void Engine::getManifest(Result<const IString*>* outResult) const
 {
-    *error = Error::noError;
-    return new nx::sdk::String(m_manifest);
+    *outResult = new nx::sdk::String(m_manifest);
 }
 
-void Engine::executeAction(IAction* /*action*/, Error* /*outError*/)
+void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
 {
 }
 
-Error Engine::setHandler(IHandler* /*handler*/)
+void Engine::setHandler(IHandler* /*handler*/)
 {
     // TODO: Use the handler for error reporting.
-    return Error::noError;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
@@ -391,12 +390,12 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 
 namespace {
 
-static const std::string kLibName = "ssc_analytics_plugin";
-
 static const std::string kPluginManifest = /*suppress newline*/1 + R"json(
 {
     "id": "nx.ssc",
     "name": "SSC analytics plugin",
+    "description": "Supports integration with SSC gasoline guns using RS232 protocol",
+    "version": "1.0.0",
     "engineSettingsModel": ""
 }
 )json";
@@ -408,7 +407,6 @@ extern "C" {
 NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
-        kLibName,
         kPluginManifest,
         [](nx::sdk::analytics::IPlugin* plugin)
         {

@@ -21,9 +21,9 @@ float TimestampedObjectMetadata::confidence() const
     return m_objectMetadata->confidence();
 }
 
-Uuid TimestampedObjectMetadata::id() const
+void TimestampedObjectMetadata::getTrackId(Uuid* outValue) const
 {
-    return m_objectMetadata->id();
+    *outValue = m_objectMetadata->trackId();
 }
 
 const char* TimestampedObjectMetadata::subtype() const
@@ -31,9 +31,9 @@ const char* TimestampedObjectMetadata::subtype() const
     return m_objectMetadata->subtype();
 }
 
-const IAttribute* TimestampedObjectMetadata::attribute(int index) const
+const IAttribute* TimestampedObjectMetadata::getAttribute(int index) const
 {
-    return m_objectMetadata->attribute(index);
+    return m_objectMetadata->attribute(index).get();
 }
 
 int TimestampedObjectMetadata::attributeCount() const
@@ -41,9 +41,9 @@ int TimestampedObjectMetadata::attributeCount() const
     return m_objectMetadata->attributeCount();
 }
 
-Rect TimestampedObjectMetadata::boundingBox() const
+void TimestampedObjectMetadata::getBoundingBox(Rect* outValue) const
 {
-    return m_objectMetadata->boundingBox();
+    *outValue = m_objectMetadata->boundingBox();
 }
 
 int64_t TimestampedObjectMetadata::timestampUs() const
@@ -61,9 +61,9 @@ void TimestampedObjectMetadata::setConfidence(float confidence)
     m_objectMetadata->setConfidence(confidence);
 }
 
-void TimestampedObjectMetadata::setId(const Uuid& value)
+void TimestampedObjectMetadata::setTrackId(const Uuid& value)
 {
-    m_objectMetadata->setId(std::move(value));
+    m_objectMetadata->setTrackId(std::move(value));
 }
 
 void TimestampedObjectMetadata::setSubtype(const std::string& value)

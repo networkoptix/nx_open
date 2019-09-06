@@ -22,10 +22,10 @@
                 <uib-tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div ng-if="user.isOwner">
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
-                            <h3>Portti</h3>
+                            <h3>Port</h3>
                             <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
                                 <div class="col-xs-6">
-                                    <input type="number" class="form-control" id="port" placeholder="Portti" name="port" ng-model="settings.port"
+                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
                                            min="1"  max="65000"
                                            pattern ="^\d*$" required>
                                 </div>
@@ -46,7 +46,7 @@
                     <div ng-if="user.isOwner">
                         <h3>Irrota palvelin järjestelmästä</h3>
                         <p>Tämä toiminto poistaa palvelimen järjestelmästä ja säilyttää tietokannan, paikalliset käyttäjät ja kokoonpanot.
-                            Videon arkisto säilyy ennallaan. Kaikki pilvipalvelun käyttäjät poistetaan</p>
+                            Videon arkisto säilyy ennallaan. <b>Kaikki pilvipalvelun käyttäjät poistetaan.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Irrota palvelin järjestelmästä</button></p>
                     </div>
                     <div>
@@ -137,7 +137,7 @@
                                     Pakota videoliikenteen salaus
                                 </label>
                             </div>
-                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Save</button>
+                            <button type="button" class="btn btn-primary" ng-click="saveTrafficSettings()">Tallenna</button>
                         </form>
                     </div>
                 </uib-tab>

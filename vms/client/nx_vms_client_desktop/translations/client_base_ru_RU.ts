@@ -2,6 +2,37 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru" sourcelanguage="en">
   <context>
+    <name>AnalyticsSearchWidget::Private</name>
+    <message>
+      <source>Any type</source>
+      <translation>Любой тип</translation>
+    </message>
+    <message>
+      <source>Select area</source>
+      <translation>Выберите область</translation>
+    </message>
+    <message>
+      <source>Select some area on the video...</source>
+      <translation>Выберите область на видео...</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>В выбранной области</translation>
+    </message>
+    <message>
+      <source>Failed to execute plugin action</source>
+      <translation>Не удалось выполнить действие плагина</translation>
+    </message>
+    <message>
+      <source>Enter parameters</source>
+      <translation>Введите параметры</translation>
+    </message>
+    <message>
+      <source>Action requires some parameters to be filled.</source>
+      <translation>Действие требует заполнения некоторых параметров.</translation>
+    </message>
+  </context>
+  <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
@@ -84,15 +115,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>Получение информации об обновлениях с сервера</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>Загрузка пакета обновления</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Установка</translation>
     </message>
   </context>
   <context>
@@ -862,11 +893,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Forget password</source>
-      <translation type="unfinished">Forget password</translation>
+      <translation>Забыли пароль</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
-      <translation type="unfinished">Cancel Upload...</translation>
+      <translation>Отменить загрузку...</translation>
     </message>
     <message>
       <source>Copy Schedule...</source>
@@ -874,7 +905,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
-      <translation type="unfinished">Analytics Engine Settings...</translation>
+      <translation>Настройки движка аналитики...</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
@@ -886,19 +917,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Pin Panel</source>
-      <translation type="unfinished">Pin Panel</translation>
+      <translation>Закрепить панель</translation>
     </message>
     <message>
       <source>Unpin Panel</source>
-      <translation type="unfinished">Unpin Panel</translation>
+      <translation>Открепить панель</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation type="unfinished">Virtual Camera...</translation>
+      <translation>Виртуальная камера...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Новая виртуальная камера...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -922,27 +953,35 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation type="unfinished">Switch to Notifications tab</translation>
+      <translation>Переключиться на вкладку Уведомления</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation type="unfinished">Switch to Motion tab</translation>
+      <translation>Переключиться на вкладку «Движение»</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation type="unfinished">Switch to Bookmarks tab</translation>
+      <translation>Переключиться на закладки</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation type="unfinished">Switch to Events tab</translation>
+      <translation>Перейти на вкладку «События»</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation type="unfinished">Switch to Objects tab</translation>
+      <translation>Переключиться на вкладку «Объекты»</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
+      <translation>Рамки объектов и информация...</translation>
+    </message>
+    <message>
+      <source>Pin Calendar</source>
+      <translation>Прикрепить календарь</translation>
+    </message>
+    <message>
+      <source>Unpin Calendar</source>
+      <translation>Открепить календарь</translation>
     </message>
   </context>
   <context>
@@ -988,23 +1027,62 @@ to view more bookmarks</source>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Пожалуйста, введите корректный пароль</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>Этот пароль некорректен.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Зашифрованная раскладка</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>Файл %1 зашифрован. Пожалуйста, введите пароль:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Пожалуйста, введите пароль для раскладки %1 еще раз:</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventSearchWidget::Private</name>
+    <message>
+      <source>Server events</source>
+      <translation>События сервера</translation>
+    </message>
+    <message>
+      <source>Analytics events</source>
+      <translation>События аналитики</translation>
+    </message>
+    <message>
+      <source>Any event</source>
+      <translation>Любое событие</translation>
+    </message>
+    <message>
+      <source>Any device issue</source>
+      <translation>Любая проблема с устройством</translation>
+    </message>
+    <message>
+      <source>Any camera issue</source>
+      <translation>Любая проблема с камерой</translation>
+    </message>
+    <message>
+      <source>Any server event</source>
+      <translation>Любое событие сервера</translation>
+    </message>
+    <message>
+      <source>Device issues</source>
+      <translation>Проблемы с устройством</translation>
+    </message>
+    <message>
+      <source>Camera issues</source>
+      <translation>Проблемы с камерой</translation>
+    </message>
+    <message>
+      <source>Any analytics event</source>
+      <translation>Любое событие аналитики</translation>
     </message>
   </context>
   <context>
@@ -1339,7 +1417,7 @@ to view more bookmarks</source>
     <name>PtzInstrument</name>
     <message>
       <source>Layout is locked</source>
-      <translation type="unfinished">Layout is locked</translation>
+      <translation>Раскладка заблокирована</translation>
     </message>
   </context>
   <context>
@@ -1611,21 +1689,21 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>Детали по %n сеансу из %1</numerusform>
+        <numerusform>Детали по %n сеансам из %1</numerusform>
+        <numerusform>Детали по %n сеансам из %1</numerusform>
+        <numerusform>Детали по %n сеансам из %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Детали по %n камерe из %1</numerusform>
+        <numerusform>Детали по %n камерам из %1</numerusform>
+        <numerusform>Детали по %n камерам из %1</numerusform>
+        <numerusform>Детали по %n камерам из %1</numerusform>
       </translation>
     </message>
   </context>
@@ -1676,24 +1754,12 @@ to view more bookmarks</source>
       <translation>Сервер обновлён</translation>
     </message>
     <message>
-      <source>Business rule updated</source>
-      <translation>Обновлены правила поведения</translation>
-    </message>
-    <message>
       <source>Server removed</source>
       <translation>Сервер удалён</translation>
     </message>
     <message>
-      <source>Business rule removed</source>
-      <translation>Правило поведения удалено</translation>
-    </message>
-    <message>
       <source>User removed</source>
       <translation>Пользователь удалён</translation>
-    </message>
-    <message>
-      <source>Business rule reseted</source>
-      <translation>Правило поведения сброшено</translation>
     </message>
     <message>
       <source>Database restored</source>
@@ -1781,16 +1847,28 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Update installed</source>
-      <translation type="unfinished">Update installed</translation>
+      <translation>Обновление установлено</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
-        <numerusform>%n actions</numerusform>
+      <translation>
+        <numerusform>%n действие</numerusform>
+        <numerusform>%n действия</numerusform>
+        <numerusform>%n действий</numerusform>
+        <numerusform>%n действий</numerusform>
       </translation>
+    </message>
+    <message>
+      <source>Event rule changed</source>
+      <translation>Правило события изменено</translation>
+    </message>
+    <message>
+      <source>Event rule removed</source>
+      <translation>Правило события удалено</translation>
+    </message>
+    <message>
+      <source>Event rules reset to default</source>
+      <translation>Правила событий сброшены по умолчанию</translation>
     </message>
   </context>
   <context>
@@ -2083,8 +2161,8 @@ to view more bookmarks</source>
       <translation>Любая Камера</translation>
     </message>
     <message>
-      <source>Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera modifiers are used in the Generic Event URL</translation>
+      <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
+      <translation>Принудительное подтверждение будет работать только для произвольных событий, если в URL события используются идентификаторы камеры</translation>
     </message>
   </context>
   <context>
@@ -2639,7 +2717,7 @@ to %1</source>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
+      <translation>Внутренняя ошибка сервера. Пожалуйста, попробуйте позже.</translation>
     </message>
   </context>
   <context>
@@ -2793,11 +2871,11 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Загрузить и установить</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>Не удалось перейти в режим совместимости для версии %1</translation>
     </message>
   </context>
   <context>
@@ -3063,21 +3141,21 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событиe</numerusform>
+        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событиz</numerusform>
+        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
+        <numerusform>Журнал событий за период с %1 по %2 - найдено %n событий</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>Журнал событий за %1 - найдено %n событие</numerusform>
+        <numerusform>Журнал событий за %1 - найдено %n события</numerusform>
+        <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
+        <numerusform>Журнал событий за %1 - найдено %n событий</numerusform>
       </translation>
     </message>
   </context>
@@ -3163,11 +3241,11 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (%n камера)</numerusform>
+        <numerusform>%1 (%n камеры)</numerusform>
+        <numerusform>%1 (%n камер)</numerusform>
+        <numerusform>%1 (%n камер)</numerusform>
       </translation>
     </message>
   </context>
@@ -3250,11 +3328,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>Этой камеры нет на некоторых выбранных раскладках. Действие будет работать, если камера будет добавлена ​​до срабатывания события.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>Эта камера не добавлена на некоторые выбранные раскладки. Действие будет работать, если камера будет добавлена ​​до срабатывания события.</translation>
     </message>
   </context>
   <context>
@@ -3291,7 +3369,7 @@ to %1</source>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>Авто (%1)</translation>
     </message>
   </context>
   <context>
@@ -3449,7 +3527,7 @@ to %1</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>Пожалуйста, введите значение.</translation>
     </message>
   </context>
   <context>
@@ -3660,7 +3738,7 @@ to %1</source>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Канала</translation>
     </message>
   </context>
   <context>
@@ -3870,26 +3948,26 @@ to %1</source>
     </message>
     <message>
       <source>Every license can be deactivated only a few times.</source>
-      <translation type="unfinished">Every license can be deactivated only a few times.</translation>
+      <translation>Каждая лицензия может быть деактивирована только несколько раз.</translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1 уже используeтся</numerusform>
+        <numerusform>%1 уже используются</numerusform>
+        <numerusform>%1 уже используются</numerusform>
+        <numerusform>%1 уже используются</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>Требуется по крайней мере %1</numerusform>
+        <numerusform>Требуются по крайней мере %1</numerusform>
+        <numerusform>Требуются по крайней мере %1</numerusform>
+        <numerusform>Требуются по крайней мере %1</numerusform>
       </translation>
     </message>
   </context>
@@ -4180,7 +4258,7 @@ to %1</source>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation type="unfinished">Area Zoom</translation>
+      <translation>Масштабирование области</translation>
     </message>
   </context>
   <context>
@@ -4335,11 +4413,15 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Виртуальная камера</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>Виртуальная камера %1</translation>
+    </message>
+    <message>
+      <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
+      <translation>&quot;Виртуальная камера&quot; - это виртуальное хранилище для видеофайлов, которое может быть загружено на любой сервер вашей системы и доступно любому пользователю.</translation>
     </message>
   </context>
   <context>
@@ -4568,11 +4650,11 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
-        <numerusform>about %n minutes</numerusform>
+      <translation>
+        <numerusform>около %n минуты</numerusform>
+        <numerusform>около %n минут</numerusform>
+        <numerusform>около %n минут</numerusform>
+        <numerusform>около %n минут</numerusform>
       </translation>
     </message>
   </context>
@@ -4761,11 +4843,11 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation type="unfinished">Current Bitrate</translation>
+      <translation>Текущий битрейт</translation>
     </message>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>нет данных для прогноза</translation>
     </message>
   </context>
   <context>
@@ -4815,11 +4897,11 @@ to %1</source>
     <name>QnResourceBrowserWidget</name>
     <message>
       <source>Local files</source>
-      <translation type="unfinished">Local files</translation>
+      <translation>Локальные файлы</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>Нет локальных файлов</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -4827,19 +4909,19 @@ to %1</source>
     </message>
     <message>
       <source>add to current layout</source>
-      <translation type="unfinished">add to current layout</translation>
+      <translation>добавить на текущую раскладку</translation>
     </message>
     <message>
       <source>open all at a new layout</source>
-      <translation type="unfinished">open all at a new layout</translation>
+      <translation>открыть все на новой раскладке</translation>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>открыть все</translation>
     </message>
     <message>
       <source>All types</source>
-      <translation type="unfinished">All types</translation>
+      <translation>Все типы</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -4855,7 +4937,7 @@ to %1</source>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Видеостены</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -4875,7 +4957,7 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Камеры и устройства</translation>
     </message>
   </context>
   <context>
@@ -4948,15 +5030,15 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Камеры и устройства</translation>
     </message>
     <message>
       <source>Videowalls</source>
-      <translation type="unfinished">Videowalls</translation>
+      <translation>Видеостены</translation>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>Движки Аналитики</translation>
     </message>
   </context>
   <context>
@@ -5229,7 +5311,7 @@ to %1</source>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Плагины</translation>
     </message>
   </context>
   <context>
@@ -5577,23 +5659,23 @@ to %1</source>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>Последние 5 минут</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>Последние 60 минут</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>Последние 24 часа</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>Самый длинный доступный период</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>Прогноз доступен только для камер с включенной записью.</translation>
     </message>
   </context>
   <context>
@@ -5708,13 +5790,7 @@ to %1</source>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
-      <translation type="unfinished">What to do with current analytics data?</translation>
-    </message>
-    <message>
-      <source>Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation type="unfinished">Current analytics data will not be automatically moved to another location and will become unaccessible. You can keep it and manually move later, or delete permanently.
-If you intended to move analytics data to another storage location, please contact support before proceeding.</translation>
+      <translation>Что делать с текущими данными аналитики?</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -5727,6 +5803,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Cancel</source>
       <translation>Отмена</translation>
+    </message>
+    <message>
+      <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
+If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
+      <translation>Текущие данные аналитики не будут автоматически перемещены в другое место и станут недоступными. Вы можете сохранить их и вручную переместить позже или удалить навсегда.
+Если вы хотите переместить данные аналитики в другое место хранения, пожалуйста, свяжитесь с поддержкой перед продолжением.</translation>
     </message>
   </context>
   <context>
@@ -5777,11 +5859,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Use to store analytics data</source>
-      <translation type="unfinished">Use to store analytics data</translation>
+      <translation>Использовать для хранения данных аналитики</translation>
     </message>
     <message>
       <source>Stores analytics data</source>
-      <translation type="unfinished">Stores analytics data</translation>
+      <translation>Хранит данные аналитики</translation>
     </message>
   </context>
   <context>
@@ -5870,7 +5952,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Плагины</translation>
     </message>
   </context>
   <context>
@@ -6007,27 +6089,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>Ни один сервер не имеет доступа в интернет для синхронизации времени</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>Система запущена в безопасном режиме</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>Система не имеет доступа в интернет для синхронизации времени</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>Ни один онлайн сервер в системе не имеет доступа в интернет для синхронизации времени.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation type="unfinished">The System is running in safe mode.</translation>
+      <translation>Система запущена в безопасном режиме.</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+      <translation>Ошибка при синхронизации удаленного архива</translation>
     </message>
   </context>
   <context>
@@ -6049,20 +6131,20 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Не содержит никакой личной информации и является полностью анонимным.</translation>
     </message>
     <message>
-      <source>Failover server measures may still request camera status updates regardless of this setting.</source>
-      <translation type="unfinished">Failover server measures may still request camera status updates regardless of this setting.</translation>
-    </message>
-    <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation type="unfinished">Enable devices and servers autodiscovery and automated device status check</translation>
+      <translation>Включить автообнаружение устройств и серверов и автоматическую проверку состояния устройства</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation type="unfinished">Enable cameras and servers autodiscovery and automated camera status check</translation>
+      <translation>Включить автообнаружение камер и серверов и автоматическую проверку состояния камеры</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation type="unfinished">When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</translation>
+      <translation>При включении система постоянно обнаруживает новые камеры и серверы и отправляет запросы на поиск камерам для обновления статуса.</translation>
+    </message>
+    <message>
+      <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
+      <translation>При Failover сервер по-прежнему будет запрашивать обновления статуса камеры независимо от этой настройки.</translation>
     </message>
   </context>
   <context>
@@ -6077,49 +6159,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>HTML file</source>
-      <translation type="unfinished">HTML file</translation>
+      <translation>Файл HTML</translation>
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation type="unfinished">Spread Sheet (CSV) File</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionModel</name>
-    <message>
-      <source>Server</source>
-      <translation>Сервер</translation>
-    </message>
-    <message>
-      <source>Offset</source>
-      <translation>Разница</translation>
-    </message>
-    <message>
-      <source>Date</source>
-      <translation>Дата</translation>
-    </message>
-    <message>
-      <source>Timezone</source>
-      <translation>Часовой пояс</translation>
-    </message>
-    <message>
-      <source>Time</source>
-      <translation>Время</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnTimeServerSelectionWidget</name>
-    <message>
-      <source>No server has Internet access. Time is not being synchronized.</source>
-      <translation>Ни один сервер не подключен к сети Интернет. Время не синхронизируется.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with the Internet and does not depend on local time on servers.</source>
-      <translation type="unfinished">VMS time is synchronized with the Internet and does not depend on local time on servers.</translation>
-    </message>
-    <message>
-      <source>VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</source>
-      <translation type="unfinished">VMS time is synchronized with local time on the selected server and does not depend on local time on other servers.</translation>
+      <translation>Файл таблицы (CSV)</translation>
     </message>
   </context>
   <context>
@@ -6645,15 +6689,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 has been successfully configured.</source>
-      <translation type="unfinished">%1 has been successfully configured.</translation>
+      <translation>%1 успешно настроен.</translation>
     </message>
     <message>
       <source>To complete the process, please connect to it with Client and update to version %1.</source>
-      <translation type="unfinished">To complete the process, please connect to it with Client and update to version %1.</translation>
+      <translation>Для завершения процесса, пожалуйста, подключитесь к нему клиентом и обновите версию %1.</translation>
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation type="unfinished">Failed to merge %1 to our system.</translation>
+      <translation>Не удалось объединить %1 с нашей системой.</translation>
     </message>
   </context>
   <context>
@@ -6784,11 +6828,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>PNG Image</source>
-      <translation type="unfinished">PNG Image</translation>
+      <translation>Изображение PNG</translation>
     </message>
     <message>
       <source>JPEG Image</source>
-      <translation type="unfinished">JPEG Image</translation>
+      <translation>Изображение JPEG</translation>
     </message>
   </context>
   <context>
@@ -7029,23 +7073,23 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Uploading footage</source>
-      <translation type="unfinished">Uploading footage</translation>
+      <translation>Загрузка записей</translation>
     </message>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation type="unfinished">Failed to add virtual camera</translation>
+      <translation>Не удалось добавить виртуальную камеру</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation type="unfinished">Open Virtual Camera Recordings...</translation>
+      <translation>Открыть записи виртуальной камеры...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+      <translation>
+        <numerusform>Вы можете загрузить этот файл в другой экземпляр виртуальной камеры.</numerusform>
+        <numerusform>Вы можете загрузить эти файлы в другой экземпляр виртуальной камеры.</numerusform>
+        <numerusform>Вы можете загрузить эти файлы в другой экземпляр виртуальной камеры.</numerusform>
+        <numerusform>Вы можете загрузить эти файлы в другой экземпляр виртуальной камеры.</numerusform>
       </translation>
     </message>
     <message>
@@ -7306,11 +7350,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+      <translation>
+        <numerusform>Эти видео файлы до сих пор загружаются в %n виртуальную камеру:</numerusform>
+        <numerusform>Эти видео файлы до сих пор загружаются в %n виртуальные камеры:</numerusform>
+        <numerusform>Эти видео файлы до сих пор загружаются в %n виртуальных камер:</numerusform>
+        <numerusform>Эти видео файлы до сих пор загружаются в %n виртуальных камер:</numerusform>
       </translation>
     </message>
   </context>
@@ -7318,11 +7362,39 @@ If you intended to move analytics data to another storage location, please conta
     <name>SessionExpiredDialog</name>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Истек срок действия вашей сессии</translation>
     </message>
     <message>
       <source>Session duration limit can be changed by the system administrators</source>
-      <translation type="unfinished">Session duration limit can be changed by the system administrators</translation>
+      <translation>Ограничение продолжительности сессии может быть изменено системными администраторами</translation>
+    </message>
+  </context>
+  <context>
+    <name>SimpleMotionSearchWidget::Private</name>
+    <message>
+      <source>Select area on the video to filter results</source>
+      <translation>Выберите область на видео для фильтрации результатов</translation>
+    </message>
+    <message>
+      <source>In selected area</source>
+      <translation>В выбранной области</translation>
+    </message>
+    <message>
+      <source>Selected camera</source>
+      <translation>Выбранная камера</translation>
+    </message>
+    <message>
+      <source>Selected device</source>
+      <translation>Выбранное устройство</translation>
+    </message>
+    <message>
+      <source>Selected media</source>
+      <translation>Выбранные медиа</translation>
+    </message>
+    <message>
+      <source>none</source>
+      <comment>No currently selected camera</comment>
+      <translation>нет</translation>
     </message>
   </context>
   <context>
@@ -7409,21 +7481,21 @@ If you intended to move analytics data to another storage location, please conta
     <name>UpdateStrings</name>
     <message>
       <source>This Linux platform is no longer supported</source>
-      <translation type="unfinished">This Linux platform is no longer supported</translation>
+      <translation>Эта Linux платформа больше не поддерживается</translation>
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation type="unfinished">This OS version is no longer supported</translation>
+      <translation>Эта версия ОС больше не поддерживается</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
       <comment>%1 is OS name, e.g. Windows</comment>
-      <translation type="unfinished">This %1 version is no longer supported</translation>
+      <translation>Эта версия %1 больше не поддерживается</translation>
     </message>
     <message>
       <source>%1 %2 is no longer supported</source>
       <comment>%1 %2 are OS name and version, e.g. Windows 7</comment>
-      <translation type="unfinished">%1 %2 is no longer supported</translation>
+      <translation>%1 %2 больше не поддерживается</translation>
     </message>
   </context>
   <context>
@@ -7498,15 +7570,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation type="unfinished">Devices on layout</translation>
+      <translation>Устройства на раскладке</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation type="unfinished">Cameras on layout</translation>
+      <translation>Камеры на раскладке</translation>
     </message>
     <message>
       <source>Any device</source>
-      <translation type="unfinished">Any device</translation>
+      <translation>Любое устройство</translation>
     </message>
     <message>
       <source>Any camera</source>
@@ -7514,7 +7586,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
+      <translation>Выбранное устройство</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -7525,11 +7597,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
     <message>
       <source>Show Always</source>
-      <translation type="unfinished">Show Always</translation>
+      <translation>Всегда показывать</translation>
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
+      <translation>Показать только на вкладке "Объекты"</translation>
     </message>
     <message>
       <source>Show</source>
@@ -7537,70 +7609,38 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Do Not Show</source>
-      <translation type="unfinished">Do Not Show</translation>
+      <translation>Не показывать</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
-      <source>Unknown object</source>
-      <translation type="unfinished">Unknown object</translation>
+      <source>deleted camera</source>
+      <translation>удаленная камера</translation>
     </message>
     <message>
-      <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <source>Unknown track</source>
+      <translation>Неизвестный трек</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::AnalyticsSearchWidget</name>
     <message>
       <source>No objects</source>
-      <translation type="unfinished">No objects</translation>
+      <translation>Нет объектов</translation>
     </message>
     <message>
       <source>No objects detected</source>
-      <translation type="unfinished">No objects detected</translation>
+      <translation>Объекты не обнаружены</translation>
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
-        <numerusform>%n objects</numerusform>
+      <translation>
+        <numerusform>%n объект</numerusform>
+        <numerusform>%n объекта</numerusform>
+        <numerusform>%n объектов</numerusform>
+        <numerusform>%n объектов</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
-    </message>
-    <message>
-      <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
-    </message>
-    <message>
-      <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
-    </message>
-    <message>
-      <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
-    </message>
-    <message>
-      <source>Failed to execute plugin action</source>
-      <translation type="unfinished">Failed to execute plugin action</translation>
-    </message>
-    <message>
-      <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
-    </message>
-    <message>
-      <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
     </message>
   </context>
   <context>
@@ -7614,7 +7654,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>удаленная камера</translation>
     </message>
   </context>
   <context>
@@ -7625,7 +7665,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select some period on timeline and click with right mouse button on it to create a bookmark.</source>
-      <translation type="unfinished">Select some period on timeline and click with right mouse button on it to create a bookmark.</translation>
+      <translation>Для создания закладки выберите некоторый период на временной шкале и щелкните правой кнопкой мыши по нему.</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -7646,17 +7686,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Applying changes...</source>
       <translation>Изменения применяются...</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::CameraAdvancedSettingsWidget</name>
-    <message>
-      <source>This I/O module has no advanced settings</source>
-      <translation>У этого модуль ввода-вывода нет дополнительных настроек</translation>
-    </message>
-    <message>
-      <source>This camera has no advanced settings</source>
-      <translation>У этой камеры нет дополнительных настроек</translation>
     </message>
   </context>
   <context>
@@ -7725,7 +7754,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Multicast</source>
-      <translation type="unfinished">Multicast</translation>
+      <translation>Multicast</translation>
     </message>
   </context>
   <context>
@@ -7744,22 +7773,22 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>More Info</source>
-      <translation type="unfinished">More Info</translation>
+      <translation>Подробнее</translation>
     </message>
     <message>
       <source>Less Info</source>
-      <translation type="unfinished">Less Info</translation>
+      <translation>Меньше информации</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraLicensePanelWidget</name>
     <message numerus="yes">
       <source>Use License</source>
-      <translation type="unfinished">
-        <numerusform>Use License</numerusform>
-        <numerusform>Use License</numerusform>
-        <numerusform>Use License</numerusform>
-        <numerusform>Use License</numerusform>
+      <translation>
+        <numerusform>Использовать лицензию</numerusform>
+        <numerusform>Использовать лицензии</numerusform>
+        <numerusform>Использовать лицензии</numerusform>
+        <numerusform>Использовать лицензии</numerusform>
       </translation>
     </message>
   </context>
@@ -7771,15 +7800,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Maximum number of motion detection rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of motion detection rectangles for current camera is reached</translation>
+      <translation>Достигнуто максимальное количество зон обнаружения движения для текущей камеры</translation>
     </message>
     <message>
       <source>Maximum number of ignore motion rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of ignore motion rectangles for current camera is reached</translation>
+      <translation>Достигнуто максимальное количество зон игнорирования движения для текущей камеры</translation>
     </message>
     <message>
       <source>Maximum number of detect motion rectangles for current camera is reached</source>
-      <translation type="unfinished">Maximum number of detect motion rectangles for current camera is reached</translation>
+      <translation>Достигнуто максимальное количество зон обнаружения движения для текущей камеры</translation>
     </message>
     <message>
       <source>Reset motion regions to default?</source>
@@ -7788,6 +7817,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>This action cannot be undone.</source>
       <translation>Это действие нельзя будет отменить.</translation>
+    </message>
+    <message>
+      <source>Motion detection stream is disabled</source>
+      <translation>Поток обнаружения движения отключен</translation>
     </message>
   </context>
   <context>
@@ -7829,16 +7862,16 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message numerus="yes">
       <source>%n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
-        <numerusform>%n cameras</numerusform>
+      <translation>
+        <numerusform>%n камера</numerusform>
+        <numerusform>%n камеры</numerusform>
+        <numerusform>%n камер</numerusform>
+        <numerusform>%n камер</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have any cameras</source>
-      <translation type="unfinished">You do not have any cameras</translation>
+      <translation>У вас нет камер</translation>
     </message>
   </context>
   <context>
@@ -7853,7 +7886,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>I/O Ports</source>
-      <translation type="unfinished">I/O Ports</translation>
+      <translation>Порты ввода/вывода</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -7932,7 +7965,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Плагины</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Определение движения отключено, все записи расписания &quot;Движение&quot; и &quot;Движение + Lo-Res&quot; будут изменены на &quot;Всегда&quot;</translation>
+    </message>
+    <message>
+      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
+      <translation>Двойной поток отключен, все записи по расписанию &quot;Движение + Lo-Res&quot; будут изменены на &quot;Всегда&quot;</translation>
     </message>
   </context>
   <context>
@@ -7940,20 +7981,20 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
-        <numerusform>%1 are used</numerusform>
+      <translation>
+        <numerusform>%1 используется</numerusform>
+        <numerusform>%1 используются</numerusform>
+        <numerusform>%1 используются</numerusform>
+        <numerusform>%1 используются</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more required</source>
-      <translation type="unfinished">
-        <numerusform>%n more required</numerusform>
-        <numerusform>%n more required</numerusform>
-        <numerusform>%n more required</numerusform>
-        <numerusform>%n more required</numerusform>
+      <translation>
+        <numerusform>Нужно еще %n</numerusform>
+        <numerusform>Нужно еще %n</numerusform>
+        <numerusform>Нужно еще %n</numerusform>
+        <numerusform>Нужно еще %n</numerusform>
       </translation>
     </message>
   </context>
@@ -7976,35 +8017,35 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Файл обновления не найден</translation>
     </message>
     <message>
       <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
+      <translation>Архив обновления поврежден</translation>
     </message>
     <message>
       <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
+      <translation>Не удалось загрузить пакет обновления: %1</translation>
     </message>
     <message>
       <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
+      <translation>Пакет обновления поврежден: %1</translation>
     </message>
     <message>
       <source>This update is already installed.</source>
-      <translation type="unfinished">This update is already installed.</translation>
+      <translation>Это обновление уже установлено.</translation>
     </message>
     <message>
       <source>This version is not installed.</source>
-      <translation type="unfinished">This version is not installed.</translation>
+      <translation>Эта версия не установлена.</translation>
     </message>
     <message>
       <source>Invalid version format.</source>
-      <translation type="unfinished">Invalid version format.</translation>
+      <translation>Неверный формат версии.</translation>
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation type="unfinished">Broken update package.</translation>
+      <translation>Пакет обновления сломан.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -8012,11 +8053,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Not enough space on disk to install the client update.</source>
-      <translation type="unfinished">Not enough space on disk to install the client update.</translation>
+      <translation>Недостаточно места на диске для установки обновления клиента.</translation>
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation type="unfinished">Installation package has been lost.</translation>
+      <translation>Пакет установки был потерян.</translation>
     </message>
   </context>
   <context>
@@ -8069,7 +8110,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation type="unfinished">Some of selected cameras require password to be set up.</translation>
+      <translation>Некоторые из выбранных камер требуют настройки пароля.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -8084,15 +8125,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::DeviceAdditionDialog</name>
     <message>
       <source>Start address</source>
-      <translation type="unfinished">Start address</translation>
+      <translation>Начальный адрес</translation>
     </message>
     <message>
       <source>End address</source>
-      <translation type="unfinished">End address</translation>
+      <translation>Конечный адрес</translation>
     </message>
     <message>
       <source>IP / Hostname / RTSP link / UDP link</source>
-      <translation type="unfinished">IP / Hostname / RTSP link / UDP link</translation>
+      <translation>IP / Имя хоста / RTSP ссылка / UDP ссылка</translation>
     </message>
     <message>
       <source>Examples:</source>
@@ -8133,7 +8174,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Checking host...</source>
-      <translation type="unfinished">Checking host...</translation>
+      <translation>Проверка хоста...</translation>
     </message>
     <message>
       <source>Finished</source>
@@ -8141,11 +8182,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Aborted</source>
-      <translation type="unfinished">Aborted</translation>
+      <translation>Прервано</translation>
     </message>
     <message>
       <source>Searching...</source>
-      <translation type="unfinished">Searching...</translation>
+      <translation>Поиск...</translation>
     </message>
     <message>
       <source>No devices found</source>
@@ -8153,15 +8194,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation type="unfinished">All devices are already added</translation>
+      <translation>Все устройства уже добавлены</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
-      <translation type="unfinished">
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
-        <numerusform>%n devices are being added. You can close this dialog or start a new search</numerusform>
+      <translation>
+        <numerusform>Добавляeтся %n устройство. Вы можете закрыть это диалоговое окно или начать новый поиск</numerusform>
+        <numerusform>Добавляeтся %n устройства. Вы можете закрыть это диалоговое окно или начать новый поиск</numerusform>
+        <numerusform>Добавляeтся %n устройств. Вы можете закрыть это диалоговое окно или начать новый поиск</numerusform>
+        <numerusform>Добавляeтся %n устройств. Вы можете закрыть это диалоговое окно или начать новый поиск</numerusform>
       </translation>
     </message>
     <message>
@@ -8170,27 +8211,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Add %n Devices</source>
-      <translation type="unfinished">
-        <numerusform>Add %n Devices</numerusform>
-        <numerusform>Add %n Devices</numerusform>
-        <numerusform>Add %n Devices</numerusform>
-        <numerusform>Add %n Devices</numerusform>
+      <translation>
+        <numerusform>Добавить %n устройство</numerusform>
+        <numerusform>Добавить %n устройства</numerusform>
+        <numerusform>Добавить %n устройств</numerusform>
+        <numerusform>Добавить %n устройств</numerusform>
       </translation>
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation type="unfinished">Address field cannot be empty</translation>
+      <translation>Поле адреса не может быть пустым</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EulaDialog</name>
     <message>
       <source>Please review and agree to the %1 in order to proceed</source>
-      <translation type="unfinished">Please review and agree to the %1 in order to proceed</translation>
+      <translation>Пожалуйста, проверьте и согласитесь с %1 для продолжения</translation>
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation type="unfinished">To use the software you must agree with the end user license agreement</translation>
+      <translation>Чтобы использовать По, вы должны принять лицензионное соглашение с конечным пользователем</translation>
     </message>
   </context>
   <context>
@@ -8218,67 +8259,27 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Objects</source>
       <comment>Analytics tab title</comment>
-      <translation type="unfinished">Objects</translation>
+      <translation>Объекты</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EventSearchWidget</name>
-    <message>
-      <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
-    </message>
-    <message>
-      <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
-    </message>
-    <message>
-      <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
-    </message>
-    <message>
-      <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
-    </message>
-    <message>
-      <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
-    </message>
-    <message>
-      <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
-    </message>
-    <message>
-      <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
-    </message>
-    <message>
-      <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
-    </message>
-    <message>
-      <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
-    </message>
     <message>
       <source>No events</source>
       <translation>Нет событий</translation>
     </message>
     <message numerus="yes">
       <source>%n events</source>
-      <translation type="unfinished">
-        <numerusform>%n events</numerusform>
-        <numerusform>%n events</numerusform>
-        <numerusform>%n events</numerusform>
-        <numerusform>%n events</numerusform>
+      <translation>
+        <numerusform>%n событие</numerusform>
+        <numerusform>%n события</numerusform>
+        <numerusform>%n событий</numerusform>
+        <numerusform>%n событий</numerusform>
       </translation>
     </message>
     <message>
-      <source>unnamed analytics engine</source>
-      <translation type="unfinished">unnamed analytics engine</translation>
-    </message>
-    <message>
       <source>No events occurred</source>
-      <translation type="unfinished">No events occurred</translation>
+      <translation>Нет событий</translation>
     </message>
   </context>
   <context>
@@ -8297,7 +8298,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ExportPasswordWidget</name>
     <message>
       <source>Please enter the password.</source>
-      <translation type="unfinished">Please enter the password.</translation>
+      <translation>Пожалуйста, введите пароль.</translation>
     </message>
   </context>
   <context>
@@ -8446,7 +8447,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+      <translation>Вы собираетесь экспортировать длинное видео. Это может потребовать много места для хранения и занять значительное время.</translation>
     </message>
   </context>
   <context>
@@ -8518,20 +8519,20 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%n new</source>
-      <translation type="unfinished">
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
-        <numerusform>%n new</numerusform>
+      <translation>
+        <numerusform>%n новый</numerusform>
+        <numerusform>%n новых</numerusform>
+        <numerusform>%n новых</numerusform>
+        <numerusform>%n новых</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n devices total</source>
-      <translation type="unfinished">
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
-        <numerusform>%n devices total</numerusform>
+      <translation>
+        <numerusform>Найдено %n устройство</numerusform>
+        <numerusform>Найдено %n устройства</numerusform>
+        <numerusform>Найдено %n устройств</numerusform>
+        <numerusform>Найдено %n устройств</numerusform>
       </translation>
     </message>
   </context>
@@ -8576,7 +8577,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Copy Link Location</source>
-      <translation type="unfinished">Copy Link Location</translation>
+      <translation>Копировать адрес ссылки</translation>
     </message>
   </context>
   <context>
@@ -8651,7 +8652,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ManualDeviceSearcher</name>
     <message>
       <source>Server is not specified</source>
-      <translation type="unfinished">Server is not specified</translation>
+      <translation>Сервер не указан</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -8670,8 +8671,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Выбранный диапазон содержит более 255 адресов.</translation>
     </message>
     <message>
-      <source>Can&apos;t start searching process</source>
-      <translation type="unfinished">Can&apos;t start searching process</translation>
+      <source>Can not start the search process</source>
+      <translation>Не могу начать процесс поиска</translation>
     </message>
   </context>
   <context>
@@ -8682,11 +8683,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>deleted camera</source>
-      <translation type="unfinished">deleted camera</translation>
+      <translation>удаленная камера</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation type="unfinished">Bookmark it...</translation>
+      <translation>Добавить в закладки...</translation>
     </message>
   </context>
   <context>
@@ -8697,27 +8698,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Checking for updates automatically</source>
-      <translation type="unfinished">Checking for updates automatically</translation>
+      <translation>Автоматически проверять наличие обновлений</translation>
     </message>
     <message>
       <source>Check for updates</source>
-      <translation type="unfinished">Check for updates</translation>
+      <translation>Проверить обновления</translation>
     </message>
     <message>
       <source>Force check</source>
-      <translation type="unfinished">Force check</translation>
+      <translation>Принудительная проверка</translation>
     </message>
     <message>
       <source>Disable Automatically Checking</source>
-      <translation type="unfinished">Disable Automatically Checking</translation>
+      <translation>Отключить автоматическую проверку</translation>
     </message>
     <message>
       <source>Check Once</source>
-      <translation type="unfinished">Check Once</translation>
+      <translation>Проверить один раз</translation>
     </message>
     <message>
       <source>Check Automatically</source>
-      <translation type="unfinished">Check Automatically</translation>
+      <translation>Проверять автоматически</translation>
     </message>
     <message>
       <source>Download in External Browser</source>
@@ -8729,39 +8730,39 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You have already installed this version.</source>
-      <translation type="unfinished">You have already installed this version.</translation>
+      <translation>Вы уже установили эту версию.</translation>
     </message>
     <message>
       <source>Unable to check updates on the internet</source>
-      <translation type="unfinished">Unable to check updates on the internet</translation>
+      <translation>Не удается проверить обновления в интернете</translation>
     </message>
     <message>
       <source>Build not found</source>
-      <translation type="unfinished">Build not found</translation>
+      <translation>Сборка не найдена</translation>
     </message>
     <message>
       <source>Cannot update from the selected file</source>
-      <translation type="unfinished">Cannot update from the selected file</translation>
+      <translation>Не удается обновить из выбранного файла</translation>
     </message>
     <message>
       <source>Invalid update information</source>
-      <translation type="unfinished">Invalid update information</translation>
+      <translation>Неверная информация об обновлении</translation>
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation type="unfinished">Downgrade to earlier versions is not possible</translation>
+      <translation>Переход на более ранние версии невозможен</translation>
     </message>
     <message>
       <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
+      <translation>Файл обновления не найден</translation>
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation type="unfinished">Upgrade package is broken</translation>
+      <translation>Пакет обновлений поврежден</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
-      <translation type="unfinished">Missing update package for some servers</translation>
+      <translation>Отсутствует пакет обновлений для некоторых серверов</translation>
     </message>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
@@ -8770,7 +8771,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No update package available</source>
-      <translation type="unfinished">No update package available</translation>
+      <translation>Пакет обновления недоступен</translation>
     </message>
     <message>
       <source>Select Update File...</source>
@@ -8782,7 +8783,56 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some servers are offline and will not be updated. Skip them?</source>
-      <translation type="unfinished">Some servers are offline and will not be updated. Skip them?</translation>
+      <translation>Некоторые серверы не в сети и не будут обновлены. Пропустить их?</translation>
+    </message>
+    <message numerus="yes">
+      <source>Missing update package for the client and %n servers</source>
+      <translation>
+        <numerusform>Отсутствует пакет обновления для клиента и %n сервера</numerusform>
+        <numerusform>Отсутствует пакет обновления для клиента и %n серверов</numerusform>
+        <numerusform>Отсутствует пакет обновления для клиента и %n серверов</numerusform>
+        <numerusform>Отсутствует пакет обновления для клиента и %n серверов</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Missing update package for the client</source>
+      <translation>Отсутствует пакет обновления для клиента</translation>
+    </message>
+    <message>
+      <source>There are no online servers to update.</source>
+      <translation>Нет онлайн серверов для обновления.</translation>
+    </message>
+    <message>
+      <source>Cancel update and delete all downloaded data?</source>
+      <translation>Отменить обновление и удалить все загруженные данные?</translation>
+    </message>
+    <message>
+      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
+      <translation>Версии ОС некоторых компонентов больше не поддерживаются. Удалите их из Системы или обновите их ОС до поддерживаемой версии.</translation>
+    </message>
+    <message>
+      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
+      <translation>Версия ОС клиента больше не поддерживается. Пожалуйста, обновите ОС до поддерживаемой версии.</translation>
+    </message>
+    <message>
+      <source>Failed to start update</source>
+      <translation>Не удалось запустить обновление</translation>
+    </message>
+    <message>
+      <source>Failed to cancel update</source>
+      <translation>Не удалось отменить обновление</translation>
+    </message>
+    <message>
+      <source>Failed to start installation</source>
+      <translation>Не удалось запустить установку</translation>
+    </message>
+    <message>
+      <source>Some servers have not completed the update process. Finish it anyway?</source>
+      <translation>Некоторые серверы не завершили процесс обновления. Завершить его в любом случае?</translation>
+    </message>
+    <message>
+      <source>Failed to download update packages to some components</source>
+      <translation>Не удалось загрузить пакеты обновления для некоторых компонентов</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -8801,24 +8851,56 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Обновление завершено</translation>
     </message>
     <message>
-      <source>Nx Witness Client will be restarted to the updated version.</source>
-      <translation type="unfinished">Nx Witness Client will be restarted to the updated version.</translation>
+      <source>Update completed, but some components have failed an update</source>
+      <translation>Обновление завершено, но некоторые компоненты не смогли обновиться</translation>
+    </message>
+    <message>
+      <source>Please update %1 manually using an installation package.</source>
+      <translation>Обновите %1 вручную, используя инсталлятор.</translation>
+    </message>
+    <message>
+      <source>%1 will be restarted to the updated version.</source>
+      <translation>%1 будет перезапущен на обновленную версию.</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>ОК</translation>
     </message>
     <message>
+      <source>There was an error while installing updates:</source>
+      <translation>При установке обновлений произошла ошибка:</translation>
+    </message>
+    <message>
       <source>Downloading updates...</source>
       <translation>Загрузка обновлений...</translation>
     </message>
     <message>
+      <source>Finish Update</source>
+      <translation>Завершить обновление</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Отмена</translation>
+    </message>
+    <message>
+      <source>The latest version is already installed</source>
+      <translation>Последняя версия уже установлена</translation>
+    </message>
+    <message>
+      <source>This version is already installed</source>
+      <translation>Эта версия уже установлена</translation>
+    </message>
+    <message>
+      <source>Install update</source>
+      <translation>Установить обновление</translation>
+    </message>
+    <message>
       <source>Upload</source>
-      <translation type="unfinished">Upload</translation>
+      <translation>Загрузить</translation>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation type="unfinished">Upload &amp;&amp; Install</translation>
+      <translation>Загрузить и установить</translation>
     </message>
     <message>
       <source>Download</source>
@@ -8826,15 +8908,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
-    </message>
-    <message>
-      <source>Select Another Build</source>
-      <translation type="unfinished">Select Another Build</translation>
+      <translation>Загрузить и установить</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation type="unfinished">Browse for Another File...</translation>
+      <translation>Выбрать другой файл...</translation>
+    </message>
+    <message>
+      <source>Select Another Build</source>
+      <translation>Выбрать другую сборку</translation>
     </message>
     <message>
       <source>Update to Specific Build</source>
@@ -8842,11 +8924,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation type="unfinished">Uploading updates...</translation>
+      <translation>Загрузка обновлений...</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
-      <translation type="unfinished">Downloading client package...</translation>
+      <translation>Загрузка клиентского пакета...</translation>
     </message>
     <message>
       <source>Installing updates...</source>
@@ -8854,7 +8936,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Installing client updates...</source>
-      <translation type="unfinished">Installing client updates...</translation>
+      <translation>Установка обновления клиента...</translation>
+    </message>
+    <message>
+      <source>Starting update to ...</source>
+      <translation>Начинается обновление до...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -8865,12 +8951,24 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Все готово для обновления до</translation>
     </message>
     <message>
-      <source>Install update</source>
-      <translation>Установить обновление</translation>
+      <source>System updated to</source>
+      <translation>Система обновлена до</translation>
     </message>
     <message>
-      <source>System updated to</source>
-      <translation type="unfinished">System updated to</translation>
+      <source>Some servers have no update packages available.</source>
+      <translation>Для некоторых серверов нет доступных пакетов обновлений.</translation>
+    </message>
+    <message>
+      <source>Some servers have encountered an internal error.</source>
+      <translation>На некоторых серверах произошла внутренней ошибкой.</translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation>Пожалуйста, свяжитесь со службой технической поддержки.</translation>
+    </message>
+    <message>
+      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
+      <translation>Некоторые серверы отключены. Пожалуйста, подождите, пока они не станут онлайн, чтобы продолжить.</translation>
     </message>
     <message>
       <source>System update in process</source>
@@ -8879,6 +8977,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Continue in Background</source>
       <translation>Продолжить в фоновом режиме</translation>
+    </message>
+    <message>
+      <source>Latest Available Update</source>
+      <translation>Последнее доступное обновление</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -8890,104 +8992,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation type="unfinished">Update from mediaservers</translation>
-    </message>
-    <message>
-      <source>Latest Available Update</source>
-      <translation>Последнее доступное обновление</translation>
-    </message>
-    <message numerus="yes">
-      <source>Missing update package for the client and %n servers</source>
-      <translation type="unfinished">
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-        <numerusform>Missing update package for the client and %n servers</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Missing update package for the client</source>
-      <translation type="unfinished">Missing update package for the client</translation>
-    </message>
-    <message>
-      <source>Finish Update</source>
-      <translation type="unfinished">Finish Update</translation>
-    </message>
-    <message>
-      <source>Cancel</source>
-      <translation>Отмена</translation>
-    </message>
-    <message>
-      <source>The latest version is already installed</source>
-      <translation type="unfinished">The latest version is already installed</translation>
-    </message>
-    <message>
-      <source>This version is already installed</source>
-      <translation type="unfinished">This version is already installed</translation>
-    </message>
-    <message>
-      <source>There are no online servers to update.</source>
-      <translation type="unfinished">There are no online servers to update.</translation>
-    </message>
-    <message>
-      <source>Some servers haven&apos;t completed update process. Finish it anyway?</source>
-      <translation type="unfinished">Some servers haven&apos;t completed update process. Finish it anyway?</translation>
-    </message>
-    <message>
-      <source>Cancel update and delete all downloaded data?</source>
-      <translation type="unfinished">Cancel update and delete all downloaded data?</translation>
-    </message>
-    <message>
-      <source>There was an error while installing updates:</source>
-      <translation type="unfinished">There was an error while installing updates:</translation>
-    </message>
-    <message>
-      <source>Some servers have gone offline. Please wait until they become online to continue.</source>
-      <translation type="unfinished">Some servers have gone offline. Please wait until they become online to continue.</translation>
-    </message>
-    <message>
-      <source>Update completed, but some components have failed an update</source>
-      <translation type="unfinished">Update completed, but some components have failed an update</translation>
-    </message>
-    <message>
-      <source>Please update %1 manually using an installation package.</source>
-      <translation>Обновите %1 вручную, используя инсталлятор.</translation>
-    </message>
-    <message>
-      <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 будет перезапущен на обновленную версию.</translation>
-    </message>
-    <message>
-      <source>Failed to download update packages to some components</source>
-      <translation type="unfinished">Failed to download update packages to some components</translation>
-    </message>
-    <message>
-      <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation type="unfinished">OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation type="unfinished">OS version of the client is no longer supported. Please update its OS to a supported version.</translation>
-    </message>
-    <message>
-      <source>Failed to start update</source>
-      <translation type="unfinished">Failed to start update</translation>
-    </message>
-    <message>
-      <source>Starting update to ...</source>
-      <translation type="unfinished">Starting update to ...</translation>
-    </message>
-    <message>
-      <source>Some servers have no package available</source>
-      <translation type="unfinished">Some servers have no package available</translation>
-    </message>
-    <message>
-      <source>Failed to cancel update</source>
-      <translation type="unfinished">Failed to cancel update</translation>
-    </message>
-    <message>
-      <source>Failed to start installation</source>
-      <translation type="unfinished">Failed to start installation</translation>
+      <translation>Обновление с медиа-серверов</translation>
     </message>
   </context>
   <context>
@@ -9003,7 +9008,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>You do not have any layouts</source>
-      <translation type="unfinished">You do not have any layouts</translation>
+      <translation>У вас нет раскладок</translation>
     </message>
   </context>
   <context>
@@ -9022,19 +9027,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>Устройство отключено</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>Камера отключена</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>Модуль ввода/вывода отключен</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>
-      <translation type="unfinished">Unknown Plugin Diagnostic Event</translation>
+      <translation>Неизвестное событие диагностики плагинов</translation>
     </message>
   </context>
   <context>
@@ -9046,10 +9051,6 @@ If you intended to move analytics data to another storage location, please conta
   </context>
   <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
-    <message>
-      <source>Some users don&apos;t have access to the selected layout. Action will not work for them.</source>
-      <translation>У некоторых пользователей нет доступа к выбранной раскладке. Действие не будет работать для них.</translation>
-    </message>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
       <translation>Ни один из выбранных пользователей не имеет доступа к выбранной раскладке. Действие не будет работать.</translation>
@@ -9068,82 +9069,82 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation type="unfinished">None of selected user roles contain users. Action will not work.</translation>
+      <translation>Ни одна из выбранных ролей не содержит пользователей. Действие не будет работать.</translation>
+    </message>
+    <message>
+      <source>Some users do not have access to the selected layout. Action will not work for them.</source>
+      <translation>У некоторых пользователей нет доступа к выбранной раскладке. Действие не будет работать для них.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::PeerStateTracker</name>
     <message>
       <source>The server is taking too long to respond</source>
-      <translation type="unfinished">The server is taking too long to respond</translation>
+      <translation>Сервер слишком долго отвечает</translation>
     </message>
     <message>
       <source>No update task</source>
-      <translation type="unfinished">No update task</translation>
+      <translation>Нет задачи обновления</translation>
     </message>
     <message>
       <source>Ready to download update</source>
-      <translation type="unfinished">Ready to download update</translation>
+      <translation>Готов к загрузке обновления</translation>
     </message>
     <message>
       <source>Downloading update</source>
-      <translation type="unfinished">Downloading update</translation>
+      <translation>Заргузка обновления</translation>
     </message>
     <message>
       <source>Ready to restart to the new version</source>
-      <translation type="unfinished">Ready to restart to the new version</translation>
+      <translation>Готов к перезапуску на новую версию</translation>
     </message>
     <message>
       <source>Installing update</source>
-      <translation type="unfinished">Installing update</translation>
+      <translation>Установка обновления</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Установлен</translation>
     </message>
     <message>
       <source>Failed to download update</source>
-      <translation type="unfinished">Failed to download update</translation>
-    </message>
-    <message>
-      <source>Failed to install update</source>
-      <translation type="unfinished">Failed to install update</translation>
+      <translation>Не удалось загрузить обновление</translation>
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation type="unfinished">Waiting for peer data</translation>
+      <translation>Ожидание данных пира</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
-      <translation type="unfinished">There is not enough space to download update files.</translation>
+      <translation>Недостаточно места для загрузки файлов обновлений.</translation>
     </message>
     <message>
       <source>There is not enough space to extract update files.</source>
-      <translation type="unfinished">There is not enough space to extract update files.</translation>
+      <translation>Недостаточно места для извлечения файлов обновления.</translation>
     </message>
     <message>
       <source>Failed to download update packages.</source>
-      <translation type="unfinished">Failed to download update packages.</translation>
+      <translation>Не удалось загрузить пакеты обновления.</translation>
     </message>
     <message>
       <source>Update contents are invalid.</source>
-      <translation type="unfinished">Update contents are invalid.</translation>
+      <translation>Неверное содержимое обновления.</translation>
     </message>
     <message>
       <source>Update archive is corrupted.</source>
-      <translation type="unfinished">Update archive is corrupted.</translation>
+      <translation>Архив обновления поврежден.</translation>
     </message>
     <message>
       <source>Update files cannot be extracted.</source>
-      <translation type="unfinished">Update files cannot be extracted.</translation>
+      <translation>Невозможно извлечь файлы обновления.</translation>
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation type="unfinished">Internal downloader error.</translation>
+      <translation>Внутренняя ошибка загрузчика.</translation>
     </message>
     <message>
       <source>Internal client error.</source>
-      <translation type="unfinished">Internal client error.</translation>
+      <translation>Внутренняя ошибка клиента.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -9151,23 +9152,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Unexpected error code.</source>
-      <translation type="unfinished">Unexpected error code.</translation>
+      <translation>Неожиданный код ошибки.</translation>
     </message>
     <message>
       <source>Ready to install update</source>
-      <translation type="unfinished">Ready to install update</translation>
+      <translation>Готов к установке обновления</translation>
     </message>
     <message>
       <source>Update package is not found.</source>
-      <translation type="unfinished">Update package is not found.</translation>
+      <translation>Пакет обновления не найден.</translation>
     </message>
     <message>
       <source>There is not enough space to install update.</source>
-      <translation type="unfinished">There is not enough space to install update.</translation>
+      <translation>Недостаточно места для установки обновления.</translation>
     </message>
     <message>
       <source>Internal server error.</source>
-      <translation type="unfinished">Internal server error.</translation>
+      <translation>Внутренняя ошибка сервера.</translation>
+    </message>
+    <message>
+      <source>This OS version is no longer supported.</source>
+      <translation>Эта версия ОС больше не поддерживается.</translation>
     </message>
   </context>
   <context>
@@ -9276,28 +9281,12 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Больше настроек</translation>
     </message>
     <message>
-      <source>Dual-Streaming not supported for this camera</source>
-      <translation>Многопоточность не поддерживается для этой камеры</translation>
-    </message>
-    <message>
-      <source>Dual-Streaming and motion detection not supported for this camera</source>
-      <translation>Данная камера не поддерживает многопоточность и детекцию движения</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled</source>
-      <translation>Обнаружение движения отключено</translation>
-    </message>
-    <message>
-      <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings</source>
-      <translation>Чтобы включить или настроить его, перейдите на вкладку &quot;Движение&quot; в настройках камеры</translation>
-    </message>
-    <message>
-      <source>Motion detection disabled or not supported</source>
+      <source>Motion detection is disabled or not supported</source>
       <translation>Обнаружение движения отключено или не поддерживается</translation>
     </message>
     <message>
-      <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-      <translation>Чтобы убедиться, что оно поддерживается, и включить его, перейдите на вкладку &quot;Движение&quot; в настройках камеры.</translation>
+      <source>Dual-streaming is disabled or not supported</source>
+      <translation>Двойной поток отключен или не поддерживается</translation>
     </message>
   </context>
   <context>
@@ -9323,18 +9312,22 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>Пользователи будут автоматически выходить из системы, если их сессия превышает заданную продолжительность.</translation>
+    </message>
+    <message>
+      <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
+      <translation>Водяные знаки будут отображаться поверх живого, архивного и экспортированного видео только для пользователей без прав администратора. Вы и другие администраторы их не увидите.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerSettingsDialogStore</name>
     <message>
       <source>Library</source>
-      <translation type="unfinished">Library</translation>
+      <translation>Библиотека</translation>
     </message>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Версия</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -9342,85 +9335,93 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>no error</source>
-      <translation type="unfinished">no error</translation>
+      <translation>нет ошибок</translation>
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation type="unfinished">library file cannot be loaded</translation>
+      <translation>файл библиотеки не может быть загружен</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>неверная или несовместимая библиотека плагинов</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>не удалось инициализировать библиотеку плагинов</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation type="unfinished">plugin returned bad manifest</translation>
+      <translation>плагин вернул плохой манифест</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation type="unfinished">plugin API version is no longer supported</translation>
+      <translation>версия API плагина больше не поддерживается</translation>
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>неизвестная ошибка</translation>
     </message>
     <message>
       <source>Not loaded</source>
-      <translation type="unfinished">Not loaded</translation>
+      <translation>Не загружен</translation>
     </message>
     <message>
       <source>Loaded</source>
-      <translation type="unfinished">Loaded</translation>
+      <translation>Загружен</translation>
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation type="unfinished">plugin is in the black list</translation>
+      <translation>плагин в чёрном списке</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Состояние</translation>
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation type="unfinished">plugin is optional and is not in the white list</translation>
+      <translation>плагин не является обязательным и не входит в белый список</translation>
+    </message>
+    <message>
+      <source>internal error</source>
+      <translation>внутренняя ошибка</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerStatusItemDelegate</name>
     <message>
       <source>Skipped</source>
-      <translation type="unfinished">Skipped</translation>
+      <translation>Пропущен</translation>
     </message>
     <message>
       <source>Installed</source>
-      <translation type="unfinished">Installed</translation>
+      <translation>Установлен</translation>
     </message>
     <message>
       <source>Installing...</source>
-      <translation type="unfinished">Installing...</translation>
+      <translation>Установка...</translation>
     </message>
     <message>
       <source>Downloaded</source>
-      <translation type="unfinished">Downloaded</translation>
+      <translation>Загружен</translation>
     </message>
     <message>
       <source>Waiting for server to respond...</source>
-      <translation type="unfinished">Waiting for server to respond...</translation>
+      <translation>Ожидание ответа сервера...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerUpdateTool</name>
     <message>
       <source>No connection to the server.</source>
-      <translation type="unfinished">No connection to the server.</translation>
+      <translation>Соединение с сервером потеряно.</translation>
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Сетевая ошибка.</translation>
+    </message>
+    <message>
+      <source>Server error.</source>
+      <translation>Ошибка сервера.</translation>
     </message>
   </context>
   <context>
@@ -9435,7 +9436,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation type="unfinished">Store Update Files</translation>
+      <translation>Хранить загруженные файлы</translation>
     </message>
     <message>
       <source>Client</source>
@@ -9443,11 +9444,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Component</source>
-      <translation type="unfinished">Component</translation>
+      <translation>Компонент</translation>
     </message>
     <message>
       <source>Installed Version</source>
-      <translation type="unfinished">Installed Version</translation>
+      <translation>Установленная версия</translation>
     </message>
   </context>
   <context>
@@ -9458,52 +9459,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation type="unfinished">Bookmark it...</translation>
+      <translation>Добавить в закладки...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
-      <source>Select area on the video to filter results</source>
-      <translation type="unfinished">Select area on the video to filter results</translation>
-    </message>
-    <message>
-      <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
-    </message>
-    <message>
       <source>No motion</source>
-      <translation type="unfinished">No motion</translation>
+      <translation>Нет движения</translation>
     </message>
     <message>
       <source>No motion detected</source>
-      <translation type="unfinished">No motion detected</translation>
+      <translation>Движение не обнаружено</translation>
     </message>
     <message numerus="yes">
       <source>%n motion events</source>
-      <translation type="unfinished">
-        <numerusform>%n motion events</numerusform>
-        <numerusform>%n motion events</numerusform>
-        <numerusform>%n motion events</numerusform>
-        <numerusform>%n motion events</numerusform>
+      <translation>
+        <numerusform>%n событие движения</numerusform>
+        <numerusform>%n события движения</numerusform>
+        <numerusform>%n событий движения</numerusform>
+        <numerusform>%n событий движения</numerusform>
       </translation>
-    </message>
-    <message>
-      <source>Selected camera</source>
-      <translation>Выбранная камера</translation>
-    </message>
-    <message>
-      <source>Selected device</source>
-      <translation type="unfinished">Selected device</translation>
-    </message>
-    <message>
-      <source>Selected media</source>
-      <translation type="unfinished">Selected media</translation>
-    </message>
-    <message>
-      <source>none</source>
-      <comment>No currently selected camera</comment>
-      <translation>нет</translation>
     </message>
   </context>
   <context>
@@ -9517,11 +9493,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::SystemHealthListModel::Private</name>
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
-      <translation type="unfinished">
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
-        <numerusform>Email address is not set for %n users</numerusform>
+      <translation>
+        <numerusform>Адрес электронной почты не установлен для %n пользователя</numerusform>
+        <numerusform>Адрес электронной почты не установлен для %n пользователей</numerusform>
+        <numerusform>Адрес электронной почты не установлен для %n пользователей</numerusform>
+        <numerusform>Адрес электронной почты не установлен для %n пользователей</numerusform>
       </translation>
     </message>
     <message>
@@ -9542,16 +9518,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>Double click to add cameras to the current layout or ctrl+click to open in a new tab</source>
-      <translation type="unfinished">
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
-        <numerusform>Double click to add cameras to the current layout or ctrl+click to open in a new tab</numerusform>
+      <translation>
+        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
+        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
+        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
+        <numerusform>Дважды щелкните чтобы добавить камеры на текущую раскладку или нажмите Ctrl и щелкните чтобы открыть в новой вкладке</numerusform>
       </translation>
     </message>
     <message>
       <source>No available archive</source>
-      <translation type="unfinished">No available archive</translation>
+      <translation>Нет доступного архива</translation>
     </message>
   </context>
   <context>
@@ -9562,7 +9538,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Time Zone</source>
-      <translation type="unfinished">Time Zone</translation>
+      <translation>Часовой пояс</translation>
     </message>
     <message>
       <source>Date</source>
@@ -9570,42 +9546,42 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation type="unfinished">Server OS Time</translation>
+      <translation>Время ОС сервера</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Время VMS</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation type="unfinished">Time, common and synchronized between all servers. Can be different with OS time on any particular server.</translation>
+      <translation>Время, общее и синхронизированное между всеми серверами. Может отличаться от времени ОС на любом конкретном сервере.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation type="unfinished">Synchronized with the Internet</translation>
+      <translation>Синхронизировано с Интернетом</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation type="unfinished">Synchronized with the local time at the selected server</translation>
+      <translation>Синхронизировано с местным временем на выбранном сервере</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation type="unfinished">Not synchronized. Each server uses its own local time.</translation>
+      <translation>Не синхронизировано. Каждый сервер использует свое местное время.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation type="unfinished">Equal to the server local time</translation>
+      <translation>Равное местному времени сервера</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
-      <translation type="unfinished">No Internet connection. Time is not being synchronized.</translation>
+      <translation>Подключение к Интернету отсутствует. Время не синхронизируется.</translation>
     </message>
     <message>
       <source>Time Server is offline. Time is not being synchronized.</source>
-      <translation type="unfinished">Time Server is offline. Time is not being synchronized.</translation>
+      <translation>Сервер времени не в сети. Время не синхронизируется.</translation>
     </message>
   </context>
   <context>
@@ -9631,7 +9607,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation type="unfinished">Could not create upload on the server side: %1</translation>
+      <translation>Не удалось создать загрузку на стороне сервера: %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
@@ -9645,16 +9621,24 @@ If you intended to move analytics data to another storage location, please conta
       <source>File was corrupted while being uploaded to the server</source>
       <translation>Файл был поврежден при загрузке на сервер</translation>
     </message>
+    <message>
+      <source>Remote file &quot;%1&quot; is corrupted</source>
+      <translation>Удаленный файл &quot;%1&quot; поврежден</translation>
+    </message>
+    <message>
+      <source>Server already has this file &quot;%1&quot;</source>
+      <translation>На сервере уже есть этот файл &quot;%1&quot;</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation type="unfinished">Motion is being detected only during video uploading.</translation>
+      <translation>Движение обнаруживается только во время загрузки видео.</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
-      <translation type="unfinished">Enabling or disabling this setting does not change anything in the existing archive.</translation>
+      <translation>Включение или отключение этого параметра ничего не меняет в существующем архиве.</translation>
     </message>
   </context>
   <context>
@@ -9755,27 +9739,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Starting export...</source>
-      <translation type="unfinished">Starting export...</translation>
+      <translation>Начало экспорта...</translation>
     </message>
     <message>
       <source>Saving layout</source>
-      <translation type="unfinished">Saving layout</translation>
+      <translation>Сохранение раскладки</translation>
     </message>
     <message>
       <source>Stop Saving</source>
-      <translation type="unfinished">Stop Saving</translation>
+      <translation>Остановить сохранение</translation>
     </message>
     <message>
       <source>Saving failed</source>
-      <translation type="unfinished">Saving failed</translation>
+      <translation>Ошибка сохранения</translation>
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation type="unfinished">Starting saving...</translation>
+      <translation>Начинается сохранение...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
-      <translation type="unfinished">We are preparing files for the export process. Please wait for a few seconds.</translation>
+      <translation>Мы готовим файлы для экспорта. Пожалуйста, подождите несколько секунд.</translation>
     </message>
   </context>
   <context>
@@ -9812,7 +9796,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation type="unfinished">Reconstruct Resolution</translation>
+      <translation>Восстановить разрешение</translation>
     </message>
   </context>
   <context>
@@ -9850,14 +9834,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventModel</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventModel</name>
     <message>
       <source>Any Plugin</source>
-      <translation type="unfinished">Any Plugin</translation>
+      <translation>Любой плагин</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::ui::PluginEventWidget</name>
+    <name>nx::vms::client::desktop::ui::PluginDiagnosticEventWidget</name>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
       <translation>Событие будет срабатывать только в том случае, если в заголовке есть совпадения с любым из введенных ключевых слов.</translation>
@@ -9984,7 +9968,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>Раскладка заполнена</translation>
     </message>
     <message>
       <source>Failed to change password</source>
@@ -10054,7 +10038,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>Виртуальные камеры нельзя перемещать между серверами</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -10066,7 +10050,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Все поддерживаемые</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -10172,38 +10156,42 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Не удалось сменить пароль на %n камер из %1</numerusform>
+        <numerusform>Не удалось сменить пароль на %n камерах из %1</numerusform>
+        <numerusform>Не удалось сменить пароль на %n камерах из %1</numerusform>
+        <numerusform>Не удалось сменить пароль на %n камерах из %1</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Предупреждение! Эта сборка предназначена только для тестирования.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>Открыть настройки сервера</translation>
     </message>
     <message>
       <source>OK</source>
       <translation>ОК</translation>
     </message>
     <message>
-      <source>Confirm storage location to store analytics data on &apos;%1&apos;</source>
-      <translation type="unfinished">Confirm storage location to store analytics data on &apos;%1&apos;</translation>
+      <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
+      <translation>Подтвердите местоположение хранилища для хранения данных аналитики на &quot;%1&quot;</translation>
     </message>
     <message>
-      <source>Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</source>
-      <translation type="unfinished">Analytics database should be stored on a local storage and can occupy up to hundred gigabytes.
-Once location to store analytics data is selected, it cannot be easily changed without loosing exitsing data. We recommed to choose location carefully and not to use system partition to avoid severe system malfunction.
-By default analytics data will be stored in mediaserver&apos;s installation directory.
-You can change storage location in the &quot;Storage Management&quot; tab in the Server Settings dialog.</translation>
+      <source>the largest available partition</source>
+      <translation>самый большой доступный раздел</translation>
+    </message>
+    <message>
+      <source>The analytics database should only be stored on a local drive and can take up large amounts of space.
+Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
+By default analytics data will be stored on %1.
+You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
+      <translation>База данных аналитики должна храниться только на локальном диске и может занимать много места.
+После выбора места для хранения аналитических данных его нельзя легко изменить без потери существующих данных. Мы рекомендуем тщательно выбирать местоположение и избегать использования системного раздела, так как это может привести к серьезной неисправности системы.
+По умолчанию аналитические данные будут храниться в %1.
+Вы можете выбрать другое место хранения на вкладке &quot;Storage Management&quot; диалога Server Settings.</translation>
     </message>
   </context>
   <context>

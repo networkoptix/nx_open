@@ -173,6 +173,26 @@ TEST(HostAddress, isIpAddress)
     ASSERT_FALSE(HostAddress("127.0.0.1").isIpAddress());
 }
 
+TEST(HostAddress, modifications)
+{
+    HostAddress default_;
+    ASSERT_EQ(HostAddress(default_.toString() + "_api").toString(), QString("0.0.0.0_api"));
+
+    HostAddress empty("");
+    ASSERT_EQ(HostAddress(empty.toString() + "_api").toString(), QString("_api"));
+
+    HostAddress domain("ya.ru");
+    ASSERT_EQ(HostAddress(domain.toString() + "_api").toString(), QString("ya.ru_api"));
+
+    HostAddress ipv4("192.168.12.34");
+    ASSERT_EQ(HostAddress(ipv4.toString() + "_api").toString(), QString("192.168.12.34_api"));
+
+    HostAddress ipv6("::1");
+    auto ipv6s = ipv6.toString() + "_api";
+    ipv6s.replace(":", "_");
+    ASSERT_EQ(HostAddress(ipv6s).toString(), QString("__1_api"));
+}
+
 #if 0 // TODO: #ak CLOUD-1124
 
 TEST(HostAddress, string_that_is_valid_ipv4_is_not_converted_to_ip_implicitly)

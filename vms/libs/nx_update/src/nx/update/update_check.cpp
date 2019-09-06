@@ -17,6 +17,7 @@
 #include <api/global_settings.h>
 #include <nx/network/socket_global.h>
 #include <api/runtime_info_manager.h>
+#include <api/server_rest_connection.h>
 
 namespace nx::update {
 
@@ -331,7 +332,7 @@ static InformationError parseAndExtractLegacyInformation(
 static InformationError fillUpdateInformation(
     nx::network::http::AsyncClient* httpClient,
     QString publicationKey,
-    nx::vms::api::SoftwareVersion currentVersion,
+    [[maybe_unused]] nx::vms::api::SoftwareVersion currentVersion,
     Information* result,
     QList<AlternativeServerData>* alternativeServers)
 {
@@ -356,8 +357,8 @@ static InformationError fillUpdateInformation(
 
     if (publicationKey == "latest")
     {
-        // Extracting latest version from
-        QString version = currentVersion.toString(nx::vms::api::SoftwareVersion::MinorFormat);
+        // We should take `current_release` and find this version in `releases` table.
+        QString version = customizationInfo.current_release;
         auto it = customizationInfo.releases.find(version);
         if (it == customizationInfo.releases.end())
             return InformationError::noNewVersion;
@@ -715,6 +716,76 @@ QString updatesDirectoryForDownloader(const QString& publicationKey)
 QString updateFilePathForDownloader(const QString& publicationKey, const QString& fileName)
 {
     return updatesDirectoryForDownloader(publicationKey) + fileName;
+}
+
+nx::update::UpdateContents checkSpecificChangesetProxied(
+    ::rest::QnConnectionPtr connection,
+    const nx::utils::SoftwareVersion& engineVersion,
+    const QString& updateUrl,
+    const QString& changeset)
+{
+    nx::update::UpdateContents contents;
+
+    contents.changeset = changeset;
+    contents.info = nx::update::updateInformation(updateUrl, engineVersion,
+        changeset, &contents.error);
+    contents.source = lit("%1 by serverUpdateTool for build=%2").arg(updateUrl, changeset);
+
+    if (contents.error == nx::update::InformationError::networkError && connection)
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Checking for updates using mediaserver as proxy");
+        auto promise = std::make_shared<std::promise<bool>>();
+        contents.source = lit("%1 by serverUpdateTool for build=%2 proxied by mediaserver").arg(updateUrl, changeset);
+        contents.info = {};
+        auto proxyCheck = promise->get_future();
+        connection->checkForUpdates(changeset,
+            [promise = std::move(promise), &contents](bool success,
+                rest::Handle /*handle*/, rest::UpdateInformationData response)
+            {
+                if (success)
+                {
+                    if (response.error != QnRestResult::NoError)
+                    {
+                        NX_DEBUG(NX_SCOPE_TAG,
+                            "checkSpecificChangeset: An error in response to the /ec2/updateInformation request: %1",
+                            response.errorString);
+
+                        QnLexical::deserialize(response.errorString, &contents.error);
+                    }
+                    else
+                    {
+                        contents.error = nx::update::InformationError::noError;
+                        contents.info = response.data;
+                    }
+                }
+                else
+                {
+                    contents.error = nx::update::InformationError::networkError;
+                }
+
+                promise->set_value(success);
+            });
+
+        proxyCheck.wait();
+    }
+
+    return contents;
+}
+
+qint64 reservedSpacePadding()
+{
+    // Reasoning for such constant values: QA team asked to make them so.
+    constexpr qint64 kDefaultReservedSpace = 100 * 1024 * 1024;
+    constexpr qint64 kWindowsReservedSpace = 500 * 1024 * 1024;
+    constexpr qint64 kArmReservedSpace = 5 * 1024 * 1024;
+
+    if (nx::utils::AppInfo::isWindows())
+        return kWindowsReservedSpace;
+
+    if (nx::utils::AppInfo::isArm())
+        return kArmReservedSpace;
+
+    return kDefaultReservedSpace;
 }
 
 } // namespace nx::update

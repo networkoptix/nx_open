@@ -7,7 +7,7 @@
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
 
-#include <nx/sdk/helpers/ptr.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/test_http_server.h>
@@ -71,8 +71,7 @@ public:
 
     nx::network::HostAddress getLocalIp(const nx::network::SocketAddress& cameraAddress);
 
-    nx::sdk::Error startMonitoring(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+    nx::sdk::Result<void> startMonitoring(const nx::sdk::analytics::IMetadataTypes* metadataTypes);
 
     void stopMonitoring();
 
@@ -87,7 +86,7 @@ public:
     ElapsedEvents& eventsToCatch() noexcept { return m_eventsToCatch; }
 
  private:
-    DeviceAgent * m_deviceAgent;
+    DeviceAgent* m_deviceAgent;
     const QUrl m_url;
     const QUrl m_endpoint;
     const QAuthenticator m_auth;

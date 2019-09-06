@@ -2,8 +2,11 @@
 
 #include <core/resource_access/providers/abstract_resource_access_provider.h>
 
+#include <nx/vms/api/types/access_rights_types.h>
+
 #include <nx/utils/thread/mutex.h>
 #include <common/common_module_aware.h>
+#include <nx_ec/data/api_fwd.h>
 
 /** Abstract base class for access providers containing common code.
  *  Thread-safety is achieved by using only signal-slot system with auto-connections.
@@ -21,6 +24,8 @@ public:
     virtual bool hasAccess(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const override;
 
+    virtual QSet<QnUuid> accessibleResources(const QnResourceAccessSubject& subject) const override;
+
     virtual Source accessibleVia(
         const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource,
@@ -33,7 +38,8 @@ protected:
     virtual Source baseSource() const = 0;
 
     virtual bool calculateAccess(const QnResourceAccessSubject& subject,
-        const QnResourcePtr& resource) const = 0;
+        const QnResourcePtr& resource,
+        nx::vms::api::GlobalPermissions globalPermissions) const = 0;
 
     bool acceptable(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource) const;
