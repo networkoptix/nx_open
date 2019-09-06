@@ -1819,9 +1819,9 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message numerus="yes">
       <source>%n actions</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n művelet</numerusform>
-        <numerusform>%n actions</numerusform>
+        <numerusform>%n művelet</numerusform>
       </translation>
     </message>
     <message>
@@ -9103,11 +9103,11 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation type="unfinished">invalid or incompatible plugin library</translation>
+      <translation>érvénytelen vagy nem kompatibilis plugin könyvtár</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation type="unfinished">plugin library failed to initialize</translation>
+      <translation>a plugin könyvtár inicializálása nem sikerült</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
