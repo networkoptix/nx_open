@@ -72,9 +72,6 @@ target_compile_definitions(nx_vms_client_desktop
 
 nx_force_include(nx_vms_client_desktop ${CMAKE_SOURCE_DIR}/libs/nx_utils/src/nx/utils/literal.h)
 
-add_dependencies(nx_vms_client_desktop
-    nx_vms_client_desktop_skin)
-
 if(WINDOWS)
     add_dependencies(nx_vms_client_desktop nov_file_launcher)
     target_link_libraries(nx_vms_client_desktop PUBLIC nx_gdi_tracer)
