@@ -54,7 +54,7 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnMediaResourcePtr &r
     connect(loadTimer, &QTimer::timeout, this,
         [this]
         {
-            NX_VERBOSE(this, "Checking load by timer (allowed: %1)", m_allowedContent);
+            NX_VERBOSE(this, "Checking load by timer (allowed: %1)", toString(m_allowedContent));
             load();
         });
     loadTimer->start();
@@ -125,7 +125,7 @@ void QnCachingCameraDataLoader::setAllowedContent(AllowedContent value)
     if (m_allowedContent == value)
         return;
 
-    NX_VERBOSE(this, "Set loader allowed content to %1", value);
+    NX_VERBOSE(this, "Set loader allowed content to %1", toString(value));
     m_allowedContent = value;
 
     for (auto contentType: m_allowedContent)
