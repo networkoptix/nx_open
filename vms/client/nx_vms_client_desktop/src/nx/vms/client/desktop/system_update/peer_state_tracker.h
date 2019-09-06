@@ -134,7 +134,7 @@ public:
      * It will return number if peers with changed data.
      */
     int setUpdateStatus(const std::map<QnUuid, nx::update::Status>& statusAll);
-    int setFreeSpaceData(const  QnUpdateFreeSpaceReply& freeSpaceData);
+
     void markStatusUnknown(const QSet<QnUuid>& targets);
     /**
      * Forcing update for mediaserver versions.
