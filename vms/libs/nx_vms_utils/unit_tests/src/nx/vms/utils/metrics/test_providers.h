@@ -93,18 +93,13 @@ private:
                     "g1", "group 1"
                 },
                 std::make_unique<ValueProvider<Resource>>(
-                    api::metrics::ValueManifest{
-                        "i", "int parameter", "table&panel", ""
-                    },
+                    api::metrics::ValueManifest({"i", "int parameter"}, api::metrics::Display::both, "pcs"),
                     Getter<Resource>([](const auto& r) { return r.current("i1"); }),
                     Watch<Resource>([](const auto& r, auto change) { return r.monitor("i1", std::move(change)); })
                 ),
                 std::make_unique<ValueProvider<Resource>>(
-                    api::metrics::ValueManifest{
-                        "t", "text parameter", "panel", ""
-                    },
-                    [](const auto& r) { return r.current("t1"); },
-                    [](const auto& r, auto change) { return r.monitor("t1", std::move(change)); }
+                    api::metrics::ValueManifest({"t", "text parameter"}, api::metrics::Display::panel),
+                    [](const auto& r) { return r.current("t1"); }
                 )
             ),
             std::make_unique<ValueGroupProvider<Resource>>(
@@ -112,18 +107,13 @@ private:
                     "g2", "group 2"
                 },
                 std::make_unique<ValueProvider<Resource>>(
-                    api::metrics::ValueManifest{
-                        "i", "int parameter", "panel", ""
-                    },
+                    api::metrics::ValueManifest({"i", "int parameter"}, api::metrics::Display::table),
                     Getter<Resource>([](const auto& r) { return r.current("i2"); }),
                     Watch<Resource>([](const auto& r, auto change) { return r.monitor("i2", std::move(change)); })
                 ),
                 std::make_unique<ValueProvider<Resource>>(
-                    api::metrics::ValueManifest{
-                        "t", "text parameter", "table&panel", ""
-                    },
-                    [](const auto& r) { return r.current("t2"); },
-                    [](const auto& r, auto change) { return r.monitor("t2", std::move(change)); }
+                    api::metrics::ValueManifest({"t", "text parameter"}, api::metrics::Display::both),
+                    [](const auto& r) { return r.current("t2"); }
                 )
             )
         );

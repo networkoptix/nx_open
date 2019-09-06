@@ -185,21 +185,21 @@ Example:
       "id": "availability",
       "name": "Availability",
       "values": [
-        { "id": "name", "name": "Name", "display": "table&panel" },
-        { "id": "status", "name": "Status", "display": "table&panel" },
-        { "id": "offlineEvents", "name": "Offline Events", "display": "table&panel" },
-        { "id": "uptime", "name": "Uptime", "unit": "s", "display": "table&panel" },
+        { "id": "name", "name": "Name", "display": "table|panel" },
+        { "id": "status", "name": "Status", "display": "table|panel" },
+        { "id": "offlineEvents", "name": "Offline Events", "display": "table|panel" },
+        { "id": "uptime", "name": "Uptime", "unit": "s", "display": "table|panel" },
         ...
       ],
     }, {
       "id": "load",
       "name": "Load",
       "values": [
-        { "id": "totalCpuUsageP", "name": "CPU Usage", "unit": "%", "display": "table&panel" },
-        { "id": "serverCpuUsageP", "name": "CPU Usage (VMS Server)", "unit": "%", "display": "table&panel" },
+        { "id": "totalCpuUsageP", "name": "CPU Usage", "unit": "%", "display": "table|panel" },
+        { "id": "serverCpuUsageP", "name": "CPU Usage (VMS Server)", "unit": "%", "display": "table|panel" },
         { "id": "recommendedCpuUsageP", "unit": "%", "display": ""}, //< May be omitted by compact option.
         { "id": "ramUsageB", "name": "RAM Usage", "unit": "b", "display": "panel" },
-        { "id": "ramUsageP", "name": "RAM Usage", "unit": "%", "display": "table&panel" },
+        { "id": "ramUsageP", "name": "RAM Usage", "unit": "%", "display": "table|panel" },
         ...
       ]
     },
@@ -210,18 +210,18 @@ Example:
       "id": "info",
       "name": "Info",
       "values": [
-        { "id": "name", "name": "Name", "display": "table&panel" },
-        { "id": "server", "name": "Server", "display": "table&panel" },
-        { "id": "type", "name": "Type", "display": "table&panel" },
-        { "id": "ip", "name": "IP", "display": "table&panel" },
-        { "id": "status", "name": "Status", "display": "table&panel" },
+        { "id": "name", "name": "Name", "display": "table|panel" },
+        { "id": "server", "name": "Server", "display": "table|panel" },
+        { "id": "type", "name": "Type", "display": "table|panel" },
+        { "id": "ip", "name": "IP", "display": "table|panel" },
+        { "id": "status", "name": "Status", "display": "table|panel" },
       ...
     }, {
       "id": "issues",
       "name": "Issues",
       "values": [
-        { "id": "offlineEvents", "name": "Offline Events", "display": "table&panel" },
-        { "id": "streamIssues", "name": "Stream Issues (1h)", "display": "table&panel" },
+        { "id": "offlineEvents", "name": "Offline Events", "display": "table|panel" },
+        { "id": "streamIssues", "name": "Stream Issues (1h)", "display": "table|panel" },
         { "id": "ipConflicts", "name": "IP conflicts (3m)", "display": "panel" }
         ...
       ]
@@ -229,8 +229,8 @@ Example:
       "id": "primaryStream",
       "name": "Primary Stream",
       "values": [
-        { "id": "targetFps", "name": "Target FPS", "unit": "fps", "display": "table&panel" },
-        { "id": "actualFps", "name": "Actual FPS", "unit": "fps", "display": "table&panel" },
+        { "id": "targetFps", "name": "Target FPS", "unit": "fps", "display": "table|panel" },
+        { "id": "actualFps", "name": "Actual FPS", "unit": "fps", "display": "table|panel" },
         { "id": "fpsDrops", "unit": "fps", "display": "" }, //< May be omitted by compact option.
         ...
       ]

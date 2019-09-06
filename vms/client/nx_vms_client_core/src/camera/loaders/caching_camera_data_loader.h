@@ -2,6 +2,7 @@
 #define QN_CACHING_CAMERA_DATA_LOADER_H
 
 #include <array>
+#include <set>
 
 #include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
@@ -44,8 +45,10 @@ public:
 
     void load(bool forced = false);
 
-    void setEnabled(bool value);
-    bool enabled() const;
+    using AllowedContent = std::set<Qn::TimePeriodContent>;
+    AllowedContent allowedContent() const;
+    void setAllowedContent(AllowedContent value);
+    bool isContentAllowed(Qn::TimePeriodContent content) const;
 
     void updateServer(const QnMediaServerResourcePtr& server);
 
@@ -57,9 +60,11 @@ public:
 signals:
     void periodsChanged(Qn::TimePeriodContent type, qint64 startTimeMs = 0);
     void loadingFailed();
+
 public slots:
     void discardCachedData();
     void invalidateCachedData();
+
 private slots:
     void at_loader_ready(const QnAbstractCameraDataPtr &timePeriods, qint64 startTimeMs, Qn::TimePeriodContent dataType);
 
@@ -74,7 +79,7 @@ private:
     void discardCachedDataType(Qn::TimePeriodContent type);
 
 private:
-    bool m_enabled = false;
+    AllowedContent m_allowedContent;
 
     const QnMediaResourcePtr m_resource;
     QnMediaServerResourcePtr m_server;

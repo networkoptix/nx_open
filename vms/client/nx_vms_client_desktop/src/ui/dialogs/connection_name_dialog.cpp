@@ -3,6 +3,8 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <client/client_settings.h>
+
 QnConnectionNameDialog::QnConnectionNameDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::ConnectionNameDialog())
@@ -14,6 +16,8 @@ QnConnectionNameDialog::QnConnectionNameDialog(QWidget *parent):
     auto validate = [this, okButton](const QString &text) {
         okButton->setEnabled(!text.trimmed().isEmpty());
     };
+
+    ui->savePasswordCheckBox->setVisible(qnSettings->saveCredentialsAllowed());
 
     connect(ui->nameLineEdit,   &QLineEdit::textChanged,   this,   validate);
     okButton->setEnabled(false);
