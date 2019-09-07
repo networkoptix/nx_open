@@ -54,6 +54,9 @@ void ListeningPeerPool::addConnection(
     processExpirationTimers(lock);
 
     auto insertionPair = m_peers.emplace(peerName, PeerContext());
+    if (insertionPair.second)
+        NX_DEBUG(this, "Server %1 is now online", peerName);
+
     PeerContext& peerContext = insertionPair.first->second;
 
     if (peerContext.expirationTimer)
@@ -396,6 +399,8 @@ void ListeningPeerPool::removeExpiredListeningPeers(
         m_peerExpirationTimers.begin()->first <= currentTime)
     {
         const std::string& peerName = m_peerExpirationTimers.begin()->second;
+
+        NX_DEBUG(this, "Server %1 is now offline", peerName);
 
         auto peerIter = m_peers.find(peerName);
         NX_ASSERT(peerIter != m_peers.end());
