@@ -2,7 +2,7 @@
 
 COMPANY_NAME="@deb.customization.company.name@"
 CLOUD_HOST="@cloudHost@"
-CLOUD_NAME="@cloudName@"
+CLOUD_NAME="@customization.cloudName@"
 LICENSE_VERSION="@eulaVersion@"
 
 . /usr/share/debconf/confmodule
@@ -31,7 +31,7 @@ check_cloud_host()
     # At this stage we don't have the config helper.
     [ -f "$CONFIG_FILE" ] || return 0
 
-    echo "Checking @cloudName@ compatibility..." >&2
+    echo "Checking @customization.cloudName@ compatibility..." >&2
 
     INSTALLED_CLOUD_HOST=$(awk -F= '/^cloudHost/ {print $2}' "$CONFIG_FILE")
     IS_CONNECTED_TO_CLOUD=$(awk -F= '/^isConnectedToCloud/ {print $2}' "$CONFIG_FILE")

@@ -7,7 +7,7 @@ ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 
 COMPANY_NAME="@deb.customization.company.name@"
 CLOUD_GROUP_SUFFIX="@cloud_group_suffix@"
-CLOUD_NAME="@cloudName@"
+CLOUD_NAME="@customization.cloudName@"
 
 BASE_DIR="/opt/$COMPANY_NAME/mediaserver"
 ETC_DIR="$BASE_DIR/etc"
