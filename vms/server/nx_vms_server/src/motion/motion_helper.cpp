@@ -19,9 +19,19 @@ QnMotionHelper::QnMotionHelper(const QString& dataDir, QObject* parent):
 QnMotionHelper::~QnMotionHelper()
 {
     QnMutexLocker lock( &m_mutex );
-    for(QnMotionArchive* writer: m_writers.values())
-        delete writer;
     m_writers.clear();
+}
+
+void QnMotionHelper::remove(const QnResourcePtr& res)
+{
+    const auto networkResource = res.dynamicCast<QnNetworkResource>();
+    if (!networkResource)
+        return;
+
+    QnMutexLocker lock(&m_mutex);
+    auto left = m_writers.lower_bound(MotionArchiveKey(networkResource, 0));
+    auto right = m_writers.upper_bound(MotionArchiveKey(networkResource, CL_MAX_CHANNELS));
+    m_writers.erase(left, right);
 }
 
 QnMotionArchive* QnMotionHelper::getArchive(const QnResourcePtr& res, int channel)
@@ -30,12 +40,14 @@ QnMotionArchive* QnMotionHelper::getArchive(const QnResourcePtr& res, int channe
     QnNetworkResourcePtr netres = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (!netres)
         return 0;
-    QnMotionArchive* writer = m_writers.value(MotionArchiveKey(netres, channel));
-    if (writer == 0) {
-        writer = new QnMotionArchive(m_dataDir, netres->getUniqueId(), channel);
-        m_writers.insert(MotionArchiveKey(netres, channel), writer);
-    }
-    return writer;
+    auto itr = m_writers.find(MotionArchiveKey(netres, channel));
+    if (itr != m_writers.end())
+        return itr->second.get();
+
+    auto writer = std::make_unique<QnMotionArchive>(m_dataDir, netres->getUniqueId(), channel);
+    auto result = writer.get();
+    m_writers.emplace(MotionArchiveKey(netres, channel), std::move(writer));
+    return result;
 }
 
 void QnMotionHelper::saveToArchive(const QnConstMetaDataV1Ptr& data)

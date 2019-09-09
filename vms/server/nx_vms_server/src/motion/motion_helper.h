@@ -28,6 +28,8 @@ public:
 
     QnMotionArchive* getArchive(const QnResourcePtr& res, int channel);
 
+    void remove(const QnResourcePtr& res);
+
     QnMotionHelper();
 private:
 
@@ -36,7 +38,7 @@ private:
 
 private:
     typedef QPair<QnNetworkResourcePtr, int> MotionArchiveKey;
-    typedef QMap<MotionArchiveKey, QnMotionArchive*> MotionWriters;
+    typedef std::map<MotionArchiveKey, std::unique_ptr<QnMotionArchive>> MotionWriters;
     MotionWriters m_writers;
     QnMutex m_mutex;
 };
