@@ -281,7 +281,23 @@ def main(config_file):
     if not wait_for_api():
         raise exceptions.ServerApiError("API of Server is not working: ping request was not successful.")
 
-    print('API test is OK.')
+    print('Rest API test is OK.')
+
+    for i in 1, 2, 3:
+        cameras = api.get_test_cameras_all()
+        if cameras is not None:
+            break
+        print(f"Attempt #{i}to get camera list")
+        time.sleep(i)
+
+    if cameras is not None:
+        for camera in cameras:
+            if not api.remove_camera(camera.id):
+                raise exceptions.ServerApiError(
+                    message=f"Unable to remove camera with id={camera.id}"
+                )
+    else:
+        raise exceptions.ServerApiError(message="Unable to get camera list.")
 
     # TODO: Move this to internal config.
     memory_per_camera_by_arch = {
@@ -325,22 +341,22 @@ def main(config_file):
                     if detection_started_at is None:
                         detection_started_at = time.time()
                     elif time.time() - detection_started_at >= duration:
-                        return True
+                        return True, cameras
                 else:
                     detection_started_at = None
-            return False
+            return False, None
 
         try:
             discovering_timeout = 120
 
             print(f"    Waiting for test cameras discovering... (timeout is {discovering_timeout} seconds)")
-            if not wait_test_cameras_discovered(discovering_timeout, 3):
+            res, cameras = wait_test_cameras_discovered(discovering_timeout, 3)
+            if not res:
                 raise exceptions.TestCameraError('Timeout expired.')
 
             print("    All test cameras had been discovered successfully.")
 
-            time.sleep(test_cameras_count*2)
-            cameras = api.get_test_cameras()
+            time.sleep(test_cameras_count * 2)
 
             for camera in cameras:
                 if camera.enable_recording(highStreamFps=sys_config['testStreamFpsHigh']):

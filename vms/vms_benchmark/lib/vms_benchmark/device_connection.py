@@ -304,4 +304,4 @@ elif platform.system() == 'Windows':
             return self.eval(f'cat "{path}"', su=su, stderr=stderr, timeout=timeout)
 
 else:
-    raise Exception("ERROR: OS is unsupported.")
+    raise Exception(f"ERROR: OS {platform.system()} is unsupported.")
