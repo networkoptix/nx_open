@@ -13,10 +13,9 @@ public:
                          const QStringList& strings);
     ~QnTimelineTextHelper();
 
-    QRectF digitCoordinates(int digit) const;
+    QRectF symbolCoordinates(QChar symbol) const;
     QRectF stringCoordinates(const QString& string) const;
     QSize stringSize(const QString& string) const;
-    QSize digitSize() const;
     QImage texture() const;
     int maxCharWidth() const;
     int lineHeight() const;

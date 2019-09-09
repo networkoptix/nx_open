@@ -789,7 +789,7 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
         + QChar::Space + datetime::getFormatString(datetime::Format::hh);
     static const QString dateDaysFormat = datetime::getFormatString(datetime::Format::dd_MM_yyyy);
     static const QString dateMonthsFormat = datetime::getFormatString(datetime::Format::MMMM_yyyy);
-    static const QString dateYearsFormat = datetime::getFormatString(datetime::Format::yyyy);;
+    static const QString dateYearsFormat = datetime::getFormatString(datetime::Format::yyyy);
 
     QString msSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Milliseconds);
     QString sSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds);

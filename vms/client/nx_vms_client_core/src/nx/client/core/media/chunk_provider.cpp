@@ -1,4 +1,4 @@
-#include "camera_chunk_provider.h"
+#include "chunk_provider.h"
 
 #include <common/common_module.h>
 
@@ -8,28 +8,24 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_history.h>
 
-class QnCameraChunkProvider::ChunkProviderInternal: public Connective<QObject>
+namespace nx::client::core {
+
+class ChunkProvider::ChunkProviderInternal: public Connective<QObject>
 {
 public:
     ChunkProviderInternal(
         Qn::TimePeriodContent contentType,
-        QnCameraChunkProvider* owner);
+        ChunkProvider* owner);
 
     QString resourceId() const;
     void setResourceId(const QString& id);
-
-    QDateTime bottomBoundDate() const;
-    qint64 bottomBound() const;
 
     const QString& filter() const;
     void setFilter(const QString& filter);
 
     bool loading() const;
 
-    qint64 closestChunkEndMs(qint64 position, bool forward) const;
     void update();
-
-    const QnTimePeriodList& periodList() const;
 
 private:
     void updateInternal();
@@ -40,30 +36,29 @@ private:
     QnVirtualCameraResourcePtr getCamera(const QnUuid& id);
 
 private:
-    QnCameraChunkProvider* const q;
+    ChunkProvider* const q;
     const Qn::TimePeriodContent m_contentType;
     QScopedPointer<QnFlatCameraDataLoader> m_loader;
-    QnTimePeriodList m_periodList;
     QString m_filter;
     bool m_loading = false;
     int updateTriesCount = 0;
 };
 
-QnCameraChunkProvider::ChunkProviderInternal::ChunkProviderInternal(
+ChunkProvider::ChunkProviderInternal::ChunkProviderInternal(
     Qn::TimePeriodContent contentType,
-    QnCameraChunkProvider* owner)
+    ChunkProvider* owner)
     :
     q(owner),
     m_contentType(contentType)
 {
 }
 
-QString QnCameraChunkProvider::ChunkProviderInternal::resourceId() const
+QString ChunkProvider::ChunkProviderInternal::resourceId() const
 {
     return m_loader ? m_loader->resource()->getId().toString() : QString();
 }
 
-void QnCameraChunkProvider::ChunkProviderInternal::cleanLoader()
+void ChunkProvider::ChunkProviderInternal::cleanLoader()
 {
     if (!m_loader)
         return;
@@ -73,7 +68,7 @@ void QnCameraChunkProvider::ChunkProviderInternal::cleanLoader()
     m_loader.reset();
 }
 
-void QnCameraChunkProvider::ChunkProviderInternal::setResourceId(const QString& id)
+void ChunkProvider::ChunkProviderInternal::setResourceId(const QString& id)
 {
     if (id == resourceId())
         return;
@@ -109,39 +104,17 @@ void QnCameraChunkProvider::ChunkProviderInternal::setResourceId(const QString& 
     update();
 }
 
-qint64 QnCameraChunkProvider::ChunkProviderInternal::bottomBound() const
-{
-    const auto boundingPeriod = m_periodList.boundingPeriod();
-    return boundingPeriod.startTimeMs > 0 ? boundingPeriod.startTimeMs : -1;
-}
-
-QDateTime QnCameraChunkProvider::ChunkProviderInternal::bottomBoundDate() const
-{
-    const auto bottomBoundMs = bottomBound();
-    return bottomBoundMs > 0
-        ? QDateTime::fromMSecsSinceEpoch(bottomBoundMs, Qt::UTC)
-        : QDateTime();
-}
-
-bool QnCameraChunkProvider::ChunkProviderInternal::loading() const
+bool ChunkProvider::ChunkProviderInternal::loading() const
 {
     return m_loading;
 }
 
-qint64 QnCameraChunkProvider::ChunkProviderInternal::closestChunkEndMs(qint64 position, bool forward) const
-{
-    auto it = m_periodList.findNearestPeriod(position, forward);
-    if (it == m_periodList.end())
-        return -1;
-    return it->endTimeMs();
-}
-
-const QString& QnCameraChunkProvider::ChunkProviderInternal::filter() const
+const QString& ChunkProvider::ChunkProviderInternal::filter() const
 {
     return m_filter;
 }
 
-void QnCameraChunkProvider::ChunkProviderInternal::setFilter(const QString& filter)
+void ChunkProvider::ChunkProviderInternal::setFilter(const QString& filter)
 {
     if (m_filter == filter)
         return;
@@ -153,13 +126,13 @@ void QnCameraChunkProvider::ChunkProviderInternal::setFilter(const QString& filt
     update();
 }
 
-void QnCameraChunkProvider::ChunkProviderInternal::update()
+void ChunkProvider::ChunkProviderInternal::update()
 {
     updateTriesCount = 3;
     updateInternal();
 }
 
-void QnCameraChunkProvider::ChunkProviderInternal::updateInternal()
+void ChunkProvider::ChunkProviderInternal::updateInternal()
 {
     if (!m_loader)
         return;
@@ -170,12 +143,7 @@ void QnCameraChunkProvider::ChunkProviderInternal::updateInternal()
     q->cameraHistoryPool()->updateCameraHistoryAsync(camera, nullptr);
 }
 
-const QnTimePeriodList& QnCameraChunkProvider::ChunkProviderInternal::periodList() const
-{
-    return m_periodList;
-}
-
-void QnCameraChunkProvider::ChunkProviderInternal::setLoading(bool value)
+void ChunkProvider::ChunkProviderInternal::setLoading(bool value)
 {
     if (m_loading == value)
         return;
@@ -184,25 +152,22 @@ void QnCameraChunkProvider::ChunkProviderInternal::setLoading(bool value)
     q->handleLoadingChanged(m_contentType);
 }
 
-void QnCameraChunkProvider::ChunkProviderInternal::setTimePeriods(const QnTimePeriodList& periods)
+void ChunkProvider::ChunkProviderInternal::setTimePeriods(const QnTimePeriodList& periods)
 {
-    m_periodList = periods;
-
-    emit q->timePeriodsUpdated();
+    q->setPeriods(m_contentType, periods);
     emit q->bottomBoundChanged();
-    emit q->bottomBoundDateChanged();
 
     setLoading(false);
 }
 
-QnVirtualCameraResourcePtr QnCameraChunkProvider::ChunkProviderInternal::getCamera(const QnUuid& id)
+QnVirtualCameraResourcePtr ChunkProvider::ChunkProviderInternal::getCamera(const QnUuid& id)
 {
     return q->resourcePool()->getResourceById<QnVirtualCameraResource>(id);
 }
 
 //--------------------------------------------------------------------------------------------------
 
-QnCameraChunkProvider::QnCameraChunkProvider(QObject* parent):
+ChunkProvider::ChunkProvider(QObject* parent):
     base_type(parent),
     m_providers(
         [this]()
@@ -217,53 +182,44 @@ QnCameraChunkProvider::QnCameraChunkProvider(QObject* parent):
 {
 }
 
-QnTimePeriodList QnCameraChunkProvider::timePeriods(Qn::TimePeriodContent contentType) const
+bool ChunkProvider::hasChunks() const
 {
-    return m_providers[contentType]->periodList();
+    return hasPeriods(Qn::RecordingContent);
 }
 
-bool QnCameraChunkProvider::hasChunks() const
+bool ChunkProvider::hasMotionChunks() const
 {
-    return m_providers[Qn::RecordingContent]->periodList().size();
+    return hasPeriods(Qn::MotionContent);
 }
 
-bool QnCameraChunkProvider::hasMotionChunks() const
-{
-    return m_providers[Qn::MotionContent]->periodList().size();
-}
-
-QString QnCameraChunkProvider::resourceId() const
+QString ChunkProvider::resourceId() const
 {
     return m_providers[Qn::RecordingContent]->resourceId();
 }
 
-void QnCameraChunkProvider::setResourceId(const QString& id)
+void ChunkProvider::setResourceId(const QString& id)
 {
     for (const auto& provider: m_providers)
         provider->setResourceId(id);
 }
 
-qint64 QnCameraChunkProvider::bottomBound() const
+qint64 ChunkProvider::bottomBound() const
 {
-    return m_providers[Qn::RecordingContent]->bottomBound();
+    const auto boundingPeriod = periods(Qn::RecordingContent).boundingPeriod();
+    return boundingPeriod.startTimeMs > 0 ? boundingPeriod.startTimeMs : -1;
 }
 
-QDateTime QnCameraChunkProvider::bottomBoundDate() const
-{
-    return m_providers[Qn::RecordingContent]->bottomBoundDate();
-}
-
-bool QnCameraChunkProvider::isLoading() const
+bool ChunkProvider::isLoading() const
 {
     return m_providers[Qn::RecordingContent]->loading();
 }
 
-bool QnCameraChunkProvider::isLoadingMotion() const
+bool ChunkProvider::isLoadingMotion() const
 {
     return m_providers[Qn::MotionContent]->loading();
 }
 
-void QnCameraChunkProvider::handleLoadingChanged(Qn::TimePeriodContent contentType)
+void ChunkProvider::handleLoadingChanged(Qn::TimePeriodContent contentType)
 {
     if (contentType == Qn::RecordingContent)
         emit loadingChanged();
@@ -271,23 +227,27 @@ void QnCameraChunkProvider::handleLoadingChanged(Qn::TimePeriodContent contentTy
         emit loadingMotionChanged();
 }
 
-qint64 QnCameraChunkProvider::closestChunkEndMs(qint64 position, bool forward) const
+qint64 ChunkProvider::closestChunkEndMs(qint64 position, bool forward) const
 {
-    return m_providers[Qn::RecordingContent]->closestChunkEndMs(position, forward);
+    const auto data = periods(Qn::RecordingContent);
+    auto it = data.findNearestPeriod(position, forward);
+    return it == data.end() ? -1 : it->endTimeMs();
 }
 
-void QnCameraChunkProvider::update()
+void ChunkProvider::update()
 {
     for (const auto& provider: m_providers)
         provider->update();
 }
 
-QString QnCameraChunkProvider::motionFilter() const
+QString ChunkProvider::motionFilter() const
 {
     return m_providers[Qn::MotionContent]->filter();
 }
 
-void QnCameraChunkProvider::setMotionFilter(const QString& value)
+void ChunkProvider::setMotionFilter(const QString& value)
 {
     m_providers[Qn::MotionContent]->setFilter(value);
 }
+
+} // namespace nx::client::core

@@ -1,7 +1,7 @@
 import QtQuick 2.6
 import QtGraphicalEffects 1.0
+import Nx 1.0
 import Nx.Core.Items 1.0
-import "utils.js" as Utils
 
 Item
 {

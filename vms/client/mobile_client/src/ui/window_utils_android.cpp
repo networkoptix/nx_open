@@ -108,4 +108,8 @@ void makeShortVibration()
     vibrator.callMethod<void>("vibrate", "(J)V", kDuration);
 }
 
+bool is24HoursTimeFormat()
+{
+    return QAndroidJniObject::callStaticMethod<jboolean>(kUtilsClass, "is24HoursTimeFormat");
+}
 #endif

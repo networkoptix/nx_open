@@ -146,9 +146,9 @@ QnTimelineTextHelper::~QnTimelineTextHelper()
 {
 }
 
-QRectF QnTimelineTextHelper::digitCoordinates(int digit) const
+QRectF QnTimelineTextHelper::symbolCoordinates(QChar symbol) const
 {
-    return stringCoordinates(QString::number(digit));
+    return stringCoordinates(symbol);
 }
 
 QRectF QnTimelineTextHelper::stringCoordinates(const QString& string) const
@@ -168,12 +168,6 @@ QSize QnTimelineTextHelper::stringSize(const QString& string) const
 {
     Q_D(const QnTimelineTextHelper);
     return d->strings.value(string).size() / d->pixelRatio;
-}
-
-QSize QnTimelineTextHelper::digitSize() const
-{
-    Q_D(const QnTimelineTextHelper);
-    return QSize(d->digitWidth, d->lineHeight) / d->pixelRatio;
 }
 
 QImage QnTimelineTextHelper::texture() const
