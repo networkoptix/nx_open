@@ -8,6 +8,7 @@
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QVarLengthArray>
+#include <QtCore/QJsonValue>
 
 #include <nx/utils/log/assert.h>
 
