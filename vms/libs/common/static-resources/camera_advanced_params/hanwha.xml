@@ -595,7 +595,7 @@
                     name="Port"
                     dataType="Number"
                     writeCmd="update"
-                    aux="range=streamsToReopen=secondary;media/videoprofile/add_update/RTPMulticastPort;profile=secondary;group=secondaryStreamMulticast;groupInclude=true;associatedWith=SECONDARY%media/videoprofile/RTPMulticastEnable,SECONDARY%media/videoprofile/RTPMulticastAddress,SECONDARY%media/videoprofile/RTPMulticastTTL;multicast=true">
+                    aux="range=media/videoprofile/add_update/RTPMulticastPort;streamsToReopen=secondary;profile=secondary;group=secondaryStreamMulticast;groupInclude=true;associatedWith=SECONDARY%media/videoprofile/RTPMulticastEnable,SECONDARY%media/videoprofile/RTPMulticastAddress,SECONDARY%media/videoprofile/RTPMulticastTTL;multicast=true">
                     <dependencies>
                         <dependencies-show>
                             <conditional-show>
