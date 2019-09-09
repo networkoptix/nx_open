@@ -1,11 +1,11 @@
-FROM python:3.6-alpine3.7
+FROM python:3.7-alpine3.10
 
 ARG VERSION
 ARG CACHE_DATE
 
 RUN set -ex \
        apk update \
-	&& apk add --no-cache ca-certificates \
+	&& apk add --no-cache ca-certificates libcrypto1.1 libffi libssl1.1 \
     && apk add --no-cache --virtual build-dependencies gcc g++ musl-dev go git \
     && export GOPATH=/go \
     && export PATH=$GOPATH/bin:$PATH \
@@ -22,10 +22,24 @@ RUN set -ex \
     && cd / \
     && apk del --purge -r build-dependencies \
     && rm -rf /go
-
+    
+COPY pip.conf /root/.config/pip/pip.conf
 COPY docker_config.json /root/.docker/config.json
 COPY stage/monitoring_simple-$VERSION-py3-none-any.whl /tmp
 
-RUN pip install /tmp/monitoring_simple-$VERSION-py3-none-any.whl
+RUN sed -i'' "s/\$VERSION/3.7.3-alpine3.10/" /root/.config/pip/pip.conf \
+    && pip install /tmp/monitoring_simple-$VERSION-py3-none-any.whl
 
 ENTRYPOINT [ "monitoring_simple" ]
+
+ARG VERSION
+ARG REVISION
+ARG BUILD_DATE
+ARG BUILD_HOST
+ARG BUILD_USER
+LABEL maintainer="Ivan Vigasin <ivigasin@gmail.com>" \
+      version="$VERSION" \
+      revision="$REVISION" \
+      build-date="$BUILD_DATE" \
+      build-host="$BUILD_HOST" \
+      build-user="$BUILD_USER"

@@ -30,5 +30,13 @@ function publish()
     push
 }
 
+function publish_deps()
+{
+    local dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    local img=009544449203.dkr.ecr.us-west-1.amazonaws.com/devtools/wheel_uploader:3.7.3-alpine3.10
+
+    docker pull $img
+    docker run --rm -i $img < $SRC_DIR/requirements.txt
+}
 
 main $@

@@ -17,7 +17,11 @@ from requests.auth import HTTPDigestAuth
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
+from monitoring_simple.ssl_helper import cert_valid_days
+
+SSL_CERT_RENEW_DAYS_WARNING = 20
 RETRY_TIMEOUT = 10  # seconds
+
 
 log = logging.getLogger('simple_cloud_test')
 
@@ -397,6 +401,16 @@ class CloudSession(object):
         command = '--log-level=DEBUG2 --test-relay --relay-url=http://{}.vmsproxy.com/'.format(relay_name)
         self.test_cctu_base(command)
 
+    def test_traffic_relay_cert(self, relay_name):
+        domain = '{}.vmsproxy.com/'.format(relay_name)
+        days = cert_valid_days(domain)
+
+        log.info('Certificate for {} is valid {} more days'.format(domain, days))
+
+        assert days > SSL_CERT_RENEW_DAYS_WARNING
+
+    # TODO: remove relay list hardcode(!!!!)
+
     @testmethod(metric='traffic_relay_failure', host='relay-la', continue_if_fails=True)
     def test_traffic_relay_la(self):
         self.test_traffic_relay('relay-la')
@@ -416,6 +430,26 @@ class CloudSession(object):
     @testmethod(metric='traffic_relay_failure', host='relay-si', continue_if_fails=True)
     def test_traffic_relay_si(self):
         self.test_traffic_relay('relay-si')
+
+    @testmethod(metric='traffic_relay_cert_failure', host='relay-la', continue_if_fails=True)
+    def test_traffic_relay_la(self):
+        self.test_traffic_relay_cert('relay-la')
+
+    @testmethod(metric='traffic_relay_cert_failure', host='relay-ny', continue_if_fails=True)
+    def test_traffic_relay_ny(self):
+        self.test_traffic_relay_cert('relay-ny')
+
+    @testmethod(metric='traffic_relay_cert_failure', host='relay-fr', continue_if_fails=True)
+    def test_traffic_relay_fr(self):
+        self.test_traffic_relay_cert('relay-fr')
+
+    @testmethod(metric='traffic_relay_cert_failure', host='relay-sy', continue_if_fails=True)
+    def test_traffic_relay_sy(self):
+        self.test_traffic_relay_cert('relay-sy')
+
+    @testmethod(metric='traffic_relay_cert_failure', host='relay-si', continue_if_fails=True)
+    def test_traffic_relay_si(self):
+        self.test_traffic_relay_cert('relay-si')
 
     @testmethod(metric='email_failure', continue_if_fails=True, debug_skip=True)
     def restore_password(self):
