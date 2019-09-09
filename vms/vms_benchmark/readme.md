@@ -21,9 +21,12 @@ The following prerequisites should be assured before running the tool:
 * Linux host: `ssh` and `sshpass` tools should be installed on the host.
 * VMS Server should be installed on the box and VMS System should be set up via the Setup Wizard
     in the Server web-admin.
-* The box should not have installed more than one VMS customization.
+* No more than one VMS should be installed on the box.
 * If the box Linux user is not root, it should be in sudoers and `sudo` should not ask for
     password.
+* The box should be connected to an isolated network together with the host, and this network
+    should have the full bandwidth that the box is planned to work with, e.g. 100 Mbps or 1 Gbps.
+    There should be no cameras in this network, but it may be connected to the internet.
 
 ---------------------------------------------------------------------------------------------------
 ## Usage
