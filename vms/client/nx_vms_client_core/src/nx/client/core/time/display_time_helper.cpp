@@ -1,0 +1,118 @@
+#include "display_time_helper.h"
+
+#include <QtQml/QtQml>
+
+#include <nx/client/core/time/time_constants.h>
+#include <translation/datetime_formatter.h>
+
+namespace nx::client::core {
+
+struct DisplayTimeHelper::Private
+{
+    Private(DisplayTimeHelper* owner);
+    QDateTime getDateTime() const;
+    void handleChanges();
+
+    DisplayTimeHelper* const q;
+    qint64 position = 0;
+    qint64 displayOffset = 0;
+    QDateTime dateTime;
+};
+
+DisplayTimeHelper::Private::Private(DisplayTimeHelper* owner):
+    q(owner),
+    position(0),
+    displayOffset(datetime::systemDisplayOffset()),
+    dateTime(getDateTime())
+{
+}
+
+QDateTime DisplayTimeHelper::Private::getDateTime() const
+{
+    return QDateTime::fromMSecsSinceEpoch(position + displayOffset, Qt::UTC);
+}
+
+void DisplayTimeHelper::Private::handleChanges()
+{
+    dateTime = getDateTime();
+    q->dateTimeChanged();
+}
+
+//--------------------------------------------------------------------------------------------------
+
+void DisplayTimeHelper::registerQmlType()
+{
+    qmlRegisterType<DisplayTimeHelper>("Nx.Utils", 1, 0, "DisplayTimeHelper");
+}
+
+DisplayTimeHelper::DisplayTimeHelper(QObject* parent):
+    base_type(parent),
+    d(new Private(this))
+{
+    const auto updateDateTime = [this]() { d->handleChanges(); };
+    connect(this, &DisplayTimeHelper::positionChanged, this, updateDateTime);
+    connect(this, &DisplayTimeHelper::displayOffsetChanged, this, updateDateTime);
+}
+
+DisplayTimeHelper::~DisplayTimeHelper()
+{
+}
+
+void DisplayTimeHelper::setPosition(qint64 value)
+{
+    value = std::clamp<qint64>(value, 0, std::numeric_limits<qint64>().max());
+    if (d->position == value)
+        return;
+
+    d->position = value;
+    emit positionChanged();
+}
+
+qint64 DisplayTimeHelper::position() const
+{
+    return d->position;
+}
+
+void DisplayTimeHelper::setDisplayOffset(qint64 value)
+{
+    value = std::clamp<qint64>(
+        value, TimeConstants::kMinDisplayOffset, TimeConstants::kMaxDisplayOffset);
+
+    if (d->displayOffset == value)
+        return;
+
+    d->displayOffset = value;
+    emit displayOffsetChanged();
+}
+
+qint64 DisplayTimeHelper::displayOffset() const
+{
+    return d->displayOffset;
+}
+
+QString DisplayTimeHelper::fullDate() const
+{
+    return datetime::toString(d->dateTime, datetime::Format::d_MMMM_yyyy);
+}
+
+QString DisplayTimeHelper::hours() const
+{
+    return datetime::toString(d->dateTime, datetime::Format::h);
+}
+
+QString DisplayTimeHelper::minutes() const
+{
+    return datetime::toString(d->dateTime, datetime::Format::m);
+}
+
+QString DisplayTimeHelper::seconds() const
+{
+    return datetime::toString(d->dateTime, datetime::Format::s);
+}
+
+QString DisplayTimeHelper::noonMark() const
+{
+    return datetime::toString(d->dateTime, datetime::Format::a);
+}
+
+} // namespace nx::client::core

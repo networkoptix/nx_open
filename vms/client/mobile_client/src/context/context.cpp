@@ -34,6 +34,8 @@
 #include <utils/common/delayed.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/mobile_client/controllers/audio_controller.h>
+#include <translation/datetime_formatter.h>
+#include <nx/client/core/watchers/server_time_watcher.h>
 
 using namespace nx::vms::utils;
 
@@ -54,6 +56,7 @@ QnContext::QnContext(QObject* parent) :
         SystemUri::ReferralSource::MobileClient,
         SystemUri::ReferralContext::WelcomePage,
         this)),
+    m_timeWatcher(commonModule()->instance<ServerTimeWatcher>()),
     m_localPrefix(lit("qrc:///")),
     m_customMargins()
 {
@@ -124,6 +127,19 @@ QnContext::QnContext(QObject* parent) :
             if (userWatcher->userName().isEmpty())
                 m_uiController->disconnectFromSystem();
         });
+
+    const auto updateTimeMode =
+        [this]()
+        {
+            m_timeWatcher->setTimeMode(qnSettings->serverTimeMode()
+                ? ServerTimeWatcher::serverTimeMode
+                : ServerTimeWatcher::clientTimeMode);
+        };
+    const auto notifier = qnSettings->notifier(QnMobileClientSettings::ServerTimeMode);
+    connect(notifier, &QnPropertyNotifier::valueChanged, this, updateTimeMode);
+    connect(m_timeWatcher, &ServerTimeWatcher::timeModeChanged,
+        this, &QnContext::serverTimeModeChanged);
+    updateTimeMode();
 }
 
 QnContext::~QnContext() {}
@@ -397,4 +413,14 @@ int QnContext::topCustomMargin() const
 int QnContext::bottomCustomMargin() const
 {
     return m_customMargins.bottom();
+}
+
+bool QnContext::serverTimeMode() const
+{
+    return m_timeWatcher->timeMode() == ServerTimeWatcher::serverTimeMode;
+}
+
+void QnContext::setServerTimeMode(bool value)
+{
+    qnSettings->setServerTimeMode(value);
 }

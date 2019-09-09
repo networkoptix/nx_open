@@ -1,20 +1,19 @@
 import QtQuick 2.6
 import Nx 1.0
-import com.networkoptix.qml 1.0
+import Nx.Core 1.0
 
 Item
 {
-    id: monthGrid
+    id: control
 
+    property alias position: calendarModel.position
+    property alias displayOffset: calendarModel.displayOffset
     property alias locale: calendarModel.locale
     property alias year: calendarModel.year
     property alias month: calendarModel.month
-    property date currentDate
-    property alias chunkProvider: calendarModel.chunkProvider
+    property alias periodsStore: calendarModel.periodsStore
 
-    property date _today: new Date()
-
-    signal datePicked(date date)
+    signal picked(real position)
 
     Grid
     {
@@ -30,10 +29,9 @@ Item
         {
             id: repeater
 
-            model: QnCalendarModel
+            model: CalendarModel
             {
                 id: calendarModel
-                currentDate: monthGrid.currentDate
             }
 
             Item
@@ -86,12 +84,8 @@ Item
                     id: clickArea
 
                     anchors.fill: parent
-                    enabled: model.date <= _today
-                    onClicked:
-                    {
-                        currentDate = model.date
-                        monthGrid.datePicked(model.date)
-                    }
+                    enabled: model.dayStartTime <= (new Date()).getTime()
+                    onClicked: control.picked(model.dayStartTime)
                 }
             }
         }

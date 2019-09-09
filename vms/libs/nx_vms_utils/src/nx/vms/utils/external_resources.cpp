@@ -12,6 +12,9 @@ namespace nx::vms::utils {
 
 QDir externalResourcesDirectory()
 {
+    if (nx::utils::AppInfo::isAndroid())
+        return QDir("assets:/translations");
+
     const auto rootDir = QDir(QCoreApplication::applicationDirPath());
     // Final destination of external resources is different on macOS.
     if (nx::utils::AppInfo::isMacOsX())
