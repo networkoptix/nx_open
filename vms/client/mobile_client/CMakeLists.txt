@@ -86,9 +86,9 @@ if(ANDROID)
     if(codeSigning)
         set(code_signing_parameters
             KEYSTORE_FILE "${customization_dir}/mobile_client/key.store"
-            KEYSTORE_ALIAS "${android.alias}"
-            KEYSTORE_PASSWORD "${android.storepass}"
-            KEYSTORE_KEY_PASSWORD "${android.keypass}"
+            KEYSTORE_ALIAS "${customization.mobile.android.alias}"
+            KEYSTORE_PASSWORD "${customization.mobile.android.storepass}"
+            KEYSTORE_KEY_PASSWORD "${customization.mobile.android.keypass}"
         )
     else()
         set(code_signing_parameters)
