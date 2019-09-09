@@ -1,28 +1,13 @@
 #include <gtest/gtest.h>
 
 #include <nx/client/core/time/display_time_helper.h>
-#include <nx/client/core/time/time_common_properties_test_helpers.h>
+#include <nx/client/core/time/time_common_properties_test.h>
 
-namespace {
+namespace nx::client::core {
+namespace test {
 
-using Helper = nx::client::core::DisplayTimeHelper;
-using HelperPtr = QSharedPointer<Helper>;
+using TestingType = testing::Types<DisplayTimeHelper>;
+INSTANTIATE_TYPED_TEST_CASE_P(DisplayTimeHelperTest, CommonTimePropertiesTest, TestingType);
 
-HelperPtr createHelper()
-{
-    return HelperPtr(new Helper());
-}
-
-} // namespace
-
-TEST(DisplayTimeHelperTest, DisplayOffsetPropertyCheck)
-{
-    checkDisplayOffsetPropertyInteractionAndRanges(createHelper().get());
-}
-
-TEST(DisplayTimeHelperTest, PositionPropertyCheck)
-{
-    checkPositionPropertyInteractionAndRanges(createHelper().get());
-}
-
-
+} // namespace test
+} // namespace nx::client::core
