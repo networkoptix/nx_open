@@ -29,6 +29,6 @@ namespace rtu
 
     QString ApplicationInfo::companyUrl()
     {
-        return QStringLiteral("${companyUrl}");
+        return QStringLiteral("${customization.contact.companyUrl}");
     }
 }

@@ -7,5 +7,5 @@ Pre-Depends: debconf
 Depends: @deb_dependencies@
 Section: database
 Priority: optional
-Homepage: @companyUrl@
+Homepage: @customization.contact.companyUrl@
 Description: @company.name@ @mediaserver.display.name@

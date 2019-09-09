@@ -13,5 +13,5 @@ Replaces: @deb.customization.company.name@-client-1.2 (<< VERSION)
 Provides: @deb.customization.company.name@-client
 Section: database
 Priority: optional
-Homepage: @companyUrl@
+Homepage: @customization.contact.companyUrl@
 Description: @client.display.name@

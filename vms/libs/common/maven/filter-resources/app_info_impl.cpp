@@ -63,7 +63,7 @@ QString QnAppInfo::licensingEmailAddress()
 
 QString QnAppInfo::companyUrl()
 {
-    return QStringLiteral("${companyUrl}");
+    return QStringLiteral("${customization.contact.companyUrl}");
 }
 
 QString QnAppInfo::supportEmailAddress()
