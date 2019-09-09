@@ -48,7 +48,7 @@ public:
 
     virtual void dropConnections() = 0;
 
-    virtual QVector<QnTransportConnectionInfo> connectionsInfo() const = 0;
+    virtual ConnectionInfoList connectionsInfo() const = 0;
 
     virtual void setHandler(ECConnectionNotificationManager* handler) = 0;
     virtual void removeHandler(ECConnectionNotificationManager* handler) = 0;

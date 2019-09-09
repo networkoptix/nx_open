@@ -195,6 +195,12 @@ struct Ini: nx::kit::IniConfig
         "on scene items for cameras not satisfying Right Panel camera filter.\n"
         "If this flag isn't set, specific data satisfying other filters is displayed.\n"
         "If this flag is set, no data is displayed.");
+
+    NX_INI_FLAG(1, resetResourceTreeModelOnUserChange,
+        "Reset Resource Tree model during user session change.");
+
+    NX_INI_FLAG(1, limitAnalyticsTimePeriodsLoading,
+        "Send analytics time period requests only when these periods are visible.");
 };
 
 inline Ini& ini()

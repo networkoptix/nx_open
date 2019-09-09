@@ -72,6 +72,7 @@ public:
         bool hasLatestVersion = false;
         bool checking = false;
         QString version;
+        QString alreadyInstalledMessage;
         /** Status messages. It is displayed under version when something went wrong. */
         QStringList statusMessages;
         /** Modes for displaying version number. */
@@ -188,6 +189,11 @@ public:
         }
 
         Data* operator->()
+        {
+            return &currentData;
+        }
+
+        const Data* operator->() const
         {
             return &currentData;
         }

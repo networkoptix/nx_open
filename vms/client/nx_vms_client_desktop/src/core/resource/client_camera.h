@@ -29,6 +29,11 @@ public:
         const QnResourcePtr& resource,
         Qn::ConnectionRole role);
 
+    /**
+     * Debug log representation. Used by toString(const T*).
+     */
+    virtual QString idForToStringFromPtr() const override;
+
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 protected slots:

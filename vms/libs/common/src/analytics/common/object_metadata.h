@@ -19,6 +19,12 @@ struct Attribute
 {
     QString name;
     QString value;
+
+    Attribute() = default;
+    Attribute(const QString& name, const QString& value):
+        name(name), value(value)
+    {
+    };
 };
 #define Attribute_Fields (name)(value)
 QN_FUSION_DECLARE_FUNCTIONS(Attribute, (json)(ubjson));
@@ -27,6 +33,8 @@ bool operator<(const Attribute& f, const Attribute& s);
 bool operator==(const Attribute& left, const Attribute& right);
 
 QString toString(const Attribute&);
+
+using Attributes = std::vector<Attribute>;
 
 //-------------------------------------------------------------------------------------------------
 static constexpr int kCoordinateDecimalDigits = 4;
@@ -39,7 +47,7 @@ struct ObjectMetadata
      * Coordinates are in range [0;1].
      */
     QRectF boundingBox;
-    std::vector<Attribute> attributes;
+    Attributes attributes;
     bool bestShot = false;
 };
 #define ObjectMetadata_Fields (typeId)(trackId)(boundingBox)(attributes)(bestShot)

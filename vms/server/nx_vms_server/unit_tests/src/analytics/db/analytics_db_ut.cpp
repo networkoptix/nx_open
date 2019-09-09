@@ -158,7 +158,7 @@ protected:
     {
         for (auto trackIter = tracks.begin(); trackIter != tracks.end(); )
         {
-            if (!ObjectTrackSearcher::satisfiesFilter(filter, *trackIter))
+            if (!filter.acceptsTrack(*trackIter))
             {
                 trackIter = tracks.erase(trackIter);
                 continue;
@@ -570,19 +570,6 @@ private:
 
     bool satisfiesFilter(
         const Filter& filter,
-        const ObjectPosition& data)
-    {
-        if (!satisfiesCommonConditions(filter, data))
-            return false;
-
-        if (!filter.boundingBox)
-            return true;
-
-        return rectsIntersectToSearchPrecision(*filter.boundingBox, data.boundingBox);
-    }
-
-    bool satisfiesFilter(
-        const Filter& filter,
         const common::metadata::ObjectMetadataPacket& data)
     {
         if (!filter.objectTrackId.isNull())
@@ -594,42 +581,10 @@ private:
                 return false;
         }
 
-        if (filter.boundingBox)
+        for (const auto& objectMetadata: data.objectMetadataList)
         {
-            bool intersects = false;
-            for (const auto& objectMetadata: data.objectMetadataList)
-            {
-                intersects |= rectsIntersectToSearchPrecision(
-                    *filter.boundingBox,
-                    objectMetadata.boundingBox);
-            }
-            if (!intersects)
-                return false;
-        }
-
-        if (!filter.objectTypeId.empty())
-        {
-            bool hasProperType = false;
-            for (const auto& objectMetadata: data.objectMetadataList)
-            {
-                hasProperType |= std::find(
-                    filter.objectTypeId.begin(), filter.objectTypeId.end(),
-                    objectMetadata.typeId) != filter.objectTypeId.end();
-            }
-            if (!hasProperType)
-                return false;
-        }
-
-        if (!filter.freeText.isEmpty())
-        {
-            bool isFilterSatisfied = false;
-            for (const auto& objectMetadata: data.objectMetadataList)
-            {
-                isFilterSatisfied |=
-                    ObjectTrackSearcher::matchAttributes(
-                        objectMetadata.attributes, filter.freeText);
-            }
-            if (!isFilterSatisfied)
+            // Checks object type id, bounding box and attributes.
+            if (!filter.acceptsMetadata(objectMetadata))
                 return false;
         }
 
@@ -950,7 +905,7 @@ protected:
                 break;
         }
 
-        m_filter.freeText = text.mid(0, text.size() / 2) + "*";
+        m_filter.freeText = text.mid(0, text.size() / 2);
     }
 
     void addRandomUnknownText()

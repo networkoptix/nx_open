@@ -307,6 +307,7 @@ void ModuleConnector::Module::remakeConnection()
 {
     NX_DEBUG(this, "Initiate reconnect for better endpoints");
     m_connectedReader.reset();
+    m_attemptingReaders.clear();
     ensureConnection();
 }
 

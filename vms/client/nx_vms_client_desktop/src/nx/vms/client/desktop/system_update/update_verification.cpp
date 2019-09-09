@@ -135,12 +135,13 @@ bool verifyUpdateContents(
     const ClientVerificationData& clientData,
     const VerificationOptions& options)
 {
+    auto logTag = nx::utils::log::Tag(
+        QString("verifyUpdateContents(%1) ").arg(contents.info.version));
     nx::update::Information& info = contents.info;
     if (contents.error != nx::update::InformationError::noError)
     {
-        NX_ERROR(typeid(UpdateContents)) << "verifyUpdateContents("
-            << contents.info.version << ") has an error before verification:"
-            << nx::update::toString(contents.error);
+        NX_ERROR(logTag, "has an error before verification: %1",
+            nx::update::toString(contents.error));
         return false;
     }
 
@@ -206,17 +207,17 @@ bool verifyUpdateContents(
     }
     else
     {
-        // TODO: Should get EULA file
         contents.eulaPath = contents.info.eulaLink;
     }
 
     // We will try to set it to false when we check servers and clients.
     contents.alreadyInstalled = true;
+    bool clientInstalledThis = clientData.installedVersions.count(targetVersion) != 0;
 
     if (!clientData.clientId.isNull()
         && (clientData.currentVersion < targetVersion
             || (clientData.currentVersion > targetVersion && options.compatibilityMode))
-        && clientData.installedVersions.count(targetVersion) == 0)
+        && !clientInstalledThis)
     {
         contents.alreadyInstalled = false;
         contents.needClientUpdate = true;
@@ -230,8 +231,7 @@ bool verifyUpdateContents(
                 break;
 
             case update::FindPackageResult::osVersionNotSupported:
-                NX_ERROR(typeid(UpdateContents), "verifyUpdateManifest(%1) OS version is not supported: %2",
-                    contents.info.version, clientData.osInfo);
+                NX_ERROR(logTag, "OS version is not supported: %1", clientData.osInfo);
                 contents.unsuportedSystemsReport.insert(
                     clientData.clientId,
                     UpdateStrings::getReportForUnsupportedOs(clientData.osInfo));
@@ -239,8 +239,7 @@ bool verifyUpdateContents(
 
             case update::FindPackageResult::otherError:
             default:
-                NX_ERROR(typeid(UpdateContents), "verifyUpdateManifest(%1) Update package is missing for %2",
-                    contents.info.version, clientData.osInfo);
+                NX_ERROR(logTag, "Update package is missing for %1", clientData.osInfo);
                 contents.missingUpdate.insert(clientData.clientId);
                 break;
         }
@@ -259,6 +258,7 @@ bool verifyUpdateContents(
     QSet<nx::update::Package*> manualPackages;
 
     QSet<QnUuid> serversWithNewerVersion;
+    QSet<QnUuid> serversWithExactVersion;
 
     // TODO: Should reverse this verification: get all platform configurations and find packages for them.
     // Checking if all servers have update packages.
@@ -274,22 +274,24 @@ bool verifyUpdateContents(
         const auto& osInfo = server->getOsInfo();
         if (!osInfo.isValid())
         {
-            NX_WARNING(typeid(UpdateContents),
-                "verifyUpdateManifest(%1) - server %2 has invalid osInfo",
-                contents.info.version, id);
+            NX_WARNING(logTag, "server %1 has invalid osInfo", id);
         }
 
         const bool hasInternet = server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);
         contents.noServerWithInternet |= hasInternet;
 
         const nx::utils::SoftwareVersion serverVersion = server->getVersion();
-        // Prohibiting updates to previous version.
+
         if (serverVersion > targetVersion)
         {
-            NX_WARNING(typeid(UpdateContents), "verifyUpdateManifest(%1) Server %2 has a newer version %3",
-                contents.info.version, id, serverVersion);
+            NX_WARNING(logTag, "Server %1 has a newer version %2", id, serverVersion);
             serversWithNewerVersion.insert(id);
             continue;
+        }
+        else if (serverVersion == targetVersion)
+        {
+            NX_DEBUG(logTag, "Server %1 is already at this version", id);
+            serversWithExactVersion.insert(id);
         }
 
         update::Package* package = serverPackages[osInfo];
@@ -305,24 +307,21 @@ bool verifyUpdateContents(
                     break;
 
                 case update::FindPackageResult::osVersionNotSupported:
-                    NX_ERROR(typeid(UpdateContents),
-                        "verifyUpdateManifest(%1) OS version is not supported: %2",
-                        contents.info.version, osInfo);
+                    NX_ERROR(logTag, "OS version is not supported: %1", osInfo);
                     contents.unsuportedSystemsReport.insert(
                         id, UpdateStrings::getReportForUnsupportedOs(osInfo));
                     continue;
 
                 case update::FindPackageResult::otherError:
                 default:
-                    NX_ERROR(typeid(UpdateContents),
-                        "verifyUpdateManifest(%1) Update package is missing for %2",
-                        contents.info.version, osInfo);
+                    NX_ERROR(logTag, "Update package is missing for %1", osInfo);
                     contents.missingUpdate.insert(id);
                     continue;
             }
         }
 
-        if (serverVersion < targetVersion && server->isOnline())
+        // Prohibiting updates to previous version.
+        if (serverVersion < targetVersion)
         {
             contents.alreadyInstalled = false;
             contents.peersWithUpdate.insert(id);
@@ -336,9 +335,17 @@ bool verifyUpdateContents(
         contents.manualPackages.push_back(*package);
 
     if (contents.peersWithUpdate.empty())
+    {
         contents.invalidVersion.unite(serversWithNewerVersion);
+    }
     else
+    {
+        // Since we have some peers with valid update, we can ignore problems for servers with
+        // exact version.
+        contents.invalidVersion -= serversWithExactVersion;
+        contents.missingUpdate -= serversWithExactVersion;
         contents.ignorePeers = serversWithNewerVersion;
+    }
 
     if (options.commonModule)
     {
@@ -351,8 +358,7 @@ bool verifyUpdateContents(
 
     if (!contents.missingUpdate.empty() || !contents.unsuportedSystemsReport.empty())
     {
-        NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
-            << contents.info.version << ") - detected missing packages.";
+        NX_WARNING(logTag, "detected missing packages.");
         contents.error = nx::update::InformationError::missingPackageError;
     }
 
@@ -362,8 +368,7 @@ bool verifyUpdateContents(
         if (targetVersion > clientData.currentVersion
             && !clientData.installedVersions.count(targetVersion))
         {
-            NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
-                << contents.info.version << ") - we should install client package, but there is no such.";
+            NX_WARNING(logTag, "we should install client package, but there is no such.");
             if (!contents.unsuportedSystemsReport.contains(clientData.clientId))
             {
                 contents.error = nx::update::InformationError::missingPackageError;
@@ -372,8 +377,7 @@ bool verifyUpdateContents(
         }
         else
         {
-            NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
-                << contents.info.version << ") - there is no client package, but applauncher has it. That's ok.";
+            NX_WARNING(logTag, "there is no client package, but applauncher has it. That's ok.");
         }
     }
 
@@ -382,23 +386,20 @@ bool verifyUpdateContents(
     if (!contents.invalidVersion.empty()
         && (!contents.alreadyInstalled || contents.peersWithUpdate.empty()))
     {
-        NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
-            << contents.info.version << ") - detected incompatible version error.";
+        NX_WARNING(logTag, "detected incompatible version error.");
         contents.error = nx::update::InformationError::incompatibleVersion;
     }
 
     // Update package has no packages at all.
     if (contents.info.packages.empty() && !activeServers.empty())
     {
-        NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
-            << contents.info.version << ") - this update is completely empty.";
+        NX_WARNING(logTag, "this update is completely empty.");
         contents.error = nx::update::InformationError::missingPackageError;
     }
 
     if (!contents.cloudIsCompatible)
     {
-        NX_WARNING(typeid(UpdateContents)) << "verifyUpdateManifest("
-            << contents.info.version << ") - detected detected incompatible cloud.";
+        NX_WARNING(logTag, "detected incompatible cloud.");
         contents.error = nx::update::InformationError::incompatibleCloudHost;
     }
 
@@ -408,11 +409,8 @@ bool verifyUpdateContents(
         for (const auto& pkg: contents.manualPackages)
             files.append(pkg.file);
 
-        NX_WARNING(typeid(UpdateContents))
-            << "verifyUpdateManifest(" << contents.info.version
-            << ") - detected some servers can not download update packages:"
-            << contents.info.version
-            << files.join(",");
+        NX_WARNING(logTag, "detected some servers can not download update packages: %1",
+            files.join(","));
     }
 
     return contents.isValidToInstall();

@@ -36,7 +36,7 @@ int frequencyToIndex(double value)
 
 double indexToFrequency(int index)
 {
-    return kFrequencies[std::clamp(0, index, kFrequencySteps - 1)];
+    return kFrequencies[std::clamp(index, 0, kFrequencySteps - 1)];
 }
 
 int opacityToIndex(double value)

@@ -91,6 +91,9 @@ bool DeviceAnalyticsBinding::restartAnalytics(const QVariantMap& settings)
 bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
 {
     QnMutexLocker lock(&m_mutex);
+    NX_DEBUG(this, "Updating needed metadata types for the Device %1 (%2) and Engine %3 (%4)",
+        m_device->getUserDefinedName(), m_device->getId(), m_engine->getName(), m_engine->getId());
+
     if (!m_deviceAgent)
     {
         NX_DEBUG(
@@ -102,7 +105,27 @@ bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
         return true;
     }
 
-    return m_deviceAgent->setNeededMetadataTypes(neededMetadataTypes());
+    auto neededMetadataTypes = this->neededMetadataTypes();
+    if (neededMetadataTypes == m_lastMetadataTypes)
+    {
+        NX_DEBUG(this,
+            "Last needed metadata types are equal to the new ones, doing nothing. "
+            "Device %1 (%2), Engine %3 (%4)",
+            m_device->getUserDefinedName(), m_device->getId(),
+            m_engine->getName(), m_engine->getId());
+        return true;
+    }
+
+    NX_DEBUG(this,
+        "Passing new needed metadata types to the DeviceAgent. Device %1 (%2), Engine %3 (%4)",
+        m_device->getUserDefinedName(), m_device->getId(),
+        m_engine->getName(), m_engine->getId());
+
+    const bool result = m_deviceAgent->setNeededMetadataTypes(neededMetadataTypes);
+    if (result)
+        m_lastMetadataTypes = std::move(neededMetadataTypes);
+
+    return result;
 }
 
 bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
@@ -150,7 +173,10 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
 
     setSettingsInternal(settings);
     if (!m_started)
+    {
+        m_lastMetadataTypes = sdk_support::MetadataTypes();
         m_started = m_deviceAgent->setNeededMetadataTypes(neededMetadataTypes());
+    }
 
     return m_started;
 }
@@ -161,6 +187,7 @@ void DeviceAnalyticsBinding::stopAnalyticsUnsafe()
     if (!m_deviceAgent)
         return;
 
+    m_lastMetadataTypes = sdk_support::MetadataTypes();
     m_deviceAgent->setNeededMetadataTypes(sdk_support::MetadataTypes());
 }
 
@@ -336,6 +363,9 @@ bool DeviceAnalyticsBinding::updateDescriptorsWithManifest(
 
 sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
 {
+    NX_DEBUG(this, "Fetching needed metadata types from RuleWatcher for the Device %1 (%2)",
+        m_device->getUserDefinedName(), m_device->getId());
+
     const auto deviceAgentManifest = m_deviceAgent->manifest();
     if (!deviceAgentManifest)
         return {};
@@ -350,6 +380,9 @@ sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
     result.objectTypeIds = nx::analytics::supportedObjectTypeIdsFromManifest(*deviceAgentManifest);
 
     const auto neededEventTypes = ruleWatcher->watchedEventsForResource(m_device->getId());
+    NX_DEBUG(this, "Needed event types for the Device %1 (%2) from RuleWatcher: %3",
+        m_device->getUserDefinedName(), m_device->getId(), neededEventTypes);
+
     for (auto it = result.eventTypeIds.begin(); it != result.eventTypeIds.end();)
     {
         if (!neededEventTypes.contains(*it))
@@ -357,6 +390,24 @@ sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
         else
             ++it;
     }
+
+    // TODO: #dmishin write a normal container toString method.
+    const auto containerToString =
+        [](const auto& container)
+        {
+            QString result("{");
+            for (auto itr = container.cbegin(); itr != container.cend(); ++itr)
+            {
+                result += *itr;
+                if (std::next(itr) != container.cend())
+                    result += ", ";
+            }
+            result += "}";
+            return result;
+        };
+
+    NX_DEBUG(this, "Filtered needed event types list for resource %1 (%2): %3",
+        m_device->getUserDefinedName(), m_device->getId(), containerToString(result.eventTypeIds));
 
     return result;
 }

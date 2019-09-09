@@ -30,6 +30,16 @@ const auto kDebugSampleUuid = QnUuid("cccccccc-cccc-cccc-cccc-cccccccccccc");
 
 namespace nx::vms::client::desktop {
 
+bool UpdateItem::isServer() const
+{
+    return component == Component::server;
+}
+
+bool UpdateItem::isClient() const
+{
+    return component == Component::client;
+}
+
 PeerStateTracker::PeerStateTracker(QObject* parent):
     base_type(parent),
     m_dataLock(QnMutex::Recursive)
@@ -536,9 +546,15 @@ std::map<QnUuid, QnMediaServerResourcePtr> PeerStateTracker::activeServers() con
     NX_MUTEX_LOCKER locker(&m_dataLock);
 
     std::map<QnUuid, QnMediaServerResourcePtr> result;
+    auto filter = m_peersIssued;
     for (const auto& item: m_items)
     {
-        if (item->offline)
+        // We heed such complex filtering to resolve verification tasks during active update.
+        // We have complex logic for tracking servers which have become offline recently. Update
+        // verification (most common user for 'activeServers') should get adjusted data as well.
+        if (filter.empty() && item->offline)
+            continue;
+        else if (!filter.empty() && !filter.contains(item->id))
             continue;
         if (item->component != UpdateItem::Component::server)
             continue;
@@ -563,12 +579,14 @@ QSet<QnUuid> PeerStateTracker::allPeers() const
     return result;
 }
 
-QSet<QnUuid> PeerStateTracker::peersInState(StatusCode state) const
+QSet<QnUuid> PeerStateTracker::peersInState(StatusCode state, bool withClient) const
 {
     NX_MUTEX_LOCKER locker(&m_dataLock);
     QSet<QnUuid> result;
     for (const auto& item: m_items)
     {
+        if (!withClient && item->component == UpdateItem::Component::client)
+            continue;
         if (item->state == state)
             result.insert(item->id);
     }
@@ -1277,6 +1295,8 @@ UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server
         this, &PeerStateTracker::atResourceChanged);
     connect(server.data(), &QnResource::flagsChanged,
         this, &PeerStateTracker::atResourceChanged);
+    connect(server.data(), &QnMediaServerResource::serverFlagsChanged,
+        this, &PeerStateTracker::atResourceChanged);
     connect(server.data(), &QnMediaServerResource::compatibilityChanged,
         this, &PeerStateTracker::atResourceChanged);
     return item;
@@ -1359,6 +1379,14 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
         item->offline = viewAsOffline;
         // TODO: Should take this away, out of the mutex scope.
         emit itemOnlineStatusChanged(item);
+        changed = true;
+    }
+
+    bool hasInternet = server->getServerFlags().testFlag(nx::vms::api::SF_HasPublicIP);;
+    if (hasInternet != item->hasInternet)
+    {
+        NX_INFO(this, "updateServerData() - peer %1 changing hasInternet to %2", item->id, hasInternet);
+        item->hasInternet = hasInternet;
         changed = true;
     }
 

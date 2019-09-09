@@ -1,3 +1,22 @@
+# Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/ #
+
+## Support (in plain terms, can probably be made more friendly) ##
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+EEEEE   X   X    PPPPP    EEEEE    RRRRR    IIIII    M       M   EEEEE    N   N   TTTTT    AA      L
+E        X X     P    P   E        R    R     I      MM     MM   E        NN  N     T     A  A     L
+EEEEE     X      PPPPP    EEEEE    RRRRR      I      M M   M M   EEEEE    N N N     T    AAAAAA    L
+E        X X     P        E        R  R       I      M  M M  M   E        N  NN     T    A    A    L
+EEEEE   X   X    P        EEEEE    R   R    IIIII    M   M   M   EEEEE    N   N     T    A    A    LLLLL
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+  
+    * This is an experimental feature.  
+    * This has not been tested to be functional in unusual or edge cases.
+    * It is not recommended for critical systems.
+    * We can provide some support but knowledge of Docker is expected when using this feature.
+    * In short, we won’t provide support on using Docker itself.  If you don’t already know how to run a container we at the most will send you to the Docker documentation.  But we will put forth reasonable efforts to resolve VMS-related issues that you may stumble upon in a patch or in future releases. No promises, though.  Please, test carefully if you intend to use this on a production system.
+
 # networkoptix-mediaserver #
 
 This is a docker image based on `ubuntu` that runs `networkoptix-mediaserver` with a minimal set of services.
@@ -9,10 +28,10 @@ Building an image from current directory
 You can use build.sh utility:
 
 ```bash
-# Building from existing debian package. It will copy it to build folder and build an image.
+# Building from existing debian package. It will copy it to the build folder and build the image.
 build.sh ~/Downloads/nxwitness-server-4.0.0.28737-linux64-beta-test.deb
 
-# Or using url to debian package. It will download it and build an image.
+# Or using url. It will download the debian package and build the image.
 build.sh https://beta.networkoptix.com/beta-builds/default/28608/linux/nxwitness-server-4.0.0.28608-linux64-beta-prod.deb
 ```
 
@@ -148,6 +167,7 @@ Things that won't invalidate a license:
 NOTE: If your license has been invalidated, it can be reactivated up to 3 times by contacting support
 
 ## Software Updates ##
+
 Both in-client and manual image updates will invalidate licenses.
 
 In-client update:
@@ -157,20 +177,25 @@ Currently in-client update works but not perfectly.
     2.  Input version number and password then click ok
     3.  Click the download button
     4.  Once finished click the install button
-    5.  The install will sit at "Installing..." for some time and then the "Finish Unstall" button will appear
+    5.  The install will sit at "Installing..." for some time and then the "Finish Update" button will appear
     6.  Click the Finish Update button
     7.  Then click yes
     8.  You will now be at the Reconnecting... dialog.  This will also sit in this state.  Click cancel
     9.  This will close the connection to the server
-    10. Stop your contianer
+    10. Stop your container
     11. Start it again
     12. Connect to it via the desktop client
     13. Open up to the in-client update page and you should get an update successful message
     14. You may be disconnected again but connecting once more should work and the updates tab should show the new version
+    Note: At this point if you remove your container and start it again you will lose your update.  The following steps are for making your update permanent.
+    15. Using the docker commit command make an image out of your current container. https://docs.docker.com/engine/reference/commandline/commit/
+    16. Now you can stop and remove your current container.
+    17. Docker run or compose and reference your new image.
+    18. Server should be up and running with new version.
 
 Updating the image itself:
     1. Bring down running container
-    2. Move the copy the DB and recorded video to another folder
+    2. Move the copy of the DB and recorded video to another folder
     3. Remove container
     4. Remove image
     5. Build new image with different server version
@@ -185,13 +210,6 @@ With this Docker container you can run a container on MacOS!  It does come with 
     * "Host" networking will not work as the MacOS puts the Docker container inside a VM, not directly on the main OS.  https://docs.docker.com/docker-for-mac/networking/
     * "Bridge" is probably the best option but for the reasons above requires some manual addition of servers and cameras
 
-## Support (in plain terms, can probably be made more friendly) ##
-
-    * This is an experimental feature.  
-    * This has not been tested to be functional in unusual or edge cases.
-    * It is not recommended for critical systems.
-    * We can provide some support but knowledge of Docker is expected when using this feature.
-    * In short, we won’t provide support on using Docker itself.  If you don’t already know how to run a container we at the most will send you to the Docker documentation.  But we will put forth reasonable efforts to resolve VMS-related issue that you may stumble upon in a patch or in future releases. No promises, though.  Please, test carefully if you intend to use this on a production system.
 
 ## TODO ##
 

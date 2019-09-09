@@ -4,7 +4,7 @@
 
 namespace nx::system_commands {
 
-std::string escapeQuotes(const std::string& arg)
+std::string escapeSingleQuotes(const std::string& arg)
 {
     std::stringstream ss;
     for (const char c: arg)
@@ -18,4 +18,4 @@ std::string escapeQuotes(const std::string& arg)
     return ss.str();
 }
 
-}
+} // namespace nx::system_commands

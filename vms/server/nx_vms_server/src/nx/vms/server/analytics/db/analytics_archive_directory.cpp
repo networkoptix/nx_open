@@ -6,10 +6,10 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <analytics/db/config.h>
+#include <analytics/db/analytics_db_utils.h>
 
 #include "attributes_dao.h"
 #include "object_type_dao.h"
-#include "serializers.h"
 
 namespace nx::analytics::db {
 
@@ -66,7 +66,8 @@ QnTimePeriodList AnalyticsArchiveDirectory::matchPeriods(
     if (deviceIds.empty())
         copyAllDeviceIds(&deviceIds);
 
-    fixFilterRegion(&filter);
+    fixFilter(&filter);
+
 
     // TODO: #ak If there are more than one device given we can apply map/reduce to speed things up.
 
@@ -99,7 +100,7 @@ AnalyticsArchiveDirectory::ObjectTrackMatchResult AnalyticsArchiveDirectory::mat
     if (deviceIds.empty())
         copyAllDeviceIds(&deviceIds);
 
-    fixFilterRegion(&filter);
+    fixFilter(&filter);
     filter.limit = std::min(
         filter.limit > 0 ? filter.limit : kMaxObjectLookupResultSet,
         kMaxObjectLookupResultSet);
@@ -236,8 +237,11 @@ AnalyticsArchiveImpl* AnalyticsArchiveDirectory::openOrGetArchive(
     return archive.get();
 }
 
-void AnalyticsArchiveDirectory::fixFilterRegion(ArchiveFilter* filter)
+void AnalyticsArchiveDirectory::fixFilter(ArchiveFilter* filter)
 {
+    std::sort(filter->allAttributesHash.begin(), filter->allAttributesHash.end());
+    std::sort(filter->objectTypes.begin(), filter->objectTypes.end());
+
     if (filter->region.isEmpty())
         filter->region = kFullRegion;
     else

@@ -67,13 +67,19 @@ GlobalPermissions QnGlobalPermissionsManager::globalPermissions(
     return calculateGlobalPermissions(subject);
 }
 
+bool QnGlobalPermissionsManager::containsPermission(
+    GlobalPermissions globalPermissions,
+    GlobalPermission requiredPermission)
+{
+    return requiredPermission == GlobalPermission::none
+        ? true
+        : globalPermissions.testFlag(requiredPermission);
+}
+
 bool QnGlobalPermissionsManager::hasGlobalPermission(const QnResourceAccessSubject& subject,
     GlobalPermission requiredPermission) const
 {
-    if (requiredPermission == GlobalPermission::none)
-        return true;
-
-    return globalPermissions(subject).testFlag(requiredPermission);
+    return containsPermission(globalPermissions(subject), requiredPermission);
 }
 
 bool QnGlobalPermissionsManager::canSeeAnotherUsers(const Qn::UserAccessData& accessRights) const

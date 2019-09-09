@@ -163,16 +163,6 @@ bool QnVideoCameraGopKeeper::canAcceptData() const
     return true;
 }
 
-static CyclicAllocator gopKeeperKeyFramesAllocator;
-
-static QnAbstractAllocator* getAllocator(size_t frameSize)
-{
-    const static size_t kMaxFrameSize = CyclicAllocator::DEFAULT_ARENA_SIZE / 2;
-    return frameSize < kMaxFrameSize
-        ? static_cast<QnAbstractAllocator*>(&gopKeeperKeyFramesAllocator)
-        : static_cast<QnAbstractAllocator*>(QnSystemAllocator::instance());
-}
-
 void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     if (m_allChannelsMask == 0)
@@ -205,8 +195,7 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
                 || m_lastKeyFrames[ch].back()->timestamp <=
                     video->timestamp - KEEP_IFRAMES_DISTANCE)
             {
-                m_lastKeyFrames[ch].push_back(QnCompressedVideoDataPtr(
-                    video->clone(getAllocator(video->dataSize()))));
+                m_lastKeyFrames[ch].push_back(QnCompressedVideoDataPtr(video->clone()));
             }
 
             while ((!m_lastKeyFrames[ch].empty()
@@ -540,8 +529,6 @@ QnVideoCamera::QnVideoCamera(
     m_settings(settings),
     m_dataProviderFactory(dataProviderFactory),
     m_resource(resource),
-    m_primaryGopKeeper(nullptr),
-    m_secondaryGopKeeper(nullptr),
     m_loStreamHlsInactivityPeriodMS(m_settings.hlsInactivityPeriod() * MSEC_PER_SEC),
     m_hiStreamHlsInactivityPeriodMS(m_settings.hlsInactivityPeriod() * MSEC_PER_SEC)
 {
@@ -560,9 +547,9 @@ QnVideoCameraGopKeeper* QnVideoCamera::getGopKeeper(StreamIndex streamIndex) con
     switch (streamIndex)
     {
         case StreamIndex::primary:
-            return m_primaryGopKeeper;
+            return m_primaryGopKeeper.get();
         case StreamIndex::secondary:
-            return m_secondaryGopKeeper;
+            return m_secondaryGopKeeper.get();
         default:
             break;
     }
@@ -585,14 +572,14 @@ void QnVideoCamera::beforeStop()
         m_secondaryGopKeeper->disconnectFromResource();
 
     if (m_primaryReader) {
-        m_primaryReader->removeDataProcessor(m_primaryGopKeeper);
+        m_primaryReader->removeDataProcessor(m_primaryGopKeeper.get());
         m_liveCacheValidityTimers[MEDIA_Quality_High].restart();
         m_primaryReader->removeDataProcessor(m_liveCache[MEDIA_Quality_High].get());
         m_primaryReader->pleaseStop();
     }
 
     if (m_secondaryReader) {
-        m_secondaryReader->removeDataProcessor(m_secondaryGopKeeper);
+        m_secondaryReader->removeDataProcessor(m_secondaryGopKeeper.get());
         m_liveCacheValidityTimers[MEDIA_Quality_Low].restart();
         m_secondaryReader->removeDataProcessor(m_liveCache[MEDIA_Quality_Low].get());
         m_secondaryReader->pleaseStop();
@@ -611,8 +598,6 @@ QnVideoCamera::~QnVideoCamera()
 {
     beforeStop();
     stop();
-    delete m_primaryGopKeeper;
-    delete m_secondaryGopKeeper;
 }
 
 void QnVideoCamera::at_camera_resourceChanged()
@@ -657,53 +642,53 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 
     QnLiveStreamProviderPtr &reader =
         (streamIndex == StreamIndex::primary) ? m_primaryReader : m_secondaryReader;
+    if (reader)
+        return;
+
+    QnAbstractStreamDataProvider* dataProvider = nullptr;
+    if (streamIndex == StreamIndex::primary
+        || (cameraResource && cameraResource->hasDualStreaming()))
+    {
+        dataProvider = m_dataProviderFactory->createDataProvider(m_resource, role);
+    }
+    if (!dataProvider)
+        return;
+
+    reader = QnLiveStreamProviderPtr(dynamic_cast<QnLiveStreamProvider*>(dataProvider));
     if (!reader)
     {
-        QnAbstractStreamDataProvider* dataProvider = nullptr;
-        if (streamIndex == StreamIndex::primary
-            || (cameraResource && cameraResource->hasDualStreaming()))
-        {
-            dataProvider = m_dataProviderFactory->createDataProvider(m_resource, role);
-        }
-
-        if (dataProvider)
-        {
-            reader = QnLiveStreamProviderPtr(dynamic_cast<QnLiveStreamProvider*>(dataProvider));
-            if (!reader)
-            {
-                delete dataProvider;
-            }
-            else
-            {
-                reader->setOwner(toSharedPointer());
-                // TODO: Make at_camera_resourceChanged async (queued connection, etc.).
-                if (role == Qn::CR_LiveVideo)
-                {
-                    connect(
-                        reader->getResource().data(),
-                        SIGNAL(resourceChanged(const QnResourcePtr&)),
-                        this,
-                        SLOT(at_camera_resourceChanged()),
-                        Qt::DirectConnection);
-                }
-
-                QnVideoCameraGopKeeper* gopKeeper =
-                    new QnVideoCameraGopKeeper(this, m_resource, catalog);
-                if (streamIndex == StreamIndex::primary)
-                    m_primaryGopKeeper = gopKeeper;
-                else
-                    m_secondaryGopKeeper = gopKeeper;
-                reader->addDataProcessor(gopKeeper);
-
-                connect(reader.get(), &QThread::started, this,
-                    [gopKeeper]()
-                    {
-                        gopKeeper->clearVideoData();
-                    },
-                    Qt::DirectConnection);
-            }
-        }
+        delete dataProvider;
+        return;
     }
+
+    reader->setOwner(toSharedPointer());
+    // TODO: Make at_camera_resourceChanged async (queued connection, etc.).
+    if (role == Qn::CR_LiveVideo)
+    {
+        connect(
+            reader->getResource().data(),
+            SIGNAL(resourceChanged(const QnResourcePtr&)),
+            this,
+            SLOT(at_camera_resourceChanged()),
+            Qt::DirectConnection);
+    }
+
+    auto gopKeeper = std::make_unique<QnVideoCameraGopKeeper>(this, m_resource, catalog);
+    reader->addDataProcessor(gopKeeper.get());
+
+    if (streamIndex == StreamIndex::primary)
+        m_primaryGopKeeper = std::move(gopKeeper);
+    else
+        m_secondaryGopKeeper = std::move(gopKeeper);
+
+    connect(reader.get(), &QThread::started, this,
+        [this, streamIndex]()
+        {
+            auto gopKeeper = getGopKeeper(streamIndex);
+            NX_CRITICAL(gopKeeper != nullptr);
+            gopKeeper->clearVideoData();
+        },
+        Qt::DirectConnection);
 }
 
 QnLiveStreamProviderPtr QnVideoCamera::readerByQuality(MediaQuality streamQuality) const
@@ -1138,7 +1123,7 @@ bool QnVideoCamera::ensureLiveCacheStarted(
     {
         const auto minMaxSizeMs = getMinMaxLiveCacheSizeMs(streamQuality);
 
-        NX_INFO(this, "Enabling Live Cache for %1 stream (%2..%3 seconds): %4",
+        NX_INFO(this, "Enabling Live Cache for %1 stream (%2..%3 milliseconds): %4",
             mediaQualityToStreamName(streamQuality),
             minMaxSizeMs.first,
             minMaxSizeMs.second,

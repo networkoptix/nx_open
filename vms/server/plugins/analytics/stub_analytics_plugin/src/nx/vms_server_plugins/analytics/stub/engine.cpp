@@ -308,6 +308,14 @@ std::string Engine::manifestString() const
                                 "defaultValue": 30,
                                 "minValue": 1,
                                 "maxValue": 100000
+                            },
+                            {
+                                "type": "SpinBox",
+                                "name": ")json" + kOverallMetadataDelayMsSetting + R"json(",
+                                "caption": "Overall metadata delay, ms",
+                                "defaultValue": 0,
+                                "minValue": 0,
+                                "maxValue": 1000000000
                             }
                         ]
                     },
@@ -338,7 +346,8 @@ std::string Engine::manifestString() const
                         "name": ")json" + kAdditionalFrameProcessingDelayMs + R"json(",
                         "caption": "Additional frame processing delay, ms",
                         "defaultValue": 0,
-                        "value": 0
+                        "minValue": 0,
+                        "maxValue": 1000000000
                     }
                 ]
             },
@@ -417,8 +426,33 @@ static std::string timestampedObjectMetadataToString(
     if (!metadata)
         return "null";
 
+    std::string attributeString;
+    if (metadata->attributeCount() > 0)
+    {
+        attributeString += "\n    Attributes:\n";
+        for (int i = 0; i < metadata->attributeCount(); ++i)
+        {
+            const Ptr<const IAttribute> attribute = metadata->attribute(i);
+            if (!attribute)
+            {
+                attributeString += "null";
+            }
+            else
+            {
+                attributeString += "        "
+                    + nx::kit::utils::toString(attribute->name())
+                    + ": "
+                    + nx::kit::utils::toString(attribute->value());
+            }
+
+            if (i < metadata->attributeCount() - 1)
+                attributeString += "\n";
+        }
+    }
+
     return nx::kit::utils::format("timestamp: %lld, id: %s",
-        metadata->timestampUs(), UuidHelper::toStdString(metadata->trackId()).c_str());
+        metadata->timestampUs(), UuidHelper::toStdString(metadata->trackId()).c_str())
+        + attributeString;
 }
 
 static std::string objectTrackToString(

@@ -171,7 +171,7 @@ void LensPtzControl::updateState()
     {
         float limit = m_ptzHandler.maxDistance > 0 ? m_ptzHandler.maxDistance : 1.0;
         newValue.horizontal = -m_ptzHandler.position.x() / limit;
-        newValue.vertical = m_ptzHandler.position.y() / limit;
+        newValue.vertical = -m_ptzHandler.position.y() / limit;
     }
 
     Value newOutput = newValue; //< value from handlers and external buttons.

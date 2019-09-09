@@ -78,6 +78,8 @@ public:
     QnResourceTreeModelNodeManager* nodeManager() const;
     QnResourceTreeModelLayoutNodeManager* layoutNodeManager() const;
 
+    bool resetInProgress() const;
+
 private:
     QnResourceTreeModelNodePtr node(const QModelIndex& index) const;
 
@@ -182,6 +184,9 @@ private:
     //Probably turn QnResourceTreeModelUserNodes into such manager too.
     QnResourceTreeModelNodeManager* const m_nodeManager;
     QnResourceTreeModelLayoutNodeManager* const m_layoutNodeManager;
+
+    bool m_resetInProgress = false;
+    int m_userChangedDepth = 0;
 };
 
 Q_DECLARE_METATYPE(QnResourceTreeModel::Scope)
