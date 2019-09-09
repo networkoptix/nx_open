@@ -23,7 +23,7 @@
         <?define vmax = "${vmax}"?>
 
         <?define customization = "${customization}"?>
-        <?define uriProtocol = "${uri.protocol}"?>
+        <?define uriProtocol = "${customization.uriProtocol}"?>
 
         <?define releaseVersionFull = "${release.version}.${buildNumber}"?>
         <?define releaseVersionMajor = "${parsedVersion.majorVersion}"?>

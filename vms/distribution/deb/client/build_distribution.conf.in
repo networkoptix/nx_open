@@ -22,7 +22,7 @@ ARCH="@arch@"
 CPP_RUNTIME_LIBS=( @cpp_runtime_libs_string@ )
 ICU_RUNTIME_LIBS=( @icu_runtime_libs_string@ )
 
-URI_PROTOCOL="@uri.protocol@"
+URI_PROTOCOL="@customization.uriProtocol@"
 INSTALLER_NAME="@installer.name@"
 LAUNCHER_VERSION_FILE="@launcher.version.file@"
 APPLAUNCHER_BINARY_NAME="@applauncher.binary.name@"

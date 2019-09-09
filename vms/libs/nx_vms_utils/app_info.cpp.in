@@ -7,7 +7,7 @@ using namespace nx::vms::utils;
 
 QString AppInfo::nativeUriProtocol()
 {
-    return QStringLiteral("${uri.protocol}");
+    return QStringLiteral("${customization.uriProtocol}");
 }
 
 QString AppInfo::nativeUriProtocolDescription()

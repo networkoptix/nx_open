@@ -40,7 +40,7 @@
             <string>@product.name@ Link</string>
             <key>CFBundleURLSchemes</key>
             <array>
-            <string>@uri.protocol@</string>
+            <string>@customization.uriProtocol@</string>
             </array>
         </dict>
     </array>

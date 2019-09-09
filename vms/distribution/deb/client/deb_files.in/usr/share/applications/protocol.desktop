@@ -8,4 +8,4 @@ Type=Application
 StartupNotify=true
 StartupWMClass=@product.name.short@
 NoDisplay=true
-MimeType=x-scheme-handler/@uri.protocol@
+MimeType=x-scheme-handler/@customization.uriProtocol@
