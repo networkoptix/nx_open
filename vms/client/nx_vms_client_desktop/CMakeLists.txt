@@ -24,7 +24,8 @@ if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
-nx_add_external_resources(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/nx_vms_client_desktop.dat
+set(nx_vms_client_desktop_external_resources_file ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/nx_vms_client_desktop.dat)
+nx_add_external_resources(${nx_vms_client_desktop_external_resources_file}
     ${CMAKE_CURRENT_LIST_DIR}/external_resources
     ${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}
     ${customization_dir}/nx_client_desktop/resources
@@ -40,6 +41,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         "${CMAKE_CURRENT_BINARY_DIR}/client_app_info_impl.cpp"
         ${uic_files}
         ${mac_sources}
+        ${nx_vms_client_desktop_external_resources_file}
     ADDITIONAL_RESOURCES
         "${customization_dir}/license.html"
         "${CMAKE_CURRENT_BINARY_DIR}/globals.json"
