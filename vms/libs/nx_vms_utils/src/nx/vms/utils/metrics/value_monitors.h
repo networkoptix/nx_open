@@ -7,6 +7,9 @@
 
 namespace nx::vms::utils::metrics {
 
+using Duration = std::chrono::milliseconds;
+using ValueIterator = std::function<void(const api::metrics::Value& value, Duration age)>;
+
 /**
  * Allows to monitor parameter value.
  */
@@ -16,10 +19,7 @@ public:
     virtual ~ValueMonitor() = default;
 
     virtual api::metrics::Value current() const = 0;
-    inline double currentN() const { return current().toDouble(); }
-
-    virtual std::vector<nx::utils::TimedValue<api::metrics::Value>> last(
-        std::chrono::milliseconds /*length*/) const { return {}; }
+    virtual void forEach(Duration maxAge, const ValueIterator& iterator) const = 0;
 };
 
 using ValueMonitors = std::map<QString, std::unique_ptr<ValueMonitor>>;
@@ -41,6 +41,7 @@ class RuntimeValueMonitor: public ValueMonitor
 public:
     RuntimeValueMonitor(const ResourceType& resource, const Getter<ResourceType>& getter);
     api::metrics::Value current() const override;
+    void forEach(Duration maxAge, const ValueIterator& iterator) const override;
 
 protected:
     const ResourceType& m_resource;
@@ -60,8 +61,7 @@ public:
         const Watch<ResourceType>& watch);
 
     api::metrics::Value current() const override;
-    std::vector<nx::utils::TimedValue<api::metrics::Value>> last(
-        std::chrono::milliseconds /*length*/) const override;
+    void forEach(Duration maxAge, const ValueIterator& iterator) const override;
 
 private:
     void updateValue();
@@ -90,6 +90,13 @@ api::metrics::Value RuntimeValueMonitor<ResourceType>::current() const
 }
 
 template<typename ResourceType>
+void RuntimeValueMonitor<ResourceType>::forEach(
+    Duration maxAge, const ValueIterator& iterator) const
+{
+    iterator(current(), maxAge);
+}
+
+template<typename ResourceType>
 ValueHistoryMonitor<ResourceType>::ValueHistoryMonitor(
     const ResourceType& resource,
     const Getter<ResourceType>& getter,
@@ -108,10 +115,10 @@ api::metrics::Value ValueHistoryMonitor<ResourceType>::current() const
 }
 
 template<typename ResourceType>
-std::vector<nx::utils::TimedValue<api::metrics::Value>> ValueHistoryMonitor<ResourceType>::last(
-    std::chrono::milliseconds length) const
+void ValueHistoryMonitor<ResourceType>::forEach(
+    Duration maxAge, const ValueIterator& iterator) const
 {
-    return m_history.last(length);
+    m_history.forEach(maxAge, iterator);
 }
 
 template<typename ResourceType>

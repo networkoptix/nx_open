@@ -1,6 +1,7 @@
+
 FROM ubuntu:18.04
 MAINTAINER "Dmitry Kargin" <dkargin@networkoptix.com>
-
+# Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 # This Dockerfile was based on the knowledge from the following sources:
 #  - some words about systemd problems inside docker https://developers.redhat.com/blog/2014/05/05/running-systemd-within-docker-container/ 
 #  - some parts from https://github.com/defn/docker-systemd

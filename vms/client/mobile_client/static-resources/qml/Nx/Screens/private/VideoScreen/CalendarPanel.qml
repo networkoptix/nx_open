@@ -5,12 +5,13 @@ import Nx 1.0
 
 Popup
 {
-    id: calendarPanel
+    id: control
 
     property alias chunkProvider: calendar.chunkProvider
-    property alias date: calendar.date
+    property alias position: calendar.position
+    property alias displayOffset: calendar.displayOffset
 
-    signal datePicked(date date)
+    signal picked(real position)
 
     signal opened()
     signal closed()
@@ -38,7 +39,7 @@ Popup
         id: calendar
         layer.enabled: true
 
-        onDatePicked: calendarPanel.datePicked(date)
+        onPicked: control.picked(position)
         onCloseClicked: close()
     }
 
@@ -97,5 +98,11 @@ Popup
             closed()
     }
 
-    onOpened: contentItem.forceActiveFocus()
+    onOpened:
+    {
+        calendar.resetToCurrentPosition()
+        contentItem.forceActiveFocus()
+    }
+
+    onPicked: close()
 }

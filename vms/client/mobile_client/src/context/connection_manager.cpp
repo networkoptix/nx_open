@@ -475,7 +475,7 @@ bool QnConnectionManagerPrivate::doConnect(
             const auto callbackConnection(QSharedPointer<QMetaObject::Connection>(new QMetaObject::Connection()));
             *callbackConnection = connect(
                 connectionStatus, &QnClientConnectionStatus::stateChanged, this,
-                    [this, callbackConnection, callback](QnConnectionState value)
+                    [callbackConnection, callback](QnConnectionState value)
                     {
                         if (value == QnConnectionState::Connecting)
                         {

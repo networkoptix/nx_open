@@ -98,6 +98,29 @@ public:
         writeArrayEnd();
     }
 
+    void writeJsonValue(const QJsonValue& value) {
+        switch (value.type()) {
+        case QJsonValue::Null:
+            writeNull();
+            break;
+        case QJsonValue::Bool:
+            writeBool(value.toBool());
+            break;
+        case QJsonValue::Double:
+            writeDouble(value.toDouble());
+            break;
+        case QJsonValue::String:
+            writeUtf8String(value.toString());
+            break;
+        case QJsonValue::Array:
+        case QJsonValue::Object:
+        default:
+            NX_ASSERT(false, "Unsupported QJsonValue type");
+            writeNull();
+            break;
+        }
+    }
+
     void writeArrayStart(int size = -1, QnUbjson::Marker type = QnUbjson::InvalidMarker) {
         writeContainerStartInternal<AtArrayStart, AtArrayElement, AtSizedArrayElement, AtTypedSizedArrayElement, AtArrayEnd>(QnUbjson::ArrayStartMarker, size, type);
     }

@@ -6,20 +6,16 @@ Item
 {
     id: control
 
+    property alias displayOffset: timeline.displayOffset
     property alias defaultWindowSize: timeline.defaultWindowSize
-    property alias windowStart: timeline.windowStart
-    property alias windowEnd: timeline.windowEnd
     property alias windowSize: timeline.windowSize
     property alias position: timeline.position
-    property alias positionDate: timeline.positionDate
     property alias chunkBarHeight: timeline.chunkBarHeight
     property alias textY: timeline.textY
     property alias stickToEnd: timeline.stickToEnd
     property alias chunkProvider: timeline.chunkProvider
     property alias startBound: timeline.startBound
-    property alias autoPlay: timeline.autoPlay
     property alias autoReturnToBounds: timeline.autoReturnToBounds
-    property alias serverTimeZoneShift: timeline.serverTimeZoneShift
     property alias motionSearchMode: timeline.motionSearchMode
     property alias changingMotionRoi: timeline.changingMotionRoi
 
@@ -66,8 +62,6 @@ Item
         motionModeChunkColor: ColorTheme.transparent(ColorTheme.green_d2, 0.6)
         motionColor: ColorTheme.red_l2
         motionLoadingColor: ColorTheme.transparent(motionColor, 0.6)
-
-        timeZoneShift: -(new Date()).getTimezoneOffset() * 60 * 1000
 
         font.pixelSize: 15
 

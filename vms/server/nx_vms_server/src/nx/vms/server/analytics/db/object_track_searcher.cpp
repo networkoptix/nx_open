@@ -113,14 +113,6 @@ template void ObjectTrackSearcher::addTimePeriodToFilter<std::chrono::seconds>(
     const TimeRangeFields& timeRangeFields,
     nx::sql::Filter* sqlFilter);
 
-static constexpr char kBoxFilteredTable[] = "%boxFilteredTable%";
-static constexpr char kFromBoxFilteredTable[] = "%fromBoxFilteredTable%";
-static constexpr char kJoinBoxFilteredTable[] = "%joinBoxFilteredTable%";
-static constexpr char kObjectFilteredByTextExpr[] = "%objectFilteredByText%";
-static constexpr char kObjectExpr[] = "%objectExpr%";
-static constexpr char kLimitObjectCount[] = "%limitObjectCount%";
-static constexpr char kObjectOrderByTrackStart[] = "%objectOrderByTrackStart%";
-
 std::optional<ObjectTrack> ObjectTrackSearcher::fetchTrackById(
     nx::sql::QueryContext* queryContext,
     const QnUuid& trackGuid)

@@ -18,8 +18,11 @@ namespace nx::vms::client::core {
 class UserWatcher;
 class TwoWayAudioController;
 class OperationManager;
+class ServerTimeWatcher;
 
 } // namespace nx::vms::client::core
+
+using nx::vms::client::core::ServerTimeWatcher;
 
 namespace nx::client::mobile {
 class QmlSettingsAdaptor;
@@ -62,6 +65,9 @@ class QnContext: public QObject, public QnConnectionContextAware
     Q_PROPERTY(int rightCustomMargin READ rightCustomMargin NOTIFY customMarginsChanged)
     Q_PROPERTY(int topCustomMargin READ topCustomMargin NOTIFY customMarginsChanged)
     Q_PROPERTY(int bottomCustomMargin READ bottomCustomMargin NOTIFY customMarginsChanged)
+
+    Q_PROPERTY(bool serverTimeMode READ serverTimeMode WRITE setServerTimeMode
+        NOTIFY serverTimeModeChanged)
 
 public:
     QnContext(QObject *parent = NULL);
@@ -134,7 +140,11 @@ public:
     int topCustomMargin() const;
     int bottomCustomMargin() const;
 
+    bool serverTimeMode() const;
+    void setServerTimeMode(bool value);
+
 signals:
+    void serverTimeModeChanged();
     void autoLoginEnabledChanged();
     void showCameraInfoChanged();
     void deviceStatusBarHeightChanged();
@@ -148,7 +158,7 @@ private:
     QnMobileAppInfo* const m_appInfo;
     QnMobileClientUiController* const m_uiController;
     QnCloudUrlHelper* const m_cloudUrlHelper;
-
+    ServerTimeWatcher* const m_timeWatcher;
     QString m_localPrefix;
     QMargins m_customMargins;
 };
