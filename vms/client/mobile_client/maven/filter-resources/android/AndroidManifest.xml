@@ -2,7 +2,7 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="auto"
-    package="${android.packageName}"
+    package="${customization.mobile.android.packageName}"
     android:versionCode="${project.version.code}"
     android:versionName="${project.version.name}.${project.version.code}">
 
