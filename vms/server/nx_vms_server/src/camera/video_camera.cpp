@@ -1123,7 +1123,7 @@ bool QnVideoCamera::ensureLiveCacheStarted(
     {
         const auto minMaxSizeMs = getMinMaxLiveCacheSizeMs(streamQuality);
 
-        NX_INFO(this, "Enabling Live Cache for %1 stream (%2..%3 seconds): %4",
+        NX_INFO(this, "Enabling Live Cache for %1 stream (%2..%3 milliseconds): %4",
             mediaQualityToStreamName(streamQuality),
             minMaxSizeMs.first,
             minMaxSizeMs.second,
