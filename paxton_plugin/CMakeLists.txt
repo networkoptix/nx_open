@@ -56,8 +56,8 @@ include(option)
 include(windows_signing)
 
 set(minilauncher.binary.name "${product.name} Launcher.exe") #< Cannot include properties.cmake.
-set(paxtonDriverOutputName "${paxtonLibraryName}.OemDvrMiniDriver")
-set(paxtonDriverIntermediateName "${paxtonLibraryName}.OemDvrMiniDriver.mini")
+set(paxtonDriverOutputName "${customization.paxton.libraryName}.OemDvrMiniDriver")
+set(paxtonDriverIntermediateName "${customization.paxton.libraryName}.OemDvrMiniDriver.mini")
 
 if(NOT sync_result STREQUAL "0")
     message(FATAL_ERROR "error: Packages sync failed")
