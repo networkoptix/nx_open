@@ -195,7 +195,7 @@ if platform.system() == 'Linux':
                 pass
             [close(self.fds[name][i]) for (name, i) in (('stdin', 1), ('stdout', 0), ('stderr', 0))]
 
-elif platform.system() == 'Windows':
+elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
     class DeviceConnection:
         class DeviceConnectionResult:
             def __init__(self, return_code, command=None, message=None):
