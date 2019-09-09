@@ -16,9 +16,15 @@ QDir externalResourcesDirectory()
         return QDir("assets:/translations");
 
     const auto rootDir = QDir(QCoreApplication::applicationDirPath());
-    return nx::utils::AppInfo::isMacOsX()
-        ? QDir(rootDir.absoluteFilePath("../Resources"))
-        : rootDir;
+    // Final destination of external resources is different on macOS.
+    if (nx::utils::AppInfo::isMacOsX())
+    {
+        auto resourcesDir = QDir(rootDir.absoluteFilePath("../Resources"));
+        // There is no Resources directory in developer mode, avoid failing on the assert later.
+        if (resourcesDir.exists())
+            return resourcesDir;
+    }
+    return rootDir;
 }
 
 bool registerExternalResource(const QString& filename)

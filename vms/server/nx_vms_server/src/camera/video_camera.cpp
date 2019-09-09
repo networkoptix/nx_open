@@ -202,9 +202,9 @@ void VideoCamera::createReader(QnServer::ChunksCatalog catalog)
     {
         connect(
             reader->getResource().data(),
-            SIGNAL(resourceChanged(const QnResourcePtr&)),
+            &QnResource::resourceChanged,
             this,
-            SLOT(at_camera_resourceChanged()),
+            &VideoCamera::at_camera_resourceChanged,
             Qt::DirectConnection);
     }
 
@@ -647,7 +647,7 @@ bool VideoCamera::ensureLiveCacheStarted(
     {
         const auto minMaxSizeMs = getMinMaxLiveCacheSizeMs(streamQuality);
 
-        NX_INFO(this, "Enabling Live Cache for %1 stream (%2..%3 seconds): %4",
+        NX_INFO(this, "Enabling Live Cache for %1 stream (%2..%3 milliseconds): %4",
             mediaQualityToStreamName(streamQuality),
             minMaxSizeMs.first,
             minMaxSizeMs.second,

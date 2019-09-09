@@ -200,6 +200,7 @@ QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(QString,       readUtf8String, w
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(QnLatin1Array, readUtf8String, writeUtf8String)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(std::string,   readUtf8String, writeUtf8String)
 QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(QByteArray,    readBinaryData, writeBinaryData)
+QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(QJsonValue,    readJsonValue,  writeJsonValue)
 #undef QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS
 
 
@@ -219,20 +220,28 @@ bool deserialize(QnUbjsonReader<Input> *stream, TYPE *target) {                 
 //QN_DEFINE_INTEGER_CONVERSION_UBJSON_SERIALIZATION_FUNCTIONS(quint64, qint64)
 #undef QN_DEFINE_INTEGER_CONVERSION_UBJSON_SERIALIZATION_FUNCTIONS
 
-template<class Output>
-void serialize(const std::chrono::milliseconds &value, QnUbjsonWriter<Output> *stream)
-{
-    stream->writeInt64(value.count());
+#ifndef Q_MOC_RUN
+#define QN_DEFINE_UBJSON_CHRONO_SERIALIZATION_FUNCTIONS(TYPE)                   \
+template<class Output>                                                          \
+void serialize(const std::chrono::TYPE &value, QnUbjsonWriter<Output> *stream)  \
+{                                                                               \
+    stream->writeInt64(value.count());                                          \
+}                                                                               \
+                                                                                \
+template<class Input>                                                           \
+bool deserialize(QnUbjsonReader<Input> *stream, std::chrono::TYPE *target)      \
+{                                                                               \
+    qint64 tmp = 0;                                                             \
+    bool result = stream->readInt64(&tmp);                                      \
+    *target = std::chrono::TYPE(tmp);                                           \
+    return result;                                                              \
 }
 
-template<class Input>
-bool deserialize(QnUbjsonReader<Input> *stream, std::chrono::milliseconds *target)
-{
-    qint64 tmp = 0;
-    bool result = stream->readInt64(&tmp);
-    *target = std::chrono::milliseconds(tmp);
-    return result;
-}
+QN_DEFINE_UBJSON_CHRONO_SERIALIZATION_FUNCTIONS(seconds)
+QN_DEFINE_UBJSON_CHRONO_SERIALIZATION_FUNCTIONS(milliseconds)
+QN_DEFINE_UBJSON_CHRONO_SERIALIZATION_FUNCTIONS(microseconds)
+#undef QN_DEFINE_UBJSON_CHRONO_SERIALIZATION_FUNCTIONS
+#endif
 
 
 #define QN_DEFINE_COLLECTION_UBJSON_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG, IMPL) \

@@ -2,6 +2,8 @@
 
 #include "timestamped_object_metadata.h"
 
+#include <nx/kit/debug.h>
+
 namespace nx {
 namespace sdk {
 namespace analytics {
@@ -33,7 +35,15 @@ const char* TimestampedObjectMetadata::subtype() const
 
 const IAttribute* TimestampedObjectMetadata::getAttribute(int index) const
 {
-    return m_objectMetadata->attribute(index).get();
+    if (index >= m_objectMetadata->attributeCount() || index < 0)
+        return nullptr;
+
+    const Ptr<const IAttribute> attribute = m_objectMetadata->attribute(index);
+    if (!NX_KIT_ASSERT(attribute))
+        return nullptr;
+
+    attribute->addRef();
+    return attribute.get();
 }
 
 int TimestampedObjectMetadata::attributeCount() const
