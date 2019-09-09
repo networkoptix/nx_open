@@ -143,6 +143,12 @@ def load_configs(config_file):
     return config, sys_config
 
 
+def log_exception(contextName, exception):
+    # TODO: Fix: traceback produces SyntaxError exception with pyinstaller on Linux.
+    #logging.error(traceback.format_exc())
+    logging.error(f'Exception: {contextName}: {type(exception)}: {str(exception)}')
+
+
 @click.command()
 @click.option('--config', 'config_file', default='vms_benchmark.conf', help='Input config file.')
 @click.option('-C', 'config_file', default='vms_benchmark.conf', help='Input config file.')
@@ -153,8 +159,8 @@ def main(config_file):
 
         if not res.success:
             raise exceptions.HostPrerequisiteFailed(
-                "ERROR: sshpass is not in PATH" +
-                " (check it is installed, for install on Ubuntu: `sudo apt install sshpass`)." +
+                "ERROR: sshpass is not on PATH" +
+                " (check if it is installed; to install on Ubuntu: `sudo apt install sshpass`)." +
                 f"Details for the error: {res.formatted_message()}"
             )
 
@@ -328,7 +334,7 @@ def main(config_file):
             )
             print(f"    Spawned {test_cameras_count} test cameras.")
         except Exception as exception:
-            logging.error(traceback.format_exc())
+            log_exception('TestCameraRunner.spawn()', exception)
             raise exceptions.TestCameraError(f"Unexpected error during spawning cameras: {str(exception)}")
 
         def wait_test_cameras_discovered(timeout, duration):
@@ -366,7 +372,7 @@ def main(config_file):
 
             camera_id = cameras[0].id
         except Exception as e:
-            logging.error(traceback.format_exc())
+            log_exception('Discovering cameras', e)
             raise exceptions.TestCameraError(f"Cameras are not discovered.", e)
 
         try:
@@ -436,7 +442,7 @@ def main(config_file):
             print(f"    Free RAM: {round(ram_free/1024/1024)}M")
         except exceptions.TestCameraStreamingError as exception:
             print(f"\nISSUE: {str(exception)}")
-            logging.error(traceback.format_exc())
+            log_exception("ISSUE", exception)
             return 1
         finally:
             stream.release()
@@ -445,31 +451,35 @@ def main(config_file):
     return 0
 
 
+def nx_print_exception(exception):
+    if isinstance(exception, exceptions.VmsBenchmarkError):
+        print(f"{str(exception)}", file=sys.stderr)
+        if exception.original_exception:
+            print('Caused by:', file=sys.stderr)
+            nx_print_exception(exception.original_exception)
+    elif isinstance(exception, urllib.error.HTTPError):
+        if exception.code == 401:
+            print(f'Server refuses passed credentials: check .conf options vmsUser and vmsPassword.', file=sys.stderr)
+        else:
+            print(f'Unexpected HTTP request error (code {exception.code}.', file=sys.stderr)
+    else:
+        print(f'ERROR: {exception}')
+
+
 if __name__ == '__main__':
+    print("VMS Benchmark started")
     try:
+        logging.info('VMS Benchmark started')
         try:
             sys.exit(main())
         except urllib.error.HTTPError as e:
-            print(e.code)
+            print(f'ERROR: Server reported HTTP code {e.code}')
         except exceptions.VmsBenchmarkError as e:
-            def nx_print_exception(exception):
-                if isinstance(exception, exceptions.VmsBenchmarkError):
-                    print(f"{str(exception)}", file=sys.stderr)
-                    if exception.original_exception:
-                        print('Caused by:\n    ', file=sys.stderr, end='')
-                        nx_print_exception(exception.original_exception)
-                elif isinstance(exception, urllib.error.HTTPError):
-                    if exception.code == 401:
-                        print(f'Server refuses passed credentials: check vmsUser/vmsPassword.', file=sys.stderr)
-                    else:
-                        print(f'Unexpected HTTP request error (code {exception.code}.', file=sys.stderr)
-                else:
-                    print("ERROR: Internal error occurred.")
-            logging.error(traceback.format_exc())
-            print('ERROR: ', file=sys.stderr, end='')
+            print(f'ERROR: ', file=sys.stderr, end='')
             nx_print_exception(e)
+            log_exception('ERROR', e)
     except Exception as e:
-        print('ERROR: Internal error occurred.', file=sys.stderr)
-        logging.error(traceback.format_exc())
+        print(f'INTERNAL ERROR: {e}', file=sys.stderr)
+        log_exception('INTERNAL ERROR', e)
     finally:
         sys.exit(1)
