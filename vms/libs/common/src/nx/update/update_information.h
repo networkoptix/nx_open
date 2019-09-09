@@ -308,6 +308,9 @@ struct UpdateContents
      */
     bool isEmpty() const;
 
+    /** Checks if peer has update package. */
+    bool peerHasUpdate(const QnUuid& id) const;
+
     /**
      * Compares this update info with 'other' and decides whether we should pick other one.
      * @return True if we need to pick 'other' update.

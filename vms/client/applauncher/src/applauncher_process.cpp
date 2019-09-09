@@ -98,13 +98,6 @@ void ApplauncherProcess::initChannels()
             startApplication(request, response);
         });
 
-    subscribe(TaskType::startApplication,
-        [this](const StartApplicationTask& request, Response& response)
-        {
-            m_installationManager->updateInstalledVersionsInformation();
-            startApplication(request, response);
-        });
-
     subscribe(TaskType::installZip,
         [this](const InstallZipTask& request, Response& response)
         {
@@ -244,7 +237,9 @@ bool ApplauncherProcess::startApplication(
     const QString binPath = installation->executableFilePath();
     QStringList environment = QProcess::systemEnvironment();
 
-    auto arguments = task.arguments;
+    QStringList arguments;
+    for (const auto& serialized: task.arguments)
+        arguments.append(serialized.split(QRegularExpression("\\s+"), QString::SkipEmptyParts));
 
     if (QnAppInfo::applicationPlatform() == "linux")
     {

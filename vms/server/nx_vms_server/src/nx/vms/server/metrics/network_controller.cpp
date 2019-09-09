@@ -42,32 +42,32 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
 {
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
-            api::metrics::Label{
-                "info", "Info"
-            },
+            api::metrics::Label(
+                "info"
+            ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest{"name", "Name", "table&panel", ""},
+                api::metrics::ValueManifest({"name"}, api::metrics::Display::both),
                 [](const auto& r) { return Value(r.name); }
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest{"server", "Server", "table&panel", ""},
+                api::metrics::ValueManifest({"server"}, api::metrics::Display::both),
                 [this](const auto&) { return Value(m_serverId); }
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest{"ip", "IP", "table&panel", ""},
+                api::metrics::ValueManifest({"ip", "IP"}, api::metrics::Display::both),
                 [](const auto& r) { return Value(r.address.toString()); }
             )
         ),
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
-            api::metrics::Label{
+            api::metrics::Label(
                 "rates", "I/O rates"
-            },
+            ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest{"in", "IN rate", "table&panel", "bps"},
+                api::metrics::ValueManifest({"in", "IN rate"}, api::metrics::Display::both, "bps"),
                 [](const auto&) { return Value(); } // TODO: Implement.
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest{"out", "OUT rate", "table&panel", "bps"},
+                api::metrics::ValueManifest({"out", "OUT rate"}, api::metrics::Display::both, "bps"),
                 [](const auto&) { return Value(); } // TODO: Implement.
             )
         )

@@ -321,7 +321,7 @@ bool verifyUpdateContents(
         }
 
         // Prohibiting updates to previous version.
-        if (serverVersion < targetVersion && server->isOnline())
+        if (serverVersion < targetVersion)
         {
             contents.alreadyInstalled = false;
             contents.peersWithUpdate.insert(id);

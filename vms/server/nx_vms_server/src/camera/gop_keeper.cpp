@@ -56,16 +56,6 @@ bool GopKeeper::canAcceptData() const
     return true;
 }
 
-static CyclicAllocator gopKeeperKeyFramesAllocator;
-
-static QnAbstractAllocator* getAllocator(size_t frameSize)
-{
-    const static size_t kMaxFrameSize = CyclicAllocator::DEFAULT_ARENA_SIZE / 2;
-    return frameSize < kMaxFrameSize
-        ? static_cast<QnAbstractAllocator*>(&gopKeeperKeyFramesAllocator)
-        : static_cast<QnAbstractAllocator*>(QnSystemAllocator::instance());
-}
-
 void GopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     if (m_allChannelsMask == 0)
@@ -98,8 +88,7 @@ void GopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
                 || m_lastKeyFrames[ch].back()->timestamp <=
                     video->timestamp - kKeepIframesDistance)
             {
-                m_lastKeyFrames[ch].push_back(QnCompressedVideoDataPtr(
-                    video->clone(getAllocator(video->dataSize()))));
+                m_lastKeyFrames[ch].push_back(QnCompressedVideoDataPtr(video->clone()));
             }
 
             while ((!m_lastKeyFrames[ch].empty()

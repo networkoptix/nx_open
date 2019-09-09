@@ -6,6 +6,25 @@
 
 namespace nx::vms::api::metrics::test {
 
+TEST(Metrics, Declarations)
+{
+    const auto expectEq =
+        [](const auto& v, const QString& s) { EXPECT_EQ(QJson::serialized(v), s); };
+
+    expectEq(
+        ValueManifest({"status"}),
+        R"j({"display":"","id":"status","name":"Status","unit":""})j");
+    expectEq(
+        ValueManifest({"ip", "IP"}),
+        R"j({"display":"","id":"ip","name":"IP","unit":""})j");
+    expectEq(
+        ValueManifest({"model"}, Display::panel),
+        R"j({"display":"panel","id":"model","name":"Model","unit":""})j");
+    expectEq(
+        ValueManifest({"fps", "FPS"}, Display::both, "fps"),
+        R"j({"display":"table|panel","id":"fps","name":"FPS","unit":"fps"})j");
+}
+
 template<typename T>
 void expectSerialization(const QByteArray& expectedJson, const T& value)
 {
@@ -54,12 +73,12 @@ TEST(Metrics, Rules)
     {
         auto status = servers["availability"]["status"];
         ASSERT_EQ(status.alarms.size(), 1);
-        EXPECT_EQ(status.alarms[0].level, "danger");
+        EXPECT_EQ(status.alarms[0].level, AlarmLevel::danger);
         EXPECT_EQ(status.alarms[0].condition, "ne status 'Online'");
 
         auto events = servers["availability"]["offlineEvents"];
         ASSERT_EQ(events.alarms.size(), 1);
-        EXPECT_EQ(events.alarms[0].level, "warning");
+        EXPECT_EQ(events.alarms[0].level, AlarmLevel::warning);
         EXPECT_EQ(events.alarms[0].condition, "gt offlineEvents 0");
     }
 
@@ -67,9 +86,9 @@ TEST(Metrics, Rules)
     {
         auto status = cameras["info"]["status"];
         ASSERT_EQ(status.alarms.size(), 2);
-        EXPECT_EQ(status.alarms[0].level, "warning");
+        EXPECT_EQ(status.alarms[0].level, AlarmLevel::warning);
         EXPECT_EQ(status.alarms[0].condition, "eq status 'Unauthorized'");
-        EXPECT_EQ(status.alarms[1].level, "danger");
+        EXPECT_EQ(status.alarms[1].level, AlarmLevel::danger);
         EXPECT_EQ(status.alarms[1].condition, "eq status 'Offline'");
     }
 
@@ -82,16 +101,16 @@ static const QByteArray kManifestExample(R"json({
         "id": "availability",
         "name": "Availability",
         "values": [
-            { "id": "name", "name": "Name", "display": "table&panel" },
-            { "id": "status", "name": "Status", "display": "table&panel" },
-            { "id": "offlineEvents", "name": "Offline Events", "display": "table&panel" }
+            { "id": "name", "name": "Name", "display": "table|panel" },
+            { "id": "status", "name": "Status", "display": "table|panel" },
+            { "id": "offlineEvents", "name": "Offline Events", "display": "table|panel" }
         ]
     }, {
         "id": "load",
         "name": "Load",
         "values": [
-            { "id": "totalCpuUsageP", "name": "CPU Usage", "unit": "%", "display": "table&panel" },
-            { "id": "serverCpuUsageP", "name": "CPU Usage (VMS Server)", "unit": "%", "display": "table&panel" }
+            { "id": "totalCpuUsageP", "name": "CPU Usage", "unit": "%", "display": "table" },
+            { "id": "serverCpuUsageP", "name": "CPU Usage (VMS Server)", "unit": "%", "display": "panel" }
         ]
     }
   ],
@@ -100,17 +119,17 @@ static const QByteArray kManifestExample(R"json({
         "id": "info",
         "name": "Info",
         "values": [
-            { "id": "name", "name": "Name", "display": "table&panel" },
-            { "id": "server", "name": "Server", "display": "table&panel" },
-            { "id": "type", "name": "Type", "display": "table&panel" },
-            { "id": "ip", "name": "IP", "display": "table&panel" }
+            { "id": "name", "name": "Name", "display": "table|panel" },
+            { "id": "server", "name": "Server", "display": "table|panel" },
+            { "id": "type", "name": "Type", "display": "" },
+            { "id": "ip", "name": "IP", "display": "table|panel" }
         ]
     }, {
         "id": "issues",
         "name": "Issues",
         "values": [
-            { "id": "offlineEvents", "name": "Offline Events", "display": "table&panel" },
-            { "id": "streamIssues", "name": "Stream Issues (1h)", "display": "table&panel" }
+            { "id": "offlineEvents", "name": "Offline Events", "display": "table|panel" },
+            { "id": "streamIssues", "name": "Stream Issues (1h)", "display": "table|panel" }
         ]
     }
   ]
@@ -133,17 +152,17 @@ TEST(Metrics, Manifest)
         const auto name = availability.values[0];
         EXPECT_EQ(name.id, "name");
         EXPECT_EQ(name.name, "Name");
-        EXPECT_EQ(name.display, "table&panel");
+        EXPECT_EQ(name.display, Displays(Display::both));
 
         const auto status = availability.values[1];
         EXPECT_EQ(status.id, "status");
         EXPECT_EQ(status.name, "Status");
-        EXPECT_EQ(status.display, "table&panel");
+        EXPECT_EQ(status.display, Displays(Display::both));
 
         const auto events = availability.values[2];
         EXPECT_EQ(events.id, "offlineEvents");
         EXPECT_EQ(events.name, "Offline Events");
-        EXPECT_EQ(events.display, "table&panel");
+        EXPECT_EQ(events.display, Displays(Display::both));
 
         const auto load = servers[1];
         EXPECT_EQ(load.id, "load");
@@ -154,7 +173,13 @@ TEST(Metrics, Manifest)
         EXPECT_EQ(cpuUsage.id, "totalCpuUsageP");
         EXPECT_EQ(cpuUsage.name, "CPU Usage");
         EXPECT_EQ(cpuUsage.unit, "%");
-        EXPECT_EQ(cpuUsage.display, "table&panel");
+        EXPECT_EQ(cpuUsage.display, Displays(Display::table));
+
+        const auto serverCpuUsage = load.values[1];
+        EXPECT_EQ(serverCpuUsage.id, "serverCpuUsageP");
+        EXPECT_EQ(serverCpuUsage.name, "CPU Usage (VMS Server)");
+        EXPECT_EQ(serverCpuUsage.unit, "%");
+        EXPECT_EQ(serverCpuUsage.display, Displays(Display::panel));
     }
 
     auto cameras = manifest["cameras"];
@@ -168,12 +193,12 @@ TEST(Metrics, Manifest)
         const auto server = info.values[1];
         EXPECT_EQ(server.id, "server");
         EXPECT_EQ(server.name, "Server");
-        EXPECT_EQ(server.display, "table&panel");
+        EXPECT_EQ(server.display, Displays(Display::both));
 
         const auto type = info.values[2];
         EXPECT_EQ(type.id, "type");
         EXPECT_EQ(type.name, "Type");
-        EXPECT_EQ(type.display, "table&panel");
+        EXPECT_EQ(type.display, Displays(Display::none));
     }
 
     expectSerialization(kManifestExample, manifest);
@@ -309,25 +334,25 @@ TEST(Metrics, Alarms)
     const auto s1 = alarms[0];
     EXPECT_EQ(s1.resource, "SERVER_UUID_1");
     EXPECT_EQ(s1.parameter, "load.totalCpuUsageP");
-    EXPECT_EQ(s1.level, "danger");
+    EXPECT_EQ(s1.level, AlarmLevel::danger);
     EXPECT_EQ(s1.text, "CPU Usage is 95%");
 
     const auto s2 = alarms[1];
     EXPECT_EQ(s2.resource, "SERVER_UUID_2");
     EXPECT_EQ(s2.parameter, "availability.status");
-    EXPECT_EQ(s2.level, "danger");
+    EXPECT_EQ(s2.level, AlarmLevel::danger);
     EXPECT_EQ(s2.text, "Status is Offline");
 
     const auto c1 = alarms[2];
     EXPECT_EQ(c1.resource, "CAMERA_UUID_1");
     EXPECT_EQ(c1.parameter, "primaryStream.targetFps");
-    EXPECT_EQ(c1.level, "warning");
+    EXPECT_EQ(c1.level, AlarmLevel::warning);
     EXPECT_EQ(c1.text, "Actual FPS is 30");
 
     const auto c2 = alarms[3];
     EXPECT_EQ(c2.resource, "CAMERA_UUID_3");
     EXPECT_EQ(c2.parameter, "issues.offlineEvents");
-    EXPECT_EQ(c2.level, "warning");
+    EXPECT_EQ(c2.level, AlarmLevel::warning);
     EXPECT_EQ(c2.text, "Offline Events is 2");
 }
 

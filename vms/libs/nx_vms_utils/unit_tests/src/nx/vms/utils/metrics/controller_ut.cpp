@@ -44,10 +44,10 @@ TEST_F(MetricsControllerTest, Manifest)
 
     EXPECT_EQ(group1.values[0].id, "i");
     EXPECT_EQ(group1.values[0].name, "int parameter");
-    EXPECT_EQ(group1.values[0].display, "table&panel");
+    EXPECT_EQ(group1.values[0].display, api::metrics::Displays(api::metrics::Display::both));
     EXPECT_EQ(group1.values[1].id, "t");
     EXPECT_EQ(group1.values[1].name, "text parameter");
-    EXPECT_EQ(group1.values[1].display, "panel");
+    EXPECT_EQ(group1.values[1].display, api::metrics::Displays(api::metrics::Display::panel));
 
     const auto group2 = testManifest[1];
     EXPECT_EQ(group2.id, "g2");
@@ -56,10 +56,10 @@ TEST_F(MetricsControllerTest, Manifest)
 
     EXPECT_EQ(group2.values[0].id, "i");
     EXPECT_EQ(group2.values[0].name, "int parameter");
-    EXPECT_EQ(group2.values[0].display, "panel");
+    EXPECT_EQ(group2.values[0].display, api::metrics::Displays(api::metrics::Display::table));
     EXPECT_EQ(group2.values[1].id, "t");
     EXPECT_EQ(group2.values[1].name, "text parameter");
-    EXPECT_EQ(group2.values[1].display, "table&panel");
+    EXPECT_EQ(group2.values[1].display, api::metrics::Displays(api::metrics::Display::both));
 }
 
 TEST_F(MetricsControllerTest, CurrentValues)

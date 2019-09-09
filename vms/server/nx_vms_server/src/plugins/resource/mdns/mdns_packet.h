@@ -114,8 +114,10 @@ struct QnMdnsTextData
         Presence presence = Presence::absent;
         QByteArray value = {};
 
-        QString toString() const {
-            switch (presence) {
+        QString toString() const
+        {
+            switch (presence)
+            {
                 case Presence::absent: return "<absent>";
                 case Presence::noValue: return "<noValue>";
                 case Presence::withValue: return value.isEmpty() ? "<emptyValue>" : value;
