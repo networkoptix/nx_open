@@ -17,13 +17,11 @@ function(get_cloud_host cloudGroup customization result_variable)
 endfunction()
 
 function(set_cloud_hosts)
-    set(cloud_hosts_json ${PACKAGES_DIR}/any/cloud_hosts/cloud_hosts.json)
     set(cloud_hosts_cmake ${CMAKE_BINARY_DIR}/cloud_hosts.cmake)
-    if(${cloud_hosts_json} IS_NEWER_THAN ${cloud_hosts_cmake})
-        execute_process(COMMAND ${PYTHON_EXECUTABLE}
-            ${build_utils_dir}/json_to_cmake.py
-            ${cloud_hosts_json} ${cloud_hosts_cmake} -p cloud_hosts)
-    endif()
+    nx_json_to_cmake(
+        ${PACKAGES_DIR}/any/cloud_hosts/cloud_hosts.json
+        ${cloud_hosts_cmake}
+         cloud_hosts)
 
     if(customCloudHost STREQUAL "")
         include(${cloud_hosts_cmake})

@@ -109,9 +109,6 @@ include(strip_target)
 include(vms_protocol_version)
 include(customization_package)
 
-include(customization/default-values.cmake)
-include(${customization_dir}/customization.cmake)
-
 if(useMetaVersion)
     set(metaVersion R15)
 endif()

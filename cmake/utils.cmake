@@ -279,3 +279,11 @@ function(nx_find_first_matching_file var glob)
     endif()
     set(${var} ${file} PARENT_SCOPE)
 endfunction()
+
+function(nx_json_to_cmake json cmake prefix)
+    if(${json} IS_NEWER_THAN ${cmake})
+        execute_process(COMMAND ${PYTHON_EXECUTABLE}
+            ${build_utils_dir}/json_to_cmake.py
+            ${json} ${cmake} -p ${prefix})
+    endif()
+endfunction()

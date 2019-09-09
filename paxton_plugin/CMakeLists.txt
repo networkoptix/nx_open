@@ -48,8 +48,6 @@ include(${depenencies_cmake_file})
 
 include(utils)
 include(customization_package)
-include(${repositoryRootDir}/customization/default-values.cmake)
-include(${customization_dir}/customization.cmake)
 
 include(cloud_host)
 include(output_directories)
