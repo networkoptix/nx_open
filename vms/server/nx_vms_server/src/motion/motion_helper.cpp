@@ -29,12 +29,12 @@ void QnMotionHelper::remove(const QnResourcePtr& res)
         return;
 
     QnMutexLocker lock(&m_mutex);
-    auto left = m_writers.lower_bound(MotionArchiveKey(networkResource, 0));
-    auto right = m_writers.upper_bound(MotionArchiveKey(networkResource, CL_MAX_CHANNELS));
+    const auto left = m_writers.lower_bound(MotionArchiveKey(networkResource, 0));
+    const auto right = m_writers.upper_bound(MotionArchiveKey(networkResource, CL_MAX_CHANNELS));
     m_writers.erase(left, right);
 }
 
-QnMotionArchive* QnMotionHelper::getArchive(const QnResourcePtr& res, int channel)
+QnMotionArchivePtr QnMotionHelper::getArchive(const QnResourcePtr& res, int channel)
 {
     QnMutexLocker lock( &m_mutex );
     QnNetworkResourcePtr netres = qSharedPointerDynamicCast<QnNetworkResource>(res);
@@ -42,17 +42,16 @@ QnMotionArchive* QnMotionHelper::getArchive(const QnResourcePtr& res, int channe
         return 0;
     auto itr = m_writers.find(MotionArchiveKey(netres, channel));
     if (itr != m_writers.end())
-        return itr->second.get();
+        return itr->second;
 
-    auto writer = std::make_unique<QnMotionArchive>(m_dataDir, netres->getUniqueId(), channel);
-    auto result = writer.get();
-    m_writers.emplace(MotionArchiveKey(netres, channel), std::move(writer));
-    return result;
+    auto writer = std::make_shared<QnMotionArchive>(m_dataDir, netres->getUniqueId(), channel);
+    m_writers.emplace(MotionArchiveKey(netres, channel), writer);
+    return writer;
 }
 
 void QnMotionHelper::saveToArchive(const QnConstMetaDataV1Ptr& data)
 {
-    QnMotionArchive* archive = getArchive(data->dataProvider->getResource(), data->channelNumber);
+    auto archive = getArchive(data->dataProvider->getResource(), data->channelNumber);
     if (archive)
         archive->saveToArchive(data);
 
@@ -60,7 +59,7 @@ void QnMotionHelper::saveToArchive(const QnConstMetaDataV1Ptr& data)
 
 QnMotionArchiveConnectionPtr QnMotionHelper::createConnection(const QnResourcePtr& res, int channel)
 {
-    QnMotionArchive* archive = getArchive(res, channel);
+    auto archive = getArchive(res, channel);
     if (archive)
         return archive->createConnection();
     else
@@ -90,7 +89,7 @@ QnTimePeriodList QnMotionHelper::matchImage(const QnChunksRequestData& request)
         {
             for (int i = 0; i < motionRegions.size(); ++i)
             {
-                QnMotionArchive* archive = getArchive(res, i);
+                auto archive = getArchive(res, i);
                 if (archive)
                 {
                     timePeriods.push_back(archive->matchPeriod(

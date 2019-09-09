@@ -26,8 +26,7 @@ public:
     QnTimePeriodList matchImage(const QnChunksRequestData& request);
     QnMotionArchiveConnectionPtr createConnection(const QnResourcePtr& res, int channel);
 
-    QnMotionArchive* getArchive(const QnResourcePtr& res, int channel);
-
+    QnMotionArchivePtr getArchive(const QnResourcePtr& res, int channel);
     void remove(const QnResourcePtr& res);
 
     QnMotionHelper();
@@ -35,10 +34,9 @@ private:
 
     // create Find mask by region
     void createMask(const QRegion& region);
-
 private:
     typedef QPair<QnNetworkResourcePtr, int> MotionArchiveKey;
-    typedef std::map<MotionArchiveKey, std::unique_ptr<QnMotionArchive>> MotionWriters;
+    typedef std::map<MotionArchiveKey, QnMotionArchivePtr> MotionWriters;
     MotionWriters m_writers;
     QnMutex m_mutex;
 };
