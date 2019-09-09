@@ -1,3 +1,4 @@
+from vms_benchmark import exceptions
 from os import pipe, fdopen, close, environ, dup2, execvpe, kill, waitpid
 import time
 import sys
@@ -84,12 +85,19 @@ if platform.system() == 'Linux':
                     print("Worker process exited unexpectedly", file=sys.stderr)
                     sys.exit(1)
 
+            self.host_key = None
+            self.ip = None
+            self.local_ip = None
+            self.is_root = False
+
+        def obtain_connection_info(self):
             # Obtain device ip address
             ssh_connection_info = self.eval('echo $SSH_CONNECTION').strip().split()
             self.ip = ssh_connection_info[2]
             self.local_ip = ssh_connection_info[0]
+            self.is_root = self.eval('id -u') == '0'
 
-        def _wait_finish_marker(self, stdout_cb=None, stderr_cb=None, timeout=15):
+        def _wait_finish_marker(self, stdout_cb=None, stderr_cb=None, timeout=15.):
             started_at = time.time()
             right_sequence = [chr(3)]
             while time.time() - started_at < timeout:
@@ -116,10 +124,17 @@ if platform.system() == 'Linux':
             self.stdin.write("\n")
             return self._wait_finish_marker(stderr_cb=lambda _d: False, timeout=timeout)
 
-        def sh(self, command, timeout=3, stdout=sys.stdout, stderr=sys.stderr):
+        def sh(self, command, timeout=3, su=False, exc=False, stdout=sys.stdout, stderr=sys.stderr):
+            command_wrapped = command if self.is_root or not su else f'sudo -n {command}'
+
             if not self._ping():
-                return self.DeviceConnectionResult(None, "Remove executor is not responding (before execution)")
-            self.stdin.write(command)
+                message = f'Remote executor is not responding before command `{command_wrapped}`.'
+                if exc:
+                    raise exceptions.DeviceCommandError(message=message)
+                else:
+                    return self.DeviceConnectionResult(None, message)
+
+            self.stdin.write(command_wrapped)
             self.stdin.write("\n")
 
             def out_print(d):
@@ -135,25 +150,42 @@ if platform.system() == 'Linux':
                 return True
 
             if not self._wait_finish_marker(stdout_cb=out_print, stderr_cb=err_print, timeout=timeout):
-                return self.DeviceConnectionResult(None, "Remote executor is not responding (after execution)")
+                message = f'Remote executor is not responding after command `{command_wrapped}`.'
+                if exc:
+                    raise exceptions.DeviceCommandError(message=message)
+                else:
+                    return self.DeviceConnectionResult(None, message)
+
             time.sleep(0.01)
             [out_print(line) for line in self.stdout.readlines()]
             self.stdin.write("echo $?\n")
             if not self._wait_finish_marker(stderr_cb=err_print, timeout=0.1):
-                return self.DeviceConnectionResult(None, "Can't obtain return code of the command")
-            return self.DeviceConnectionResult(int(''.join(self.stdout.readlines())))
+                message = f"Can't obtain return code of the command {command_wrapped}"
+                if exc:
+                    raise exceptions.DeviceCommandError(message=message)
+                else:
+                    return self.DeviceConnectionResult(None, message)
 
-        def eval(self, cmd, timeout=3, stderr=sys.stderr):
+            return_code = int(''.join(self.stdout.readlines()))
+
+            if return_code != 0 and exc:
+                raise exceptions.DeviceCommandError(
+                    message=f'Command `{command_wrapped}` failed with code {return_code}'
+                )
+
+            return self.DeviceConnectionResult(return_code)
+
+        def eval(self, cmd, timeout=3, su=False, stderr=sys.stderr):
             out = StringIO()
-            res = self.sh(cmd, stdout=out, stderr=stderr, timeout=timeout)
+            res = self.sh(cmd, su=su, stdout=out, stderr=stderr, timeout=timeout)
 
             if not res:
                 return None
 
             return out.getvalue().strip()
 
-        def get_file_content(self, path, stderr=sys.stderr, timeout=15):
-            return self.eval(f'cat "{path}"', stderr=stderr, timeout=timeout)
+        def get_file_content(self, path, su=False, stderr=sys.stderr, timeout=15):
+            return self.eval(f'cat "{path}"', su=su, stderr=stderr, timeout=timeout)
 
         def __del__(self):
             try:
@@ -166,7 +198,7 @@ if platform.system() == 'Linux':
 elif platform.system() == 'Windows':
     class DeviceConnection:
         class DeviceConnectionResult:
-            def __init__(self, return_code, message=None):
+            def __init__(self, return_code, command=None, message=None):
                 self.message = message
                 self.return_code = return_code
 
@@ -182,11 +214,11 @@ elif platform.system() == 'Windows':
             self.login = login
             self.password = password
             if password:
-                self.ssh_command = [
+                self._ssh_command = [
                     'plink',
                     '-batch',
                     "-pw", password,
-                    '-P', port,
+                    '-P', str(port),
                     f"{login}@{host}" if login else host,
                     'sh'
                 ]
@@ -200,15 +232,30 @@ elif platform.system() == 'Windows':
                 #    'sh'
                 #]
             else:
-                self.ssh_command = ['ssh', f"-p{port}", f"{login}@{host}" if login else host, 'sh']
+                self._ssh_command = ['plink', '-batch', '-P', str(port), f"{login}@{host}" if login else host, 'sh']
+
+            self.host_key = None
+            self.ip = None
+            self.local_ip = None
+            self.is_root = False
+
+        def obtain_connection_info(self):
             # Obtain device ip address
             ssh_connection_info = self.eval('echo $SSH_CONNECTION').strip().split()
             self.ip = ssh_connection_info[2]
             self.local_ip = ssh_connection_info[0]
+            self.is_root = self.eval('id -u') == '0'
+
+        def ssh_command(self):
+            res = self._ssh_command.copy()
+            if self.host_key:
+                res.insert(2, '-hostkey')
+                res.insert(3, self.host_key)
+            return res
 
         _SH_DEFAULT = object()
 
-        def sh(self, command, timeout=3, stdout=_SH_DEFAULT, stderr=_SH_DEFAULT):
+        def sh(self, command, timeout=3, su=False, exc=False, stdout=sys.stdout, stderr=sys.stderr):
             opts = {
                 'stdin': subprocess.PIPE
             }
@@ -216,12 +263,17 @@ elif platform.system() == 'Windows':
                 opts['stdout'] = subprocess.PIPE
             if stderr != self._SH_DEFAULT:
                 opts['stderr'] = subprocess.PIPE
+            command_wrapped = command if self.is_root or not su else f"sudo -n {command}"
             try:
-                proc = subprocess.Popen(self.ssh_command, **opts)
-                out, err = proc.communicate(f"{command}\n".encode('UTF-8'), timeout)
+                proc = subprocess.Popen(self.ssh_command(), **opts)
+                out, err = proc.communicate(f"{command_wrapped}\n".encode('UTF-8'), timeout)
                 proc.stdin.close()
             except subprocess.TimeoutExpired:
-                print('TimeoutExpired')
+                message = f'Timeout {timeout} seconds expired'
+                if exc:
+                    raise exceptions.DeviceCommandError(message=message)
+                else:
+                    return self.DeviceConnectionResult(None, message)
 
             if stdout != self._SH_DEFAULT:
                 write_method = getattr(stdout, 'write', None)
@@ -232,19 +284,24 @@ elif platform.system() == 'Windows':
                 if callable(write_method):
                     stderr.write(err.decode('UTF-8'))
 
-            return self.DeviceConnectionResult(proc.returncode)
+            if exc and proc.returncode != 0:
+                raise exceptions.DeviceCommandError(
+                    message=f'Command `{command_wrapped}` failed with code {proc.returncode}'
+                )
 
-        def eval(self, cmd, timeout=3, stderr=_SH_DEFAULT):
+            return self.DeviceConnectionResult(proc.returncode, command=command_wrapped)
+
+        def eval(self, cmd, timeout=3, su=False, stderr=sys.stderr):
             out = StringIO()
-            res = self.sh(cmd, stdout=out, stderr=stderr, timeout=timeout)
+            res = self.sh(cmd, su=su, stdout=out, stderr=stderr, timeout=timeout)
 
             if not res:
                 return None
 
             return out.getvalue().strip()
 
-        def get_file_content(self, path, stderr=sys.stderr, timeout=15):
-            return self.eval(f'cat "{path}"', stderr=stderr, timeout=timeout)
+        def get_file_content(self, path, su=False, stderr=sys.stderr, timeout=15):
+            return self.eval(f'cat "{path}"', su=su, stderr=stderr, timeout=timeout)
 
 else:
     raise Exception("ERROR: OS is unsupported.")

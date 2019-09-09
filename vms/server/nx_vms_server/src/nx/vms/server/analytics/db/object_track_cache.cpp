@@ -191,7 +191,6 @@ void ObjectTrackCache::updateObject(
     {
         trackContext.track.deviceId = packet.deviceId;
         trackContext.track.id = objectMetadata.trackId;
-        trackContext.track.objectTypeId = objectMetadata.typeId;
         trackContext.track.firstAppearanceTimeUs = packet.timestampUs;
 
         trackContext.lastReportTime = nx::utils::monotonicTime();
@@ -201,6 +200,9 @@ void ObjectTrackCache::updateObject(
         trackContext.modified = true;
         m_timerPool.removeTimer(trackContext.track.id);
     }
+
+    if (trackContext.track.objectTypeId.isEmpty())
+        trackContext.track.objectTypeId = objectMetadata.typeId;
 
     if (objectMetadata.bestShot)
     {

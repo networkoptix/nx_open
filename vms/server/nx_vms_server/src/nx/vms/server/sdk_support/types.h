@@ -23,4 +23,9 @@ struct MetadataTypes
     std::set<QString> objectTypeIds;
 };
 
+inline bool operator==(const MetadataTypes& lhs, const MetadataTypes& rhs)
+{
+    return lhs.eventTypeIds == rhs.eventTypeIds && lhs.objectTypeIds == rhs.objectTypeIds;
+}
+
 } // namespace nx::vms::server::sdk_support
