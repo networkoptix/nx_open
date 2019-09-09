@@ -202,9 +202,9 @@ void VideoCamera::createReader(QnServer::ChunksCatalog catalog)
     {
         connect(
             reader->getResource().data(),
-            SIGNAL(resourceChanged(const QnResourcePtr&)),
+            &QnResource::resourceChanged,
             this,
-            SLOT(at_camera_resourceChanged()),
+            &VideoCamera::at_camera_resourceChanged,
             Qt::DirectConnection);
     }
 
