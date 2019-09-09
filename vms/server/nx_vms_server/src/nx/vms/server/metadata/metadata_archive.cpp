@@ -384,7 +384,8 @@ void MetadataArchive::loadDataFromIndexDesc(
             --i;
         }
         totalSteps -= readed / recordSize();
-        recordNumberToSeek = std::max(0, recordNumberToSeek - qMin(totalSteps, kRecordsPerIteration));
+        recordNumberToSeek = std::max(
+            0, recordNumberToSeek - std::min(totalSteps, kRecordsPerIteration));
 
     }
 }
