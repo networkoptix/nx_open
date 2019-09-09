@@ -44,10 +44,6 @@ class Camera:
         if 200 <= response.code < 300:
             return True
 
-        from pprint import pprint
-        pprint(json.loads(response.read()))
-        #print(f"{json.loads(response.read())}", file=sys.stderr)
-
         return False
 
     def recorded_time_periods(self):
@@ -83,12 +79,7 @@ class Camera:
         if 200 <= response.code < 300:
             return True
 
-        from pprint import pprint
-        pprint(json.loads(response.read()))
-        #print(f"{json.loads(response.read())}", file=sys.stderr)
-
         return False
-        "/ec2/recordedTimePeriods"
 
     def disable_recording(self):
         return self.enable_recording(False)

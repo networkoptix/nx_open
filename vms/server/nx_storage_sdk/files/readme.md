@@ -72,16 +72,16 @@ build_samples_arm32.sh
 ```
 
 On Windows, after CMake generation phase, Visual Studio GUI can be used to compile a sample:
-open `..\nx_storage_sdk-build\<sample_name>\<sample_name>.sln` and build the `ALL_BUILD` project. Make
+open `..\storage_sdk-build\<sample_name>\<sample_name>.sln` and build the `ALL_BUILD` project. Make
 sure that the platform combo-box is set to "x64".
 
 After successful build, locate the built artifacts:
 ```
 # Windows:
-..\nx_storage_sdk-build\<sample_name>\Debug\<sample_name>.dll
+..\storage_sdk-build\<sample_name>\Debug\<sample_name>.dll
 
 # Linux:
-../nx_storage_sdk-build/<sample_name>/lib<sample_name>.so
+../storage_sdk-build/<sample_name>/lib<sample_name>.so
 ```
 
 To install a plugin, just copy its library file to the dedicated folder in the VMS Server
@@ -100,13 +100,13 @@ ATTENTION: After copying a plugin library, the Server has to be restarted.
 
 Plugin libraries compiled using nx_storage_sdk 1.7.1 (which has been included with VMS 3.2) are
 compatible with VMS 4.0, because the binary interface (ABI) did not change. The same way, plugins
-compiled with this newer nx_storage_sdk should work with VMS 3.2 as well.
+compiled with this newer storage_sdk should work with VMS 3.2 as well.
 
-The current nx_sdk version (coming with VMS 4.0) has no new features or extensions to the API
+The current storage_sdk version (coming with VMS 4.0) has no new features or extensions to the API
 available for the plugins in nx_storage_sdk 1.7.1 (coming with VMS 3.2).
 
 Re-compiling the source code of plugins written with nx_storage_sdk 1.7.1 using this newer
-nx_storage_sdk requires some simple adjustments due the following breaking changes in SDK source
+storage_sdk requires some simple adjustments due the following breaking changes in SDK source
 code:
 
 - Changed prototypes of the base interface `class PluginInterface` methods (does not affect binary

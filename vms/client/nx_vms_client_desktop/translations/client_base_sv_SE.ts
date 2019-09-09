@@ -7249,7 +7249,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>Hej</translation>
+      <translation>Hög</translation>
     </message>
     <message>
       <source>Bst</source>

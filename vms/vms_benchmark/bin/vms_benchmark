@@ -6,9 +6,8 @@ import sys
 import time
 import logging
 import traceback
-from sys import exit
 
-logging.basicConfig(filename='nx_box_tool.log', filemode='w', level=logging.DEBUG)
+logging.basicConfig(filename='vms_benchmark.log', filemode='w', level=logging.DEBUG)
 
 # This block ensures that ^C interrupts are handled quietly.
 try:
@@ -45,26 +44,24 @@ project_root = osp.dirname(osp.dirname(osp.realpath(__file__)))
 if osp.isfile(osp.join(project_root, ".not_installed")):
     sys.path.insert(0, osp.join(project_root, "lib"))
 
-from nx_box_tool.config import ConfigParser
-from nx_box_tool.device_connection import DeviceConnection
-from nx_box_tool.platform import Platform
-from nx_box_tool.server import Server
-from nx_box_tool.server_api import ServerApi
-from nx_box_tool.test_camera_runner import TestCameraRunner
-from nx_box_tool import exceptions
+from vms_benchmark.config import ConfigParser
+from vms_benchmark.device_connection import DeviceConnection
+from vms_benchmark.device_platform import DevicePlatform
+from vms_benchmark.vms_scanner import VmsScanner
+from vms_benchmark.server_api import ServerApi
+from vms_benchmark.test_camera_runner import TestCameraRunner
+from vms_benchmark.linux_distibution import LinuxDistributionDetector
+from vms_benchmark import device_tests
+from vms_benchmark import host_tests
+from vms_benchmark import exceptions
 
+import urllib
 import click
 import cv2
 import os
 
 
-@click.command()
-def main():
-    """Program for test device to ability of run Nx VMS on it."""
-    if platform.system() == 'Linux' and os.system('sshpass -h >/dev/null 2>&1') != 0:
-        print("ERROR: sshpass not found.", file=sys.stderr)
-        return 1
-
+def load_configs(config_file):
     option_descriptions = {
         "deviceHost": {
             "type": 'string'
@@ -95,7 +92,7 @@ def main():
         }
     }
 
-    config = ConfigParser('nx_box_tool.conf', option_descriptions)
+    config = ConfigParser(config_file, option_descriptions)
 
     sys_option_descriptions = {
         "testCameraBin": {
@@ -133,7 +130,7 @@ def main():
         },
     }
 
-    sys_config = ConfigParser('.nx_box_tool.ini', sys_option_descriptions)
+    sys_config = ConfigParser('.vms_benchmark.ini', sys_option_descriptions)
 
     if sys_config['testCameraBin']:
         TestCameraRunner.binary_file = sys_config['testCameraBin']
@@ -143,6 +140,26 @@ def main():
         TestCameraRunner.test_file_low_resolution = sys_config['testFileLowResolution']
     TestCameraRunner.debug = sys_config['testCameraDebug']
 
+    return config, sys_config
+
+
+@click.command()
+@click.option('--config', 'config_file', default='vms_benchmark.conf', help='Input config file.')
+@click.option('-C', 'config_file', default='vms_benchmark.conf', help='Input config file.')
+def main(config_file):
+    """Program for test device to ability of run Nx VMS on it."""
+    if platform.system() == 'Linux':
+        res = host_tests.SshPassInstalled().call()
+
+        if not res.success:
+            raise exceptions.HostPrerequisiteFailed(
+                "ERROR: sshpass is not in PATH" +
+                " (check it is installed, for install on Ubuntu: `sudo apt install sshpass`)." +
+                f"Details for the error: {res.formatted_message()}"
+            )
+
+    config, sys_config = load_configs(config_file)
+
     device = DeviceConnection(
         host=config['deviceHost'],
         login=config.get('deviceLogin', None),
@@ -150,9 +167,37 @@ def main():
         port=config['deviceSshPort']
     )
 
-    print(f"Device IP: {device.ip}")
+    res = device_tests.SshHostKeyIsKnown(device).call()
 
-    dev_platform = Platform.gather(device)
+    if not res.success:
+        raise exceptions.SshHostKeyObtainingFailed(
+            f"Can't obtain SSH host key of the box.\nDetails of the error: {res.formatted_message()}"
+        )
+    else:
+        device.host_key = res.details[0]
+        device.obtain_connection_info()
+
+    if not device.is_root:
+        res = device_tests.SudoConfigured(device).call()
+
+        if not res.success:
+            raise exceptions.SshHostKeyObtainingFailed(
+                'Sudo is not configured properly, check that user is root or could run `sudo true` ' +
+                'without typing password.' +
+                f"Details of the error: {res.formatted_message()}"
+            )
+
+    print(f"Device IP: {device.ip}")
+    if device.is_root:
+        print(f"SSH user is root.")
+
+    linux_distribution = LinuxDistributionDetector.detect(device)
+
+    print(f"Linux distribution name: {linux_distribution.name}")
+    print(f"Linux distribution version: {linux_distribution.version}")
+    print(f"Linux kernel version: {'.'.join(str(c) for c in linux_distribution.kernel_version)}")
+
+    dev_platform = DevicePlatform.gather(device, linux_distribution)
 
     print(f"Arch: {dev_platform.arch}")
     print(f"Number of CPUs: {dev_platform.cpu_number}")
@@ -165,38 +210,37 @@ def main():
         dev_platform.storages_list.items()
     ]
 
-    server = Server.detect(device)
+    vmses = VmsScanner.scan(device, linux_distribution)
 
-    if server.has_vms():
+    if vmses and len(vmses) > 0:
         print(f"Detected VMS installations:")
-        for vms in server.vmses:
-            print(f"    {vms.customization} in {vms.dir} (port {vms.port}, PID {vms.pid})")
+        for vms in vmses:
+            print(f"    {vms.customization} in {vms.dir} (port {vms.port}, PID {vms.pid if vms.pid else '-'})")
     else:
         print("There is no VMSes found on the device.")
         print("Nothing to do.")
         return 0
 
-    if len(server.vmses) > 1:
+    if len(vmses) > 1:
         raise exceptions.DeviceStateError("More than one customizations found.")
 
-    vms = server.vmses[0]
+    vms = vmses[0]
 
     if not vms.is_up():
         raise exceptions.DeviceStateError("VMS is not running currently.")
 
     print('Restarting server...')
-    res = device.sh(f"sudo service {vms.customization}-mediaserver restart", timeout=30)
-
-    if not res or res.return_code != 0:
-        raise exceptions.ServerError("Unable to restart Server: restart command had failed.")
+    vms.restart(exc=True)
 
     def wait_for_server_up(timeout=30):
         started_at = time.time()
 
         while True:
-            res = Server.detect(device)
+            global vmses
 
-            if res.has_vms() and res.vmses[0].is_up():
+            vmses = VmsScanner.scan(device, linux_distribution)
+
+            if vmses and len(vmses) > 0 and vmses[0].is_up():
                 break
 
             if time.time() - started_at > timeout:
@@ -204,15 +248,14 @@ def main():
 
             time.sleep(0.5)
 
-        time.sleep(5)
-        return res
+        time.sleep(5)  # TODO: Investigate this sleep
 
-    server = wait_for_server_up()
+        return True
 
-    if not server:
+    if not wait_for_server_up():
         raise exceptions.ServerError("Unable to restart Server: Server was not upped.")
 
-    vms = server.vmses[0]
+    vms = vmses[0]
     print('Server restarted successfully.')
     print(f"Free space of RAM: {round(dev_platform.ram_free()/1024/1024)}M of {round(dev_platform.ram/1024/1024)}M")
 
@@ -248,7 +291,10 @@ def main():
     }
 
     for test_cameras_count in config.get('testCamerasTestSequence', [1, 2, 3, 4, 6, 8, 10, 15, 20, 40, 80, 160, 256]):
-        if dev_platform.ram_available() < (
+        ram_available = dev_platform.ram_available()
+        ram_free = ram_available if ram_available else dev_platform.ram_free()
+
+        if ram_available and ram_available < (
                 test_cameras_count * memory_per_camera_by_arch.get(dev_platform.arch, 200)*1024*1024
         ):
             raise exceptions.InsuficientResourcesError(
@@ -289,7 +335,7 @@ def main():
 
             print(f"    Waiting for test cameras discovering... (timeout is {discovering_timeout} seconds)")
             if not wait_test_cameras_discovered(discovering_timeout, 3):
-                raise exceptions.TestCameraError(f"Failed to discover {test_cameras_count} test cameras: timeout ended")
+                raise exceptions.TestCameraError('Timeout expired.')
 
             print("    All test cameras had been discovered successfully.")
 
@@ -303,9 +349,9 @@ def main():
                     raise exceptions.TestCameraError(f"Error enabling recording on camera {camera.id}: request failed.")
 
             camera_id = cameras[0].id
-        except Exception:
+        except Exception as e:
             logging.error(traceback.format_exc())
-            raise exceptions.TestCameraError(f"Cameras are not discovered due to undefined reasons.")
+            raise exceptions.TestCameraError(f"Cameras are not discovered.", e)
 
         try:
             stream_opening_started_at = time.time()
@@ -361,13 +407,21 @@ def main():
                     break
                 last_pts = pts
                 last_ts = time.time()
+            import pprint
+            log_events = api.get_events(streaming_started_at)
+            storage_failure_events_count = sum(
+                event['aggregationCount']
+                for event in log_events
+                if event['eventParams'].get('eventType', None) == 'storageFailureEvent'
+            )
             print(f"    Frame drops: {frame_drops}")
+            print(f"    Storage failures: {storage_failure_events_count}")
             print(f"    CPU usage: {device.eval('cat /proc/loadavg').split()[1]}")
-            print(f"    Free RAM: {round(dev_platform.ram_available()/1024/1024)}M")
+            print(f"    Free RAM: {round(ram_free/1024/1024)}M")
         except exceptions.TestCameraStreamingError as exception:
             print(f"\nISSUE: {str(exception)}")
             logging.error(traceback.format_exc())
-            return
+            return 1
         finally:
             stream.release()
 
@@ -379,10 +433,27 @@ if __name__ == '__main__':
     try:
         try:
             sys.exit(main())
-        except exceptions.NxBoxToolError as e:
-            print(f"ERROR: {str(e)}", file=sys.stderr)
+        except urllib.error.HTTPError as e:
+            print(e.code)
+        except exceptions.VmsBenchmarkError as e:
+            def nx_print_exception(exception):
+                if isinstance(exception, exceptions.VmsBenchmarkError):
+                    print(f"{str(exception)}", file=sys.stderr)
+                    if exception.original_exception:
+                        print('Caused by:\n    ', file=sys.stderr, end='')
+                        nx_print_exception(exception.original_exception)
+                elif isinstance(exception, urllib.error.HTTPError):
+                    if exception.code == 401:
+                        print(f'Server refuses passed credentials: check vmsUser/vmsPassword.', file=sys.stderr)
+                    else:
+                        print(f'Unexpected HTTP request error (code {exception.code}.', file=sys.stderr)
+                else:
+                    print("ERROR: Internal error occurred.")
+            logging.error(traceback.format_exc())
+            print('ERROR: ', file=sys.stderr, end='')
+            nx_print_exception(e)
     except Exception as e:
-        print('ERROR: Unexpected error occurred.', file=sys.stderr)
+        print('ERROR: Internal error occurred.', file=sys.stderr)
         logging.error(traceback.format_exc())
     finally:
         sys.exit(1)
