@@ -32,7 +32,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         ${uic_files}
         ${mac_sources}
     ADDITIONAL_RESOURCES
-        "${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}"
+        "${CMAKE_CURRENT_LIST_DIR}/skins/${customization.skin}"
         "${customization_dir}/nx_client_desktop/resources"
         "${customization_dir}/icons/all/logo.png"
         "${customization_dir}/license.html"
