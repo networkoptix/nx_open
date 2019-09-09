@@ -1,8 +1,9 @@
 #pragma once
 
+#include <QtCore/QDateTime>
 #include <QtCore/QLocale>
 #include <QtCore/QString>
-#include <QtCore/QDateTime>
+#include <QtCore/QSharedPointer>
 
 namespace datetime {
 
