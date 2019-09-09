@@ -119,8 +119,7 @@ bool dumpStringToFile(
     QFile f(absoluteFilePath);
     if (!f.open(QFile::WriteOnly))
     {
-        NX_DEBUG(logTag,
-            "Unable to dump string to file: unable to open %1");
+        NX_DEBUG(logTag, "Unable to dump string to file: unable to open %1", absoluteFilePath);
         return false;
     }
 
@@ -137,7 +136,8 @@ bool dumpStringToFile(
         if (f.write("\n") < 0)
         {
             NX_DEBUG(logTag,
-                "Unable to dump string to file: unable to write trailing end-of-line symbol");
+                "Unable to dump string to file %1: unable to write trailing end-of-line symbol",
+                absoluteFilePath);
             return false;
         }
     }
