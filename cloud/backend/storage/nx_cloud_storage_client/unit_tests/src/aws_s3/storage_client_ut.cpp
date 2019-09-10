@@ -42,6 +42,12 @@ protected:
         whenUploadMediaChunk();
     }
 
+    void givenUploadedCameraInfo()
+    {
+        whenSaveRandomCameraInfo();
+        thenCameraInfoIsSaved();
+    }
+
     void whenOpenStorageClient()
     {
         m_client.open(
@@ -269,7 +275,7 @@ TEST_F(AwsS3StorageContentClient, camera_info_is_uploaded)
 
 TEST_F(AwsS3StorageContentClient, camera_info_is_downloaded)
 {
-    whenSaveRandomCameraInfo();
+    givenUploadedCameraInfo();
     whenDownloadCameraInfo();
     thenExpectedCameraInfoIsDownloaded();
 }
