@@ -14,6 +14,12 @@ namespace {
 
 static const QString kVariableMark("%");
 
+template<typename Duration>
+double seconds(Duration duration)
+{
+    return double(duration.count()) * double(Duration::period::num) / double(Duration::period::den);
+}
+
 class FormulaBuilder
 {
 public:
@@ -120,11 +126,11 @@ public:
         return nullptr;
     }
 
-    template<typename Operation> //< Value(std::vector<TimedValue<Value>>)
+    template<typename Operation> //< Value(void(Value, std::chrono::duration) forEach)
     ValueGenerator durationOperation(int valueI, int durationI, Operation operation) const
     {
         return
-            [operation, monitor = monitor(valueI), getDuration = value(durationI)]
+            [operation = std::move(operation), monitor = monitor(valueI), getDuration = value(durationI)]
             {
                 const auto durationStr = getDuration().toVariant().toString();
                 const auto duration = nx::utils::parseTimerDuration(durationStr);
@@ -137,6 +143,45 @@ public:
             };
     }
 
+    template<typename Condition> //< bool(Value)
+    ValueGenerator durationCount(int valueI, int durationI, Condition condition) const
+    {
+        return durationOperation(
+            valueI, durationI,
+            [condition = std::move(condition)](const auto& forEach)
+            {
+                size_t count = 0;
+                forEach([&](const auto& v, auto) { count += condition(v) ? 1 : 0; });
+                return (double) count;
+            });
+    }
+
+    template<typename Extraction> // double(double value, double durationS)
+    ValueGenerator durationExtraction(int valueI, int durationI, Extraction extraction) const
+    {
+        return durationOperation(
+            valueI, durationI,
+            [extraction = std::move(extraction)](const auto& forEach)
+            {
+                double maxAgeS = 0;
+                double total = 0;
+                double lastValue = 0;
+                double lastAgeS = 0;
+                forEach(
+                    [&](const auto& value, auto time)
+                    {
+                        const double ageS = seconds(time);
+                        maxAgeS = std::max(ageS, maxAgeS);
+                        total += extraction(lastValue, lastAgeS - ageS);
+                        lastValue = value.toDouble();
+                        lastAgeS = ageS;
+                    });
+
+                total += extraction(lastValue, lastAgeS);
+                return total ? api::metrics::Value(total / maxAgeS) : api::metrics::Value();
+            });
+    }
+
     ValueGenerator getDurationOperation() const
     {
         if (function() == "history") // value duration
@@ -146,40 +191,22 @@ public:
                 [](const auto& forEach)
                 {
                     QJsonObject items;
-                    forEach(
-                        [&](const auto& value, auto interval)
-                        {
-                            const auto s = std::chrono::duration_cast<std::chrono::seconds>(interval);
-                            items[QString::number(s.count())] = value;
-                        });
+                    forEach([&](const auto& v, auto a) { items[QString::number(seconds(a))] = v; });
                     return items;
                 });
         }
 
         if (function() == "count") // value duration
-        {
-            return durationOperation(
-                1, 2,
-                [](const auto& forEach)
-                {
-                    size_t count = 0;
-                    forEach([&](const auto&, auto) { count++; });
-                    return (double) count;
-                });
-        }
+            return durationCount(1, 2, [](const auto&) { return true; });
 
         if (function() == "countValues") // value duration expected
-        {
-            return durationOperation(
-                1, 2,
-                [getExpected = value(3)](const auto& forEach)
-                {
-                    const auto expected = getExpected();
-                    size_t count = 0;
-                    forEach([&](const auto& value, auto) { count += (value == expected) ? 1 : 0; });
-                    return (double) count;
-                });
-        }
+            return durationCount(1, 2, [expected = value(3)](const auto& v) { return v == expected(); });
+
+        if (function() == "average") // value duration
+            return durationExtraction(1, 2, [](double v, double d) { return v * d; });
+
+        if (function() == "perSecond") // value duration
+            return durationExtraction(1, 2, [](double v, double) { return v; });
 
         return nullptr;
     }

@@ -108,27 +108,83 @@ TEST_F(MetricsGenerators, ValueDuration)
 
     timeShift.applyAbsoluteShift(std::chrono::minutes(5));
     resource.update("a", 7);
+
     EXPECT_EQ(count(), api::metrics::Value(2));
     EXPECT_EQ(count7(), api::metrics::Value(1));
     EXPECT_EQ(countHello(), api::metrics::Value(0));
 
     timeShift.applyAbsoluteShift(std::chrono::minutes(15));
     resource.update("a", "Hello");
+
     EXPECT_EQ(count(), api::metrics::Value(3));
     EXPECT_EQ(count7(), api::metrics::Value(1));
     EXPECT_EQ(countHello(), api::metrics::Value(1));
 
     timeShift.applyAbsoluteShift(std::chrono::minutes(25));
     resource.update("a", "hello");
+
     EXPECT_EQ(count(), api::metrics::Value(4));
     EXPECT_EQ(count7(), api::metrics::Value(1));
     EXPECT_EQ(countHello(), api::metrics::Value(1));
 
     timeShift.applyAbsoluteShift(std::chrono::minutes(50));
     resource.update("a", "hello");
+
     EXPECT_EQ(count(), api::metrics::Value(2));
     EXPECT_EQ(count7(), api::metrics::Value(1));
     EXPECT_EQ(countHello(), api::metrics::Value(1));
+}
+
+TEST_F(MetricsGenerators, ValueAverage)
+{
+    nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
+
+    const auto average = parseFormulaOrThrow("average %b 1m", monitors);
+    const auto perSecond = parseFormulaOrThrow("perSecond %b 30s", monitors);
+
+    resource.update("b", 0);
+
+    EXPECT_EQ(average(), api::metrics::Value());
+    EXPECT_EQ(perSecond(), api::metrics::Value());
+
+    #define EXPECT_VALUE(GETTER, VALUE) \
+    { \
+        const auto value = GETTER(); \
+        const auto number = value.toDouble(); \
+        EXPECT_TRUE((number > (VALUE - 0.1)) && (number < (VALUE + 0.1))) \
+            << value.toVariant().toString().toStdString(); \
+    }
+
+    timeShift.applyAbsoluteShift(std::chrono::seconds(10));
+    resource.update("b", 100);
+
+    EXPECT_VALUE(average, 0);
+    EXPECT_VALUE(perSecond, 10);
+
+    timeShift.applyAbsoluteShift(std::chrono::seconds(20));
+    resource.update("b", 200);
+
+    EXPECT_VALUE(average, 50);
+    EXPECT_VALUE(perSecond, 15);
+
+    timeShift.applyAbsoluteShift(std::chrono::seconds(40));
+    resource.update("b", 600);
+
+    EXPECT_VALUE(average, 125);
+    EXPECT_VALUE(perSecond, 30);
+
+    timeShift.applyAbsoluteShift(std::chrono::minutes(1));
+    resource.update("b", 30);
+
+    EXPECT_VALUE(average, 283.3);
+    EXPECT_VALUE(perSecond, 27.6);
+
+    timeShift.applyAbsoluteShift(std::chrono::minutes(1) + std::chrono::seconds(30));
+
+    EXPECT_VALUE(average, 248.3);
+    EXPECT_VALUE(perSecond, 1);
+
+    #undef EXPECT_VALUE
 }
 
 TEST_F(MetricsGenerators, Text)
