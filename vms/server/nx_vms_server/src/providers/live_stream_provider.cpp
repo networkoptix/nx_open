@@ -426,6 +426,13 @@ void QnLiveStreamProvider::onGotVideoFrame(
     if (m_totalVideoFrames && (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
         saveBitrateIfNeeded(compressedFrame, currentLiveParams, isCameraControlRequired);
 
+    processMetadata(compressedFrame);
+}
+
+void QnLiveStreamProvider::processMetadata(
+    const QnCompressedVideoDataPtr& compressedFrame)
+{
+
     NX_VERBOSE(this) << lm("Proceeding with motion detection and/or feeding metadata plugins");
 
     bool needToAnalyzeMotion = false;
