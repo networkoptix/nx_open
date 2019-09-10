@@ -57,12 +57,14 @@ private:
     void pingResources(const QnResourcePtr& res);
 
     void sortForeignResources(QList<QnSecurityCamResourcePtr>& foreignResources);
+    bool timeToMarkOffline(const QString& uniqueId) const;
+
 private:
     //map<uniq id, > TODO #ak old values from this dictionary are not cleared
     QnMediaServerModule* m_serverModule = nullptr;
-    QMap<QString, int> m_resourceDiscoveryCounter;
+    mutable QMap<QString, int> m_resourceDiscoveryCounter;
     //map<uniq id, > TODO #ak old values from this dictionary are not cleared
-    QMap<QString, int> m_disconnectSended;
+    QMap<QString, int> m_disconnectedSent;
 
     using ResourceList = QMap<QString, QnSecurityCamResourcePtr>;
     QVector<ResourceList> m_tmpForeignResources;

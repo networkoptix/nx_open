@@ -497,11 +497,21 @@ bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResour
     return false;
 }
 
+bool QnMServerResourceDiscoveryManager::timeToMarkOffline(const QString& uniqueId) const
+{
+    if (m_disconnectedSent[uniqueId])
+        return false;
+
+    const auto maxRetries = m_serverModule->settings().retryCountToMakeCameraOffline();
+    if (m_resourceDiscoveryCounter[uniqueId] < maxRetries)
+        ++m_resourceDiscoveryCounter[uniqueId];
+
+    return m_resourceDiscoveryCounter[uniqueId] >= maxRetries;
+}
+
 void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& discoveredResources)
 {
-    const QnResourceList& resources = resourcePool()->getResources();
-
-    for(const QnResourcePtr& res: resources)
+    for (const QnResourcePtr& res : resourcePool()->getResources())
     {
         QnNetworkResource* netRes = dynamic_cast<QnNetworkResource*>(res.data());
         if (!netRes)
@@ -513,60 +523,45 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
         if (res->hasFlags(Qn::foreigner)) //< this camera belongs to some other mediaserver
             continue;
 
-        QDateTime ldt = netRes->getLastDiscoveredTime();
-        QDateTime currentT = qnSyncTime->currentDateTime();
+        auto* camRes = dynamic_cast<QnVirtualCameraResource*>(netRes);
+        const auto uniqueId = res->getUniqueId();
+        const auto resString = netResourceString(netRes);
+        const bool isCamUsed = QnLiveStreamProvider::hasRunningLiveProvider(netRes)
+            || (camRes && camRes->isLicenseUsed());
 
-        //check if resource was discovered
-        QString uniqId = res->getUniqueId();
-        if (!discoveredResources.contains(uniqId))
+        const auto sendNotification =
+            [&]()
         {
-            // resource is not found
-            m_resourceDiscoveryCounter[uniqId]++;
+            NX_DEBUG(this, "Sending the \"disconnected\" signal for the camera %1", resString);
+            if (camRes)
+                camRes->issueOccured();
 
-            if (m_resourceDiscoveryCounter[uniqId] >= m_serverModule->settings().retryCountToMakeCameraOffline())
-            {
-                QnVirtualCameraResource* camRes = dynamic_cast<QnVirtualCameraResource*>(netRes);
+            emit cameraDisconnected(res, qnSyncTime->currentUSecsSinceEpoch());
+            m_disconnectedSent[uniqueId] = true;
+        };
 
-                NX_VERBOSE(this,
-                    "Camera %1 has not answered to %2 discovery loops in a row.",
-                    netResourceString(netRes), m_resourceDiscoveryCounter[uniqId]);
-
-                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)
-                    || (camRes && camRes->isLicenseUsed()))
-                {
-                    if (res->getStatus() == Qn::Offline && !m_disconnectSended[uniqId])
-                    {
-                        NX_VERBOSE(this,
-                            "Send disconnected signal for camera %1",
-                            netResourceString(netRes));
-
-                        QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
-                        if (cam)
-                            cam->issueOccured();
-                        emit cameraDisconnected(res, qnSyncTime->currentUSecsSinceEpoch());
-                        m_disconnectSended[uniqId] = true;
-                    }
-                    else if (res->getStatus() >= Qn::Online)
-                    {
-                        m_disconnectSended[uniqId] = false;
-                    }
-                }
-                else
-                {
-                    NX_INFO(this,
-                        "Mark resource %1 as offline"
-                        " because it doesn't response to discovery any more.",
-                        netResourceString(camRes));
-
-                    res->setStatus(Qn::Offline);
-                    m_resourceDiscoveryCounter[uniqId] = 0;
-                }
-            }
+        if (discoveredResources.contains(uniqueId))
+        {
+            NX_VERBOSE(this, "Resource %1 is discovered or seems alive", resString);
+            m_resourceDiscoveryCounter[uniqueId] = 0;
+            m_disconnectedSent[uniqueId] = false;
         }
-        else
+        else if (timeToMarkOffline(uniqueId))
         {
-            m_resourceDiscoveryCounter[uniqId] = 0;
-            m_disconnectSended[uniqId] = false;
+            // Camera was used and was set offline somewhere else. In this case only notification
+            // should be sent.
+            if (isCamUsed && res->getStatus() == Qn::Offline)
+            {
+                sendNotification();
+            }
+            // Camera was not used, so no other thread turned it off. That's why we set it offline
+            // here before sending notification.
+            else if (res->getStatus() != Qn::Offline && !isCamUsed)
+            {
+                sendNotification();
+                netRes->setStatus(Qn::Offline);
+                NX_DEBUG(this, "Mark resource %1 as offline", resString);
+            }
         }
     }
 }
