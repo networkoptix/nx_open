@@ -30,10 +30,9 @@ static constexpr RelayingConfiguration kRelayAcceptsNonSecureConnections{false};
 static constexpr RelayingConfiguration kRelayAcceptsSslOnly{true};
 
 class Relaying:
-    public BasicTestFixture,
-    public ::testing::TestWithParam<RelayingConfiguration>
+    public BasicTestFixture<::testing::TestWithParam<RelayingConfiguration>>
 {
-    using base_type = BasicTestFixture;
+    using base_type = BasicTestFixture<::testing::TestWithParam<RelayingConfiguration>>;
 
 public:
     Relaying()
