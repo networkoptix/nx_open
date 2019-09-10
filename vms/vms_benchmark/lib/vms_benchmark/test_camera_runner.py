@@ -30,6 +30,6 @@ def test_camera_running(local_ip, lowStreamFps, count=1):
         raise exceptions.TestCameraError(f"Unexpected error during spawning cameras: {str(exception)}")
 
     try:
-        yield
+        yield proc
     finally:
         proc.terminate()
