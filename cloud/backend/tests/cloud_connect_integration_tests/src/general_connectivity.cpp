@@ -15,10 +15,9 @@ namespace cloud {
 namespace test {
 
 class GeneralConnectivity:
-    public BasicTestFixture,
-    public ::testing::Test
+    public BasicTestFixture<::testing::Test>
 {
-    using base_type = BasicTestFixture;
+    using base_type = BasicTestFixture<::testing::Test>;
 
 protected:
     void givenListeningCloudServer()

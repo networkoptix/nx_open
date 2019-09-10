@@ -9,10 +9,9 @@
 namespace nx::network::cloud::test {
 
 class ListenigPeerRegistration:
-    public BasicTestFixture,
-    public ::testing::Test
+    public BasicTestFixture<::testing::Test>
 {
-    using base_type = BasicTestFixture;
+    using base_type = BasicTestFixture<::testing::Test>;
 
 protected:
     virtual void SetUp() override
