@@ -72,6 +72,12 @@ QRectF interpolatedRectangle(
     microseconds futureRectangleTimestamp,
     microseconds timestamp)
 {
+    if (!rectangle.isValid())
+        return futureRectangle;
+
+    if (!futureRectangle.isValid())
+        return rectangle;
+
     if (futureRectangleTimestamp <= rectangleTimestamp)
         return rectangle;
 
@@ -271,6 +277,13 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
         else
         {
             areaInfo.rectangle = objectInfo.rectangle;
+        }
+
+        if (!areaInfo.rectangle.isValid())
+        {
+            NX_VERBOSE(this, "Object info has invalid rectangle data: %1", objectInfo);
+            areaHighlightWidget->removeArea(objectInfo.id);
+            continue;
         }
 
         QString debugInfoDescriptor(ini().displayAnalyticsObjectsDebugInfo);
