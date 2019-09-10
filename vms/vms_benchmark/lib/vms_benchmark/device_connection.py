@@ -89,6 +89,9 @@ if platform.system() == 'Linux':
             out = StringIO()
             res = self.sh(cmd, su=su, stdout=out, stderr=stderr, timeout=timeout)
 
+            if res.return_code is None:
+                raise exceptions.DeviceCommandError(res.message)
+
             if not res:
                 return None
 
