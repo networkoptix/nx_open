@@ -546,6 +546,10 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
                         emit cameraDisconnected(res, qnSyncTime->currentUSecsSinceEpoch());
                         m_disconnectSended[uniqId] = true;
                     }
+                    else if (res->getStatus() >= Qn::Online)
+                    {
+                        m_disconnectSended[uniqId] = false;
+                    }
                 }
                 else
                 {
