@@ -64,7 +64,7 @@ if platform.system() == 'Linux':
         def sh(self, command, timeout=3, su=False, exc=False, stdout=sys.stdout, stderr=sys.stderr):
             command_wrapped = command if self.is_root or not su else f'sudo -n {command}'
 
-            run = subprocess.run([*self.ssh_args, command_wrapped], timeout=timeout, capture_output=True)
+            run = subprocess.run([*self.ssh_args, command_wrapped], timeout=timeout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             if run.returncode == 255:
                 if exc:
                     raise exceptions.DeviceCommandError(message=run.stderr.rstrip())
