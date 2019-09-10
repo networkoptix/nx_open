@@ -312,10 +312,7 @@ void UploadWorker::handleWaitForFileOnServer(
         {
             case FileInformation::Status::notFound:
                 // Try again later.
-                executeDelayed([this]()
-                {
-                    checkRemoteFile();
-                }, 1000);
+                executeDelayedParented([this] { checkRemoteFile(); }, 1000, this);
                 break;
             case FileInformation::Status::corrupted:
                 // try to recreate if allowed
@@ -369,10 +366,7 @@ void UploadWorker::handleWaitForFileOnServer(
     else
     {
         // Try again later.
-        executeDelayed([this]()
-        {
-            checkRemoteFile();
-        }, 1000);
+        executeDelayedParented([this] { checkRemoteFile(); }, 1000, this);
     }
 }
 

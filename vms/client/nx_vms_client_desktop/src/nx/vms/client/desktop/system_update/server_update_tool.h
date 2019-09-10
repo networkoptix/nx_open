@@ -61,7 +61,6 @@ public:
 
     bool hasInitiatedThisUpdate() const;
 
-
     /**
      * Sends GET https://localhost:7001/ec2/updateInformation and stores response in an internal
      * cache. Data from consequent requests is integrated into this cache, for each server.
@@ -156,6 +155,13 @@ public:
     bool verifyUpdateManifest(
         UpdateContents& contents,
         const std::set<nx::utils::SoftwareVersion>& clientVersions, bool checkClient = true) const;
+
+    /**
+     * Checks if there are any uploads to specified server
+     * @param id server uid
+     * @return true if there are active uploads
+     */
+    bool hasActiveUploadsTo(const QnUuid& id) const;
 
     /** Start uploading local update packages to the servers. */
     bool startUpload(const UpdateContents& contents, bool cleanExisting);

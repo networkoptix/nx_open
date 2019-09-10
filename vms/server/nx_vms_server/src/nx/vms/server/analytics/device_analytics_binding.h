@@ -88,7 +88,7 @@ private:
     QnAbstractDataReceptorPtr m_metadataSink;
     std::atomic<bool> m_started{false};
     nx::analytics::MetadataLogger m_incomingFrameLogger;
-    sdk_support::MetadataTypes m_lastMetadataTypes;
+    std::optional<sdk_support::MetadataTypes> m_lastNeededMetadataTypes;
 };
 
 } // namespace nx::vms::server::analytics
