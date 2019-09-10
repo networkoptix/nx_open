@@ -291,10 +291,8 @@ void QnStreamMixer::handlePacket(QnAbstractMediaDataPtr& data)
 
         if(data->dataType == QnAbstractMediaData::DataType::AUDIO)
             channelMap = &m_sourceMap[provider].audioChannelMap;
-        else if(data->dataType == QnAbstractMediaData::DataType::VIDEO)
-            channelMap = &m_sourceMap[provider].videoChannelMap;
         else
-            return;
+            channelMap = &m_sourceMap[provider].videoChannelMap;
 
         if (channelMap->count(originalChannel))
         {

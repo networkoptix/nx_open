@@ -165,10 +165,9 @@ void initialize(Manager* manager, Action* root)
 
     factory(AcknowledgeEventAction)
         .mode(DesktopMode)
-        .flags(SingleTarget | ResourceTarget)
-        .requiredTargetPermissions(Qn::ViewContentPermission)
+        .flags(NoTarget | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(GlobalPermission::manageBookmarks)
-        .condition(condition::hasFlags(Qn::live_cam, MatchMode::ExactlyOne)
+        .condition(condition::hasFlags(Qn::live_cam, MatchMode::All)
             && !condition::isSafeMode());
 
     factory(StartVideoWallControlAction)

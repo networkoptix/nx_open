@@ -394,11 +394,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     if (!actionParams.requireConfirmation(action->getRuntimeParams().eventType))
         return;
 
-    if (!camera)
-        return;
-
-    NX_ASSERT(menu()->canTrigger(action::AcknowledgeEventAction, camera));
-    if (!menu()->canTrigger(action::AcknowledgeEventAction, camera))
+    if (!NX_ASSERT(menu()->canTrigger(action::AcknowledgeEventAction, camera)))
         return;
 
     eventData.removable = false;
@@ -416,7 +412,9 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     const auto actionHandler =
         [this, camera, action]()
         {
-            action::Parameters params(camera);
+            action::Parameters params;
+            if (camera && camera->commonModule())
+                params.setItems(QVariant::fromValue<QnResourcePtr>(camera));
             params.setArgument(Qn::ActionDataRole, action);
             menu()->trigger(action::AcknowledgeEventAction, params);
         };

@@ -229,8 +229,8 @@ void ModuleConnector::InformationReader::readUntilError()
         if (destructionWatcher.objectDestroyed())
             return;
     }
-    static const int kMaxDatagramSize(1024*4);
-    m_buffer.reserve(kMaxDatagramSize);
+    static const int kMaxModuleInformationJsonSize(1024*4);
+    m_buffer.reserve(kMaxModuleInformationJsonSize);
     m_socket->readSomeAsync(&m_buffer,
         [this](SystemError::ErrorCode code, size_t size)
         {

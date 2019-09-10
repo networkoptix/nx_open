@@ -328,7 +328,7 @@ static const int kPublicIpUpdateTimeoutMs = 60 * 2 * 1000;
 static nx::utils::log::Tag kLogTag(typeid(MediaServerProcess));
 
 static const int kMinimalGlobalThreadPoolSize = 4;
-static const int kCheckAnalyticsUsedTimeoutMs = 1000 * 5;
+static const std::chrono::seconds kCheckAnalyticsUsedTimeout(5);
 
 void addFakeVideowallUser(QnCommonModule* commonModule)
 {
@@ -4116,7 +4116,7 @@ void MediaServerProcess::connectSignals()
         &MediaServerProcess::updateAddressesList);
 
     m_checkAnalyticsTimer = std::make_unique<QTimer>();
-    connect(m_checkAnalyticsTimer .get(), SIGNAL(timeout()), this, SLOT(at_checkAnalyticsUsed()), Qt::DirectConnection);
+    connect(m_checkAnalyticsTimer.get(), SIGNAL(timeout()), this, SLOT(at_checkAnalyticsUsed()), Qt::DirectConnection);
     m_generalTaskTimer = std::make_unique<QTimer>();
     connect(m_generalTaskTimer.get(), SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
     m_serverStartedTimer = std::make_unique<QTimer>();
@@ -4412,7 +4412,7 @@ void MediaServerProcess::startObjects()
     // Write server started event with delay. In case of client has time to reconnect, it could display it on the right panel.
     m_serverStartedTimer->setSingleShot(true);
     m_serverStartedTimer->start(serverModule()->settings().serverStartedEventTimeoutMs());
-    m_checkAnalyticsTimer->start(kCheckAnalyticsUsedTimeoutMs);
+    m_checkAnalyticsTimer->start(kCheckAnalyticsUsedTimeout);
 }
 
 std::map<QString, QVariant> MediaServerProcess::confParamsFromSettings() const
