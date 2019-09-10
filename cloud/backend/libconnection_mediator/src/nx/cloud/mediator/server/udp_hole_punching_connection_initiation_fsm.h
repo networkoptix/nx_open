@@ -105,6 +105,14 @@ public:
     stats::ConnectSession statisticsInfo() const;
 
 private:
+    struct ConnectResponseSenderContext
+    {
+        network::TransportProtocol networkProtocol;
+        ConnectCompletionHandler sendResponseFunc;
+
+        ConnectResponseSenderContext() = delete;
+    };
+
     State m_state;
     nx::String m_connectionId;
     std::function<void(api::NatTraversalResultCode)> m_onFsmFinishedEventHandler;
@@ -117,7 +125,7 @@ private:
     api::ConnectRequest m_connectRequest;
     api::ConnectionAckRequest m_connectionAckRequest;
 
-    std::vector<ConnectCompletionHandler> m_connectResponseSenders;
+    std::vector<ConnectResponseSenderContext> m_connectResponseSenders;
     const std::vector<network::SocketAddress> m_serverPeerEndpoints;
     const nx::String m_serverPeerHostName;
     const api::CloudConnectVersion m_serverPeerCloudConnectVersion;
@@ -223,6 +231,10 @@ private:
     void fixConnectResponseForBuggyClient(
         api::ResultCode resultCode,
         api::ConnectResponse* const connectResponse);
+
+    void sendConnectResponse(
+        ConnectResponseSenderContext& senderContext,
+        const std::tuple<api::ResultCode, api::ConnectResponse>& response);
 };
 
 } // namespace hpm

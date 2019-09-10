@@ -272,7 +272,9 @@ void UDPHolePunchingConnectionInitiationFsm::connectRequestReceived(
 
     m_clientEndpoint = requestSourceDescriptor;
     m_connectRequest = std::move(request);
-    m_connectResponseSenders.push_back(std::move(connectResponseSender));
+    m_connectResponseSenders.push_back({
+        requestSourceDescriptor.transportProtocol,
+        std::move(connectResponseSender)});
     m_originatingPeerCloudConnectVersion = request.cloudConnectVersion;
 
     updateSessionStatistics(requestSourceDescriptor, request);
@@ -441,16 +443,12 @@ void UDPHolePunchingConnectionInitiationFsm::sendConnectResponse()
 
     NX_ASSERT(!m_connectResponseSenders.empty(),
         "State %1. Response: (%2, %3)", m_state,
-            m_cachedConnectResponse ? QnLexical::serialized(std::get<0>(*m_cachedConnectResponse)) : QString(),
-            QJson::serialized(m_cachedConnectResponse ? std::get<1>(*m_cachedConnectResponse) : api::ConnectResponse()));
+            QnLexical::serialized(std::get<0>(*m_cachedConnectResponse)),
+            QJson::serialized(std::get<1>(*m_cachedConnectResponse)));
 
-    for (auto& handler: m_connectResponseSenders)
-    {
-        nx::utils::swapAndCall(
-            handler,
-            std::get<0>(*m_cachedConnectResponse),
-            std::get<1>(*m_cachedConnectResponse));
-    }
+    for (auto& senderContext: m_connectResponseSenders)
+        sendConnectResponse(senderContext, *m_cachedConnectResponse);
+
     m_connectResponseSenders.clear();
 }
 
@@ -629,6 +627,35 @@ void UDPHolePunchingConnectionInitiationFsm::fixConnectResponseForBuggyClient(
     {
         // Reporting dummy UDP endpoint to the buggy client.
         connectResponse->udpEndpointList.push_back(SocketAddress("1.2.3.4:12345"));
+    }
+}
+
+void UDPHolePunchingConnectionInitiationFsm::sendConnectResponse(
+    ConnectResponseSenderContext& senderContext,
+    const std::tuple<api::ResultCode, api::ConnectResponse>& response)
+{
+    if (senderContext.networkProtocol == network::TransportProtocol::udp)
+    {
+        // Sending the request as-is.
+        nx::utils::swapAndCall(
+            senderContext.sendResponseFunc,
+            std::get<0>(response),
+            std::get<1>(response));
+    }
+    else if (senderContext.networkProtocol == network::TransportProtocol::tcp)
+    {
+        // Removing server's UDP endpoints which could be present in the response
+        // in case if the corresponding connect request was a retransmit.
+        auto responseWithoutUdpEndpoints = std::get<1>(response);
+        responseWithoutUdpEndpoints.udpEndpointList.clear();
+        nx::utils::swapAndCall(
+            senderContext.sendResponseFunc,
+            std::get<0>(response),
+            std::move(responseWithoutUdpEndpoints));
+    }
+    else
+    {
+        NX_ASSERT(false, lm("Protocol: %1").args((int) senderContext.networkProtocol));
     }
 }
 
