@@ -141,7 +141,8 @@ int Service::runServiceMain(const AbstractServiceSettings& settings)
 	{
         result = serviceMain(settings);
 
-		NX_ASSERT(m_actionToTake != ActionToTake::invalid);
+		if (m_actionToTake == ActionToTake::invalid)
+			NX_DEBUG(this, "Service was started and stopped without calling runMainLoop");
 
         if (m_actionToTake == ActionToTake::restart)
             NX_INFO(this, "Service will restart. serviceMain returned %1", result);
