@@ -154,7 +154,11 @@ def log_exception(contextName, exception):
 @click.option('-C', 'config_file', default='vms_benchmark.conf', help='Input config file.')
 def main(config_file):
     """Program for test device to ability of run Nx VMS on it."""
-    if platform.system() == 'Linux':
+    config, sys_config = load_configs(config_file)
+
+    password = config.get('devicePassword', None)
+
+    if password and platform.system() == 'Linux':
         res = host_tests.SshPassInstalled().call()
 
         if not res.success:
@@ -164,12 +168,10 @@ def main(config_file):
                 f"Details for the error: {res.formatted_message()}"
             )
 
-    config, sys_config = load_configs(config_file)
-
     device = DeviceConnection(
         host=config['deviceHost'],
         login=config.get('deviceLogin', None),
-        password=config.get('devicePassword', None),
+        password=password,
         port=config['deviceSshPort']
     )
 
