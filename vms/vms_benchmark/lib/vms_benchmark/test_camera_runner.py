@@ -17,7 +17,7 @@ class TestCameraRunner:
         try:
             kill(self.pid, 9)
             waitpid(self.pid, 0)
-        except ChildProcessError:
+        except:  #< Probably, the testcamera processes are already finished.
             pass
 
     @staticmethod

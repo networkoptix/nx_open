@@ -2,8 +2,8 @@
 
 #include <core/resource/camera_resource.h>
 
+#include <QtCore/QMap>
 #include <QtCore/QString>
-#include <QMap>
 
 namespace {
 
@@ -15,6 +15,8 @@ static constexpr float kResolutionFactorMultiplier = 0.009f;
 static constexpr float kFpsFactorMultiplier = 1.0f;
 static constexpr float kMaxSuggestedBitrateKbps = 192.0f;
 static constexpr float kDefaultBitratePerGop = 30.0f;
+
+static constexpr QSize kDefaultResolution{1920, 1080};
 
 static const QMap<QString, float> kBitrateMultiplierByCodec =
     { { "MJPEG", 2.0f }, { "H264", 1.0f }, { "H265", 0.8 } };
@@ -55,6 +57,10 @@ float CameraBitrateCalculator::suggestBitrateForQualityKbps(
         static_cast<int>(Qn::StreamQuality::highest) - static_cast<int>(Qn::StreamQuality::lowest);
     const float qualityFactor = kLowEndBitrateKbps + (kHighEndBitrateKbps - kLowEndBitrateKbps)
         * qualityLevel / qualitySpread;
+
+    // Use a predefined value for cameras which did not fill the resolution yet.
+    if (resolution.isEmpty())
+        resolution = kDefaultResolution;
 
     const float resolutionFactor = kResolutionFactorMultiplier * pow(
         resolution.width() * resolution.height(),

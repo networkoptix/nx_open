@@ -644,6 +644,17 @@ void ServerUpdateTool::markUploadCompleted(const QString& uploadId)
     }
 }
 
+bool ServerUpdateTool::hasActiveUploadsTo(const QnUuid& id) const
+{
+    QStringList idsToRemove;
+    for (const auto& record: m_uploadStateById)
+    {
+        if (record.second.uuid == id)
+            return true;
+    }
+    return false;
+}
+
 bool ServerUpdateTool::startUpload(const UpdateContents& contents, bool cleanExisting)
 {
     NX_VERBOSE(this, "startUpload() clean=%1", cleanExisting);
