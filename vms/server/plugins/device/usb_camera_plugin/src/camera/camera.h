@@ -25,8 +25,8 @@ public:
 
     bool initialize();
     void uninitialize();
-    VideoStream&  videoStream();
-    AudioStream&  audioStream();
+    VideoStream& videoStream();
+    AudioStream& audioStream();
 
     bool hasAudio() const;
     void setAudioEnabled(bool value);
