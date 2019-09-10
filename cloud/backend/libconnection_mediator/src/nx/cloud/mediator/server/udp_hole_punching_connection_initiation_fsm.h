@@ -36,7 +36,7 @@ enum class State
     fini,
 };
 
-const char* toString(State);
+constexpr const char* toString(State);
 
 enum class Event
 {
@@ -51,7 +51,7 @@ enum class Event
     connectionResultWaitTimedOut,
 };
 
-const char* toString(Event);
+constexpr const char* toString(Event);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ public:
      *     UDPHolePunchingConnectionInitiationFsm instance.
      */
     UDPHolePunchingConnectionInitiationFsm(
-        nx::String connectionID,
+        nx::String connectionId,
         const ListeningPeerData& serverPeerData,
         std::function<void(api::NatTraversalResultCode)> onFsmFinishedEventHandler,
         const conf::Settings& settings,
@@ -106,7 +106,7 @@ public:
 
 private:
     State m_state;
-    nx::String m_connectionID;
+    nx::String m_connectionId;
     std::function<void(api::NatTraversalResultCode)> m_onFsmFinishedEventHandler;
     const conf::Settings& m_settings;
     AbstractRelayClusterClient* const m_relayClusterClient;
