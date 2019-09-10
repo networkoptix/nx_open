@@ -24,7 +24,7 @@ nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/build_options.conf.in
     ${build_script_options} @ONLY)
 
 # Command to be executed at the build phase.
-if(targetDevice STREQUAL "linux-x64")
+if(targetDevice MATCHES "^linux-x64")
     add_custom_command(OUTPUT ${zip_file}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${logs_dir}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${build_dir}
