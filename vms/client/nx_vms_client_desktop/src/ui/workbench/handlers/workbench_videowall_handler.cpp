@@ -98,6 +98,7 @@
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 #include <utils/screen_utils.h>
 #include <nx/vms/client/desktop/videowall/utils.h>
+#include <nx/utils/app_info.h>
 
 using nx::vms::client::desktop::utils::UnityLauncherWorkaround;
 using namespace nx;
@@ -3042,7 +3043,13 @@ void QnWorkbenchVideoWallHandler::setItemControlledBy(
 void QnWorkbenchVideoWallHandler::updateMainWindowGeometry(const QnScreenSnaps& screenSnaps)
 {
     const QRect targetGeometry = screenSnaps.geometry(nx::gui::Screens::geometries());
-    mainWindowWidget()->setGeometry(targetGeometry);
+    const auto mainWindow = mainWindowWidget();
+    mainWindow->move(targetGeometry.x(), targetGeometry.y());
+
+    if (nx::utils::AppInfo::isMacOsX())
+        mainWindow->showFullScreen();
+    else
+        mainWindowWidget()->resize(targetGeometry.size());
 }
 
 void QnWorkbenchVideoWallHandler::updateControlLayout(
