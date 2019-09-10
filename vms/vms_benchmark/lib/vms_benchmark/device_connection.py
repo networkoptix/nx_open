@@ -29,6 +29,9 @@ if platform.system() == 'Linux':
                     "-p", password,
                     "ssh",
                     "-o", "StrictHostKeyChecking=no",
+                    "-o", "BatchMode=yes",
+                    "-o", "PubkeyAuthentication=no",
+                    "-o", "PasswordAuthentication=yes",
                     "-T",
                     f"-p{port}",
                     f"{login}@{host}" if login else host,
@@ -36,7 +39,15 @@ if platform.system() == 'Linux':
                 ]
             else:
                 self.ssh_command = 'ssh'
-                self.ssh_args = ['ssh', f"-p{port}", f"{login}@{host}" if login else host]
+                self.ssh_args = [
+                    'ssh',
+                    f"-p{port}",
+                    f"{login}@{host}" if login else host,
+                    "-o", "StrictHostKeyChecking=no",
+                    "-o", "BatchMode=yes",
+                    "-o", "PubkeyAuthentication=yes",
+                    "-o", "PasswordAuthentication=no",
+                    ]
 
             self.host_key = None
             self.ip = None
