@@ -333,13 +333,17 @@ def main(config_file):
             count=test_cameras_count,
             lowStreamFps=sys_config['testStreamFpsLow']
         )
-        with test_camera_cm:
+        with test_camera_cm as test_camera_process:
             print(f"    Spawned {test_cameras_count} test cameras.")
 
             def wait_test_cameras_discovered(timeout, duration):
                 started_at = time.time()
                 detection_started_at = None
                 while time.time() - started_at < timeout:
+                    if test_camera_process.poll() is not None:
+                        raise exceptions.TestCameraError(
+                            f'Test Camera process exited unexpectedly with code {test_camera_process.returncode}')
+
                     cameras = api.get_test_cameras()
 
                     if len(cameras) >= test_cameras_count:
