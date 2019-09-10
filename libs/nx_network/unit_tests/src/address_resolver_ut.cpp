@@ -269,6 +269,39 @@ protected:
         return m_resolver;
     }
 
+    void givenResolvePausedInHandler()
+    {
+        m_hostNameToResolve = nx::utils::generateRandomName(7);
+        emulateHostnameResolvableByDnsResolver();
+
+        m_handlerCompleted = false;
+
+        std::promise<void> aboutToPause;
+        m_resolver.resolveAsync(
+            m_hostNameToResolve,
+            [this, &aboutToPause](auto&&...)
+            {
+                aboutToPause.set_value();
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                m_handlerCompleted = true;
+            },
+            NatTraversalSupport::enabled,
+            AF_INET,
+            this);
+
+        aboutToPause.get_future().wait();
+    }
+
+    void whenCancelResolve()
+    {
+        m_resolver.cancel(this);
+    }
+
+    void thenCancelBlockedUntilHandlerCompletion()
+    {
+        ASSERT_TRUE(m_handlerCompleted);
+    }
+
 private:
     using ResolveResult =
         std::tuple<SystemError::ErrorCode, std::deque<AddressEntry>>;
@@ -280,6 +313,7 @@ private:
     std::list<QString> m_hostnamesPassedToDnsResolver;
     nx::utils::SyncQueue<ResolveResult> m_resolveResults;
     ResolveResult m_prevResolveResult;
+    std::atomic<bool> m_handlerCompleted{false};
 
     SystemError::ErrorCode saveHostNameWithoutResolving(
         const QString& hostName,
@@ -345,6 +379,13 @@ TEST_F(AddressResolver, resolving_same_name_with_different_ip_version)
     thenResolveSucceeded();
     andResolvedTo(HostAddress(in4addr_loopback));
     andResolvedTo(HostAddress(in6addr_loopback, 0));
+}
+
+TEST_F(AddressResolver, cancel_waits_for_handler_completion)
+{
+    givenResolvePausedInHandler();
+    whenCancelResolve();
+    thenCancelBlockedUntilHandlerCompletion();
 }
 
 //-------------------------------------------------------------------------------------------------
