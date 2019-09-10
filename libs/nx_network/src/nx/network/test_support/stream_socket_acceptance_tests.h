@@ -431,14 +431,24 @@ protected:
         ASSERT_TRUE(m_server->listen());
     }
 
-    void givenConnectedSocket()
+    void givenClientSocket()
     {
         if (m_connection)
             m_connection->pleaseStopSync();
 
         m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
+    }
+
+    void whenConnectClientSocket()
+    {
         ASSERT_TRUE(m_connection->connect(serverEndpoint(), nx::network::kNoTimeout))
             << SystemError::getLastOSErrorText().toStdString();
+    }
+
+    void givenConnectedSocket()
+    {
+        givenClientSocket();
+        whenConnectClientSocket();
     }
 
     void givenPingPongServer()
@@ -1736,7 +1746,7 @@ TYPED_TEST_P(StreamSocketAcceptance, pollable_is_valid_after_shutdown)
 {
     this->givenSilentServer();
     this->givenConnectedSocket();
-    
+
     this->whenInvokeShutdown();
 
     this->thenPollableIsStillValid();
