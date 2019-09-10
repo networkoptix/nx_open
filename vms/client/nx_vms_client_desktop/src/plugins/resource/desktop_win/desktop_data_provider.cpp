@@ -354,7 +354,10 @@ bool QnDesktopDataProvider::initVideoCapturing()
     int ret = av_image_alloc(m_frame->data, m_frame->linesize,
         m_grabber->width(), m_grabber->height(), m_grabber->format(), /*align*/ 1);
     if (ret < 0)
-        memset((AVPicture*)m_frame, 0, sizeof(AVPicture));
+    {
+        m_lastErrorStr = tr("Could not detect capturing resolution");
+        return false;
+    }
 
     QString videoCodecName;
     if (m_encodeQualuty <= 0.5)
@@ -544,7 +547,8 @@ int QnDesktopDataProvider::processData(bool flush)
 {
     if (m_videoCodecCtx == 0)
         return -1;
-    //int out_size = avcodec_encode_video(m_videoCodecCtx, m_videoBuf, m_videoBufSize, flush ? 0 : m_frame);
+    if (m_frame->width <= 0 || m_frame->height <= 0)
+        return -1;
 
     m_outPacket->data = m_videoBuf;
     m_outPacket->size = m_videoBufSize;
