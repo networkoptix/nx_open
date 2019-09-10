@@ -3244,7 +3244,8 @@
         {
             "keys": [
                 "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
-                "Hikvision|DS-2DF8223*", "ONVIF|K20IC-*"
+                "Hikvision|DS-2DF8223*", "ONVIF|K20IC-*",
+                "HIKVISION|DFI6256A"
             ],
             "clearInputsTimeoutSec": 1,
             "comment": "considers input state as 0 after specified timeout"

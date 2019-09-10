@@ -459,10 +459,10 @@ TEST_F(ServerArchiveDelegatePlaybackTest, TestHelper)
 class ChunkQualityChooserTest: public ::testing::Test
 {
 public:
-    static QnVirtualCameraResourcePtr testCamera;
-    static std::unique_ptr<QnMediaServerModule> serverModule;
+    QnVirtualCameraResourcePtr testCamera;
+    std::unique_ptr<QnMediaServerModule> serverModule;
 
-    void findChunkHelper(
+    void checkChunk(
         qint64 timestampMs, qint64 expectedTimeMs, QnServer::ChunksCatalog expectedCatalog,
         bool preciseFind = false,
         MediaQuality prefferedQuality = MediaQuality::MEDIA_Quality_High)
@@ -595,9 +595,6 @@ public:
 
 };
 
-QnVirtualCameraResourcePtr ChunkQualityChooserTest::testCamera;
-std::unique_ptr<QnMediaServerModule> ChunkQualityChooserTest::serverModule;
-
 TEST_F(ChunkQualityChooserTest, main)
 {
     chooseChunk(false, false);
@@ -622,12 +619,12 @@ TEST_F(ChunkQualityChooserTest, fourChunkTest)
     addRecord(lqCatalogBackup, 0, 100);
     addRecord(hqCatalogMain, 300, 100);
 
-    findChunkHelper(0 /*timePoint*/, 0 /*result*/,
-        QnServer::ChunksCatalog::HiQualityCatalog, true /* precise find*/);
+    checkChunk(/*timePoint*/ 0, /*result*/ 0,
+        QnServer::ChunksCatalog::HiQualityCatalog, /*preciseFind*/ true);
 
-    findChunkHelper(0 /*timePoint*/, 0 /*result*/,
+    checkChunk(0 /*timePoint*/, 0 /*result*/,
         QnServer::ChunksCatalog::LowQualityCatalog,
-        true /* precise find*/, MediaQuality::MEDIA_Quality_Low /*prefferedQuality*/);
+        /*preciseFind*/ true, /*prefferedQuality*/ MediaQuality::MEDIA_Quality_Low);
 }
 
 TEST_F(ChunkQualityChooserTest, shortAltChunkTest)
@@ -644,10 +641,10 @@ TEST_F(ChunkQualityChooserTest, shortAltChunkTest)
     addRecord(lqCatalogMain, 100, 1);
     addRecord(lqCatalogMain, 199, 10);
 
-    findChunkHelper(100 * 1000 /*timePoint*/,
-        200 * 1000 /*result*/, QnServer::ChunksCatalog::HiQualityCatalog);
+    checkChunk(/*timePoint*/ 100 * 1000,
+        /*result*/ 200 * 1000, QnServer::ChunksCatalog::HiQualityCatalog);
 
     addRecord(lqCatalogMain, 101, 10);
-    findChunkHelper(100 * 1000 /*timePoint*/,
-        100 * 1000 /*result*/, QnServer::ChunksCatalog::LowQualityCatalog);
+    checkChunk(/*timePoint*/ 100 * 1000,
+        /*result*/ 100 * 1000, QnServer::ChunksCatalog::LowQualityCatalog);
 }

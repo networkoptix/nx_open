@@ -285,7 +285,7 @@ void CloudStreamSocket::connectAsync(
             NX_VERBOSE(this, lm("Address resolved. Code: %1, entries: %2")
                 .args(code, dnsEntries.size()));
 
-            if (operationGuard->lock())
+            if (auto lock = operationGuard->lock())
             {
                 m_writeIoBinder.post(
                     [this, port, handler = std::move(handler),

@@ -34,8 +34,7 @@ bool Camera::initialize()
     {
         NX_DEBUG(this,
             "Failed to obtain a valid compression type descriptor error: %2, for camera: %1",
-            status,
-            toString());
+            status, toString());
         return false;
     }
     return true;
@@ -46,6 +45,7 @@ void Camera::uninitialize()
     NX_DEBUG(this, "unititialize");
     std::scoped_lock<std::mutex> lock(m_mutex);
     m_keyFrameFound = false;
+    m_packetBuffer.flush();
     m_videoStream->uninitializeInput();
     m_audioStream->uninitialize();
 }
@@ -123,9 +123,8 @@ void Camera::setAudioEnabled(bool value)
 {
     m_audioEnabled = value;
     if (!m_audioEnabled)
-    {
         m_audioStream->uninitialize();
-    }
+
 }
 
 bool Camera::audioEnabled() const

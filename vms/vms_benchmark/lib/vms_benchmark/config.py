@@ -21,7 +21,6 @@ class ConfigOptionValueError(exceptions.VmsBenchmarkError):
         self.original_exception = original_exception
 
 
-
 class ConfigParser:
     def __init__(self, filepath, option_descriptions=None):
         try:

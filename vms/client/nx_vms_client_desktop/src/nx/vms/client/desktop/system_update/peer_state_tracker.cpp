@@ -549,12 +549,7 @@ std::map<QnUuid, QnMediaServerResourcePtr> PeerStateTracker::activeServers() con
     auto filter = m_peersIssued;
     for (const auto& item: m_items)
     {
-        // We heed such complex filtering to resolve verification tasks during active update.
-        // We have complex logic for tracking servers which have become offline recently. Update
-        // verification (most common user for 'activeServers') should get adjusted data as well.
         if (filter.empty() && item->offline)
-            continue;
-        else if (!filter.empty() && !filter.contains(item->id))
             continue;
         if (item->component != UpdateItem::Component::server)
             continue;

@@ -5,8 +5,8 @@
 ---------------------------------------------------------------------------------------------------
 ## Introduction
 
-VMS Benchmark is a command-line tool which allows a partner/customer to assess the ability to run VMS
-on a certain device. The tool runs on a host PC, connects to the device, collects system
+VMS Benchmark is a command-line tool which allows a partner/customer to assess the ability to run
+VMS on a Linux-based device. The tool runs on a host PC, connects to the device, collects system
 information such as CPU type and RAM size, and then starts the VMS Server, feeds it test video
 streams from virtual cameras, and creates a detailed report about potential performance issues.
 
@@ -18,10 +18,26 @@ device (it may be ARM or x64) with Linux called "box" here.
 
 The following prerequisites should be assured before running the tool:
 
-* Linux host: `ssh` and `sshpass` tools should be installed on the host in case of Linux.
-* VMS Server should be installed on the box and VMS System should be set up.
-* Two customizations on the single box is not supported.
-* If the box Linux user is not root, it should be in sudoers and `sudo echo Test` should not require typing a password.
+* Host PC hardware: A physical PC with at least Core i5 quad-core or equivalent, and 4G RAM.
+* Host PC OS: Ubuntu 18.04 or Windows 10.
+   * The tool may work with other OS versions, but it is not officially supported.
+   * On Windows, running VMS Benchmark from a Cygwin shell may or may not work, and is not
+       officially supported.
+* Host PC should not run any other software at the time of running VMS Benchmark, besides built-in
+    OS components. Such software may or may not interfere with VMS Benchmark and may or may not
+    affect its ability to run or the accuracy of its report.
+* Linux host: `ssh` and `sshpass` tools should be installed on the host.
+* VMS Server should be installed on the box and VMS System should be set up via the Setup Wizard
+    in the Server web-admin.
+* No more than one VMS should be installed on the box.
+* If the box Linux user is not root, it should be in sudoers and `sudo` should not ask for
+    password.
+* The box should be connected to an isolated network together with the host, and this network
+    should have the full bandwidth that the box is planned to work with, e.g. 100 Mbps or 1 Gbps.
+    There should be no cameras in this network, but it may be connected to the internet.
+
+If there is a need to contact the Support Team regarding an issue with the VMS Benchmark tool
+itself, make sure that all the above listed prerequisites are fulfilled.
 
 ---------------------------------------------------------------------------------------------------
 ## Usage
@@ -32,12 +48,15 @@ tool's zip file can be found among VMS distribution files for the respective pla
 Linux x64).
 
 All configuration options for the tool are supplied via a configuration file - a name-value text
-file called `vms_benchmark.conf` which should reside next to the tool's executable.
+file called `vms_benchmark.conf` which should reside next to the tool's executable. Each option has
+a detailed comment in this file.
 
 Do at least the following in the `vms_benchmark.conf` before running the tool:
 - Specify VMS username and password in `vmsUser`/`vmsPassword` fields.
 - If `ssh <deviceHost>` on the host machine requires to enter credentials, specify them in 
     `deviceLogin` and `devicePassword` fields.
+- In order to test the ability of the box to process the load of the desired number of cameras,
+    set `testCamerasTestSequence` accordingly.
 
 Then simply run the command `vms_benchmark` without arguments, and watch or capture its output.
 
@@ -48,6 +67,7 @@ Currently, the tool has no command-line options besides `--help` which shows a t
 
 Currently, on successful run the tool produces a report similar to this:
 ```
+VMS Benchmark started.
 Device IP: 192.168.0.100
 Arch: armv7l
 Number of CPUs: 12

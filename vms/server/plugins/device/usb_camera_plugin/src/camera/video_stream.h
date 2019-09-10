@@ -46,7 +46,6 @@ public:
 
 private:
     std::string m_url;
-    std::weak_ptr<Camera> m_camera;
     CodecParameters m_codecParams;
     nxpl::TimeProvider* const m_timeProvider;
     std::atomic_bool m_needReinitialization = true;
@@ -60,7 +59,7 @@ private:
      * Get the url of the video stream, modified appropriately based on platform.
      */
     std::string ffmpegUrlPlatformDependent() const;
-    int initializeInput();
+    int reinitializeInput();
     void setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& inputFormat);
     CodecParameters findClosestHardwareConfiguration(const CodecParameters& params) const;
     void setCodecParameters(const CodecParameters& codecParams);

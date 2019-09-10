@@ -159,7 +159,7 @@ QAuthenticator QnNetworkResource::getDefaultAuth() const
 
 QAuthenticator QnNetworkResource::getAuthInternal(const QString& value)
 {
-    auto delimiterPos = value.indexOf(lit(":"));
+    const auto delimiterPos = value.indexOf(lit(":"));
     QAuthenticator auth;
     auth.setUser(value);
     if (delimiterPos >= 0)
