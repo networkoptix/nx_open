@@ -180,31 +180,29 @@ int VideoStream::getMaxBitrate()
     return device::video::getMaxBitrate(m_url, m_compressionTypeDescriptor);
 }
 
-int VideoStream::initializeInput()
+int VideoStream::reinitializeInput()
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    auto inputFormat = std::make_unique<ffmpeg::InputFormat>();
-    int result = inputFormat->initialize(ffmpegDeviceTypePlatformDependent());
+    m_inputFormat = std::make_unique<ffmpeg::InputFormat>();
+    int result = m_inputFormat->initialize(ffmpegDeviceTypePlatformDependent());
     if (result < 0)
         return result;
 
-    setInputFormatOptions(inputFormat);
+    setInputFormatOptions(m_inputFormat);
 
-    NX_DEBUG(this, "open video device: [%1]", ffmpegUrlPlatformDependent());
-    result = inputFormat->open(ffmpegUrlPlatformDependent().c_str());
+    NX_DEBUG(this, "opening video device: [%1], codec params: %2",
+        ffmpegUrlPlatformDependent(), m_codecParams.toString());
+
+    result = m_inputFormat->open(ffmpegUrlPlatformDependent().c_str());
     if (result < 0)
+    {
+        m_inputFormat->close();
         return result;
-
-    m_inputFormat = std::move(inputFormat);
+    }
     return 0;
 }
 
 void VideoStream::setInputFormatOptions(std::unique_ptr<ffmpeg::InputFormat>& inputFormat)
 {
-    NX_DEBUG(this, "Camera %1 attempting to open video stream with params: %2",
-        m_url,
-        m_codecParams.toString());
-
     AVFormatContext * context = inputFormat->formatContext();
     if (m_codecParams.codecId != AV_CODEC_ID_NONE)
         context->video_codec_id = m_codecParams.codecId;
@@ -238,11 +236,11 @@ int VideoStream::nextPacket(std::shared_ptr<ffmpeg::Packet>& result)
     if (!pluggedIn())
         return AVERROR(EIO);
 
+    std::unique_lock<std::mutex> lock(m_mutex);
     int status;
     if (m_needReinitialization)
     {
-        uninitializeInput();
-        status = initializeInput();
+        status = reinitializeInput();
         if (status < 0)
             return status;
         m_needReinitialization = false;

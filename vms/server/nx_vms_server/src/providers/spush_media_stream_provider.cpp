@@ -129,7 +129,7 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
     return m_openStreamResult;
 }
 
-void CLServerPushStreamReader::processAvMetadata(const QnAbstractMediaDataPtr& data)
+void CLServerPushStreamReader::postProcessData(const QnAbstractMediaDataPtr& data)
 {
     QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     QnCompressedAudioDataPtr audioData = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
@@ -234,7 +234,7 @@ void CLServerPushStreamReader::run()
         if(data)
             data->dataProvider = this;
 
-        processAvMetadata(data);
+        postProcessData(data);
 
         if (data && getRole() == Qn::CR_SecondaryLiveVideo)
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;

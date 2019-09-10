@@ -18,9 +18,17 @@ int TranscodeStreamReader::initializeTranscoder()
     return m_transcoder.initialize(decoderCodecPar, m_codecParams);
 }
 
+void TranscodeStreamReader::uninitialize()
+{
+    std::scoped_lock<std::mutex> lock(m_mutex);
+    m_transcoder.uninitialize();
+    m_encoderNeedsReinitialization = true;
+}
+
 int TranscodeStreamReader::transcode(
     const std::shared_ptr<ffmpeg::Packet>& source, std::shared_ptr<ffmpeg::Packet>& result)
 {
+    std::scoped_lock<std::mutex> lock(m_mutex);
     int status;
     if (m_encoderNeedsReinitialization)
     {

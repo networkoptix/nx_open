@@ -43,7 +43,6 @@ protected:
     virtual void beforeRun() override;
     virtual void afterRun() override;
     virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) = 0;
-    virtual void processAvMetadata(const QnAbstractMediaDataPtr& data);
 private:
     virtual CameraDiagnostics::Result openStream() override final;
     virtual void run() override final; // in a loop: takes data from device and puts into queue
@@ -51,7 +50,7 @@ private:
     virtual bool isCameraControlRequired() const;
 
     bool processOpenStreamResult();
-
+    void postProcessData(const QnAbstractMediaDataPtr& data);
 private:
     const nx::vms::server::resource::CameraPtr m_camera;
     bool m_needReopen = false;

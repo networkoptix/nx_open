@@ -78,7 +78,7 @@ void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractMediaDataRecept
     }
     else
     {
-        NX_WARNING(this, "Remove not added data processor: %1", dp);
+        NX_DEBUG(this, "Remove not added data processor: %1", dp);
     }
 }
 
