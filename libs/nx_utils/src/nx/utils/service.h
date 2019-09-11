@@ -50,6 +50,8 @@ public:
 	/**
 	 * Restarts the process without terminating it. The service should have been started already
 	 * with a call to exec.
+	 * NOTE: Causes runMainLoop to return.
+	 * NOTE: serviceMain will be invoked again after it returns.
 	 * NOTE: Cannot be called in the same thread as exec, because exec blocks until termination.
 	 * NOTE: exec does not return if restart is called. pleaseStop must be called to stop the
 	 * the service.
