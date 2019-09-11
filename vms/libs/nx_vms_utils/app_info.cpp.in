@@ -1,6 +1,3 @@
-//
-// This file is generated. Go to pom.xml.
-//
 #include <nx/vms/utils/app_info.h>
 
 using namespace nx::vms::utils;
@@ -17,7 +14,7 @@ QString AppInfo::nativeUriProtocolDescription()
 
 QString AppInfo::desktopFileName()
 {
-    return QStringLiteral("${installer.name}.desktop");
+    return QStringLiteral("${customization.installerName}.desktop");
 }
 
 QString AppInfo::iconFileName()
