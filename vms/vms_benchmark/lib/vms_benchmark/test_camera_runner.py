@@ -9,6 +9,7 @@ binary_file = './testcamera'
 test_file_high_resolution = './test_file_high_resolution.ts'
 test_file_low_resolution = './test_file_low_resolution.ts'
 debug = False
+logging = None
 
 
 @contextmanager
@@ -28,8 +29,20 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
         opts['stderr'] = subprocess.PIPE
 
     env = {}
+    ld_library_path = None
     if platform.system() == 'Linux':
-        env['LD_LIBRARY_PATH'] = os.path.dirname(binary_file)
+        ld_library_path = os.path.dirname(binary_file)
+        env['LD_LIBRARY_PATH'] = ld_library_path
+
+    assert logging
+    # NOTE: The first arg is the command itself.
+    logging.info('Running testcamera with the following command and args:')
+    logging.info('[')
+    if ld_library_path:
+        logging.info(f'LD_LIBRARY_PATH={ld_library_path}')
+    for arg in camera_args:
+        logging.info(arg)
+    logging.info(']')
 
     try:
         proc = subprocess.Popen(camera_args, env=env, **opts)

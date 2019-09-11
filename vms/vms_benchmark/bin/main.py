@@ -19,8 +19,7 @@ try:
     signal.signal(signal.SIGINT, exit_handler)
     signal.signal(signal.SIGTERM, exit_handler)
     if platform.system() == 'Linux':
-        # Prevent "[Errno 32] Broken pipe" exceptions when
-        # writing to a pipe.
+        # Prevent "[Errno 32] Broken pipe" exceptions when writing to a pipe.
         signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
 except KeyboardInterrupt:
@@ -97,16 +96,19 @@ def load_configs(config_file):
     sys_option_descriptions = {
         "testCameraBin": {
             "optional": True,
-            "type": 'string'
+            "type": 'string',
+            "default": './testcamera/testcamera'
         },
         "testFileHighResolution": {
             "optional": True,
-            "type": 'string'
+            "type": 'string',
+            "default": './high.ts'
         },
         "testFileLowResolution": {
             "optional": True,
-            "type": 'string'
-        },
+            "type": 'string',
+            "default": './low.ts'
+    },
         "streamTestDurationSecs": {
             "optional": True,
             "type": 'integer',
@@ -118,10 +120,14 @@ def load_configs(config_file):
             "default": 30
         },
         "testStreamFpsHigh": {
+            "optional": True,
             "type": 'integer',
+            "default": 30
         },
         "testStreamFpsLow": {
+            "optional": True,
             "type": 'integer',
+            "default": 7
         },
         "testCameraDebug": {
             "optional": True,
@@ -130,7 +136,7 @@ def load_configs(config_file):
         },
     }
 
-    sys_config = ConfigParser('.vms_benchmark.ini', sys_option_descriptions)
+    sys_config = ConfigParser('vms_benchmark.ini', sys_option_descriptions, is_file_optional=True)
 
     if sys_config['testCameraBin']:
         test_camera_runner.binary_file = sys_config['testCameraBin']
@@ -151,7 +157,8 @@ def log_exception(contextName, exception):
 @click.option('--config', 'config_file', default='vms_benchmark.conf', help='Input config file.')
 @click.option('-C', 'config_file', default='vms_benchmark.conf', help='Input config file.')
 def main(config_file):
-    """Program for test device to ability of run Nx VMS on it."""
+    test_camera_runner.logging = logging
+
     config, sys_config = load_configs(config_file)
 
     password = config.get('devicePassword', None)

@@ -12,7 +12,7 @@ python3.6 \
     $DEV_PATH/python/bin/pyinstaller \
     -y \
     -F --hidden-import json \
-    --distpath $BUILD_DIR/dist \
+    --distpath $BUILD_DIR/distrib \
     --workpath $BUILD_DIR/build \
     --specpath $BUILD_DIR \
     -p $SRC_DIR/lib \

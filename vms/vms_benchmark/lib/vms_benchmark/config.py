@@ -22,31 +22,40 @@ class ConfigOptionValueError(exceptions.VmsBenchmarkError):
 
 
 class ConfigParser:
-    def __init__(self, filepath, option_descriptions=None):
+    def __init__(self, filepath, option_descriptions=None, is_file_optional=False):
+        assert option_descriptions or not is_file_optional
+
+        is_file_present = True
         try:
             f = open(filepath)
         except FileNotFoundError:
-            raise NoConfigFile(f"Config file '{filepath}' not found.")
+            if is_file_optional:
+                is_file_present = False
+            else:
+                raise NoConfigFile(f"Config file '{filepath}' not found.")
 
         def process_env_vars(string):
             import re
             from os import environ
             return re.sub(r"(\$[a-zA-Z_][a-zA-Z_]+)", lambda match: environ.get(match.group(1), ''), string)
 
-        self.options = dict([
-            [
-                line[:line.find('=')].strip(),
-                process_env_vars(line[line.find('=') + 1:].strip())
-            ] for line in [
-                line
-                for line in [
-                    line[:line.find('#')] if line.find('#') != -1 else line
-                    for line in
-                    f.readlines()
+        if not is_file_present:
+            self.options = dict()
+        else:
+            self.options = dict([
+                [
+                    line[:line.find('=')].strip(),
+                    process_env_vars(line[line.find('=') + 1:].strip())
+                ] for line in [
+                    line
+                    for line in [
+                        line[:line.find('#')] if line.find('#') != -1 else line
+                        for line in
+                        f.readlines()
+                    ]
+                    if '=' in line
                 ]
-                if '=' in line
-            ]
-        ])
+            ])
 
         if option_descriptions:
             for name, _ in ((k, v) for (k, v) in option_descriptions.items() if v.get('optional', False) is False):
