@@ -488,8 +488,10 @@ if __name__ == '__main__':
             print(f'ERROR: ', file=sys.stderr, end='')
             nx_print_exception(e)
             log_exception('ERROR', e)
+        except Exception as e:
+            print(f'UNEXPECTED ERROR: {e}', file=sys.stderr)
+            log_exception('UNEXPECTED ERROR', e)
     except Exception as e:
         print(f'INTERNAL ERROR: {e}', file=sys.stderr)
-        log_exception('INTERNAL ERROR', e)
-    finally:
-        sys.exit(1)
+
+    sys.exit(1)
