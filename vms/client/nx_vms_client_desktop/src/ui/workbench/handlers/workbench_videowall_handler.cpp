@@ -244,16 +244,70 @@ auto offlineItemOnThisPc = []
 
 } /* anonymous namespace */
 
+//--------------------------------------------------------------------------------------------------
+
+class QnWorkbenchVideoWallHandler::GeometrySetter: public QObject
+{
+    using base_type = QObject;
+public:
+    GeometrySetter(QWidget* target, QObject* parent = nullptr);
+
+    void changeGeometry(const QRect& geometry);
+
+    bool eventFilter(QObject* watched, QEvent* event);
+
+private:
+    QWidget* const m_target;
+    QSize m_finalSize;
+};
+
+QnWorkbenchVideoWallHandler::GeometrySetter::GeometrySetter(QWidget* target, QObject* parent):
+    base_type(parent),
+    m_target(target)
+{
+    if (nx::utils::AppInfo::isMacOsX())
+        m_target->installEventFilter(this);
+}
+
+void QnWorkbenchVideoWallHandler::GeometrySetter::changeGeometry(const QRect& geometry)
+{
+    const auto targetSize = geometry.size();
+    if (nx::utils::AppInfo::isMacOsX() && m_target->geometry().size() != targetSize)
+    {
+        m_target->setUpdatesEnabled(false);
+        m_finalSize = targetSize;
+    }
+    m_target->setGeometry(geometry);
+}
+
+bool QnWorkbenchVideoWallHandler::GeometrySetter::eventFilter(QObject* watched, QEvent* event)
+{
+    if (!m_finalSize.isEmpty() && watched == m_target && event->type() == QEvent::Resize)
+    {
+        const auto currentSize = static_cast<QResizeEvent*>(event)->size();
+        if (m_finalSize == currentSize)
+        {
+            m_finalSize = QSize();
+            const auto setUpdatesEnabled = [this]() { m_target->setUpdatesEnabled(true); };
+            static constexpr int kSomeSmallDelayMs = 1000;
+            executeDelayedParented(setUpdatesEnabled, kSomeSmallDelayMs, this);
+        }
+    }
+    return base_type::eventFilter(watched, event);
+}
+
+//--------------------------------------------------------------------------------------------------
+
 QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_licensesHelper(new QnVideoWallLicenseUsageHelper(commonModule(), this))
-#ifdef _DEBUG
-    /* Limit by reasonable size. */
-    , m_uuidPool(new QnUuidPool(uuidPoolBase, 256))
-#else
-    , m_uuidPool(new QnUuidPool(uuidPoolBase, 16384))
-#endif
+    m_licensesHelper(new QnVideoWallLicenseUsageHelper(commonModule(), this)),
+    #ifdef _DEBUG
+        /* Limit by reasonable size. */
+        m_uuidPool(new QnUuidPool(uuidPoolBase, 256))
+    #else
+        m_uuidPool(new QnUuidPool(uuidPoolBase, 16384))
+    #endif
 {
     m_videoWallMode.active = qnRuntime->isVideoWallMode();
     m_videoWallMode.opening = false;
@@ -458,7 +512,6 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
 QnWorkbenchVideoWallHandler::~QnWorkbenchVideoWallHandler()
 {
-
 }
 
 ec2::AbstractVideowallManagerPtr QnWorkbenchVideoWallHandler::connection() const
@@ -3043,13 +3096,10 @@ void QnWorkbenchVideoWallHandler::setItemControlledBy(
 void QnWorkbenchVideoWallHandler::updateMainWindowGeometry(const QnScreenSnaps& screenSnaps)
 {
     const QRect targetGeometry = screenSnaps.geometry(nx::gui::Screens::geometries());
-    const auto mainWindow = mainWindowWidget();
-    mainWindow->move(targetGeometry.x(), targetGeometry.y());
+    if (!m_geometrySetter)
+        m_geometrySetter.reset(new GeometrySetter(mainWindowWidget()));
 
-    if (nx::utils::AppInfo::isMacOsX())
-        mainWindow->showFullScreen();
-    else
-        mainWindowWidget()->resize(targetGeometry.size());
+    m_geometrySetter->changeGeometry(targetGeometry);
 }
 
 void QnWorkbenchVideoWallHandler::updateControlLayout(
