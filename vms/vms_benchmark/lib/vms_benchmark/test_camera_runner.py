@@ -17,8 +17,8 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
     camera_args = [
         binary_file,
         f"--local-interface={local_ip}",
-        f"--fps-primary {primary_fps}",
-        f"--fps-secondary {secondary_fps}",
+        f"--fps-primary", str(primary_fps),
+        f"--fps-secondary", str(secondary_fps),
         f"files=\"{test_file_high_resolution}\";secondary-files=\"{test_file_low_resolution}\";count={count}",
     ]
 
@@ -35,15 +35,13 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
         env['LD_LIBRARY_PATH'] = ld_library_path
 
     # NOTE: The first arg is the command itself.
-    logging.info('Running testcamera with the following command and args:')
-    logging.info('[')
+    log_message = 'Running testcamera with the following command and args:\n'
     if ld_library_path:
-        logging.info(f'LD_LIBRARY_PATH={ld_library_path}')
+        log_message += f'    LD_LIBRARY_PATH={ld_library_path}\n'
     for arg in camera_args:
-        logging.info(arg)
-    logging.info(']')
+        log_message += f'    {arg}\n'
+    logging.info(log_message)
 
-    logging.info(f"Run: {' '.join(camera_args)}")
     try:
         proc = subprocess.Popen(camera_args, env=env, **opts)
     except Exception as exception:

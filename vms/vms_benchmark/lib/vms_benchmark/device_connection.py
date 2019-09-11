@@ -7,8 +7,7 @@ import subprocess
 from io import StringIO
 
 def log_remote_command(command):
-    logging.info('Executing remote command:')
-    logging.info(f'    {command}')
+    logging.info(f'Executing remote command:\n    {command}')
 
 
 def log_remote_command_status(status_code):
@@ -16,7 +15,7 @@ def log_remote_command_status(status_code):
         result_log_message = 'succeeded'
     else:
         result_log_message = f'failed with code {status_code}'
-    logging.info(f'    Remote command {result_log_message}')
+    logging.info(f'Remote command {result_log_message}')
 
 
 if platform.system() == 'Linux':
@@ -74,7 +73,7 @@ if platform.system() == 'Linux':
             self.local_ip = ssh_connection_info[0]
             self.is_root = self.eval('id -u') == '0'
 
-        def sh(self, command, timeout=3, su=False, exc=False, stdout=sys.stdout, stderr=sys.stderr):
+        def sh(self, command, timeout=3, su=False, exc=False, stdout=sys.stdout, stderr=None):
             command_wrapped = command if self.is_root or not su else f'sudo -n {command}'
 
             log_remote_command(command_wrapped)
@@ -90,7 +89,7 @@ if platform.system() == 'Linux':
 
             if run.returncode != 0 and exc:
                 raise exceptions.DeviceCommandError(
-                    message=f'Command `{command_wrapped}` failed with code {run.returncode}'
+                    message=f'Command `{command_wrapped}` failed with code {run.returncode}, stderr:\n    {run.stderr}'
                 )
 
             if stdout:
@@ -102,7 +101,7 @@ if platform.system() == 'Linux':
 
             return self.DeviceConnectionResult(run.returncode)
 
-        def eval(self, cmd, timeout=3, su=False, stderr=sys.stderr):
+        def eval(self, cmd, timeout=3, su=False, stderr=None):
             out = StringIO()
             res = self.sh(cmd, su=su, stdout=out, stderr=stderr, timeout=timeout)
 
@@ -114,7 +113,7 @@ if platform.system() == 'Linux':
 
             return out.getvalue().strip()
 
-        def get_file_content(self, path, su=False, stderr=sys.stderr, timeout=15):
+        def get_file_content(self, path, su=False, stderr=None, timeout=15):
             return self.eval(f'cat "{path}"', su=su, stderr=stderr, timeout=timeout)
 
 elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
