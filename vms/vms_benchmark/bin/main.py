@@ -289,12 +289,13 @@ def main(config_file):
         time.sleep(5)
         return True
 
-    api.check_authentication()
-
     if not wait_for_api():
         raise exceptions.ServerApiError("API of Server is not working: ping request was not successful.")
 
-    print('Rest API test is OK.')
+    print('Rest API basic test is OK.')
+
+    api.check_authentication()
+    print('Rest API authentication test is OK.')
 
     for i in 1, 2, 3:
         cameras = api.get_test_cameras_all()
