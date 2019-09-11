@@ -5,6 +5,7 @@ import sys
 import traceback
 from io import StringIO
 from os import path as osp
+import logging
 
 project_root = osp.dirname(osp.dirname(osp.realpath(__file__)))
 if osp.isfile(osp.join(project_root, ".not_installed")):
@@ -12,10 +13,12 @@ if osp.isfile(osp.join(project_root, ".not_installed")):
 
 from vms_benchmark.device_connection import DeviceConnection
 
+logging.basicConfig(filename='test.log', filemode='w', level=logging.DEBUG)
 
 class TestStringMethods(unittest.TestCase):
     def test_connection(self):
         device = DeviceConnection(
+            logging=logging,
             host='vega',
             port=22
         )
@@ -64,6 +67,7 @@ class TestStringMethods(unittest.TestCase):
 
     def test_stderr_none_acceptance(self):
         device = DeviceConnection(
+            logging=logging,
             host='vega',
             port=22
         )

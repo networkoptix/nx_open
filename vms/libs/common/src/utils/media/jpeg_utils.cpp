@@ -6,11 +6,147 @@
 #include "jpeg_utils.h"
 
 #include <nx/utils/log/assert.h>
+#include <utils/media/bitStream.h>
 
 namespace nx_jpg
 {
     static const int MARKER_HEADER_SIZE = 2;
     static const int MARKER_LENGTH_SIZE = 2;
+
+struct Component
+{
+    uint8_t id = 0;
+    uint8_t vCount = 0;
+    uint8_t hCount = 0;
+    uint8_t quantIndex = 0;
+};
+
+AVPixelFormat convertGbr(uint32_t pixFmtMask, uint8_t bits)
+{
+    switch (pixFmtMask)
+    {
+    case 0x11111100:
+        return bits <= 8 ? AV_PIX_FMT_GBRP : AV_PIX_FMT_GBRP16;
+
+    case 0x12111100:
+    case 0x14121200:
+    case 0x14111100:
+    case 0x22211100:
+    case 0x22112100:
+    case 0x21111100:
+        return bits <= 8 ? AV_PIX_FMT_GBRP : AV_PIX_FMT_NONE;
+    }
+    return AV_PIX_FMT_NONE;
+}
+
+AVPixelFormat convertYuv(uint32_t pixFmtMask, uint8_t bits)
+{
+    switch (pixFmtMask)
+    {
+    case 0x11111100:
+        if (bits <= 8)
+            return bits <= 8 ? AV_PIX_FMT_YUV444P : AV_PIX_FMT_YUV444P16;
+
+    case 0x12121100:
+    case 0x22122100:
+    case 0x21211100:
+    case 0x22211200:
+    case 0x22221100:
+    case 0x22112200:
+    case 0x11222200:
+    case 0x31111100:
+        return bits <= 8 ? AV_PIX_FMT_YUV444P : AV_PIX_FMT_NONE;
+
+    case 0x12111100:
+    case 0x14121200:
+    case 0x14111100:
+    case 0x22211100:
+    case 0x22112100:
+        return bits <= 8 ? AV_PIX_FMT_YUV440P : AV_PIX_FMT_NONE;
+
+    case 0x21111100:
+        return bits <= 8 ? AV_PIX_FMT_YUV422P : AV_PIX_FMT_YUV422P16;
+
+    case 0x22121100:
+    case 0x22111200:
+        return bits <= 8 ? AV_PIX_FMT_YUV422P : AV_PIX_FMT_NONE;
+
+    case 0x22111100:
+    case 0x42111100:
+    case 0x24111100:
+        if (pixFmtMask == 0x42111100 || pixFmtMask == 0x24111100)
+        {
+            if (bits > 8)
+                return AV_PIX_FMT_NONE;
+        }
+        return bits <= 8 ? AV_PIX_FMT_YUV420P : AV_PIX_FMT_YUV420P16;
+
+    case 0x41111100:
+        return bits <= 8 ? AV_PIX_FMT_YUV411P : AV_PIX_FMT_NONE;
+
+    default:
+        return AV_PIX_FMT_NONE;
+    }
+}
+
+AVPixelFormat parsePixelFormatFromSOF(const quint8* data, size_t size)
+{
+    if (size <= 4)
+        return AV_PIX_FMT_NONE;
+
+    uint8_t bits = 0;
+    uint8_t numberComponents = 0;
+    Component components[4];
+    try
+    {
+        BitStreamReader reader(data + 4, size - 4);
+        bits = reader.getBits(8);
+        reader.skipBits(32); // height and width
+        numberComponents = reader.getBits(8);
+        if (numberComponents > 4)
+            return AV_PIX_FMT_NONE;
+
+        for (uint8_t i = 0; i < numberComponents; i++) {
+
+            components[i].id = reader.getBits(8) - 1;
+            components[i].hCount = reader.getBits(4);
+            components[i].vCount = reader.getBits(4);
+            components[i].quantIndex = reader.getBits(8);
+            if (components[i].quantIndex >= 4)
+                return AV_PIX_FMT_NONE;
+            if (!components[i].hCount || !components[i].vCount)
+                return AV_PIX_FMT_NONE;
+        }
+    }
+    catch (const BitStreamException&)
+    {
+        return AV_PIX_FMT_NONE;
+    }
+
+    if (numberComponents == 1)
+        return bits <= 8 ? AV_PIX_FMT_GRAY8 : AV_PIX_FMT_GRAY16;
+
+    if (numberComponents != 3) // not impelemented
+        return AV_PIX_FMT_NONE;
+
+    // below obfuscated code from ffmpeg, need to be simplified
+    uint32_t pixFmtMask =
+        ((unsigned)components[0].hCount << 28) | (components[0].vCount << 24) |
+        (components[1].hCount << 20) | (components[1].vCount << 16) |
+        (components[2].hCount << 12) | (components[2].vCount <<  8) |
+        (components[3].hCount <<  4) |  components[3].vCount;
+    /* NOTE we do not allocate pictures large enough for the possible
+     * padding of h/v_count being 4 */
+    if (!(pixFmtMask & 0xD0D0D0D0))
+        pixFmtMask -= (pixFmtMask & 0xF0F0F0F0) >> 1;
+    if (!(pixFmtMask & 0x0D0D0D0D))
+        pixFmtMask -= (pixFmtMask & 0x0F0F0F0F) >> 1;
+
+    if (components[0].id == 'Q' && components[1].id == 'F' && components[2].id == 'A')
+        return convertGbr(pixFmtMask, bits);
+
+    return convertYuv(pixFmtMask, bits);
+}
 
     QString toString(ResultCode resCode)
     {
@@ -104,7 +240,7 @@ namespace nx_jpg
         }
         return succeeded;
     }
-    
+
     bool readJpegImageInfo( const quint8* data, size_t size, ImageInfo* const imgInfo )
     {
         auto parseHandler = [data, size, imgInfo]( int markerType, size_t markerLength, size_t currentOffset ) -> bool
@@ -121,11 +257,12 @@ namespace nx_jpg
             imgInfo->precision = sofDataStart[0];
             imgInfo->height = (sofDataStart[1] << 8) | sofDataStart[2];
             imgInfo->width = (sofDataStart[3] << 8) | sofDataStart[4];
+            imgInfo->pixelFormat = parsePixelFormatFromSOF(data + currentOffset, size);
             return false;
         };
 
         JpegParser parser;
-        parser.setParseHandler( parseHandler );
+        parser.setParseHandler(parseHandler);
         ResultCode rc = parser.parse( data, size );
         return rc == succeeded || rc == interrupted;
     }

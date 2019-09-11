@@ -19,8 +19,7 @@ try:
     signal.signal(signal.SIGINT, exit_handler)
     signal.signal(signal.SIGTERM, exit_handler)
     if platform.system() == 'Linux':
-        # Prevent "[Errno 32] Broken pipe" exceptions when
-        # writing to a pipe.
+        # Prevent "[Errno 32] Broken pipe" exceptions when writing to a pipe.
         signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
 except KeyboardInterrupt:
@@ -49,7 +48,7 @@ from vms_benchmark.device_connection import DeviceConnection
 from vms_benchmark.device_platform import DevicePlatform
 from vms_benchmark.vms_scanner import VmsScanner
 from vms_benchmark.server_api import ServerApi
-from vms_benchmark.test_camera_runner import TestCameraRunner
+from vms_benchmark import test_camera_runner
 from vms_benchmark.linux_distibution import LinuxDistributionDetector
 from vms_benchmark import device_tests
 from vms_benchmark import host_tests
@@ -97,16 +96,19 @@ def load_configs(config_file):
     sys_option_descriptions = {
         "testCameraBin": {
             "optional": True,
-            "type": 'string'
+            "type": 'string',
+            "default": './testcamera/testcamera'
         },
         "testFileHighResolution": {
             "optional": True,
-            "type": 'string'
+            "type": 'string',
+            "default": './high.ts'
         },
         "testFileLowResolution": {
             "optional": True,
-            "type": 'string'
-        },
+            "type": 'string',
+            "default": './low.ts'
+    },
         "streamTestDurationSecs": {
             "optional": True,
             "type": 'integer',
@@ -118,10 +120,14 @@ def load_configs(config_file):
             "default": 30
         },
         "testStreamFpsHigh": {
+            "optional": True,
             "type": 'integer',
+            "default": 30
         },
         "testStreamFpsLow": {
+            "optional": True,
             "type": 'integer',
+            "default": 7
         },
         "testCameraDebug": {
             "optional": True,
@@ -130,31 +136,34 @@ def load_configs(config_file):
         },
     }
 
-    sys_config = ConfigParser('.vms_benchmark.ini', sys_option_descriptions)
+    sys_config = ConfigParser('vms_benchmark.ini', sys_option_descriptions, is_file_optional=True)
 
     if sys_config['testCameraBin']:
-        TestCameraRunner.binary_file = sys_config['testCameraBin']
+        test_camera_runner.binary_file = sys_config['testCameraBin']
     if sys_config['testFileHighResolution']:
-        TestCameraRunner.test_file_high_resolution = sys_config['testFileHighResolution']
+        test_camera_runner.test_file_high_resolution = sys_config['testFileHighResolution']
     if sys_config['testFileLowResolution']:
-        TestCameraRunner.test_file_low_resolution = sys_config['testFileLowResolution']
-    TestCameraRunner.debug = sys_config['testCameraDebug']
+        test_camera_runner.test_file_low_resolution = sys_config['testFileLowResolution']
+    test_camera_runner.debug = sys_config['testCameraDebug']
 
     return config, sys_config
 
 
 def log_exception(contextName, exception):
-    # TODO: Fix: traceback produces SyntaxError exception with pyinstaller on Linux.
-    #logging.error(traceback.format_exc())
-    logging.error(f'Exception: {contextName}: {type(exception)}: {str(exception)}')
+    logging.exception(f'Exception: {contextName}: {type(exception)}: {str(exception)}')
 
 
 @click.command()
 @click.option('--config', 'config_file', default='vms_benchmark.conf', help='Input config file.')
 @click.option('-C', 'config_file', default='vms_benchmark.conf', help='Input config file.')
 def main(config_file):
-    """Program for test device to ability of run Nx VMS on it."""
-    if platform.system() == 'Linux':
+    test_camera_runner.logging = logging
+
+    config, sys_config = load_configs(config_file)
+
+    password = config.get('devicePassword', None)
+
+    if password and platform.system() == 'Linux':
         res = host_tests.SshPassInstalled().call()
 
         if not res.success:
@@ -164,12 +173,11 @@ def main(config_file):
                 f"Details for the error: {res.formatted_message()}"
             )
 
-    config, sys_config = load_configs(config_file)
-
     device = DeviceConnection(
+        logging=logging,
         host=config['deviceHost'],
         login=config.get('deviceLogin', None),
-        password=config.get('devicePassword', None),
+        password=password,
         port=config['deviceSshPort']
     )
 
@@ -326,126 +334,128 @@ def main(config_file):
         print(f"Try to serve {test_cameras_count} cameras.")
         print("")
 
-        try:
-            _test_cameras_runner = TestCameraRunner.spawn(
-                local_ip=device.local_ip,
-                count=test_cameras_count,
-                lowStreamFps=sys_config['testStreamFpsLow']
-            )
+        test_camera_cm = test_camera_runner.test_camera_running(
+            local_ip=device.local_ip,
+            count=test_cameras_count,
+            primary_fps=sys_config['testStreamFpsHigh'],
+            secondary_fps=sys_config['testStreamFpsLow'],
+        )
+        with test_camera_cm as test_camera_process:
             print(f"    Spawned {test_cameras_count} test cameras.")
-        except Exception as exception:
-            log_exception('TestCameraRunner.spawn()', exception)
-            raise exceptions.TestCameraError(f"Unexpected error during spawning cameras: {str(exception)}")
 
-        def wait_test_cameras_discovered(timeout, duration):
-            started_at = time.time()
-            detection_started_at = None
-            while time.time() - started_at < timeout:
-                cameras = api.get_test_cameras()
+            def wait_test_cameras_discovered(timeout, duration):
+                started_at = time.time()
+                detection_started_at = None
+                while time.time() - started_at < timeout:
+                    if test_camera_process.poll() is not None:
+                        raise exceptions.TestCameraError(
+                            f'Test Camera process exited unexpectedly with code {test_camera_process.returncode}')
 
-                if len(cameras) >= test_cameras_count:
-                    if detection_started_at is None:
-                        detection_started_at = time.time()
-                    elif time.time() - detection_started_at >= duration:
-                        return True, cameras
-                else:
-                    detection_started_at = None
-            return False, None
+                    cameras = api.get_test_cameras()
 
-        try:
-            discovering_timeout = 120
+                    if len(cameras) >= test_cameras_count:
+                        if detection_started_at is None:
+                            detection_started_at = time.time()
+                        elif time.time() - detection_started_at >= duration:
+                            return True, cameras
+                    else:
+                        detection_started_at = None
+                return False, None
 
-            print(f"    Waiting for test cameras discovering... (timeout is {discovering_timeout} seconds)")
-            res, cameras = wait_test_cameras_discovered(discovering_timeout, 3)
-            if not res:
-                raise exceptions.TestCameraError('Timeout expired.')
+            try:
+                discovering_timeout = 120
 
-            print("    All test cameras had been discovered successfully.")
+                print(f"    Waiting for test cameras discovering... (timeout is {discovering_timeout} seconds)")
+                res, cameras = wait_test_cameras_discovered(discovering_timeout, 3)
+                if not res:
+                    raise exceptions.TestCameraError('Timeout expired.')
 
-            time.sleep(test_cameras_count * 2)
+                print("    All test cameras had been discovered successfully.")
 
-            for camera in cameras:
-                if camera.enable_recording(highStreamFps=sys_config['testStreamFpsHigh']):
-                    print(f"    Recording on camera {camera.id} enabled.")
-                else:
-                    raise exceptions.TestCameraError(f"Error enabling recording on camera {camera.id}: request failed.")
+                time.sleep(test_cameras_count * 2)
 
-            camera_id = cameras[0].id
-        except Exception as e:
-            log_exception('Discovering cameras', e)
-            raise exceptions.TestCameraError(f"Cameras are not discovered.", e)
+                for camera in cameras:
+                    if camera.enable_recording(highStreamFps=sys_config['testStreamFpsHigh']):
+                        print(f"    Recording on camera {camera.id} enabled.")
+                    else:
+                        raise exceptions.TestCameraError(f"Error enabling recording on camera {camera.id}: request failed.")
 
-        try:
-            stream_opening_started_at = time.time()
-            stream_duration = sys_config['streamTestDurationSecs']
+                camera_id = cameras[0].id
+            except Exception as e:
+                log_exception('Discovering cameras', e)
+                raise exceptions.TestCameraError(f"Cameras are not discovered.", e) from e
 
-            while time.time() - stream_opening_started_at < 25:
-                stream_url = f"rtsp://{config['vmsUser']}:{config['vmsPassword']}@{device.ip}:{vms.port}/{camera_id}"
-                stream = cv2.VideoCapture(stream_url)
+            try:
+                stream_opening_started_at = time.time()
+                stream_duration = sys_config['streamTestDurationSecs']
 
-                if stream.isOpened():
-                    print(f"    RTSP stream opened. Test duration: {stream_duration} seconds.")
-                    break
+                while time.time() - stream_opening_started_at < 25:
+                    stream_url = f"rtsp://{config['vmsUser']}:{config['vmsPassword']}@{device.ip}:{vms.port}/{camera_id}"
+                    stream = cv2.VideoCapture(stream_url)
 
-            if not stream.isOpened():
-                raise exceptions.TestCameraStreamingError(f"Can't open RTSP stream {stream_url}: timeout ended")
+                    if stream.isOpened():
+                        print(f"    RTSP stream opened. Test duration: {stream_duration} seconds.")
+                        break
 
-            streaming_started_at = time.time()
+                if not stream.isOpened():
+                    raise exceptions.TestCameraStreamingError(f"Can't open RTSP stream {stream_url}: timeout ended")
 
-            last_pts = None
-            last_ts = None
-            first_ts = None
-            frames = 0
+                streaming_started_at = time.time()
 
-            frame_drops = 0
-            dummy_frames_count = 0
+                last_pts = None
+                last_ts = None
+                first_ts = None
+                frames = 0
 
-            while stream.isOpened():
-                _ret, _frame = stream.read()
-                frames += 1
-                pts = stream.get(cv2.CAP_PROP_POS_MSEC)
+                frame_drops = 0
+                dummy_frames_count = 0
 
-                if first_ts is None:
-                    first_ts = time.time()
-                else:
-                    lag = time.time() - (first_ts + frames * (1.0/float(sys_config['testFileFps'])))
-                    if lag > 5:
-                        raise exceptions.TestCameraStreamingError('Stream is too slow.')
+                while stream.isOpened():
+                    _ret, _frame = stream.read()
+                    frames += 1
+                    pts = stream.get(cv2.CAP_PROP_POS_MSEC)
 
-                ts = time.time()
+                    if first_ts is None:
+                        first_ts = time.time()
+                    else:
+                        lag = time.time() - (first_ts + frames * (1.0/float(sys_config['testFileFps'])))
+                        if lag > 5:
+                            raise exceptions.TestCameraStreamingError('Stream is too slow.')
 
-                if last_ts is not None and ts - last_ts < 0.01:
-                    dummy_frames_count += 1
+                    ts = time.time()
 
-                    if dummy_frames_count > 50:
-                        raise exceptions.TestCameraStreamingError('Stream is unexpectedly broken.')
+                    if last_ts is not None and ts - last_ts < 0.01:
+                        dummy_frames_count += 1
 
-                pts_diff_max = (1000./float(sys_config['testFileFps']))*1.05
+                        if dummy_frames_count > 50:
+                            raise exceptions.TestCameraStreamingError('Stream is unexpectedly broken.')
 
-                if last_pts is not None and pts - last_pts > pts_diff_max:
-                    frame_drops += 1
-                if time.time() - streaming_started_at > stream_duration:
-                    print(f"    Serving {test_cameras_count} cameras is OK.")
-                    break
-                last_pts = pts
-                last_ts = time.time()
-            import pprint
-            log_events = api.get_events(streaming_started_at)
-            storage_failure_events_count = sum(
-                event['aggregationCount']
-                for event in log_events
-                if event['eventParams'].get('eventType', None) == 'storageFailureEvent'
-            )
-            print(f"    Frame drops: {frame_drops}")
-            print(f"    Storage failures: {storage_failure_events_count}")
-            print(f"    CPU usage: {device.eval('cat /proc/loadavg').split()[1]}")
-            print(f"    Free RAM: {round(ram_free/1024/1024)}M")
-        except exceptions.TestCameraStreamingError as exception:
-            print(f"\nISSUE: {str(exception)}")
-            log_exception("ISSUE", exception)
-            return 1
-        finally:
-            stream.release()
+                    pts_diff_max = (1000./float(sys_config['testFileFps']))*1.05
+
+                    if last_pts is not None and pts - last_pts > pts_diff_max:
+                        frame_drops += 1
+                    if time.time() - streaming_started_at > stream_duration:
+                        print(f"    Serving {test_cameras_count} cameras is OK.")
+                        break
+                    last_pts = pts
+                    last_ts = time.time()
+                import pprint
+                log_events = api.get_events(streaming_started_at)
+                storage_failure_events_count = sum(
+                    event['aggregationCount']
+                    for event in log_events
+                    if event['eventParams'].get('eventType', None) == 'storageFailureEvent'
+                )
+                print(f"    Frame drops: {frame_drops}")
+                print(f"    Storage failures: {storage_failure_events_count}")
+                print(f"    CPU usage: {device.eval('cat /proc/loadavg').split()[1]}")
+                print(f"    Free RAM: {round(ram_free/1024/1024)}M")
+            except exceptions.TestCameraStreamingError as exception:
+                print(f"\nISSUE: {str(exception)}")
+                log_exception("ISSUE", exception)
+                return 1
+            finally:
+                stream.release()
 
     print('\nAll tests are successfully finished.')
     return 0

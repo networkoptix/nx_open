@@ -42,7 +42,7 @@ bool Camera::initialize()
 
 void Camera::uninitialize()
 {
-    NX_DEBUG(this, "unititialize");
+    NX_DEBUG(this, "uninitialize");
     std::scoped_lock<std::mutex> lock(m_mutex);
     m_keyFrameFound = false;
     m_packetBuffer.flush();
