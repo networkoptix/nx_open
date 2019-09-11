@@ -355,7 +355,7 @@ void QnResourceAccessManager::recalculateAllPermissions()
         QnMutexLocker lk(&m_mutex);
         m_permissionsCache = permissionsCache;
     }
-
+    emit allPermissionsRecalculated();
 }
 
 void QnResourceAccessManager::updatePermissions(const QnResourceAccessSubject& subject,

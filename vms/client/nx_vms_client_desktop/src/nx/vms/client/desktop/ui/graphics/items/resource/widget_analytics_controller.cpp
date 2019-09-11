@@ -415,7 +415,7 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
     if (!objectMetadataPackets.isEmpty())
     {
         const auto& metadata = objectMetadataPackets.first();
-        if (toMs(microseconds(metadata->timestampUs)) <= toMs(timestamp))
+        if (toMs(microseconds(metadata->timestampUs)) <= timestampMs)
         {
             if (d->logger)
                 d->logger->pushObjectMetadata(*metadata);
