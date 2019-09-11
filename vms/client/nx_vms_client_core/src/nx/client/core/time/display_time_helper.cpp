@@ -2,7 +2,7 @@
 
 #include <QtQml/QtQml>
 
-#include <nx/client/core/time/time_constants.h>
+#include <nx/client/core/time/calendar_utils.h>
 #include <nx/vms/time/formatter.h>
 
 namespace nx::client::core {
@@ -76,7 +76,7 @@ qint64 DisplayTimeHelper::position() const
 void DisplayTimeHelper::setDisplayOffset(qint64 value)
 {
     value = std::clamp<qint64>(
-        value, TimeConstants::kMinDisplayOffset, TimeConstants::kMaxDisplayOffset);
+        value, CalendarUtils::kMinDisplayOffset, CalendarUtils::kMaxDisplayOffset);
 
     if (d->displayOffset == value)
         return;

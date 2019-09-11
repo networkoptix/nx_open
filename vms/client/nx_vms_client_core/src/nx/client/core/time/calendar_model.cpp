@@ -6,18 +6,11 @@
 
 #include <functional>
 
-#include <nx/client/core/time/time_constants.h>
+#include <nx/client/core/time/calendar_utils.h>
 #include <nx/client/core/media/chunk_provider.h>
 #include <nx/client/core/media/time_periods_store.h>
 
 namespace {
-
-QDate createDate(int year, int month)
-{
-    return QDate(year, month, 1);
-}
-
-//--------------------------------------------------------------------------------------------------
 
 struct Day
 {
@@ -68,7 +61,7 @@ void Month::updateMonthTo(int yearValue, int monthValue, qint64 displayOffset)
 {
     year = yearValue;
     month = monthValue;
-    const auto startDate = createDate(year, month);
+    const auto startDate = QDate(year, month, 1);
     startDay = Day(startDate, displayOffset);
     endDay = Day(QDate(year, month, startDate.daysInMonth()), displayOffset);
 }
@@ -87,7 +80,6 @@ namespace nx::client::core {
 struct CalendarModel::Private
 {
     Private(CalendarModel* owner);
-    QDate getFirstCalendarDate(int year, int month) const;
     void resetDaysModelData();
     void updateArchiveInfo();
     void handleCurrentPositionChanged();
@@ -110,24 +102,13 @@ CalendarModel::Private::Private(CalendarModel* owner):
 {
 }
 
-QDate CalendarModel::Private::getFirstCalendarDate(int year, int month) const
-{
-    auto date = createDate(year, month);
-    int dayOfWeek = date.dayOfWeek();
-    if (locale.firstDayOfWeek() == Qt::Monday)
-        date = date.addDays(1 - dayOfWeek);
-    else if (dayOfWeek < Qt::Sunday)
-        date = date.addDays(-dayOfWeek);
-    return date;
-}
-
 void CalendarModel::Private::resetDaysModelData()
 {
     q->beginResetModel();
 
     days.clear();
 
-    auto date = getFirstCalendarDate(currentMonth.year, currentMonth.month);
+    auto date = CalendarUtils::firstWeekStartDate(locale, currentMonth.year, currentMonth.month);
     if (!date.isValid())
         return;
 
@@ -219,6 +200,7 @@ CalendarModel::CalendarModel(QObject* parent):
     base_type(parent),
     d(new Private(this))
 {
+    d->resetDaysModelData();
 }
 
 CalendarModel::~CalendarModel()
@@ -267,7 +249,7 @@ int CalendarModel::year() const
 
 void CalendarModel::setYear(int year)
 {
-    year = std::clamp(year, TimeConstants::kMinYear, TimeConstants::kMaxYear);
+    year = std::clamp(year, CalendarUtils::kMinYear, CalendarUtils::kMaxYear);
     if (year == d->currentMonth.year)
         return;
 
@@ -285,7 +267,7 @@ int CalendarModel::month() const
 
 void CalendarModel::setMonth(int month)
 {
-    month = std::clamp(month, TimeConstants::kMinMonth, TimeConstants::kMaxMonth);
+    month = std::clamp(month, CalendarUtils::kMinMonth, CalendarUtils::kMaxMonth);
     if (month == d->currentMonth.month)
         return;
 
@@ -355,7 +337,7 @@ qint64 CalendarModel::displayOffset() const
 void CalendarModel::setDisplayOffset(qint64 value)
 {
     value = std::clamp<qint64>(
-        value, TimeConstants::kMinDisplayOffset, TimeConstants::kMaxDisplayOffset);
+        value, CalendarUtils::kMinDisplayOffset, CalendarUtils::kMaxDisplayOffset);
 
     if (d->displayOffset == value)
         return;

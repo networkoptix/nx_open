@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 
-#include <nx/client/core/time/time_constants.h>
+#include <nx/client/core/time/calendar_utils.h>
 
 namespace nx::client::core {
 namespace test {
@@ -17,7 +17,7 @@ TYPED_TEST_CASE_P(CommonTimePropertiesTest);
 
 TYPED_TEST_P(CommonTimePropertiesTest, DisplayOffsetPropertyCheck)
 {
-    using TimeConstants = nx::client::core::TimeConstants;
+    using TimeConstants = nx::client::core::CalendarUtils;
 
     TypeParam& object = this->object;
     // Checks if display offset setter/getter works correctly.
