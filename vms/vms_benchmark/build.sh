@@ -16,4 +16,4 @@ python3.6 \
     --workpath $BUILD_DIR/build \
     --specpath $BUILD_DIR \
     -p $SRC_DIR/lib \
-    $SRC_DIR/bin/vms_benchmark
+    $SRC_DIR/bin/main.py

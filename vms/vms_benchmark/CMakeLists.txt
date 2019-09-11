@@ -32,7 +32,7 @@ if(targetDevice MATCHES "^linux-x64")
         COMMAND ${CMAKE_COMMAND} -P ${copy_files_script} #< Create and populate sdk dir.
 
         COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/build.sh >${zip_log}
-        COMMAND ${CMAKE_COMMAND} -E copy ${build_dir}/dist/vms_benchmark ${stage_dir}/
+        COMMAND ${CMAKE_COMMAND} -E copy ${build_dir}/dist/main ${stage_dir}/
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/distrib/.vms_benchmark.ini ${stage_dir}/
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/distrib/vms_benchmark.conf ${stage_dir}/
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/readme.md ${stage_dir}/

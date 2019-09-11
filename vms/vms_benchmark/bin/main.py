@@ -144,8 +144,21 @@ def load_configs(config_file):
 
 
 def log_exception(contextName, exception):
-    # TODO: Fix: traceback produces SyntaxError exception with pyinstaller on Linux.
-    #logging.error(traceback.format_exc())
+    logging.exception(f'Exception: {contextName}: {type(exception)}: {str(exception)}')
+    return
+    formatted_traceback = ''
+    tb = exception.__traceback__
+    while tb is not None:
+        formatted_traceback += (
+            '  '
+            f'File "{tb.tb_frame.f_code.co_filename}"'
+            f', '
+            f'line {tb.tb_frame.f_lineno}'
+            f', '
+            f'in {tb.tb_frame.f_code.co_name}'
+            '\n'
+        )
+        tb = tb.tb_next
     logging.error(f'Exception: {contextName}: {type(exception)}: {str(exception)}')
 
 
@@ -376,7 +389,7 @@ def main(config_file):
                 camera_id = cameras[0].id
             except Exception as e:
                 log_exception('Discovering cameras', e)
-                raise exceptions.TestCameraError(f"Cameras are not discovered.", e)
+                raise exceptions.TestCameraError(f"Cameras are not discovered.", e) from e
 
             try:
                 stream_opening_started_at = time.time()
