@@ -39,14 +39,9 @@ class LinuxDistributionDetector:
 
             info = dict(unquote_value_if_needed(*line.split('=')) for line in res.split('\n') if len(line.strip()) > 0)
 
-            if info.get('ID', None) == 'debian':
-                os_name = 'debian'
-                os_family_name = 'debian'
-                os_version = info.get('VERSION_ID')
-            elif info.get('ID', None) == 'ubuntu':
-                os_name = 'ubuntu'
-                os_family_name = 'debian'
-                os_version = info.get('VERSION_ID')
+            os_name = info.get('ID')
+            os_family_name = info.get('ID_LIKE')
+            os_version = info.get('VERSION_ID')
         else:
             os_name = 'custom'
             os_family_name = 'none'
