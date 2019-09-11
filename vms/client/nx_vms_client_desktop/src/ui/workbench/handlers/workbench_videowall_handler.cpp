@@ -246,9 +246,13 @@ auto offlineItemOnThisPc = []
 
 //--------------------------------------------------------------------------------------------------
 
+// Workaround for the geometry changes. In MacOsX setGeometry function call on main window
+// hangs all drawing to the whole client. As workaround we turn off updates before geometry changes
+// and return them back when resize operations are complete.
 class QnWorkbenchVideoWallHandler::GeometrySetter: public QObject
 {
     using base_type = QObject;
+
 public:
     GeometrySetter(QWidget* target, QObject* parent = nullptr);
 
