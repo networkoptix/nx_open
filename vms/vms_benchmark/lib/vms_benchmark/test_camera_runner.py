@@ -1,3 +1,5 @@
+import os
+import platform
 import subprocess
 from contextlib import contextmanager
 
@@ -24,8 +26,12 @@ def test_camera_running(local_ip, lowStreamFps, count=1):
         opts['stdout'] = subprocess.PIPE
         opts['stderr'] = subprocess.PIPE
 
+    env = {}
+    if platform.system() == 'Linux':
+        env['LD_LIBRARY_PATH'] = os.path.dirname(binary_file)
+
     try:
-        proc = subprocess.Popen(camera_args, **opts)
+        proc = subprocess.Popen(camera_args, env=env, **opts)
     except Exception as exception:
         raise exceptions.TestCameraError(f"Unexpected error during spawning cameras: {str(exception)}")
 
