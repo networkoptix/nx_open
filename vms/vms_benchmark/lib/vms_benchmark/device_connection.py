@@ -7,8 +7,7 @@ import subprocess
 from io import StringIO
 
 def log_remote_command(command):
-    logging.info('Executing remote command:')
-    logging.info(f'    {command}')
+    logging.info(f'Executing remote command:\n    {command}')
 
 
 def log_remote_command_status(status_code):
@@ -16,7 +15,7 @@ def log_remote_command_status(status_code):
         result_log_message = 'succeeded'
     else:
         result_log_message = f'failed with code {status_code}'
-    logging.info(f'    Remote command {result_log_message}')
+    logging.info(f'Remote command {result_log_message}')
 
 
 if platform.system() == 'Linux':
