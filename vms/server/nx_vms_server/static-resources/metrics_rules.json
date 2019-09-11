@@ -1,0 +1,176 @@
+{
+    "systems": {
+        "info": {
+            "values": {
+                "name": {
+                    "display": "panel"
+                },
+                "recommendedMaxServers": {
+                    "calculate": "const 100"
+                },
+                "servers": {
+                    "display": "panel",
+                    "alarms": [{
+                        "level": "warning",
+                        "condition": "greaterThen %servers %recommendedMaxServers",
+                        "text": "The maximum number of %recommendedMaxServers servers per system is reached. Create another system to use more servers"
+                    }]
+                },
+                "users": {
+                    "display": "panel"
+                },
+                "recommendedMaxCameras": {
+                    "calculate": "const 10000"
+                },
+                "cameras": {
+                    "display": "panel",
+                    "alarms": [{
+                        "level": "warning",
+                        "condition": "greaterThen %servers %recommendedMaxCameras",
+                        "text": "The maximum number of %recommendedMaxCameras camera channels per system is reached. Create another system to use more cameras"
+                    }]
+                }
+            }
+        }
+    },
+    "servers": {
+        "state": {
+            "values": {
+                "name": {
+                    "display": "table|panel"
+                },
+                "status": {
+                    "display": "table|panel",
+                    "alarms": [{
+                        "level": "error",
+                        "condition": "notEqual %status Online",
+                        "text": "Status is %status"
+                    }]
+                },
+                "offlineEvents": {
+                    "name": "Server Offline events (24h)",
+                    "display": "table|panel",
+                    "calculate": "countValues %status 24h Offline",
+                    "insert": "uptimeS",
+                    "alarms": [{
+                        "level": "warning",
+                        "condition": "greaterThen %offlineEvents 1",
+                        "text": "went Offline %offlineEvents times in last 24 hours"
+                    }]
+                },
+                "uptimeS": {
+                    "name": "Uptime",
+                    "unit": "s",
+                    "display": "table|panel"
+                }
+            }
+        }
+    },
+    "cameras": {
+        "info": {
+            "values": {
+                "name": {
+                    "display": "table|panel"
+                },
+                "server": {
+                    "display": "table|panel"
+                },
+                "type": {
+                    "display": "table|panel"
+                },
+                "ip": {
+                    "name": "IP",
+                    "display": "table|panel"
+                },
+                "vendor": {
+                    "display": "panel"
+                },
+                "model": {
+                    "display": "panel"
+                },
+                "firmware": {
+                    "display": "panel"
+                },
+                "status": {
+                    "display": "table|panel",
+                    "alarms": [{
+                        "level": "warning",
+                        "condition": "equal %status Unauthorized",
+                        "text": "Status is %status"
+                    }, {
+                        "level": "error",
+                        "condition": "equal %status Offline",
+                        "text": "Status is %status"
+                    }]
+                },
+                "offlineEvents": {
+                    "name": "Server Offline events (24h)",
+                    "display": "table|panel",
+                    "calculate": "countValues %status 24h Offline",
+                    "alarms": [{
+                        "level": "warning",
+                        "condition": "greaterThen %offlineEvents 1",
+                        "text": "went Offline %offlineEvents times in last 24 hours"
+                    }]
+                }
+            }
+        }
+    },
+    "storages": {
+        "info": {
+            "values": {
+                "name": {
+                    "display": "table|panel"
+                },
+                "server": {
+                    "display": "table|panel"
+                },
+                "type": {
+                    "display": "table|panel"
+                }
+            }
+        },
+        "state": {
+            "values": {
+                "status": {
+                    "display": "table|panel"
+                },
+                "issues": {
+                    "name": "Issues (24h)",
+                    "display": "table|panel"
+                }
+            }
+        }
+    },
+    "networkInterfaces": {
+        "info": {
+            "values": {
+                "name": {
+                    "display": "table|panel"
+                },
+                "server": {
+                    "display": "table|panel"
+                },
+                "ip": {
+                    "name": "IP",
+                    "display": "table|panel"
+                }
+            }
+        },
+        "rates": {
+            "name": "I/O rates",
+            "values": {
+                "inBps": {
+                    "name": "IN rate",
+                    "unit": "bps",
+                    "display": "table|panel"
+                },
+                "outBps": {
+                    "name": "OUT rate",
+                    "unit": "bps",
+                    "display": "table|panel"
+                }
+            }
+        }
+    }
+}

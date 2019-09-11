@@ -87,30 +87,26 @@ private:
     {
         return nx::utils::make_container<ValueGroupProviders<Resource>>(
             std::make_unique<ValueGroupProvider<Resource>>(
-                api::metrics::Label{
-                    "g1", "group 1"
-                },
+                "g1",
                 std::make_unique<ValueProvider<Resource>>(
-                    api::metrics::ValueManifest({"i", "int parameter"}, api::metrics::Display::both, "pcs"),
-                    Getter<Resource>([](const auto& r) { return r.current("i1"); }),
-                    Watch<Resource>([](const auto& r, auto change) { return r.monitor("i1", std::move(change)); })
+                    "i",
+                    [](const auto& r) { return r.current("i1"); },
+                    [](const auto& r, auto change) { return r.monitor("i1", std::move(change)); }
                 ),
                 std::make_unique<ValueProvider<Resource>>(
-                    api::metrics::ValueManifest({"t", "text parameter"}, api::metrics::Display::panel),
+                    "t",
                     [](const auto& r) { return r.current("t1"); }
                 )
             ),
             std::make_unique<ValueGroupProvider<Resource>>(
-                api::metrics::Label{
-                    "g2", "group 2"
-                },
+                "g2",
                 std::make_unique<ValueProvider<Resource>>(
-                    api::metrics::ValueManifest({"i", "int parameter"}, api::metrics::Display::table),
-                    Getter<Resource>([](const auto& r) { return r.current("i2"); }),
-                    Watch<Resource>([](const auto& r, auto change) { return r.monitor("i2", std::move(change)); })
+                    "i",
+                    [](const auto& r) { return r.current("i2"); },
+                    [](const auto& r, auto change) { return r.monitor("i2", std::move(change)); }
                 ),
                 std::make_unique<ValueProvider<Resource>>(
-                    api::metrics::ValueManifest({"t", "text parameter"}, api::metrics::Display::both),
+                    "t",
                     [](const auto& r) { return r.current("t2"); }
                 )
             )

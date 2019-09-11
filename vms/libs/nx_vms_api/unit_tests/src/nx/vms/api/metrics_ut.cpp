@@ -38,28 +38,37 @@ void expectSerialization(const QByteArray& expectedJson, const T& value)
 static const QByteArray kRulesExample(R"json({
     "servers": {
         "availability": {
-            "status": { "alarms": [{ "level": "danger", "condition": "ne status 'Online'" }]},
-            "offlineEvents": { "alarms": [{ "level": "warning", "condition": "gt offlineEvents 0" }]}
+            "name": "Availability Info",
+            "values": {
+                "status": { "alarms": [{ "level": "danger", "condition": "ne status 'Online'" }]},
+                "offlineEvents": { "alarms": [{ "level": "warning", "condition": "gt offlineEvents 0" }]}
+            }
         },
         "load": {
-            "recommendedCpuUsageP": { "calculate": "const 95" },
-            "totalCpuUsageP": { "alarms": [{
-                "level": "warning",
-                "condition": "gt totalCpuUsageP recommendedCpuUsageP"
-            }]}
+            "values": {
+                "recommendedCpuUsageP": { "calculate": "const 95" },
+                "totalCpuUsageP": { "alarms": [{
+                    "level": "warning",
+                    "condition": "gt totalCpuUsageP recommendedCpuUsageP"
+                }]}
+            }
         }
     },
     "cameras": {
         "info": {
-            "status": { "alarms": [
-                { "level": "warning", "condition": "eq status 'Unauthorized'" },
-                { "level": "danger", "condition": "eq status 'Offline'" }
-            ]}
+            "values": {
+                "status": { "alarms": [
+                    { "level": "warning", "condition": "eq status 'Unauthorized'" },
+                    { "level": "danger", "condition": "eq status 'Offline'" }
+                ]}
+            }
         },
-        "issues": { "group": {
-            "offlineEvents": { "alarms": [{ "level": "warning", "condition": "gt offlineEvents 0" }] },
-            "streamIssues": { "alarms": [{ "level": "warning", "condition": "gt streamIssues 0" }] }
-        }}
+        "issues": {
+            "values": {
+                "offlineEvents": { "alarms": [{ "level": "warning", "condition": "gt offlineEvents 0" }] },
+                "streamIssues": { "alarms": [{ "level": "warning", "condition": "gt streamIssues 0" }] }
+            }
+        }
     }
 })json");
 
@@ -71,12 +80,12 @@ TEST(Metrics, Rules)
 
     auto servers = rules["servers"];
     {
-        auto status = servers["availability"]["status"];
+        auto status = servers["availability"].values["status"];
         ASSERT_EQ(status.alarms.size(), 1);
         EXPECT_EQ(status.alarms[0].level, AlarmLevel::danger);
         EXPECT_EQ(status.alarms[0].condition, "ne status 'Online'");
 
-        auto events = servers["availability"]["offlineEvents"];
+        auto events = servers["availability"].values["offlineEvents"];
         ASSERT_EQ(events.alarms.size(), 1);
         EXPECT_EQ(events.alarms[0].level, AlarmLevel::warning);
         EXPECT_EQ(events.alarms[0].condition, "gt offlineEvents 0");
@@ -84,7 +93,7 @@ TEST(Metrics, Rules)
 
     auto cameras = rules["cameras"];
     {
-        auto status = cameras["info"]["status"];
+        auto status = cameras["info"].values["status"];
         ASSERT_EQ(status.alarms.size(), 2);
         EXPECT_EQ(status.alarms[0].level, AlarmLevel::warning);
         EXPECT_EQ(status.alarms[0].condition, "eq status 'Unauthorized'");

@@ -42,33 +42,24 @@ utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkControll
 {
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
-            api::metrics::Label(
-                "info"
+            "info",
+            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+                "name", [](const auto& r) { return Value(r.name); }
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"name"}, api::metrics::Display::both),
-                [](const auto& r) { return Value(r.name); }
+                "server", [this](const auto&) { return Value(m_serverId); }
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"server"}, api::metrics::Display::both),
-                [this](const auto&) { return Value(m_serverId); }
-            ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"ip", "IP"}, api::metrics::Display::both),
-                [](const auto& r) { return Value(r.address.toString()); }
+                "ip", [](const auto& r) { return Value(r.address.toString()); }
             )
         ),
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
-            api::metrics::Label(
-                "rates", "I/O rates"
+            "rates",
+            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+                "inBps", [](const auto&) { return Value(666); } // TODO: Implement.
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"in", "IN rate"}, api::metrics::Display::both, "bps"),
-                [](const auto&) { return Value(); } // TODO: Implement.
-            ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"out", "OUT rate"}, api::metrics::Display::both, "bps"),
-                [](const auto&) { return Value(); } // TODO: Implement.
+                "outBps", [](const auto&) { return Value(777); } // TODO: Implement.
             )
         )
     );

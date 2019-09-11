@@ -10,7 +10,7 @@ void PrintTo(const Value& v, ::std::ostream* s)
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ValueManifest)(ValueGroupManifest)(AlarmRule)(ValueRule)(Alarm),
+    (ValueManifest)(ValueGroupManifest)(AlarmRule)(ValueRule)(ValueGroupRules)(Alarm),
     (json), _Fields, (optional, true))
 
 static QString nameOrCapitalizedId(QString name, const QString& id)

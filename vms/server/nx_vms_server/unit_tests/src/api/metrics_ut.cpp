@@ -52,7 +52,7 @@ protected:
 TEST_F(MetricsApi, Api)
 {
     const auto rules = get<SystemRules>("/api/metrics/rules");
-    expectCounts("rules", rules, "systems", 1, "servers", 1, "cameras", 1, "storages", 0);
+    expectCounts("rules", rules, "systems", 1, "servers", 1, "cameras", 1, "storages", 2);
     expectEq(rules, get<SystemRules>("/ec2/metrics/rules"));
 
     const auto manifest = get<SystemManifest>("/api/metrics/manifest");

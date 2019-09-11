@@ -21,7 +21,7 @@ public:
     api::metrics::ValueGroup current() const;
     std::vector<api::metrics::Alarm> alarms() const;
 
-    void setRules(const api::metrics::ValueGroupRules& rules);
+    void setRules(const std::map<QString, api::metrics::ValueRule>& rules);
 
 private:
     mutable nx::utils::Mutex m_mutex;

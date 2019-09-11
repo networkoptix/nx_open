@@ -11,21 +11,47 @@ namespace nx::vms::utils::metrics::test {
 static const QByteArray kRules(R"json({
     "tests": {
         "g1": {
-            "c": { "calculate": "const hello" },
-            "ip": {
-                "name": "i plus",
-                "display": "panel",
-                "calculate": "add %i 1",
-                "insert": "i",
-                "alarms": [{
-                    "level": "warning",
-                    "condition": "greaterThen %i 100",
-                    "text": "i = %i, ip = %ip"
-                },{
-                    "level": "danger",
-                    "condition": "lessThen %i 0",
-                    "text": "i = %i, ip = %ip"
-                }]
+            "name": "group 1",
+            "values": {
+                "i": {
+                    "name": "int parameter",
+                    "display": "panel|table"
+                },
+                "t": {
+                    "name": "text parameter",
+                    "display": "panel"
+                },
+                "c": {
+                    "calculate": "const hello"
+                },
+                "ip": {
+                    "name": "i plus",
+                    "display": "panel",
+                    "calculate": "add %i 1",
+                    "insert": "i",
+                    "alarms": [{
+                        "level": "warning",
+                        "condition": "greaterThen %i 100",
+                        "text": "i = %i, ip = %ip"
+                    },{
+                        "level": "danger",
+                        "condition": "lessThen %i 0",
+                        "text": "i = %i, ip = %ip"
+                    }]
+                }
+            }
+        },
+        "g2": {
+            "name": "group 2",
+            "values": {
+                "i": {
+                    "name": "int parameter",
+                    "display": "table"
+                },
+                "t": {
+                    "name": "text parameter",
+                    "display": "table|panel"
+                }
             }
         }
     }
@@ -55,6 +81,11 @@ public:
 
     void testManifest(bool includeRules)
     {
+        const api::metrics::Displays displayNone(api::metrics::Display::none);
+        const api::metrics::Displays displayPanel(api::metrics::Display::panel);
+        const api::metrics::Displays displayTable(api::metrics::Display::table);
+        const api::metrics::Displays displayBoth = displayPanel | displayTable;
+
         auto systemManifest = m_systemController.manifest();
         EXPECT_EQ(systemManifest.size(), 1);
 
@@ -63,7 +94,7 @@ public:
 
         const auto group1 = testManifest[0];
         EXPECT_EQ(group1.id, "g1");
-        EXPECT_EQ(group1.name, "group 1");
+        EXPECT_EQ(group1.name, includeRules ? "group 1" : "G1");
         ASSERT_EQ(group1.values.size(), includeRules ? 4 : 2);
 
         int b = 0;
@@ -72,30 +103,30 @@ public:
             b = 1;
             EXPECT_EQ(group1.values[0].id, "ip");
             EXPECT_EQ(group1.values[0].name, "i plus");
-            EXPECT_EQ(group1.values[0].display, api::metrics::Displays(api::metrics::Display::panel));
+            EXPECT_EQ(group1.values[0].display, displayPanel);
             EXPECT_EQ(group1.values[3].id, "c");
             EXPECT_EQ(group1.values[3].name, "C");
-            EXPECT_EQ(group1.values[3].display, api::metrics::Displays(api::metrics::Display::none));
+            EXPECT_EQ(group1.values[3].display, displayNone);
         }
 
         EXPECT_EQ(group1.values[b + 0].id, "i");
-        EXPECT_EQ(group1.values[b + 0].name, "int parameter");
-        EXPECT_EQ(group1.values[b + 0].display, api::metrics::Displays(api::metrics::Display::both));
+        EXPECT_EQ(group1.values[b + 0].name, includeRules ? "int parameter" : "I");
+        EXPECT_EQ(group1.values[b + 0].display, includeRules ? displayBoth : displayNone);
         EXPECT_EQ(group1.values[b + 1].id, "t");
-        EXPECT_EQ(group1.values[b + 1].name, "text parameter");
-        EXPECT_EQ(group1.values[b + 1].display, api::metrics::Displays(api::metrics::Display::panel));
+        EXPECT_EQ(group1.values[b + 1].name, includeRules ? "text parameter" : "T");
+        EXPECT_EQ(group1.values[b + 1].display, includeRules ? displayPanel : displayNone);
 
         const auto group2 = testManifest[1];
         EXPECT_EQ(group2.id, "g2");
-        EXPECT_EQ(group2.name, "group 2");
+        EXPECT_EQ(group2.name, includeRules ? "group 2" : "G2");
         ASSERT_EQ(group2.values.size(), 2);
 
         EXPECT_EQ(group2.values[0].id, "i");
-        EXPECT_EQ(group2.values[0].name, "int parameter");
-        EXPECT_EQ(group2.values[0].display, api::metrics::Displays(api::metrics::Display::table));
+        EXPECT_EQ(group2.values[0].name, includeRules ? "int parameter" : "I");
+        EXPECT_EQ(group2.values[0].display, includeRules ? displayTable : displayNone);
         EXPECT_EQ(group2.values[1].id, "t");
-        EXPECT_EQ(group2.values[1].name, "text parameter");
-        EXPECT_EQ(group2.values[1].display, api::metrics::Displays(api::metrics::Display::both));
+        EXPECT_EQ(group2.values[1].name, includeRules ? "text parameter" : "T");
+        EXPECT_EQ(group2.values[1].display, includeRules ? displayBoth : displayNone);
     }
 
     void testValues(bool includeRules)

@@ -93,8 +93,13 @@ struct NX_VMS_API ValueRule: ValueManifest
 #define ValueRule_Fields ValueManifest_Fields(calculate)(insert)(alarms)
 QN_FUSION_DECLARE_FUNCTIONS(ValueRule, (json), NX_VMS_API)
 
-using ValueGroupRules
-    = std::map<QString /*id*/, ValueRule>;
+struct ValueGroupRules
+{
+    QString name;
+    std::map<QString /*id*/, ValueRule> values;
+};
+#define ValueGroupRules_Fields (name)(values)
+QN_FUSION_DECLARE_FUNCTIONS(ValueGroupRules, (json), NX_VMS_API)
 
 using ResourceRules
     = std::map<QString /*id*/, ValueGroupRules>;

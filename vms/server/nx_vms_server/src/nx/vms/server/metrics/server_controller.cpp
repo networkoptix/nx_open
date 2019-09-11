@@ -57,31 +57,26 @@ utils::metrics::Getter<ServerController::Resource> ServerController::localGetter
 
 utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController::makeProviders()
 {
-    using namespace std::chrono;
+    const auto uptimeS =
+        [start = std::chrono::steady_clock::now()](const auto&)
+        {
+            return Value((double) std::chrono::duration_cast<std::chrono::seconds>(
+                std::chrono::steady_clock::now() - start).count());
+        };
 
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
-            api::metrics::Label(
-                "state"
+            "state",
+            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+                "name", [](const auto& r) { return Value(r->getName()); }
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"name"}, api::metrics::Display::both),
-                [](const auto& r) { return Value(r->getName()); }
-            ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"status"}, api::metrics::Display::both),
+                "status",
                 [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
-                qtSignalWatch<Resource>(&QnStorageResource::statusChanged)
+                qtSignalWatch<Resource>(&QnResource::statusChanged)
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"uptime"}, api::metrics::Display::both, "s"),
-                localGetter(
-                    [start = steady_clock::now()](const auto&)
-                    {
-                        return Value((double) duration_cast<seconds>(
-                            steady_clock::now() - start).count());
-                    }
-                )
+                "uptimeS", localGetter(uptimeS)
             )
         )
         // TODO: Implement "Server load", "Info" and "Activity" groups.

@@ -47,7 +47,8 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
         if (!NX_ASSERT(groupIt != manifest.end(), "Group not found: %1", groupId))
             continue;
 
-        for (const auto& [valueId, valueRule]: groupRules)
+        groupIt->name = groupRules.name;
+        for (const auto& [valueId, valueRule]: groupRules.values)
         {
             const auto existing = std::find_if(
                 groupIt->values.begin(), groupIt->values.end(),
@@ -55,12 +56,9 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
             if (existing != groupIt->values.end())
             {
                 // Override existing value manifest.
-                if (!valueRule.name.isEmpty())
-                    existing->name = valueRule.name;
-                if (valueRule.display != api::metrics::Displays(api::metrics::Display::none))
-                    existing->display = valueRule.display;
-                if (!valueRule.unit.isEmpty())
-                    existing->unit = valueRule.unit;
+                existing->name = valueRule.name;
+                existing->display = valueRule.display;
+                existing->unit = valueRule.unit;
                 continue;
             }
 

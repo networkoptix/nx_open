@@ -4595,96 +4595,23 @@ void MediaServerProcess::loadResourceParamsData()
     }
 }
 
-// TODO: Should be moved into a resource file.
-static const QByteArray kMetricsAlarmRules(R"json({
-    "systems": {
-        "info": {
-            "recommendedMaxServers": {
-                "calculate": "const 100"
-            },
-            "servers": {
-                "alarms": [{
-                    "level": "warning",
-                    "condition": "greaterThen %servers %recommendedMaxServers",
-                    "text": "The maximum number of %recommendedMaxServers servers per system is reached. Create another system to use more servers"
-                }]
-            },
-            "recommendedMaxCameras": {
-                "calculate": "const 10000"
-            },
-            "cameras": {
-                "alarms": [{
-                    "level": "warning",
-                    "condition": "greaterThen %servers %recommendedMaxCameras",
-                    "text": "The maximum number of %recommendedMaxCameras camera channels per system is reached. Create another system to use more cameras"
-                }]
-            }
-        }
-    },
-    "servers": {
-        "state": {
-            "status": {
-                "alarms": [{
-                    "level": "error",
-                    "condition": "notEqual %status Online",
-                    "text": "Status is %status"
-                }]
-            },
-            "offlineEvents": {
-                "name": "Server Offline events (24h)",
-                "display": "table|panel",
-                "calculate": "countValues %status 24h Offline",
-                "insert": "uptime",
-                "alarms": [{
-                    "level": "warning",
-                    "condition": "greaterThen %offlineEvents 1",
-                    "text": "went Offline %offlineEvents times in last 24 hours"
-                }]
-            }
-        }
-    },
-    "cameras": {
-        "info": {
-            "status": {
-                "alarms": [{
-                    "level": "warning",
-                    "condition": "equal %status Unauthorized",
-                    "text": "Status is %status"
-                }, {
-                    "level": "error",
-                    "condition": "equal %status Offline",
-                    "text": "Status is %status"
-                }]
-            },
-            "offlineEvents": {
-                "name": "Server Offline events (24h)",
-                "display": "table|panel",
-                "calculate": "countValues %status 24h Offline",
-                "alarms": [{
-                    "level": "warning",
-                    "condition": "greaterThen %offlineEvents 1",
-                    "text": "went Offline %offlineEvents times in last 24 hours"
-                }]
-            }
-        }
-    }
-})json");
-
 void MediaServerProcess::initMetricsController()
 {
-    using namespace nx::vms;
     m_metricsController = std::make_unique<nx::vms::utils::metrics::SystemController>();
 
+    using namespace nx::vms;
     m_metricsController->add(std::make_unique<server::metrics::SystemResourceController>(serverModule()));
     m_metricsController->add(std::make_unique<server::metrics::ServerController>(serverModule()));
     m_metricsController->add(std::make_unique<server::metrics::CameraController>(serverModule()));
     m_metricsController->add(std::make_unique<server::metrics::StorageController>(serverModule()));
     m_metricsController->add(std::make_unique<server::metrics::NetworkController>(commonModule()->moduleGUID()));
 
+    QFile rulesFile(":/metrics_rules.json");
+    const auto rulesJson = rulesFile.open(QIODevice::ReadOnly) ? rulesFile.readAll() : QByteArray();
     api::metrics::SystemRules rules;
-    NX_CRITICAL(QJson::deserialize(kMetricsAlarmRules, &rules));
-
+    NX_CRITICAL(QJson::deserialize(rulesJson, &rules), rulesJson);
     m_metricsController->setRules(std::move(rules));
+
     m_metricsController->start();
 }
 

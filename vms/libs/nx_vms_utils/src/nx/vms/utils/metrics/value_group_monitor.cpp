@@ -36,7 +36,7 @@ std::vector<api::metrics::Alarm> ValueGroupMonitor::alarms() const
     return alarms;
 }
 
-void ValueGroupMonitor::setRules(const api::metrics::ValueGroupRules& rules)
+void ValueGroupMonitor::setRules(const std::map<QString, api::metrics::ValueRule>& rules)
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
 

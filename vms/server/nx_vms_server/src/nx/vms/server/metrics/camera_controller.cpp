@@ -42,39 +42,30 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
 {
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
-            api::metrics::Label(
-                "info"
+            "info",
+            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+                "name", [](const auto& r) { return Value(r->getName()); }
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"name"}, api::metrics::Display::both),
-                [](const auto& r) { return Value(r->getName()); }
+                "server", [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"server"}, api::metrics::Display::both),
-                [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
+                "type", [](const auto&) { return Value(); } // TODO: Get actual type.
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"type"}, api::metrics::Display::both),
-                [](const auto&) { return Value(); } // TODO: Get actual status.
+                "ip", [](const auto& r) { return Value(r->getUrl()); } // TODO: Get host from this URL.
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"ip", "IP"}, api::metrics::Display::both),
-                [](const auto& r) { return Value(r->getUrl()); } // TODO: Get host from this URL.
+                "vendor", [](const auto& r) { return Value(r->getVendor()); }
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"vendor"}, api::metrics::Display::panel),
-                [](const auto& r) { return Value(r->getVendor()); }
+                "model", [](const auto& r) { return Value(r->getModel()); }
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"model"}, api::metrics::Display::panel),
-                [](const auto& r) { return Value(r->getModel()); }
+                "firmware", [](const auto& r) { return Value(r->getFirmware()); }
             ),
             std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"firmware"}, api::metrics::Display::panel),
-                [](const auto& r) { return Value(r->getFirmware()); }
-            ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                api::metrics::ValueManifest({"status"}, api::metrics::Display::both),
+                "status",
                 [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
                 qtSignalWatch<Resource>(&resource::Camera::statusChanged)
             )

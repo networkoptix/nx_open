@@ -15,7 +15,7 @@ class ValueProvider
 {
 public:
     ValueProvider(
-        api::metrics::ValueManifest manifest,
+        QString id,
         Getter<ResourceType> getter,
         Watch<ResourceType> watch = nullptr);
 
@@ -41,15 +41,10 @@ template<typename ResourceType>
 class ValueGroupProvider
 {
 public:
-    ValueGroupProvider(api::metrics::Label label, ValueProviders<ResourceType> providers);
+    ValueGroupProvider(QString id, ValueProviders<ResourceType> providers);
 
     template<typename... Providers>
-    ValueGroupProvider(api::metrics::Label label, Providers... providers):
-        ValueGroupProvider(
-            std::move(label),
-            nx::utils::make_container<ValueProviders<ResourceType>>(std::move(providers)...))
-    {
-    }
+    ValueGroupProvider(QString id, Providers... providers);
 
     const QString& id() const { return m_label.id; }
 
@@ -68,11 +63,11 @@ using ValueGroupProviders = std::vector<std::unique_ptr<ValueGroupProvider<Resou
 
 template<typename ResourceType>
 ValueProvider<ResourceType>::ValueProvider(
-    api::metrics::ValueManifest manifest,
+    QString id,
     Getter<ResourceType> getter,
     Watch<ResourceType> watch)
 :
-    m_manifest(std::move(manifest)),
+    m_manifest(id),
     m_getter(std::move(getter)),
     m_watch(std::move(watch))
 {
@@ -89,11 +84,19 @@ std::unique_ptr<ValueMonitor> ValueProvider<ResourceType>::monitor(const Resourc
 
 template<typename ResourceType>
 ValueGroupProvider<ResourceType>::ValueGroupProvider(
-    api::metrics::Label label,
+    QString id,
     std::vector<std::unique_ptr<ValueProvider<ResourceType>>> providers)
 :
-    m_label(std::move(label)),
+    m_label(id),
     m_providers(std::move(providers))
+{
+}
+
+template<typename ResourceType>
+template<typename... Providers>
+ValueGroupProvider<ResourceType>::ValueGroupProvider(QString id, Providers... providers):
+    ValueGroupProvider(
+        id, nx::utils::make_container<ValueProviders<ResourceType>>(std::move(providers)...))
 {
 }
 
