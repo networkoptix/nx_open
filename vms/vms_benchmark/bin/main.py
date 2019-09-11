@@ -157,8 +157,6 @@ def log_exception(contextName, exception):
 @click.option('--config', 'config_file', default='vms_benchmark.conf', help='Input config file.')
 @click.option('-C', 'config_file', default='vms_benchmark.conf', help='Input config file.')
 def main(config_file):
-    test_camera_runner.logging = logging
-
     config, sys_config = load_configs(config_file)
 
     password = config.get('devicePassword', None)
@@ -174,7 +172,6 @@ def main(config_file):
             )
 
     device = DeviceConnection(
-        logging=logging,
         host=config['deviceHost'],
         login=config.get('deviceLogin', None),
         password=password,

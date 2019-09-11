@@ -18,7 +18,6 @@ logging.basicConfig(filename='test.log', filemode='w', level=logging.DEBUG)
 class TestStringMethods(unittest.TestCase):
     def test_connection(self):
         device = DeviceConnection(
-            logging=logging,
             host='vega',
             port=22
         )
@@ -67,7 +66,6 @@ class TestStringMethods(unittest.TestCase):
 
     def test_stderr_none_acceptance(self):
         device = DeviceConnection(
-            logging=logging,
             host='vega',
             port=22
         )
