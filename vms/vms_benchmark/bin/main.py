@@ -174,6 +174,7 @@ def main(config_file):
             )
 
     device = DeviceConnection(
+        logging=logging,
         host=config['deviceHost'],
         login=config.get('deviceLogin', None),
         password=password,
