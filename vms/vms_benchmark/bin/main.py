@@ -360,6 +360,7 @@ def main(config_file):
                             return True, cameras
                     else:
                         detection_started_at = None
+                    time.sleep(1)
                 return False, None
 
             try:
