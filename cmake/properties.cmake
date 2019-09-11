@@ -1,14 +1,18 @@
-nx_set_variable_if_empty(client.name "${company.name} ${product.name} Client")
-nx_set_variable_if_empty(client.display.name "${display.product.name} Client")
-nx_set_variable_if_empty(applauncher.name "${company.name} ${display.product.name} Launcher")
-nx_set_variable_if_empty(traytool.name "${display.product.name} Tray Assistant")
-nx_set_variable_if_empty(mediaserver.display.name "${display.product.name} Media Server")
+# Overridden in metavms
 nx_set_variable_if_empty(mediaserver_service_name "${company.name} Server")
 nx_set_variable_if_empty(mediaserver_application_name "${company.name} Media Server")
-nx_set_variable_if_empty(client.mediafolder.name "${product.name} Media")
-nx_set_variable_if_empty(testcamera.name "${company.name} ${display.product.name} Test Camera")
+
+# Overridden in ionetworks, ionetworks_cn
 nx_set_variable_if_empty(windowsInstallPath "${company.name}")
 
+
+set(client.name "${company.name} ${product.name} Client")
+set(client.display.name "${display.product.name} Client")
+set(applauncher.name "${company.name} ${display.product.name} Launcher")
+set(traytool.name "${display.product.name} Tray Assistant")
+set(mediaserver.display.name "${display.product.name} Media Server")
+set(client.mediafolder.name "${product.name} Media")
+set(testcamera.name "${company.name} ${display.product.name} Test Camera")
 set(client.binary.name "client-bin")
 set(applauncher.binary.name "applauncher-bin")
 set(minilauncher.binary.name "applauncher")
