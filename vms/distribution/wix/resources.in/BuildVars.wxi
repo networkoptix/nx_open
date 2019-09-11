@@ -9,13 +9,12 @@
         <?define ProductTitle="${company.name} ${display.product.name} Setup v.${releaseVersion}"?>
         <?define productTitle = "${company.name} ${display.product.name} Setup v.${releaseVersion}"?>
 
-        <?define serverUpgradeCode = "${customization.upgradeCode}"?>
-        <?define clientUpgradeCode = "${customization.clientUpgradeCode}"?>
-        <?define clientBundleUpgradeCode = "${customization.clientBundleUpgradeCode}"?>
-        <?define serverBundleUpgradeCode = "${customization.serverBundleUpgradeCode}"?>
-        <?define fullBundleUpgradeCode = "${customization.fullBundleUpgradeCode}"?>
-        <?define nxtoolBundleUpgradeCode = "${nxtool.bundleUpgradeCode}"?>
-        <?define axBundleUpgradeCode = "${paxton.bundleUpgradeCode}"?>
+        <?define serverUpgradeCode = "${customization.desktop.windows.serverUpgradeCode}"?>
+        <?define clientUpgradeCode = "${customization.desktop.windows.clientUpgradeCode}"?>
+        <?define clientBundleUpgradeCode = "${customization.desktop.windows.clientBundleUpgradeCode}"?>
+        <?define serverBundleUpgradeCode = "${customization.desktop.windows.serverBundleUpgradeCode}"?>
+        <?define fullBundleUpgradeCode = "${customization.desktop.windows.fullBundleUpgradeCode}"?>
+        <?define nxtoolBundleUpgradeCode = "${customization.nxtool.bundleUpgradeCode}"?>
 
         <?define cloudHost = "${cloudHost}"?>
 
@@ -46,7 +45,7 @@
 
         <?define productExeName = "${product.name}"?>
         <?define clientExeName = "${display.product.name}"?>
-        <?define nxtoolExeName = "${nxtool.company.name} Server Tool"?>
+        <?define nxtoolExeName = "${customization.nxtool.applicationName}"?>
 
         <?define defaultTranslation = "${defaultTranslation}"?>
         <?define companyInstallPath = "${windowsInstallPath}"?>
