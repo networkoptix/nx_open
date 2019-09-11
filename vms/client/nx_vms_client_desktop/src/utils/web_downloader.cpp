@@ -55,28 +55,32 @@ QString getSuggestedFileName(const QNetworkReply* reply)
 
 QString getUniqueFilePath(const QString& path)
 {
-    const auto kNumTries = 100;
-    const auto kNameSuffix = " (%1)";
+    static constexpr auto kNumTries = 100;
+    static constexpr auto kNameSuffix = " (%1)";
 
     const auto fileInfo = QFileInfo(path);
     if (!fileInfo.exists())
         return path;
 
-    // Split the file into 2 parts - dot+extension, and everything else. For
-    // example, "path/file.tar.gz" becomes "path/file"+".tar.gz", while
+    // Split the file into 2 parts - dot+extension, and everything else.
+    // For example, "path/file.tar.gz" becomes "path/file"+".tar.gz", while
     // "path/file" (note lack of extension) becomes "path/file"+"".
     QString secondPart = fileInfo.completeSuffix();
     QString firstPart;
-    if (!secondPart.isEmpty()) {
+    if (!secondPart.isEmpty())
+    {
         secondPart = "." + secondPart;
         firstPart = path.left(path.size() - secondPart.size());
-    } else {
+    }
+    else
+    {
         firstPart = path;
     }
 
     // Try with an ever-increasing number suffix, until we've reached a file
     // that does not yet exist.
-    for (int i = 1; i <= kNumTries; i++) {
+    for (int i = 1; i <= kNumTries; i++)
+    {
         // Construct the new file name by adding the unique number between the
         // first and second part.
         const auto suffix = QString(kNameSuffix).arg(i);
