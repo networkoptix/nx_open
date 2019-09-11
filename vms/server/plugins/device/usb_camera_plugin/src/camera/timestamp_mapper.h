@@ -31,17 +31,6 @@ public:
         return nxTimeStamp;
     }
 
-    size_t size() const
-    {
-        return m_timestamps.size();
-    }
-
-    void clear()
-    {
-        if (m_timestamps.size() > 0)
-            m_timestamps.clear();
-    }
-
 private:
     std::vector<std::pair<int64_t /*ffmpeg pts*/, uint64_t /*nx timestamp*/>> m_timestamps;
     static constexpr int kTimestampMaxSize = 30;

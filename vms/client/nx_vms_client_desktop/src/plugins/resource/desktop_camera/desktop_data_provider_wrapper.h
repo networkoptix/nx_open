@@ -5,7 +5,7 @@
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 
-class QnDesktopDataProvider;
+class QnDesktopDataProviderBase;
 
 /*
 * This class used for sharing desktop media stream
@@ -14,7 +14,7 @@ class QnDesktopDataProvider;
 class QnDesktopDataProviderWrapper: public QnAbstractMediaStreamDataProvider, public QnAbstractDataConsumer
 {
 public:
-    QnDesktopDataProviderWrapper(QnResourcePtr res, QnDesktopDataProvider* owner);
+    QnDesktopDataProviderWrapper(QnResourcePtr res, QnDesktopDataProviderBase* owner);
     virtual ~QnDesktopDataProviderWrapper();
 
     virtual void start(Priority priority = InheritPriority) override;
@@ -22,7 +22,7 @@ public:
     QString lastErrorStr() const;
     virtual bool hasThread() const override { return false; }
     virtual bool needConfigureProvider() const override;
-
+    const QnDesktopDataProviderBase* owner() const { return m_owner;  }
 protected:
     virtual bool processData(const QnAbstractDataPacketPtr& /*data*/) override { return true; }
 
@@ -31,5 +31,5 @@ protected:
 
 private:
     QSet<void*> m_needKeyData;
-    QnDesktopDataProvider* m_owner;
+    QnDesktopDataProviderBase* m_owner;
 };

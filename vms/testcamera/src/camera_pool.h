@@ -20,7 +20,8 @@ public:
         const QStringList& localInterfacesToListen,
         QnCommonModule* commonModule,
         bool noSecondaryStream,
-        int fps);
+        int fpsPrimary,
+        int fpsSecondary);
 
     virtual ~QnCameraPool();
 
@@ -46,7 +47,8 @@ private:
     mutable QMutex m_mutex;
     QnCameraDiscoveryListener* m_discoveryListener;
     bool m_noSecondaryStream;
-    int m_fps;
+    int m_fpsPrimary;
+    int m_fpsSecondary;
 };
 
 #endif // __CAMERA_POOL_H__
