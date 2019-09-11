@@ -53,6 +53,44 @@ QString getSuggestedFileName(const QNetworkReply* reply)
     return match.captured(1);
 }
 
+QString getUniqueFilePath(const QString& path)
+{
+    const auto kNumTries = 100;
+    const auto kNameSuffix = " (%1)";
+
+    const auto fileInfo = QFileInfo(path);
+    if (!fileInfo.exists())
+        return path;
+
+    // Split the file into 2 parts - dot+extension, and everything else. For
+    // example, "path/file.tar.gz" becomes "path/file"+".tar.gz", while
+    // "path/file" (note lack of extension) becomes "path/file"+"".
+    QString secondPart = fileInfo.completeSuffix();
+    QString firstPart;
+    if (!secondPart.isEmpty()) {
+        secondPart = "." + secondPart;
+        firstPart = path.left(path.size() - secondPart.size());
+    } else {
+        firstPart = path;
+    }
+
+    // Try with an ever-increasing number suffix, until we've reached a file
+    // that does not yet exist.
+    for (int i = 1; i <= kNumTries; i++) {
+        // Construct the new file name by adding the unique number between the
+        // first and second part.
+        const auto suffix = QString(kNameSuffix).arg(i);
+        const auto newPath = firstPart + suffix + secondPart;
+
+        // If no file exists with the new name, return it.
+        if (!QFileInfo::exists(newPath))
+            return newPath;
+    }
+
+    // All names are taken - bail out and return the original.
+    return path;
+}
+
 } // namespace
 
 WebDownloader::WebDownloader(QObject* parent,
@@ -92,14 +130,16 @@ bool WebDownloader::download(
     const auto suggestedName = getSuggestedFileName(reply);
 
     auto lastDir = qnSettings->lastDownloadDir();
-    if (lastDir.isEmpty())
+    if (lastDir.isEmpty() || !QDir(lastDir).exists())
         lastDir = qnSettings->mediaFolder();
+
+    const auto uniquePath = getUniqueFilePath(QDir(lastDir).filePath(suggestedName));
 
     ContextHelper contextHelper(parent);
 
     QnCustomFileDialog saveDialog(contextHelper.windowWidget(),
         tr("Save File As..."),
-        QDir(lastDir).filePath(suggestedName),
+        uniquePath,
         QnCustomFileDialog::createFilter(QnCustomFileDialog::kAllFilesFilter));
     saveDialog.setFileMode(QFileDialog::AnyFile);
     saveDialog.setAcceptMode(QFileDialog::AcceptSave);
