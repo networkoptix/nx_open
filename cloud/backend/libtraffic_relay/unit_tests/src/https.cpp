@@ -35,17 +35,18 @@ public:
 protected:
     virtual void SetUp() override
     {
-        const auto certificateFilePath =
-            lm("%1/%2").args(testDataDir(), "traffic_relay.cert").toStdString();
+        m_certificateFilePath =
+			lm("%1/%2").args(testDataDir(), "traffic_relay.cert").toStdString();
 
         ASSERT_TRUE(nx::network::ssl::Engine::useOrCreateCertificate(
-            certificateFilePath.c_str(),
+            m_certificateFilePath.c_str(),
             "traffic_relay/https test", "US", "Nx"));
 
         addRelayInstance({
             "--https/listenOn=0.0.0.0:0",
+			"--https/certificateMonitorTimeout=20ms",
             "-https/certificatePath",
-            certificateFilePath.c_str()});
+			m_certificateFilePath.c_str()});
     }
 
     nx::utils::Url basicHttpsUrl() const
@@ -79,6 +80,24 @@ protected:
             std::bind(&Https::saveStatisticsRequestResult, this, _1, _2, _3));
     }
 
+	void whenCertificateFileIsModified()
+	{
+		relay().moduleInstance()->setOnStartedEventHandler(
+			[this](bool isStarted) { m_relayRestartedEvent.push(isStarted); });
+
+		// Sleep is needed to allow SslCertificateWatcher to fully initialize.
+		// Otherwise, it may initialize with the contents of the modified file,
+		// and detection will fail.
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+		modifyCertificateFile();
+	}
+
+	void thenRelayIsRestarted()
+	{
+		ASSERT_TRUE(m_relayRestartedEvent.pop());
+	}
+
     void thenConnectionIsEstablished()
     {
         ASSERT_EQ(SystemError::noError, m_connectResultQueue.pop());
@@ -97,6 +116,8 @@ private:
     std::unique_ptr<network::ssl::ClientStreamSocket> m_connection;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_connectResultQueue;
     nx::utils::SyncQueue<api::ResultCode> m_apiResponseQueue;
+	std::string m_certificateFilePath;
+	nx::utils::SyncQueue<bool> m_relayRestartedEvent;
 
     void saveConnectResult(SystemError::ErrorCode systemErrorCode)
     {
@@ -114,6 +135,14 @@ private:
                 response->statusLine.statusCode))
             : api::ResultCode::networkError);
     }
+
+	void modifyCertificateFile()
+	{
+		NX_DEBUG(this, "Modifying certificate file");
+		std::ofstream file(m_certificateFilePath, std::ios::app);
+		file << ' ';
+		file.close();
+	}
 };
 
 TEST_F(Https, ssl_connections_are_accepted_as_configured)
@@ -126,6 +155,12 @@ TEST_F(Https, http_api_is_available_via_ssl)
 {
     whenPerformApiCallUsingHttps();
     thenApiCallSucceeded();
+}
+
+TEST_F(Https, relay_restarts_if_certificate_file_is_modified)
+{
+	whenCertificateFileIsModified();
+	thenRelayIsRestarted();
 }
 
 } // namespace test

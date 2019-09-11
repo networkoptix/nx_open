@@ -18,11 +18,13 @@
 #include "http_handlers.h"
 #include "options_request_handler.h"
 #include "proxy_handler.h"
+#include "ssl_certificate_watcher.h"
 #include "../controller/connect_session_manager.h"
 #include "../controller/controller.h"
 #include "../model/model.h"
 #include "../settings.h"
 #include "../statistics_provider.h"
+#include "../relay_service.h"
 
 namespace nx {
 namespace cloud {
@@ -47,10 +49,12 @@ public:
 //-------------------------------------------------------------------------------------------------
 
 View::View(
+	RelayService* relayService,
     const conf::Settings& settings,
     Model* model,
     Controller* controller)
     :
+	m_relayService(relayService),
     m_settings(settings),
     m_model(model),
     m_controller(controller),
@@ -89,6 +93,14 @@ void View::registerStatisticsApiHandlers(
 
 void View::start()
 {
+	NX_INFO(this, "https/certificatePath is %1", m_settings.https().certificatePath);
+	if (!m_settings.https().certificatePath.empty())
+	{
+		NX_INFO(this, "Monitoring ssl certificate for changes");
+		m_sslCertificateWatcher =
+			std::make_unique<view::SslCertificateWatcher>(m_relayService, m_settings.https());
+	}
+
     m_multiAddressHttpServer.forEachListener(
         &nx::network::http::HttpStreamSocketServer::setConnectionInactivityTimeout,
         m_settings.http().connectionInactivityTimeout);
