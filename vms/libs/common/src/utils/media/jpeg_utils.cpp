@@ -15,7 +15,7 @@ namespace nx_jpg
 
 struct Component
 {
-    uint8_t id;
+    uint8_t id = 0;
     uint8_t vCount = 0;
     uint8_t hCount = 0;
     uint8_t quantIndex = 0;
@@ -89,7 +89,7 @@ AVPixelFormat convertYuv(uint32_t pixFmtMask, uint8_t bits)
     }
 }
 
-AVPixelFormat parsePixelFormat(const quint8* data, size_t size)
+AVPixelFormat parsePixelFormatFromSOF(const quint8* data, size_t size)
 {
     if (size <= 4)
         return AV_PIX_FMT_NONE;
@@ -257,7 +257,7 @@ AVPixelFormat parsePixelFormat(const quint8* data, size_t size)
             imgInfo->precision = sofDataStart[0];
             imgInfo->height = (sofDataStart[1] << 8) | sofDataStart[2];
             imgInfo->width = (sofDataStart[3] << 8) | sofDataStart[4];
-            imgInfo->pixelFormat = parsePixelFormat(data + currentOffset, size);
+            imgInfo->pixelFormat = parsePixelFormatFromSOF(data + currentOffset, size);
             return false;
         };
 

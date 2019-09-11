@@ -170,10 +170,8 @@ QList<QString> getSdpAttributesFromContext(
     }
     if (stream.codecpar->codec_id == AV_CODEC_ID_MJPEG)
     {
-        result.push_back(
-            "a=framesize:" + QString::number(payloadType) + " " +
-            QString::number(stream.codecpar->width) + "-" +
-            QString::number(stream.codecpar->height));
+        result.push_back(lm("a=framesize:%1 %2-%3").args(
+            payloadType, stream.codecpar->width, stream.codecpar->height));
     }
     avcodec_parameters_free(&stream.codecpar);
     return result;
