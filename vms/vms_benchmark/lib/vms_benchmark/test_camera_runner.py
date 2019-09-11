@@ -1,3 +1,4 @@
+import logging
 import os
 import platform
 import subprocess
@@ -9,7 +10,6 @@ binary_file = './testcamera'
 test_file_high_resolution = './test_file_high_resolution.ts'
 test_file_low_resolution = './test_file_low_resolution.ts'
 debug = False
-logging = None
 
 
 @contextmanager
@@ -34,7 +34,6 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
         ld_library_path = os.path.dirname(binary_file)
         env['LD_LIBRARY_PATH'] = ld_library_path
 
-    assert logging
     # NOTE: The first arg is the command itself.
     logging.info('Running testcamera with the following command and args:')
     logging.info('[')
@@ -44,6 +43,7 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
         logging.info(arg)
     logging.info(']')
 
+    logging.info(f"Run: {' '.join(camera_args)}")
     try:
         proc = subprocess.Popen(camera_args, env=env, **opts)
     except Exception as exception:

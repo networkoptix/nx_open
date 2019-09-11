@@ -1,17 +1,17 @@
+import logging
+
 from vms_benchmark import exceptions
 import sys
 import platform
 import subprocess
 from io import StringIO
 
-def log_remote_command(logging, command):
-    assert logging
+def log_remote_command(command):
     logging.info('Executing remote command:')
     logging.info(f'    {command}')
 
 
-def log_remote_command_status(logging, status_code):
-    assert logging
+def log_remote_command_status(status_code):
     if status_code == 0:
         result_log_message = 'succeeded'
     else:
@@ -32,8 +32,7 @@ if platform.system() == 'Linux':
             def message(self):
                 return self.message
 
-        def __init__(self, logging, proto='ssh', host='127.0.0.1', port=80, login=None, password=None):
-            self.logging = logging
+        def __init__(self, proto='ssh', host='127.0.0.1', port=80, login=None, password=None):
             self.host = host
             self.port = port
             self.login = login
@@ -78,10 +77,10 @@ if platform.system() == 'Linux':
         def sh(self, command, timeout=3, su=False, exc=False, stdout=sys.stdout, stderr=sys.stderr):
             command_wrapped = command if self.is_root or not su else f'sudo -n {command}'
 
-            log_remote_command(self.logging, command_wrapped)
+            log_remote_command(command_wrapped)
 
             run = subprocess.run([*self.ssh_args, command_wrapped], timeout=timeout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            log_remote_command_status(self.logging, run.returncode)
+            log_remote_command_status(run.returncode)
 
             if run.returncode == 255:
                 if exc:
@@ -131,8 +130,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             def message(self):
                 return self.message
 
-        def __init__(self, logging, proto='ssh', host='127.0.0.1', port=80, login=None, password=None):
-            self.logging = logging
+        def __init__(self, proto='ssh', host='127.0.0.1', port=80, login=None, password=None):
             self.host = host
             self.port = port
             self.login = login
@@ -188,7 +186,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             if stderr != self._SH_DEFAULT:
                 opts['stderr'] = subprocess.PIPE
             command_wrapped = command if self.is_root or not su else f"sudo -n {command}"
-            log_remote_command(self.logging, command_wrapped)
+            log_remote_command(command_wrapped)
             try:
                 proc = subprocess.Popen(self.ssh_command(), **opts)
                 out, err = proc.communicate(f"{command_wrapped}\n".encode('UTF-8'), timeout)
@@ -209,7 +207,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
                 if callable(write_method):
                     stderr.write(err.decode('UTF-8'))
 
-            log_remote_command_status(self.logging, proc.returncode)
+            log_remote_command_status(proc.returncode)
             
             if exc and proc.returncode != 0:
                 raise exceptions.DeviceCommandError(
