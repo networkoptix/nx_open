@@ -6,6 +6,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <utils/web_downloader.h>
+#include <utils/common/delayed.h>
 
 namespace {
 
@@ -57,8 +58,16 @@ QnWebPage::QnWebPage(QObject* parent): base_type(parent)
 
 void QnWebPage::download(QNetworkReply* reply)
 {
-    if (!WebDownloader::download(m_networkAccessManager, reply, this))
-        reply->deleteLater();
+    // Avoid reply deletion in event loop.
+    reply->setParent(this);
+
+    executeLater(
+        [this, reply] {
+            // Successful call to download() will re-parent the reply.
+            if (!WebDownloader::download(m_networkAccessManager, reply, this))
+                reply->deleteLater();
+        },
+        this);
 }
 
 bool QnWebPage::supportsExtension(Extension extension) const
