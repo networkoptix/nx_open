@@ -12,9 +12,9 @@ BEGIN
         BLOCK "040904E4"
         BEGIN
             VALUE "CompanyName",        "${company.name}"
-            VALUE "FileDescription",    "${nxtool.name}"
+            VALUE "FileDescription",    "${customization.nxtool.applicationName}"
             VALUE "FileVersion",        "${release.version}.${buildNumber}"
-            VALUE "InternalName",       "${nxtool.name}"
+            VALUE "InternalName",       "${customization.nxtool.applicationName}"
             VALUE "LegalCopyright",     "${nx_copyright}"
             VALUE "LegalTrademarks1",   "All Rights Reserved"
             VALUE "LegalTrademarks2",   "All Rights Reserved"

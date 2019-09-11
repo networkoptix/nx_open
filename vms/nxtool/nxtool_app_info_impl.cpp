@@ -4,7 +4,7 @@ namespace rtu
 {
     QString ApplicationInfo::applicationDisplayName()
     {
-        return QStringLiteral("${nxtool.name}");
+        return QStringLiteral("${customization.nxtool.applicationName}");
     }
 
     QString ApplicationInfo::applicationVersion()

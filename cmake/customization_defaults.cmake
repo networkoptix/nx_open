@@ -6,8 +6,6 @@ set(dynamic.customization "false")
 set(liteDeviceName "microserver")
 set(shortCloudName "Cloud")
 
-set(uri.protocol "nx-vms")
-
 # Build submodules
 set(build_nxtool OFF)
 set(build_paxton OFF)
@@ -15,16 +13,8 @@ set(build_mobile ON)
 
 set(backgroundImage "{}")
 set(defaultWebPages "{}")
-set(defaultSkin "dark_blue")
 
-set(freeLicenseCount "4")
-set(freeLicenseIsTrial "true")
 set(eulaVersion 1)
-
-# Support section
-set(supportUrl "")
-set(supportEmail "")
-set(supportPhone "")
 
 # Update parameters
 set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
@@ -77,11 +67,5 @@ set(defaultTranslation en_US)
 
 set(customization.defines "")
 
-set(compatibleCustomizations "")
-
 # Defaults to ${company.name} in the properties.cmake
 set(windowsInstallPath "")
-
-# Some customizations do not have old mobile application
-set(android.oldPackageName "")
-set(ios.old_app_appstore_id "")

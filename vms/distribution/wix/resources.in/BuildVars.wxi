@@ -32,7 +32,7 @@
 
         <?define clientInternalName = "${client.name}"?>
         <?define clientRegPath = "Software\${company.name}\${client.name}"?>
-        <?define nxtoolName = "${nxtool.name}"?>
+        <?define nxtoolName = "${customization.nxtool.applicationName}"?>
         <?define mediaserverName = "${mediaserver_application_name}"?>
         <?define trayToolName = "${traytool.name}"?>
         <?define productName = "${display.product.name}"?>
