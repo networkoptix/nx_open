@@ -1,12 +1,17 @@
 import urllib.request
+from collections import namedtuple
 from urllib.parse import urlencode
 from urllib.error import URLError
 import base64
 import json
+import logging
 
 from vms_benchmark import exceptions
 from vms_benchmark.camera import Camera
 from vms_benchmark.license import License
+
+
+Response = namedtuple('Response', ['code', 'body'])
 
 
 class ServerApi:
@@ -21,13 +26,35 @@ class ServerApi:
         self.user = user
         self.password = password
 
+    @staticmethod
+    def get_request(url_or_request):
+        if isinstance(url_or_request, urllib.request.Request):
+            url = url_or_request.full_url
+        else:
+            url = url_or_request
+        logging.info(f"Sending HTTP request GET to Server:\n    {url}")
+        response = urllib.request.urlopen(url_or_request)
+        return ServerApi._read_response(response)
+
+    @staticmethod
+    def post_request(request, data):
+        logging.info(f"Sending HTTP POST request to Server:\n    {request.full_url}\n    with data\n    {data}")
+        response = urllib.request.urlopen(request, data=data)
+        return ServerApi._read_response(response)
+
+    @staticmethod
+    def _read_response(response):
+        body = response.read()
+        logging.info(f"Got HTTP response {response.code}:\n    {body}")
+        return Response(response.code, body)
+
     def ping(self):
         try:
-            response = urllib.request.urlopen(f"http://{self.ip}:{self.port}/api/ping")
+            response = self.get_request(f"http://{self.ip}:{self.port}/api/ping")
             result = self.Response(response.code)
 
             if 200 <= response.code < 300:
-                result.payload = json.loads(response.read())
+                result.payload = json.loads(response.body)
         except URLError:
             return None
 
@@ -39,7 +66,7 @@ class ServerApi:
             credentials = f"{self.user}:{self.password}"
             encoded_credentials = base64.b64encode(credentials.encode('ascii'))
             request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
-            urllib.request.urlopen(request)
+            self.get_request(request)
         except urllib.error.HTTPError as e:
             if e.code == 401:
                 raise exceptions.ServerApiError(
@@ -53,11 +80,11 @@ class ServerApi:
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
-        response = urllib.request.urlopen(request)
+        response = self.get_request(request)
         result = self.Response(response.code)
 
         if 200 <= response.code < 300:
-            result.payload = json.loads(response.read())
+            result.payload = json.loads(response.body)
 
             cameras = [
                 Camera(
@@ -79,11 +106,11 @@ class ServerApi:
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
-        response = urllib.request.urlopen(request)
+        response = self.get_request(request)
         result = self.Response(response.code)
 
         if 200 <= response.code < 300:
-            result.payload = json.loads(response.read())
+            result.payload = json.loads(response.body)
 
             cameras = [
                 Camera(
@@ -105,12 +132,12 @@ class ServerApi:
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
-        response = urllib.request.urlopen(request)
+        response = self.get_request(request)
 
         result = self.Response(response.code)
 
         if 200 <= response.code < 300:
-            result.payload = json.loads(response.read())
+            result.payload = json.loads(response.body)
             return [
                 License.parse(license_description['licenseBlock'])
                 for license_description in result.payload
@@ -123,12 +150,12 @@ class ServerApi:
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
-        response = urllib.request.urlopen(request)
+        response = self.get_request(request)
 
         result = self.Response(response.code)
 
         if 200 <= response.code < 300:
-            result.payload = json.loads(response.read())
+            result.payload = json.loads(response.body)
             if int(result.payload['error']) != 0:
                 return None
             return result.payload['reply']
@@ -142,7 +169,7 @@ class ServerApi:
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
         request.add_header('Content-Type', 'application/json')
         request.get_method = lambda: 'POST'
-        response = urllib.request.urlopen(
+        response = self.post_request(
             request,
             data=json.dumps({
                 "id": camera_id
@@ -158,7 +185,7 @@ class ServerApi:
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
         request.add_header('Content-Type', 'application/json')
         request.get_method = lambda: 'POST'
-        response = urllib.request.urlopen(
+        response = self.post_request(
             request,
             data=urlencode({
                 "key": license.serial,
