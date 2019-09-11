@@ -15,6 +15,9 @@ if(NOT useLoginKeychain AND codeSigning)
         message(FATAL_ERROR "Cannot find any certificates in ${certificates_path}/macosx")
     endif()
 
+    # TODO: #GDM Shouldn't this be a bit more safe?
+    set(mac_certificate_file_password "qweasd123")
+
     set(import_root_cert_command
         COMMAND ${CMAKE_SOURCE_DIR}/build_utils/macos/prepare_build_keychain.sh
             --keychain ${codeSigningKeychainName}

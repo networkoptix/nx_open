@@ -20,8 +20,6 @@ set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
 set(updateFeedUrl "http://updates.vmsproxy.com/updates.json")
 set(releaseNotesUrl "http://updates.vmsproxy.com/releasenotes.json")
 
-set(mac_certificate_file_password "qweasd123")
-
 # Additional Features
 set(vmax false)
 

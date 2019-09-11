@@ -5,7 +5,7 @@
 	<key>CFBundleExecutable</key>
 	<string>applet</string>
 	<key>CFBundleIdentifier</key>
-	<string>@mac.protocol_handler_bundle.identifier@@parsedVersion.majorVersion@.@parsedVersion.minorVersion@.@parsedVersion.incrementalVersion@.@buildNumber@</string>
+	<string>@customization.desktop.macos.protocolHandlerBundleIdentifier@@parsedVersion.majorVersion@.@parsedVersion.minorVersion@.@parsedVersion.incrementalVersion@.@buildNumber@</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleDisplayName</key>
