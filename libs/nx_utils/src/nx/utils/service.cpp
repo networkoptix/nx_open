@@ -139,6 +139,8 @@ int Service::runServiceMain(const AbstractServiceSettings& settings)
 
     do
 	{
+		m_actionToTake = ActionToTake::invalid;
+
         result = serviceMain(settings);
 
 		if (m_actionToTake == ActionToTake::invalid)
