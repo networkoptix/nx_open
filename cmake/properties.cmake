@@ -44,3 +44,8 @@ set(apple_team_id "L6FE34GJWM")
 if(eulaVersionOverride)
     set(eulaVersion ${eulaVersionOverride})
 endif()
+
+set(enable_hanwha false)
+if(customization.desktop.supportsHanwha)
+    set(enable_hanwha true)
+endif()

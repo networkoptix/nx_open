@@ -2,7 +2,6 @@ set(updatefeed.auto "false")
 set(windows.skip.sign "false")
 
 set(help.language "english")
-set(dynamic.customization "false")
 set(liteDeviceName "microserver")
 set(shortCloudName "Cloud")
 
@@ -25,11 +24,8 @@ set(mac_certificate_file_password "qweasd123")
 
 # Additional Features
 set(vmax false)
-set(enable_hanwha false)
-set(useMetaVersion OFF)
 
-# if true, you can use --customization=<path> to specify customization
-set(dynamic.customization false)
+set(useMetaVersion OFF)
 
 # Localization
 set(installerLanguage "en_US")
