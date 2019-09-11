@@ -28,11 +28,10 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
         opts['stdout'] = subprocess.PIPE
         opts['stderr'] = subprocess.PIPE
 
-    env = {}
     ld_library_path = None
     if platform.system() == 'Linux':
         ld_library_path = os.path.dirname(binary_file)
-        env['LD_LIBRARY_PATH'] = ld_library_path
+        opts['env'] = {'LD_LIBRARY_PATH': ld_library_path}
 
     # NOTE: The first arg is the command itself.
     log_message = 'Running testcamera with the following command and args:\n'
@@ -43,7 +42,7 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
     logging.info(log_message)
 
     try:
-        proc = subprocess.Popen(camera_args, env=env, **opts)
+        proc = subprocess.Popen(camera_args, **opts)
     except Exception as exception:
         raise exceptions.TestCameraError(f"Unexpected error during spawning cameras: {str(exception)}")
 
