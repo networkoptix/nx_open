@@ -329,7 +329,8 @@ def main(config_file):
         test_camera_cm = test_camera_runner.test_camera_running(
             local_ip=device.local_ip,
             count=test_cameras_count,
-            lowStreamFps=sys_config['testStreamFpsLow']
+            primary_fps=sys_config['testStreamFpsHigh'],
+            secondary_fps=sys_config['testStreamFpsLow'],
         )
         with test_camera_cm as test_camera_process:
             print(f"    Spawned {test_cameras_count} test cameras.")
