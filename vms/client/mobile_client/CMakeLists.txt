@@ -105,8 +105,8 @@ if(ANDROID)
 endif()
 
 if(IOS)
-    if(mobile_bundle_name STREQUAL display_mobile_name)
-        message(FATAL_ERROR "mobile_bundle_name cannot be equal to display_mobile_name.")
+    if(customization.mobile.ios.bundleName STREQUAL customization.mobile.displayName)
+        message(FATAL_ERROR "customization.mobile.ios.bundleName cannot be equal to customization.mobile.displayName.")
     endif()
 
     set(provisioning_profiles_dir "${certificates_path}/mobile_client/ios/provisioning_profiles")
@@ -165,7 +165,7 @@ if(IOS)
         )
     else()
         set_target_properties(mobile_client PROPERTIES
-            XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${ios.sign.identity}"
+            XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "${icustomization.mobile.ios.signIdentity}"
             XCODE_ATTRIBUTE_CODE_SIGN_ENTITLEMENTS "${CMAKE_CURRENT_BINARY_DIR}/mobile_client.entitlements"
             XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "--keychain ${codeSigningKeychainName}"
             XCODE_ATTRIBUTE_PROVISIONING_PROFILE "${provisioning_profile_id}"

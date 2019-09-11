@@ -11,11 +11,11 @@
 	<key>CFBundleExecutable</key>
 	<string>mobile_client</string>
 	<key>CFBundleIdentifier</key>
-	<string>${ios.new_bundle_identifier}</string>
+	<string>${customization.mobile.ios.bundleIdentifier}</string>
 	<key>CFBundleDisplayName</key>
-	<string>${display_mobile_name}</string>
+	<string>${customization.mobile.displayName}</string>
 	<key>CFBundleName</key>
-	<string>${mobile_bundle_name}</string>
+	<string>${customization.mobile.ios.bundleName}</string>
 	<key>CFBundleShortVersionString</key>
 	<string>${project.version.name}</string>
 	<key>CFBundleVersion</key>
@@ -55,7 +55,7 @@
 				<string>${customization.uriProtocol}</string>
 			</array>
 			<key>CFBundleURLName</key>
-			<string>${ios.new_bundle_identifier}</string>
+			<string>${customization.mobile.ios.bundleIdentifier}</string>
 		</dict>
 	</array>
 	<key>NSPhotoLibraryUsageDescription</key>
