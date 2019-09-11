@@ -29,13 +29,11 @@ if platform.system() == 'Linux':
                     "-p", password,
                     "ssh",
                     "-o", "StrictHostKeyChecking=no",
-                    "-o", "BatchMode=yes",
                     "-o", "PubkeyAuthentication=no",
                     "-o", "PasswordAuthentication=yes",
                     "-T",
                     f"-p{port}",
                     f"{login}@{host}" if login else host,
-                    "sh", "-i"
                 ]
             else:
                 self.ssh_command = 'ssh'
