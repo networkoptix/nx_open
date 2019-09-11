@@ -252,4 +252,7 @@ private:
 
     QnVideoWallLicenseUsageHelper* m_licensesHelper;
     QScopedPointer<QnUuidPool> m_uuidPool;
+
+    class GeometrySetter;
+    QScopedPointer<GeometrySetter> m_geometrySetter;
 };
