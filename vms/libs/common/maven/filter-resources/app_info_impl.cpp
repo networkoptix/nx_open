@@ -88,15 +88,15 @@ QString QnAppInfo::updateGeneratorUrl()
 
 int QnAppInfo::freeLicenseCount()
 {
-    return ${freeLicenseCount};
+    return 4;
 }
 
 QString QnAppInfo::freeLicenseKey()
 {
-    return QStringLiteral("${freeLicenseKey}");
+    return "${customization.desktop.trialLicenseKey}";
 }
 
 bool QnAppInfo::freeLicenseIsTrial()
 {
-    return ${freeLicenseIsTrial};
+    return true;
 }
