@@ -292,6 +292,8 @@ def main(config_file):
         time.sleep(5)
         return True
 
+    api.check_authentication()
+
     if not wait_for_api():
         raise exceptions.ServerApiError("API of Server is not working: ping request was not successful.")
 

@@ -4,6 +4,7 @@ from urllib.error import URLError
 import base64
 import json
 
+from vms_benchmark import exceptions
 from vms_benchmark.camera import Camera
 from vms_benchmark.license import License
 
@@ -31,6 +32,21 @@ class ServerApi:
             return None
 
         return result
+
+    def check_authentication(self):
+        try:
+            request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/moduleInformationAuthenticated")
+            credentials = f"{self.user}:{self.password}"
+            encoded_credentials = base64.b64encode(credentials.encode('ascii'))
+            request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
+            urllib.request.urlopen(request)
+        except urllib.error.HTTPError as e:
+            if e.code == 401:
+                raise exceptions.ServerApiError(
+                    "API of Server is not working: "
+                    "authentication was not successful, "
+                    "check vmsUser and vmsPassword in vms_benchmark.conf")
+            raise
 
     def get_test_cameras_all(self):
         request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/getCamerasEx")
