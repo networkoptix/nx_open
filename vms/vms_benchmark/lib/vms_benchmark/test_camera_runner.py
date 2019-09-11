@@ -17,8 +17,8 @@ def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
     camera_args = [
         binary_file,
         f"--local-interface={local_ip}",
-        f"--fps-primary {primary_fps}",
-        f"--fps-secondary {secondary_fps}",
+        f"--fps-primary", str(primary_fps),
+        f"--fps-secondary", str(secondary_fps),
         f"files=\"{test_file_high_resolution}\";secondary-files=\"{test_file_low_resolution}\";count={count}",
     ]
 
