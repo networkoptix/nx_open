@@ -160,7 +160,7 @@ class DevicePlatform:
             device=device,
             ram=ram,
             arch=arch,
-            cpu_number=len(cpuinfo_parsed),
+            cpu_number=cpuinfo.count('\n\n'),
             cpu_features=cpu_features,
             storages_list=storages_map,
             linux_distribution=linux_distribution
