@@ -2,6 +2,11 @@
 * 27 may 2014
 * a.kolesnikov
 ***********************************************************/
+extern "C"
+{
+#include <libavutil/pixfmt.h>
+}
+
 
 #include <functional>
 
@@ -10,22 +15,14 @@
 
 namespace nx_jpg
 {
-    class ImageInfo
+    struct ImageInfo
     {
-    public:
-        int precision;
-        int width;
-        int height;
-
-        ImageInfo()
-        :
-            precision( -1 ),
-            width( -1 ),
-            height( -1 )
-        {
-        }
+        int precision = -1;
+        int width = -1;
+        int height = -1;
+        AVPixelFormat pixelFormat = AV_PIX_FMT_NONE;
     };
-    
+
     enum ResultCode
     {
         succeeded,
@@ -91,5 +88,5 @@ namespace nx_jpg
         int m_currentMarkerCode;
     };
 
-    bool readJpegImageInfo( const quint8* data, size_t size, ImageInfo* const imgInfo );
+    bool readJpegImageInfo(const quint8* data, size_t size, ImageInfo* const imgInfo);
 }

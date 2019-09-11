@@ -10,11 +10,23 @@ extern "C"
 #include <QtCore/QDebug>
 
 #include <nx/utils/log/log.h>
+#include <utils/media/jpeg_utils.h>
 
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
 
 static const int IO_BLOCK_SIZE = 1024*16;
+
+static AVPixelFormat jpegPixelFormatToRtp(AVPixelFormat value)
+{
+    switch (value)
+    {
+        case AV_PIX_FMT_YUV420P: return AV_PIX_FMT_YUVJ420P;
+        case AV_PIX_FMT_YUV422P: return AV_PIX_FMT_YUVJ422P;
+        case AV_PIX_FMT_YUV444P: return AV_PIX_FMT_YUVJ444P;
+        default: return value;
+    }
+}
 
 static qint32 ffmpegReadPacket(void* /*opaque*/, quint8* /*buf*/, int /*size*/)
 {
@@ -131,6 +143,21 @@ void QnFfmpegTranscoder::setFormatOption(const QString& option, const QString& v
     av_opt_set(m_formatCtx->priv_data, option.toLatin1().data(), value.toLatin1().data(), 0);
 }
 
+AVPixelFormat QnFfmpegTranscoder::getPixelFormatJpeg(const QnConstCompressedVideoDataPtr& video)
+{
+    nx_jpg::ImageInfo info;
+    if (!nx_jpg::readJpegImageInfo((const uint8_t*)video->data(), video->dataSize(), &info) ||
+        info.pixelFormat == AV_PIX_FMT_NONE)
+    {
+        NX_DEBUG(this, "Failed to parse MJPEG header");
+        return AV_PIX_FMT_YUV420P;
+    }
+    if (m_container == "rtp")
+        return jpegPixelFormatToRtp(info.pixelFormat);
+    else
+        return info.pixelFormat;
+}
+
 int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio)
 {
     if (!m_formatCtx)
@@ -151,7 +178,9 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         m_videoEncoderCodecCtx = videoStream->codec;
         m_videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         m_videoEncoderCodecCtx->codec_id = m_videoCodec;
-        m_videoEncoderCodecCtx->pix_fmt = m_videoCodec == AV_CODEC_ID_MJPEG ? AV_PIX_FMT_YUVJ420P : AV_PIX_FMT_YUV420P;
+        m_videoEncoderCodecCtx->pix_fmt = AV_PIX_FMT_YUV420P;
+        if (m_videoCodec == AV_CODEC_ID_MJPEG)
+            m_videoEncoderCodecCtx->pix_fmt = getPixelFormatJpeg(video);
 
         if (m_vTranscoder)
         {
@@ -196,7 +225,11 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             }
 
             if (video->context)
+            {
                 QnFfmpegHelper::mediaContextToAvCodecContext(m_videoEncoderCodecCtx, video->context);
+                if (m_videoCodec == AV_CODEC_ID_MJPEG)
+                    m_videoEncoderCodecCtx->pix_fmt = getPixelFormatJpeg(video);
+            }
 
             m_videoEncoderCodecCtx->width = videoWidth;
             m_videoEncoderCodecCtx->height = videoHeight;
