@@ -165,7 +165,7 @@ def device_cpu_usage(device):
 
 
 def report_server_events(api, streaming_started_at):
-    print(f"Requesting potential failure events from the Server.")
+    print(f"    Requesting potential failure events from the Server...")
     import pprint
     log_events = api.get_events(streaming_started_at)
     storage_failure_events_count = sum(
@@ -173,7 +173,7 @@ def report_server_events(api, streaming_started_at):
         for event in log_events
         if event['eventParams'].get('eventType', None) == 'storageFailureEvent'
     )
-    print(f"    Storage failures: {storage_failure_events_count}")
+    print(f"        Storage failures: {storage_failure_events_count}")
 
 
 @click.command()
