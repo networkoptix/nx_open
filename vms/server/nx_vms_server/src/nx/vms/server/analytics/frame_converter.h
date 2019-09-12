@@ -43,6 +43,7 @@ public:
 
     /**
      * @param pixelFormat If omitted, a compressed frame request is assumed.
+     * @param rotationAngle Possible values: 0, 90, 180, 270; direction: clockwise.
      * @return Either IUncompressedVideoFrame or ICompressedVideoFrame; null if the frame is not
      *     available.
      */
