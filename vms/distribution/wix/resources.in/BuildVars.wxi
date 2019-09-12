@@ -6,8 +6,8 @@
         <?define installerLanguage="${installerLanguage}"?>
         <?define companyName="${company.name}"?>
         <?define ServerRegPath="Software\${company.name}\${mediaserver_application_name}"?>
-        <?define ProductTitle="${company.name} ${customization.displayName} Setup v.${releaseVersion}"?>
-        <?define productTitle = "${company.name} ${customization.displayName} Setup v.${releaseVersion}"?>
+        <?define ProductTitle="${company.name} ${customization.vmsName} Setup v.${releaseVersion}"?>
+        <?define productTitle = "${company.name} ${customization.vmsName} Setup v.${releaseVersion}"?>
 
         <?define serverUpgradeCode = "${customization.desktop.windows.serverUpgradeCode}"?>
         <?define clientUpgradeCode = "${customization.desktop.windows.clientUpgradeCode}"?>
@@ -35,7 +35,7 @@
         <?define nxtoolName = "${customization.nxtool.applicationName}"?>
         <?define mediaserverName = "${mediaserver_application_name}"?>
         <?define trayToolName = "${traytool.name}"?>
-        <?define productName = "${customization.displayName}"?>
+        <?define productName = "${customization.vmsName}"?>
         <?define applauncherName = "${applauncher.name}"?>
         <?define applauncherBinaryName = "${applauncher.binary.name}"?>
         <?define minilauncherBinaryName = "${minilauncher.binary.name}"?>
@@ -46,7 +46,7 @@
         <?define productExeName = "${product.name}"?>
 
         <!-- TODO: #GDM Something strange here! Client exe name differs! -->
-        <?define clientExeName = "${customization.displayName}"?>
+        <?define clientExeName = "${customization.vmsName}"?>
 
         <?define nxtoolExeName = "${customization.nxtool.applicationName}"?>
 
@@ -62,8 +62,8 @@
             <?define SystemFolderActual = "System64Folder"?>
         <?endif?>
 
-        <?define clientInstallFullPath="[$(var.ProgramFilesFolder)]${windowsInstallPath}\${customization.displayName}\Client" ?>
-        <?define nxtoolInstallFullPath="[$(var.ProgramFilesFolder)]${windowsInstallPath}\${customization.displayName}\Nxtool" ?>
+        <?define clientInstallFullPath="[$(var.ProgramFilesFolder)]${windowsInstallPath}\${customization.vmsName}\Client" ?>
+        <?define nxtoolInstallFullPath="[$(var.ProgramFilesFolder)]${windowsInstallPath}\${customization.vmsName}\Nxtool" ?>
 
         <!-- Wix Variables -->
 

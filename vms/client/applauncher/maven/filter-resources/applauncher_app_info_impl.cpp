@@ -17,7 +17,7 @@ QString QnApplauncherAppInfo::installationRoot()
 
 QString QnApplauncherAppInfo::productName()
 {
-    return QStringLiteral("${customization.displayName}");
+    return QStringLiteral("${customization.vmsName}");
 }
 
 QString QnApplauncherAppInfo::bundleName()

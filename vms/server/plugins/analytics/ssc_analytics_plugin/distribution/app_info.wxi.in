@@ -5,8 +5,8 @@
         <?define productId = "${productId}"?>
         <?define productUpgradeCode = "${productUpgradeCode}"?>
         <?define bundleUpgradeCode = "${bundleUpgradeCode}"?>
-        <?define productName = "${customization.displayName}"?>
-        <?define installerProductName = "${customization.displayName} SSC Plugin"?>
+        <?define productName = "${customization.vmsName}"?>
+        <?define installerProductName = "${customization.vmsName} SSC Plugin"?>
         <?define manufacturer = "${company.name}"?>
         <?define productVersion = "${release.version}.${buildNumber}"?>
         <?define customizationDir = "${customization.dir}"?>

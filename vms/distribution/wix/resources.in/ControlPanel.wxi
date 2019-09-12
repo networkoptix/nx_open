@@ -6,7 +6,7 @@
   <Property Id="ARPPRODUCTICON" Value="favicon.ico" />
   <Property Id="ARPHELPLINK" Value="${customization.contact.companyUrl}" />
   <Property Id="ARPREADME" Value="${customization.contact.companyUrl}" />
-  <Property Id="ARPURLINFOABOUT" Value="${company.name} ${customization.displayName}" />
+  <Property Id="ARPURLINFOABOUT" Value="${company.name} ${customization.vmsName}" />
   <Property Id="ARPURLUPDATEINFO" Value="${customization.contact.companyUrl}" />
   <Property Id="ARPHELPTELEPHONE" Value="${customization.contact.companyUrl}" />
   <Property Id="ARPAUTHORIZEDCDFPREFIX" Value="${customization.contact.companyUrl}" />

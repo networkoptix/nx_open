@@ -5,14 +5,15 @@ nx_set_variable_if_empty(mediaserver_application_name "${company.name} Media Ser
 # Overridden in ionetworks, ionetworks_cn
 nx_set_variable_if_empty(windowsInstallPath "${company.name}")
 
-
+# TODO: GDM Rename to 'Client Settings Key and use explicitly'
 set(client.name "${company.name} ${product.name} Client")
-set(client.display.name "${customization.displayName} Client")
-set(applauncher.name "${company.name} ${customization.displayName} Launcher")
-set(traytool.name "${customization.displayName} Tray Assistant")
-set(mediaserver.display.name "${customization.displayName} Media Server")
+
+set(client.display.name "${customization.vmsName} Client")
+set(applauncher.name "${company.name} ${customization.vmsName} Launcher")
+set(traytool.name "${customization.vmsName} Tray Assistant")
+set(mediaserver.display.name "${customization.vmsName} Media Server")
 set(client.mediafolder.name "${product.name} Media")
-set(testcamera.name "${company.name} ${customization.displayName} Test Camera")
+set(testcamera.name "${company.name} ${customization.vmsName} Test Camera")
 set(client.binary.name "client-bin")
 set(applauncher.binary.name "applauncher-bin")
 set(minilauncher.binary.name "applauncher")
@@ -27,9 +28,9 @@ if(WINDOWS)
     set(applauncher.binary.name "applauncher.exe")
     set(minilauncher.binary.name "${product.name} Launcher.exe")
     set(testcamera.binary.name "testcamera.exe")
-    set(installation.root "C:/Program Files/${windowsInstallPath}/${customization.displayName}")
+    set(installation.root "C:/Program Files/${windowsInstallPath}/${customization.vmsName}")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    set(client.binary.name "${customization.displayName}")
+    set(client.binary.name "${customization.vmsName}")
     set(installation.root "/Applications/")
 endif()
 

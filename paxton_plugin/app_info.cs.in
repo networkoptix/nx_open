@@ -2,8 +2,8 @@ namespace nx {
 
 internal static class AppInfo {
     public const string companyName = "${company.name}";
-    public const string productName = "${customization.displayName}";
-    public const string displayProductName = "${company.name} ${customization.displayName}";
+    public const string productName = "${customization.vmsName}";
+    public const string displayProductName = "${company.name} ${customization.vmsName}";
     public const string customization = "${customization}";
     public const string uriProtocol = "${customization.uriProtocol}";
     public const string cloudHost = "${cloudHost}";
