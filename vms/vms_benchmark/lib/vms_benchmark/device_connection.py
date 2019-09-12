@@ -215,7 +215,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
 
             return self.DeviceConnectionResult(proc.returncode, command=command_wrapped)
 
-        def eval(self, cmd, timeout=3, su=False, stderr=sys.stderr):
+        def eval(self, cmd, timeout=3, su=False, stderr=None):
             out = StringIO()
             res = self.sh(cmd, su=su, stdout=out, stderr=stderr, timeout=timeout)
 

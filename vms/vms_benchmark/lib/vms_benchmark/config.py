@@ -37,7 +37,7 @@ class ConfigParser:
         def process_env_vars(string):
             import re
             from os import environ
-            return re.sub(r"(\$[a-zA-Z_][a-zA-Z_]+)", lambda match: environ.get(match.group(1), ''), string)
+            return re.sub(r"\$([a-zA-Z_][a-zA-Z_]+)", lambda match: environ.get(match.group(1), ''), string)
 
         if not is_file_present:
             self.options = dict()
