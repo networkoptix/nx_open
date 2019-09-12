@@ -219,14 +219,13 @@ void WebDownloader::startDownload()
     auto action = CommandActionPtr(new CommandAction(tr("Open Containing Folder")));
     connect(action.data(), &QAction::triggered, this, [this]() {
         auto path = m_fileInfo.absoluteFilePath();
-        if (!m_fileInfo.exists())
+        // Do not use m_fileInfo.exists() because it caches the result.
+        if (!QFileInfo::exists(path))
         {
             // Show folder content instead of removed file.
             // macOS handles this automatically.
             if (!nx::utils::AppInfo::isMacOsX())
-            {
                 path = m_fileInfo.absolutePath();
-            }
         }
         QnEnvironment::showInGraphicalShell(path);
     });
