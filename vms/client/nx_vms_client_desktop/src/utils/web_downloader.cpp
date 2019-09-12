@@ -8,6 +8,7 @@
 
 #include <platform/environment.h>
 
+#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <common/common_module.h>
 
@@ -217,7 +218,17 @@ void WebDownloader::startDownload()
 
     auto action = CommandActionPtr(new CommandAction(tr("Open Containing Folder")));
     connect(action.data(), &QAction::triggered, this, [this]() {
-        QnEnvironment::showInGraphicalShell(m_fileInfo.absoluteFilePath());
+        auto path = m_fileInfo.absoluteFilePath();
+        if (!m_fileInfo.exists())
+        {
+            // Show folder content instead of removed file.
+            // macOS handles this automatically.
+            if (!nx::utils::AppInfo::isMacOsX())
+            {
+                path = m_fileInfo.absolutePath();
+            }
+        }
+        QnEnvironment::showInGraphicalShell(path);
     });
     progressManager->setAction(m_activityId, action);
 
