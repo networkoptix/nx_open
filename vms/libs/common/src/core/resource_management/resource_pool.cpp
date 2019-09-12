@@ -214,6 +214,7 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
             }
         }
     }
+    lk.unlock();
 
     /* Remove layout resources. */
     const auto videoWalls = getResources<QnVideoWallResource>();
@@ -247,8 +248,6 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
 
         NX_VERBOSE(this, "Resource removed [%1] (%2)", otherResource->getName(), otherResource);
     }
-
-    lk.unlock();
 
     /* Emit notifications. */
     for (auto layoutResource: removedLayoutResources)
