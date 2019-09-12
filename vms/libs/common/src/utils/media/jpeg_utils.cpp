@@ -44,9 +44,10 @@ AVPixelFormat convertYuv(uint32_t pixFmtMask, uint8_t bits)
     switch (pixFmtMask)
     {
         case 0x11111100:
+        {
             if (bits <= 8)
                 return bits <= 8 ? AV_PIX_FMT_YUV444P : AV_PIX_FMT_YUV444P16;
-
+        }
         case 0x12121100:
         case 0x22122100:
         case 0x21211100:
@@ -108,7 +109,8 @@ AVPixelFormat parsePixelFormatFromSof(const quint8* data, size_t size)
         if (numberComponents > 4)
             return AV_PIX_FMT_NONE;
 
-        for (uint8_t i = 0; i < numberComponents; i++) {
+        for (uint8_t i = 0; i < numberComponents; i++)
+        {
 
             components[i].id = reader.getBits(8) - 1;
             components[i].hCount = reader.getBits(4);
