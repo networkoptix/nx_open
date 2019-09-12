@@ -156,11 +156,10 @@ def log_exception(contextName, exception):
 def device_cpu_usage(device):
     cpu_usage_file = '/proc/loadavg'
     cpu_usage_reply = device.eval(f'cat {cpu_usage_file}')
-    cpu_usage_reply_list = cpu_usage_reply.split()
-    if len(cpu_usage_reply_list) < 2:
+    cpu_usage_reply_list = cpu_usage_reply.split() if cpu_usage_reply else None
+    if not cpu_usage_reply_list or len(cpu_usage_reply_list) < 2:
         # TODO: Properly log an arbitrary string in cpu_usage_reply.
-        return (f'Unable to fetch box cpu usage: unexpected contents in {cpu_usage_file}: ' +
-                f'"{cpu_usage_reply}"')
+        return (f'Unable to fetch box cpu usage: unexpected contents in {cpu_usage_file}')
     return cpu_usage_reply_list[1]
 
 
