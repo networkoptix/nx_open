@@ -56,8 +56,9 @@ bool RtspPerf::getCamerasUrls(const QString& server, std::vector<QString>& urls)
     nx::network::http::HttpClient httpClient;
     httpClient.setUserName(m_config.user);
     httpClient.setUserPassword(m_config.password);
-
-    if (!httpClient.doGet("http://" + server + "/ec2/getCamerasEx"))
+    QString request = "http://" + server + "/ec2/getCamerasEx";
+    NX_INFO(this, "Obtain camera list using request: %1", request);
+    if (!httpClient.doGet(request))
     {
         NX_ERROR(this, "Failed to get camera list");
         return false;
@@ -147,7 +148,7 @@ void RtspPerf::run()
                 ++successSessions;
         }
         float bitrate = bitrateCounter.update(totalBytesRead);
-        NX_INFO(this, "Total bitrate %1 MBit/s, worked sessions %2, failed %3, bytes read %4",
+        NX_INFO(this, "Total bitrate %1 MBit/s, working sessions %2, failed %3, bytes read %4",
             QString::number(bitrate, 'f', 3), successSessions, std::max<int64_t>(m_totalFailed, 0), totalBytesRead);
     }
 }

@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     parser.addHelpOption();
     parser.addVersionOption();
     QCommandLineOption serverOption(QStringList() << "s" << "server",
-        "Server address and port. By default: '127.0.0.1:7001'.", "server address", "127.0.0.1:7001");
+        "Server address and port. By default: '127.0.0.1:7001'.", "server", "127.0.0.1:7001");
     parser.addOption(serverOption);
     QCommandLineOption countOption(QStringList() << "c" << "count",
         "Rtsp session count. By default: 1", "count", "1");
