@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.111",
+    "version": "1.0.1.112",
     "data": [
         {
             "keys": [
@@ -1227,6 +1227,21 @@
                     "VideoEncoderConfigurationA02,VideoEncoderConfigurationA06",
                     "VideoEncoderConfigurationA03,VideoEncoderConfigurationA07",
                     "VideoEncoderConfigurationA04,VideoEncoderConfigurationA08"
+                ]
+            }
+        },
+        {
+            "keys": [
+                "DW|DWC-PVX16W"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "video_encoder01_01,video_encoder01_02",
+                    "video_encoder02_01,video_encoder02_02",
+                    "video_encoder03_01,video_encoder03_02",
+                    "video_encoder04_01,video_encoder04_02"
                 ]
             }
         },
