@@ -1,62 +1,52 @@
-from os import kill, waitpid
+import logging
+import os
 import platform
+import subprocess
+from contextlib import contextmanager
+
+from vms_benchmark import exceptions
+
+binary_file = './testcamera'
+test_file_high_resolution = './test_file_high_resolution.ts'
+test_file_low_resolution = './test_file_low_resolution.ts'
+debug = False
 
 
-class TestCameraRunner:
-    binary_file = './testcamera'
-    test_file_high_resolution = './test_file_high_resolution.ts'
-    test_file_low_resolution = './test_file_low_resolution.ts'
-    debug = False
+@contextmanager
+def test_camera_running(local_ip, primary_fps, secondary_fps, count=1):
+    camera_args = [
+        binary_file,
+        f"--local-interface={local_ip}",
+        f"--fps-primary", str(primary_fps),
+        f"--fps-secondary", str(secondary_fps),
+        f"files=\"{test_file_high_resolution}\";secondary-files=\"{test_file_low_resolution}\";count={count}",
+    ]
 
-    def __init__(self, local_ip, pid, count):
-        self.local_ip = local_ip
-        self.pid = pid
-        self.count = count
+    opts = {}
 
-    def __del__(self):
-        try:
-            kill(self.pid, 9)
-            waitpid(self.pid, 0)
-        except:  #< Probably, the testcamera processes are already finished.
-            pass
+    if not debug:
+        opts['stdout'] = subprocess.PIPE
+        opts['stderr'] = subprocess.PIPE
 
-    @staticmethod
-    def spawn(local_ip, lowStreamFps, count=1):
-        camera_command = TestCameraRunner.binary_file
-        camera_args = [
-            TestCameraRunner.binary_file,
-            f"--local-interface={local_ip}",
-            f"--fps {lowStreamFps}",
-            f"files=\"{TestCameraRunner.test_file_high_resolution}\";secondary-files=\"{TestCameraRunner.test_file_low_resolution}\";count={count}",
-        ]
+    ld_library_path = None
+    if platform.system() == 'Linux':
+        ld_library_path = os.path.dirname(binary_file)
+        opts['env'] = {'LD_LIBRARY_PATH': ld_library_path}
 
-        if platform.system() == 'Linux':
-            import os
-            from os import fork, execvpe, close
+    # NOTE: The first arg is the command itself.
+    log_message = 'Running testcamera with the following command and args:\n'
+    if ld_library_path:
+        log_message += f'    LD_LIBRARY_PATH={ld_library_path}\n'
+    for arg in camera_args:
+        log_message += f'    {arg}\n'
+    logging.info(log_message)
 
-            environ = os.environ.copy()
-            environ['LD_LIBRARY_PATH'] = os.path.dirname(TestCameraRunner.binary_file)
+    try:
+        proc = subprocess.Popen(camera_args, **opts)
+    except Exception as exception:
+        raise exceptions.TestCameraError(f"Unexpected error during spawning cameras: {str(exception)}")
 
-            pid = fork()
-
-            if pid == 0:
-                close(0)
-                if not TestCameraRunner.debug:
-                    [close(fd) for fd in (1, 2)]
-                execvpe(camera_command, camera_args, environ)
-
-        elif platform.system() == 'Windows':
-            import subprocess
-
-            opts = {}
-
-            if not TestCameraRunner.debug:
-                opts['stdout'] = subprocess.PIPE
-                opts['stderr'] = subprocess.PIPE
-
-            proc = subprocess.Popen(camera_args, **opts)
-            pid = proc.pid
-        else:
-            pass
-
-        return TestCameraRunner(local_ip, pid, count)
+    try:
+        yield proc
+    finally:
+        proc.terminate()

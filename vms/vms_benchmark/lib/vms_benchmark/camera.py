@@ -30,13 +30,13 @@ class Camera:
         ]
 
         if enable:
-            response = urllib.request.urlopen(request, data=json.dumps({
+            response = self.api.post_request(request, data=json.dumps({
                 "cameraId": self.id,
                 "scheduleEnabled": enable,
                 "scheduleTasks": scheduleTasks,
             }).encode())
         else:
-            response = urllib.request.urlopen(request, data=json.dumps({
+            response = self.api.post_request(request, data=json.dumps({
                 "cameraId": self.id,
                 "scheduleEnabled": enable,
             }).encode())
@@ -65,13 +65,13 @@ class Camera:
         ]
 
         if enable:
-            response = urllib.request.urlopen(request, data=json.dumps({
+            response = self.api.post_request(request, data=json.dumps({
                 "cameraId": self.id,
                 "scheduleEnabled": enable,
                 "scheduleTasks": scheduleTasks,
             }).encode())
         else:
-            response = urllib.request.urlopen(request, data=json.dumps({
+            response = self.api.post_request(request, data=json.dumps({
                 "cameraId": self.id,
                 "scheduleEnabled": enable,
             }).encode())

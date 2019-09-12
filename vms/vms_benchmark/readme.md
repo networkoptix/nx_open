@@ -27,6 +27,8 @@ The following prerequisites should be assured before running the tool:
     OS components. Such software may or may not interfere with VMS Benchmark and may or may not
     affect its ability to run or the accuracy of its report.
 * Linux host: `ssh` and `sshpass` tools should be installed on the host.
+* Windows host: Firewall should be disabled completely to enable spawning virtual cameras in the
+    isolated network.
 * VMS Server should be installed on the box and VMS System should be set up via the Setup Wizard
     in the Server web-admin.
 * No more than one VMS should be installed on the box.

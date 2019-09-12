@@ -6,9 +6,9 @@ set PYTHONPATH=%DEV_PATH%\python\lib\python3.7\site-packages
 python3.exe -m PyInstaller ^
     -y ^
     -F --hidden-import json ^
-    --distpath %BUILD_DIR%\dist ^
+    --distpath %BUILD_DIR%\distrib ^
     --workpath %BUILD_DIR%\build ^
     --specpath %BUILD_DIR% ^
     --add-binary "%DEV_PATH%\python\Lib\site-packages\cv2\opencv_ffmpeg400_64.dll;." ^
     -p %SRC_DIR%\lib ^
-    %SRC_DIR%\bin\vms_benchmark
+    %SRC_DIR%\bin\main.py

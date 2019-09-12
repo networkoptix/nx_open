@@ -68,6 +68,7 @@ private:
     AVIOContext* createFfmpegIOContext();
     void closeFfmpegContext();
     int muxPacket(const QnConstAbstractMediaDataPtr& packet);
+    AVPixelFormat getPixelFormatJpeg(const QnConstCompressedVideoDataPtr& video);
 
 private:
     Config m_config;

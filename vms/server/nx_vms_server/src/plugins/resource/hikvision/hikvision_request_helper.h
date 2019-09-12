@@ -29,7 +29,7 @@ public:
     using XmlRequestHelper::XmlRequestHelper;
 
     ProtocolStates fetchIntegrationProtocolInfo();
-    bool enableIntegrationProtocols(const ProtocolStates& integrationProtocolStates);
+    bool enableIntegrationProtocols(ProtocolStates &integrationProtocolStates);
 
     bool checkIsapiSupport();
     std::optional<std::map<int, QString>> getOnvifUsers();
