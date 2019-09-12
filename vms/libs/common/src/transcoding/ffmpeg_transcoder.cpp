@@ -179,8 +179,6 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         m_videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         m_videoEncoderCodecCtx->codec_id = m_videoCodec;
         m_videoEncoderCodecCtx->pix_fmt = AV_PIX_FMT_YUV420P;
-        if (m_videoCodec == AV_CODEC_ID_MJPEG)
-            m_videoEncoderCodecCtx->pix_fmt = getPixelFormatJpeg(video);
 
         if (m_vTranscoder)
         {
@@ -225,16 +223,15 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             }
 
             if (video->context)
-            {
                 QnFfmpegHelper::mediaContextToAvCodecContext(m_videoEncoderCodecCtx, video->context);
-                if (m_videoCodec == AV_CODEC_ID_MJPEG)
-                    m_videoEncoderCodecCtx->pix_fmt = getPixelFormatJpeg(video);
-            }
 
             m_videoEncoderCodecCtx->width = videoWidth;
             m_videoEncoderCodecCtx->height = videoHeight;
             m_videoEncoderCodecCtx->bit_rate = videoWidth * videoHeight; // auto fill bitrate. 2Mbit for full HD, 1Mbit for 720x768
         }
+        if (m_videoCodec == AV_CODEC_ID_MJPEG)
+            m_videoEncoderCodecCtx->pix_fmt = getPixelFormatJpeg(video);
+
         m_videoEncoderCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
         m_videoEncoderCodecCtx->time_base.num = 1;
         m_videoEncoderCodecCtx->time_base.den = 60;

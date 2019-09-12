@@ -25,16 +25,16 @@ AVPixelFormat convertGbr(uint32_t pixFmtMask, uint8_t bits)
 {
     switch (pixFmtMask)
     {
-    case 0x11111100:
-        return bits <= 8 ? AV_PIX_FMT_GBRP : AV_PIX_FMT_GBRP16;
+        case 0x11111100:
+            return bits <= 8 ? AV_PIX_FMT_GBRP : AV_PIX_FMT_GBRP16;
 
-    case 0x12111100:
-    case 0x14121200:
-    case 0x14111100:
-    case 0x22211100:
-    case 0x22112100:
-    case 0x21111100:
-        return bits <= 8 ? AV_PIX_FMT_GBRP : AV_PIX_FMT_NONE;
+        case 0x12111100:
+        case 0x14121200:
+        case 0x14111100:
+        case 0x22211100:
+        case 0x22112100:
+        case 0x21111100:
+            return bits <= 8 ? AV_PIX_FMT_GBRP : AV_PIX_FMT_NONE;
     }
     return AV_PIX_FMT_NONE;
 }
@@ -43,53 +43,56 @@ AVPixelFormat convertYuv(uint32_t pixFmtMask, uint8_t bits)
 {
     switch (pixFmtMask)
     {
-    case 0x11111100:
-        if (bits <= 8)
-            return bits <= 8 ? AV_PIX_FMT_YUV444P : AV_PIX_FMT_YUV444P16;
-
-    case 0x12121100:
-    case 0x22122100:
-    case 0x21211100:
-    case 0x22211200:
-    case 0x22221100:
-    case 0x22112200:
-    case 0x11222200:
-    case 0x31111100:
-        return bits <= 8 ? AV_PIX_FMT_YUV444P : AV_PIX_FMT_NONE;
-
-    case 0x12111100:
-    case 0x14121200:
-    case 0x14111100:
-    case 0x22211100:
-    case 0x22112100:
-        return bits <= 8 ? AV_PIX_FMT_YUV440P : AV_PIX_FMT_NONE;
-
-    case 0x21111100:
-        return bits <= 8 ? AV_PIX_FMT_YUV422P : AV_PIX_FMT_YUV422P16;
-
-    case 0x22121100:
-    case 0x22111200:
-        return bits <= 8 ? AV_PIX_FMT_YUV422P : AV_PIX_FMT_NONE;
-
-    case 0x22111100:
-    case 0x42111100:
-    case 0x24111100:
-        if (pixFmtMask == 0x42111100 || pixFmtMask == 0x24111100)
+        case 0x11111100:
         {
-            if (bits > 8)
-                return AV_PIX_FMT_NONE;
+            if (bits <= 8)
+                return bits <= 8 ? AV_PIX_FMT_YUV444P : AV_PIX_FMT_YUV444P16;
         }
-        return bits <= 8 ? AV_PIX_FMT_YUV420P : AV_PIX_FMT_YUV420P16;
+        case 0x12121100:
+        case 0x22122100:
+        case 0x21211100:
+        case 0x22211200:
+        case 0x22221100:
+        case 0x22112200:
+        case 0x11222200:
+        case 0x31111100:
+            return bits <= 8 ? AV_PIX_FMT_YUV444P : AV_PIX_FMT_NONE;
 
-    case 0x41111100:
-        return bits <= 8 ? AV_PIX_FMT_YUV411P : AV_PIX_FMT_NONE;
+        case 0x12111100:
+        case 0x14121200:
+        case 0x14111100:
+        case 0x22211100:
+        case 0x22112100:
+            return bits <= 8 ? AV_PIX_FMT_YUV440P : AV_PIX_FMT_NONE;
 
-    default:
-        return AV_PIX_FMT_NONE;
+        case 0x21111100:
+            return bits <= 8 ? AV_PIX_FMT_YUV422P : AV_PIX_FMT_YUV422P16;
+
+        case 0x22121100:
+        case 0x22111200:
+            return bits <= 8 ? AV_PIX_FMT_YUV422P : AV_PIX_FMT_NONE;
+
+        case 0x22111100:
+        case 0x42111100:
+        case 0x24111100:
+        {
+            if (pixFmtMask == 0x42111100 || pixFmtMask == 0x24111100)
+            {
+                if (bits > 8)
+                    return AV_PIX_FMT_NONE;
+            }
+            return bits <= 8 ? AV_PIX_FMT_YUV420P : AV_PIX_FMT_YUV420P16;
+        }
+        case 0x41111100:
+            return bits <= 8 ? AV_PIX_FMT_YUV411P : AV_PIX_FMT_NONE;
+
+        default:
+            return AV_PIX_FMT_NONE;
     }
 }
 
-AVPixelFormat parsePixelFormatFromSOF(const quint8* data, size_t size)
+// Parsing of SOF JPEG header to obtain pixel format
+AVPixelFormat parsePixelFormatFromSof(const quint8* data, size_t size)
 {
     if (size <= 4)
         return AV_PIX_FMT_NONE;
@@ -106,7 +109,8 @@ AVPixelFormat parsePixelFormatFromSOF(const quint8* data, size_t size)
         if (numberComponents > 4)
             return AV_PIX_FMT_NONE;
 
-        for (uint8_t i = 0; i < numberComponents; i++) {
+        for (uint8_t i = 0; i < numberComponents; i++)
+        {
 
             components[i].id = reader.getBits(8) - 1;
             components[i].hCount = reader.getBits(4);
@@ -257,7 +261,7 @@ AVPixelFormat parsePixelFormatFromSOF(const quint8* data, size_t size)
             imgInfo->precision = sofDataStart[0];
             imgInfo->height = (sofDataStart[1] << 8) | sofDataStart[2];
             imgInfo->width = (sofDataStart[3] << 8) | sofDataStart[4];
-            imgInfo->pixelFormat = parsePixelFormatFromSOF(data + currentOffset, size);
+            imgInfo->pixelFormat = parsePixelFormatFromSof(data + currentOffset, size);
             return false;
         };
 
