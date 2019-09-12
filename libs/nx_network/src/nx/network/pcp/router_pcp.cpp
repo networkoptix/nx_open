@@ -6,8 +6,8 @@
 #include <QDateTime>
 
 static const quint32 LIFETIME = 1 * 60 * 60;
-static const int RESPONCE_WAIT = 1000;
-static const int RESPONCE_BUFFER = 1024;
+static const int RESPONSE_WAIT = 1000;
+static const int RESPONSE_BUFFER = 1024;
 
 namespace nx {
 namespace network {
@@ -31,9 +31,9 @@ void Router::mapPort(Mapping& mapping)
         return;
 
     QElapsedTimer timer;
-    while (timer.elapsed() < RESPONCE_WAIT)
+    while (timer.elapsed() < RESPONSE_WAIT)
     {
-        QByteArray response(RESPONCE_BUFFER, Qt::Uninitialized);
+        QByteArray response(RESPONSE_BUFFER, Qt::Uninitialized);
         SocketAddress server;
         int recv = m_clientSocket->recvFrom(response.data(), response.size(), &server);
         if (server != m_serverAddress) continue;

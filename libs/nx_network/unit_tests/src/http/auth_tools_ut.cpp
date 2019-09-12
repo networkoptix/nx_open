@@ -25,9 +25,9 @@ TEST(HttpAuthDigest, partialResponse_test)
         QByteArray(nonce)+QByteArray(nonceTrailer),
         ha2);
 
-    const auto partialResponce = nx::network::http::calcIntermediateResponse(ha1, nonce);
+    const auto partialResponse = nx::network::http::calcIntermediateResponse(ha1, nonce);
     const auto responseFromPartial = nx::network::http::calcResponseFromIntermediate(
-        partialResponce,
+        partialResponse,
         sizeof(nonce) - 1,
         nonceTrailer,
         ha2);

@@ -83,8 +83,8 @@ void QnPingUtility::run() {
     while (!m_stop) {
         qint64 startTime = QDateTime::currentMSecsSinceEpoch();
 
-        PingResponce responce = ping(seq);
-        emit pingResponce(responce);
+        PingResponse response = ping(seq);
+        emit pingResponse(response);
 
         qint64 waitTime = startTime + m_timeout - QDateTime::currentMSecsSinceEpoch();
         if (waitTime > 0)
@@ -94,8 +94,8 @@ void QnPingUtility::run() {
     }
 }
 
-QnPingUtility::PingResponce QnPingUtility::ping(quint16 seq) {
-    PingResponce result;
+QnPingUtility::PingResponse QnPingUtility::ping(quint16 seq) {
+    PingResponse result;
     result.type = UnknownError;
     result.hostAddress = m_hostAddress;
     result.seq = seq;

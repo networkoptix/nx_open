@@ -101,7 +101,7 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<QnWeakObjectHash>();
     qRegisterMetaType<WeakGraphicsItemPointerList>();
     qRegisterMetaType<QnCustomization>();
-    qRegisterMetaType<QnPingUtility::PingResponce>();
+    qRegisterMetaType<QnPingUtility::PingResponse>();
     qRegisterMetaType<nx::vms::client::desktop::ServerFileCache::OperationResult>();
 
     qRegisterMetaType<QnTimeSliderColors>();

@@ -14,7 +14,7 @@ using ConnectionPtr = network::stun::AbstractServerConnection*;
 using ConnectionStrongRef = std::shared_ptr<network::stun::AbstractServerConnection>;
 using ConnectionWeakRef = std::weak_ptr<network::stun::AbstractServerConnection>;
 
-/** Send success responce without attributes. */
+/** Send success response without attributes. */
 template<typename ConnectionPtr>
 void sendSuccessResponse(
     const ConnectionPtr& connection,
@@ -30,7 +30,7 @@ void sendSuccessResponse(
     connection->sendMessage(std::move(response), nullptr);
 }
 
-/** Send error responce with error code and description as attribute. */
+/** Send error response with error code and description as attribute. */
 template<typename ConnectionPtr>
 void sendErrorResponse(
     const ConnectionPtr& connection,

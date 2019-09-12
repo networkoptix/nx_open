@@ -187,7 +187,7 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
     std::vector<QnByteArray*> dataArrays;
     while (true)
     {
-        int bytesRead = rtspClient.readBinaryResponce(dataArrays, rtpChannelNum);
+        int bytesRead = rtspClient.readBinaryResponse(dataArrays, rtpChannelNum);
         if (rtpChannelNum >= 0 && (int)dataArrays.size() > rtpChannelNum && dataArrays[rtpChannelNum])
             dataArrays[rtpChannelNum]->clear();
         if (bytesRead <= 0)
