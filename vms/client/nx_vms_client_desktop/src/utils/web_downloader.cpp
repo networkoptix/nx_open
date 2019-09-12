@@ -274,6 +274,7 @@ void WebDownloader::cancel()
         if (messageBox.exec() == QDialogButtonBox::Cancel)
             return;
     }
+    m_cancelRequested = true;
     m_file->remove();
     m_reply->abort();
 
@@ -338,7 +339,8 @@ void WebDownloader::onReplyFinished()
             setState(State::Completed);
             break;
         default:
-            setState(State::Failed);
+            if (!m_cancelRequested)
+                setState(State::Failed);
             removeFile = true;
     }
 

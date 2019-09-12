@@ -57,6 +57,7 @@ private:
     QFile* m_file;
     QFileInfo m_fileInfo;
     QnUuid m_activityId;
+    bool m_cancelRequested = false;
 };
 
 } // namespace utils
