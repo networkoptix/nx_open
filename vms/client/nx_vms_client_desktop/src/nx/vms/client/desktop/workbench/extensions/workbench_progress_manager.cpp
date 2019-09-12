@@ -97,6 +97,25 @@ void WorkbenchProgressManager::setProgress(const QnUuid& activityId, qreal value
     emit progressChanged(activityId, value);
 }
 
+QString WorkbenchProgressManager::progressFormat(const QnUuid& activityId) const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_lookup.value(activityId).format;
+}
+
+void WorkbenchProgressManager::setProgressFormat(const QnUuid& activityId, const QString& value)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto iter = m_lookup.find(activityId);
+    if (iter == m_lookup.end() || iter->format == value)
+        return;
+
+    iter->format = value;
+
+    lock.unlock();
+    emit progressFormatChanged(activityId, value);
+}
+
 bool WorkbenchProgressManager::isCancellable(const QnUuid& activityId) const
 {
     QnMutexLocker lock(&m_mutex);

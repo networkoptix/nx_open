@@ -38,6 +38,9 @@ public:
     qreal progress(const QnUuid& activityId) const;
     void setProgress(const QnUuid& activityId, qreal value);
 
+    QString progressFormat(const QnUuid& activityId) const;
+    void setProgressFormat(const QnUuid& activityId, const QString& value);
+
     static constexpr qreal kIndefiniteProgressValue = -1;
     static constexpr qreal kCompletedProgressValue = -2;
     static constexpr qreal kFailedProgressValue = -3;
@@ -62,6 +65,7 @@ signals:
     void cancelRequested(const QnUuid& activityId);
     void interactionRequested(const QnUuid& activityId);
     void progressChanged(const QnUuid& activityId, qreal progress);
+    void progressFormatChanged(const QnUuid& activityId, const QString& format);
     void cancellableChanged(const QnUuid& activityId, bool isCancellable);
     void titleChanged(const QnUuid& activityId, const QString& title);
     void descriptionChanged(const QnUuid& activityId, const QString& description);
@@ -75,6 +79,7 @@ private:
         bool cancellable = false;
         qreal progress = 0.0;
         CommandActionPtr action = nullptr;
+        QString format;
 
         State() = default;
         State(const QString& title, const QString& description, bool cancellable, qreal progress):
