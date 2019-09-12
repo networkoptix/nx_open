@@ -84,7 +84,7 @@ QString AppInfo::productNameShort()
 
 QString AppInfo::productNameLong()
 {
-    return "${display.product.name}";
+    return "${customization.displayName}";
 }
 
 QString AppInfo::productName()

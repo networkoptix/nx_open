@@ -63,5 +63,5 @@ Template: @deb.customization.company.name@-mediaserver/complete-setup-hint
 Type: note
 Description: Complete the setup process
  Installation is not yet complete.
- To proceed please run @display.product.name@ Client and click "New System" tile
+ To proceed please run @client.display.name@ and click "New System" tile
  or access server web-page with your browser.

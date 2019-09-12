@@ -7,7 +7,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>English</string>
     <key>CFBundleDisplayName</key>
-    <string>@display.product.name@</string>
+    <string>@customization.displayName@</string>
     <key>CFBundleExecutable</key>
     <string>launcher</string>
     <key>CFBundleIconFile</key>
@@ -17,7 +17,7 @@
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>@display.product.name@</string>
+    <string>@customization.displayName@</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>

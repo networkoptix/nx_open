@@ -1,6 +1,6 @@
 [Desktop Entry]
-Name=@display.product.name@
-Comment=@display.product.name@ Client
+Name=@customization.displayName@
+Comment=@client.display.name@
 Exec=/opt/@deb.customization.company.name@/client/@release.version@.@buildNumber@/bin/applauncher
 Icon=vmsclient-@customization@.png
 Terminal=false
