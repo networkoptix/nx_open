@@ -95,6 +95,36 @@ QString getUniqueFilePath(const QString& path)
     return path;
 }
 
+QString speedToText(qint64 bytesRead, qint64 elapsedMs)
+{
+    static constexpr qint64 kBitsPerByte = 8;
+
+    static constexpr auto kMsPerSec = 1000;
+    static constexpr qreal kBitsPerKb = 1000.0;
+    static constexpr qreal kKbPerMb = 1000.0;
+    static constexpr qreal kMbPerGb = 1000.0;
+
+    if (elapsedMs == 0)
+        elapsedMs = 1;
+
+    QString speedLabel = "Kbps";
+    qreal speed = (bytesRead * kBitsPerByte) / (kBitsPerKb * elapsedMs / kMsPerSec);
+
+    if (speed >= kKbPerMb)
+    {
+        speedLabel = "Mbps";
+        speed /= kKbPerMb;
+    }
+
+    if (speed >= kMbPerGb)
+    {
+        speedLabel = "Gbps";
+        speed /= kMbPerGb;
+    }
+
+    return QString("%1 %2").arg(speed, 0, 'f', 1).arg(speedLabel);
+}
+
 } // namespace
 
 WebDownloader::WebDownloader(QObject* parent,
@@ -325,8 +355,13 @@ void WebDownloader::onReadyRead()
 void WebDownloader::onDownloadProgress(qint64 bytesRead, qint64 bytesTotal)
 {
     auto progressManager = context()->instance<WorkbenchProgressManager>();
-    if (m_state == State::Downloading)
-        progressManager->setProgress(m_activityId, static_cast<qreal>(bytesRead) / bytesTotal);
+    if (m_state != State::Downloading)
+        return;
+
+    const QString speed = speedToText(bytesRead, m_downloadTimer.elapsed());
+
+    progressManager->setProgress(m_activityId, static_cast<qreal>(bytesRead) / bytesTotal);
+    progressManager->setProgressFormat(m_activityId, QString("%1, %p%").arg(speed));
 }
 
 void WebDownloader::onReplyFinished()
