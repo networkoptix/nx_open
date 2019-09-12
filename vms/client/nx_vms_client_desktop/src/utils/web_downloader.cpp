@@ -153,6 +153,15 @@ public:
 WebDownloader::~WebDownloader()
 {
     context()->instance<WorkbenchProgressManager>()->remove(m_activityId);
+
+    // Cleanup incomplete files.
+    if (m_state != State::Completed)
+    {
+        if (m_file->isOpen())
+            m_file->close();
+
+        m_file->remove();
+    }
 }
 
 bool WebDownloader::download(
