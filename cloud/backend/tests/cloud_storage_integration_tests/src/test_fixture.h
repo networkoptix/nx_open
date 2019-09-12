@@ -21,8 +21,17 @@ public:
     ~TestFixture();
 
 protected:
-    struct TestContext
+	enum InitializeFlags
+	{
+		bucket = 1 << 0,
+		storage = 1 << 1,
+		system = 1 << 2,
+		all = bucket | storage | system,
+	};
+
+    class TestContext
     {
+	public:
         S3Bucket* s3Bucket = nullptr;
         nx::cloud::db::AccountWithPassword cloudDbAccount;
         nx::cloud::db::api::SystemData system;
@@ -42,12 +51,22 @@ protected:
      * - Creates a Cloud Storage.
      * - Associates the CloudDb system with the Cloud Storage
      */
-    TestContext initializeTest();
+    TestContext initializeTest(int initializeFlags = InitializeFlags::all);
 
     nx::cloud::db::CdbLauncher& cloudDb();
     const nx::cloud::db::CdbLauncher& cloudDb() const;
-    CloudStorageLauncher& cloudStorage(int index = 0);
-    const CloudStorageLauncher& cloudStorage(int index = 0) const;
+    CloudStorageLauncher& storageService(int index = 0);
+    const CloudStorageLauncher& storageService(int index = 0) const;
+
+	void readStorage(api::Client* cloudStorageClient, const std::string& storageId);
+	std::pair<api::Result, api::Storage> waitForReadStorageResponse();
+
+	void removeStorage(api::Client* storageServiceClient, const std::string& storageId);
+	api::Result waitForRemoveStorageResponse();
+
+	std::unique_ptr<api::Client> makeStorageServiceClient(
+		const nx::utils::Url& storageServiceUrl,
+		const nx::cloud::db::AccountWithPassword& cloudDbAccount) const;
 
 private:
     S3Bucket& launchS3Bucket();
@@ -64,6 +83,8 @@ private:
     discovery::test::DiscoveryServer m_discoveryServer;
     std::unique_ptr<CloudStorageCluster> m_cloudStorageCluster;
     nx::cloud::db::CdbLauncher m_cloudDb;
+	nx::utils::SyncQueue<std::pair<api::Result, api::Storage>> m_readStorageResponse;
+	nx::utils::SyncQueue<api::Result> m_removeStorageResponse;
 };
 
 } // namespace nx::cloud::storage::service::test
