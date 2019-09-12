@@ -153,6 +153,28 @@ def log_exception(contextName, exception):
     logging.exception(f'Exception: {contextName}: {type(exception)}: {str(exception)}')
 
 
+def device_cpu_usage(device):
+    cpu_usage_file = '/proc/loadavg'
+    cpu_usage_reply = device.eval(f'cat {cpu_usage_file}')
+    cpu_usage_reply_list = cpu_usage_reply.split() if cpu_usage_reply else None
+    if not cpu_usage_reply_list or len(cpu_usage_reply_list) < 2:
+        # TODO: Properly log an arbitrary string in cpu_usage_reply.
+        return (f'Unable to fetch box cpu usage: unexpected contents in {cpu_usage_file}')
+    return cpu_usage_reply_list[1]
+
+
+def report_server_events(api, streaming_started_at):
+    print(f"    Requesting potential failure events from the Server...")
+    import pprint
+    log_events = api.get_events(streaming_started_at)
+    storage_failure_events_count = sum(
+        event['aggregationCount']
+        for event in log_events
+        if event['eventParams'].get('eventType', None) == 'storageFailureEvent'
+    )
+    print(f"        Storage failures: {storage_failure_events_count}")
+
+
 @click.command()
 @click.option('--config', 'config_file', default='vms_benchmark.conf', help='Input config file.')
 @click.option('-C', 'config_file', default='vms_benchmark.conf', help='Input config file.')
@@ -268,7 +290,7 @@ def main(config_file):
 
     vms = vmses[0]
     print('Server restarted successfully.')
-    print(f"Free space of RAM: {round(dev_platform.ram_free()/1024/1024)}M of {round(dev_platform.ram/1024/1024)}M")
+    print(f"Free space of RAM: {round(dev_platform.ram_free()/1024/1024)} MB of {round(dev_platform.ram/1024/1024)} MB")
 
     api = ServerApi(device.ip, vms.port, user=config['vmsUser'], password=config['vmsPassword'])
 
@@ -320,7 +342,9 @@ def main(config_file):
         "x86_64": 200
     }
 
-    for test_cameras_count in config.get('testCamerasTestSequence', [1, 2, 3, 4, 6, 8, 10, 15, 20, 40, 80, 160, 256]):
+    for test_cameras_count in config.get(
+            'testCamerasTestSequence', [1, 2, 3, 4, 6, 8, 10, 16, 32, 64, 128]):
+
         ram_available = dev_platform.ram_available()
         ram_free = ram_available if ram_available else dev_platform.ram_free()
 
@@ -328,10 +352,9 @@ def main(config_file):
                 test_cameras_count * memory_per_camera_by_arch.get(dev_platform.arch, 200)*1024*1024
         ):
             raise exceptions.InsuficientResourcesError(
-                f"{test_cameras_count} is too many test cameras for that box, because the RAM is too small."
-            )
+                f"Not enough free RAM on the box for {test_cameras_count} cameras.")
 
-        print(f"Try to serve {test_cameras_count} cameras.")
+        print(f"Serving {test_cameras_count} virtual cameras.")
         print("")
 
         test_camera_cm = test_camera_runner.test_camera_running(
@@ -341,7 +364,7 @@ def main(config_file):
             secondary_fps=sys_config['testStreamFpsLow'],
         )
         with test_camera_cm as test_camera_process:
-            print(f"    Spawned {test_cameras_count} test cameras.")
+            print(f"    Started {test_cameras_count} virtual cameras.")
 
             def wait_test_cameras_discovered(timeout, duration):
                 started_at = time.time()
@@ -366,12 +389,12 @@ def main(config_file):
             try:
                 discovering_timeout = 120
 
-                print(f"    Waiting for test cameras discovering... (timeout is {discovering_timeout} seconds)")
+                print(f"    Waiting for virtual cameras discovering (timeout is {discovering_timeout} seconds).")
                 res, cameras = wait_test_cameras_discovered(discovering_timeout, 3)
                 if not res:
                     raise exceptions.TestCameraError('Timeout expired.')
 
-                print("    All test cameras had been discovered successfully.")
+                print("    All virtual cameras discovered successfully.")
 
                 time.sleep(test_cameras_count * 2)
 
@@ -379,12 +402,13 @@ def main(config_file):
                     if camera.enable_recording(highStreamFps=sys_config['testStreamFpsHigh']):
                         print(f"    Recording on camera {camera.id} enabled.")
                     else:
-                        raise exceptions.TestCameraError(f"Error enabling recording on camera {camera.id}: request failed.")
+                        raise exceptions.TestCameraError(
+                            f"Failed enabling recording on camera {camera.id}.")
 
                 camera_id = cameras[0].id
             except Exception as e:
                 log_exception('Discovering cameras', e)
-                raise exceptions.TestCameraError(f"Cameras are not discovered.", e) from e
+                raise exceptions.TestCameraError(f"Cameras were not discovered.", e) from e
 
             try:
                 stream_opening_started_at = time.time()
@@ -395,11 +419,12 @@ def main(config_file):
                     stream = cv2.VideoCapture(stream_url)
 
                     if stream.isOpened():
-                        print(f"    RTSP stream opened. Test duration: {stream_duration} seconds.")
+                        print(f"    Video stream from the Server opened. Test duration: {stream_duration} seconds.")
                         break
 
                 if not stream.isOpened():
-                    raise exceptions.TestCameraStreamingError(f"Can't open RTSP stream {stream_url}: timeout ended")
+                    raise exceptions.TestCameraStreamingError(
+                        f'Cannot open video stream {stream_url}: timeout expired.')
 
                 streaming_started_at = time.time()
 
@@ -411,46 +436,61 @@ def main(config_file):
                 frame_drops = 0
                 dummy_frames_count = 0
 
-                while stream.isOpened():
-                    _ret, _frame = stream.read()
-                    frames += 1
-                    pts = stream.get(cv2.CAP_PROP_POS_MSEC)
+                try:
+                    streaming_succeeded = False
+                    while stream.isOpened():
+                        _ret, _frame = stream.read()
+                        frames += 1
+                        pts = stream.get(cv2.CAP_PROP_POS_MSEC)
 
-                    if first_ts is None:
-                        first_ts = time.time()
-                    else:
-                        lag = time.time() - (first_ts + frames * (1.0/float(sys_config['testFileFps'])))
-                        if lag > 5:
-                            raise exceptions.TestCameraStreamingError('Stream is too slow.')
+                        if first_ts is None:
+                            first_ts = time.time()
+                        else:
+                            lag = time.time() - (first_ts + frames * (1.0/float(sys_config['testFileFps'])))
+                            maxAllowedLagSeconds = 5
+                            if lag > maxAllowedLagSeconds:
+                                raise exceptions.TestCameraStreamingError(
+                                    'Streaming video from the Server FAILED: ' +
+                                    f'the video lags for more than {maxAllowedLagSeconds} seconds; ' +
+                                    'can be caused by poor performance of either the host or the box.')
 
-                    ts = time.time()
+                        ts = time.time()
 
-                    if last_ts is not None and ts - last_ts < 0.01:
-                        dummy_frames_count += 1
+                        if last_ts is not None and ts - last_ts < 0.01:
+                            dummy_frames_count += 1
 
-                        if dummy_frames_count > 50:
-                            raise exceptions.TestCameraStreamingError('Stream is unexpectedly broken.')
+                            maxAllowedDummyFrames = 50
+                            if dummy_frames_count > maxAllowedDummyFrames:
+                                raise exceptions.TestCameraStreamingError(
+                                    'Streaming video from the Server FAILED: ' +
+                                    f'the stream is broken - more than {maxAllowedDummyFrames} ' +
+                                    'frames with equal timestamps; ' +
+                                    'can be caused by poor performance of either the host or the box, ' +
+                                    'or Server issues.')
 
-                    pts_diff_max = (1000./float(sys_config['testFileFps']))*1.05
+                        pts_diff_max = (1000./float(sys_config['testFileFps']))*1.05
 
-                    if last_pts is not None and pts - last_pts > pts_diff_max:
-                        frame_drops += 1
-                    if time.time() - streaming_started_at > stream_duration:
-                        print(f"    Serving {test_cameras_count} cameras is OK.")
-                        break
-                    last_pts = pts
-                    last_ts = time.time()
-                import pprint
-                log_events = api.get_events(streaming_started_at)
-                storage_failure_events_count = sum(
-                    event['aggregationCount']
-                    for event in log_events
-                    if event['eventParams'].get('eventType', None) == 'storageFailureEvent'
-                )
-                print(f"    Frame drops: {frame_drops}")
-                print(f"    Storage failures: {storage_failure_events_count}")
-                print(f"    CPU usage: {device.eval('cat /proc/loadavg').split()[1]}")
-                print(f"    Free RAM: {round(ram_free/1024/1024)}M")
+                        if last_pts is not None and pts - last_pts > pts_diff_max:
+                            frame_drops += 1
+                        if time.time() - streaming_started_at > stream_duration:
+                            streaming_succeeded = True
+                            print(f"    Serving {test_cameras_count} virtual cameras succeeded.")
+                            break
+                        last_pts = pts
+                        last_ts = time.time()
+
+                    if not streaming_succeeded:
+                        raise exceptions.TestCameraStreamingError(
+                            'Streaming video from the Server FAILED: ' +
+                            'the stream has unexpectedly finished; ' +
+                            'can be caused by network issues or Server issues.')
+                finally:
+                    print(f"    Frame drops: {frame_drops} (expected 0)")
+                    print(f"    Frames with equal timestamps: {dummy_frames_count} (expected 0)")
+                    print(f"    CPU usage: {device_cpu_usage(device)}")
+                    print(f"    Free RAM: {round(ram_free/1024/1024)} MB")
+
+                report_server_events(api, streaming_started_at)
             except exceptions.TestCameraStreamingError as exception:
                 print(f"\nISSUE: {str(exception)}")
                 log_exception("ISSUE", exception)
@@ -458,7 +498,7 @@ def main(config_file):
             finally:
                 stream.release()
 
-    print('\nAll tests are successfully finished.')
+    print('\nSUCCESS: All tests finished.')
     return 0
 
 
