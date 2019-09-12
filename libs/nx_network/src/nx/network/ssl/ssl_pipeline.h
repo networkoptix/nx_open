@@ -6,8 +6,25 @@
 #include <openssl/ssl.h>
 
 #include <nx/utils/byte_stream/pipeline.h>
+#include <nx/utils/move_only_func.h>
 
 namespace nx::network::ssl {
+
+struct Certificate
+{
+    std::string issuer;
+    long serialNumber = 0;
+
+    /**
+     * This pointer is valid only inside VerifyCertificateCallback.
+     */
+    X509* x509Certificate = nullptr;
+};
+
+/**
+ * @return true if the certificate has been verified. false otherwise.
+ */
+using VerifyCertificateCallback = nx::utils::MoveOnlyFunc<bool(const Certificate&)>;
 
 /**
  * NOTE: Not thread-safe.
@@ -50,6 +67,8 @@ public:
 
     void shutdown();
 
+    void setVerifyCertificateCallback(VerifyCertificateCallback func);
+
 protected:
     SSL* ssl();
 
@@ -66,6 +85,7 @@ private:
     bool m_writeThirsty = false;
     bool m_eof = false;
     bool m_failed = false;
+    VerifyCertificateCallback m_verifyCertificateCallback;
 
     void initSslBio(SSL_CTX* sslContext);
 
@@ -85,6 +105,7 @@ private:
     static long bioCtrl(BIO* bio, int cmd, long num, void* /*ptr*/);
     static int bioNew(BIO* bio);
     static int bioFree(BIO* bio);
+    static int verifyServerCertificateCallback(int preverify_ok, X509_STORE_CTX* x509_ctx);
 };
 
 class NX_NETWORK_API ConnectingPipeline:

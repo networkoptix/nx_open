@@ -252,6 +252,13 @@ std::string StreamSocket::serverName() const
     return m_sslPipeline->serverNameFromClientHello();
 }
 
+void StreamSocket::setVerifyCertificateCallback(
+    VerifyCertificateCallback func)
+{
+    if (m_sslPipeline)
+        m_sslPipeline->setVerifyCertificateCallback(std::move(func));
+}
+
 void StreamSocket::cancelIoInAioThread(nx::network::aio::EventType eventType)
 {
     // Performing handshake (part of connect) and cancellation of connect has been requested?

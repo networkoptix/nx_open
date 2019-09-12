@@ -94,6 +94,8 @@ public:
 
     virtual std::string serverName() const override;
 
+    void setVerifyCertificateCallback(VerifyCertificateCallback func);
+
 protected:
     virtual void cancelIoInAioThread(nx::network::aio::EventType eventType) override;
 
