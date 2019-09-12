@@ -22,7 +22,7 @@ struct Day
 
     qint64 startTime = 0;
     bool hasArchive = false;
-    int dayNumber = 1; //< todo: remove me
+    int dayNumber = 1;
 };
 
 Day::Day() {}
@@ -48,8 +48,9 @@ bool Day::containsTime(qint64 value) const
 
 struct Month
 {
-    void updateMonthTo(int year, int month, qint64 displayOffset);
+    void recalculateData(qint64 displayOffset);
     bool containsDay(const Day& day) const;
+    bool containsPosition(qint64 position) const;
 
     int year = 1970;
     int month = 1;
@@ -57,10 +58,8 @@ struct Month
     Day endDay;
 };
 
-void Month::updateMonthTo(int yearValue, int monthValue, qint64 displayOffset)
+void Month::recalculateData(qint64 displayOffset)
 {
-    year = yearValue;
-    month = monthValue;
     const auto startDate = QDate(year, month, 1);
     startDay = Day(startDate, displayOffset);
     endDay = Day(QDate(year, month, startDate.daysInMonth()), displayOffset);
@@ -69,6 +68,11 @@ void Month::updateMonthTo(int yearValue, int monthValue, qint64 displayOffset)
 bool Month::containsDay(const Day& day) const
 {
     return day.startTime <= endDay.endTime() && day.endTime() >= startDay.startTime;
+}
+
+bool Month::containsPosition(qint64 position) const
+{
+    return startDay.startTime <= position && position <= endDay.endTime();
 }
 
 } // namespace
@@ -129,6 +133,7 @@ void CalendarModel::Private::resetDaysModelData()
 
     updateArchiveInfo();
     q->endResetModel();
+    currentMonth.recalculateData(displayOffset);
 }
 
 void CalendarModel::Private::updateArchiveInfo()
@@ -225,7 +230,8 @@ QVariant CalendarModel::data(const QModelIndex& index, int role) const
         case DayStartTimeRole:
             return day.startTime;
         case IsCurrentRole:
-            return day.containsTime(d->currentPosition);
+            return d->currentMonth.containsPosition(d->currentPosition)
+                && day.containsTime(d->currentPosition);
         case HasArchiveRole:
             return day.hasArchive;
     }
@@ -253,8 +259,7 @@ void CalendarModel::setYear(int year)
     if (year == d->currentMonth.year)
         return;
 
-
-    d->currentMonth.updateMonthTo(year, d->currentMonth.month, d->displayOffset);
+    d->currentMonth.year = year;
     emit yearChanged();
 
     d->resetDaysModelData();
@@ -271,7 +276,7 @@ void CalendarModel::setMonth(int month)
     if (month == d->currentMonth.month)
         return;
 
-    d->currentMonth.updateMonthTo(d->currentMonth.year, month, d->displayOffset);
+    d->currentMonth.month = month;
     emit yearChanged();
 
     d->resetDaysModelData();
