@@ -28,7 +28,7 @@ function(set_cloud_hosts)
         get_cloud_host(${cloudGroup} ${customization} cloudHost)
 
         set(compatibleCloudHosts)
-        foreach(customization ${compatibleCustomizations})
+        foreach(customization ${customization.mobile.compatibleCustomizations})
             get_cloud_host(${cloudGroup} ${customization} host)
             list(APPEND compatibleCloudHosts ${host})
         endforeach()
