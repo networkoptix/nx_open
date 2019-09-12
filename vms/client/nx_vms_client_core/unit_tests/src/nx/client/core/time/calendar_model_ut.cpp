@@ -14,18 +14,30 @@ struct CalendarModelTestFixture: public testing::Test
     CalendarModel model;
 };
 
-struct FirstDayTimeParams
+//--------------------------------------------------------------------------------------------------
+
+struct StartDayOffsetTestParams
 {
+    QLocale locale;
     int year;
     int month;
     int startDayOffsetValue;
-    QLocale locale;
 };
 
-struct CalendarModelStartDayValueTestFixture: public testing::TestWithParam<FirstDayTimeParams>
+struct CalendarModelStartDayValueTestFixture: public testing::TestWithParam<StartDayOffsetTestParams>
 {
+    virtual void SetUp() override;
+
     CalendarModel model;
 };
+
+void CalendarModelStartDayValueTestFixture::SetUp()
+{
+    const auto parameters = GetParam();
+    model.setYear(parameters.year);
+    model.setMonth(parameters.month);
+    model.setLocale(parameters.locale);
+}
 
 //--------------------------------------------------------------------------------------------------
 
@@ -73,25 +85,19 @@ INSTANTIATE_TYPED_TEST_CASE_P(CalendarModelTest, CommonTimePropertiesTest, Testi
 TEST_P(CalendarModelStartDayValueTestFixture, StartDayOffset)
 {
     static const QString kFirstDayText = "1";
-
     const auto parameters = GetParam();
-    model.setYear(parameters.year);
-    model.setMonth(parameters.month);
-    model.setLocale(parameters.locale);
-
     const auto dayNumber = model.index(parameters.startDayOffsetValue).data().toString();
     ASSERT_EQ(dayNumber, kFirstDayText);
 }
 
-static constexpr int kYear = 2019;
-static constexpr int kMonth = 9;
-static const FirstDayTimeParams kSundayWeekStartDayCheckParams =
-    {kYear, kMonth, 0, QLocale(QLocale::English, QLocale::UnitedStates)};
-static const FirstDayTimeParams kMondayWeekStartDayCheckParams =
-    {kYear, kMonth, 6, QLocale(QLocale::Russian, QLocale::RussianFederation)};
+// 1 September 2019 is Sunday. Testing values checks if visual model has proper offset of the first
+// month's day (accroding to the specified locale).
+static std::vector<StartDayOffsetTestParams> kStartDayTestingValues = {
+    {QLocale(QLocale::English, QLocale::UnitedStates), 2019, 9, 0},
+    {QLocale(QLocale::Russian, QLocale::RussianFederation), 2019, 9, 6}};
 
 INSTANTIATE_TEST_CASE_P(CalendarModel, CalendarModelStartDayValueTestFixture,
-    testing::Values(kSundayWeekStartDayCheckParams, kMondayWeekStartDayCheckParams));
+    testing::ValuesIn(kStartDayTestingValues));
 
 } // namespace test
 } // namespace nx::client::core
