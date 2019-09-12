@@ -1188,12 +1188,12 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
             {
                 if( bytesRead == 0 )
                 {
-                    NX_INFO(this, "RTSP connection to %1 has been unexpectedly closed",
+                    NX_DEBUG(this, "RTSP connection to %1 has been unexpectedly closed",
                         m_tcpSock->getForeignAddress());
                 }
                 else if (!m_tcpSock->isClosed())
                 {
-                    NX_WARNING(this, "Error reading RTSP response from %1. %2",
+                    NX_DEBUG(this, "Error reading RTSP response from %1. %2",
                         m_tcpSock->getForeignAddress(), SystemError::getLastOSErrorText());
                 }
                 return false; //< error occurred or connection closed
@@ -1236,7 +1236,7 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
         }
         if (m_responseBufferLen == RTSP_BUFFER_LEN)
         {
-            NX_INFO(this, "RTSP response from %1 has exceeded max response size (%2)",
+            NX_DEBUG(this, "RTSP response from %1 has exceeded max response size (%2)",
                 m_tcpSock->getForeignAddress(), RTSP_BUFFER_LEN);
             return false;
         }
