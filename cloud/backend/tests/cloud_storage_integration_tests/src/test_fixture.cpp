@@ -106,6 +106,21 @@ Result TestFixture::waitForRemoveStorageResponse()
 	return m_removeStorageResponse.pop();
 }
 
+void TestFixture::getCredentials(api::Client* cloudStorageClient, const std::string& storageId)
+{
+	cloudStorageClient->getCredentials(
+		storageId,
+		[this](auto result, auto storageCredentials)
+		{
+			m_getCredentialsResponse.push({std::move(result), std::move(storageCredentials)});
+		});
+}
+
+std::pair<api::Result, api::StorageCredentials> TestFixture::waitForGetCredentialsResponse()
+{
+	return m_getCredentialsResponse.pop();
+}
+
 std::unique_ptr<Client> TestFixture::makeStorageServiceClient(
 	const nx::utils::Url& storageSeviceUrl,
 	const nx::cloud::db::AccountWithPassword& cloudDbAccount) const

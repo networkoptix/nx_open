@@ -64,6 +64,9 @@ protected:
 	void removeStorage(api::Client* storageServiceClient, const std::string& storageId);
 	api::Result waitForRemoveStorageResponse();
 
+	void getCredentials(api::Client* cloudStorageClient, const std::string& storageId);
+	std::pair<api::Result, api::StorageCredentials> waitForGetCredentialsResponse();
+
 	std::unique_ptr<api::Client> makeStorageServiceClient(
 		const nx::utils::Url& storageServiceUrl,
 		const nx::cloud::db::AccountWithPassword& cloudDbAccount) const;
@@ -85,6 +88,7 @@ private:
     nx::cloud::db::CdbLauncher m_cloudDb;
 	nx::utils::SyncQueue<std::pair<api::Result, api::Storage>> m_readStorageResponse;
 	nx::utils::SyncQueue<api::Result> m_removeStorageResponse;
+	nx::utils::SyncQueue<std::pair<api::Result, api::StorageCredentials>> m_getCredentialsResponse;
 };
 
 } // namespace nx::cloud::storage::service::test
