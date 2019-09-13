@@ -7,6 +7,7 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/network/stun/message.h>
 #include <nx/network/buffer.h>
+#include <nx/utils/qnbytearrayref.h>
 
 #include "../connection_server/base_protocol_message_types.h"
 #include "stun_message_parser_buffer.h"
@@ -19,6 +20,8 @@ class NX_NETWORK_API MessageParser:
     public nx::network::server::AbstractMessageParser<Message>
 {
 private:
+    static constexpr int kHeaderSize = 20;
+
     enum
     {
         // Header
@@ -83,6 +86,10 @@ public:
     virtual void reset() override;
 
 private:
+    nx::network::server::ParserState parseInternal(
+        const QnByteArrayConstRef& /*buf*/,
+        size_t* /*bytesProcessed*/);
+
     // Attribute value parsing
     attrs::Attribute* parseXORMappedAddress();
     attrs::Attribute* parseErrorCode();
@@ -131,6 +138,12 @@ private:
         }
     };
 
+    enum class CachedContent
+    {
+        partialHeader,
+        partialAttributes,
+    };
+
     STUNHeader m_header;
     STUNAttr m_attribute;
     Message* m_outputMessage = nullptr;
@@ -138,6 +151,10 @@ private:
     int m_state = HEADER_INITIAL_AND_TYPE;
     // This is for opaque usage
     std::deque<char> m_tempBuffer;
+
+    CachedContent m_cachedContent = CachedContent::partialHeader;
+    std::size_t m_bytesToCache = kHeaderSize;
+    nx::Buffer m_cache;
 };
 
 } // namespace stun
