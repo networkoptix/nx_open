@@ -46,7 +46,7 @@ private:
 private slots:
     void cancel();
     void onDownloadProgress(qint64 bytesRead, qint64 bytesTotal);
-    void onReadyRead();
+    void writeAvailableData();
     void onReplyFinished();
 
 private:
@@ -58,6 +58,7 @@ private:
     QFileInfo m_fileInfo;
     QnUuid m_activityId;
     bool m_cancelRequested = false;
+    bool m_hasWriteError = false;
 };
 
 } // namespace utils

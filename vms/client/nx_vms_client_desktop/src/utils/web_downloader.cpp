@@ -297,7 +297,7 @@ void WebDownloader::startDownload()
             cancel();
         });
 
-    connect(m_reply, &QNetworkReply::readyRead, this, &WebDownloader::onReadyRead);
+    connect(m_reply, &QNetworkReply::readyRead, this, &WebDownloader::writeAvailableData);
     connect(m_reply, &QNetworkReply::downloadProgress, this, &WebDownloader::onDownloadProgress);
     connect(m_reply, &QNetworkReply::finished, this, &WebDownloader::onReplyFinished);
 
@@ -305,12 +305,12 @@ void WebDownloader::startDownload()
 
     // If we missed readyRead or finished signals while save dialog event loop was running...
     if (m_reply->isRunning())
-        m_file->write(m_reply->readAll());
+        writeAvailableData();
 
     if (m_reply->isFinished())
     {
         if (m_reply->error() == QNetworkReply::NoError)
-            m_file->write(m_reply->readAll());
+            writeAvailableData();
         onReplyFinished();
     }
 }
@@ -380,9 +380,14 @@ void WebDownloader::setState(State state)
     }
 }
 
-void WebDownloader::onReadyRead()
+void WebDownloader::writeAvailableData()
 {
-    m_file->write(m_reply->readAll());
+    const auto data = m_reply->readAll();
+    if (m_file->write(data) != data.size())
+    {
+        m_hasWriteError = true;
+        m_reply->abort();
+    }
 }
 
 void WebDownloader::onDownloadProgress(qint64 bytesRead, qint64 bytesTotal)
@@ -399,22 +404,23 @@ void WebDownloader::onDownloadProgress(qint64 bytesRead, qint64 bytesTotal)
 
 void WebDownloader::onReplyFinished()
 {
-    bool removeFile = false;
+    const bool success = m_reply->error() == QNetworkReply::NoError && !m_hasWriteError;
 
-    switch (m_reply->error())
+    if (success)
     {
-        case QNetworkReply::NoError:
-            setState(State::Completed);
-            break;
-        default:
-            if (!m_cancelRequested)
-                setState(State::Failed);
-            removeFile = true;
+        setState(State::Completed);
+    }
+    else
+    {
+        // Show failed notification only if there was no cancel request from the user.
+        // If the user manually canceled the downloading process then silently remove the informer.
+        if (!m_cancelRequested)
+            setState(State::Failed);
     }
 
     if (m_file->isOpen())
         m_file->close();
 
-    if (removeFile)
+    if (!success)
         m_file->remove();
 }
