@@ -5,7 +5,7 @@
 
 QnDesktopDataProviderWrapper::QnDesktopDataProviderWrapper(
     QnResourcePtr res,
-    QnDesktopDataProvider* owner)
+    QnDesktopDataProviderBase* owner)
     :
     QnAbstractMediaStreamDataProvider(res),
     QnAbstractDataConsumer(100),

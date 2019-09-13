@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.111",
+    "version": "1.0.1.113",
     "data": [
         {
             "keys": [
@@ -1064,7 +1064,20 @@
                 "DW|DWC-MF21M8TIR","Win4NET Co., Ltd.|Clebo-MF21M8TIR",
                 "DW|DWC-MF21M4FM","Win4NET Co., Ltd.|Clebo-MF21M4FM",
                 "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM",
-                "DW|DWC-MB950TIR", "DW|DWC-MV950TIR", "DW|DWC-BVI2IR"
+                "DW|DWC-MB950TIR", "DW|DWC-MV950TIR", "DW|DWC-BVI2IR",
+                "DW|DWC-PVX16W",
+                "DW|DWC-PZ21M69T",
+                "DW|DWC-PB6M4T",
+                "DW|DWC-MTT4Wi28",
+                "DW|DWC-MTT4Wi36",
+                "DW|DWC-MTT4Wi6",
+                "DW|DWC-MVT4Wi28",
+                "DW|DWC-MVT4Wi36",
+                "DW|DWC-MVT4Wi6",
+                "DW|DWC-MBT4Wi28",
+                "DW|DWC-MBT4Wi36",
+                "DW|DWC-MD72i4V",
+                "DW|DWC-MD724V"
             ],
             "operationalPtzCapabilities": "NoPtzCapabilities"
         },
@@ -1098,7 +1111,10 @@
                 "ACTI|KCM3311", "ACTI|KCM7211", "ACTI|KCM5611", "ACTI|KCM5311",
                 "Sony|SNC-EM600","Sony|SNC-CX600","Sony|SNC-DH120T", "Sony|SNC-XM636",
                 "DW|DWC-MB421TIR", "DW|DWC-MD421D", "DW|DWC-MV85DiA",
-                "Win4NET Co., Ltd.|Clebo-BL20"
+                "Win4NET Co., Ltd.|Clebo-BL20",
+                "DW|DWC-MB45DiA",
+                "DW|DWC-MTT4WiA",
+                "DW|DWC-MVT4WiA"
             ],
             "operationalPtzCapabilities": "ContinuousZoomCapability"
         },
@@ -1227,6 +1243,21 @@
                     "VideoEncoderConfigurationA02,VideoEncoderConfigurationA06",
                     "VideoEncoderConfigurationA03,VideoEncoderConfigurationA07",
                     "VideoEncoderConfigurationA04,VideoEncoderConfigurationA08"
+                ]
+            }
+        },
+        {
+            "keys": [
+                "DW|DWC-PVX16W"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "video_encoder01_01,video_encoder01_02",
+                    "video_encoder02_01,video_encoder02_02",
+                    "video_encoder03_01,video_encoder03_02",
+                    "video_encoder04_01,video_encoder04_02"
                 ]
             }
         },
@@ -3244,7 +3275,8 @@
         {
             "keys": [
                 "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
-                "Hikvision|DS-2DF8223*", "ONVIF|K20IC-*"
+                "Hikvision|DS-2DF8223*", "ONVIF|K20IC-*",
+                "HIKVISION|DFI6256A"
             ],
             "clearInputsTimeoutSec": 1,
             "comment": "considers input state as 0 after specified timeout"

@@ -5,6 +5,7 @@
 
 #include <QtWidgets/QGraphicsSceneHoverEvent>
 
+#include <ui/common/fixed_rotation.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 #include <nx/client/core/utils/geometry.h>
@@ -151,25 +152,30 @@ public:
         AreaHighlightOverlayWidget::AreaInformation info;
         QSharedPointer<AreaRectItem> rectItem;
         QSharedPointer<AreaTooltipItem> tooltipItem;
+        QRectF rotatedRectangle;
 
         QRectF actualRect(const QSizeF& widgetSize) const
         {
             // Using .toRect() to round rectangle coordinates.
-            return Geometry::cwiseMul(info.rectangle, widgetSize).toRect();
+            return Geometry::cwiseMul(rotatedRectangle, widgetSize).toRect();
         }
     };
 
     Private(AreaHighlightOverlayWidget* q);
 
     void setHighlightedArea(const QnUuid& areaId);
-    void updateArea(const Area& area);
+    void updateArea(Area& area);
     void updateArea(const QnUuid& areaId);
     void updateAreas();
+    void ensureRotation();
+    QRectF rotatedRectangle(const QRectF& source) const;
 
 public:
     QHash<QnUuid, Area> areaById;
     QnUuid highlightedAreaId;
     bool highlightAreasOnHover = true;
+    QPointer<QGraphicsRotation> rotation;
+    int angle = 0;
 };
 
 AreaHighlightOverlayWidget::Private::Private(AreaHighlightOverlayWidget* q):
@@ -193,10 +199,12 @@ void AreaHighlightOverlayWidget::Private::setHighlightedArea(const QnUuid& areaI
 }
 
 void AreaHighlightOverlayWidget::Private::updateArea(
-    const AreaHighlightOverlayWidget::Private::Area& area)
+    AreaHighlightOverlayWidget::Private::Area& area)
 {
     if (!area.rectItem || !area.tooltipItem)
         return;
+
+    area.rotatedRectangle = rotatedRectangle(area.info.rectangle);
 
     const bool highlighted = highlightedAreaId == area.info.id;
 
@@ -238,8 +246,57 @@ void AreaHighlightOverlayWidget::Private::updateArea(const QnUuid& areaId)
 
 void AreaHighlightOverlayWidget::Private::updateAreas()
 {
-    for (const auto& area: areaById)
+    for (auto& area: areaById)
         updateArea(area);
+}
+
+void AreaHighlightOverlayWidget::Private::ensureRotation()
+{
+    if (rotation)
+        return;
+
+    for (auto transform: q->transformations())
+    {
+        rotation = qobject_cast<QnFixedRotationTransform*>(transform);
+        if (rotation)
+            break;
+    }
+
+    if (!rotation)
+        return;
+
+    const auto updateAngle =
+        [this]()
+        {
+            angle = this->rotation
+                ? int(Rotation::closestStandardRotation(this->rotation->angle()).value())
+                : 0;
+
+            updateAreas();
+        };
+
+    connect(rotation.data(), &QGraphicsRotation::angleChanged, this, updateAngle);
+    updateAngle();
+}
+
+QRectF AreaHighlightOverlayWidget::Private::rotatedRectangle(const QRectF& source) const
+{
+    switch (angle)
+    {
+        case 90:
+            return QRectF(source.top(), 1.0 - source.right(), source.height(), source.width());
+
+        case 180:
+            return QRectF(
+                1.0 - source.right(), 1.0 - source.bottom(), source.width(), source.height());
+
+        case 270:
+            return QRectF(1.0 - source.bottom(), source.left(), source.height(), source.width());
+
+        default:
+            NX_ASSERT(angle == 0);
+            return source;
+    }
 }
 
 AreaHighlightOverlayWidget::AreaHighlightOverlayWidget(QGraphicsWidget* parent):
@@ -264,6 +321,8 @@ void AreaHighlightOverlayWidget::addOrUpdateArea(
         NX_ASSERT(false, "Area ID cannot be null.");
         return;
     }
+
+    d->ensureRotation();
 
     auto& area = d->areaById[areaInformation.id];
 

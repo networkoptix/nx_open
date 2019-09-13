@@ -234,7 +234,7 @@ bool BaseRemoteArchiveSynchronizationTask::saveMotion(const QnConstMetaDataV1Ptr
             .args(microseconds(motion->timestamp), m_resource->getUserDefinedName()));
 
         auto helper = serverModule()->motionHelper();
-        QnMotionArchive* archive = helper->getArchive(m_resource, motion->channelNumber);
+        auto archive = helper->getArchive(m_resource, motion->channelNumber);
         if (archive)
             archive->saveToArchive(motion);
     }

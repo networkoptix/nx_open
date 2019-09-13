@@ -72,6 +72,12 @@ QRectF interpolatedRectangle(
     microseconds futureRectangleTimestamp,
     microseconds timestamp)
 {
+    if (!rectangle.isValid())
+        return futureRectangle;
+
+    if (!futureRectangle.isValid())
+        return rectangle;
+
     if (futureRectangleTimestamp <= rectangleTimestamp)
         return rectangle;
 
@@ -115,9 +121,14 @@ std::optional<std::pair<ObjectMetadataPacketPtr, ObjectMetadata>> findObjectMeta
     return std::nullopt;
 }
 
+milliseconds toMs(microseconds value)
+{
+    return duration_cast<milliseconds>(value);
+}
+
 QString approximateDebugTime(microseconds value)
 {
-    const auto valueMs = duration_cast<milliseconds>(value);
+    const auto valueMs = toMs(value);
     return nx::utils::timestampToDebugString(valueMs, "hh:mm:ss.zzz")
         + " (" + QString::number(valueMs.count()) +")";
 }
@@ -254,7 +265,6 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
         }
 
         auto areaInfo = areaInfoFromObject(objectInfo);
-
         if (ini().enableObjectMetadataInterpolation)
         {
             areaInfo.rectangle = interpolatedRectangle(
@@ -267,6 +277,13 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
         else
         {
             areaInfo.rectangle = objectInfo.rectangle;
+        }
+
+        if (!areaInfo.rectangle.isValid())
+        {
+            NX_VERBOSE(this, "Object info has invalid rectangle data: %1", objectInfo);
+            areaHighlightWidget->removeArea(objectInfo.id);
+            continue;
         }
 
         QString debugInfoDescriptor(ini().displayAnalyticsObjectsDebugInfo);
@@ -362,6 +379,9 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
     if (d->logger)
         d->logger->pushFrameInfo({timestamp});
 
+    // TODO: Use milliseconds in all metadata calculations.
+    const auto timestampMs = toMs(timestamp);
+
     // IMPORTANT: Current implementation is intended to work well only if exactly one analytics
     // plugin is enabled on the device. If several plugins are enabled, future metadata packets
     // preview can contain only one plugin data, and this will lead to another plugin's areas to be
@@ -387,15 +407,15 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         approximateDebugTime(timestamp),
         d->mediaResourceWidget->resource()->toResourcePtr()->getId(),
         objectMetadataPackets.size(),
-        duration_cast<milliseconds>(d->averageMetadataPeriod));
+        toMs(d->averageMetadataPeriod));
 
     // If the plugin provides duration, approximate prolongation is not needed.
     bool currentMetadataHasDuration = false;
 
     if (!objectMetadataPackets.isEmpty())
     {
-        if (const auto& metadata = objectMetadataPackets.first();
-            metadata->timestampUs <= timestamp.count())
+        const auto& metadata = objectMetadataPackets.first();
+        if (toMs(microseconds(metadata->timestampUs)) <= timestampMs)
         {
             if (d->logger)
                 d->logger->pushObjectMetadata(*metadata);
@@ -445,7 +465,8 @@ void WidgetAnalyticsController::updateAreas(microseconds timestamp, int channel)
         }
 
         // Cleanup areas which should not be visible right now.
-        if (timestamp < it->startTimestamp || timestamp > it->endTimestamp)
+        if (timestampMs < toMs(it->startTimestamp)
+            || timestampMs > toMs(it->endTimestamp))
         {
             NX_VERBOSE(this, "Cleanup object %1 as it does not fit into timestamp window", *it);
             d->removeArea(*it);

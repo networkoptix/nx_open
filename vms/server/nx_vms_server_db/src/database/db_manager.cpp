@@ -4978,12 +4978,13 @@ ErrorCode QnDbManager::doQueryNoLock(
     QString pathFilter(lit("path"));
     if (!path.isEmpty())
         pathFilter = QString(lit("substr(path, %2)")).arg(path.length()+1);
-    QString q = QString(lit("SELECT %1 FROM vms_storedFiles WHERE path LIKE '%2%' ")).arg(pathFilter).arg(path);
+    QString q = QString(lit("SELECT %1 FROM vms_storedFiles WHERE path LIKE ? ")).arg(pathFilter);
     if (!path.isEmpty())
         q += QString(lit("AND substr(path, %2) NOT LIKE '%/%' ")).arg(path.length()+1);
 
     query.setForwardOnly(true);
     query.prepare(q);
+    query.addBindValue(path + "%");
     if (!query.exec())
     {
         qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();

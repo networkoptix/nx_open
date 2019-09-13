@@ -79,7 +79,7 @@ bool PictureHeader::decode(const uint8_t* data, uint32_t size)
             }
         }
     }
-    catch(const BitStreamException&)
+    catch (const BitStreamException&)
     {
         return false;
     }

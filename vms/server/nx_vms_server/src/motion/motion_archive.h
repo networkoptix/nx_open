@@ -56,3 +56,6 @@ private:
     QnMetaDataV1Ptr m_lastDetailedData;
     qint64 m_lastTimestamp = 0;
 };
+
+using QnMotionArchivePtr = std::shared_ptr<QnMotionArchive>;
+

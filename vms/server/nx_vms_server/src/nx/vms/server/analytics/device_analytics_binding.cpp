@@ -106,7 +106,7 @@ bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
     }
 
     auto neededMetadataTypes = this->neededMetadataTypes();
-    if (neededMetadataTypes == m_lastMetadataTypes)
+    if (m_lastNeededMetadataTypes && (neededMetadataTypes == *m_lastNeededMetadataTypes))
     {
         NX_DEBUG(this,
             "Last needed metadata types are equal to the new ones, doing nothing. "
@@ -123,7 +123,7 @@ bool DeviceAnalyticsBinding::updateNeededMetadataTypes()
 
     const bool result = m_deviceAgent->setNeededMetadataTypes(neededMetadataTypes);
     if (result)
-        m_lastMetadataTypes = std::move(neededMetadataTypes);
+        m_lastNeededMetadataTypes = std::move(neededMetadataTypes);
 
     return result;
 }
@@ -174,8 +174,11 @@ bool DeviceAnalyticsBinding::startAnalyticsUnsafe(const QVariantMap& settings)
     setSettingsInternal(settings);
     if (!m_started)
     {
-        m_lastMetadataTypes = sdk_support::MetadataTypes();
-        m_started = m_deviceAgent->setNeededMetadataTypes(neededMetadataTypes());
+        m_lastNeededMetadataTypes.reset();
+        auto neededMetadataTypes = this->neededMetadataTypes();
+        m_started = m_deviceAgent->setNeededMetadataTypes(neededMetadataTypes);
+        if (m_started)
+            m_lastNeededMetadataTypes = std::move(neededMetadataTypes);
     }
 
     return m_started;
@@ -187,7 +190,7 @@ void DeviceAnalyticsBinding::stopAnalyticsUnsafe()
     if (!m_deviceAgent)
         return;
 
-    m_lastMetadataTypes = sdk_support::MetadataTypes();
+    m_lastNeededMetadataTypes.reset();
     m_deviceAgent->setNeededMetadataTypes(sdk_support::MetadataTypes());
 }
 

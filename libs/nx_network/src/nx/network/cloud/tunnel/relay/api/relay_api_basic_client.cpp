@@ -1,5 +1,7 @@
 #include "relay_api_basic_client.h"
 
+#include <boost/algorithm/string/predicate.hpp>
+
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/url/url_parse_helper.h>
@@ -119,14 +121,12 @@ std::string BasicClient::prepareActualRelayUrl(
     const std::string& requestPath)
 {
     auto actualRelayUrl = contentLocationUrl;
+
+    if (!NX_ASSERT(boost::algorithm::ends_with(actualRelayUrl, requestPath)))
+        return actualRelayUrl; //< In worst case, a request will fail.
+
     // Removing request path from the end of response.actualRelayUrl
     // so that we have basic relay url.
-    NX_ASSERT(
-        actualRelayUrl.find(requestPath) != std::string::npos);
-    NX_ASSERT(
-        actualRelayUrl.find(requestPath) + requestPath.size() ==
-        actualRelayUrl.size());
-
     actualRelayUrl.erase(actualRelayUrl.size() - requestPath.size());
 
     return actualRelayUrl;

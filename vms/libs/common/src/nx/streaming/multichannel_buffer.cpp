@@ -76,7 +76,7 @@ void MultiChannelBuffer::pushData(const QnAbstractMediaDataPtr& media)
         if (m_terminated.load())
             return;
 
-        const auto channel = media->dataType == QnAbstractMediaData::DataType::VIDEO
+        const auto channel = media->dataType != QnAbstractMediaData::DataType::AUDIO
             ? media->channelNumber
             : m_videoChannelCount + media->channelNumber;
 
