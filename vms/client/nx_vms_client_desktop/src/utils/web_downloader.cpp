@@ -131,11 +131,11 @@ QString speedToText(qint64 bytesRead, qint64 elapsedMs)
 WebDownloader::WebDownloader(QObject* parent,
     std::shared_ptr<QNetworkAccessManager> networkManager,
     QNetworkReply* reply,
-    QFile* file,
+    std::unique_ptr<QFile> file,
     const QFileInfo& fileInfo):
     base_type(parent),
     QnWorkbenchContextAware(parent), m_networkManager(networkManager), m_reply(reply),
-    m_file(file), m_fileInfo(fileInfo)
+    m_file(std::move(file)), m_fileInfo(fileInfo)
 {
     m_reply->setParent(this);
     startDownload();
@@ -177,35 +177,48 @@ bool WebDownloader::download(
     if (lastDir.isEmpty() || !QDir(lastDir).exists())
         lastDir = qnSettings->mediaFolder();
 
-    const auto uniquePath = getUniqueFilePath(QDir(lastDir).filePath(suggestedName));
+    auto filePath = getUniqueFilePath(QDir(lastDir).filePath(suggestedName));
 
     ContextHelper contextHelper(parent);
 
-    QnCustomFileDialog saveDialog(contextHelper.windowWidget(),
-        tr("Save File As..."),
-        uniquePath,
-        QnCustomFileDialog::createFilter(QnCustomFileDialog::kAllFilesFilter));
-    saveDialog.setFileMode(QFileDialog::AnyFile);
-    saveDialog.setAcceptMode(QFileDialog::AcceptSave);
+    std::unique_ptr<QFile> file;
+    QFileInfo fileInfo;
 
-    if (!saveDialog.exec())
-        return false;
+    // Loop until we have a writable file path.
+    while (true)
+    {
+        QnCustomFileDialog saveDialog(contextHelper.windowWidget(),
+            tr("Save File As..."),
+            filePath,
+            QnCustomFileDialog::createFilter(QnCustomFileDialog::kAllFilesFilter));
+        saveDialog.setFileMode(QFileDialog::AnyFile);
+        saveDialog.setAcceptMode(QFileDialog::AcceptSave);
 
-    const QString filePath = saveDialog.selectedFile();
+        if (!saveDialog.exec())
+            return false;
 
-    if (filePath.isEmpty())
-        return false;
+        filePath = saveDialog.selectedFile();
 
-    QFileInfo fileInfo(filePath);
+        if (filePath.isEmpty())
+            return false;
+
+        fileInfo = QFileInfo(filePath);
+        file = std::make_unique<QFile>();
+        file->setFileName(fileInfo.absoluteFilePath());
+        if (file->open(QIODevice::WriteOnly))
+            break; // Break from the loop if we got a writable file.
+
+        QnMessageBox messageBox(contextHelper.windowWidget());
+        messageBox.setIcon(QnMessageBoxIcon::Critical);
+        messageBox.setText(tr("Failed to save file"));
+        messageBox.setInformativeText(tr("%1 folder is blocked for writing.").arg(QDir::toNativeSeparators(fileInfo.absolutePath())));
+        messageBox.setStandardButtons(QDialogButtonBox::Ok);
+        messageBox.exec();
+    }
 
     qnSettings->setLastDownloadDir(fileInfo.absolutePath());
 
-    auto file = new QFile(reply);
-    file->setFileName(fileInfo.absoluteFilePath());
-    if (!file->open(QIODevice::WriteOnly))
-        return false;
-
-    new WebDownloader(contextHelper.context()->instance<WorkbenchProgressManager>(), manager, reply, file, fileInfo);
+    new WebDownloader(contextHelper.context()->instance<WorkbenchProgressManager>(), manager, reply, std::move(file), fileInfo);
     return true;
 }
 
