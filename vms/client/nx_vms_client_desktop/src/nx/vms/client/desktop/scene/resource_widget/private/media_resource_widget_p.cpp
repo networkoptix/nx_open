@@ -312,7 +312,11 @@ bool MediaResourceWidgetPrivate::calculateIsAnalyticsSupported() const
 
     const auto supportedObjectTypes = camera->supportedObjectTypes();
     return std::any_of(supportedObjectTypes.cbegin(), supportedObjectTypes.cend(),
-        [](const auto& entry) { return !entry.second.empty(); });
+        [](const auto& objectTypesByEngineId)
+        {
+            const auto& objectTypes = objectTypesByEngineId.second;
+            return !objectTypes.empty();
+        });
 }
 
 void MediaResourceWidgetPrivate::updateIsAnalyticsSupported()
