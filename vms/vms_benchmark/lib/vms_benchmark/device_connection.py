@@ -79,7 +79,16 @@ if platform.system() == 'Linux':
 
             log_remote_command(command_wrapped)
 
-            run = subprocess.run([*self.ssh_args, command_wrapped], timeout=timeout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            try:
+                run = subprocess.run([*self.ssh_args, command_wrapped], timeout=timeout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            except subprocess.TimeoutExpired:
+                message = (f'Unable to execute remote command via ssh: timeout of {timeout} seconds expired; ' +
+                          'check deviceHost in vms_benchmark.conf.')
+                if exc:
+                    raise exceptions.DeviceCommandError(message=message)
+                else:
+                    return self.DeviceConnectionResult(None, message, command=command_wrapped)
+
             log_remote_command_status(run.returncode)
 
             if run.returncode == 255:

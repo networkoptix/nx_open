@@ -72,7 +72,7 @@ class ServerApi:
                 raise exceptions.ServerApiError(
                     "API of Server is not working: "
                     "authentication was not successful, "
-                    "check vmsUser and vmsPassword in vms_benchmark.conf")
+                    "check vmsUser and vmsPassword in vms_benchmark.conf.")
             raise
 
     def get_test_cameras_all(self):
