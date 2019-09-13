@@ -210,8 +210,18 @@ bool WebDownloader::download(
 
         QnMessageBox messageBox(contextHelper.windowWidget());
         messageBox.setIcon(QnMessageBoxIcon::Critical);
-        messageBox.setText(tr("Failed to save file"));
-        messageBox.setInformativeText(tr("%1 folder is blocked for writing.").arg(QDir::toNativeSeparators(fileInfo.absolutePath())));
+        if (fileInfo.exists())
+        {
+            messageBox.setText(tr("Failed to overwrite file"));
+            messageBox.setInformativeText(QDir::toNativeSeparators(fileInfo.absoluteFilePath()));
+        }
+        else
+        {
+            messageBox.setText(tr("Failed to save file"));
+            messageBox.setInformativeText(
+                tr("%1 folder is blocked for writing.")
+                    .arg(QDir::toNativeSeparators(fileInfo.absolutePath())));
+        }
         messageBox.setStandardButtons(QDialogButtonBox::Ok);
         messageBox.exec();
     }
