@@ -128,10 +128,7 @@ void IncomingControlConnection::processRequest()
         stun::MessageClass::successResponse, 0,
         std::move(m_message.header.transactionId)));
     if (m_message.header.method == 0)
-    {
-        std::cerr<<"Received request with method 0 from "<<m_socket->getForeignAddress().toString().toStdString()<<std::endl;
-        return; //protection from bug in old version
-    }
+        return; //< Protection from bug in old version.
 
     if (!tryProcess<
             hpm::api::UdpHolePunchingSynRequest,
