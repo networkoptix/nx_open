@@ -80,7 +80,6 @@ private:
     };
 
     const utils::Url m_baseApiUrl;
-    std::optional<std::chrono::milliseconds> m_requestTimeout;
     std::map<network::aio::BasicPollable*, Context> m_activeRequests;
     QnMutex m_mutex;
     std::optional<std::chrono::milliseconds> m_requestTimeout;
@@ -126,13 +125,6 @@ template<typename ApiResultCodeDescriptor>
 GenericApiClient<ApiResultCodeDescriptor>::~GenericApiClient()
 {
     pleaseStopSync();
-}
-
-template<typename ApiResultCodeDescriptor>
-void GenericApiClient<ApiResultCodeDescriptor>::setRequestTimeout(
-    std::chrono::milliseconds timeout)
-{
-    m_requestTimeout = timeout;
 }
 
 template<typename ApiResultCodeDescriptor>
