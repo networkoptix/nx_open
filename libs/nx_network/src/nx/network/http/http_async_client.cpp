@@ -113,16 +113,18 @@ std::unique_ptr<AbstractStreamSocket> AsyncClient::takeSocket()
     if (!m_socket)
         return nullptr;
 
+    auto unprocessedData = m_httpStreamReader.fetchMessageBody();
+    if (!m_receivedBytesLeft.isEmpty())
+        unprocessedData += std::exchange(m_receivedBytesLeft, {});
+
     std::unique_ptr<AbstractStreamSocket> result;
     result.swap(m_socket);
     result->cancelIOSync(nx::network::aio::etNone);
-    if (!m_receivedBytesLeft.isEmpty())
+    if (!unprocessedData.isEmpty())
     {
-        decltype(m_receivedBytesLeft) receivedBytesLeft;
-        receivedBytesLeft.swap(m_receivedBytesLeft);
         auto bufferedStreamSocket = std::make_unique<nx::network::BufferedStreamSocket>(
             std::move(result),
-            std::move(receivedBytesLeft));
+            std::move(unprocessedData));
         result = std::move(bufferedStreamSocket);
     }
     return result;
