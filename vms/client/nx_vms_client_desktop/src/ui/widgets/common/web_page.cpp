@@ -26,7 +26,7 @@ body {
     width: 100%;
     background-color: {background-color};
 
-    font-family: 'Roboto-Regular', 'Roboto', ArialMT, Arial;
+    font-family: 'Roboto-Regular', 'Roboto';
     font-weight: 400;
     font-style: normal;
     font-kerning: normal;
@@ -58,7 +58,6 @@ img {
     font-size: 11px;
     line-height: 20px;
     color: {font2-color};
-    //opacity: 0.7;
 }
 
 #row1 {
