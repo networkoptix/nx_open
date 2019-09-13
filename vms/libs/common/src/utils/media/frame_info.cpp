@@ -554,7 +554,7 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, AVPixel
     return nullptr;
 }
 
-CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
+CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle) const
 {
     if (angle > 180)
         angle = 270;
