@@ -168,14 +168,14 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
 {
     NX_VERBOSE(this, "Removing resources %1", resources);
 
-    QnResourceList removedLayoutResources;
+    QnResourceList removedLayouts;
     QnResourceList removedUsers;
     QnResourceList removedOtherResources;
     auto appendRemovedResource =
-        [&](QnResourcePtr resource)
+        [&](const QnResourcePtr& resource)
         {
             if (resource->hasFlags(Qn::layout))
-                removedLayoutResources.push_back(resource);
+                removedLayouts.push_back(resource);
             else if (resource->hasFlags(Qn::user))
                 removedUsers.push_back(resource);
             else
@@ -214,44 +214,56 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
             }
         }
     }
+
+    // After resources removing, we must check if removed layouts left on the videowall items and
+    // if the removed cameras / webpages / server left as the layout items.
+    const auto existingVideoWalls = getResources<QnVideoWallResource>();
+    const auto existingLayouts = getResources<QnLayoutResource>();
+
     lk.unlock();
 
-    /* Remove layout resources. */
-    const auto videoWalls = getResources<QnVideoWallResource>();
-    for (const QnResourcePtr& layoutResource: removedLayoutResources)
+    // Remove layout resources from the videowalls
+    QSet<QnUuid> removedLayoutsIds;
+    for (const auto& layout: removedLayouts)
+        removedLayoutsIds.insert(layout->getId());
+
+    for (const auto& videowall: existingVideoWalls)
     {
-        for (const QnVideoWallResourcePtr& videowall: videoWalls)
-            // TODO: #Elric this is way beyond what one may call 'suboptimal'.
+        for (QnVideoWallItem item: videowall->items()->getItems())
         {
-            for (QnVideoWallItem item: videowall->items()->getItems())
+            if (removedLayoutsIds.contains(item.layout))
             {
-                if (item.layout != layoutResource->getId())
-                    continue;
                 item.layout = QnUuid();
                 videowall->items()->updateItem(item);
             }
         }
-
-        NX_VERBOSE(this, "Resource removed [%1] (%2)", layoutResource->getName(), layoutResource);
     }
 
-    /* Remove other resources. */
-    const auto layouts = getResources<QnLayoutResource>();
-    for (const QnResourcePtr& otherResource: removedOtherResources)
+    // Remove other resources from layouts.
+    QSet<QnUuid> removedResourcesIds;
+    QSet<QString> removedResourcesUniqueIds;
+    for (const auto& resource: removedOtherResources)
     {
-        for (const QnLayoutResourcePtr& layoutResource: layouts)
-            // TODO: #Elric this is way beyond what one may call 'suboptimal'.
-            for (const QnLayoutItemData& data: layoutResource->getItems())
-                if (data.resource.id == otherResource->getId() || data.resource.uniqueId ==
-                    otherResource->getUniqueId())
-                    layoutResource->removeItem(data);
+        removedResourcesIds.insert(resource->getId());
+        removedResourcesUniqueIds.insert(resource->getUniqueId());
+    }
 
-        NX_VERBOSE(this, "Resource removed [%1] (%2)", otherResource->getName(), otherResource);
+    for (const auto& layout: existingLayouts)
+    {
+        // TODO: #GDM Search layout item by universal id is a bit more complex. Unify the process.
+        for (const auto& item: layout->getItems())
+        {
+            if (removedResourcesIds.contains(item.resource.id)
+                || removedResourcesUniqueIds.contains(item.resource.uniqueId))
+            {
+                layout->removeItem(item);
+            }
+        }
     }
 
     /* Emit notifications. */
-    for (auto layoutResource: removedLayoutResources)
-        emit resourceRemoved(layoutResource);
+    for (auto layout: removedLayouts)
+        emit resourceRemoved(layout);
 
     for (auto resource: removedOtherResources)
         emit resourceRemoved(resource);
