@@ -12,6 +12,8 @@ namespace stun {
 
 using namespace attrs;
 
+static constexpr std::uint32_t kMagicCookie = 0x2112A442;
+
 MessageParser::MessageParser()
 {
     reset();
@@ -20,6 +22,62 @@ MessageParser::MessageParser()
 void MessageParser::setMessage(Message* const msg)
 {
     m_outputMessage = msg;
+}
+
+nx::network::server::ParserState MessageParser::parse(
+    const nx::Buffer& buf,
+    std::size_t* bytesProcessed)
+{
+    // This caching function added as a workaround since the parsing logic
+    // has numerous errors when parsing fragented message.
+    // So, providing only header / attributes / full message to the actual parser.
+
+    QnByteArrayConstRef input(buf);
+    *bytesProcessed = 0;
+
+    while (!input.isEmpty())
+    {
+        NX_ASSERT(m_cache.size() < m_bytesToCache);
+        const auto bytesToCopy = std::min<int>(m_bytesToCache - m_cache.size(), input.size());
+        QnByteArrayConstRef bufToParse;
+        if (m_cache.isEmpty() && bytesToCopy == m_bytesToCache)
+        {
+            bufToParse = input.mid(0, bytesToCopy);
+            input.pop_front(bytesToCopy);
+            *bytesProcessed += bytesToCopy;
+        }
+        else
+        {
+            m_cache.append(input.data(), bytesToCopy);
+            input.pop_front(bytesToCopy);
+            *bytesProcessed += bytesToCopy;
+            if (!validateCachedData())
+                return nx::network::server::ParserState::failed;
+            if (m_cache.size() < m_bytesToCache)
+                return nx::network::server::ParserState::readingMessage;
+            bufToParse = m_cache;
+        }
+
+        std::size_t bytesParsed = 0;
+        const auto result = parseInternal(bufToParse, &bytesParsed);
+        NX_ASSERT(bytesParsed == bufToParse.size() || result == server::ParserState::failed);
+
+        m_cache.clear();
+        if (result != server::ParserState::readingMessage)
+        {
+            // Parsing completed of failed. Anyway, current message cannot be continued.
+            m_cachedContent = CachedContent::header;
+            m_bytesToCache = kHeaderSize;
+            return result;
+        }
+
+        NX_ASSERT(m_cachedContent == CachedContent::header);
+
+        m_cachedContent = CachedContent::attributes;
+        m_bytesToCache = m_header.length;
+    }
+
+    return server::ParserState::readingMessage;
 }
 
 nx::network::server::ParserState MessageParser::state() const
@@ -38,6 +96,10 @@ void MessageParser::reset()
     m_leftMessageLength = 0;
     m_state = HEADER_INITIAL_AND_TYPE;
     m_tempBuffer.clear();
+
+    m_cachedContent = CachedContent::header;
+    m_cache.clear();
+    m_bytesToCache = kHeaderSize;
 }
 
 // Parsing for each specific type
@@ -490,7 +552,9 @@ int MessageParser::parseEndMessageIntegrity(MessageParserBuffer& /*buffer*/)
     }
 }
 
-nx::network::server::ParserState MessageParser::parse(const nx::Buffer& user_buffer, std::size_t* bytes_transferred)
+nx::network::server::ParserState MessageParser::parseInternal(
+    const QnByteArrayConstRef& user_buffer,
+    std::size_t* bytes_transferred)
 {
     if (user_buffer.isEmpty())  //end-of-file received
         return nx::network::server::ParserState::readingMessage;
@@ -566,6 +630,27 @@ nx::network::server::ParserState MessageParser::parse(const nx::Buffer& user_buf
                 return nx::network::server::ParserState::failed;
         }
     } while (true);
+}
+
+bool MessageParser::validateCachedData()
+{
+    if (m_cachedContent == CachedContent::header)
+    {
+        // The most significant 2 bits of every STUN message MUST be zeroes.
+        if (!m_cache.isEmpty() && (m_cache[0] & 0xC0) != 0)
+            return false;
+
+        if (m_cache.size() >= 8)
+        {
+            // The magic cookie field MUST contain the fixed value 0x2112A442 in network byte order.
+            std::uint32_t magicCookie = 0;
+            memcpy(&magicCookie, m_cache.data() + 4, sizeof(std::uint32_t));
+            if (ntohl(magicCookie) != kMagicCookie)
+                return false;
+        }
+    }
+
+    return true;
 }
 
 } // namespace stun

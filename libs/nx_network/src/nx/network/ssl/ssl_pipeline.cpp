@@ -5,10 +5,13 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/type_utils.h>
 
 #include "ssl_static_data.h"
 
 namespace nx::network::ssl {
+
+static constexpr int kSslExDataThisIndex = 0;
 
 Pipeline::Pipeline(SSL_CTX* sslContext):
     m_ssl(nullptr, &SSL_free)
@@ -96,6 +99,16 @@ void Pipeline::shutdown()
     SSL_shutdown(ssl());
 }
 
+void Pipeline::setVerifyCertificateCallback(VerifyCertificateCallback func)
+{
+    m_verifyCertificateCallback = std::move(func);
+
+    SSL_set_verify(
+        m_ssl.get(),
+        SSL_VERIFY_PEER,
+        m_verifyCertificateCallback ? &Pipeline::verifyServerCertificateCallback : NULL);
+}
+
 SSL* Pipeline::ssl()
 {
     return m_ssl.get();
@@ -127,6 +140,8 @@ void Pipeline::initSslBio(SSL_CTX* context)
 
     NX_ASSERT(context);
     m_ssl.reset(SSL_new(context)); //<< Get new SSL state with context.
+
+    SSL_set_ex_data(m_ssl.get(), kSslExDataThisIndex, this);
 
     SSL_set_verify(m_ssl.get(), SSL_VERIFY_NONE, NULL);
     SSL_set_session_id_context(
@@ -365,6 +380,29 @@ int Pipeline::bioFree(BIO* bio)
     }
 
     return 1;
+}
+
+int Pipeline::verifyServerCertificateCallback(int /*preverifyOk*/, X509_STORE_CTX* x509Ctx)
+{
+    auto ssl = static_cast<SSL*>(X509_STORE_CTX_get_ex_data(
+        x509Ctx,
+        SSL_get_ex_data_X509_STORE_CTX_idx()));
+
+    auto pipeline = static_cast<Pipeline*>(SSL_get_ex_data(ssl, kSslExDataThisIndex));
+
+    X509* cert = X509_STORE_CTX_get_current_cert(x509Ctx);
+
+    auto memBio = nx::utils::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
+    X509_NAME_print(memBio.get(), X509_get_issuer_name(cert), 0);
+
+    Certificate certificate;
+    certificate.issuer.resize(BIO_ctrl_pending(memBio.get()));
+    BIO_read(memBio.get(), certificate.issuer.data(), certificate.issuer.size());
+
+    certificate.serialNumber = ASN1_INTEGER_get(cert->cert_info->serialNumber);
+    certificate.x509Certificate = cert;
+
+    return pipeline->m_verifyCertificateCallback(certificate) ? 1 : 0;
 }
 
 //-------------------------------------------------------------------------------------------------

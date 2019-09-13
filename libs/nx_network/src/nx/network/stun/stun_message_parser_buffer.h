@@ -3,6 +3,7 @@
 #include <deque>
 
 #include <nx/network/buffer.h>
+#include <nx/utils/qnbytearrayref.h>
 
 namespace nx {
 namespace network {
@@ -15,8 +16,8 @@ namespace stun {
 class NX_NETWORK_API MessageParserBuffer
 {
 public:
-    MessageParserBuffer(std::deque<char>* temp_buffer, const nx::Buffer& buffer);
-    MessageParserBuffer(const nx::Buffer& buffer);
+    MessageParserBuffer(std::deque<char>* temp_buffer, const QnByteArrayConstRef& buffer);
+    MessageParserBuffer(const QnByteArrayConstRef& buffer);
 
     std::uint16_t NextUint16(bool* ok);
     std::uint32_t NextUint32(bool* ok);
@@ -27,9 +28,9 @@ public:
     std::size_t position() const;
 
 private:
-    std::deque<char>* m_tempBuffer;
-    const nx::Buffer& m_buffer;
-    std::size_t m_position;
+    std::deque<char>* m_tempBuffer = nullptr;
+    const QnByteArrayConstRef& m_buffer;
+    std::size_t m_position = 0;
 
     bool ensure(std::size_t byteSize, void* buffer);
 

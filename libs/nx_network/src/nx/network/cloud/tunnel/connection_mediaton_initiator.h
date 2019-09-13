@@ -30,6 +30,8 @@ public:
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
+    void setTimeout(std::optional<std::chrono::milliseconds> timeout);
+
     void start(
         const hpm::api::ConnectRequest& request,
         Handler handler);
@@ -59,6 +61,7 @@ private:
     aio::Timer m_tcpConnectDelayTimer;
     std::unique_ptr<nx::hpm::api::Client> m_mediatorApiClient;
     bool m_tcpRequestCompleted = false;
+    std::optional<std::chrono::milliseconds> m_timeout;
 
     void initiateConnectOverUdp();
     void initiateConnectOverTcp();

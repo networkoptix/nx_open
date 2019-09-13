@@ -320,6 +320,7 @@ BasicTestFixture<Base>::BasicTestFixture(
     int relayCount,
     std::optional<std::chrono::seconds> disconnectedPeerTimeout)
     :
+    base_type("cloud_connect_integration_tests"),
     m_staticMsgBody("Hello, hren!"),
     m_relayCount(relayCount),
     m_disconnectedPeerTimeout(disconnectedPeerTimeout)

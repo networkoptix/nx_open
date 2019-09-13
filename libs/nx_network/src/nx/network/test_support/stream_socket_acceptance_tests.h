@@ -431,14 +431,18 @@ protected:
         ASSERT_TRUE(m_server->listen());
     }
 
-    void givenConnectedSocket()
+    void givenClientSocket()
     {
         if (m_connection)
             m_connection->pleaseStopSync();
 
         m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
-        ASSERT_TRUE(m_connection->connect(serverEndpoint(), nx::network::kNoTimeout))
-            << SystemError::getLastOSErrorText().toStdString();
+    }
+
+    void givenConnectedSocket()
+    {
+        givenClientSocket();
+        whenSynchronouslyConnectToServer();
     }
 
     void givenPingPongServer()
@@ -455,9 +459,16 @@ protected:
         whenConnectUsingHostName();
     }
 
+    void whenSynchronouslyConnectToServer()
+    {
+        ASSERT_TRUE(m_connection->connect(serverEndpoint(), nx::network::kNoTimeout))
+            << SystemError::getLastOSErrorText().toStdString();
+    }
+
     template<typename AuxiliaryConnectCompletionHandler>
     void whenConnectToServer(AuxiliaryConnectCompletionHandler&& handler)
     {
+        givenClientSocket();
         whenConnectToServerAsync(serverEndpoint(), std::move(handler));
         thenConnectionIsEstablished();
     }
@@ -467,7 +478,6 @@ protected:
         const SocketAddress& endpoint,
         AuxiliaryConnectCompletionHandler&& handler)
     {
-        m_connection = std::make_unique<typename SocketTypeSet::ClientSocket>();
         ASSERT_TRUE(m_connection->setNonBlockingMode(true));
         m_connection->connectAsync(
             endpoint,
@@ -476,6 +486,11 @@ protected:
                 handler();
                 this->saveConnectResult(resultCode);
             });
+    }
+
+    void whenConnectToServerAsync()
+    {
+        whenConnectToServerAsync(serverEndpoint(), []() {});
     }
 
     void whenReceivedMessageFromServerAsync(
@@ -491,6 +506,7 @@ protected:
 
     void whenConnectUsingHostName()
     {
+        givenClientSocket();
         whenConnectToServerAsync(m_mappedEndpoint, [](){});
     }
 
@@ -872,9 +888,14 @@ protected:
         ASSERT_EQ(SystemError::noError, m_connectResultQueue.pop());
     }
 
+    void thenConnectionIsNotEstablished()
+    {
+        ASSERT_NE(SystemError::noError, m_connectResultQueue.pop());
+    }
+
     void thenEveryConnectionEstablishedSuccessfully()
     {
-        for (int i = 0; i < (int) m_clientConnections.size(); ++i)
+        for (std::size_t i = 0; i < m_clientConnections.size(); ++i)
         {
             ASSERT_EQ(SystemError::noError, m_connectResultQueue.pop());
         }

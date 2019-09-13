@@ -60,7 +60,7 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
     Controller controller(settings, &model);
     m_controller = &controller;
 
-    View view(settings, &model, &controller);
+    View view(this, settings, &model, &controller);
     m_view = &view;
 
     const auto remoteRelayPeerPool =
