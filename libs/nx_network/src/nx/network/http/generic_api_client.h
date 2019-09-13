@@ -42,7 +42,7 @@ public:
     virtual void bindToAioThread(
         network::aio::AbstractAioThread* aioThread) override;
 
-    void setRequestTimeout(std::chrono::milliseconds timeout);
+    void setRequestTimeout(std::optional<std::chrono::milliseconds> timeout);
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -80,9 +80,9 @@ private:
     };
 
     const utils::Url m_baseApiUrl;
-    std::optional<std::chrono::milliseconds> m_requestTimeout;
     std::map<network::aio::BasicPollable*, Context> m_activeRequests;
     QnMutex m_mutex;
+    std::optional<std::chrono::milliseconds> m_requestTimeout;
 
     template<typename Output, typename... InputArgs>
     auto createHttpClient(
@@ -128,13 +128,6 @@ GenericApiClient<ApiResultCodeDescriptor>::~GenericApiClient()
 }
 
 template<typename ApiResultCodeDescriptor>
-void GenericApiClient<ApiResultCodeDescriptor>::setRequestTimeout(
-    std::chrono::milliseconds timeout)
-{
-    m_requestTimeout = timeout;
-}
-
-template<typename ApiResultCodeDescriptor>
 void GenericApiClient<ApiResultCodeDescriptor>::bindToAioThread(
     network::aio::AbstractAioThread* aioThread)
 {
@@ -143,6 +136,13 @@ void GenericApiClient<ApiResultCodeDescriptor>::bindToAioThread(
     QnMutexLocker lock(&m_mutex);
     for (const auto& context : m_activeRequests)
         context.second.client->bindToAioThread(aioThread);
+}
+
+template<typename ApiResultCodeDescriptor>
+void GenericApiClient<ApiResultCodeDescriptor>::setRequestTimeout(
+    std::optional<std::chrono::milliseconds> timeout)
+{
+    m_requestTimeout = timeout;
 }
 
 template<typename ApiResultCodeDescriptor>
@@ -163,6 +163,9 @@ void GenericApiClient<ApiResultCodeDescriptor>::makeAsyncCall(
     auto request = createHttpClient<Output>(
         requestPath,
         std::move(inputArgs)...);
+
+    if (m_requestTimeout)
+        request->setRequestTimeout(*m_requestTimeout);
 
     request->execute(
         [this, request, handler = std::move(handler)](
