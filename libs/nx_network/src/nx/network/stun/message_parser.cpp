@@ -29,7 +29,7 @@ nx::network::server::ParserState MessageParser::parse(
     std::size_t* bytesProcessed)
 {
     // This caching function added as a workaround since the parsing logic
-    // has numerous errors when parsing fragented message.
+    // has numerous errors when parsing fragmented message.
     // So, providing only header / attributes / full message to the actual parser.
 
     QnByteArrayConstRef input(buf);
@@ -65,7 +65,7 @@ nx::network::server::ParserState MessageParser::parse(
         m_cache.clear();
         if (result != server::ParserState::readingMessage)
         {
-            // Parsing completed of failed. Anyway, current message cannot be continued.
+            // Parsing completed or failed. Anyway, current message cannot be continued.
             m_cachedContent = CachedContent::header;
             m_bytesToCache = kHeaderSize;
             return result;
