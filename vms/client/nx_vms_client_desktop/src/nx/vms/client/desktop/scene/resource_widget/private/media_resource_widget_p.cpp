@@ -310,11 +310,12 @@ bool MediaResourceWidgetPrivate::calculateIsAnalyticsSupported() const
     if (!camera || !analyticsMetadataProvider)
         return false;
 
-    const auto engines = camera->enabledAnalyticsEngineResources();
-    return std::any_of(engines.cbegin(), engines.cend(),
-        [](const common::AnalyticsEngineResourcePtr& engine)
+    const auto supportedObjectTypes = camera->supportedObjectTypes();
+    return std::any_of(supportedObjectTypes.cbegin(), supportedObjectTypes.cend(),
+        [](const auto& objectTypesByEngineId)
         {
-            return !engine->manifest().objectTypes.empty();
+            const auto& objectTypes = objectTypesByEngineId.second;
+            return !objectTypes.empty();
         });
 }
 
