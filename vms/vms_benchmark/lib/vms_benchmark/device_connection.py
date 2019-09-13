@@ -21,9 +21,10 @@ def log_remote_command_status(status_code):
 if platform.system() == 'Linux':
     class DeviceConnection:
         class DeviceConnectionResult:
-            def __init__(self, return_code, message=None):
+            def __init__(self, return_code, message=None, command=None):
                 self.message = message
                 self.return_code = return_code
+                self.command = command
 
             def __bool__(self):
                 return self.return_code == 0
@@ -85,7 +86,7 @@ if platform.system() == 'Linux':
                 if exc:
                     raise exceptions.DeviceCommandError(message=run.stderr.rstrip())
                 else:
-                    return self.DeviceConnectionResult(None, run.stderr.rstrip())
+                    return self.DeviceConnectionResult(None, run.stderr.rstrip(), command=command_wrapped)
 
             if run.returncode != 0 and exc:
                 raise exceptions.DeviceCommandError(
@@ -99,7 +100,7 @@ if platform.system() == 'Linux':
                 stderr.write(run.stderr.decode())
                 stderr.flush()
 
-            return self.DeviceConnectionResult(run.returncode)
+            return self.DeviceConnectionResult(run.returncode, command=command_wrapped)
 
         def eval(self, cmd, timeout=3, su=False, stderr=None):
             out = StringIO()
@@ -119,9 +120,10 @@ if platform.system() == 'Linux':
 elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
     class DeviceConnection:
         class DeviceConnectionResult:
-            def __init__(self, return_code, command=None, message=None):
+            def __init__(self, return_code, message=None, command=None):
                 self.message = message
                 self.return_code = return_code
+                self.command = command
 
             def __bool__(self):
                 return self.return_code == 0
@@ -195,7 +197,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
                 if exc:
                     raise exceptions.DeviceCommandError(message=message)
                 else:
-                    return self.DeviceConnectionResult(None, message)
+                    return self.DeviceConnectionResult(None, message, command=command_wrapped)
 
             if stdout != self._SH_DEFAULT:
                 write_method = getattr(stdout, 'write', None)

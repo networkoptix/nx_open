@@ -20,6 +20,9 @@ class SudoConfigured:
             print(f'`{res.command}`: "{obtained_test_message}"', file=sys.stderr)
 
         if not res or res.return_code != 0 or obtained_test_message != test_message:
-            return DeviceTestResult(success=False, message=f"Command `{res.command}` failed: {str(error_message)}")
+            return DeviceTestResult(
+                success=False,
+                message=f"Command `{res.command}` failed: {str(error_message.getvalue().strip())}"
+            )
 
         return DeviceTestResult(success=True)
