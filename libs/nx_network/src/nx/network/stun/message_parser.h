@@ -153,7 +153,7 @@ private:
     std::deque<char> m_tempBuffer;
 
     CachedContent m_cachedContent = CachedContent::partialHeader;
-    std::size_t m_bytesToCache = kHeaderSize;
+    int m_bytesToCache = kHeaderSize;
     nx::Buffer m_cache;
 };
 
