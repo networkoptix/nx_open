@@ -549,7 +549,9 @@ std::map<QnUuid, QnMediaServerResourcePtr> PeerStateTracker::activeServers() con
     auto filter = m_peersIssued;
     for (const auto& item: m_items)
     {
-        if (filter.empty() && item->offline)
+        if (!filter.empty() && !filter.contains(item->id))
+            continue;
+        if (item->offline)
             continue;
         if (item->component != UpdateItem::Component::server)
             continue;

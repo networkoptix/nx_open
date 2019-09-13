@@ -26,11 +26,18 @@ int VideoTranscoder::initializeDecoder(AVCodecParameters* codecPar)
     }
 
     if (status < 0)
+    {
+        NX_WARNING(this, "Decoder initialize error: %1", ffmpeg::utils::errorToString(status));
         return status;
+    }
 
     status = decoder->open();
     if (status < 0)
+    {
+        NX_WARNING(this, "Failed to open video decoder, error: %1",
+            ffmpeg::utils::errorToString(status));
         return status;
+    }
 
     m_decoder = std::move(decoder);
     return 0;
@@ -48,7 +55,10 @@ int VideoTranscoder::initializeEncoder(const CodecParameters& codecParams)
             break;
     }
     if (result < 0)
+    {
+        NX_WARNING(this, "Encoder initialize error: %1", ffmpeg::utils::errorToString(result));
         return result;
+    }
 
     encoder->setFps(codecParams.fps);
     encoder->setResolution(codecParams.resolution.width, codecParams.resolution.height);
@@ -64,7 +74,10 @@ int VideoTranscoder::initializeEncoder(const CodecParameters& codecParams)
 
     result = encoder->open();
     if (result < 0)
+    {
+        NX_WARNING(this, "Encoder open error: %1", ffmpeg::utils::errorToString(result));
         return result;
+    }
 
     m_encoder = std::move(encoder);
     return 0;
@@ -73,6 +86,7 @@ int VideoTranscoder::initializeEncoder(const CodecParameters& codecParams)
 int VideoTranscoder::initialize(
     AVCodecParameters* decoderCodecPar,const CodecParameters& codecParams)
 {
+    NX_DEBUG(this, "Initialize transcoder, params: %1", codecParams.toString());
     int status = initializeDecoder(decoderCodecPar);
     if (status < 0)
         return status;
@@ -146,13 +160,19 @@ int VideoTranscoder::transcode(
     Frame* scaledFrame;
     int status = m_scaler.scale(frame.get(), &scaledFrame);
     if (status < 0)
+    {
+        NX_WARNING(this, "Scale error: %1", ffmpeg::utils::errorToString(status));
         return status;
+    }
 
     result = std::make_shared<ffmpeg::Packet>(m_encoder->codecId(), AVMEDIA_TYPE_VIDEO);
 
     status = encode(scaledFrame, result.get());
     if (status < 0)
+    {
+        NX_WARNING(this, "Encode error: %1", ffmpeg::utils::errorToString(status));
         return status;
+    }
 
     m_encoderTimestamps.addTimestamp(frame->packetPts(), frame->timestamp());
 

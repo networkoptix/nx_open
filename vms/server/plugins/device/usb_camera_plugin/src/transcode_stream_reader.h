@@ -17,12 +17,14 @@ public:
     void setFps(float fps);
     void setResolution(const nxcip::Resolution& resolution);
     void setBitrate(int bitrate);
+    void uninitialize();
 
 private:
     std::shared_ptr<ffmpeg::Packet> nextPacket();
     int initializeTranscoder();
 
 private:
+    mutable std::mutex m_mutex;
     std::shared_ptr<Camera> m_camera;
     ffmpeg::VideoTranscoder m_transcoder;
     CodecParameters m_codecParams;

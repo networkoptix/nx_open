@@ -145,6 +145,7 @@ public:
 signals:
     void permissionsChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
         Qn::Permissions permissions);
+    void allPermissionsRecalculated();
 
 protected:
     virtual void beforeUpdate() override;

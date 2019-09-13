@@ -170,6 +170,11 @@ QList<QnResourceChannelMapping> MultisensorDataProvider::getVideoChannelMapping(
         ResourceDataKey::kMultiresourceVideoChannelMapping);
 }
 
+void MultisensorDataProvider::setRole(Qn::ConnectionRole role)
+{
+    QnAbstractMediaStreamDataProvider::setRole(role);
+}
+
 } // namespace utils
 } // namespace plugins
 } // namespace nx
