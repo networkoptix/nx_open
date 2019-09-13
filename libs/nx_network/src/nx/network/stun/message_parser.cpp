@@ -12,6 +12,8 @@ namespace stun {
 
 using namespace attrs;
 
+static constexpr std::uint32_t kMagicCookie = 0x2112A442;
+
 MessageParser::MessageParser()
 {
     reset();
@@ -49,6 +51,8 @@ nx::network::server::ParserState MessageParser::parse(
             m_cache.append(input.data(), bytesToCopy);
             input.pop_front(bytesToCopy);
             *bytesProcessed += bytesToCopy;
+            if (!validateCachedData())
+                return nx::network::server::ParserState::failed;
             if (m_cache.size() < m_bytesToCache)
                 return nx::network::server::ParserState::readingMessage;
             bufToParse = m_cache;
@@ -62,14 +66,14 @@ nx::network::server::ParserState MessageParser::parse(
         if (result != server::ParserState::readingMessage)
         {
             // Parsing completed of failed. Anyway, current message cannot be continued.
-            m_cachedContent = CachedContent::partialHeader;
+            m_cachedContent = CachedContent::header;
             m_bytesToCache = kHeaderSize;
             return result;
         }
 
-        NX_ASSERT(m_cachedContent == CachedContent::partialHeader);
+        NX_ASSERT(m_cachedContent == CachedContent::header);
 
-        m_cachedContent = CachedContent::partialAttributes;
+        m_cachedContent = CachedContent::attributes;
         m_bytesToCache = m_header.length;
     }
 
@@ -93,7 +97,7 @@ void MessageParser::reset()
     m_state = HEADER_INITIAL_AND_TYPE;
     m_tempBuffer.clear();
 
-    m_cachedContent = CachedContent::partialHeader;
+    m_cachedContent = CachedContent::header;
     m_cache.clear();
     m_bytesToCache = kHeaderSize;
 }
@@ -626,6 +630,27 @@ nx::network::server::ParserState MessageParser::parseInternal(
                 return nx::network::server::ParserState::failed;
         }
     } while (true);
+}
+
+bool MessageParser::validateCachedData()
+{
+    if (m_cachedContent == CachedContent::header)
+    {
+        // The most significant 2 bits of every STUN message MUST be zeroes.
+        if (!m_cache.isEmpty() && (m_cache[0] & 0xC0) != 0)
+            return false;
+
+        if (m_cache.size() >= 8)
+        {
+            // The magic cookie field MUST contain the fixed value 0x2112A442 in network byte order.
+            std::uint32_t magicCookie = 0;
+            memcpy(&magicCookie, m_cache.data() + 4, sizeof(std::uint32_t));
+            if (ntohl(magicCookie) != kMagicCookie)
+                return false;
+        }
+    }
+
+    return true;
 }
 
 } // namespace stun

@@ -106,6 +106,15 @@ protected:
         }
     }
 
+    void whenParseMalformedHeader()
+    {
+        m_parsedMessage = Message();
+        m_parser.setMessage(&m_parsedMessage);
+
+        std::size_t bytesRead = 0;
+        m_prevParseResult = m_parser.parse("malformed header", &bytesRead);
+    }
+
     void thenParserIsAbleToParseCorrectPacket()
     {
         prepareRandomMessage();
@@ -119,6 +128,11 @@ protected:
     void thenParseSucceeded()
     {
         ASSERT_EQ(nx::network::server::ParserState::done, m_prevParseResult);
+    }
+
+    void thenParseFailed()
+    {
+        ASSERT_EQ(nx::network::server::ParserState::failed, m_prevParseResult);
     }
 
     void thenParseDidNotSucceed()
@@ -239,6 +253,12 @@ TEST_F(StunMessageParser, parses_fragmented_message)
 
     thenParseSucceeded();
     andParsedMessageIsExpected();
+}
+
+TEST_F(StunMessageParser, detects_malformed_header)
+{
+    whenParseMalformedHeader();
+    thenParseFailed();
 }
 
 } // namespace test

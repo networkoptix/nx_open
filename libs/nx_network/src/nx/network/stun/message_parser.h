@@ -115,6 +115,8 @@ private:
     int parseEndWithFingerprint(MessageParserBuffer& buffer);
     std::size_t calculatePaddingSize(std::size_t value_bytes);
 
+    bool validateCachedData();
+
 private:
     struct STUNHeader
     {
@@ -140,8 +142,8 @@ private:
 
     enum class CachedContent
     {
-        partialHeader,
-        partialAttributes,
+        header,
+        attributes,
     };
 
     STUNHeader m_header;
@@ -152,7 +154,7 @@ private:
     // This is for opaque usage
     std::deque<char> m_tempBuffer;
 
-    CachedContent m_cachedContent = CachedContent::partialHeader;
+    CachedContent m_cachedContent = CachedContent::header;
     int m_bytesToCache = kHeaderSize;
     nx::Buffer m_cache;
 };
