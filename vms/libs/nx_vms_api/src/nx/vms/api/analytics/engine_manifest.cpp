@@ -40,7 +40,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
         "needBestShotVideoFrame")
     (nx::vms::api::analytics::EngineManifest::ObjectAction::Capability::needBestShotObjectMetadata,
         "needBestShotObjectMetadata")
-    (nx::vms::api::analytics::EngineManifest::ObjectAction::Capability::needTrack, "needTrack")
+    (nx::vms::api::analytics::EngineManifest::ObjectAction::Capability::needFullTrack, "needFullTrack")
 )
 QN_FUSION_DEFINE_FUNCTIONS(
     nx::vms::api::analytics::EngineManifest::ObjectAction::Capability, (numeric)(debug))
@@ -53,7 +53,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
         "needBestShotVideoFrame")
     (nx::vms::api::analytics::EngineManifest::ObjectAction::Capability::needBestShotObjectMetadata,
         "needBestShotObjectMetadata")
-    (nx::vms::api::analytics::EngineManifest::ObjectAction::Capability::needTrack, "needTrack")
+    (nx::vms::api::analytics::EngineManifest::ObjectAction::Capability::needFullTrack, "needFullTrack")
 )
 QN_FUSION_DEFINE_FUNCTIONS(
     nx::vms::api::analytics::EngineManifest::ObjectAction::Capabilities, (numeric)(debug))
