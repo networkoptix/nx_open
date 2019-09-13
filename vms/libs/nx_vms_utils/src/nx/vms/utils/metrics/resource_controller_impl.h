@@ -56,7 +56,8 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
             if (existing != groupIt->values.end())
             {
                 // Override existing value manifest.
-                existing->name = valueRule.name;
+                if (!valueRule.name.isEmpty())
+                    existing->name = valueRule.name;
                 existing->display = valueRule.display;
                 existing->unit = valueRule.unit;
                 continue;

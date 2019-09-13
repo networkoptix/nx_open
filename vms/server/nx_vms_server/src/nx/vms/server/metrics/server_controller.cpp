@@ -10,6 +10,35 @@
 
 namespace nx::vms::server::metrics {
 
+namespace {
+
+class ServerDescription: public utils::metrics::ResourceDescription<QnMediaServerResource*>
+{
+public:
+    ServerDescription(QnMediaServerResource* resource, QnUuid ownId):
+        utils::metrics::ResourceDescription<QnMediaServerResource*>(resource),
+        m_ownId(std::move(ownId))
+    {
+    }
+
+    QString id() const override
+    {
+        return this->resource->getId().toSimpleString();
+    }
+
+    utils::metrics::Scope scope() const override
+    {
+        return this->resource->getId() == m_ownId
+            ? utils::metrics::Scope::local
+            : utils::metrics::Scope::system;
+    }
+
+private:
+    QnUuid m_ownId;
+};
+
+} // namespace
+
 ServerController::ServerController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     utils::metrics::ResourceControllerImpl<QnMediaServerResource*>("servers", makeProviders())
@@ -24,7 +53,7 @@ void ServerController::start()
         [this](const QnResourcePtr& resource)
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
-                add(std::make_unique<ResourceDescription<Resource>>(server.get()));
+                add(std::make_unique<ServerDescription>(server.get(), moduleGUID()));
         });
 
     QObject::connect(
@@ -36,28 +65,9 @@ void ServerController::start()
         });
 }
 
-bool ServerController::isLocal(const Resource& resource) const
-{
-    return resource->getId() == moduleGUID();
-}
-
-utils::metrics::Getter<ServerController::Resource> ServerController::localGetter(
-    utils::metrics::Getter<Resource> getter) const
-{
-    return
-        [this, getter = std::move(getter), isLocalCache = std::unique_ptr<bool>()](
-            const Resource& resource) mutable
-        {
-            if (!isLocalCache)
-                isLocalCache = std::make_unique<bool>(isLocal(resource));
-
-            return *isLocalCache ? getter(resource) : Value();
-        };
-}
-
 utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController::makeProviders()
 {
-    const auto uptimeS =
+    const auto getUptimeS =
         [start = std::chrono::steady_clock::now()](const auto&)
         {
             return Value((double) std::chrono::duration_cast<std::chrono::seconds>(
@@ -65,18 +75,18 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
         };
 
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
-        std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
+        utils::metrics::makeValueGroupProvider<Resource>(
             "state",
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "name", [](const auto& r) { return Value(r->getName()); }
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "status",
                 [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
                 qtSignalWatch<Resource>(&QnResource::statusChanged)
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
-                "uptimeS", localGetter(uptimeS)
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "uptimeS", getUptimeS
             )
         )
         // TODO: Implement "Server load", "Info" and "Activity" groups.

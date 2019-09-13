@@ -7,6 +7,14 @@
 
 namespace nx::vms::utils::metrics {
 
+enum class Scope
+{
+    local, //< The value is only monitored for local resources.
+    system //< The value is monitored for all known resources in the system.
+};
+
+inline QString toString(Scope scope) { return scope == Scope::local ? "local" : "system"; }
+
 using Duration = std::chrono::milliseconds;
 using ValueIterator = std::function<void(const api::metrics::Value& value, Duration age)>;
 
@@ -16,10 +24,15 @@ using ValueIterator = std::function<void(const api::metrics::Value& value, Durat
 class NX_VMS_UTILS_API ValueMonitor
 {
 public:
+    explicit ValueMonitor(Scope scope): m_scope(scope) {}
     virtual ~ValueMonitor() = default;
 
+    Scope scope() const { return m_scope; }
     virtual api::metrics::Value current() const = 0;
     virtual void forEach(Duration maxAge, const ValueIterator& iterator) const = 0;
+
+private:
+    Scope m_scope = Scope::local;
 };
 
 using ValueMonitors = std::map<QString, std::unique_ptr<ValueMonitor>>;
@@ -39,7 +52,7 @@ template<typename ResourceType>
 class RuntimeValueMonitor: public ValueMonitor
 {
 public:
-    RuntimeValueMonitor(const ResourceType& resource, const Getter<ResourceType>& getter);
+    RuntimeValueMonitor(Scope scope, const ResourceType& resource, const Getter<ResourceType>& getter);
     api::metrics::Value current() const override;
     void forEach(Duration maxAge, const ValueIterator& iterator) const override;
 
@@ -56,6 +69,7 @@ class ValueHistoryMonitor: public RuntimeValueMonitor<ResourceType>
 {
 public:
     ValueHistoryMonitor(
+        Scope scope,
         const ResourceType& resource,
         const Getter<ResourceType>& getter,
         const Watch<ResourceType>& watch);
@@ -75,9 +89,11 @@ private:
 
 template<typename ResourceType>
 RuntimeValueMonitor<ResourceType>::RuntimeValueMonitor(
+    Scope scope,
     const ResourceType& resource,
     const Getter<ResourceType>& getter)
 :
+    ValueMonitor(scope),
     m_resource(resource),
     m_getter(getter)
 {
@@ -98,11 +114,12 @@ void RuntimeValueMonitor<ResourceType>::forEach(
 
 template<typename ResourceType>
 ValueHistoryMonitor<ResourceType>::ValueHistoryMonitor(
+    Scope scope,
     const ResourceType& resource,
     const Getter<ResourceType>& getter,
     const Watch<ResourceType>& watch)
 :
-    RuntimeValueMonitor<ResourceType>(resource, getter),
+    RuntimeValueMonitor<ResourceType>(scope, resource, getter),
     m_watchGuard(watch(resource, [this](){ updateValue(); }))
 {
     updateValue();

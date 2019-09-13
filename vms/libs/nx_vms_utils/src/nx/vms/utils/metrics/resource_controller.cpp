@@ -1,22 +1,27 @@
 #include "resource_controller.h"
 
+#include <nx/utils/log/log.h>
+
 namespace nx::vms::utils::metrics {
 
-api::metrics::ResourceGroupValues ResourceController::values() const
+api::metrics::ResourceGroupValues ResourceController::values(Scope requestScope) const
 {
     api::metrics::ResourceGroupValues values;
     for (const auto& [id, monitor]: m_monitors)
-        values[id] = monitor->current();
+    {
+        if (auto current = monitor->current(requestScope); !current.empty())
+            values[id] = std::move(current);
+    }
 
     return values;
 }
 
-std::vector<api::metrics::Alarm> ResourceController::alarms() const
+std::vector<api::metrics::Alarm> ResourceController::alarms(Scope requestScope) const
 {
     std::vector<api::metrics::Alarm> allAlarms;
     for (const auto& [id, monitor]: m_monitors)
     {
-        auto alarms = monitor->alarms();
+        auto alarms = monitor->alarms(requestScope);
         for (auto& alarm: alarms)
         {
             alarm.resource = id;
@@ -48,13 +53,20 @@ void ResourceController::add(const QString& id, std::unique_ptr<ResourceMonitor>
     monitor->setRules(m_rules);
 
     auto [it, isOk] = m_monitors.emplace(id, std::move(monitor));
-    NX_ASSERT(isOk, "Resource duplicate: %1", id);
+    if (NX_ASSERT(isOk, "Resource duplicate: %1", id))
+        NX_INFO(this, "Add resource '%1' monitor: %2", id, it->second);
+
 }
 
 void ResourceController::remove(const QString& id)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-    m_monitors.erase(id); // TODO: Move destruction out of the mutex.
+    const auto it = m_monitors.find(id);
+    if (!NX_ASSERT(it != m_monitors.end(), "Unable to remove resource %1", id))
+        return;
+
+    NX_INFO(this, "Remove resource '%1' monitor: %2", id, it->second);
+    m_monitors.erase(it); // TODO: Move destruction out of the mutex.
 }
 
 } // namespace nx::vms::utils::metrics

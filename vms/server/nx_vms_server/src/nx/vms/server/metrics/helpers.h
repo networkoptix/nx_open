@@ -6,15 +6,6 @@
 namespace nx::vms::server::metrics {
 
 template<typename ResourceType>
-class ResourceDescription: public utils::metrics::ResourceDescription<ResourceType>
-{
-public:
-    using base = utils::metrics::ResourceDescription<ResourceType>;
-    using base::base;
-    QString id() const override { return this->resource->getId().toSimpleString(); };
-};
-
-template<typename ResourceType>
 utils::metrics::Watch<ResourceType> staticWatch()
 {
     return

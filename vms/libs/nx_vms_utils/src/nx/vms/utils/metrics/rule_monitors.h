@@ -6,8 +6,14 @@ namespace nx::vms::utils::metrics {
 
 using ValueGenerator = std::function<api::metrics::Value()>;
 
-NX_VMS_UTILS_API ValueGenerator parseFormula(const QString& formula, const ValueMonitors& monitors);
-NX_VMS_UTILS_API ValueGenerator parseFormulaOrThrow(const QString& formula, const ValueMonitors& monitors);
+struct ValueGeneratorResult
+{
+    ValueGenerator generator;
+    Scope scope = Scope::local;
+};
+
+NX_VMS_UTILS_API ValueGeneratorResult parseFormula(const QString& formula, const ValueMonitors& monitors);
+NX_VMS_UTILS_API ValueGeneratorResult parseFormulaOrThrow(const QString& formula, const ValueMonitors& monitors);
 
 using TextGenerator = std::function<QString()>;
 
@@ -19,7 +25,7 @@ NX_VMS_UTILS_API TextGenerator parseTemplate(QString template_, const ValueMonit
 class NX_VMS_UTILS_API ExtraValueMonitor: public ValueMonitor
 {
 public:
-    ExtraValueMonitor(ValueGenerator formula);
+    ExtraValueMonitor(ValueGeneratorResult formula);
     api::metrics::Value current() const override;
     void forEach(Duration maxAge, const ValueIterator& iterator) const override;
 
@@ -36,12 +42,14 @@ public:
     AlarmMonitor(
         QString parameter,
         api::metrics::AlarmLevel level,
-        ValueGenerator condition,
+        ValueGeneratorResult condition,
         TextGenerator text);
 
+    Scope scope() const { return m_scope; }
     std::optional<api::metrics::Alarm> currentAlarm();
 
 private:
+    const Scope m_scope = Scope::local;
     const QString m_parameter;
     const api::metrics::AlarmLevel m_level;
     const ValueGenerator m_condition;

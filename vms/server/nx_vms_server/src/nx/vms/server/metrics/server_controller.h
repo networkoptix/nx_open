@@ -20,12 +20,6 @@ public:
     void start() override;
 
 private:
-    /** @returns true if this resource is a current server. */
-    bool isLocal(const Resource& resource) const;
-
-    /** Allows getter to work only on current server resource. */
-    utils::metrics::Getter<Resource> localGetter(utils::metrics::Getter<Resource> getter) const;
-
     utils::metrics::ValueGroupProviders<Resource> makeProviders();
 };
 

@@ -1,5 +1,7 @@
 #include "system_controller.h"
 
+#include <nx/utils/log/log.h>
+
 namespace nx::vms::utils::metrics {
 
 void SystemController::add(std::unique_ptr<ResourceController> resourceController)
@@ -20,6 +22,7 @@ void SystemController::start()
 
 api::metrics::SystemManifest SystemController::manifest() const
 {
+    const auto start = std::chrono::steady_clock::now();
     NX_MUTEX_LOCKER lock(&m_mutex);
     if (!m_manifestCache)
     {
@@ -28,24 +31,31 @@ api::metrics::SystemManifest SystemController::manifest() const
             (*m_manifestCache)[label] = controller->manifest();
     }
 
+    NX_DEBUG(this, "Return manifest in %1", std::chrono::steady_clock::now() - start);
     return *m_manifestCache;
 }
 
-api::metrics::SystemValues SystemController::values() const
+api::metrics::SystemValues SystemController::values(Scope requestScope) const
 {
-    api::metrics::SystemValues manifest;
+    const auto start = std::chrono::steady_clock::now();
+    api::metrics::SystemValues systemValues;
     for (const auto& [label, controller]: m_resourceControllers)
-        manifest[label] = controller->values();
+    {
+        if (auto values = controller->values(requestScope); !values.empty())
+            systemValues[label] = std::move(values);
+    }
 
-    return manifest;
+    NX_DEBUG(this, "Return %1 values in %2", requestScope, std::chrono::steady_clock::now() - start);
+    return systemValues;
 }
 
-std::vector<api::metrics::Alarm> SystemController::alarms() const
+std::vector<api::metrics::Alarm> SystemController::alarms(Scope requestScope) const
 {
+    const auto start = std::chrono::steady_clock::now();
     std::vector<api::metrics::Alarm> allAlarms;
     for (const auto& [label, controller]: m_resourceControllers)
     {
-        auto alarms = controller->alarms();
+        auto alarms = controller->alarms(requestScope);
         for (auto& alarm: alarms)
         {
             (void) label; // TODO: Add label?
@@ -53,6 +63,8 @@ std::vector<api::metrics::Alarm> SystemController::alarms() const
         }
     }
 
+    NX_DEBUG(this, "Return %1 %2 alarm(s) in %3",
+        allAlarms.size(), requestScope, std::chrono::steady_clock::now() - start);
     return allAlarms;
 }
 

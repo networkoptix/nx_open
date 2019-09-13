@@ -8,7 +8,12 @@ namespace {
 class TestResource
 {
 public:
-    TestResource(int id): m_id(id) {}
+    TestResource(int id):
+        m_id(id)
+    {
+        setDefaults();
+    }
+
     int id() const { return m_id; }
 
     void update(const QString& name, api::metrics::Value value)
@@ -18,6 +23,14 @@ public:
         param.value = std::move(value);
         if (param.change)
             param.change();
+    }
+
+    void setDefaults()
+    {
+        update("i1", m_id * 10 + 1);
+        update("t1", "first of " + QString::number(m_id));
+        update("i2", m_id * 10 + 2);
+        update("t2", "second of " + QString::number(m_id));
     }
 
     api::metrics::Value current(const QString& name) const
@@ -47,7 +60,6 @@ private:
 
 private:
     const int m_id = 0;
-    const bool m_isLocal = false;
     mutable std::map<QString, Param> m_params;
 };
 
@@ -55,6 +67,7 @@ struct TestResourceDescription: ResourceDescription<TestResource>
 {
     using ResourceDescription::ResourceDescription;
     QString id() const override { return "R" + QString::number(resource.id()); }
+    Scope scope() const override { return (resource.id() % 2 == 0) ? Scope::local : Scope::system; }
 };
 
 class TestResourceController: public ResourceControllerImpl<TestResource>
@@ -68,14 +81,7 @@ public:
     TestResource* makeResource(int id)
     {
         std::unique_ptr<TestResourceDescription> description = std::make_unique<TestResourceDescription>(id);
-        auto resource = &description->resource;
-
-        resource->update("i1", id * 10 + 1);
-        resource->update("t1", "first of " + QString::number(id));
-
-        resource->update("i2", id * 10 + 2);
-        resource->update("t2", "second of " + QString::number(id));
-
+        const auto resource = &description->resource;
         add(std::move(description));
         return resource;
     }
@@ -86,26 +92,26 @@ private:
     static ValueGroupProviders<Resource> makeProviders()
     {
         return nx::utils::make_container<ValueGroupProviders<Resource>>(
-            std::make_unique<ValueGroupProvider<Resource>>(
+            makeValueGroupProvider<Resource>(
                 "g1",
-                std::make_unique<ValueProvider<Resource>>(
+                makeLocalValueProvider<Resource>(
                     "i",
                     [](const auto& r) { return r.current("i1"); },
                     [](const auto& r, auto change) { return r.monitor("i1", std::move(change)); }
                 ),
-                std::make_unique<ValueProvider<Resource>>(
+                makeLocalValueProvider<Resource>(
                     "t",
                     [](const auto& r) { return r.current("t1"); }
                 )
             ),
-            std::make_unique<ValueGroupProvider<Resource>>(
+            makeValueGroupProvider<Resource>(
                 "g2",
-                std::make_unique<ValueProvider<Resource>>(
+                makeSystemValueProvider<Resource>(
                     "i",
                     [](const auto& r) { return r.current("i2"); },
                     [](const auto& r, auto change) { return r.monitor("i2", std::move(change)); }
                 ),
-                std::make_unique<ValueProvider<Resource>>(
+                makeSystemValueProvider<Resource>(
                     "t",
                     [](const auto& r) { return r.current("t2"); }
                 )

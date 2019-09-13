@@ -15,6 +15,7 @@ public:
         for (const auto& id: {"a", "b"})
         {
             monitors[id] = std::make_unique<ValueHistoryMonitor<TestResource>>(
+                Scope::local,
                 resource,
                 m_getters[id] = [id](const auto& r) { return r.current(id); },
                 m_watches[id] = [id](const auto& r, auto change) { return r.monitor(id, std::move(change)); });
@@ -53,17 +54,17 @@ TEST_F(MetricsGenerators, ValueErrors)
 
 TEST_F(MetricsGenerators, ValueBinary)
 {
-    const auto helloWorld = parseFormulaOrThrow("const HelloWorld", monitors);
+    const auto helloWorld = parseFormulaOrThrow("const HelloWorld", monitors).generator;
     EXPECT_EQ(helloWorld(), api::metrics::Value("HelloWorld"));
 
-    const auto number7 = parseFormulaOrThrow("const 7", monitors);
+    const auto number7 = parseFormulaOrThrow("const 7", monitors).generator;
     EXPECT_EQ(number7(), api::metrics::Value(7));
 
-    const auto plusAB = parseFormulaOrThrow("+ %a %b", monitors);
-    const auto minusAB = parseFormulaOrThrow("- %a %b", monitors);
-    const auto equalAB = parseFormulaOrThrow("= %a %b", monitors);
-    const auto notEqualAB = parseFormulaOrThrow("!= %a %b", monitors);
-    const auto greaterAB = parseFormulaOrThrow("> %a %b", monitors);
+    const auto plusAB = parseFormulaOrThrow("+ %a %b", monitors).generator;
+    const auto minusAB = parseFormulaOrThrow("- %a %b", monitors).generator;
+    const auto equalAB = parseFormulaOrThrow("= %a %b", monitors).generator;
+    const auto notEqualAB = parseFormulaOrThrow("!= %a %b", monitors).generator;
+    const auto greaterAB = parseFormulaOrThrow("> %a %b", monitors).generator;
 
     EXPECT_EQ(plusAB(), api::metrics::Value());
     EXPECT_EQ(minusAB(), api::metrics::Value());
@@ -86,21 +87,21 @@ TEST_F(MetricsGenerators, ValueBinary)
     EXPECT_EQ(greaterAB(), api::metrics::Value(false));
 
     resource.update("a", 7);
-    EXPECT_EQ(parseFormulaOrThrow("greaterOrEqual %a 7", monitors)(), api::metrics::Value(true));
-    EXPECT_EQ(parseFormulaOrThrow("greaterOrEqual %a 10", monitors)(), api::metrics::Value(false));
+    EXPECT_EQ(parseFormulaOrThrow("greaterOrEqual %a 7", monitors).generator(), api::metrics::Value(true));
+    EXPECT_EQ(parseFormulaOrThrow("greaterOrEqual %a 10", monitors).generator(), api::metrics::Value(false));
 
     resource.update("a", "hello");
-    EXPECT_EQ(parseFormulaOrThrow("equal %a hello", monitors)(), api::metrics::Value(true));
-    EXPECT_EQ(parseFormulaOrThrow("notEqual %a hello", monitors)(), api::metrics::Value(false));
+    EXPECT_EQ(parseFormulaOrThrow("equal %a hello", monitors).generator(), api::metrics::Value(true));
+    EXPECT_EQ(parseFormulaOrThrow("notEqual %a hello", monitors).generator(), api::metrics::Value(false));
 }
 
 TEST_F(MetricsGenerators, ValueDuration)
 {
     nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
 
-    const auto count = parseFormulaOrThrow("count %a 30m", monitors);
-    const auto count7 = parseFormulaOrThrow("countValues %a 40m 7", monitors);
-    const auto countHello = parseFormulaOrThrow("countValues %a 50m Hello", monitors);
+    const auto count = parseFormulaOrThrow("count %a 30m", monitors).generator;
+    const auto count7 = parseFormulaOrThrow("countValues %a 40m 7", monitors).generator;
+    const auto countHello = parseFormulaOrThrow("countValues %a 50m Hello", monitors).generator;
 
     EXPECT_EQ(count(), api::metrics::Value(1));
     EXPECT_EQ(count7(), api::metrics::Value(0));
@@ -139,8 +140,8 @@ TEST_F(MetricsGenerators, ValueAverage)
 {
     nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
 
-    const auto average = parseFormulaOrThrow("average %b 1m", monitors);
-    const auto perSecond = parseFormulaOrThrow("perSecond %b 30s", monitors);
+    const auto average = parseFormulaOrThrow("average %b 1m", monitors).generator;
+    const auto perSecond = parseFormulaOrThrow("perSecond %b 30s", monitors).generator;
 
     resource.update("b", 0);
 

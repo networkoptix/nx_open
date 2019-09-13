@@ -17,6 +17,7 @@ public:
     }
 
     QString id() const override { return m_serverId + "_" + this->resource.name; };
+    utils::metrics::Scope scope() const override { return utils::metrics::Scope::local; };
 
 private:
     const QString m_serverId;
@@ -41,24 +42,24 @@ void NetworkController::start()
 utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkController::makeProviders()
 {
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
-        std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
+        utils::metrics::makeValueGroupProvider<Resource>(
             "info",
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeLocalValueProvider<Resource>(
                 "name", [](const auto& r) { return Value(r.name); }
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeLocalValueProvider<Resource>(
                 "server", [this](const auto&) { return Value(m_serverId); }
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeLocalValueProvider<Resource>(
                 "ip", [](const auto& r) { return Value(r.address.toString()); }
             )
         ),
-        std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
+        utils::metrics::makeValueGroupProvider<Resource>(
             "rates",
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeLocalValueProvider<Resource>(
                 "inBps", [](const auto&) { return Value(666); } // TODO: Implement.
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeLocalValueProvider<Resource>(
                 "outBps", [](const auto&) { return Value(777); } // TODO: Implement.
             )
         )

@@ -52,7 +52,11 @@ public:
     ValueMonitor* monitor(const QString& id) const
     {
         if (const auto it = m_monitors.find(id); it != m_monitors.end())
-            return it->second.get();
+        {
+            const auto m = it->second.get();
+            m_isLocal |= (m->scope() == Scope::local);
+            return m;
+        }
 
         throw std::domain_error("Unknown value id: " + id.toStdString());
     }
@@ -213,6 +217,8 @@ public:
 
     ValueGenerator build() const
     {
+        m_isLocal = false;
+
         if (function() == "const")
             return value(1);
 
@@ -225,15 +231,18 @@ public:
         throw std::domain_error("Unsupported function: " + function().toStdString());
     }
 
+    bool isLocal() const { return m_isLocal; }
+
 private:
     const QString& m_formula;
     const QStringList m_parts;
     const ValueMonitors& m_monitors;
+    mutable bool m_isLocal = false;
 };
 
 } // namespace
 
-ValueGenerator parseFormula(const QString& formula, const ValueMonitors& monitors)
+ValueGeneratorResult parseFormula(const QString& formula, const ValueMonitors& monitors)
 {
     try
     {
@@ -242,13 +251,15 @@ ValueGenerator parseFormula(const QString& formula, const ValueMonitors& monitor
     catch (const std::domain_error& error)
     {
         NX_DEBUG(NX_SCOPE_TAG, "Unable to parse formula '%1': %2", formula, error.what());
-        return nullptr;
+        return ValueGeneratorResult{nullptr, Scope::local};
     }
 }
 
-ValueGenerator parseFormulaOrThrow(const QString& formula, const ValueMonitors& monitors)
+ValueGeneratorResult parseFormulaOrThrow(const QString& formula, const ValueMonitors& monitors)
 {
-    return FormulaBuilder(formula, monitors).build();
+    FormulaBuilder builder(formula, monitors);
+    auto parsed = builder.build();
+    return ValueGeneratorResult{std::move(parsed), builder.isLocal() ? Scope::local : Scope::system};
 }
 
 TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors)
@@ -272,8 +283,9 @@ TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors)
         };
 }
 
-ExtraValueMonitor::ExtraValueMonitor(ValueGenerator formula):
-    m_formula(std::move(formula))
+ExtraValueMonitor::ExtraValueMonitor(ValueGeneratorResult formula):
+    ValueMonitor(formula.scope),
+    m_formula(std::move(formula.generator))
 {
 }
 
@@ -288,11 +300,15 @@ void ExtraValueMonitor::forEach(Duration maxAge, const ValueIterator& iterator) 
 }
 
 AlarmMonitor::AlarmMonitor(
-    QString parameter, api::metrics::AlarmLevel level, ValueGenerator condition, TextGenerator text)
+    QString parameter,
+    api::metrics::AlarmLevel level,
+    ValueGeneratorResult condition,
+    TextGenerator text)
 :
+    m_scope(condition.scope),
     m_parameter(std::move(parameter)),
     m_level(std::move(level)),
-    m_condition(std::move(condition)),
+    m_condition(std::move(condition.generator)),
     m_text(std::move(text))
 {
 }

@@ -15,13 +15,15 @@ public:
     public:
         virtual ~Description() = default;
         virtual QString id() const = 0;
+        virtual Scope scope() const = 0;
     };
 
     ResourceMonitor(std::unique_ptr<Description> resource, ValueGroupMonitors monitors);
+
     QString id() const { return m_resource->id(); }
 
-    api::metrics::ResourceValues current() const;
-    std::vector<api::metrics::Alarm> alarms() const;
+    api::metrics::ResourceValues current(Scope requestScope) const;
+    std::vector<api::metrics::Alarm> alarms(Scope requestScope) const;
 
     void setRules(const api::metrics::ResourceRules& rules);
 

@@ -8,6 +8,35 @@
 
 namespace nx::vms::server::metrics {
 
+namespace {
+
+class CameraDescription: public utils::metrics::ResourceDescription<resource::Camera*>
+{
+public:
+    CameraDescription(resource::Camera* resource, QnUuid serverId):
+        utils::metrics::ResourceDescription<resource::Camera*>(resource),
+        m_serverId(std::move(serverId))
+    {
+    }
+
+    QString id() const override
+    {
+        return this->resource->getId().toSimpleString();
+    }
+
+    utils::metrics::Scope scope() const override
+    {
+        return this->resource->getParentId() == m_serverId
+            ? utils::metrics::Scope::local
+            : utils::metrics::Scope::system;
+    }
+
+private:
+    QnUuid m_serverId;
+};
+
+} // namespace
+
 CameraController::CameraController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     utils::metrics::ResourceControllerImpl<resource::Camera*>("cameras", makeProviders())
@@ -16,16 +45,17 @@ CameraController::CameraController(QnMediaServerModule* serverModule):
 
 void CameraController::start()
 {
+    const auto currentServerId = serverModule()->commonModule()->moduleGUID();
     const auto resourcePool = serverModule()->commonModule()->resourcePool();
     QObject::connect(
         resourcePool, &QnResourcePool::resourceAdded,
-        [this](const QnResourcePtr& resource)
+        [this, currentServerId](const QnResourcePtr& resource)
         {
             if (auto camera = resource.dynamicCast<resource::Camera>())
             {
-                // TODO: Monitor for camera transfers to the different server.
-                if (camera->getParentId() == serverModule()->commonModule()->moduleGUID())
-                    add(std::make_unique<ResourceDescription<Resource>>(camera.get()));
+                // TODO: Monitor for camera transfers to the different server. If it happens,
+                // resource should be readded as local/remote.
+                add(std::make_unique<CameraDescription>(camera.get(), currentServerId));
             }
         });
 
@@ -41,30 +71,30 @@ void CameraController::start()
 utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController::makeProviders()
 {
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
-        std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
+        utils::metrics::makeValueGroupProvider<Resource>(
             "info",
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "name", [](const auto& r) { return Value(r->getName()); }
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "server", [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "type", [](const auto&) { return Value(); } // TODO: Get actual type.
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "ip", [](const auto& r) { return Value(r->getUrl()); } // TODO: Get host from this URL.
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "vendor", [](const auto& r) { return Value(r->getVendor()); }
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "model", [](const auto& r) { return Value(r->getModel()); }
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "firmware", [](const auto& r) { return Value(r->getFirmware()); }
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "status",
                 [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
                 qtSignalWatch<Resource>(&resource::Camera::statusChanged)

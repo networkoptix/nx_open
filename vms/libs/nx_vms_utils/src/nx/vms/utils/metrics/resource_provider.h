@@ -59,8 +59,12 @@ std::unique_ptr<ResourceMonitor> ResourceProvider<ResourceType>::monitor(
 {
     ValueGroupMonitors monitors;
     for (const auto& provider: m_providers)
-        monitors[provider->id()] = provider->monitor(description->resource);
+    {
+        if (auto monitor = provider->monitor(description->resource, description->scope()))
+            monitors.emplace(provider->id(), std::move(monitor));
+    }
 
+    NX_ASSERT(monitors.size());
     return std::make_unique<ResourceMonitor>(std::move(description), std::move(monitors));
 }
 

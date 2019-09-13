@@ -8,6 +8,20 @@
 
 namespace nx::vms::server::metrics {
 
+namespace {
+
+class StorageDescription: public utils::metrics::ResourceDescription<QnStorageResource*>
+{
+public:
+    using base = utils::metrics::ResourceDescription<QnStorageResource*>;
+    using base::base;
+
+    QString id() const override { return this->resource->getId().toSimpleString(); }
+    utils::metrics::Scope scope() const override { return utils::metrics::Scope::local; }
+};
+
+} // namespace
+
 StorageController::StorageController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     utils::metrics::ResourceControllerImpl<QnStorageResource*>("storages", makeProviders())
@@ -24,7 +38,7 @@ void StorageController::start()
             if (const auto storage = resource.dynamicCast<QnStorageResource>())
             {
                 if (storage->getParentId() == serverModule()->commonModule()->moduleGUID())
-                    add(std::make_unique<ResourceDescription<Resource>>(storage.get()));
+                    add(std::make_unique<StorageDescription>(storage.get()));
             }
         });
 
@@ -40,26 +54,26 @@ void StorageController::start()
 utils::metrics::ValueGroupProviders<StorageController::Resource> StorageController::makeProviders()
 {
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
-        std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
+        utils::metrics::makeValueGroupProvider<Resource>(
             "info",
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "name", [](const auto& r) { return Value(r->getName()); }
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "server", [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "type", [](const auto& r) { return Value(r->getStorageType()); }
             )
         ),
-        std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
+        utils::metrics::makeValueGroupProvider<Resource>(
             "state",
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "status", // FIXME: Impl does not fallow spec so far.
                 [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
                 qtSignalWatch<Resource>(&QnStorageResource::statusChanged)
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeLocalValueProvider<Resource>(
                 "issues", [](const auto&) { return Value(7); } // TODO: Implement.
             )
         )

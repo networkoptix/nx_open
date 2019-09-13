@@ -15,17 +15,11 @@ LocalRestHandler::LocalRestHandler(utils::metrics::SystemController* controller)
 
 JsonRestResponse LocalRestHandler::executeGet(const JsonRestRequest& request)
 {
-    if (request.path.endsWith("/rules"))
-         return JsonRestResponse(m_controller->rules());
-
-    if (request.path.endsWith("/manifest"))
-        return JsonRestResponse(m_controller->manifest());
-
     if (request.path.endsWith("/values"))
-        return JsonRestResponse(m_controller->values());
+        return JsonRestResponse(m_controller->values(utils::metrics::Scope::local));
 
     if (request.path.endsWith("/alarms"))
-        return JsonRestResponse(m_controller->alarms());
+        return JsonRestResponse(m_controller->alarms(utils::metrics::Scope::local));
 
     return JsonRestResponse(nx::network::http::StatusCode::notFound, QnJsonRestResult::BadRequest);
 }
@@ -39,12 +33,18 @@ SystemRestHandler::SystemRestHandler(
 }
 
 template<typename Values>
-Values queryAndMerge(
+JsonRestResponse queryAndMerge(
     Values values, const QString& api,
     const QnSharedResourcePointerList<QnMediaServerResource>& servers);
 
 JsonRestResponse SystemRestHandler::executeGet(const JsonRestRequest& request)
 {
+    if (request.path.endsWith("/rules"))
+         return JsonRestResponse(m_controller->rules());
+
+    if (request.path.endsWith("/manifest"))
+        return JsonRestResponse(m_controller->manifest());
+
     QnSharedResourcePointerList<QnMediaServerResource> otherServers;
     for (auto& s: serverModule()->commonModule()->resourcePool()->getResources<QnMediaServerResource>())
     {
@@ -53,12 +53,12 @@ JsonRestResponse SystemRestHandler::executeGet(const JsonRestRequest& request)
     }
 
     if (request.path.endsWith("/values"))
-        return JsonRestResponse(queryAndMerge(m_controller->values(), "values", otherServers));
+        return queryAndMerge(m_controller->values(utils::metrics::Scope::system), "values", otherServers);
 
     if (request.path.endsWith("/alarms"))
-        return JsonRestResponse(queryAndMerge(m_controller->alarms(), "alarms", otherServers));
+        return queryAndMerge(m_controller->alarms(utils::metrics::Scope::system), "alarms", otherServers);
 
-    return LocalRestHandler::executeGet(request);
+    return JsonRestResponse(nx::network::http::StatusCode::notFound, QnJsonRestResult::BadRequest);
 }
 
 static void logResponse(const nx::utils::Url& url, const api::metrics::SystemValues& serverValues)
@@ -73,7 +73,7 @@ static void logResponse(const nx::utils::Url& url, const api::metrics::Alarms& a
 }
 
 template<typename Values>
-Values queryAndMerge(
+JsonRestResponse queryAndMerge(
     Values values, const QString& api,
     const QnSharedResourcePointerList<QnMediaServerResource>& servers)
 {
@@ -107,7 +107,7 @@ Values queryAndMerge(
         api::metrics::merge(&values, &serverValues);
     }
 
-    return values;
+    return JsonRestResponse(values);
 }
 
 } // namespace nx::vms::server::metrics

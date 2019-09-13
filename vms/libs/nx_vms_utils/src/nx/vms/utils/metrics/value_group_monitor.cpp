@@ -9,7 +9,7 @@ ValueGroupMonitor::ValueGroupMonitor(ValueMonitors monitors):
 {
 }
 
-api::metrics::ValueGroup ValueGroupMonitor::current() const
+api::metrics::ValueGroup ValueGroupMonitor::current(Scope requiredScope) const
 {
     // TODO: Use RW lock.
     NX_MUTEX_LOCKER locker(&m_mutex);
@@ -17,6 +17,9 @@ api::metrics::ValueGroup ValueGroupMonitor::current() const
     api::metrics::ValueGroup values;
     for (const auto& [id, monitor]: m_valueMonitors)
     {
+        if (requiredScope == Scope::local && monitor->scope() == Scope::system)
+            continue;
+
         if (auto v = monitor->current(); !v.isNull())
             values[id] = std::move(v);
     }
@@ -24,11 +27,14 @@ api::metrics::ValueGroup ValueGroupMonitor::current() const
     return values;
 }
 
-std::vector<api::metrics::Alarm> ValueGroupMonitor::alarms() const
+std::vector<api::metrics::Alarm> ValueGroupMonitor::alarms(Scope requiredScope) const
 {
     std::vector<api::metrics::Alarm> alarms;
     for (const auto& monitor: m_alarmMonitors)
     {
+        if (requiredScope == Scope::local && monitor->scope() == Scope::system)
+            continue;
+
         if (auto alarm = monitor->currentAlarm())
             alarms.push_back(std::move(*alarm));
     }

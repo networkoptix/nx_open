@@ -51,21 +51,23 @@ protected:
 // TODO: Check for actual data returned.
 TEST_F(MetricsApi, Api)
 {
-    const auto rules = get<SystemRules>("/api/metrics/rules");
+    const auto rules = get<SystemRules>("/ec2/metrics/rules");
     expectCounts("rules", rules, "systems", 1, "servers", 1, "cameras", 1, "storages", 2);
-    expectEq(rules, get<SystemRules>("/ec2/metrics/rules"));
 
-    const auto manifest = get<SystemManifest>("/api/metrics/manifest");
+    const auto manifest = get<SystemManifest>("/ec2/metrics/manifest");
     expectCounts("manifest", manifest, "systems", 1, "servers", 1, "cameras", 1, "storages", 2);
-    expectEq(manifest, get<SystemManifest>("/ec2/metrics/manifest"));
 
-    const auto values = get<SystemValues>("/api/metrics/values");
-    expectCounts("values", values,"systems", 1, "servers", 1, "cameras", 0, "storages", 0);
-    expectEq(values, get<SystemValues>("/ec2/metrics/values"));
+    const auto localValues = get<SystemValues>("/api/metrics/values");
+    expectCounts("localValues", localValues,"systems", 0, "servers", 1, "cameras", 0, "storages", 0);
 
-    const auto alarms = get<SystemValues>("/api/metrics/alarms");
-    EXPECT_EQ(alarms.size(), 0);
-    expectEq(alarms, get<SystemValues>("/ec2/metrics/alarms"));
+    const auto systemValues = get<SystemValues>("/ec2/metrics/values");
+    expectCounts("systemValues", systemValues,"systems", 1, "servers", 1, "cameras", 0, "storages", 0);
+
+    const auto localAlarms = get<SystemValues>("/api/metrics/alarms");
+    EXPECT_EQ(localAlarms.size(), 0);
+
+    const auto systemAlarms = get<SystemValues>("/ec2/metrics/alarms");
+    EXPECT_EQ(systemAlarms.size(), 0);
 }
 
 } // nx::test

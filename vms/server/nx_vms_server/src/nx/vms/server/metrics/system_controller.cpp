@@ -21,6 +21,11 @@ public:
         return (!id.isNull() ? id : m_settings->localSystemId().toSimpleString());
     }
 
+    utils::metrics::Scope scope() const override
+    {
+        return utils::metrics::Scope::system;
+    }
+
 private:
     QnGlobalSettings* m_settings;
 };
@@ -45,18 +50,18 @@ utils::metrics::ValueGroupProviders<SystemResourceController::Resource>
     const auto settings = globalSettings();
 
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
-        std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
+        utils::metrics::makeValueGroupProvider<Resource>(
             "info",
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "name", [settings](const auto&) { return Value(settings->systemName()); }
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "servers", [pool](const auto&) { return Value(pool->getAllServers(Qn::AnyStatus).size()); }
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "users", [pool](const auto&) { return Value(pool->getResources<QnUserResource>().size()); }
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeSystemValueProvider<Resource>(
                 "cameras", [pool](const auto&) { return Value(pool->getAllCameras().size()); }
             )
         )
