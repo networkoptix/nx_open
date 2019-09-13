@@ -69,7 +69,11 @@ if platform.system() == 'Linux':
 
         def obtain_connection_info(self):
             # Obtain device ip address
-            ssh_connection_info = self.eval('echo $SSH_CONNECTION').strip().split()
+            eval_reply = self.eval('echo $SSH_CONNECTION')
+            ssh_connection_info = eval_reply.strip().split() if eval_reply else None
+            if not eval_reply or len(ssh_connection_info) < 3:
+                raise exceptions.DeviceCommandError(
+                    'Unable to connect to the box via ssh; check deviceLogin and devicePassword in vms_benchmark.conf.')
             self.ip = ssh_connection_info[2]
             self.local_ip = ssh_connection_info[0]
             self.is_root = self.eval('id -u') == '0'

@@ -204,7 +204,7 @@ def main(config_file):
 
     if not res.success:
         raise exceptions.SshHostKeyObtainingFailed(
-            f"Can't obtain SSH host key of the box.\nDetails of the error: {res.formatted_message()}"
+            f"Can't obtain ssh host key of the box.\nDetails of the error: {res.formatted_message()}"
         )
     else:
         device.host_key = res.details[0]
@@ -222,7 +222,7 @@ def main(config_file):
 
     print(f"Device IP: {device.ip}")
     if device.is_root:
-        print(f"SSH user is root.")
+        print(f"ssh user is root.")
 
     linux_distribution = LinuxDistributionDetector.detect(device)
 
