@@ -1263,6 +1263,13 @@ void initialize(Manager* manager, Action* root)
             && !condition::isSafeMode()
             && !condition::tourIsRunning());
 
+    factory()
+        .flags(Scene | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Page..."))
+        .childFactory(new WebPageFactory(manager))
+        .autoRepeat(false)
+        .condition(condition::hasFlags(Qn::web_page, MatchMode::ExactlyOne));
+
     factory(RenameResourceAction)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget | IntentionallyAmbiguous)
         .requiredTargetPermissions(Qn::WritePermission | Qn::WriteNamePermission)
