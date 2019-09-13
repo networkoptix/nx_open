@@ -8,10 +8,12 @@ class NX_AWS_CLIENT_API Credentials:
     public nx::network::http::Credentials
 {
     using base_type = nx::network::http::Credentials;
+
 public:
     nx::String sessionToken;
 
     Credentials() = default;
+    Credentials(nx::network::http::Credentials);
     Credentials(
         const QString& username,
         const network::http::AuthToken& authToken,

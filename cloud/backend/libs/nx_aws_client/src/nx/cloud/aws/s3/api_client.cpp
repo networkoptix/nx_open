@@ -19,22 +19,22 @@ static constexpr char kAwsS3ServiceName[] = "s3";
 nx::utils::UrlQuery buildQuery(const ListBucketRequest& request)
 {
     nx::utils::UrlQuery query;
-    query.add(http::kListType, http::kListTypeValue);
+    query.addQueryItem(http::kListType, http::kListTypeValue);
 
     if (!request.delimiter.empty())
-        query.add("delimiter", request.delimiter);
+        query.addQueryItem("delimiter", request.delimiter);
     if (!request.encodingType.empty())
-        query.add("encoding-type", request.encodingType);
+        query.addQueryItem("encoding-type", request.encodingType);
     if (request.maxKeys > 0)
-        query.add("max-keys", request.maxKeys);
+        query.addQueryItem("max-keys", request.maxKeys);
     if (!request.prefix.empty())
-        query.add("prefix", request.prefix);
+        query.addQueryItem("prefix", request.prefix);
     if (!request.continuationToken.empty())
-        query.add("continuation-token", request.continuationToken);
+        query.addQueryItem("continuation-token", request.continuationToken);
     if (!request.startAfter.empty())
-        query.add("start-after", request.startAfter);
+        query.addQueryItem("start-after", request.startAfter);
 
-    return query.add("fetch-owner", request.fetchOwner);
+    return query.addQueryItem("fetch-owner", request.fetchOwner);
 }
 
 } // namespace

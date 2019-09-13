@@ -18,7 +18,6 @@
 
 namespace nx {
 
-namespace clusterdb::engine { class Synchroni; }
 namespace utils::stree { class ResourceContainer; }
 
 namespace network { class SocketAddress; }
@@ -156,7 +155,7 @@ private:
         const nx::utils::stree::ResourceContainer& authInfo,
         const api::AddStorageRequest& request) const;
 
-    nx::sql::DBResult addStorageToDb(
+    void addStorageToDb(
         AddStorageContext* addStorageContext,
         nx::sql::QueryContext* queryContext);
 
@@ -164,7 +163,7 @@ private:
         AddStorageContext* addStorageContext,
         nx::sql::DBResult dbResult) const;
 
-    nx::sql::DBResult removeStorageFromDb(
+    void removeStorageFromDb(
         CommonStorageContext* removeStorageContext,
         nx::sql::QueryContext* queryContext);
 
@@ -175,9 +174,9 @@ private:
     template<typename DbFunc, typename Handler>
     void modifySystemStorageRelation(
         const char* operation,
-        nx::utils::stree::ResourceContainer authInfo,
-        std::string storageId,
-        std::string systemId,
+        const nx::utils::stree::ResourceContainer& authInfo,
+        const std::string& storageId,
+        const std::string& systemId,
         DbFunc dbFunc,
         Handler handler);
 

@@ -46,32 +46,11 @@ private:
 } // namespace
 
 class MultipleRelays:
-    public BasicTestFixture,
-    public testing::Test
+    public BasicTestFixture<::testing::Test>
 {
-    using base_type = BasicTestFixture;
+    using base_type = BasicTestFixture<::testing::Test>;
 
 public:
-    ~MultipleRelays()
-    {
-        discoveryServer().unsubscribeFromNodeDiscovered(m_nodeDiscoveredSubscriptionId);
-
-        for (int i = 0; i < relayClusterSize(); ++i)
-            trafficRelay(i).stop();
-
-        if (m_geoIpFactoryFuncBak)
-        {
-            nx::hpm::geo_ip::ResolverFactory::instance().setCustomFunc(
-                std::move(m_geoIpFactoryFuncBak));
-        }
-
-        if (m_relayClusterClientFuncBak)
-        {
-            nx::hpm::RelayClusterClientFactory::instance().setCustomFunc(
-                std::move(m_relayClusterClientFuncBak));
-        }
-    }
-
     void addIpAndRegion(const std::string& ipAddress, const nx::geo_ip::Location& location)
     {
         m_geoIpResolver->add(ipAddress, location);
@@ -161,6 +140,28 @@ protected:
             });
 
         base_type::SetUp(); //< Manually calling BasicTestFixture::SetUp
+    }
+
+    virtual void TearDown() override
+    {
+        discoveryServer().unsubscribeFromNodeDiscovered(m_nodeDiscoveredSubscriptionId);
+
+        for (int i = 0; i < relayClusterSize(); ++i)
+            trafficRelay(i).stop();
+
+        if (m_geoIpFactoryFuncBak)
+        {
+            nx::hpm::geo_ip::ResolverFactory::instance().setCustomFunc(
+                std::move(m_geoIpFactoryFuncBak));
+        }
+
+        if (m_relayClusterClientFuncBak)
+        {
+            nx::hpm::RelayClusterClientFactory::instance().setCustomFunc(
+                std::move(m_relayClusterClientFuncBak));
+        }
+
+        base_type::TearDown();
     }
 
     void whenServerConnectsToMediator()

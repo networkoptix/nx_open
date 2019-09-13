@@ -1,17 +1,21 @@
 #include "content_client.h"
 
 #include <nx/utils/log/log_message.h>
+#include <nx/utils/string.h>
 #include <nx/utils/time.h>
+
+#include "utils.h"
 
 namespace nx::cloud::storage::client::aws_s3 {
 
 ContentClient::ContentClient(
     const std::string& /*storageClientId*/,
+    const std::string& awsRegion,
     const nx::utils::Url& url,
     const nx::cloud::aws::Credentials& credentials)
     :
     m_awsClient(
-        "us_east", //< TODO: #ak Take the region from somewhere.
+        awsRegion,
         url,
         credentials)
 {
@@ -61,13 +65,21 @@ void ContentClient::getChunkLog(
 }
 
 void ContentClient::downloadChunk(
-    const std::string& /*deviceId*/,
-    int /*streamIndex*/,
-    std::chrono::system_clock::time_point /*timestamp*/,
+    const std::string& deviceId,
+    int streamIndex,
+    std::chrono::system_clock::time_point timestamp,
     DownloadHandler handler)
 {
-    handler(ResultCode::notImplemented, nx::Buffer());
-    // TODO
+    const auto filePath = generateChunkPath(deviceId, streamIndex, timestamp);
+
+    m_awsClient.downloadFile(
+        filePath,
+        [handler = std::move(handler)](
+            nx::cloud::aws::Result result,
+            nx::Buffer chunkData)
+        {
+            handler(toResultCode(result), std::move(chunkData));
+        });
 }
 
 void ContentClient::removeChunk(
@@ -81,20 +93,33 @@ void ContentClient::removeChunk(
 }
 
 void ContentClient::saveDeviceDescription(
-    const std::string& /*cameraId*/,
-    const DeviceDescription& /*data*/,
+    const std::string& cameraId,
+    const DeviceDescription& data,
     Handler handler)
 {
-    handler(ResultCode::notImplemented);
-    // TODO
+    m_awsClient.uploadFile(
+        generateCameraInfoFilePath(cameraId),
+        nx::Buffer::fromStdString(toString(data)),
+        [handler = std::move(handler)](nx::cloud::aws::Result result)
+        {
+            handler(toResultCode(result));
+        });
 }
 
 void ContentClient::getDeviceDescription(
-    const std::string& /*cameraId*/,
+    const std::string& cameraId,
     GetDeviceDescriptionHandler handler)
 {
-    handler(ResultCode::notImplemented, DeviceDescription{});
-    // TODO
+    m_awsClient.downloadFile(
+        generateCameraInfoFilePath(cameraId),
+        [handler = std::move(handler)](
+            nx::cloud::aws::Result result,
+            nx::Buffer data)
+        {
+            handler(
+                toResultCode(result),
+                fromString<DeviceDescription>(std::string_view(data.data(), data.size())));
+        });
 }
 
 std::string ContentClient::generateChunkPath(
@@ -107,16 +132,16 @@ std::string ContentClient::generateChunkPath(
     memset(&tm, 0, sizeof(tm));
     gmtime_r(&unixTimestamp, &tm);
 
-    return lm("/camera/%1/%2/%3/%4/%5/%6/%7.mkv")
-        .args(cameraId, streamIndex,
-            tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,
-            unixTimestamp).toStdString();
+    return nx::utils::buildString(
+        "/camera/", cameraId, "/", streamIndex, "/",
+        tm.tm_year + 1900, "/", tm.tm_mon + 1, "/", tm.tm_mday, "/", tm.tm_hour, "/",
+        unixTimestamp, ".mkv");
 }
 
 std::string ContentClient::generateCameraInfoFilePath(
     const std::string& cameraId)
 {
-    return lm("/camera/%1/info.txt").args(cameraId).toStdString();
+    return nx::utils::buildString("/camera/", cameraId, "/info.txt");
 }
 
 void ContentClient::stopWhileInAioThread()
@@ -124,11 +149,6 @@ void ContentClient::stopWhileInAioThread()
     base_type::stopWhileInAioThread();
 
     m_awsClient.pleaseStopSync();
-}
-
-ResultCode ContentClient::toResultCode(aws::Result result)
-{
-    return result.ok() ? ResultCode::ok : ResultCode::ioError;
 }
 
 } // namespace nx::cloud::storage::client::aws_s3

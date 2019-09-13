@@ -119,6 +119,12 @@ void BucketApi::thenAddBucketResponseIs(ResultCode resultCode)
     m_lastBucketAdded = std::move(bucket);
 }
 
+void BucketApi::thenAddBucketFails()
+{
+	auto [result, bucket] = m_addBucketResponse.pop();
+	ASSERT_FALSE(result.ok());
+}
+
 void BucketApi::thenListBucketsSucceeds()
 {
     auto [result, buckets] = m_listBucketsResponse.pop();
@@ -202,11 +208,11 @@ TEST_F(BucketApi, add_bucket)
     andAddedBucketMatchesExpectedBucket();
 }
 
-TEST_F(BucketApi, DISABLED_fails_to_add_unknown_bucket)
+TEST_F(BucketApi, fails_to_add_unknown_bucket)
 {
     whenAddUnknownBucket();
 
-    thenAddBucketResponseIs(ResultCode::notFound);
+	thenAddBucketFails();
 }
 
 

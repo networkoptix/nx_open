@@ -19,7 +19,7 @@ struct isIterable<
 } // namespace nx::utils
 
 namespace QnTypeTraits {
-    
+
     struct na {};
 
     template<class T>
@@ -37,3 +37,20 @@ namespace QnTypeTraits {
     struct no_type { char dummy[64]; };
 
 } // namespace QnTypeTraits
+
+namespace std {
+
+#if defined(ANDROID) || defined(__ANDROID__)
+
+template<class F, class... ArgTypes>
+struct invoke_result
+{
+    using type = typename std::result_of<F(ArgTypes...)>::type;
+};
+
+template<class F, class... ArgTypes>
+using invoke_result_t = typename invoke_result<F, ArgTypes...>::type;
+
+#endif
+
+} // namespace std

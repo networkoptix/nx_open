@@ -1,5 +1,7 @@
 #include "abstract_fusion_request_handler_detail.h"
 
+#include <nx/utils/url_query.h>
+
 namespace nx::network::http::detail {
 
 void BaseFusionRequestHandler::requestCompleted(FusionRequestResult result)
@@ -70,37 +72,32 @@ bool BaseFusionRequestHandler::getInputFormat(
 }
 
 bool BaseFusionRequestHandler::getOutputFormat(
-    const nx::network::http::Request& /*request*/,
-    FusionRequestResult* /*errorDescription*/)
+    const nx::network::http::Request& request,
+    FusionRequestResult* errorDescription)
 {
     m_outputFormat = Qn::SerializationFormat::JsonFormat;
 
-    // TODO: #ak Fetching m_outputDataFormat from url query.
-    // TODO: #ak Fetch format from Accept header.
-
-#if 0
-    if (*format == Qn::SerializationFormat::UnsupportedFormat)
+    const QUrlQuery urlQuery(request.requestLine.url.query());
+    const auto formatStr = urlQuery.queryItemValue("format");
+    if (!formatStr.isEmpty())
     {
-        const auto contentTypeIter = request.headers.find("Content-Type");
-        if (contentTypeIter != request.headers.cend())
+        bool parsed = false;
+        const auto format = QnLexical::deserialized<Qn::SerializationFormat>(
+            formatStr, Qn::JsonFormat, &parsed);
+        if (!parsed || !isFormatSupported(format))
         {
-            // Using same output format as input.
-            const QByteArray dataFormatStr = contentTypeIter->second.split(';')[0];
-            *format = Qn::serializationFormatFromHttpContentType(dataFormatStr);
+            *errorDescription = FusionRequestResult(
+                FusionRequestErrorClass::badRequest,
+                QnLexical::serialized(FusionRequestErrorDetail::notAcceptable),
+                FusionRequestErrorDetail::notAcceptable,
+                lm("Output format %1 not supported").args(formatStr));
+            return false;
         }
+
+        m_outputFormat = format;
     }
 
-    if (!isFormatSupported(*format))
-    {
-        *errorDescription = FusionRequestResult(
-            FusionRequestErrorClass::badRequest,
-            QnLexical::serialized(FusionRequestErrorDetail::notAcceptable),
-            FusionRequestErrorDetail::notAcceptable,
-            lm("Output format %1 not supported").args(
-                Qn::serializationFormatToHttpContentType(m_outputDataFormat)));
-        return false;
-    }
-#endif
+    // TODO: #ak Fetch format from Accept header.
 
     return true;
 }

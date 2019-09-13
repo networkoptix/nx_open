@@ -4,23 +4,14 @@ namespace nx::utils {
 
 namespace detail {
 
-bool convert(const QString& value, QString* outObject)
+void convert(const QString& value, std::string* outValue)
 {
-    *outObject = value;
-    return true;
+    *outValue = value.toStdString();
 }
 
-bool convert(const QString& value, std::string* outObject)
+void convert(const QString& value, QString* outValue)
 {
-    *outObject = value.toStdString();
-    return true;
-}
-
-bool convert(const QString& value, int* outObject)
-{
-    bool ok = false;
-    *outObject = value.toInt(&ok);
-    return ok;
+    *outValue = value;
 }
 
 } // namespace detail
@@ -30,23 +21,23 @@ UrlQuery::UrlQuery(const QString& query):
 {
 }
 
-UrlQuery& UrlQuery::add(const QString& key, const QString& value)
+UrlQuery& UrlQuery::addQueryItem(const QString& key, const QString& value)
 {
     m_query.addQueryItem(key, value);
     return *this;
 }
 
-UrlQuery& UrlQuery::add(const QString& key, const std::string& value)
+UrlQuery& UrlQuery::addQueryItem(const QString& key, const std::string& value)
 {
-    return add(key, QString::fromStdString(value));
+    return addQueryItem(key, QString::fromStdString(value));
 }
 
-UrlQuery& UrlQuery::add(const char* key, const char* value)
+UrlQuery& UrlQuery::addQueryItem(const char* key, const char* value)
 {
-    return add(QString(key), QString(value));
+    return addQueryItem(QString(key), QString(value));
 }
 
-bool UrlQuery::hasKey(const QString& key) const
+bool UrlQuery::hasQueryItem(const QString& key) const
 {
     return m_query.hasQueryItem(key);
 }

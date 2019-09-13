@@ -10,8 +10,6 @@
 
 int main(int argc, char** argv)
 {
-    nx::utils::TestOptions::setModuleName("nx_appserver2_ut");
-
     QnStaticCommonModule staticCommonModule(nx::vms::api::PeerType::server);
 
     std::unique_ptr<QCoreApplication> application;

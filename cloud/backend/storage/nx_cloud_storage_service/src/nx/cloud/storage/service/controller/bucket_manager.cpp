@@ -14,7 +14,6 @@
 
 namespace nx::cloud::storage::service::controller {
 
-using namespace std::placeholders;
 using namespace model::dao;
 using namespace nx::cloud::storage::service::api;
 
@@ -75,7 +74,7 @@ void BucketManager::addBucket(const AddBucketRequest& request, AddBucketHandler 
                 return handler(std::move(result), Bucket());
             }
 
-            addBucketToDb(std::move(region), std::move(request), std::move(handler));
+            addBucketInternal(std::move(region), std::move(request), std::move(handler));
         });
 }
 
@@ -88,7 +87,6 @@ void BucketManager::listBuckets(
         [this, guard = m_asyncCounter.getScopedIncrement(), buckets](auto queryContext)
         {
             buckets->buckets = fetchBuckets(queryContext);
-            return nx::sql::DBResult::ok;
         },
         [this, guard = m_asyncCounter.getScopedIncrement(),
             handler = std::move(handler), buckets](
@@ -141,7 +139,7 @@ std::vector<Bucket> BucketManager::fetchBuckets(
     return m_bucketDao->fetchBuckets(queryContext);
 }
 
-void BucketManager::addBucketToDb(
+void BucketManager::addBucketInternal(
     std::string region,
     AddBucketRequest request,
     AddBucketHandler handler)
@@ -155,7 +153,7 @@ void BucketManager::addBucketToDb(
         [this, guard = m_asyncCounter.getScopedIncrement(), bucket](auto queryContext)
         {
             NX_VERBOSE(this, "addBucket %1", toString(*bucket));
-            return m_bucketDao->addBucket(queryContext, *bucket);
+            m_bucketDao->addBucket(queryContext, *bucket);
         },
         [this, guard = m_asyncCounter.getScopedIncrement(), handler = std::move(handler),
             bucket](
@@ -171,7 +169,7 @@ void BucketManager::addBucketToDb(
                 return handler(std::move(error), Bucket());
             }
 
-            NX_VERBOSE(this, "addBucketToDb succeeded for bucket %1", toString(*bucket));
+            NX_VERBOSE(this, "addBucket succeeded for bucket %1", toString(*bucket));
             handler(ResultCode::ok, std::move(*bucket));
         });
 }

@@ -3,13 +3,12 @@
 #include <gtest/gtest.h>
 
 #include <nx/cloud/storage/service/test_support/cloud_storage_launcher.h>
+#include <nx/cloud/storage/service/test_support/s3_bucket.h>
 #include <nx/geo_ip/test_support/memory_resolver.h>
 #include <nx/cloud/storage/service/api/client.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <nx/cloud/storage/service/controller/geo_ip_resolver.h>
-
-#include "../s3_bucket.h"
 
 namespace nx::cloud::storage::service::test {
 
@@ -44,6 +43,7 @@ protected:
     void whenListBuckets();
     void whenRemoveBucket(std::string bucketName = {});
     void thenAddBucketResponseIs(api::ResultCode resultCode);
+	void thenAddBucketFails();
     void thenListBucketsSucceeds();
     void thenRemoveBucketSucceeds();
     void andAddedBucketMatchesExpectedBucket();
