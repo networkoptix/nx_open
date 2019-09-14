@@ -46,7 +46,6 @@ bool FileWatcher::subscribe(
 	}
 
 	*outSubscriptionId = m_uniqueId++;
-
 	auto& actualSubscriptionId = watchContext->subscriptionIds[*outSubscriptionId];
 	watchContext->subscription.subscribe(std::move(handler), &actualSubscriptionId);
 

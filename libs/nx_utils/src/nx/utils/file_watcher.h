@@ -30,9 +30,10 @@ public:
 	~FileWatcher();
 
 	/**
-	 * @return true if the file exists, false otherwise
+	 * @return true subscribed successfully, false otherwise. If subscription failed,
+	 * SystemError::GetLastOsErrorCode() is set.
 	 */
-	bool subscribe(
+	 bool subscribe(
 		const std::string& filePath,
 		FileModifiedHandler handler,
 		nx::utils::SubscriptionId* const outSubscriptionId);
@@ -43,6 +44,7 @@ public:
 
 private:
 #ifdef _WIN32
+	// MSVC complains about "using Stat = struct _stat64;"
 	struct Stat: public _stat64 {};
 #else
 	using Stat = struct stat64;
