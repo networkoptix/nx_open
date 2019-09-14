@@ -202,7 +202,7 @@ void QnThirdPartyStorageResource::openStorage(
     m_storage = storage;
 }
 
-QIODevice *QnThirdPartyStorageResource::open(
+QIODevice *QnThirdPartyStorageResource::openInternal(
     const QString& fileName, QIODevice::OpenMode openMode)
 {
     if (!m_valid)

@@ -104,7 +104,7 @@ void QnLayoutFileStorageResource::setUrl(const QString& value)
     readIndexHeader();
 }
 
-QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
+QIODevice* QnLayoutFileStorageResource::openInternal(const QString& url, QIODevice::OpenMode openMode)
 {
     QnMutexLocker lock(&m_fileSync);
 

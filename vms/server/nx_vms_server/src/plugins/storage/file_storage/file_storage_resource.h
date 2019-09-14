@@ -33,7 +33,6 @@ public:
 
     static QnStorageResource* instance(QnMediaServerModule* serverModule, const QString&);
 
-    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
     QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode, int bufferSize);
 
     virtual float getAvarageWritingUsage() const override;
@@ -65,7 +64,9 @@ public:
 
     qint64 calcInitialSpaceLimit();
     void setMounted(bool value);
-
+protected:
+    virtual QIODevice* openInternal(const QString& fileName, QIODevice::OpenMode openMode) override;
+    QIODevice* openInternal(const QString& fileName, QIODevice::OpenMode openMode, int bufferSize);
 private:
     qint64 getDeviceSizeByLocalPossiblyNonExistingPath(const QString &path) const;
     QString removeProtocolPrefix(const QString& url);

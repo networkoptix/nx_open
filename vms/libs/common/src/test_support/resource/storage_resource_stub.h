@@ -11,7 +11,6 @@ public:
     StorageResourceStub();
     virtual ~StorageResourceStub();
 
-    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
     virtual Qn::StorageInitResult initOrUpdate() override;
 
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
@@ -24,6 +23,8 @@ public:
     virtual qint64 getFreeSpace() override;
     virtual qint64 getTotalSpace() const override;
     virtual int getCapabilities() const override;
+protected:
+    virtual QIODevice* openInternal(const QString& fileName, QIODevice::OpenMode openMode) override;
 };
 
 } // namespace nx

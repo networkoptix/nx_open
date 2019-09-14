@@ -117,12 +117,18 @@ QString genLocalPath(const QString &url, const QString &prefix = "/tmp/")
 } // namespace <anonymous>
 
 
-QIODevice* QnFileStorageResource::open(const QString& fileName, QIODevice::OpenMode openMode)
+QIODevice* QnFileStorageResource::open(
+    const QString& fileName, QIODevice::OpenMode openMode, int bufferSize)
 {
-    return open(fileName, openMode, 0);
+    return wrapIoDevice(std::unique_ptr<QIODevice>(openInternal(fileName, openMode, bufferSize)));
 }
 
-QIODevice* QnFileStorageResource::open(
+QIODevice* QnFileStorageResource::openInternal(const QString& fileName, QIODevice::OpenMode openMode)
+{
+    return openInternal(fileName, openMode, 0);
+}
+
+QIODevice* QnFileStorageResource::openInternal(
     const QString& url,
     QIODevice::OpenMode openMode,
     int bufferSize)

@@ -33,7 +33,7 @@ int QnExtIODeviceStorageResource::getCapabilities() const
     return m_capabilities;
 }
 
-QIODevice* QnExtIODeviceStorageResource::open( const QString& filePath, QIODevice::OpenMode /*openMode*/ )
+QIODevice* QnExtIODeviceStorageResource::openInternal( const QString& filePath, QIODevice::OpenMode /*openMode*/ )
 {
     QnMutexLocker lk( &m_mutex );
 

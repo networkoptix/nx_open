@@ -14,8 +14,6 @@ public:
 
     static QnStorageResource* instance(QnCommonModule* commonModule, const QString&);
 
-    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
-
     virtual int getCapabilities() const override;
     virtual Qn::StorageInitResult initOrUpdate() override;
     virtual FileInfoList getFileList(const QString& dirName) override;
@@ -27,4 +25,6 @@ public:
     virtual bool isDirExists(const QString& url) override;
     virtual qint64 getFreeSpace() override;
     virtual qint64 getTotalSpace() const override;
+protected:
+    virtual QIODevice* openInternal(const QString& fileName, QIODevice::OpenMode openMode) override;
 };

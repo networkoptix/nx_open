@@ -53,6 +53,14 @@ void StorageController::start()
 
 utils::metrics::ValueGroupProviders<StorageController::Resource> StorageController::makeProviders()
 {
+    static const std::chrono::seconds kIoRateUpdateInterval(5);
+    static auto ioRate = [](const auto& r, const auto& metric)
+    {
+        const auto bytes = r->getAndResetMetric(metric);
+        const auto kbps = round(bytes / 1024.0 * 8.0 / kIoRateUpdateInterval.count());
+        return StorageController::Value(kbps);
+    };
+
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         utils::metrics::makeValueGroupProvider<Resource>(
             "info",
@@ -76,9 +84,23 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
             utils::metrics::makeLocalValueProvider<Resource>(
                 "issues", [](const auto&) { return Value(7); } // TODO: Implement.
             )
+        ),
+        std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
+            "activity",
+            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+                "inRate", //< Kbps.
+                [](const auto& r) { return ioRate(r, &QnStorageResource::Metrics::bytesRead); },
+                nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
+            ),
+            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+                "outRate", //< Kbps.
+                [](const auto& r) { return ioRate(r, &QnStorageResource::Metrics::bytesWritten); },
+                nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
+                )
         )
-        // TODO: Add Activity and Space groups.
+        // TODO: Add Space groups.
     );
+
 }
 
 } // namespace nx::vms::server::metrics

@@ -29,7 +29,6 @@ public:
     ~QnThirdPartyStorageResource() = default;
 
 public: // Inherited interface overrides.
-    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
     virtual int getCapabilities() const override;
     virtual qint64 getFreeSpace() override;
     virtual qint64 getTotalSpace()const override;
@@ -41,7 +40,8 @@ public: // Inherited interface overrides.
     virtual bool isDirExists(const QString& url) override;
     virtual qint64 getFileSize(const QString& url) const override;
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
-
+protected:
+    virtual QIODevice* openInternal(const QString& fileName, QIODevice::OpenMode openMode) override;
 private:
     void openStorage(const char* storageUrl, nx_spl::StorageFactory* storageFactory);
 
