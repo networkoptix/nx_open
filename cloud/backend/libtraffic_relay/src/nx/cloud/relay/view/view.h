@@ -24,16 +24,13 @@ namespace relay {
 class AbstractStatisticsProvider;
 
 namespace conf { class Settings; }
-namespace view { class SslCertificateWatcher; }
 class Controller;
 class Model;
-class RelayService;
 
 class View
 {
 public:
     View(
-		RelayService* relayService,
         const conf::Settings& settings,
         Model* model,
         Controller* controller);
@@ -66,7 +63,6 @@ private:
         }
     };
 
-	RelayService* m_relayService;
     const conf::Settings& m_settings;
     Model* m_model;
     Controller* m_controller;
@@ -78,7 +74,6 @@ private:
     nx::network::http::server::MultiEndpointAcceptor m_multiAddressHttpServer;
     std::unique_ptr<HtdigestAuthenticator> m_htdigestAuthenticator;
     network::maintenance::Server m_maintenanceServer;
-	std::unique_ptr<view::SslCertificateWatcher> m_sslCertificateWatcher;
 
     void registerApiHandlers();
 
