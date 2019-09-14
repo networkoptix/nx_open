@@ -74,9 +74,8 @@ protected:
 private:
 	enum class ActionToTake
 	{
-		invalid,
 		restart,
-		terminate,
+		stop,
 	};
 
     bool m_isLoggingInitializationRequired = true;
