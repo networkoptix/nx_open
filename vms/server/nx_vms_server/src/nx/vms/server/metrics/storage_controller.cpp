@@ -65,7 +65,7 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
         utils::metrics::makeValueGroupProvider<Resource>(
             "info",
             utils::metrics::makeSystemValueProvider<Resource>(
-                "name", [](const auto& r) { return Value(r->getName()); }
+                "name", [](const auto& r) { return Value(r->getPath()); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "server", [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
