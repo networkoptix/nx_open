@@ -18,7 +18,7 @@ FileWatcher::~FileWatcher()
 
 bool FileWatcher::subscribe(
 	const std::string& filePath,
-	FileModifiedHandler handler,
+	Handler handler,
 	SubscriptionId* const outSubscriptionId)
 {
 	*outSubscriptionId = kInvalidSubscriptionId;
@@ -104,21 +104,21 @@ void FileWatcher::run()
 			if (!fileExists && watch.second.fileData.lastExists)
 			{
 				watch.second.fileData.lastExists = false;
-				notify(&lock, &watch, WatchEvent::deleted);
+				notify(&lock, &watch, EventType::deleted);
 				continue;
 			}
 
 			if (fileExists && !watch.second.fileData.lastExists)
 			{
 				watch.second.fileData.lastExists = true;
-				notify(&lock, &watch, WatchEvent::created);
+				notify(&lock, &watch, EventType::created);
 				continue;
 			}
 
 			if (!metadataEqual(watch.second.fileData.lastStat, currentStat))
 			{
 				watch.second.fileData.lastStat = std::move(currentStat);
-				notify(&lock, &watch, WatchEvent::modified);
+				notify(&lock, &watch, EventType::modified);
 				continue;
 			}
 		}
@@ -131,10 +131,10 @@ void FileWatcher::run()
 void FileWatcher::notify(
 	MutexLocker* lock,
 	FileWatchIterator* fileWatch,
-	WatchEvent watchEvent)
+	EventType eventType)
 {
 	lock->unlock();
-	fileWatch->second.subscription.notify(fileWatch->first, watchEvent);
+	fileWatch->second.subscription.notify(fileWatch->first, eventType);
 	lock->relock();
 }
 

@@ -70,27 +70,27 @@ protected:
 	{
 		m_fileWatcher->unsubscribe(m_subscriptionIds.back());
 
-		while(!m_watchEvents.empty())
-			m_watchEvents.pop();
+		while(!m_fileEvents.empty())
+			m_fileEvents.pop();
 	}
 
-	void thenSubscriberIsNotified(file_system::WatchEvent watchEvent)
+	void thenSubscriberIsNotified(file_system::FileWatcher::EventType eventType)
 	{
-		m_lastEvent = m_watchEvents.pop();
+		m_lastEvent = m_fileEvents.pop();
 		ASSERT_EQ(m_filePath, std::get<0>(m_lastEvent));
-		ASSERT_EQ(watchEvent, std::get<1>(m_lastEvent));
+		ASSERT_EQ(eventType, std::get<1>(m_lastEvent));
 	}
 
-	void thenAllSubscribersAreNotified(file_system::WatchEvent watchEvent)
+	void thenAllSubscribersAreNotified(file_system::FileWatcher::EventType eventType)
 	{
 		for (int i = 0; i < (int) m_subscriptionIds.size(); ++i)
-			thenSubscriberIsNotified(watchEvent);
+			thenSubscriberIsNotified(eventType);
 	}
 
 	void thenFormerSubscriberIsNotNotified()
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		ASSERT_TRUE(m_watchEvents.empty());
+		ASSERT_TRUE(m_fileEvents.empty());
 	}
 
 private:
@@ -104,18 +104,18 @@ private:
 		m_subscriptionIds.emplace_back(kInvalidSubscriptionId);
 		m_fileWatcher->subscribe(
 			filePath,
-			[this](const auto& filePath, const auto watchEvent)
+			[this](const auto& filePath, const auto eventType)
 			{
-				m_watchEvents.push(std::make_tuple(filePath, watchEvent));
+				m_fileEvents.push(std::make_tuple(filePath, eventType));
 			},
 			&m_subscriptionIds.back());
 	}
 
 private:
 	std::unique_ptr<file_system::FileWatcher> m_fileWatcher;
-	SyncQueue<std::tuple<std::string, file_system::WatchEvent>> m_watchEvents;
+	SyncQueue<std::tuple<std::string, file_system::FileWatcher::EventType>> m_fileEvents;
 	std::string m_filePath;
-	std::tuple<std::string, file_system::WatchEvent> m_lastEvent;
+	std::tuple<std::string, file_system::FileWatcher::EventType> m_lastEvent;
 	std::vector<SubscriptionId> m_subscriptionIds;
 };
 
@@ -126,7 +126,7 @@ TEST_F(FileWatcher, file_created)
 
 	whenFileIsCreated();
 
-	thenSubscriberIsNotified(file_system::WatchEvent::created);
+	thenSubscriberIsNotified(file_system::FileWatcher::EventType::created);
 }
 
 TEST_F(FileWatcher, file_modified)
@@ -136,7 +136,7 @@ TEST_F(FileWatcher, file_modified)
 
 	whenFileIsModified();
 
-	thenSubscriberIsNotified(file_system::WatchEvent::modified);
+	thenSubscriberIsNotified(file_system::FileWatcher::EventType::modified);
 }
 
 TEST_F(FileWatcher, file_deleted)
@@ -146,7 +146,7 @@ TEST_F(FileWatcher, file_deleted)
 
 	whenFileIsDeleted();
 
-	thenSubscriberIsNotified(file_system::WatchEvent::deleted);
+	thenSubscriberIsNotified(file_system::FileWatcher::EventType::deleted);
 }
 
 TEST_F(FileWatcher, unsubscribe)
@@ -167,7 +167,7 @@ TEST_F(FileWatcher, multiple_subscribers)
 
 	whenFileIsCreated();
 
-	thenAllSubscribersAreNotified(file_system::WatchEvent::created);
+	thenAllSubscribersAreNotified(file_system::FileWatcher::EventType::created);
 }
 
 } // namespace nx::utils::test

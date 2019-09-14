@@ -8,24 +8,25 @@
 
 namespace nx::utils::file_system {
 
-enum class WatchEvent
-{
-	created,
-	modified,
-	deleted,
-};
-
-//-------------------------------------------------------------------------------------------------
-// FileWatcher
-
-using FileModifiedHandler = MoveOnlyFunc<void(const std::string&, WatchEvent)>;
-
 /**
  * Watches files for modifications and notifies when a file has been modified.
  */
 class NX_UTILS_API FileWatcher
 {
 public:
+	enum class EventType
+	{
+		created,
+		modified,
+		deleted,
+	};
+
+	using Handler = MoveOnlyFunc<void(const std::string&, EventType)>;
+
+public:
+	/**
+	 * @param timeout the amount of time to wait between polling files for changes
+	 */
 	FileWatcher(std::chrono::milliseconds timeout);
 	~FileWatcher();
 
@@ -35,7 +36,7 @@ public:
 	 */
 	 bool subscribe(
 		const std::string& filePath,
-		FileModifiedHandler handler,
+		Handler handler,
 		nx::utils::SubscriptionId* const outSubscriptionId);
 
 	void unsubscribe(nx::utils::SubscriptionId subscriptionId);
@@ -61,7 +62,7 @@ private:
 	struct WatchContext
 	{
 		FileData fileData;
-		Subscription<std::string, WatchEvent> subscription;
+		Subscription<std::string, EventType> subscription;
 		std::map<UniqueId, SubscriptionId> subscriptionIds;
 	};
 
@@ -74,7 +75,7 @@ private:
 	void notify(
 		nx::utils::MutexLocker* lock,
 		FileWatchIterator* fileWatch,
-		WatchEvent watchEvent);
+		EventType watchEvent);
 
 	static int doStat(const char* filePath, Stat* buf);
 	static bool metadataEqual(const Stat& a, const Stat& b);
