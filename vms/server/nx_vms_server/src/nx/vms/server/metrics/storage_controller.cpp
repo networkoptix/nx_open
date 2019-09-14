@@ -57,8 +57,8 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
     static auto ioRate = [](const auto& r, const auto& metric)
     {
         const auto bytes = r->getAndResetMetric(metric);
-        const auto kbps = round(bytes / 1024.0 * 8.0 / kIoRateUpdateInterval.count());
-        return StorageController::Value(kbps);
+        const auto kBps = round(bytes / 1000.0 / kIoRateUpdateInterval.count());
+        return StorageController::Value(kBps);
     };
 
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
@@ -88,12 +88,12 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
             "activity",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "inRate", //< Kbps.
+                "inRate", //< KB/s.
                 [](const auto& r) { return ioRate(r, &QnStorageResource::Metrics::bytesRead); },
                 nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "outRate", //< Kbps.
+                "outRate", //< KB/s.
                 [](const auto& r) { return ioRate(r, &QnStorageResource::Metrics::bytesWritten); },
                 nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
                 )
