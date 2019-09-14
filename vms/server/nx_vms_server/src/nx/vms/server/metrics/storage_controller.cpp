@@ -87,12 +87,12 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
         ),
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
             "activity",
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeLocalValueProvider<Resource>(
                 "inRate", //< Kbps.
                 [](const auto& r) { return ioRate(r, &QnStorageResource::Metrics::bytesRead); },
                 nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
             ),
-            std::make_unique<utils::metrics::ValueProvider<Resource>>(
+            utils::metrics::makeLocalValueProvider<Resource>(
                 "outRate", //< Kbps.
                 [](const auto& r) { return ioRate(r, &QnStorageResource::Metrics::bytesWritten); },
                 nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
