@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
+#include <stdio.h>
+
 #include <nx/utils/file_watcher.h>
 #include <nx/utils/thread/sync_queue.h>
-#include <stdio.h>
 
 namespace nx::utils::test {
 
