@@ -45,7 +45,7 @@ TEST_F(MetricsGenerators, ValueErrors)
             parseFormulaOrThrow(formula, monitors);
             FAIL() << "Did not throw: "  << formula.toStdString();
         }
-        catch(const std::domain_error& error)
+        catch(const std::logic_error& error)
         {
             EXPECT_EQ(QString(error.what()), QString(expectedError)) << formula.toStdString();
         }

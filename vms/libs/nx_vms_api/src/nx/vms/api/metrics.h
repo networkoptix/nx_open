@@ -11,7 +11,9 @@ namespace nx::vms::api::metrics {
 
 //< TODO: std::variant<QString, int>.
 struct NX_VMS_API Value: QJsonValue { using QJsonValue::QJsonValue; };
+
 NX_VMS_API void PrintTo(const Value& v, ::std::ostream* s);
+NX_VMS_API void merge(Value* destination, Value* source);
 
 using ValueGroup
     = std::map<QString /*parameterId*/, Value>;
@@ -24,8 +26,6 @@ using ResourceGroupValues =
 
 using SystemValues
     = std::map<QString /*resourceGroup*/, ResourceGroupValues>;
-
-NX_VMS_API void merge(SystemValues* destination, SystemValues* source);
 
 // -----------------------------------------------------------------------------------------------
 
@@ -121,7 +121,20 @@ QN_FUSION_DECLARE_FUNCTIONS(Alarm, (json), NX_VMS_API)
 
 using Alarms = std::vector<Alarm>;
 
-NX_UTILS_API void merge(Alarms* destination, Alarms* source);
+// -----------------------------------------------------------------------------------------------
+
+template<typename Value>
+void merge(std::map<QString, Value>* destination, std::map<QString, Value>* source)
+{
+    for (auto& [id, value]: *source)
+        merge(&(*destination)[id], &value);
+}
+
+template<typename Value>
+void merge(std::vector<Value>* destination, std::vector<Value>* source)
+{
+    destination->insert(destination->end(), source->begin(), source->end());
+}
 
 } // namespace nx::vms::api::metrics
 

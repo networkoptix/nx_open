@@ -20,15 +20,20 @@ void CameraController::start()
     const auto resourcePool = serverModule()->commonModule()->resourcePool();
     QObject::connect(
         resourcePool, &QnResourcePool::resourceAdded,
-        [this, currentServerId](const QnResourcePtr& resource)
+        [this](const QnResourcePtr& resource)
         {
-            if (auto camera = resource.dynamicCast<resource::Camera>())
+            if (auto camera = resource.dynamicCast<resource::Camera>().get())
             {
-                // TODO: Monitor for camera transfers to the different server. If it happens,
-                // resource should be removed and added with appropriate scope marker.
-                add(camera.get(), camera->getPhysicalId(), (camera->getParentId() == moduleGUID())
-                    ? utils::metrics::Scope::local
-                    : utils::metrics::Scope::system);
+                const auto addOrUpdate =
+                    [this, camera]()
+                    {
+                        add(camera, camera->getId(), (camera->getParentId() == moduleGUID())
+                            ? utils::metrics::Scope::local
+                            : utils::metrics::Scope::system);
+                    };
+
+                connect(camera, &QnResource::parentIdChanged, addOrUpdate);
+                addOrUpdate();
             }
         });
 
@@ -36,7 +41,7 @@ void CameraController::start()
         resourcePool, &QnResourcePool::resourceRemoved,
         [this](const QnResourcePtr& resource)
         {
-            if (auto camera = resource.dynamicCast<resource::Camera>())
+            if (auto camera = resource.dynamicCast<resource::Camera>().get())
                 remove(camera->getId());
         });
 }

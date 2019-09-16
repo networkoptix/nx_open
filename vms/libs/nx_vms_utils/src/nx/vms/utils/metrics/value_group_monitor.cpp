@@ -1,5 +1,7 @@
 #include "value_group_monitor.h"
 
+#include <nx/utils/log/log.h>
+
 #include "rule_monitors.h"
 
 namespace nx::vms::utils::metrics {
@@ -53,14 +55,20 @@ void ValueGroupMonitor::setRules(const std::map<QString, api::metrics::ValueRule
             continue;
         try
         {
-            auto formula = parseFormulaOrThrow(rule.calculate, m_valueMonitors);
-            m_valueMonitors.emplace(
-                parameterId,
-                std::make_unique<ExtraValueMonitor>(std::move(formula)));
+            // TODO: All extra values should be emplaced before formula calculation. Currently some
+            // arguments may appear missing during calculation, because they are supposed to added
+            // later.
+            m_valueMonitors.emplace(parameterId, std::make_unique<ExtraValueMonitor>(
+                parseFormulaOrThrow(rule.calculate, m_valueMonitors)));
         }
-        catch (const std::exception& error)
+        catch (const std::invalid_argument& error)
         {
-            NX_ASSERT(false, "Unable to attach extra value to %1: %2", parameterId, error.what());
+            // TODO: This should be allowed for system resources only.
+            NX_DEBUG(this, "Skip extra value %1: %2", parameterId, error.what());
+        }
+        catch (const std::logic_error& error)
+        {
+            NX_ASSERT(false, "Unable to add extra value %1: %2", parameterId, error.what());
         }
     }
 
@@ -78,10 +86,14 @@ void ValueGroupMonitor::setRules(const std::map<QString, api::metrics::ValueRule
                     parseTemplate(alarmRule.text, m_valueMonitors)
                 ));
             }
-            catch (const std::exception& error)
+            catch (const std::invalid_argument& error)
             {
-                NX_ASSERT(
-                    false, "Unable to attach alarm monitor to %1: %2", parameterId, error.what());
+                // TODO: This should be allowed for system resources only.
+                NX_DEBUG(this, "Skip alarm monitor %1: %2", parameterId, error.what());
+            }
+            catch (const std::logic_error& error)
+            {
+                NX_ASSERT(false, "Unable to add alarm monitor %1: %2", parameterId, error.what());
             }
         }
     }

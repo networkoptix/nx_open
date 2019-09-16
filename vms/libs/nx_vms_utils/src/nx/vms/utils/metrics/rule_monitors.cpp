@@ -58,7 +58,7 @@ public:
             return m;
         }
 
-        throw std::domain_error("Unknown value id: " + id.toStdString());
+        throw std::invalid_argument("Unknown value id: " + id.toStdString());
     }
 
     ValueGenerator value(int index) const { return value(part(index)); }

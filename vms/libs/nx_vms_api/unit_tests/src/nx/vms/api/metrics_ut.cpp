@@ -310,6 +310,27 @@ TEST(Metrics, Values)
     expectSerialization(kValuesExample, mergedValues);
 }
 
+TEST(Metrics, ValuesMerge)
+{
+    SystemValues firstValues;
+    firstValues["servers"]["SERVER_1"]["info"]["status"] = "Online";
+    firstValues["servers"]["SERVER_1"]["info"]["publicIp"] = "192.168.0.1";
+    firstValues["servers"]["SERVER_1"]["load"]["cpuUsageP"] = 50;
+    firstValues["servers"]["SERVER_2"]["info"]["status"] = "Online";
+
+    SystemValues secondValues;
+    firstValues["servers"]["SERVER_2"]["info"]["publicIp"] = "192.168.0.2";
+    firstValues["servers"]["SERVER_2"]["load"]["cpuUsageP"] = 70;
+
+    merge(&firstValues, &secondValues);
+    EXPECT_EQ(firstValues["servers"]["SERVER_1"]["info"]["status"], "Online");
+    EXPECT_EQ(firstValues["servers"]["SERVER_1"]["info"]["publicIp"], "192.168.0.1");
+    EXPECT_EQ(firstValues["servers"]["SERVER_1"]["load"]["cpuUsageP"], 50);
+    EXPECT_EQ(firstValues["servers"]["SERVER_2"]["info"]["status"], "Online");
+    EXPECT_EQ(firstValues["servers"]["SERVER_2"]["info"]["publicIp"], "192.168.0.2");
+    EXPECT_EQ(firstValues["servers"]["SERVER_2"]["load"]["cpuUsageP"], 70);
+}
+
 static const QByteArray kAlarmsExample(R"json([
   {
     "resource": "SERVER_UUID_1",

@@ -22,7 +22,7 @@ public:
 protected:
     ResourceType* add(ResourceType resource, QString id, Scope scope);
     ResourceType* add(ResourceType resource, QnUuid id, Scope scope);
-    void remove(QnUuid id);
+    bool remove(QnUuid id);
 
 private:
     std::unique_ptr<ResourceProvider<Resource>> m_provider;
@@ -99,9 +99,9 @@ ResourceType* ResourceControllerImpl<ResourceType>::add(
 }
 
 template<typename ResourceType>
-void ResourceControllerImpl<ResourceType>::remove(QnUuid id)
+bool ResourceControllerImpl<ResourceType>::remove(QnUuid id)
 {
-    ResourceController::remove(id.toSimpleString());
+    return ResourceController::remove(id.toSimpleString());
 }
 
 } // namespace nx::vms::utils::metrics

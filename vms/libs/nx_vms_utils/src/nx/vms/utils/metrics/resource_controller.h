@@ -26,7 +26,7 @@ public:
 
 protected:
     void add(std::unique_ptr<ResourceMonitor> monitor);
-    void remove(const QString& id);
+    bool remove(const QString& id);
 
 private:
     const QString m_label;

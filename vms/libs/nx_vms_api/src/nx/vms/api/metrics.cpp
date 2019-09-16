@@ -9,6 +9,11 @@ void PrintTo(const Value& v, ::std::ostream* s)
     *s << QJson::serialized(v).toStdString();
 }
 
+NX_VMS_API void merge(Value* destination, Value* source)
+{
+    *destination = *source;
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (ValueManifest)(ValueGroupManifest)(AlarmRule)(ValueRule)(ValueGroupRules)(Alarm),
     (json), _Fields, (optional, true))
@@ -37,21 +42,6 @@ ValueManifest::ValueManifest(Label label, Displays display, QString unit):
 ValueGroupManifest::ValueGroupManifest(Label label):
     Label(std::move(label))
 {
-}
-
-void merge(SystemValues* destination, SystemValues* source)
-{
-    for (auto& [group, sourceResources]: *source)
-    {
-        auto& destinationResources = (*destination)[group];
-        for (auto& [resourceId, values]: sourceResources)
-            destinationResources[resourceId] = std::move(values);
-    }
-}
-
-void merge(Alarms* destination, Alarms* source)
-{
-    destination->insert(destination->end(), source->begin(), source->end());
 }
 
 } // namespace nx::vms::api::metrics
