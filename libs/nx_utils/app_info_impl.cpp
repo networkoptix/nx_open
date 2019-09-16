@@ -60,7 +60,7 @@ QString AppInfo::applicationArch()
 
 QString AppInfo::organizationName()
 {
-    return "${company.name}";
+    return "${customization.companyName}";
 }
 
 QString AppInfo::linuxOrganizationName()

@@ -61,5 +61,5 @@ set(defaultTranslation en_US)
 
 set(customization.defines "")
 
-# Defaults to ${company.name} in the properties.cmake
+# Defaults to ${customization.companyName} in the properties.cmake
 set(windowsInstallPath "")

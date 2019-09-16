@@ -11,7 +11,7 @@ BEGIN
     BEGIN
         BLOCK "040904E4"
         BEGIN
-            VALUE "CompanyName",        "${company.name}"
+            VALUE "CompanyName",        "${customization.companyName}"
             VALUE "FileDescription",    "${customization.nxtool.applicationName}"
             VALUE "FileVersion",        "${release.version}.${buildNumber}"
             VALUE "InternalName",       "${customization.nxtool.applicationName}"

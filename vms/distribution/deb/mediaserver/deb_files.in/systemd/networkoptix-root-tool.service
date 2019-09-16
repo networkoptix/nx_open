@@ -1,7 +1,7 @@
-# @company.name@ Root Tool
+# @customization.companyName@ Root Tool
 
 [Unit]
-Description=@company.name@ Root Tool
+Description=@customization.companyName@ Root Tool
 After=network.target local-fs.target remote-fs.target
 
 [Service]

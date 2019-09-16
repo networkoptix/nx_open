@@ -1,7 +1,7 @@
-# @company.name@ Media Server
+# @customization.companyName@ Media Server
 
 [Unit]
-Description=@company.name@ Media Server
+Description=@customization.companyName@ Media Server
 After=network.target local-fs.target remote-fs.target
 Requires=@root_tool_service@
 

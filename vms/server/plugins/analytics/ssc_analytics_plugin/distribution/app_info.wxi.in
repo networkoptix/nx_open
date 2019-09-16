@@ -7,7 +7,7 @@
         <?define bundleUpgradeCode = "${bundleUpgradeCode}"?>
         <?define productName = "${customization.vmsName}"?>
         <?define installerProductName = "${customization.vmsName} SSC Plugin"?>
-        <?define manufacturer = "${company.name}"?>
+        <?define manufacturer = "${customization.companyName}"?>
         <?define productVersion = "${release.version}.${buildNumber}"?>
         <?define customizationDir = "${customization.dir}"?>
         <?define binariesDirectory = "${bin_source_dir}"?>

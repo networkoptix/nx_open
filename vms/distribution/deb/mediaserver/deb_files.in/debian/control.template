@@ -2,10 +2,10 @@ Package: @deb.customization.company.name@-mediaserver
 Version: VERSION
 Installed-Size: INSTALLED_SIZE
 Architecture: @target.arch@
-Maintainer: @company.name@ <@supportEmail@>
+Maintainer: @customization.companyName@ <@supportEmail@>
 Pre-Depends: debconf
 Depends: @deb_dependencies@
 Section: database
 Priority: optional
 Homepage: @customization.contact.companyUrl@
-Description: @company.name@ @mediaserver.display.name@
+Description: @customization.companyName@ @mediaserver.display.name@

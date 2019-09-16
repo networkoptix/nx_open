@@ -1,19 +1,19 @@
 # Overridden in metavms
-nx_set_variable_if_empty(mediaserver_service_name "${company.name} Server")
-nx_set_variable_if_empty(mediaserver_application_name "${company.name} Media Server")
+nx_set_variable_if_empty(mediaserver_service_name "${customization.companyName} Server")
+nx_set_variable_if_empty(mediaserver_application_name "${customization.companyName} Media Server")
 
 # Overridden in ionetworks, ionetworks_cn
-nx_set_variable_if_empty(windowsInstallPath "${company.name}")
+nx_set_variable_if_empty(windowsInstallPath "${customization.companyName}")
 
 # TODO: GDM Rename to 'Client Settings Key and use explicitly'
-set(client.name "${company.name} ${product.name} Client")
+set(client.name "${customization.companyName} ${product.name} Client")
 
 set(client.display.name "${customization.vmsName} Client")
-set(applauncher.name "${company.name} ${customization.vmsName} Launcher")
+set(applauncher.name "${customization.companyName} ${customization.vmsName} Launcher")
 set(traytool.name "${customization.vmsName} Tray Assistant")
 set(mediaserver.display.name "${customization.vmsName} Media Server")
 set(client.mediafolder.name "${product.name} Media")
-set(testcamera.name "${company.name} ${customization.vmsName} Test Camera")
+set(testcamera.name "${customization.companyName} ${customization.vmsName} Test Camera")
 set(client.binary.name "client-bin")
 set(applauncher.binary.name "applauncher-bin")
 set(minilauncher.binary.name "applauncher")

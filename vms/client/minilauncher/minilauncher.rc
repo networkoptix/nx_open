@@ -12,7 +12,7 @@ BEGIN
     BEGIN
         BLOCK "040904E4"
         BEGIN
-            VALUE "CompanyName",        "${company.name}"
+            VALUE "CompanyName",        "${customization.companyName}"
             VALUE "FileDescription",    "${minilauncher.name}"
             VALUE "FileVersion",        "${release.version}.${buildNumber}"
             VALUE "InternalName",       "${minilauncher.name}"

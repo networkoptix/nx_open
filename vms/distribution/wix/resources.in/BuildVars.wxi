@@ -4,10 +4,10 @@
         <?define buildVars_includeGuard="BuildWars.wxi"?>
 
         <?define installerLanguage="${installerLanguage}"?>
-        <?define companyName="${company.name}"?>
-        <?define ServerRegPath="Software\${company.name}\${mediaserver_application_name}"?>
-        <?define ProductTitle="${company.name} ${customization.vmsName} Setup v.${releaseVersion}"?>
-        <?define productTitle = "${company.name} ${customization.vmsName} Setup v.${releaseVersion}"?>
+        <?define companyName="${customization.companyName}"?>
+        <?define ServerRegPath="Software\${customization.companyName}\${mediaserver_application_name}"?>
+        <?define ProductTitle="${customization.companyName} ${customization.vmsName} Setup v.${releaseVersion}"?>
+        <?define productTitle = "${customization.companyName} ${customization.vmsName} Setup v.${releaseVersion}"?>
 
         <?define serverUpgradeCode = "${customization.desktop.windows.serverUpgradeCode}"?>
         <?define clientUpgradeCode = "${customization.desktop.windows.clientUpgradeCode}"?>
@@ -28,10 +28,10 @@
         <?define releaseVersionMajor = "${parsedVersion.majorVersion}"?>
         <?define releaseVersionMinor = "${parsedVersion.minorVersion}"?>
 
-        <?define ECRegPath="Software\${company.name}\${appserver.name}"?>
+        <?define ECRegPath="Software\${customization.companyName}\${appserver.name}"?>
 
         <?define clientInternalName = "${client.name}"?>
-        <?define clientRegPath = "Software\${company.name}\${client.name}"?>
+        <?define clientRegPath = "Software\${customization.companyName}\${client.name}"?>
         <?define nxtoolName = "${customization.nxtool.applicationName}"?>
         <?define mediaserverName = "${mediaserver_application_name}"?>
         <?define trayToolName = "${traytool.name}"?>
