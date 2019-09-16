@@ -50,7 +50,7 @@ public:
 
 private:
 #ifdef _WIN32
-	// MSVC complains about "using Stat = struct _stat64;"
+	// MSVC complains about undefined struct when "using Stat = struct _stat64;"
 	struct Stat: public _stat64 {};
 #else
 	using Stat = struct stat64;

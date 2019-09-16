@@ -32,9 +32,13 @@ bool FileWatcher::subscribe(
 
 	if (firstInsertion)
 	{
+		lock.unlock();
+
 		const auto [err, stat] = doStat(filePath);
 		if (err && err != ENOENT)
 			return false;
+
+		lock.relock();
 
 		fileExists = err != ENOENT;
 		watchContext = &m_fileWatches[filePath];
@@ -97,14 +101,14 @@ void FileWatcher::run()
 
 			lock.relock();
 
-			if (!fileExists && watch.second.fileData.lastExists)
+			if (watch.second.fileData.lastExists && !fileExists)
 			{
 				watch.second.fileData.lastExists = false;
 				notify(&lock, &watch, EventType::deleted);
 				continue;
 			}
 
-			if (fileExists && !watch.second.fileData.lastExists)
+			if (!watch.second.fileData.lastExists && fileExists)
 			{
 				watch.second.fileData.lastExists = true;
 				notify(&lock, &watch, EventType::created);
@@ -121,6 +125,7 @@ void FileWatcher::run()
 
 		lock.unlock();
 		std::this_thread::sleep_for(m_timeout);
+		lock.relock();
 	}
 }
 
