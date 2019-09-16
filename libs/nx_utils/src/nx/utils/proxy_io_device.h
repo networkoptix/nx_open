@@ -15,7 +15,7 @@ class ProxyIoDevice: public QIODevice
 public:
     using Callback = nx::utils::MoveOnlyFunc<void(qint64)>;
 
-    ProxyIoDevice::ProxyIoDevice(std::unique_ptr<QIODevice> source) :
+    ProxyIoDevice(std::unique_ptr<QIODevice> source):
         m_source(std::move(source))
     {
         // Add 'Unbuffered' flag to prevent internal QIODevice buffering.
