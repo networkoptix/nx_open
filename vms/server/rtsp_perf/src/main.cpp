@@ -58,7 +58,15 @@ int main(int argc, char** argv)
     QCommandLineOption sslOption(QStringList() << "ssl",
         "Use SSL. By default: 'false'");
     parser.addOption(sslOption);
+    QCommandLineOption timestampsOption(QStringList() << "timestamps",
+        "Print frame's timestamps. By default: 'false'");
+    parser.addOption(timestampsOption);
+    QCommandLineOption urlOption(QStringList() << "url",
+        "Force camera URL, all sessions will use this URL to connect to server, option "
+        "'--server' will ignored, can be set multiple URLs.", "url", "");
+    parser.addOption(urlOption);
     parser.process(app);
+
     RtspPerf::Config config;
     config.count = parser.value(countOption).toInt();
     config.startInterval = std::chrono::milliseconds(parser.value(intervalOption).toInt());
@@ -68,6 +76,12 @@ int main(int argc, char** argv)
     config.user = parser.value(userOption);
     config.password = parser.value(passwordOption);
     config.useSsl = parser.isSet(sslOption);
+    config.printTimestamps = parser.isSet(timestampsOption);
+    config.urls = parser.values(urlOption);
+
+    if (parser.isSet(serverOption) && !config.urls.isEmpty())
+        printf("WARNING: Url configured, '--server' option will ignored\n");
+
     if (!validateConfig(config))
         return 1;
 
