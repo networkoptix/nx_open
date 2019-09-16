@@ -85,4 +85,6 @@ SpinBox
             opacity: enabled ? 1.0 : 0.3
         }
     }
+
+    Component.onCompleted: textInput.text = control.displayText
 }
