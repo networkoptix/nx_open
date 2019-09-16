@@ -4,27 +4,6 @@
 
 namespace nx::vms::server::metrics {
 
-namespace {
-
-class InterfaceDescription:
-    public utils::metrics::ResourceDescription<nx::network::QnInterfaceAndAddr>
-{
-public:
-    InterfaceDescription(nx::network::QnInterfaceAndAddr resource, QString serverId):
-        utils::metrics::ResourceDescription<nx::network::QnInterfaceAndAddr>(std::move(resource)),
-        m_serverId(std::move(serverId))
-    {
-    }
-
-    QString id() const override { return m_serverId + "_" + this->resource.name; };
-    utils::metrics::Scope scope() const override { return utils::metrics::Scope::local; };
-
-private:
-    const QString m_serverId;
-};
-
-} // namespace
-
 NetworkController::NetworkController(const QnUuid& serverId):
     utils::metrics::ResourceControllerImpl<nx::network::QnInterfaceAndAddr>(
         "networkInterfaces", makeProviders()),
@@ -36,7 +15,7 @@ void NetworkController::start()
 {
     // TODO: Add monitor for add/remove.
     for (auto iface: nx::network::getAllIPv4Interfaces())
-        add(std::make_unique<InterfaceDescription>(std::move(iface), m_serverId));
+        add(std::move(iface), m_serverId + "_" + iface.name, utils::metrics::Scope::local);
 }
 
 utils::metrics::ValueGroupProviders<NetworkController::Resource> NetworkController::makeProviders()

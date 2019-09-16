@@ -47,14 +47,15 @@ void ResourceController::setRules(api::metrics::ResourceRules rules)
         monitor->setRules(m_rules);
 }
 
-void ResourceController::add(const QString& id, std::unique_ptr<ResourceMonitor> monitor)
+void ResourceController::add(std::unique_ptr<ResourceMonitor> monitor)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     monitor->setRules(m_rules);
 
-    auto [it, isOk] = m_monitors.emplace(id, std::move(monitor));
+    auto id = monitor->id();
+    auto [it, isOk] = m_monitors.emplace(std::move(id), std::move(monitor));
     if (NX_ASSERT(isOk, "Resource duplicate: %1", id))
-        NX_INFO(this, "Add resource '%1' monitor: %2", id, it->second);
+        NX_INFO(this, "Add %1", it->second);
 
 }
 
@@ -65,7 +66,7 @@ void ResourceController::remove(const QString& id)
     if (!NX_ASSERT(it != m_monitors.end(), "Unable to remove resource %1", id))
         return;
 
-    NX_INFO(this, "Remove resource '%1' monitor: %2", id, it->second);
+    NX_INFO(this, "Remove %1", it->second);
     m_monitors.erase(it); // TODO: Move destruction out of the mutex.
 }
 

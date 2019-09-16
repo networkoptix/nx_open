@@ -14,8 +14,6 @@ public:
         setDefaults();
     }
 
-    int id() const { return m_id; }
-
     void update(const QString& name, api::metrics::Value value)
     {
         NX_VERBOSE(this, "Set %1 = %2", name, value);
@@ -63,13 +61,6 @@ private:
     mutable std::map<QString, Param> m_params;
 };
 
-struct TestResourceDescription: ResourceDescription<TestResource>
-{
-    using ResourceDescription::ResourceDescription;
-    QString id() const override { return "R" + QString::number(resource.id()); }
-    Scope scope() const override { return (resource.id() % 2 == 0) ? Scope::local : Scope::system; }
-};
-
 class TestResourceController: public ResourceControllerImpl<TestResource>
 {
 public:
@@ -80,10 +71,8 @@ public:
 
     TestResource* makeResource(int id)
     {
-        std::unique_ptr<TestResourceDescription> description = std::make_unique<TestResourceDescription>(id);
-        const auto resource = &description->resource;
-        add(std::move(description));
-        return resource;
+        const auto scope = (id % 2 == 0) ? Scope::local : Scope::system;
+        return add(TestResource(id), "R" + QString::number(id), scope);
     }
 
 private:

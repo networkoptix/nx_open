@@ -156,7 +156,7 @@ public:
             ASSERT_EQ(testResources.size(), (scope == Scope::system) ? 3 : 2);
 
             auto local1 = testResources["R0"];
-            ASSERT_EQ(local1.size(), 2);
+            ASSERT_EQ(local1.size(), (scope == Scope::system) ? 2 : 1);
             {
                 auto group1 = local1["g1"];
                 ASSERT_EQ(group1.size(), includeRules ? ((scope == Scope::system) ? 4 : 3) : 2);
@@ -171,18 +171,21 @@ public:
                     }
                 }
 
-                auto group2 = local1["g2"];
-                ASSERT_EQ(group2.size(), includeRules ? 3 : 2);
-                EXPECT_EQ(group2["i"], 2);
-                EXPECT_EQ(group2["t"], "second of 0");
-                if (includeRules)
+                if (scope == Scope::system)
                 {
-                    EXPECT_EQ(group2["im"], 1);
+                    auto group2 = local1["g2"];
+                    ASSERT_EQ(group2.size(), includeRules ? 3 : 2);
+                    EXPECT_EQ(group2["i"], 2);
+                    EXPECT_EQ(group2["t"], "second of 0");
+                    if (includeRules)
+                    {
+                        EXPECT_EQ(group2["im"], 1);
+                    }
                 }
             }
 
             auto local2 = testResources["R2"];
-            ASSERT_EQ(local2.size(), 2);
+            ASSERT_EQ(local2.size(), (scope == Scope::system) ? 2 : 1);
             {
                 auto group1 = local2["g1"];
                 ASSERT_EQ(group1.size(), includeRules ? ((scope == Scope::system) ? 4 : 3) : 2);
@@ -197,18 +200,21 @@ public:
                     }
                 }
 
-                auto group2 = local2["g2"];
-                EXPECT_EQ(group2["i"], 22);
-                EXPECT_EQ(group2["t"], "second of 2");
-                if (includeRules)
+                if (scope == Scope::system)
                 {
-                    EXPECT_EQ(group2["im"], 21);
+                    auto group2 = local2["g2"];
+                    EXPECT_EQ(group2["i"], 22);
+                    EXPECT_EQ(group2["t"], "second of 2");
+                    if (includeRules)
+                    {
+                        EXPECT_EQ(group2["im"], 21);
+                    }
                 }
             }
 
+            auto remote = testResources["R1"];
             if (scope == Scope::system)
             {
-                auto remote = testResources["R1"];
                 ASSERT_EQ(remote.size(), 1);
 
                 auto group2 = remote["g2"];
@@ -230,8 +236,6 @@ public:
             auto local1 = testResources["R0"];
             EXPECT_EQ(local1["g1"]["i"], 666);
             EXPECT_EQ(local1["g1"]["t"], "first of 0");
-            EXPECT_EQ(local1["g2"]["i"], 2);
-            EXPECT_EQ(local1["g2"]["t"], "second of 0");
             if (includeRules)
             {
                 EXPECT_EQ(local1["g1"]["ip"], 667);
@@ -240,12 +244,15 @@ public:
                     EXPECT_EQ(local1["g1"]["c"], "hello");
                 }
             }
+            if (scope == Scope::system)
+            {
+                EXPECT_EQ(local1["g2"]["i"], 2);
+                EXPECT_EQ(local1["g2"]["t"], "second of 0");
+            }
 
             auto local2 = testResources["R2"];
             EXPECT_EQ(local2["g1"]["i"], 21);
             EXPECT_EQ(local2["g1"]["t"], "first of 2");
-            EXPECT_EQ(local2["g2"]["i"], 22);
-            EXPECT_EQ(local2["g2"]["t"], "second of 2");
             if (includeRules)
             {
                 EXPECT_EQ(local2["g1"]["ip"], 22);
@@ -254,10 +261,15 @@ public:
                     EXPECT_EQ(local2["g1"]["c"], "hello");
                 }
             }
-
             if (scope == Scope::system)
             {
-                auto remote = testResources["R1"];
+                EXPECT_EQ(local2["g2"]["i"], 22);
+                EXPECT_EQ(local2["g2"]["t"], "second of 2");
+            }
+
+            auto remote = testResources["R1"];
+            if (scope == Scope::system)
+            {
                 ASSERT_EQ(remote.size(), 1);
 
                 auto group2 = remote["g2"];
@@ -296,18 +308,18 @@ public:
         m_resources[2]->update("i1", -2);
         {
             const auto alarms = m_systemController.alarms(scope);
-            ASSERT_EQ(alarms.size(), (scope == Scope::system) ? 4 : 3);
+            ASSERT_EQ(alarms.size(), (scope == Scope::system) ? 4 : 2);
 
             EXPECT_ALARM(alarms[0], "R0", "g1.ip", warning, "i = 150 (>100), ip = 151");
-            EXPECT_ALARM(alarms[1], "R0", "g2.i", warning, "i is 50 (>30)");
             if (scope == Scope::system)
             {
+                EXPECT_ALARM(alarms[1], "R0", "g2.i", warning, "i is 50 (>30)");
                 EXPECT_ALARM(alarms[2], "R1", "g2.i", warning, "i is 70 (>30)");
                 EXPECT_ALARM(alarms[3], "R2", "g1.ip", danger, "i = -2 (<0), ip = -1");
             }
             else
             {
-                EXPECT_ALARM(alarms[2], "R2", "g1.ip", danger, "i = -2 (<0), ip = -1");
+                EXPECT_ALARM(alarms[1], "R2", "g1.ip", danger, "i = -2 (<0), ip = -1");
             }
         }
 
@@ -316,8 +328,9 @@ public:
         m_resources[2]->update("i2", 50);
         {
             const auto alarms = m_systemController.alarms(scope);
-            ASSERT_EQ(alarms.size(), 1);
-            EXPECT_ALARM(alarms[0], "R2", "g2.i", warning, "i is 50 (>30)");
+            ASSERT_EQ(alarms.size(), (scope == Scope::system) ? 1 : 0);
+            if (scope == Scope::system)
+                EXPECT_ALARM(alarms[0], "R2", "g2.i", warning, "i is 50 (>30)");
         }
 
         #undef EXPECT_ALARM

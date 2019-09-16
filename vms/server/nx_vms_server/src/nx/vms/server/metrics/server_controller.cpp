@@ -10,35 +10,6 @@
 
 namespace nx::vms::server::metrics {
 
-namespace {
-
-class ServerDescription: public utils::metrics::ResourceDescription<QnMediaServerResource*>
-{
-public:
-    ServerDescription(QnMediaServerResource* resource, QnUuid ownId):
-        utils::metrics::ResourceDescription<QnMediaServerResource*>(resource),
-        m_ownId(std::move(ownId))
-    {
-    }
-
-    QString id() const override
-    {
-        return this->resource->getId().toSimpleString();
-    }
-
-    utils::metrics::Scope scope() const override
-    {
-        return this->resource->getId() == m_ownId
-            ? utils::metrics::Scope::local
-            : utils::metrics::Scope::system;
-    }
-
-private:
-    QnUuid m_ownId;
-};
-
-} // namespace
-
 ServerController::ServerController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     utils::metrics::ResourceControllerImpl<QnMediaServerResource*>("servers", makeProviders())
@@ -53,7 +24,11 @@ void ServerController::start()
         [this](const QnResourcePtr& resource)
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
-                add(std::make_unique<ServerDescription>(server.get(), moduleGUID()));
+            {
+                add(server.get(), server->getId(), (server->getId() == moduleGUID())
+                    ? utils::metrics::Scope::local
+                    : utils::metrics::Scope::system);
+            }
         });
 
     QObject::connect(
@@ -61,7 +36,7 @@ void ServerController::start()
         [this](const QnResourcePtr& resource)
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
-                remove(server->getId().toSimpleString());
+                remove(server->getId());
         });
 }
 

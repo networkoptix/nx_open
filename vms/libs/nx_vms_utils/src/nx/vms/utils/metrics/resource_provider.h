@@ -6,18 +6,6 @@
 namespace nx::vms::utils::metrics {
 
 /**
- * Represents resource ownership and provides it's description for monitor.
- */
-template<typename ResourceType>
-struct ResourceDescription: ResourceMonitor::Description
-{
-    template<typename... Args>
-    ResourceDescription(Args... args): resource(std::forward<Args>(args)...) {}
-
-    ResourceType resource;
-};
-
-/**
  * Provides a parameter group.
  * Creates a ResourceMonitor with group monitors inside.
  */
@@ -29,7 +17,7 @@ public:
 
     api::metrics::ResourceManifest manifest() const;
     std::unique_ptr<ResourceMonitor> monitor(
-        std::unique_ptr<ResourceDescription<ResourceType>> resource) const;
+        std::unique_ptr<TypedResourceDescription<ResourceType>> resource) const;
 
 private:
     ValueGroupProviders<ResourceType> m_providers;
@@ -55,12 +43,12 @@ api::metrics::ResourceManifest ResourceProvider<ResourceType>::manifest() const
 
 template<typename ResourceType>
 std::unique_ptr<ResourceMonitor> ResourceProvider<ResourceType>::monitor(
-    std::unique_ptr<ResourceDescription<ResourceType>> description) const
+    std::unique_ptr<TypedResourceDescription<ResourceType>> description) const
 {
     ValueGroupMonitors monitors;
     for (const auto& provider: m_providers)
     {
-        if (auto monitor = provider->monitor(description->resource, description->scope()))
+        if (auto monitor = provider->monitor(description->resource, description->scope))
             monitors.emplace(provider->id(), std::move(monitor));
     }
 

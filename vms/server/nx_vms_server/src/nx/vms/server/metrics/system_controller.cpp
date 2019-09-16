@@ -8,30 +8,6 @@
 
 namespace nx::vms::server::metrics {
 
-namespace {
-
-class SystemDescription: public utils::metrics::ResourceDescription<void*>
-{
-public:
-    SystemDescription(QnGlobalSettings* s): ResourceDescription(nullptr), m_settings(s) {}
-
-    QString id() const override
-    {
-        const auto id = m_settings->cloudSystemId();
-        return (!id.isNull() ? id : m_settings->localSystemId().toSimpleString());
-    }
-
-    utils::metrics::Scope scope() const override
-    {
-        return utils::metrics::Scope::system;
-    }
-
-private:
-    QnGlobalSettings* m_settings;
-};
-
-} // namespace
-
 SystemResourceController::SystemResourceController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     utils::metrics::ResourceControllerImpl<void*>("systems", makeProviders())
@@ -40,7 +16,17 @@ SystemResourceController::SystemResourceController(QnMediaServerModule* serverMo
 
 void SystemResourceController::start()
 {
-    add(std::make_unique<SystemDescription>(globalSettings()));
+    // TODO: Monitor cloudSystemId and use it instead of localSystemId when avaliable.
+    QObject::connect(
+        globalSettings(), &QnGlobalSettings::localSystemIdChanged,
+        [&]()
+        {
+            if (m_lastId)
+                remove(*m_lastId);
+
+            m_lastId = globalSettings()->localSystemId();
+            add(nullptr, *m_lastId, utils::metrics::Scope::system);
+        });
 }
 
 utils::metrics::ValueGroupProviders<SystemResourceController::Resource>

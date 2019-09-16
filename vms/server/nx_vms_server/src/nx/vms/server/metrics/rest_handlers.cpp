@@ -15,11 +15,15 @@ LocalRestHandler::LocalRestHandler(utils::metrics::SystemController* controller)
 
 JsonRestResponse LocalRestHandler::executeGet(const JsonRestRequest& request)
 {
+    auto scope = utils::metrics::Scope::local;
+    if (request.params.contains("system"))
+        scope = utils::metrics::Scope::system;
+
     if (request.path.endsWith("/values"))
-        return JsonRestResponse(m_controller->values(utils::metrics::Scope::local));
+        return JsonRestResponse(m_controller->values(scope));
 
     if (request.path.endsWith("/alarms"))
-        return JsonRestResponse(m_controller->alarms(utils::metrics::Scope::local));
+        return JsonRestResponse(m_controller->alarms(scope));
 
     return JsonRestResponse(nx::network::http::StatusCode::notFound, QnJsonRestResult::BadRequest);
 }

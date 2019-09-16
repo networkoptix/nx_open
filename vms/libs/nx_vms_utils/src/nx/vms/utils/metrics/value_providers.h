@@ -2,6 +2,7 @@
 
 #include <nx/utils/std/cppnx.h>
 
+#include "value_group_monitor.h"
 #include "value_monitors.h"
 
 namespace nx::vms::utils::metrics {
@@ -92,9 +93,9 @@ std::unique_ptr<ValueMonitor> ValueProvider<ResourceType>::monitor(
         return nullptr;
 
     if (!m_watch)
-        return std::make_unique<RuntimeValueMonitor<ResourceType>>(resourceScope, resource, m_getter);
+        return std::make_unique<RuntimeValueMonitor<ResourceType>>(m_scope, resource, m_getter);
 
-    return std::make_unique<ValueHistoryMonitor<ResourceType>>(resourceScope, resource, m_getter, m_watch);
+    return std::make_unique<ValueHistoryMonitor<ResourceType>>(m_scope, resource, m_getter, m_watch);
 }
 
 template<typename ResourceType, typename... Args>

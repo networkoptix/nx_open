@@ -5,15 +5,9 @@
 #include <nx/utils/value_history.h>
 #include <nx/utils/move_only_func.h>
 
+#include "resource_description.h"
+
 namespace nx::vms::utils::metrics {
-
-enum class Scope
-{
-    local, //< The value is only monitored for local resources.
-    system //< The value is monitored for all known resources in the system.
-};
-
-inline QString toString(Scope scope) { return scope == Scope::local ? "local" : "system"; }
 
 using Duration = std::chrono::milliseconds;
 using ValueIterator = std::function<void(const api::metrics::Value& value, Duration age)>;

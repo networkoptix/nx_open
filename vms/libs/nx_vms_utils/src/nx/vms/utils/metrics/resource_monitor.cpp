@@ -1,8 +1,12 @@
 #include "resource_monitor.h"
 
+#include <nx/utils/log/log.h>
+
 namespace nx::vms::utils::metrics {
 
-ResourceMonitor::ResourceMonitor(std::unique_ptr<Description> resource, ValueGroupMonitors monitors):
+ResourceMonitor::ResourceMonitor(
+    std::unique_ptr<ResourceDescription> resource, ValueGroupMonitors monitors)
+:
     m_resource(std::move(resource)),
     m_monitors(std::move(monitors))
 {
@@ -17,6 +21,15 @@ api::metrics::ResourceValues ResourceMonitor::current(Scope requestScope) const
             values[id] = std::move(v);
     }
 
+    const auto countValues =
+        [&]()
+        {
+            size_t count = 0;
+            for (const auto& [id, value]: values) count += value.size();
+            return count;
+        };
+
+    NX_VERBOSE(this, "Return %1 %2 values in %3 groups", countValues(), requestScope, values.size());
     return values;
 }
 
@@ -33,6 +46,7 @@ std::vector<api::metrics::Alarm> ResourceMonitor::alarms(Scope requestScope) con
         }
     }
 
+    NX_VERBOSE(this, "Return %1 %2 alarms", allAlarms.size(), requestScope);
     return allAlarms;
 }
 
@@ -45,6 +59,11 @@ void ResourceMonitor::setRules(const api::metrics::ResourceRules& rules)
     }
 
     // TODO: Assert on unprocessed rules?
+}
+
+QString ResourceMonitor::idForToStringFromPtr() const
+{
+    return lm("%1 %2").args(m_resource->scope, m_resource->id);
 }
 
 } // namespace nx::vms::utils::metrics

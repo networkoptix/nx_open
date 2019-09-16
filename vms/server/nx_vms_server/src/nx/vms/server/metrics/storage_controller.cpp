@@ -8,20 +8,6 @@
 
 namespace nx::vms::server::metrics {
 
-namespace {
-
-class StorageDescription: public utils::metrics::ResourceDescription<QnStorageResource*>
-{
-public:
-    using base = utils::metrics::ResourceDescription<QnStorageResource*>;
-    using base::base;
-
-    QString id() const override { return this->resource->getId().toSimpleString(); }
-    utils::metrics::Scope scope() const override { return utils::metrics::Scope::local; }
-};
-
-} // namespace
-
 StorageController::StorageController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     utils::metrics::ResourceControllerImpl<QnStorageResource*>("storages", makeProviders())
@@ -35,10 +21,11 @@ void StorageController::start()
         resourcePool, &QnResourcePool::resourceAdded,
         [this](const QnResourcePtr& resource)
         {
-            if (const auto storage = resource.dynamicCast<QnStorageResource>())
+            // TODO: Consider to add system storages as well.
+            if (const auto storage = resource.dynamicCast<QnStorageResource>();
+                storage && storage->getParentId() == serverModule()->commonModule()->moduleGUID())
             {
-                if (storage->getParentId() == serverModule()->commonModule()->moduleGUID())
-                    add(std::make_unique<StorageDescription>(storage.get()));
+                add(storage.get(), storage->getId(), utils::metrics::Scope::local);
             }
         });
 
@@ -46,8 +33,11 @@ void StorageController::start()
         resourcePool, &QnResourcePool::resourceRemoved,
         [this](const QnResourcePtr& resource)
         {
-            if (const auto storage = resource.dynamicCast<QnStorageResource>())
-                remove(storage->getId().toSimpleString());
+            if (const auto storage = resource.dynamicCast<QnStorageResource>();
+                storage && storage->getParentId() == serverModule()->commonModule()->moduleGUID())
+            {
+                remove(storage->getId());
+            }
         });
 }
 

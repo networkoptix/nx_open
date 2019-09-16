@@ -45,7 +45,17 @@ api::metrics::SystemValues SystemController::values(Scope requestScope) const
             systemValues[label] = std::move(values);
     }
 
-    NX_DEBUG(this, "Return %1 values in %2", requestScope, std::chrono::steady_clock::now() - start);
+    const auto counts =
+        [&]()
+        {
+            QStringList list;
+            for (const auto& [label, values]: systemValues)
+                list << lm("%1 %2").args(values.size(), label);
+            return list;
+        };
+
+    NX_DEBUG(this, "Return %1 from %2 values in %3",
+        counts().join(", "), requestScope, std::chrono::steady_clock::now() - start);
     return systemValues;
 }
 

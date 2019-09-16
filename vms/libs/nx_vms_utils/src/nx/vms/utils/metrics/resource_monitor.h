@@ -10,25 +10,18 @@ namespace nx::vms::utils::metrics {
 class NX_VMS_UTILS_API ResourceMonitor
 {
 public:
-    class Description
-    {
-    public:
-        virtual ~Description() = default;
-        virtual QString id() const = 0;
-        virtual Scope scope() const = 0;
-    };
+    ResourceMonitor(std::unique_ptr<ResourceDescription> resource, ValueGroupMonitors monitors);
 
-    ResourceMonitor(std::unique_ptr<Description> resource, ValueGroupMonitors monitors);
-
-    QString id() const { return m_resource->id(); }
+    QString id() const { return m_resource->id; }
 
     api::metrics::ResourceValues current(Scope requestScope) const;
     std::vector<api::metrics::Alarm> alarms(Scope requestScope) const;
 
     void setRules(const api::metrics::ResourceRules& rules);
+    QString idForToStringFromPtr() const;
 
 private:
-    const std::unique_ptr<Description> m_resource;
+    const std::unique_ptr<ResourceDescription> m_resource;
     ValueGroupMonitors m_monitors;
 };
 

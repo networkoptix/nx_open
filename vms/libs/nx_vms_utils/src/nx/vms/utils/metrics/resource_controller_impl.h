@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/utils/uuid.h>
+
 #include "resource_controller.h"
 
 namespace nx::vms::utils::metrics {
@@ -18,7 +20,9 @@ public:
     virtual api::metrics::ResourceManifest manifest() const override final;
 
 protected:
-    void add(std::unique_ptr<ResourceDescription<ResourceType>> resource);
+    ResourceType* add(ResourceType resource, QString id, Scope scope);
+    ResourceType* add(ResourceType resource, QnUuid id, Scope scope);
+    void remove(QnUuid id);
 
 private:
     std::unique_ptr<ResourceProvider<Resource>> m_provider;
@@ -76,11 +80,28 @@ api::metrics::ResourceManifest ResourceControllerImpl<ResourceType>::manifest() 
 }
 
 template<typename ResourceType>
-void ResourceControllerImpl<ResourceType>::add(
-    std::unique_ptr<ResourceDescription<ResourceType>> resource)
+ResourceType* ResourceControllerImpl<ResourceType>::add(
+    ResourceType resource, QString id, Scope scope)
 {
-    const auto id = resource->id();
-    ResourceController::add(id, m_provider->monitor(std::move(resource)));
+    auto description = std::make_unique<utils::metrics::TypedResourceDescription<Resource>>(
+        std::move(resource), std::move(id), scope);
+
+    const auto ptr = &description->resource;
+    ResourceController::add(m_provider->monitor(std::move(description)));
+    return ptr;
+}
+
+template<typename ResourceType>
+ResourceType* ResourceControllerImpl<ResourceType>::add(
+    ResourceType resource, QnUuid id, Scope scope)
+{
+    return add(std::move(resource), id.toSimpleString(), scope);
+}
+
+template<typename ResourceType>
+void ResourceControllerImpl<ResourceType>::remove(QnUuid id)
+{
+    ResourceController::remove(id.toSimpleString());
 }
 
 } // namespace nx::vms::utils::metrics

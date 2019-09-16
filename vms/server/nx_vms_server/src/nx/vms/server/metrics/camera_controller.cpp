@@ -8,35 +8,6 @@
 
 namespace nx::vms::server::metrics {
 
-namespace {
-
-class CameraDescription: public utils::metrics::ResourceDescription<resource::Camera*>
-{
-public:
-    CameraDescription(resource::Camera* resource, QnUuid serverId):
-        utils::metrics::ResourceDescription<resource::Camera*>(resource),
-        m_serverId(std::move(serverId))
-    {
-    }
-
-    QString id() const override
-    {
-        return this->resource->getId().toSimpleString();
-    }
-
-    utils::metrics::Scope scope() const override
-    {
-        return this->resource->getParentId() == m_serverId
-            ? utils::metrics::Scope::local
-            : utils::metrics::Scope::system;
-    }
-
-private:
-    QnUuid m_serverId;
-};
-
-} // namespace
-
 CameraController::CameraController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     utils::metrics::ResourceControllerImpl<resource::Camera*>("cameras", makeProviders())
@@ -54,8 +25,10 @@ void CameraController::start()
             if (auto camera = resource.dynamicCast<resource::Camera>())
             {
                 // TODO: Monitor for camera transfers to the different server. If it happens,
-                // resource should be readded as local/remote.
-                add(std::make_unique<CameraDescription>(camera.get(), currentServerId));
+                // resource should be removed and added with appropriate scope marker.
+                add(camera.get(), camera->getPhysicalId(), (camera->getParentId() == moduleGUID())
+                    ? utils::metrics::Scope::local
+                    : utils::metrics::Scope::system);
             }
         });
 
@@ -64,7 +37,7 @@ void CameraController::start()
         [this](const QnResourcePtr& resource)
         {
             if (auto camera = resource.dynamicCast<resource::Camera>())
-                remove(camera->getId().toSimpleString());
+                remove(camera->getId());
         });
 }
 

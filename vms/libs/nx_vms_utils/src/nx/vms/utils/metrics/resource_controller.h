@@ -25,7 +25,7 @@ public:
     void setRules(api::metrics::ResourceRules rules);
 
 protected:
-    void add(const QString& id, std::unique_ptr<ResourceMonitor> monitor);
+    void add(std::unique_ptr<ResourceMonitor> monitor);
     void remove(const QString& id);
 
 private:

@@ -18,6 +18,9 @@ public:
 
 private:
     utils::metrics::ValueGroupProviders<Resource> makeProviders();
+
+private:
+    std::optional<QnUuid> m_lastId;
 };
 
 } // namespace nx::vms::server::metrics
