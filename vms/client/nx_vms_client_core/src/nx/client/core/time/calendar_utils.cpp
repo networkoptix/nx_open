@@ -12,7 +12,6 @@ static constexpr int kMaxOffset =
 
 } // namespace
 
-
 namespace nx::client::core {
 
 const int CalendarUtils::kMinYear = QDateTime::fromMSecsSinceEpoch(0, Qt::UTC).date().year();

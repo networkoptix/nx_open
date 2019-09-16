@@ -112,14 +112,14 @@ INSTANTIATE_TEST_CASE_P(CalendarModel, CalendarModelStartDayValueTestFixture,
 //--------------------------------------------------------------------------------------------------
 
 static const QLocale kPositionTestLocale(QLocale::Russian, QLocale::RussianFederation);
-static const QString kExpectedNoHighlighValue("no highlighted items");
+static const QString kExpectedNoHighlightValue("no highlighted items");
 static const QString kExpectedFirstDayOfMonth = "1";
 static const QString kExpectedLastDayOfMonth = "30";
 
 enum DisplayOffset
 {
     utc = 0,
-    specified = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::hours(3)).count()
+    positive = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::hours(3)).count()
 };
 
 struct PositionHighlightTestParams: public CalendarModelBasicParams
@@ -168,7 +168,7 @@ TEST_P(CalendarModelPositionHighlightTestFixture, PositionHighlightTest)
 {
     const auto params = GetParam();
 
-    QString highlightedDayNumber = kExpectedNoHighlighValue;
+    QString highlightedDayNumber = kExpectedNoHighlightValue;
     for (int row = 0; row != model.rowCount(); ++row)
     {
         const auto index = model.index(row);
@@ -183,53 +183,55 @@ TEST_P(CalendarModelPositionHighlightTestFixture, PositionHighlightTest)
 }
 
 static const std::vector<PositionHighlightTestParams> kPositionHighlightTestingData = {
-    // Utc display offset tests
-    PositionHighlightTestParams(
-        kTestMonthStartUtc,
-        DisplayOffset::utc,
-        kExpectedFirstDayOfMonth),
-    PositionHighlightTestParams(
-        kTestMonthEndUtc,
-        DisplayOffset::utc,
-        kExpectedLastDayOfMonth),
-    PositionHighlightTestParams(
-        kTestMonthStartUtc - 1,
-        DisplayOffset::utc,
-        kExpectedNoHighlighValue),
-    PositionHighlightTestParams(
-        kTestMonthEndUtc + 1,
-        DisplayOffset::utc,
-        kExpectedNoHighlighValue),
 
-    // Specified display offset tests
-    PositionHighlightTestParams(
-        kTestMonthStartUtc,
-        DisplayOffset::specified,
-        kExpectedFirstDayOfMonth),
-    PositionHighlightTestParams(
-        kTestMonthStartUtc - DisplayOffset::specified,
-        DisplayOffset::specified,
-        kExpectedFirstDayOfMonth),
-    PositionHighlightTestParams(
-        kTestMonthStartUtc - DisplayOffset::specified - 1,
-        DisplayOffset::specified,
-        kExpectedNoHighlighValue),
-    PositionHighlightTestParams(
-        kTestMonthEndUtc,
-        DisplayOffset::specified,
-        kExpectedNoHighlighValue),
-    PositionHighlightTestParams(
-        kTestMonthEndUtc - DisplayOffset::specified,
-        DisplayOffset::specified,
-        kExpectedLastDayOfMonth),
-    PositionHighlightTestParams(
-        kTestMonthEndUtc - DisplayOffset::specified + 1,
-        DisplayOffset::specified,
-        kExpectedNoHighlighValue),
-    };
+    // Utc display offset tests.
+
+    // If current position points to the start of the month - we expect highlighted the first day.
+    {kTestMonthStartUtc, DisplayOffset::utc, kExpectedFirstDayOfMonth},
+
+    // If current position points to the end of the month - we expect highlighted the last day.
+    {kTestMonthEndUtc, DisplayOffset::utc, kExpectedLastDayOfMonth},
+
+    // If current position is before the start of the month - we expect nothing highlighted.
+    {kTestMonthStartUtc - 1, DisplayOffset::utc, kExpectedNoHighlightValue},
+
+    // If current position is after the end of the month - we expect nothing highlighted.
+    {kTestMonthEndUtc + 1, DisplayOffset::utc, kExpectedNoHighlightValue},
+
+    // Specified display offset tests.
+
+    // If current position fits in the first day (assuming display offset) - we expect highlighted
+    // first day.
+    {kTestMonthStartUtc, DisplayOffset::positive, kExpectedFirstDayOfMonth},
+
+    // If current position points to the start of the month (assuming display offset) - we expect
+    // highlighted first day.
+    {kTestMonthStartUtc - DisplayOffset::positive, DisplayOffset::positive,
+        kExpectedFirstDayOfMonth},
+
+    // If current position points before the start of the month (assuming display offset) - we
+    // expect nothing hightlighted.
+    {kTestMonthStartUtc - DisplayOffset::positive - 1, DisplayOffset::positive,
+        kExpectedNoHighlightValue},
+
+    // If current position points after the end of the month (assuming display offset) - we
+    // expect nothing highlighted.
+    {kTestMonthEndUtc, DisplayOffset::positive, kExpectedNoHighlightValue},
+
+    // If current position points to the end of the month (assuming display offset) - we expect
+    // highlighted last day.
+    {kTestMonthEndUtc - DisplayOffset::positive, DisplayOffset::positive,
+        kExpectedLastDayOfMonth},
+
+    // If current position points after the end of the month (assuming display offset) - we
+    // expect nothing highlighted.
+    {kTestMonthEndUtc - DisplayOffset::positive + 1, DisplayOffset::positive,
+        kExpectedNoHighlightValue} };
 
 INSTANTIATE_TEST_CASE_P(CalendarModel, CalendarModelPositionHighlightTestFixture,
     testing::ValuesIn(kPositionHighlightTestingData));
+
+//--------------------------------------------------------------------------------------------------
 
 // Future tests: (this comment will be removed)
 //      check archive chunk presence
