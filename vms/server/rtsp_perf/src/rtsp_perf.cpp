@@ -36,22 +36,6 @@ private:
     int64_t m_prevBytesRead = 0;
 };
 
-QString RtspPerf::Config::toString()
-{
-    return
-        "\nserver: " + server +
-        "\nuser: " + user +
-        "\npassword: " + password +
-        "\nuse ssl: " + QString::number(useSsl) +
-        "\ncount: " + QString::number(count) +
-        "\nlive percent: " + QString::number(livePercent) + "%" +
-        "\ntimeout: " + QString::number(timeout.count()) + "ms" +
-        "\nstart interval: " + (startInterval == std::chrono::milliseconds::zero() ?
-            "auto" : QString::number(startInterval.count()) + "ms") +
-        "\nprint timestamps: " + QString::number(printTimestamps) +
-        "\n";
-}
-
 bool RtspPerf::getCamerasUrls(const QString& server, std::vector<QString>& urls)
 {
     std::vector<QString> result;
@@ -59,7 +43,7 @@ bool RtspPerf::getCamerasUrls(const QString& server, std::vector<QString>& urls)
     httpClient.setUserName(m_config.user);
     httpClient.setUserPassword(m_config.password);
 
-    QString request = "http://" + server + "/ec2/getCamerasEx";
+    const QString request = "http://" + server + "/ec2/getCamerasEx";
     NX_INFO(this, "Obtain camera list using request: %1", request);
     if (!httpClient.doGet(request))
     {
@@ -159,7 +143,7 @@ void RtspPerf::run()
                 ++successSessions;
         }
         float bitrate = bitrateCounter.update(totalBytesRead);
-        NX_ALWAYS(this, "Total bitrate %1 MBit/s, working sessions %2, failed %3, bytes read %4",
+        NX_INFO(this, "Total bitrate %1 MBit/s, working sessions %2, failed %3, bytes read %4",
             QString::number(bitrate, 'f', 3), successSessions, std::max<int64_t>(m_totalFailed, 0), totalBytesRead);
     }
 }
@@ -178,6 +162,12 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
     NX_INFO(this, "Start test rtps session: %1 %2",
         url,
         live ? "live" : "archive, from position: " + QString::number(position / 1000000));
+
+    const QString cameraId = url.endsWith('/') ?
+        url.mid(url.left(url.size() - 1).lastIndexOf('/') + 1) : url.mid(url.lastIndexOf('/') + 1);
+    if (cameraId.isEmpty())
+        NX_ERROR(this, "Failed to parse camera id from url: %1", url);
+
     QAuthenticator auth;
     auth.setUser(config.user);
     auth.setPassword(config.password);
@@ -206,7 +196,8 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
             {
                 parsePacketTimestamp(
                     (uint8_t*)dataArrays[rtpChannelNum]->data() + kInterleavedRtpOverTcpPrefixLength,
-                    dataArrays[rtpChannelNum]->size() - kInterleavedRtpOverTcpPrefixLength);
+                    dataArrays[rtpChannelNum]->size() - kInterleavedRtpOverTcpPrefixLength,
+                    cameraId);
             }
             dataArrays[rtpChannelNum]->clear();
         }
@@ -222,16 +213,17 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
         delete data;
 }
 
-void RtspPerf::Session::parsePacketTimestamp(uint8_t* data, int64_t size)
+void RtspPerf::Session::parsePacketTimestamp(
+    const uint8_t* data, int64_t size, const QString& cameraId)
 {
     using namespace nx::streaming::rtp;
 
     static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 
-    RtpHeader* rtpHeader = (RtpHeader*)data;
+    const RtpHeader* rtpHeader = (RtpHeader*) data;
     if (rtpHeader->CSRCCount != 0 || rtpHeader->version != 2)
     {
-        NX_WARNING(this, lm("Got mailformed RTP packet header. Ignored."));
+        NX_WARNING(this, "Got malformed RTP packet header. Ignored.");
         return;
     }
 
@@ -251,9 +243,12 @@ void RtspPerf::Session::parsePacketTimestamp(uint8_t* data, int64_t size)
 
         const QnAbstractMediaData::DataType dataType = (QnAbstractMediaData::DataType)*(payload++);
         const quint32 timestampHigh = qFromBigEndian(*(quint32*) payload);
-        int64_t timestamp = qFromBigEndian(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
+        const int64_t timestamp = qFromBigEndian(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
         if (dataType == QnAbstractMediaData::VIDEO)
-            NX_INFO(this, "Received frame timestamp %1", timestamp);
+        {
+            printf("Camera %s timestamp %lld us\n", cameraId.toUtf8().data(),
+                (long long int) timestamp);
+        }
     }
     newPacket = rtpHeader->marker;
 }
