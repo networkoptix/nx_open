@@ -18,7 +18,7 @@ public:
 protected:
 	virtual void SetUp() override
 	{
-		m_fileWatcher = std::make_unique<file_system::FileWatcher>(std::chrono::milliseconds(10));
+		m_fileWatcher = std::make_unique<file_system::FileWatcher>(std::chrono::milliseconds(100));
 		m_filePath = testDataDir().toStdString() + "/test.txt";
 	}
 
@@ -56,8 +56,8 @@ protected:
 
 	void whenFileIsModified()
 	{
-		std::ofstream file(m_filePath);
-		file << "modified";
+		std::ofstream file(m_filePath, std::ios::out | std::ios::trunc);
+		file << "data";
 		file.close();
 	}
 
@@ -70,7 +70,8 @@ protected:
 	{
 		m_fileWatcher->unsubscribe(m_subscriptionIds.back());
 
-		while(!m_fileEvents.empty())
+		// Removing any existing events to check for "no events emitted" later
+		while (!m_fileEvents.empty())
 			m_fileEvents.pop();
 	}
 
@@ -83,13 +84,13 @@ protected:
 
 	void thenAllSubscribersAreNotified(file_system::FileWatcher::EventType eventType)
 	{
-		for (int i = 0; i < (int) m_subscriptionIds.size(); ++i)
+		for (int i = 0; i < (int)m_subscriptionIds.size(); ++i)
 			thenSubscriberIsNotified(eventType);
 	}
 
 	void thenFormerSubscriberIsNotNotified()
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		ASSERT_TRUE(m_fileEvents.empty());
 	}
 
@@ -97,6 +98,9 @@ private:
 	void createFile(const std::string& filePath)
 	{
 		std::ofstream file(filePath);
+		file << "data";
+		file.close();
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 	}
 
 	void subscribe(const std::string& filePath)
