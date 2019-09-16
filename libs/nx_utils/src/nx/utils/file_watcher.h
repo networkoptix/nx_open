@@ -21,6 +21,11 @@ public:
 		deleted,
 	};
 
+	enum WatchAttributes
+	{
+		metadata = 1 << 0,
+	};
+
 	using Handler = MoveOnlyFunc<void(const std::string&, EventType)>;
 
 public:
@@ -37,7 +42,8 @@ public:
 	 bool subscribe(
 		const std::string& filePath,
 		Handler handler,
-		nx::utils::SubscriptionId* const outSubscriptionId);
+		 nx::utils::SubscriptionId* const outSubscriptionId,
+		 WatchAttributes watchAttributes = WatchAttributes::metadata);
 
 	void unsubscribe(nx::utils::SubscriptionId subscriptionId);
 

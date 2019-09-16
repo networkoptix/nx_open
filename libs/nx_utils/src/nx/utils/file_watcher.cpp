@@ -19,7 +19,8 @@ FileWatcher::~FileWatcher()
 bool FileWatcher::subscribe(
 	const std::string& filePath,
 	Handler handler,
-	SubscriptionId* const outSubscriptionId)
+	SubscriptionId* const outSubscriptionId,
+	FileWatcher::WatchAttributes watchAttributes)
 {
 	*outSubscriptionId = kInvalidSubscriptionId;
 
