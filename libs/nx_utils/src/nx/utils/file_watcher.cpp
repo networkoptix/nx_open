@@ -32,23 +32,20 @@ bool FileWatcher::subscribe(
 
 	if (firstInsertion)
 	{
-		Stat currentStat;
-		memset(&currentStat, 0, sizeof(currentStat));
-
-		const int result = doStat(filePath.c_str(), &currentStat);
-		const int error = errno;
-		if (result != 0 && error != ENOENT)
+		const auto [err, stat] = doStat(filePath);
+		if (err && err != ENOENT)
 			return false;
 
-		fileExists = result == 0 || error != ENOENT;
+		fileExists = err != ENOENT;
 		watchContext = &m_fileWatches[filePath];
 		watchContext->fileData.lastExists = fileExists;
-		watchContext->fileData.lastStat = std::move(currentStat);
+		watchContext->fileData.lastStat = std::move(stat);
 	}
 
 	*outSubscriptionId = m_uniqueId++;
 	auto& actualSubscriptionId = watchContext->subscriptionIds[*outSubscriptionId];
 	watchContext->subscription.subscribe(std::move(handler), &actualSubscriptionId);
+	watchContext->watchAttributes |= watchAttributes;
 
 	return true;
 }
@@ -93,12 +90,10 @@ void FileWatcher::run()
 
 			lock.unlock();
 
-			Stat currentStat;
-			const int result = doStat(filePath.c_str(), &currentStat);
-			const int error = errno;
-			if (result != 0 && error != ENOENT)
+			const auto [err, stat] = doStat(filePath);
+			if (err && err != ENOENT)
 				continue;
-			const bool fileExists = result == 0 || error != ENOENT;
+			const bool fileExists = err != ENOENT;
 
 			lock.relock();
 
@@ -116,9 +111,9 @@ void FileWatcher::run()
 				continue;
 			}
 
-			if (!metadataEqual(watch.second.fileData.lastStat, currentStat))
+			if (!metadataEqual(watch.second.fileData.lastStat, stat))
 			{
-				watch.second.fileData.lastStat = std::move(currentStat);
+				watch.second.fileData.lastStat = std::move(stat);
 				notify(&lock, &watch, EventType::modified);
 				continue;
 			}
@@ -139,21 +134,30 @@ void FileWatcher::notify(
 	lock->relock();
 }
 
-int FileWatcher::doStat(const char* filePath, Stat* buf)
+std::pair <int, FileWatcher::Stat> FileWatcher::doStat(const std::string& filePath)
 {
+	Stat buf;
+	memset(&buf, 0, sizeof(buf));
+
+	int result;
 #ifdef _WIN32
-	return _stat64(filePath, buf);
+	result = _stat64(filePath.c_str(), &buf);
 #else
-	return stat64(filePath, buf);
-#endif
+	result = stat64(filePath.c_str(), &buf);
+#endif // _WIN32
+
+	if (result)
+		result = errno;
+
+	return std::make_pair(result, std::move(buf));
 }
 
 bool FileWatcher::metadataEqual(const Stat& a, const Stat& b)
 {
 	return
-		a.st_ctime == b.st_ctime
+		a.st_size == b.st_size
+		&& a.st_ctime == b.st_ctime
 		&& a.st_mtime == b.st_mtime
-		&& a.st_size == b.st_size
 	    && a.st_atime == b.st_atime;
 }
 

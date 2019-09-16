@@ -1,7 +1,6 @@
 #pragma once
 
 #include <thread>
-
 #include <sys/stat.h>
 
 #include "subscription.h"
@@ -40,8 +39,8 @@ public:
 	 * SystemError::GetLastOsErrorCode() is set.
 	 */
 	 bool subscribe(
-		const std::string& filePath,
-		Handler handler,
+		 const std::string& filePath,
+		 Handler handler,
 		 nx::utils::SubscriptionId* const outSubscriptionId,
 		 WatchAttributes watchAttributes = WatchAttributes::metadata);
 
@@ -55,7 +54,7 @@ private:
 	struct Stat: public _stat64 {};
 #else
 	using Stat = struct stat64;
-#endif
+#endif // _WIN32
 
 	using UniqueId = SubscriptionId;
 
@@ -68,6 +67,7 @@ private:
 	struct WatchContext
 	{
 		FileData fileData;
+		int watchAttributes = 0;
 		Subscription<std::string, EventType> subscription;
 		std::map<UniqueId, SubscriptionId> subscriptionIds;
 	};
@@ -83,7 +83,10 @@ private:
 		FileWatchIterator* fileWatch,
 		EventType watchEvent);
 
-	static int doStat(const char* filePath, Stat* buf);
+	/**
+	 * @return std::pair.first 0 on success or errno on failure
+	 */
+	static std::pair<int, Stat> doStat(const std::string& filePath);
 	static bool metadataEqual(const Stat& a, const Stat& b);
 
 private:
