@@ -621,6 +621,14 @@ def mediaserver(configuration):
             except ConnectionError as e:
                 assert False, "Couldn't connect to local mediaserver directly: {}".format(e)
 
+        # Setup if not alread set up
+        log.info('Setting up system')
+        r = requests_retry_session().post('http://{}:7001/api/setupLocalSystem'.format(mediaserver_ip),
+                                         params={'systemName': 'monitoring',
+                                                 'password': ADMIN_PASS},
+                                         auth=requests.auth.HTTPDigestAuth(DEFAULT_LOGIN, 'admin'))
+        log.info('Status: {}'.format(r.status_code))
+
         # Detach from the cloud
         log.info('Detaching system from the cloud')
         r = requests_retry_session().get('http://{}:7001/api/detachFromCloud'.format(mediaserver_ip),
