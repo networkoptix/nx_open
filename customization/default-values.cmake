@@ -66,7 +66,6 @@ set(translations
     no_NO
     pl_PL
     pt_BR
-    pt_PT
     uk_UA
     vi_VN
     th_TH
