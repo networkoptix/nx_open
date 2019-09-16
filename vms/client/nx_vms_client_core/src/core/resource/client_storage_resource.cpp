@@ -90,7 +90,7 @@ void QnClientStorageResource::setActive(bool value)
 }
 
 
-QIODevice* QnClientStorageResource::open(const QString&, QIODevice::OpenMode)
+QIODevice* QnClientStorageResource::openInternal(const QString&, QIODevice::OpenMode)
 {
     NX_ASSERT(false);
     return NULL;

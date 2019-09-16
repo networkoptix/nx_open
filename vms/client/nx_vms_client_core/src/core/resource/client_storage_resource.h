@@ -26,8 +26,6 @@ public:
 
     static QnClientStorageResourcePtr newStorage(const QnMediaServerResourcePtr &parentServer, const QString &url);
 
-    virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
-
     virtual Qn::StorageInitResult initOrUpdate() override;
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
     qint64 getFileSize(const QString& url) const override;
@@ -51,7 +49,7 @@ public:
 
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
-
+    virtual QIODevice* openInternal(const QString& fileName, QIODevice::OpenMode openMode) override;
 signals:
     void freeSpaceChanged(const QnResourcePtr &storage);
     void totalSpaceChanged(const QnResourcePtr &storage);
