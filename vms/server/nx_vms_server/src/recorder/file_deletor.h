@@ -26,6 +26,7 @@ public:
     void deleteFile(const QString& fileName, const QnUuid &storageId);
 
     virtual void run() override;
+    qint64 postponedFileSize(const QnUuid& storageId);
 private:
     void processPostponedFiles();
     void postponeFile(const QString& fileName, const QnUuid &storageId);
@@ -35,13 +36,14 @@ private:
     {
         QString fileName;
         QnUuid storageId;
+		std::optional<qint64> fileSize;
 
-        PostponedFileData(const QString &fileName, const QnUuid &storageId)
-            : fileName(fileName),
-              storageId(storageId)
+        PostponedFileData(const QString &fileName, const QnUuid &storageId):
+            fileName(fileName),
+            storageId(storageId)
         {}
     };
-    friend bool operator < (const PostponedFileData &lhs, const PostponedFileData &rhs);
+    friend bool operator < (const PostponedFileData& lhs, const PostponedFileData& rhs);
 
     typedef QQueue<PostponedFileData> PostponedFileDataQueue;
     typedef std::set<PostponedFileData> PostponedFileDataSet;

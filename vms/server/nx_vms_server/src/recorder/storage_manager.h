@@ -42,6 +42,7 @@
 #include "nx/vms/server/server_module_aware.h"
 #include <media_server/media_server_module.h>
 #include <api/helpers/chunks_request_data.h>
+#include <nx/vms/server/resource/storage_resource.h>
 
 extern "C" {
 
@@ -66,7 +67,7 @@ class QnStorageManager: public QObject, public /*mixin*/ nx::vms::server::Server
     friend class nx::caminfo::ServerWriterHandler;
 
 public:
-    typedef QMap<int, QnStorageResourcePtr> StorageMap;
+    typedef QMap<int, nx::vms::server::StorageResourcePtr> StorageMap;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;   /* Map by camera unique id. */
     typedef QMap<QString, QSet<QDate>> UsedMonthsMap; /* Map by camera unique id. */
 
@@ -119,7 +120,7 @@ public:
     bool checkIfMyStorage(const QnStorageResourcePtr &storage) const;
     QnStorageResourcePtr getStorageByUrlExact(const QString& storageUrl);
     QnStorageResourcePtr getStorageByVolume(const QString& volumeRoot) const;
-    QnStorageResourcePtr storageRoot(int storage_index) const { QnMutexLocker lock( &m_mutexStorages ); return m_storageRoots.value(storage_index); }
+    nx::vms::server::StorageResourcePtr storageRoot(int storage_index) const;
     bool isStorageAvailable(int storage_index) const;
     bool isStorageAvailable(const QnStorageResourcePtr& storage) const;
 
@@ -142,7 +143,8 @@ public:
                         storage->getFreeSpace() > storage->getSpaceLimit();
             });
 
-    QnStorageResourceList getStorages() const;
+
+    nx::vms::server::StorageResourceList getStorages() const;
 
     /*
      * Return writable storages with checkBox 'usedForWriting'
@@ -156,7 +158,7 @@ public:
     QSet<QnStorageResourcePtr> getAllWritableStorages(
         const QnStorageResourceList* additionalStorages = nullptr) const;
 
-    QnStorageResourceList getStoragesInLexicalOrder() const;
+    nx::vms::server::StorageResourceList getStoragesInLexicalOrder() const;
     bool hasRebuildingStorages() const;
 
     void clearSpace(bool forced=false);
@@ -199,6 +201,7 @@ public:
         QnMediaServerModule* serverModule,
         const QnStorageResourcePtr& storage);
 
+    int64_t nxOccupiedSpace(const QnStorageResourcePtr& storage) const;
 signals:
     void storagesAvailable();
     void noStoragesAvailable();
@@ -222,7 +225,8 @@ private:
     bool isArchiveTimeExistsInternal(const QString& cameraUniqueId, qint64 timeMs);
     bool isArchiveTimeExistsInternal(const QString& cameraUniqueId, const QnTimePeriod period);
     //void loadFullFileCatalogInternal(QnServer::ChunksCatalog catalog, bool rebuildMode);
-    QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& uniqueId, QString& quality);
+    nx::vms::server::StorageResourcePtr extractStorageFromFileName(
+        int& storageIndex, const QString& fileName, QString& uniqueId, QString& quality);
     void getTimePeriodInternal(std::vector<QnTimePeriodList>& periods,
         const QnNetworkResourcePtr& camera,
         qint64 startTimeMs,

@@ -4,7 +4,6 @@
 #include <core/resource/media_server_resource.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/proxy_io_device.h>
 
 const qint64 QnStorageResource::kNasStorageLimit = 50LL * 1024 * 1024 * 1024; // 50 gb
 const qint64 QnStorageResource::kThirdPartyStorageLimit = 10LL * 1024 * 1024 * 1024; // 10 gb
@@ -15,8 +14,7 @@ QnStorageResource::QnStorageResource(QnCommonModule* commonModule):
     m_maxStoreTime(0),
     m_usedForWriting(false),
     m_storageBitrateCoeff(0.0),
-    m_isBackup(false),
-    m_metrics(std::make_shared<Metrics>())
+    m_isBackup(false)
 {
 }
 
@@ -240,40 +238,13 @@ void QnStorageResource::setStatusFlag(Qn::StorageStatuses status)
     m_status = status;
 }
 
+QIODevice* QnStorageResource::open(const QString &fileName, QIODevice::OpenMode openMode)
+{
+    return openInternal(fileName, openMode);
+}
+
 Qn::StorageStatuses QnStorageResource::statusFlag() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_status;
-}
-
-qint64 QnStorageResource::getAndResetMetric(std::atomic<qint64> Metrics::*parameter)
-{
-    return (*m_metrics.*parameter).exchange(0);
-}
-
-QIODevice* QnStorageResource::open(const QString &fileName, QIODevice::OpenMode openMode)
-{
-    auto sourceIoDevice = openInternal(fileName, openMode);
-    return wrapIoDevice(std::unique_ptr<QIODevice>(sourceIoDevice));
-}
-
-QIODevice* QnStorageResource::wrapIoDevice(std::unique_ptr<QIODevice> ioDevice)
-{
-    auto result = new nx::utils::ProxyIoDevice(std::move(ioDevice));
-
-    std::weak_ptr<Metrics> statistics = m_metrics;
-    result->setOnWriteCallback(
-        [statistics](qint64 size)
-    {
-        if (auto strongRef = statistics.lock(); size > 0 && strongRef)
-            strongRef->bytesWritten += size;
-    });
-    result->setOnReadCallback(
-        [statistics](qint64 size)
-    {
-        if (auto strongRef = statistics.lock(); size > 0 && strongRef)
-            strongRef->bytesRead += size;
-    });
-
-    return result;
 }

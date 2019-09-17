@@ -32,6 +32,7 @@
 
 #include <nx/utils/concurrent.h>
 #include "storage_db_pool.h"
+#include <nx/vms/server/resource/storage_resource.h>
 
 QnMutex DeviceFileCatalog::m_rebuildMutex;
 QSet<void*> DeviceFileCatalog::m_pauseList;
@@ -39,6 +40,8 @@ QSet<void*> DeviceFileCatalog::m_pauseList;
 const quint16 DeviceFileCatalog::Chunk::FILE_INDEX_NONE = 0xffff;
 const quint16 DeviceFileCatalog::Chunk::FILE_INDEX_WITH_DURATION = 0xfffe;
 const int DeviceFileCatalog::Chunk::UnknownDuration = -1;
+
+using namespace nx::vms::server;
 
 namespace {
     std::array<QString, QnServer::ChunksCatalogCount> catalogPrefixes = {"low_quality", "hi_quality"};
@@ -789,7 +792,7 @@ bool DeviceFileCatalog::isEmpty() const
 
 DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
 {
-    QnStorageResourcePtr storage;
+    StorageResourcePtr storage;
     QString delFileName;
     int storageIndex;
     Chunk deletedChunk;
@@ -809,14 +812,10 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
     }
 
     storage = getMyStorageMan()->storageRoot(storageIndex);
-    if (storage) {
-        if (!delFileName.isEmpty())
-        {
-            //storage->addWritedSpace(-deletedSize);
-            storage->removeFile(delFileName);
-        }
-    }
+    if (!storage || delFileName.isEmpty())
+        return deletedChunk; //< Nothing to delete.
 
+    serverModule()->fileDeletor()->deleteFile(delFileName, storage->getId());
     return deletedChunk;
 }
 

@@ -6,7 +6,6 @@
 #include <nx/utils/system_error.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
-#include <nx/vms/server/root_fs.h>
 
 #include "file_deletor.h"
 
@@ -57,17 +56,16 @@ void QnFileDeletor::init(const QString& tmpRoot)
     start();
 }
 
-bool QnFileDeletor::internalDeleteFile(const QString& fileName)
-{
-    if (serverModule()->rootFileSystem()->removePath(fileName))
-        return true;
 
-    return !serverModule()->rootFileSystem()->isPathExists(fileName);
-}
-
-void QnFileDeletor::deleteFile(const QString& fileName, const QnUuid &storageId)
+void QnFileDeletor::deleteFile(
+    const QString& fileName, const QnUuid &storageId)
 {
-    if (!internalDeleteFile(fileName))
+    NX_ASSERT(!storageId.isNull());
+    auto storage = resourcePool()->getResourceById<QnStorageResource>(storageId);
+    if (!storage)
+        return; //< Nothing to delete any more.
+
+    if (!storage->removeFile(fileName))
     {
         NX_DEBUG(this, lm("[Cleanup, FileStorage]. Postponing file %1").arg(fileName));
         postponeFile(fileName, storageId);
@@ -94,12 +92,16 @@ void QnFileDeletor::processPostponedFiles()
             QByteArray line = m_deleteCatalog.readLine().trimmed();
             while(!line.isEmpty())
             {
-                if (line.indexOf(',') == -1) // old version (fileName)
-                    m_postponedFiles.emplace(PostponedFileData(QString::fromUtf8(line), QnUuid()));
+                if (line.indexOf(',') == -1) // old version <= 2.4 (fileName only)
+                {
+                    // Not supported any more. Just skip command
+                }
                 else // new version (fileName, storageUniqueId)
                 {
                     auto splits = line.split(',');
-                    m_postponedFiles.emplace(QString::fromUtf8(splits[0].trimmed()), QnUuid::fromRfc4122(splits[1].trimmed()));
+                    m_postponedFiles.emplace(
+                        QString::fromUtf8(splits[0].trimmed()),
+                        QnUuid::fromRfc4122(splits[1].trimmed()));
                 }
                 line = m_deleteCatalog.readLine().trimmed();
             }
@@ -145,33 +147,28 @@ void QnFileDeletor::processPostponedFiles()
             break;
         }
 
-        if (itr->storageId.isNull()) // File from the old-style deleteCatalog. Try once and discard.
-            internalDeleteFile(itr->fileName);
-        else
+        auto storage = resourcePool()->getResourceById<QnStorageResource>(itr->storageId);
+        bool needToPostpone = !storage || storage->getStatus() == Qn::ResourceStatus::Offline;
+
+        if (!storage)
         {
-            auto storage = resourcePool()->getResourceById(itr->storageId);
-            bool needToPostpone = !storage || storage->getStatus() == Qn::ResourceStatus::Offline;
+            NX_VERBOSE(this, lit("[Cleanup] storage with id %1 not found in pool. Postponing file %2")
+                    .arg(itr->storageId.toString())
+                    .arg(itr->fileName));
+        }
+        else if (storage->getStatus() == Qn::ResourceStatus::Offline)
+        {
+            NX_VERBOSE(this, lit("[Cleanup] storage %1 is offline. Postponing file %2")
+                    .arg(storage->getUrl())
+                    .arg(itr->fileName));
+        }
 
-            if (!storage)
-            {
-                NX_VERBOSE(this, lit("[Cleanup] storage with id %1 not found in pool. Postponing file %2")
-                        .arg(itr->storageId.toString())
-                        .arg(itr->fileName));
-            }
-            else if (storage->getStatus() == Qn::ResourceStatus::Offline)
-            {
-                NX_VERBOSE(this, lit("[Cleanup] storage %1 is offline. Postponing file %2")
-                        .arg(storage->getUrl())
-                        .arg(itr->fileName));
-            }
-
-            if (needToPostpone || !internalDeleteFile(itr->fileName))
-            {
-                newList.insert(*itr);
-                NX_VERBOSE(this, lit("[Cleanup] Postponing file %1. Reason: %2")
-                    .arg(itr->fileName)
-                    .arg(needToPostpone ? "Storage is offline or not in the resource pool" : "Delete failed"));
-            }
+        if (needToPostpone || !storage->removeFile(itr->fileName))
+        {
+            newList.insert(*itr);
+            NX_VERBOSE(this, lit("[Cleanup] Postponing file %1. Reason: %2")
+                .arg(itr->fileName)
+                .arg(needToPostpone ? "Storage is offline or not in the resource pool" : "Delete failed"));
         }
     }
     if (newList.empty())
@@ -198,4 +195,28 @@ void QnFileDeletor::processPostponedFiles()
         if (tmpFile.rename(m_deleteCatalog.fileName()))
             m_postponedFiles = newList;
     }
+}
+
+qint64 QnFileDeletor::postponedFileSize(const QnUuid& storageId)
+{
+    QnMutexLocker lock(&m_mutex);
+    qint64 result = 0;
+
+    for (const auto& data: m_postponedFiles)
+    {
+        if (!storageId.isNull() && data.storageId != storageId)
+            continue;
+        if (!data.fileSize)
+        {
+            if (auto dataStorage = resourcePool()->getResourceById<QnStorageResource>(data.storageId))
+            {
+                // fileSize field is not key field, it can be changed.
+                PostponedFileData& nonConstData = const_cast<PostponedFileData&>(data);
+                nonConstData.fileSize = dataStorage->getFileSize(data.fileName);
+            }
+        }
+        if (data.fileSize)
+            result += *data.fileSize;
+    }
+    return result;
 }

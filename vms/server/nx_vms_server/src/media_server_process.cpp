@@ -4030,17 +4030,14 @@ void MediaServerProcess::loadPlugins()
     for (nx_spl::StorageFactory* const storagePlugin:
     pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
     {
-        auto settings = &serverModule()->settings();
         storagePlugins->registerStoragePlugin(
             storagePlugin->storageType(),
-            std::bind(
-                &QnThirdPartyStorageResource::instance,
-                std::placeholders::_1,
-                std::placeholders::_2,
-                storagePlugin,
-                settings
-            ),
-            false);
+            [this, storagePlugin](QnCommonModule*, const QString& path)
+            {
+                auto settings = &serverModule()->settings();
+                return QnThirdPartyStorageResource::instance(
+                    serverModule(), path, storagePlugin, settings);
+            }, /*isDefaultProtocol*/ false);
     }
 
     storagePlugins->registerStoragePlugin(

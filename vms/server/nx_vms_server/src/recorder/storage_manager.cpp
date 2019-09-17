@@ -89,6 +89,7 @@ const QString kArchiveCameraGroupNameKey = lit("groupName");
 
 static const std::chrono::hours kAnalyticsDataCleanupStep {1};
 
+using namespace nx::vms::server;
 
 struct TasksQueueInfo {
     int tasksCount;
@@ -561,9 +562,9 @@ public:
 private:
     QnStorageManager* m_owner = nullptr;
 
-    QnStorageResourceList storagesToTest()
+    StorageResourceList storagesToTest()
     {
-        QnStorageResourceList result = m_owner->getStorages();
+        StorageResourceList result = m_owner->getStorages();
         std::sort(
             result.begin(),
             result.end(),
@@ -623,6 +624,7 @@ QnStorageManager::QnStorageManager(
 
     m_oldStorageIndexes = deserializeStorageFile();
 
+
     connect(resourcePool(), &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 
@@ -665,6 +667,12 @@ QnStorageManager::QnStorageManager(
     m_removeEmtyDirTimer.invalidate();
 
     startAuxTimerTasks();
+}
+
+int64_t QnStorageManager::nxOccupiedSpace(const QnStorageResourcePtr& storage) const
+{
+    int storageIndex = storageDbPool()->getStorageIndex(storage);
+    return calculateNxOccupiedSpace(storageIndex);
 }
 
 int64_t QnStorageManager::calculateNxOccupiedSpace(int storageIndex) const
@@ -1218,8 +1226,11 @@ QString QnStorageManager::toCanonicalPath(const QString& path)
     return result;
 }
 
-void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
+void QnStorageManager::addStorage(const QnStorageResourcePtr& abstractStorage)
 {
+    auto storage = abstractStorage.dynamicCast<StorageResource>();
+    NX_ASSERT(storage);
+
     int storageIndex = storageDbPool()->getStorageIndex(storage);
     NX_DEBUG(this, "Adding storage. Path: %1", nx::utils::url::hidePassword(storage->getUrl()));
 
@@ -2116,19 +2127,22 @@ bool QnStorageManager::hasRebuildingStorages() const
     return result || m_archiveRebuildInfo.state == Qn::RebuildState_FullScan;
 }
 
-QnStorageResourceList QnStorageManager::getStorages() const
+StorageResourceList QnStorageManager::getStorages() const
 {
-    QnMutexLocker lock( &m_mutexStorages );
-    return m_storageRoots.values().toSet().toList(); // remove storage duplicates. Duplicates are allowed in sake for v1.4 compatibility
+    QnMutexLocker lock(&m_mutexStorages);
+    StorageResourceList result;
+    for (const auto& storage: m_storageRoots.values().toSet())
+        result << storage;
+    return result; // remove storage duplicates. Duplicates are allowed in sake for v1.4 compatibility
 }
 
-QnStorageResourceList QnStorageManager::getStoragesInLexicalOrder() const
+StorageResourceList QnStorageManager::getStoragesInLexicalOrder() const
 {
     // duplicate storage path's aren't used any more
     QnMutexLocker lock(&m_mutexStorages);
-    QnStorageResourceList result = m_storageRoots.values();
+    StorageResourceList result = getStorages();
     std::sort(result.begin(), result.end(),
-              [](const QnStorageResourcePtr& storage1, const QnStorageResourcePtr& storage2)
+              [](const StorageResourcePtr& storage1, const StorageResourcePtr& storage2)
     {
         return storage1->getUrl() < storage2->getUrl();
     });
@@ -2153,6 +2167,7 @@ void QnStorageManager::clearDbByChunk(DeviceFileCatalogPtr catalog, const Device
             QnStorageDbPtr sdb = storageDbPool()->getSDB(storage);
             if (sdb)
                 sdb->deleteRecords(catalog->cameraUniqueId(), catalog->getRole(), chunk.startTimeMs);
+
         }
     }
 }
@@ -2844,7 +2859,8 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(const QString& cam
     return fileCatalog;
 }
 
-QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& uniqueId, QString& quality)
+StorageResourcePtr QnStorageManager::extractStorageFromFileName(
+    int& storageIndex, const QString& fileName, QString& uniqueId, QString& quality)
 {
     // 1.4 to 1.5 compatibility notes:
     // 1.5 prevent duplicates path to same physical storage (aka c:/test and c:/test/)
@@ -2854,7 +2870,7 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
 
     storageIndex = -1;
     const StorageMap storages = getAllStorages();
-    QnStorageResourcePtr ret;
+    StorageResourcePtr ret;
     int matchLen = 0;
     QString storageUrl;
     for(StorageMap::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
@@ -2909,6 +2925,12 @@ QnStorageResourcePtr QnStorageManager::getStorageByVolume(const QString& volumeR
     }
 
     return QnStorageResourcePtr();
+}
+
+nx::vms::server::StorageResourcePtr QnStorageManager::storageRoot(int storage_index) const
+{
+    QnMutexLocker lock(&m_mutexStorages);
+    return m_storageRoots.value(storage_index);
 }
 
 QnStorageResourcePtr QnStorageManager::getStorageByUrlInternal(const QString& fileName)
@@ -2967,7 +2989,7 @@ bool QnStorageManager::fileFinished(
     int storageIndex;
     QString quality;
     QString cameraUniqueId;
-    QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, cameraUniqueId, quality);
+    StorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, cameraUniqueId, quality);
     if (!storage)
         return false;
 
@@ -2989,10 +3011,13 @@ bool QnStorageManager::fileFinished(
         QnStorageDbPtr sdb = storageDbPool()->getSDB(storage);
         if (sdb)
             sdb->addRecord(cameraUniqueId, DeviceFileCatalog::catalogByPrefix(quality), chunk);
+
         return true;
     }
     else if (renameOK)
-        serverModule()->fileDeletor()->deleteFile(newName, storage->getId());
+    {
+        storage->removeFile(newName);
+    }
     return false;
 }
 

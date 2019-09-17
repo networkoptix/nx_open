@@ -46,7 +46,7 @@ int QnStorageSpaceRestHandler::executeGet(
     QnStorageSpaceReply reply;
 
     auto enumerate = [fastRequest, &reply, this](
-        const QnStorageResourceList& storages,
+        const auto& storages,
         const QSet<QnStorageResourcePtr>& writableStorages)
         {
             for (const auto& storage: storages)

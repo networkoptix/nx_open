@@ -4,6 +4,7 @@
 #include "core/resource/storage_resource.h"
 #include <utils/common/app_info.h>
 #include <platform/platform_abstraction.h>
+#include <nx/vms/server/resource/storage_resource.h>
 
 #if defined(Q_OS_WIN)
 #include <wtypes.h>
@@ -20,9 +21,9 @@ namespace nx { namespace vms::server { class RootFileSystem; } }
 
 const QString NX_TEMP_FOLDER_NAME = QnAppInfo::productNameShort() + "_temp_folder_";
 
-class QnFileStorageResource: public QnStorageResource
+class QnFileStorageResource: public nx::vms::server::StorageResource
 {
-    using base_type = QnStorageResource;
+    using base_type = nx::vms::server::StorageResource;
 private:
     static const QString FROM_SEP;
     static const QString TO_SEP;
@@ -117,6 +118,5 @@ private:
     mutable QnMutex      m_writeTestMutex;
     bool m_isSystem;
     bool m_isMounted = true;
-    QnMediaServerModule* m_serverModule = nullptr;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;

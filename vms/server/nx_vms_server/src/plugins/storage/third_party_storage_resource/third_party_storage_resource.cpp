@@ -154,14 +154,14 @@ private:
 } //namespace aux
 
 QnStorageResource* QnThirdPartyStorageResource::instance(
-    QnCommonModule* commonModule,
+    QnMediaServerModule* serverModule,
     const QString& url,
     nx_spl::StorageFactory* sf,
     const nx::vms::server::Settings* settings)
 {
     try
     {
-        return new QnThirdPartyStorageResource(commonModule, sf, url, settings);
+        return new QnThirdPartyStorageResource(serverModule, sf, url, settings);
     }
     catch (...)
     {
@@ -170,12 +170,12 @@ QnStorageResource* QnThirdPartyStorageResource::instance(
 }
 
 QnThirdPartyStorageResource::QnThirdPartyStorageResource(
-    QnCommonModule* commonModule,
+    QnMediaServerModule* serverModule,
     nx_spl::StorageFactory* sf,
     const QString& storageUrl,
     const nx::vms::server::Settings* settings)
     :
-    QnStorageResource(commonModule),
+    base_type(serverModule),
     m_valid(true),
     m_settings(settings)
 {

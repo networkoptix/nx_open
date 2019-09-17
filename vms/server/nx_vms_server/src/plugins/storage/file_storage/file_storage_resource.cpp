@@ -142,21 +142,21 @@ QIODevice* QnFileStorageResource::openInternal(
     int ffmpegBufferSize = 0;
 
     int ffmpegMaxBufferSize =
-        m_serverModule->settings().maxFfmpegBufferSize();
+        serverModule()->settings().maxFfmpegBufferSize();
 
     int systemFlags = 0;
     if (openMode & QIODevice::WriteOnly)
     {
-        ioBlockSize = m_serverModule->settings().ioBlockSize();
+        ioBlockSize = serverModule()->settings().ioBlockSize();
 
         ffmpegBufferSize = qMax(
-            m_serverModule->settings().ffmpegBufferSize(),
+            serverModule()->settings().ffmpegBufferSize(),
             bufferSize);
 
 #ifdef Q_OS_WIN
         if ((openMode & QIODevice::ReadWrite) == QIODevice::ReadWrite)
             systemFlags = 0;
-        else if (!m_serverModule->settings().disableDirectIO())
+        else if (!serverModule()->settings().disableDirectIO())
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
@@ -206,7 +206,7 @@ QIODevice* QnFileStorageResource::openInternal(
 
 nx::vms::server::RootFileSystem* QnFileStorageResource::rootTool() const
 {
-    return m_serverModule->rootFileSystem();
+    return serverModule()->rootFileSystem();
 }
 
 void QnFileStorageResource::setLocalPathSafe(const QString &path)
@@ -235,14 +235,14 @@ qint64 QnFileStorageResource::getDeviceSizeByLocalPossiblyNonExistingPath(const 
 {
     qint64 result;
 
-    if (m_serverModule->rootFileSystem()->isPathExists(path))
-        return m_serverModule->rootFileSystem()->totalSpace(path);
+    if (serverModule()->rootFileSystem()->isPathExists(path))
+        return serverModule()->rootFileSystem()->totalSpace(path);
 
-    if (!m_serverModule->rootFileSystem()->makeDirectory(path))
+    if (!serverModule()->rootFileSystem()->makeDirectory(path))
         return -1;
 
-    result = m_serverModule->rootFileSystem()->totalSpace(path);
-    m_serverModule->rootFileSystem()->removePath(path);
+    result = serverModule()->rootFileSystem()->totalSpace(path);
+    serverModule()->rootFileSystem()->removePath(path);
 
     return result;
 }
@@ -324,9 +324,9 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         }
     }
 
-    QString sysPath = sysDrivePath(m_serverModule);
+    QString sysPath = sysDrivePath(serverModule());
     if (!sysPath.isNull())
-        m_isSystem = getDevicePath(m_serverModule, url).startsWith(sysPath);
+        m_isSystem = getDevicePath(serverModule(), url).startsWith(sysPath);
     else
         m_isSystem = false;
 
@@ -372,7 +372,7 @@ bool QnFileStorageResource::checkDBCap() const
 
     // Same for mounted by hand remote storages (NAS)
     QList<QnPlatformMonitor::PartitionSpace> partitions =
-        m_serverModule->platform()->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
+        serverModule()->platform()->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
             QnPlatformMonitor::NetworkPartition );
 
     bool dbReady = true;
@@ -615,17 +615,16 @@ Qn::StorageInitResult QnFileStorageResource::mountTmpDrive(const QString& url)
 void QnFileStorageResource::setUrl(const QString& url)
 {
     QnMutexLocker lock(&m_mutexCheckStorage);
-    QnStorageResource::setUrl(url);
+    base_type::setUrl(url);
     m_valid = false;
 }
 
 QnFileStorageResource::QnFileStorageResource(QnMediaServerModule* serverModule):
-    base_type(serverModule->commonModule()),
+    base_type(serverModule),
     m_valid(false),
     m_capabilities(0),
     m_cachedTotalSpace(QnStorageResource::kUnknownSize),
-    m_isSystem(false),
-    m_serverModule(serverModule)
+    m_isSystem(false)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
@@ -657,8 +656,10 @@ bool QnFileStorageResource::removeFile(const QString& url)
     if (!m_valid)
         return false;
 
-    m_serverModule->fileDeletor()->deleteFile(removeProtocolPrefix(translateUrlToLocal(url)), getId());
-    return true;
+    const auto fileName = removeProtocolPrefix(translateUrlToLocal(url));
+    if (serverModule()->rootFileSystem()->removePath(fileName))
+        return true;
+    return !serverModule()->rootFileSystem()->isPathExists(fileName);
 }
 
 bool QnFileStorageResource::renameFile(const QString& oldName, const QString& newName)
@@ -885,7 +886,7 @@ qint64 QnFileStorageResource::calcInitialSpaceLimit()
 
 qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType ptype) const
 {
-    const qint64 defaultStorageSpaceLimit = m_serverModule->settings().minStorageSpace();
+    const qint64 defaultStorageSpaceLimit = serverModule()->settings().minStorageSpace();
     const bool isLocal =
         ptype == QnPlatformMonitor::LocalDiskPartition
         || ptype == QnPlatformMonitor::RemovableDiskPartition;
@@ -906,7 +907,7 @@ bool QnFileStorageResource::isLocal()
             || storageTypeString == QnLexical::serialized(QnPlatformMonitor::RemovableDiskPartition);
     }
 
-    auto platformMonitor = static_cast<QnPlatformMonitor*>(m_serverModule->platform()->monitor());
+    auto platformMonitor = static_cast<QnPlatformMonitor*>(serverModule()->platform()->monitor());
     auto partitions = platformMonitor->totalPartitionSpaceInfo(QnPlatformMonitor::NetworkPartition);
 
     for (const auto &partition : partitions)

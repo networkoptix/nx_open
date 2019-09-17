@@ -1,9 +1,6 @@
 #pragma once
 
 #include "abstract_storage_resource.h"
-
-#include <atomic>
-
 #include <utils/crypt/encryptable.h>
 
 class QnAbstractMediaStreamDataProvider;
@@ -80,17 +77,11 @@ public:
 
     bool isWritable() const;
 
-    struct Metrics
-    {
-        std::atomic<qint64> bytesRead{0};
-        std::atomic<qint64> bytesWritten{0};
-    };
-
-    qint64 getAndResetMetric(std::atomic<qint64> Metrics::*parameter);
+    virtual qint64 nxOccupedSpace() const { return 0; }
 
     virtual QIODevice* open(
         const QString &fileName,
-        QIODevice::OpenMode openMode) override final;
+        QIODevice::OpenMode openMode) override;
 signals:
     /*
      * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
@@ -106,7 +97,6 @@ signals:
     void typeChanged(const QnResourcePtr& resource);
 protected:
     virtual QIODevice* openInternal(const QString &fileName, QIODevice::OpenMode openMode) = 0;
-    QIODevice* wrapIoDevice(std::unique_ptr<QIODevice> ioDevice);
 private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // in seconds
@@ -117,8 +107,6 @@ private:
     mutable QnMutex m_bitrateMtx;
     bool m_isBackup;
     Qn::StorageStatuses m_status = Qn::StorageStatus::none;
-
-    std::shared_ptr<Metrics> m_metrics;
 };
 
 Q_DECLARE_METATYPE(QnStorageResourcePtr);

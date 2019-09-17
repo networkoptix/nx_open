@@ -10,7 +10,7 @@ namespace nx::vms::server::metrics {
 
 StorageController::StorageController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
-    utils::metrics::ResourceControllerImpl<QnStorageResource*>("storages", makeProviders())
+    utils::metrics::ResourceControllerImpl<StorageResource*>("storages", makeProviders())
 {
 }
 
@@ -22,7 +22,7 @@ void StorageController::start()
         [this](const QnResourcePtr& resource)
         {
             // TODO: Consider to add system storages as well.
-            if (const auto storage = resource.dynamicCast<QnStorageResource>();
+            if (const auto storage = resource.dynamicCast<StorageResource>();
                 storage && storage->getParentId() == serverModule()->commonModule()->moduleGUID())
             {
                 add(storage.get(), storage->getId(), utils::metrics::Scope::local);
@@ -79,16 +79,27 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
             "activity",
             utils::metrics::makeLocalValueProvider<Resource>(
                 "inRate", //< KB/s.
-                [](const auto& r) { return ioRate(r, &QnStorageResource::Metrics::bytesRead); },
+                [](const auto& r) { return ioRate(r, &StorageResource::Metrics::bytesRead); },
                 nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "outRate", //< KB/s.
-                [](const auto& r) { return ioRate(r, &QnStorageResource::Metrics::bytesWritten); },
+                [](const auto& r) { return ioRate(r, &StorageResource::Metrics::bytesWritten); },
                 nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
-                )
+            )
+        ),
+        std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
+            "space",
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "totalSpace", //< GB.
+                [](const auto& r) { return round(r->getTotalSpace() / 1000000000.0); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "usedByVms", //< Percents.
+                [](const auto& r)
+                { return round(r->nxOccupedSpace() / (double) r->getTotalSpace() * 100); }
+            )
         )
-        // TODO: Add Space groups.
     );
 
 }

@@ -4,21 +4,23 @@
 #include <storage/third_party_storage.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/sdk/ptr.h>
+#include <nx/vms/server/resource/storage_resource.h>
 
 namespace nx::vms::server { class Settings; }
 
-class QnThirdPartyStorageResource: public QnStorageResource
+class QnThirdPartyStorageResource: public nx::vms::server::StorageResource
 {
+    using base_type = nx::vms::server::StorageResource;
 public:
     static QnStorageResource* instance(
-        QnCommonModule* commonModule,
+        QnMediaServerModule* serverModule,
         const QString& url,
         nx_spl::StorageFactory* sf,
         const nx::vms::server::Settings* settings
     );
 
     QnThirdPartyStorageResource(
-        QnCommonModule* commonModule,
+        QnMediaServerModule* serverModule,
         nx_spl::StorageFactory* sf,
         const QString& storageUrl,
         const nx::vms::server::Settings* settings
