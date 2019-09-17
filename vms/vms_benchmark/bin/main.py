@@ -58,7 +58,7 @@ import click
 import cv2
 
 
-def load_configs(config_file):
+def load_configs(config_file, sys_config_file):
     option_descriptions = {
         "deviceHost": {
             "type": 'string'
@@ -139,7 +139,7 @@ def load_configs(config_file):
         },
     }
 
-    sys_config = ConfigParser('vms_benchmark.ini', sys_option_descriptions, is_file_optional=True)
+    sys_config = ConfigParser(sys_config_file, sys_option_descriptions, is_file_optional=True)
 
     if sys_config['testCameraBin']:
         test_camera_runner.binary_file = sys_config['testCameraBin']
@@ -190,8 +190,14 @@ def process_server_events(api, streaming_started_at):
 @click.command()
 @click.option('--config', 'config_file', default='vms_benchmark.conf', help='Input config file.')
 @click.option('-C', 'config_file', default='vms_benchmark.conf', help='Input config file.')
-def main(config_file):
-    config, sys_config = load_configs(config_file)
+@click.option('--sys-config', 'sys_config_file', default='vms_benchmark.ini', help='Input internal system config file.')
+def main(config_file, sys_config_file):
+    config, sys_config = load_configs(config_file, sys_config_file)
+
+    if sys_config.ORIGINAL_OPTIONS is not None:
+        print(f"Override default options from INI config '{sys_config_file}':")
+        for k, v in sys_config.ORIGINAL_OPTIONS.items():
+            print(f"    {k}={v}")
 
     password = config.get('devicePassword', None)
 

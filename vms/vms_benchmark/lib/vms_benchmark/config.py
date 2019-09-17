@@ -57,6 +57,8 @@ class ConfigParser:
                 )
             )
 
+        self.ORIGINAL_OPTIONS = self.options.copy() if is_file_present else None
+
         if option_descriptions:
             for name, _ in ((k, v) for (k, v) in option_descriptions.items() if v.get('optional', False) is False):
                 if name not in self.options.keys():
