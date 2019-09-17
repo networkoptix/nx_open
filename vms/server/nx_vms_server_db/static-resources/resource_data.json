@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.113",
+    "version": "1.0.1.115",
     "data": [
         {
             "keys": [
@@ -2196,7 +2196,8 @@
         {
             "keys": [
                 "Dahua*|*",
-                "Honewell|H4W4PER2"
+                "Honewell|H4W4PER2",
+                "Honeywell*|H4W4PER2"
             ],
             "trustToVideoSourceSize": false
         },
