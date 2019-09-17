@@ -5,7 +5,6 @@ import signal
 import sys
 import time
 import logging
-import traceback
 
 logging.basicConfig(filename='vms_benchmark.log', filemode='w', level=logging.DEBUG)
 
@@ -57,7 +56,6 @@ from vms_benchmark import exceptions
 import urllib
 import click
 import cv2
-import os
 
 
 def load_configs(config_file):
@@ -108,7 +106,7 @@ def load_configs(config_file):
             "optional": True,
             "type": 'string',
             "default": './low.ts'
-    },
+        },
         "streamTestDurationSecs": {
             "optional": True,
             "type": 'integer',
@@ -134,6 +132,11 @@ def load_configs(config_file):
             "type": 'boolean',
             "default": False
         },
+        "cpuUsageThreshold": {
+            "optional": True,
+            "type": 'float',
+            "default": 0.5
+        },
     }
 
     sys_config = ConfigParser('vms_benchmark.ini', sys_option_descriptions, is_file_optional=True)
@@ -149,23 +152,29 @@ def load_configs(config_file):
     return config, sys_config
 
 
-def log_exception(contextName, exception):
-    logging.exception(f'Exception: {contextName}: {type(exception)}: {str(exception)}')
+def log_exception(context_name, exception):
+    logging.exception(f'Exception: {context_name}: {type(exception)}: {str(exception)}')
 
 
 def device_cpu_usage(device):
     cpu_usage_file = '/proc/loadavg'
     cpu_usage_reply = device.eval(f'cat {cpu_usage_file}')
     cpu_usage_reply_list = cpu_usage_reply.split() if cpu_usage_reply else None
+
     if not cpu_usage_reply_list or len(cpu_usage_reply_list) < 2:
         # TODO: Properly log an arbitrary string in cpu_usage_reply.
-        return (f'Unable to fetch box cpu usage: unexpected contents in {cpu_usage_file}')
-    return cpu_usage_reply_list[1]
+        raise exceptions.DeviceFileContentError(cpu_usage_file)
+
+    try:
+        result = float(cpu_usage_reply_list[1])
+    except ValueError:
+        raise exceptions.DeviceFileContentError(cpu_usage_file)
+
+    return result
 
 
-def report_server_events(api, streaming_started_at):
+def process_server_events(api, streaming_started_at):
     print(f"    Requesting potential failure events from the Server...")
-    import pprint
     log_events = api.get_events(streaming_started_at)
     storage_failure_events_count = sum(
         event['aggregationCount']
@@ -173,6 +182,9 @@ def report_server_events(api, streaming_started_at):
         if event['eventParams'].get('eventType', None) == 'storageFailureEvent'
     )
     print(f"        Storage failures: {storage_failure_events_count}")
+
+    if storage_failure_events_count > 0:
+        raise exceptions.StorageFailuresIssue(storage_failure_events_count)
 
 
 @click.command()
@@ -357,22 +369,22 @@ def main(config_file):
         print(f"Serving {test_cameras_count} virtual cameras.")
         print("")
 
-        test_camera_cm = test_camera_runner.test_camera_running(
+        test_camera_context_manager = test_camera_runner.test_camera_running(
             local_ip=device.local_ip,
             count=test_cameras_count,
             primary_fps=sys_config['testStreamFpsHigh'],
             secondary_fps=sys_config['testStreamFpsLow'],
         )
-        with test_camera_cm as test_camera_process:
+        with test_camera_context_manager as test_camera_context:
             print(f"    Started {test_cameras_count} virtual cameras.")
 
             def wait_test_cameras_discovered(timeout, duration):
                 started_at = time.time()
                 detection_started_at = None
                 while time.time() - started_at < timeout:
-                    if test_camera_process.poll() is not None:
+                    if test_camera_context.poll() is not None:
                         raise exceptions.TestCameraError(
-                            f'Test Camera process exited unexpectedly with code {test_camera_process.returncode}')
+                            f'Test Camera process exited unexpectedly with code {test_camera_context.returncode}')
 
                     cameras = api.get_test_cameras()
 
@@ -423,7 +435,7 @@ def main(config_file):
                         break
 
                 if not stream.isOpened():
-                    raise exceptions.TestCameraStreamingError(
+                    raise exceptions.TestCameraStreamingIssue(
                         f'Cannot open video stream {stream_url}: timeout expired.')
 
                 streaming_started_at = time.time()
@@ -449,7 +461,7 @@ def main(config_file):
                             lag = time.time() - (first_ts + frames * (1.0/float(sys_config['testFileFps'])))
                             maxAllowedLagSeconds = 5
                             if lag > maxAllowedLagSeconds:
-                                raise exceptions.TestCameraStreamingError(
+                                raise exceptions.TestCameraStreamingIssue(
                                     'Streaming video from the Server FAILED: ' +
                                     f'the video lags for more than {maxAllowedLagSeconds} seconds; ' +
                                     'can be caused by network issues or poor performance of either the host or the box.'
@@ -462,7 +474,7 @@ def main(config_file):
 
                             maxAllowedDummyFrames = 50
                             if dummy_frames_count > maxAllowedDummyFrames:
-                                raise exceptions.TestCameraStreamingError(
+                                raise exceptions.TestCameraStreamingIssue(
                                     'Streaming video from the Server FAILED: ' +
                                     f'the stream is broken - more than {maxAllowedDummyFrames} ' +
                                     'frames with equal timestamps; ' +
@@ -481,18 +493,32 @@ def main(config_file):
                         last_ts = time.time()
 
                     if not streaming_succeeded:
-                        raise exceptions.TestCameraStreamingError(
+                        raise exceptions.TestCameraStreamingIssue(
                             'Streaming video from the Server FAILED: ' +
                             'the stream has unexpectedly finished; ' +
                             'can be caused by network issues or Server issues.')
                 finally:
+                    try:
+                        cpu_usage_summarized = device_cpu_usage(device)/dev_platform.cpu_number
+                    except exceptions.VmsBenchmarkError as e:
+                        raise exceptions.UnableToFetchDataFromDevice(
+                            'Unable to fetch box cpu usage',
+                            original_exception=e
+                        )
+
                     print(f"    Frame drops: {frame_drops} (expected 0)")
                     print(f"    Frames with equal timestamps: {dummy_frames_count} (expected 0)")
-                    print(f"    CPU usage: {device_cpu_usage(device)}")
+                    print(f"    CPU usage: {str(cpu_usage_summarized) if cpu_usage_summarized else '-'}")
                     print(f"    Free RAM: {round(ram_free/1024/1024)} MB")
 
-                report_server_events(api, streaming_started_at)
-            except exceptions.TestCameraStreamingError as exception:
+                    process_server_events(api, streaming_started_at)
+
+                    if cpu_usage_summarized > sys_config['cpuUsageThreshold']:
+                        raise exceptions.CPUUsageThresholdExceededIssue(
+                            cpu_usage_summarized,
+                            sys_config['cpuUsageThreshold']
+                        )
+            except exceptions.VmsBenchmarkIssue as exception:
                 print(f"\nISSUE: {str(exception)}")
                 log_exception("ISSUE", exception)
                 return 1

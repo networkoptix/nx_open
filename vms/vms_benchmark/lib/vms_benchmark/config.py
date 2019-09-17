@@ -42,11 +42,11 @@ class ConfigParser:
         if not is_file_present:
             self.options = dict()
         else:
-            self.options = dict([
-                [
+            self.options = dict(
+                (
                     line[:line.find('=')].strip(),
                     process_env_vars(line[line.find('=') + 1:].strip())
-                ] for line in [
+                ) for line in (
                     line
                     for line in [
                         line[:line.find('#')] if line.find('#') != -1 else line
@@ -54,8 +54,8 @@ class ConfigParser:
                         f.readlines()
                     ]
                     if '=' in line
-                ]
-            ])
+                )
+            )
 
         if option_descriptions:
             for name, _ in ((k, v) for (k, v) in option_descriptions.items() if v.get('optional', False) is False):
@@ -69,6 +69,8 @@ class ConfigParser:
 
                     if option_descriptions[name]['type'] == 'integer':
                         self.options[name] = int(self.options[name])
+                    if option_descriptions[name]['type'] == 'float':
+                        self.options[name] = float(self.options[name])
                     if option_descriptions[name]['type'] == 'boolean':
                         self.options[name] = self.options[name] in ('true', 'True', 't', 'yes', 'Yes', '1')
                     elif option_descriptions[name]['type'] == 'integers' and self.options.get(name, None) is not None:
@@ -85,7 +87,7 @@ class ConfigParser:
     def __getitem__(self, item):
         return self.options[item]
 
-    _get_DEFAULT=object()
+    _get_DEFAULT = object()
 
     def get(self, key, default=_get_DEFAULT):
         if default == self._get_DEFAULT:
