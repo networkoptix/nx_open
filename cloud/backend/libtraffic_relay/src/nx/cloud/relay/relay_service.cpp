@@ -151,8 +151,18 @@ void RelayService::watchSslCertificateFileIfNeeded(const conf::Settings& setting
 
 	const bool subscribed = m_fileWatcher->subscribe(
 		settings.https().certificatePath,
-		[this](const auto& filePath, const auto watchEvent)
+		[this, certificatePath = settings.https().certificatePath](
+		    const auto& filePath,
+		    auto systemError,
+		    auto /*watchEvent*/)
 		{
+			if (systemError != SystemError::noError && filePath == certificatePath)
+			{
+				NX_WARNING(this, "SystemError %1 occured while watching certificate file.",
+					SystemError::toString(systemError));
+				return;
+			}
+
 			NX_INFO(this, "Ssl certificate file %1 changed, restarting service", filePath);
 			restart();
 		},

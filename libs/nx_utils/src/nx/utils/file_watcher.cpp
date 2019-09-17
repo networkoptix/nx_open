@@ -74,19 +74,17 @@ void FileWatcher::run()
 			if (watch.second.subscriptionIds.empty())
 				continue;
 
-			const auto filePath = watch.first;
-
 			lock.unlock();
-			const auto [systemErrorCode, stat] = doStat(filePath);
+			const auto [systemError, stat] = doStat(watch.first);
 			lock.relock();
 
-			if (systemErrorCode && systemErrorCode != SystemError::fileNotFound)
+			if (systemError && systemError != SystemError::fileNotFound)
 			{
-				notify(&lock, &watch, EventType(), systemErrorCode);
+				notify(&lock, &watch, EventType(), systemError);
 				continue;
 			}
 
-			const bool fileExists = systemErrorCode != SystemError::fileNotFound;
+			const bool fileExists = systemError != SystemError::fileNotFound;
 
 			if (watch.second.fileData.lastExists && !fileExists)
 			{
@@ -140,11 +138,11 @@ std::pair<SystemError::ErrorCode, FileWatcher::Stat> FileWatcher::doStat(
 	result = stat64(filePath.c_str(), &buf);
 #endif // _WIN32
 
-	const auto systemErrorCode = result
+	const auto systemError = result
 		? SystemError::getLastOSErrorCode()
 		: SystemError::noError;
 
-	return std::make_pair(systemErrorCode, std::move(buf));
+	return std::make_pair(systemError, std::move(buf));
 }
 
 bool FileWatcher::metadataEqual(const Stat& a, const Stat& b)
