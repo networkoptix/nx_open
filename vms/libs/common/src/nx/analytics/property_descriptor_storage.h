@@ -78,7 +78,7 @@ private:
     const QString m_propertyName;
 
     mutable QnMutex m_mutex;
-    mutable CachedValue<Container> m_cachedContainer;
+    mutable nx::utils::CachedValue<Container> m_cachedContainer;
 
     NotifyWhenUpdated m_notifier;
     PropertyDescriptorStorageHelper m_helper;

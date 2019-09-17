@@ -177,7 +177,7 @@ private:
     QString m_authKey;
     bool m_isCompatible = true;
 
-    CachedValue<Qn::PanicMode> m_panicModeCache;
+    nx::utils::CachedValue<Qn::PanicMode> m_panicModeCache;
 
     mutable QnResourcePtr m_firstCamera;
 

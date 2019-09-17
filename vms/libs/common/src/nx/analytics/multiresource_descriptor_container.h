@@ -232,7 +232,7 @@ private:
     MultiresourceDescriptorContainerHelper m_helper;
 
     mutable QnMutex m_mutex;
-    CachedValue<DescriptorMap> m_cachedMergedDescriptors;
+    nx::utils::CachedValue<DescriptorMap> m_cachedMergedDescriptors;
 };
 
 } // namespace nx::analytics

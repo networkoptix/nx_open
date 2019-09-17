@@ -443,18 +443,18 @@ private:
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
-    CachedValue<Qn::LicenseType> m_cachedLicenseType;
-    CachedValue<bool> m_cachedHasDualStreaming;
-    CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
-    CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
-    CachedValue<bool> m_cachedIsDtsBased;
-    CachedValue<Qn::MotionType> m_motionType;
-    CachedValue<bool> m_cachedIsIOModule;
-    CachedValue<bool> m_cachedCanConfigureRemoteRecording;
-    CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
-    CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
-    CachedValue<bool> m_cachedHasVideo;
-    CachedValue<MotionStreamIndex> m_cachedMotionStreamIndex;
+    nx::utils::CachedValue<Qn::LicenseType> m_cachedLicenseType;
+    nx::utils::CachedValue<bool> m_cachedHasDualStreaming;
+    nx::utils::CachedValue<Qn::MotionTypes> m_cachedSupportedMotionType;
+    nx::utils::CachedValue<Qn::CameraCapabilities> m_cachedCameraCapabilities;
+    nx::utils::CachedValue<bool> m_cachedIsDtsBased;
+    nx::utils::CachedValue<Qn::MotionType> m_motionType;
+    nx::utils::CachedValue<bool> m_cachedIsIOModule;
+    nx::utils::CachedValue<bool> m_cachedCanConfigureRemoteRecording;
+    nx::utils::CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
+    nx::utils::CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
+    nx::utils::CachedValue<bool> m_cachedHasVideo;
+    nx::utils::CachedValue<MotionStreamIndex> m_cachedMotionStreamIndex;
 
 protected slots:
     virtual void resetCachedValues();

@@ -40,6 +40,6 @@ private:
 
 private:
     QnMutex* m_mutex; //< For m_devices.
-    CachedValue<DeviceList> m_devices;
+    nx::utils::CachedValue<DeviceList> m_devices;
     QSettings m_settings;
 };

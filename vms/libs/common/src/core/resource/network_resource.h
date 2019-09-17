@@ -124,7 +124,7 @@ private:
 
     QDateTime m_lastDiscoveredTime;
 
-    CachedValue<QString> m_cachedHostAddress;
+    nx::utils::CachedValue<QString> m_cachedHostAddress;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnNetworkResource::NetworkStatus)

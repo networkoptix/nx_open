@@ -54,7 +54,7 @@ private:
     api::analytics::EngineManifest fetchManifest() const;
 
 private:
-    CachedValue<api::analytics::EngineManifest> m_cachedManifest;
+    nx::utils::CachedValue<api::analytics::EngineManifest> m_cachedManifest;
     mutable QnMutex m_cacheMutex;
 };
 
