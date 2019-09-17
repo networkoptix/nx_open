@@ -358,7 +358,7 @@ bool remoteFileExists(const std::string& uri, ftplib& impl)
     if (file.empty()) // Uri shouldn't end with '/'
         throw std::runtime_error("empty file name");
 
-    if (impl.Nlst(fileInfo.name.c_str(), dir.c_str()) == 0)
+    if (impl.Nlst(fileInfo.fullPath.c_str(), dir.c_str()) == 0)
         throw aux::BadUrlException("MLSD failed. Remote dir not exists");
 
     std::ifstream ifs(fileInfo.fullPath);
@@ -521,37 +521,37 @@ int tryFtpReconnect(
 static FileNameAndPath localUniqueFilePath(const std::string& suffix)
 {
     /* First, get a system tmp path*/
-    std::string tmpFolderPath;
+    std::string tmpFolder;
     #if defined (_WIN32)
-        tmpFolderPath.resize(MAX_PATH + 1);
-        DWORD result = GetTempPathA(
-            static_cast<DWORD>(tmpFolderPath.size()), (LPSTR) tmpFolderPath.data());
+        char buf[MAX_PATH + 1];
+        DWORD result = GetTempPathA(sizeof(buf), buf);
         assert(result > 0);
         if (result == 0)
             std::cerr << "Failed to get a temporary folder path" << std::endl;
+        tmpFolder = buf;
     #elif defined (__unix__)
         for (const auto& v: {"TMP", "TEMP", "TMPDIR", "TEMPDIR"})
         {
             const char* envVar = getenv(v);
             if (envVar == nullptr)
                 continue;
-            tmpFolderPath = envVar;
+            tmpFolder = envVar;
             break;
         }
-        if (tmpFolderPath.empty())
-            tmpFolderPath = "/tmp";
+        if (tmpFolder.empty())
+            tmpFolder = "/tmp";
     #else
         assert(false);
     #endif
     /* Now, when the base path is found, generate pseudo random bytes for a file name. */
-    std::stringstream resultStream;
+    std::stringstream nameStream;
     for (int i = 0; i < 4; ++i)
-        resultStream << std::hex << rand();
+        nameStream << std::hex << rand();
     /* Append the suffix, fill the result and we are done. */
-    resultStream << suffix;
+    nameStream << suffix;
     FileNameAndPath nameAndPath;
-    nameAndPath.name = resultStream.str();
-    nameAndPath.fullPath = tmpFolderPath + "/" + nameAndPath.name;
+    nameAndPath.name = nameStream.str();
+    nameAndPath.fullPath = tmpFolder + "/" + nameAndPath.name;
     return nameAndPath;
 }
 
@@ -761,7 +761,7 @@ int STORAGE_METHOD_CALL FtpStorage::getCapabilities() const
 
     // list
     int ret = 0;
-    if (m_impl->Dir(fileInfo.name.c_str(), ".") == 1)
+    if (m_impl->Dir(fileInfo.fullPath.c_str(), ".") == 1)
         ret |= cap::ListFile;
 
     FILE* ofs = fopen(fileInfo.fullPath.c_str(), "wb");
@@ -847,7 +847,7 @@ FileInfoIterator* STORAGE_METHOD_CALL FtpStorage::getFileIterator(
     const auto fileInfo = aux::localUniqueFilePath();
     aux::FileRemover fr(fileInfo.fullPath);
 
-    if (m_impl->Nlst(fileInfo.name.c_str(), dirUrl) == 0)
+    if (m_impl->Nlst(fileInfo.fullPath.c_str(), dirUrl) == 0)
     {
         *ecode = error::UnknownError;
         return nullptr;
@@ -912,7 +912,7 @@ int STORAGE_METHOD_CALL FtpStorage::dirExists(
     const auto fileInfo = aux::localUniqueFilePath();
     aux::FileRemover fr(fileInfo.fullPath);
 
-    if (m_impl->Nlst(fileInfo.name.c_str(), url) == 0)
+    if (m_impl->Nlst(fileInfo.fullPath.c_str(), url) == 0)
         return 0;
 
     return 1;
@@ -1169,12 +1169,12 @@ FtpIODevice::FtpIODevice(
                 if (f == NULL)
                     throw aux::InternalErrorException("couldn't create local temporary file");
                 fclose(f);
-                if (m_impl->Put(m_localfile.name.c_str(), uri, ftplib::image) == 0)
+                if (m_impl->Put(m_localfile.fullPath.c_str(), uri, ftplib::image) == 0)
                     throw aux::InternalErrorException("ftp put failed");
             }
             else
             {
-                if (m_impl->Get(m_localfile.name.c_str(), uri, ftplib::image) == 0)
+                if (m_impl->Get(m_localfile.fullPath.c_str(), uri, ftplib::image) == 0)
                     throw aux::InternalErrorException("ftp get failed");
             }
         }
@@ -1182,7 +1182,7 @@ FtpIODevice::FtpIODevice(
         {
             if (!fileExists)
                 throw aux::BadUrlException("file not found in storage");
-            else if (m_impl->Get(m_localfile.name.c_str(), uri, ftplib::image) == 0)
+            else if (m_impl->Get(m_localfile.fullPath.c_str(), uri, ftplib::image) == 0)
                 throw aux::InternalErrorException("ftp get failed");
         }
 
@@ -1223,7 +1223,7 @@ void FtpIODevice::flush()
             );
 
     if(alive && m_altered)
-        m_impl->Put(m_localfile.name.c_str(), m_uri.c_str(), ftplib::image);
+        m_impl->Put(m_localfile.fullPath.c_str(), m_uri.c_str(), ftplib::image);
 }
 
 uint32_t STORAGE_METHOD_CALL FtpIODevice::write(
