@@ -187,6 +187,29 @@ def process_server_events(api, streaming_started_at):
         raise exceptions.StorageFailuresIssue(storage_failure_events_count)
 
 
+def get_writable_storages(api):
+    try:
+        storages = api.get_storage_spaces()
+    except exceptions.VmsBenchmarkError as e:
+        raise exceptions.ServerApiError('Unable to get VMS storages via REST HTTP', original_exception=e)
+
+    if storages is None:
+        raise exceptions.ServerApiError('Unable to get VMS storages via REST HTTP: request failed')
+
+    def storage_is_writable(storage):
+        free_space = int(storage['freeSpace'])
+        reserved_space = int(storage['reservedSpace'])
+
+        return free_space > reserved_space
+
+    try:
+        result = [storage for storage in storages if storage_is_writable(storage)]
+    except (ValueError, KeyError) as e:
+        raise exceptions.ServerApiResponseError("Bad response body to get storages request", original_exception=e)
+
+    return result
+
+
 @click.command()
 @click.option('--config', 'config_file', default='vms_benchmark.conf', help='Input config file.')
 @click.option('-C', 'config_file', default='vms_benchmark.conf', help='Input config file.')
@@ -332,10 +355,18 @@ def main(config_file, sys_config_file):
     if not wait_for_api():
         raise exceptions.ServerApiError("API of Server is not working: ping request was not successful.")
 
-    print('Rest API basic test is OK.')
+    print('REST API basic test is OK.')
 
     api.check_authentication()
-    print('Rest API authentication test is OK.')
+    print('REST API authentication test is OK.')
+
+    try:
+        storages = get_writable_storages(api)
+    except Exception as e:
+        raise exceptions.ServerApiError(message="Unable to get VMS storages via REST HTTP", original_exception=e)
+
+    if len(storages) == 0:
+        raise exceptions.DeviceStateError("Server has no storages, check free space")
 
     for i in 1, 2, 3:
         cameras = api.get_test_cameras_all()
@@ -535,19 +566,33 @@ def main(config_file, sys_config_file):
     return 0
 
 
-def nx_print_exception(exception):
-    if isinstance(exception, exceptions.VmsBenchmarkError):
-        print(f"{str(exception)}", file=sys.stderr)
-        if exception.original_exception:
-            print('Caused by:', file=sys.stderr)
-            nx_print_exception(exception.original_exception)
+def nx_format_exception(exception):
+    if isinstance(exception, ValueError):
+        return f"Error value {exception}"
+    elif isinstance(exception, KeyError):
+        return f"No key {exception}"
     elif isinstance(exception, urllib.error.HTTPError):
         if exception.code == 401:
-            print(f'Server refuses passed credentials: check .conf options vmsUser and vmsPassword.', file=sys.stderr)
+            return 'Server refuses passed credentials: check .conf options vmsUser and vmsPassword'
         else:
-            print(f'Unexpected HTTP request error (code {exception.code}.', file=sys.stderr)
+            return f'Unexpected HTTP request error (code {exception.code})'
     else:
-        print(f'ERROR: {exception}')
+        return str(exception)
+
+
+def nx_print_exception(exception, recursive_level=0):
+    string_indent = '  '*recursive_level
+    if isinstance(exception, exceptions.VmsBenchmarkError):
+        print(f"{string_indent}{str(exception)}", file=sys.stderr)
+        if exception.original_exception:
+            print(f'{string_indent}Caused by:', file=sys.stderr)
+            nx_print_exception(exception.original_exception, recursive_level=recursive_level+2)
+    else:
+        print(
+            f'{string_indent}{nx_format_exception(exception)}'
+            if recursive_level > 0
+            else f'{string_indent}ERROR: {nx_format_exception(exception)}'
+        )
 
 
 if __name__ == '__main__':
@@ -556,9 +601,7 @@ if __name__ == '__main__':
         logging.info('VMS Benchmark started')
         try:
             sys.exit(main())
-        except urllib.error.HTTPError as e:
-            print(f'ERROR: Server reported HTTP code {e.code}')
-        except exceptions.VmsBenchmarkError as e:
+        except (exceptions.VmsBenchmarkError, urllib.error.HTTPError) as e:
             print(f'ERROR: ', file=sys.stderr, end='')
             nx_print_exception(e)
             log_exception('ERROR', e)

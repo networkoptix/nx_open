@@ -29,6 +29,10 @@ class ServerApiError(VmsBenchmarkError):
     pass
 
 
+class ServerApiResponseError(VmsBenchmarkError):
+    pass
+
+
 class TestCameraError(VmsBenchmarkError):
     pass
 
