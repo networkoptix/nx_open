@@ -24,6 +24,13 @@ public:
     bool hasSharedResource(const QnResourceAccessSubject& subject, const QnUuid& resourceId) const;
     void setSharedResources(const QnResourceAccessSubject& subject, const QSet<QnUuid>& resources);
 
+    /**
+     * Expliticly set shared resources without checks for subject existance and without signals
+     * sending. Actual as workaround the situation when saveAccessRights transaction is received
+     * before the saveUser / saveRole transaction.
+     */
+    void setSharedResourcesById(const QnUuid& subjectId, const QSet<QnUuid>& resources);
+
 private:
     void setSharedResourcesInternal(const QnResourceAccessSubject& subject,
         const QSet<QnUuid>& resources);
