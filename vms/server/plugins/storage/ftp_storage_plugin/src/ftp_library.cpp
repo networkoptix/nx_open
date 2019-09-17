@@ -1143,7 +1143,7 @@ FtpIODevice::FtpIODevice(
         );
         std::string remoteDir, remoteFile;
         aux::dirFromUri(uri, &remoteDir, &remoteFile);
-        m_localfile = aux::localUniqueFilePath(remoteFile);
+        m_localfile = aux::localUniqueFilePath("--" + remoteFile);
         bool fileExists = false;
         try
         {
