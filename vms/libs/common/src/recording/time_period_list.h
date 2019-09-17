@@ -118,7 +118,7 @@ public:
             if (endItr->endTimeMs() > last.startTimeMs - detailLevel)
             {
                 const qint64 lastEndTime = last.endTimeMs();
-                last.startTimeMs = qMin(last.startTimeMs, endItr->startTimeMs);
+                last.startTimeMs = qMin<int64_t>(last.startTimeMs, endItr->startTimeMs);
                 if (!last.isInfinite())
                     last.durationMs = lastEndTime - last.startTimeMs;
             }

@@ -258,9 +258,9 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
                     // every time we find file that can not be opened.
                     // In forward mode - same, but opposite direction
                     if (m_reverseMode) {
-                        seekTimeMs = std::min(seekTimeMs, newChunk.endTimeMs() + kSeekStep);
+                        seekTimeMs = std::min<int64_t>(seekTimeMs, newChunk.endTimeMs() + kSeekStep);
                     } else {
-                        seekTimeMs = std::max(seekTimeMs, newChunk.startTimeMs - kSeekStep);
+                        seekTimeMs = std::max<int64_t>(seekTimeMs, newChunk.startTimeMs - kSeekStep);
                     }
                     continue;
                 }
