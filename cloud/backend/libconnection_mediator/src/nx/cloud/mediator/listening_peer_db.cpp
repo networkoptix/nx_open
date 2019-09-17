@@ -274,8 +274,7 @@ void ListeningPeerDb::findMediatorByPeerDomain(
 
             if (!ok)
             {
-                NX_VERBOSE(this,
-                    "Failed to deserialize MediatorEndpoints. string was: %1",
+                NX_VERBOSE(this, "Failed to deserialize MediatorEndpoints. string was: %1",
                     containerString(map));
                 return handler(MediatorEndpoint());
             }
@@ -297,14 +296,14 @@ void ListeningPeerDb::addUplinkSpeed(
     m_map->database().dataManager().insertOrUpdate(
         key,
         QJson::serialized(uplinkSpeed).toStdString(),
-        [this, func = __func__, key, peerId, uplinkSpeed,
+        [this, key, peerId, uplinkSpeed,
             handler = std::move(handler)](
                 clusterdb::map::ResultCode result)
         {
             if (result != clusterdb::map::ResultCode::ok)
             {
-                NX_VERBOSE(this, "%1: insertOrUpdate failed for key: %2 with ResultCode: %3",
-                    func, key, clusterdb::map::toString(result));
+                NX_VERBOSE(this, "Failed to save connection speed for peer %1. %2",
+                    key, clusterdb::map::toString(result));
                 return handler(false);
             }
 
