@@ -34,7 +34,7 @@ public:
     }
 
     std::unique_ptr<nx::ut::utils::WorkDirResource> workDirResource;
-    QnStorageResourcePtr storage;
+    StorageResourcePtr storage;
 };
 
 TEST_F(StorageTest, StorageMetrics)
@@ -53,13 +53,13 @@ TEST_F(StorageTest, StorageMetrics)
         file->read(kPattern.length() * 2); //< Try to read more than file length.
     }
 
-    auto bytesWritten = storage->getAndResetMetric(&QnStorageResource::Metrics::bytesWritten);
-    auto bytesRead = storage->getAndResetMetric(&QnStorageResource::Metrics::bytesRead);
+    auto bytesWritten = storage->getAndResetMetric(&StorageResource::Metrics::bytesWritten);
+    auto bytesRead = storage->getAndResetMetric(&StorageResource::Metrics::bytesRead);
     ASSERT_EQ(kPattern.length() * kIterations, bytesWritten);
     ASSERT_EQ(kPattern.length() * kIterations, bytesRead);
 
-    bytesWritten = storage->getAndResetMetric(&QnStorageResource::Metrics::bytesWritten);
-    bytesRead = storage->getAndResetMetric(&QnStorageResource::Metrics::bytesWritten);
+    bytesWritten = storage->getAndResetMetric(&StorageResource::Metrics::bytesWritten);
+    bytesRead = storage->getAndResetMetric(&StorageResource::Metrics::bytesWritten);
     ASSERT_EQ(0, bytesWritten);
     ASSERT_EQ(0, bytesRead);
 }
