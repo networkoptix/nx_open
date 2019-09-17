@@ -886,16 +886,18 @@ void MediaServerProcess::saveStorages(
     }
 }
 
-static const int SYSTEM_USAGE_DUMP_TIMEOUT = 7*60*1000;
+static const std::chrono::milliseconds kSystemUsageDumpTimeout = std::chrono::minutes(30);
 
 void MediaServerProcess::dumpSystemUsageStats()
 {
     if (!m_platform->monitor())
         return;
 
-    m_platform->monitor()->totalCpuUsage();
-    m_platform->monitor()->totalRamUsage();
-    m_platform->monitor()->totalHddLoad();
+//    const bool isStatisticsDisabled = serverModule()->mutableSettings()->settings().noMonitorStatistics();
+//    const bool isStatisticsDisabled = settings->settings().noMonitorStatistics();
+    // TODO: should disable statistics in some other way here.
+
+    m_platform->monitor()->logStatistics();
 
     // TODO: #muskov
     //  - Add some more fields that might be interesting.
@@ -910,18 +912,14 @@ void MediaServerProcess::dumpSystemUsageStats()
         }
     }
     const auto networkIfInfo = networkIfList.join(", ");
-    if (m_mediaServer->setProperty(
-        ResourcePropertyKey::Server::kNetworkInterfaces, networkIfInfo))
-    {
+    if (m_mediaServer->setProperty(ResourcePropertyKey::Server::kNetworkInterfaces, networkIfInfo))
         m_mediaServer->saveProperties();
-    }
 
-    QnMutexLocker lk(&m_mutex);
-    if(m_dumpSystemResourceUsageTaskId == 0)  //monitoring cancelled
+    NX_MUTEX_LOCKER lk(&m_mutex);
+    if (m_dumpSystemResourceUsageTaskId == 0)  // Monitoring cancelled
         return;
     m_dumpSystemResourceUsageTaskId = nx::utils::TimerManager::instance()->addTimer(
-        std::bind(&MediaServerProcess::dumpSystemUsageStats, this),
-        std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT));
+        std::bind(&MediaServerProcess::dumpSystemUsageStats, this), kSystemUsageDumpTimeout);
 }
 
 #ifdef Q_OS_WIN
@@ -1013,13 +1011,8 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
 
     addCommandLineParametersFromConfig(settings.get());
 
-    const bool isStatisticsDisabled =
-        settings->settings().noMonitorStatistics();
-
     m_platform.reset(new QnPlatformAbstraction());
     m_platform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
-    m_platform->setUpdatePeriodMs(
-        isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs);
 
     const QString raidEventLogName = system_log::ini().logName;
     const QString raidEventProviderName = system_log::ini().providerName;
@@ -4836,8 +4829,7 @@ void MediaServerProcess::run()
     commonModule()->resourceDiscoveryManager()->setReady(true);
 
     m_dumpSystemResourceUsageTaskId = nx::utils::TimerManager::instance()->addTimer(
-        std::bind(&MediaServerProcess::dumpSystemUsageStats, this),
-        std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT));
+        std::bind(&MediaServerProcess::dumpSystemUsageStats, this), kSystemUsageDumpTimeout);
 
     nx::mserver_aux::makeFakeData(
         cmdLineArguments().createFakeData, m_ec2Connection, commonModule()->moduleGUID());

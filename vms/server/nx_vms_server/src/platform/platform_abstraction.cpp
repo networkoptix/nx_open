@@ -27,8 +27,6 @@ QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
     m_monitor = new QnGlobalMonitor(new QnMonitorImpl(this), this);
 }
 
-void QnPlatformAbstraction::setUpdatePeriodMs(int value) { m_monitor->setUpdatePeriodMs(value); }
-
 QnPlatformAbstraction::~QnPlatformAbstraction()
 {
     return;

@@ -38,7 +38,7 @@ int QnStatisticsRestHandler::executeGet(
     QnStatisticsReply reply;
     auto monitor = serverModule()->platform()->monitor();
     reply.updatePeriod = monitor->updatePeriodMs();
-    reply.uptimeMs = monitor->upTimeMs();
+    reply.uptimeMs = monitor->processUptime().count();
 
     QnStatisticsDataList cpuInfo;
     cpuInfo.append(QnStatisticsDataItem(lit("CPU"), monitor->totalCpuUsage(), Qn::StatisticsCPU));

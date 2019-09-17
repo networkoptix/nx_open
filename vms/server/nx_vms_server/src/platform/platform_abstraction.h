@@ -20,7 +20,6 @@ public:
         return m_monitor;
     }
 
-    void setUpdatePeriodMs(int value);
     void setServerModule(QnMediaServerModule* serverModule);
 
 private:

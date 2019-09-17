@@ -133,52 +133,50 @@ public:
 
     virtual void setServerModule(QnMediaServerModule* /*serverModule*/) {}
 
-    // TODO: #Elric remove 'total' from names.
-
     /**
-     * \returns                         Percent of CPU time (both user and kernel) consumed
-     *                                  by all running processes since the last call to this function,
-     *                                  a number in range <tt>[0.0, 1.0]</tt>.
+     * @returns Percent of CPU time (both user and kernel) consumed by all running processes since
+     *     the last call to this function, a number in range <tt>[0.0, 1.0]</tt>.
      */
     virtual qreal totalCpuUsage() = 0;
 
     /**
-     * \returns                         Percent of RAM currently consumed by all running processes,
-     *                                  a number in range <tt>[0.0, 1.0]</tt>.
+     * @returns Percent of RAM currently consumed by all running processes, a number
+     *     in range <tt>[0.0, 1.0]</tt>.
      */
     virtual qreal totalRamUsage() = 0;
 
     /**
-     * \returns                         A list of HDD load entries for all HDDs on this PC.
+     * @returns A list of HDD load entries for all HDDs on this PC.
      */
     virtual QList<HddLoad> totalHddLoad() = 0;
 
     /**
-     * \returns                         A list of network load entries for all network interfaces on this PC.
+     * @returns A list of network load entries for all network interfaces on this PC.
      */
     virtual QList<NetworkLoad> totalNetworkLoad() = 0;
 
     /**
-     * @returns                         A list of network load entries for all network interfaces of the given types on this PC.
+     * @returns A list of network load entries for all network interfaces of the given types on
+     * this PC.
      */
     QList<NetworkLoad> totalNetworkLoad(NetworkInterfaceTypes types);
 
     /**
-     * @returns                         A list of partition space entries for all partitions on this PC.
+     * @returns A list of partition space entries for all partitions on this PC.
      */
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() = 0;
 
     /**
-     * @returns                         A list of partition space entries for all partitions of the given types on this PC.
+     * @returns A list of partition space entries for all partitions of the given types on this PC.
      */
     QList<PartitionSpace> totalPartitionSpaceInfo(PartitionTypes types);
 
     /**
-     * @brief partitionByPath           Get partition name by path to some folder located on this partition.
-     *                                  Used to get partition by path to the storage.
-     * @param path                      Platform-specific path to target folder.
-     * @returns                         Platform-specific string describing this logical partition,
-     *                                  suitable to be shown to the user.
+     * @brief Get partition name by path to some folder located on this partition. Used to get
+     *     partition by path to the storage.
+     * @param path Platform-specific path to target folder.
+     * @returns Platform-specific string describing this logical partition, suitable to be shown
+     *     to the user.
      */
     virtual QString partitionByPath(const QString& /*path*/) { return QString(); }
 
