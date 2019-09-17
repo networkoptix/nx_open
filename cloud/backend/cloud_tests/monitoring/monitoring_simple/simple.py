@@ -435,23 +435,23 @@ class CloudSession(object):
         self.test_traffic_relay('relay-si')
 
     @testmethod(metric='traffic_relay_cert_failure', host='relay-la', continue_if_fails=True)
-    def test_traffic_relay_la(self):
+    def test_traffic_relay_cert_la(self):
         self.test_traffic_relay_cert('relay-la')
 
     @testmethod(metric='traffic_relay_cert_failure', host='relay-ny', continue_if_fails=True)
-    def test_traffic_relay_ny(self):
+    def test_traffic_relay_cert_ny(self):
         self.test_traffic_relay_cert('relay-ny')
 
     @testmethod(metric='traffic_relay_cert_failure', host='relay-fr', continue_if_fails=True)
-    def test_traffic_relay_fr(self):
+    def test_traffic_relay_cert_fr(self):
         self.test_traffic_relay_cert('relay-fr')
 
     @testmethod(metric='traffic_relay_cert_failure', host='relay-sy', continue_if_fails=True)
-    def test_traffic_relay_sy(self):
+    def test_traffic_relay_cert_sy(self):
         self.test_traffic_relay_cert('relay-sy')
 
     @testmethod(metric='traffic_relay_cert_failure', host='relay-si', continue_if_fails=True)
-    def test_traffic_relay_si(self):
+    def test_traffic_relay_cert_si(self):
         self.test_traffic_relay_cert('relay-si')
 
     @testmethod(metric='email_failure', continue_if_fails=True, debug_skip=True)
