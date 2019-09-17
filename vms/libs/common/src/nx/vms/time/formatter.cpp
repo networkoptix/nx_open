@@ -204,6 +204,11 @@ FormatterPtr Formatter::system()
     return SystemFormatterHolder::get();
 }
 
+FormatterPtr Formatter::custom(const QLocale& locale)
+{
+    return custom(locale, system()->is24HoursTimeFormat());
+}
+
 FormatterPtr Formatter::custom(const QLocale& locale, bool is24HoursTimeFormat)
 {
     return FormatterPtr(new Formatter(locale, is24HoursTimeFormat));

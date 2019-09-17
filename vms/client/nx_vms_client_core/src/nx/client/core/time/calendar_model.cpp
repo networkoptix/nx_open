@@ -48,21 +48,29 @@ bool Day::containsTime(qint64 value) const
 
 struct Month
 {
+    Month(int year = 1970, int month = 1, qint64 displayOffset = 0);
+
     void recalculateData(qint64 displayOffset);
     bool containsDay(const Day& day) const;
     bool containsPosition(qint64 position) const;
 
-    int year = 1970;
-    int month = 1;
+    int year;
+    int month;
     Day startDay;
     Day endDay;
 };
 
+Month::Month(int year, int month, qint64 displayOffset):
+    year(year),
+    month(month),
+    startDay(QDate(year, month, 1), displayOffset),
+    endDay(QDate(year, month, QDate(year, month, 1).daysInMonth()), displayOffset)
+{
+}
+
 void Month::recalculateData(qint64 displayOffset)
 {
-    const auto startDate = QDate(year, month, 1);
-    startDay = Day(startDate, displayOffset);
-    endDay = Day(QDate(year, month, startDate.daysInMonth()), displayOffset);
+    *this = Month(year, month, displayOffset);
 }
 
 bool Month::containsDay(const Day& day) const
