@@ -524,7 +524,8 @@ static FileNameAndPath localUniqueFilePath(const std::string& suffix)
     std::string tmpFolderPath;
     #if defined (_WIN32)
         tmpFolderPath.resize(MAX_PATH + 1);
-        DWORD result = GetTempPathA(static_cast<DWORD>(tmpFolderPath.size()), tmpFolderPath.data());
+        DWORD result = GetTempPathA(
+            static_cast<DWORD>(tmpFolderPath.size()), (LPSTR) tmpFolderPath.data());
         assert(result > 0);
         if (result == 0)
             std::cerr << "Failed to get a temporary folder path" << std::endl;
