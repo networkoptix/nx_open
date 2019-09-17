@@ -568,7 +568,7 @@ FtpFileInfoIterator::FtpFileInfoIterator(
         m_curFile(m_fileList.cbegin())
 {
     m_urlData.assign(baseDir.cbegin(), baseDir.cend());
-    if (baseDir[baseDir.size()-1] != '/')
+    if (baseDir.empty() || baseDir[baseDir.size()-1] != '/')
     {
         m_urlData.push_back('/');
         m_basedirsize = (int)(baseDir.size() + 1);
