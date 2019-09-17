@@ -168,8 +168,8 @@ void RelayService::watchSslCertificateFileIfNeeded(const conf::Settings& setting
 		},
 		&m_subscriptionId);
 
-	if (!systemError)
-		NX_WARNING(this, "Failed to watch ssl file for changes: %1", systemError);
+	if (systemError)
+		NX_WARNING(this, "Failed to watch ssl certificate file for changes: %1", systemError);
 }
 
 } // namespace relay

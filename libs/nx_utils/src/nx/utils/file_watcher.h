@@ -39,9 +39,6 @@ public:
 
 	/**
 	 * @return SystemError::noError if subscribed successfully, some error code otherwise.
-	 * NOTE: If multiple threads subscribe to the same filepath at close to the same time, the
-	 * second thread may fail to subscribe and SystemError::again is returned. In that case,
-	 * retry until SystemError::noError or some other error code is returned.
 	 */
 	 SystemError::ErrorCode subscribe(
 		 const std::string& filePath,
