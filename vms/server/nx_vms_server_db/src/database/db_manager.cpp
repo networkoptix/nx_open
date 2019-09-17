@@ -1993,7 +1993,6 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             && resyncIfNeeded(ResyncResourceProperties);
     }
 
-
     if (updateName.endsWith(lit("/99_20180605_add_rotation_to_presets.sql")))
     {
         return ec2::migration::ptz::addRotationToPresets(logTag, m_sdb)
@@ -2048,6 +2047,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/99_20190821_fix_analytics_engine_guids.sql")))
         return resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith("/99_20190917_delete_vms_camera_user_attributes_license_used.sql"))
+        return resyncIfNeeded(ResyncCameraAttributes);
 
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;
@@ -2437,7 +2439,6 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const CameraAttributesDat
             min_archive_days,
             max_archive_days,
             preferred_server_id,
-            license_used,
             failover_priority,
             backup_type,
             logical_id,
@@ -2457,7 +2458,6 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const CameraAttributesDat
             :minArchiveDays,
             :maxArchiveDays,
             :preferredServerId,
-            :licenseUsed,
             :failoverPriority,
             :backupType,
             :logicalId,
@@ -3942,7 +3942,6 @@ ErrorCode QnDbManager::doQueryNoLock(
             coalesce(min_archive_days, %1) as minArchiveDays,
             coalesce(max_archive_days, %2) as maxArchiveDays,
             preferred_server_id as preferredServerId,
-            license_used as licenseUsed,
             failover_priority as failoverPriority,
             backup_type as backupType,
             logical_id as logicalId,
@@ -4023,7 +4022,6 @@ ErrorCode QnDbManager::doQueryNoLock(const QnCameraDataExQuery& query,
             coalesce(cu.min_archive_days, %1) as minArchiveDays,
             coalesce(cu.max_archive_days, %2) as maxArchiveDays,
             cu.preferred_server_id as preferredServerId,
-            cu.license_used as licenseUsed,
             cu.failover_priority as failoverPriority,
             cu.backup_type as backupType,
             cu.logical_id as logicalId,

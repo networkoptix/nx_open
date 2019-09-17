@@ -23,7 +23,7 @@ public:
     QnUuid cameraId;
     Qn::MotionType motionType = Qn::MotionType::MT_Default;
     QList<QnMotionRegion> motionRegions;
-    bool licenseUsed = false;
+    bool scheduleEnabled = false;
     bool audioEnabled = false;
     bool cameraControlDisabled = false; //< TODO: #GDM Double negation.
     QnScheduleTaskList scheduleTasks;

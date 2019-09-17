@@ -214,12 +214,12 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     if (!resourceExists && m_defaultUserAttrs)
     {
         QnCameraUserAttributesPtr userAttrCopy(new QnCameraUserAttributes(*m_defaultUserAttrs.data()));
-        if (userAttrCopy->licenseUsed)
+        if (userAttrCopy->scheduleEnabled)
         {
             QnCamLicenseUsageHelper helper(serverModule()->commonModule());
             helper.propose(QnVirtualCameraResourceList() << cameraResource, true);
             if (!helper.isValid())
-                userAttrCopy->licenseUsed = false;
+                userAttrCopy->scheduleEnabled = false;
         }
         userAttrCopy->cameraId = apiCameraData.id;
 

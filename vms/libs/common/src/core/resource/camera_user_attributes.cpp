@@ -12,8 +12,8 @@ void QnCameraUserAttributes::assign(
         *modifiedFields << "groupNameChanged";
     if (dewarpingParams != right.dewarpingParams)
         *modifiedFields << "mediaDewarpingParamsChanged";
-    if (licenseUsed != right.licenseUsed)
-        *modifiedFields << "licenseUsedChanged";
+    if (scheduleEnabled != right.scheduleEnabled)
+        *modifiedFields << "scheduleEnabledChanged";
     if (scheduleTasks != right.scheduleTasks)
         *modifiedFields << "scheduleTasksChanged";
     if (motionRegions != right.motionRegions)

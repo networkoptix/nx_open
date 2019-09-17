@@ -462,9 +462,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param scheduleEnabled Whether recording to the archive is enabled for the camera.
      *     %value false
      *     %value true
-     * %param licenseUsed Whether the license is used for the camera.
-     *     %value false
-     *     %value true
      * %param motionType Type of motion detection method.
      *     %value MT_Default Use default method.
      *     %value MT_HardwareGrid Use motion detection grid implemented by the camera.
@@ -559,9 +556,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param scheduleEnabled Whether recording to the archive is enabled for the camera.
      *     %value false
      *     %value true
-     * %param licenseUsed Whether the license is used for the camera.
-     *     %value false
-     *     %value true
      * %param motionType Type of motion detection method.
      *     %value MT_Default Use default method.
      *     %value MT_HardwareGrid Use motion detection grid implemented by the camera.
@@ -654,9 +648,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %param cameraName Camera name.
      *     %param userDefinedGroupName Name of the user-defined camera group.
      *     %param scheduleEnabled Whether recording to the archive is enabled for the camera.
-     *         %value false
-     *         %value true
-     *     %param licenseUsed Whether the license is used for the camera.
      *         %value false
      *         %value true
      *     %param motionType Type of motion detection method.
@@ -794,9 +785,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %param cameraName Camera name.
      *     %param userDefinedGroupName Name of the user-defined camera group.
      *     %param scheduleEnabled Whether recording to the archive is enabled for the camera.
-     *         %value false
-     *         %value true
-     *     %param licenseUsed Whether the license is used for the camera.
      *         %value false
      *         %value true
      *     %param motionType Type of motion detection method.
