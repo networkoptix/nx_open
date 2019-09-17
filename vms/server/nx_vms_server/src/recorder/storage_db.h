@@ -29,7 +29,7 @@ class QnStorageDb: public QObject, public nx::vms::server::ServerModuleAware
 {
 public:
     typedef boost::bimap<QString, uint16_t> UuidToHash;
-    typedef std::set<DeviceFileCatalog::Chunk> ChunkSet;
+    typedef std::set<nx::vms::server::Chunk> ChunkSet;
     typedef std::array<ChunkSet, 2> LowHiChunksCatalogs;
     typedef std::unordered_map<QString, LowHiChunksCatalogs, QStringHasher> UuidToCatalogs;
 
@@ -50,13 +50,13 @@ public:
 
     void addRecord(const QString& cameraUniqueId,
                    QnServer::ChunksCatalog catalog,
-                   const DeviceFileCatalog::Chunk& chunk);
+                   const nx::vms::server::Chunk& chunk);
 
     QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
 
     void replaceChunks(const QString& cameraUniqueId,
                        QnServer::ChunksCatalog catalog,
-                       const std::deque<DeviceFileCatalog::Chunk>& chunks);
+                       const ChunksDeque& chunks);
 
 private:
     using VacuumCompletionHandler = nx::utils::MoveOnlyFunc<void(bool)>;
@@ -92,9 +92,9 @@ private:
         QVector<DeviceFileCatalogPtr>* deviceFileCatalog,
         int cameraId,
         int catalogIndex,
-        std::deque <DeviceFileCatalog::Chunk> chunks,
+        std::deque <nx::vms::server::Chunk> chunks,
         const UuidToHash& uuidToHash);
-    DeviceFileCatalog::Chunk toChunk(const nx::media_db::MediaFileOperation& mediaData) const;
+    nx::vms::server::Chunk toChunk(const nx::media_db::MediaFileOperation& mediaData) const;
     bool vacuum(QVector<DeviceFileCatalogPtr> *data = nullptr);
     QByteArray dbFileContent();
     void startVacuum(

@@ -55,11 +55,11 @@ void QnDualQualityHelper::openCamera(const QString& cameraUniqueId)
 
 void QnDualQualityHelper::findDataForTime(
     const qint64                                time,
-    DeviceFileCatalog::TruncableChunk           &chunk,
+    nx::vms::server::TruncableChunk           &chunk,
     DeviceFileCatalogPtr                        &catalog,
     DeviceFileCatalog::FindMethod               findMethod,
     bool                                        preciseFind,
-    const DeviceFileCatalog::UniqueChunkCont    &ignoreChunks
+    const nx::vms::server::UniqueChunkCont    &ignoreChunks
 )
 {
     DeviceFileCatalogPtr normalCatalog = (isLowMediaQuality(m_quality) ?
@@ -102,13 +102,13 @@ void QnDualQualityHelper::findDataForTime(
 
 void QnDualQualityHelper::findDataForTimeHelper(
     const qint64                                time,
-    DeviceFileCatalog::TruncableChunk           &resultChunk,
+    nx::vms::server::TruncableChunk           &resultChunk,
     DeviceFileCatalogPtr                        &resultCatalog,
     DeviceFileCatalog::FindMethod               findMethod,
     bool                                        preciseFind,
     SearchStack                                 &searchStack,
     qint64                                      previousDistance,
-    const DeviceFileCatalog::UniqueChunkCont    &ignoreChunks
+    const nx::vms::server::UniqueChunkCont    &ignoreChunks
 )
 {
     if (searchStack.empty() || previousDistance == 0)
@@ -133,9 +133,9 @@ void QnDualQualityHelper::findDataForTimeHelper(
         DeviceFileCatalogPtr currentCatalog,
         const qint64 time,
         DeviceFileCatalog::FindMethod findMethod,
-        const DeviceFileCatalog::UniqueChunkCont& ignoreChunks)
+        const nx::vms::server::UniqueChunkCont& ignoreChunks)
     {
-        DeviceFileCatalog::TruncableChunk currentChunk;
+        nx::vms::server::TruncableChunk currentChunk;
         int chunkIndex = currentCatalog->findFileIndex(time, findMethod);
         while (1)
         {
@@ -144,8 +144,8 @@ void QnDualQualityHelper::findDataForTimeHelper(
             if (currentChunk.startTimeMs == -1)
                 break;
 
-            DeviceFileCatalog::UniqueChunk chunkToFind =
-                DeviceFileCatalog::UniqueChunk(
+            nx::vms::server::UniqueChunk chunkToFind =
+                nx::vms::server::UniqueChunk(
                     currentChunk,
                     currentCatalog->cameraUniqueId(),
                     currentCatalog->getRole(),
@@ -263,7 +263,7 @@ void QnDualQualityHelper::findDataForTimeHelper(
 }
 
 int64_t QnDualQualityHelper::calcDistanceHelper(
-    const DeviceFileCatalog::Chunk  &chunk,
+    const nx::vms::server::Chunk  &chunk,
     const int64_t                   time,
     DeviceFileCatalog::FindMethod   findMethod
 )

@@ -119,7 +119,7 @@ std::future<UpdateContents> checkSpecificChangeset(
  */
 
 nx::update::UpdateContents checkSpecificChangesetProxied(
-        rest::QnConnectionPtr proxyConnection,
+        ::rest::QnConnectionPtr proxyConnection,
         const nx::utils::SoftwareVersion& engineVersion,
         const QString& updateUrl, const QString& build);
 

@@ -584,7 +584,7 @@ QnStorageResourceList MediaServerProcess::createStorages(const QnMediaServerReso
         storages.append(storage);
         NX_DEBUG(kLogTag, lm("Creating new storage: %1").arg(folderPath));
     }
-    bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
+    bigStorageThreshold /= QnStorageManager::kBigStorageTreshold;
 
     for (int i = 0; i < storages.size(); ++i) {
         QnStorageResourcePtr storage = storages[i].dynamicCast<QnStorageResource>();

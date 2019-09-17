@@ -63,7 +63,8 @@ void doExecutePost(
     StatusCodeExpectation httpStatus,
     const QString& authName,
     const QString& authPassword,
-    QByteArray* responseBody);
+    QByteArray* responseBody,
+    const QByteArray& contentType);
 
 /**
  * @param urlStr Part of the URL after the origin - staring with a slash, path and query.
@@ -77,8 +78,17 @@ void executePost(
     StatusCodeExpectation httpStatus = Equals(nx::network::http::StatusCode::ok),
     const QString& authName = "admin",
     const QString& authPassword = "admin",
-    QByteArray* responseBody = nullptr)
+    QByteArray* responseBody = nullptr,
+    const QByteArray& contentType = "application/json")
 {
+    if constexpr (std::is_same_v<RequestData, QByteArray>)
+    {
+        ASSERT_NO_FATAL_FAILURE(doExecutePost(
+            launcher, urlStr, requestData, std::move(preprocessRequestFunc), httpStatus, authName,
+            authPassword, responseBody, contentType));
+        return;
+    }
+
     QByteArray request;
     if constexpr (std::is_same<QByteArray, RequestData>::value)
         request = requestData;
@@ -87,7 +97,7 @@ void executePost(
 
     ASSERT_NO_FATAL_FAILURE(doExecutePost(
         launcher, urlStr, request, std::move(preprocessRequestFunc), httpStatus, authName,
-        authPassword, responseBody));
+        authPassword, responseBody, contentType));
 }
 
 void doExecuteGet(
@@ -121,7 +131,9 @@ void executeGet(
     ASSERT_NO_FATAL_FAILURE(doExecuteGet(launcher, urlStr, &response, httpStatus, authName,
         authPassword));
     if (responseData)
+    {
         ASSERT_TRUE(QJson::deserialize(response, responseData));
+    }
 }
 
 void executeGet(
@@ -141,7 +153,9 @@ void executeGet(
     nx::network::http::BufferType response;
     ASSERT_NO_FATAL_FAILURE(doExecuteGet(url, &response, httpStatus));
     if (responseData)
+    {
         ASSERT_TRUE(QJson::deserialize(response, responseData));
+    }
 }
 
 void executeGet(

@@ -72,8 +72,8 @@ nx::utils::Url createUrl(const MediaServerLauncher* const launcher, const QStrin
 
 void doExecutePost(const MediaServerLauncher* const launcher, const QString& urlStr,
     const QByteArray& request, PreprocessRequestFunc preprocessRequestFunc,
-    StatusCodeExpectation httpStatus, const QString &authName, const QString &authPassword,
-    QByteArray* responseBody)
+    StatusCodeExpectation httpStatus, const QString &authName, const QString &authPassword, QByteArray* responseBody,
+    const QByteArray& contentType)
 {
     auto httpClient = createHttpClient(authName, authPassword);
     nx::utils::Url url = createUrl(launcher, urlStr);
@@ -83,7 +83,7 @@ void doExecutePost(const MediaServerLauncher* const launcher, const QString& url
     NX_INFO(typeid(FunctionsTag), lm("POST %1").arg(urlStr));
     NX_INFO(typeid(FunctionsTag), lm("POST_REQUEST: %2").arg(actualRequest));
 
-    httpClient->doPost(url, "application/json", actualRequest);
+    httpClient->doPost(url, contentType, actualRequest);
 
     const auto response = readResponseBody(httpClient.get());
     NX_INFO(typeid(FunctionsTag), lm("POST_RESPONSE: %1").arg(response));

@@ -294,7 +294,7 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(c
 
 void QnCameraHistoryPool::at_cameraPrepared(
     bool success,
-    const rest::Handle& requestId,
+    const ::rest::Handle& requestId,
     const nx::vms::api::CameraHistoryDataList& periods,
     callbackFunction callback)
 {

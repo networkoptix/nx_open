@@ -36,7 +36,7 @@ private:
     std::shared_ptr<Metrics> m_metrics;
 };
 
-using StorageResourcePtr = QSharedPointer<StorageResource>;
+using StorageResourcePtr = QnSharedResourcePointer<StorageResource>;
 using  StorageResourceList = QnSharedResourcePointerList<StorageResource>;
 
 } // namespace nx::vms::server

@@ -62,12 +62,14 @@ Writer::Writer(WriterHandler* writeHandler):
     m_handler(writeHandler)
 {}
 
-void Writer::write()
+void Writer::writeAll()
 {
     NX_VERBOSE(this, lit("[CamInfo] writing camera info files starting..."));
 
     for (auto& storageUrl: m_handler->storagesUrls())
+    {
         for (int i = 0; i < static_cast<int>(QnServer::ChunksCatalogCount); ++i)
+        {
             for (auto& cameraId: m_handler->camerasIds(static_cast<QnServer::ChunksCatalog>(i)))
             {
                 if (m_handler->needStop())
@@ -76,8 +78,24 @@ void Writer::write()
                     makeFullPath(storageUrl, static_cast<QnServer::ChunksCatalog>(i), cameraId),
                     m_composer.make(m_handler->composerHandler(cameraId)));
             }
+        }
+    }
 
     NX_VERBOSE(this, lit("[CamInfo] writing camera info files DONE"));
+}
+
+void Writer::writeFile(const QString& cameraUniqueId, QnServer::ChunksCatalog quality)
+{
+    for (auto& storageUrl: m_handler->storagesUrls())
+    {
+        writeInfoIfNeeded(
+            makeFullPath(storageUrl, quality, cameraUniqueId),
+            m_composer.make(m_handler->composerHandler(cameraUniqueId)));
+    }
+
+    NX_DEBUG(
+        this, "[CamInfo] updated camera information file for the camera %1, %2 catalog",
+        cameraUniqueId, quality);
 }
 
 bool Writer::isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFileData) const
@@ -104,12 +122,13 @@ void Writer::writeInfoIfNeeded(const QString& infoFilePath, const QByteArray& in
 }
 
 QString Writer::makeFullPath(
-    const QString& storageUrl,
-    QnServer::ChunksCatalog catalog,
-    const QString& cameraId)
+    const QString& storageUrl, QnServer::ChunksCatalog catalog, const QString& cameraId)
 {
     auto separator = getPathSeparator(storageUrl);
-    auto basePath = closeDirPath(storageUrl) + DeviceFileCatalog::prefixByCatalog(catalog) + separator;
+    auto basePath =
+        closeDirPath(storageUrl) + DeviceFileCatalog::prefixByCatalog(catalog) + separator;
+    if (!QDir().exists(basePath))
+        QDir().mkpath(basePath);
     return basePath + cameraId + separator + lit("info.txt");
 }
 
@@ -299,15 +318,10 @@ QString Reader::infoFilePath() const
 bool Reader::readFileData()
 {
     m_fileData = m_getDataFunc(infoFilePath());
-
     if (m_fileData.isNull())
     {
-        m_lastError =  {
-            lit("File data is NULL for archive camera %1")
-                .arg(m_archiveCamData.coreData.physicalId),
-            utils::log::Level::error
-        };
-        return false;
+        NX_DEBUG(
+            this, "File data is NULL for archive camera %1", m_archiveCamData.coreData.physicalId);
     }
 
     return true;
