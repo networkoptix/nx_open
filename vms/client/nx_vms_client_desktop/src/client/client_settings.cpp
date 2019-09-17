@@ -150,25 +150,8 @@ QnClientSettings::QnClientSettings(const QnStartupParameters& startupParameters,
     setName(LAST_RECORDING_DIR,     lit("videoRecording/previousDir"));
     setName(LAST_EXPORT_DIR,        lit("export/previousDir"));
 
-    /* Load from internal resource. */
-    QFile file(QLatin1String(":/globals.json"));
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QJsonObject jsonObject;
-        if (!QJson::deserialize(file.readAll(), &jsonObject))
-        {
-            NX_ASSERT(false, "Client settings file could not be parsed!");
-        }
-        else
-        {
-            updateFromJson(jsonObject.value(lit("settings")).toObject());
-        }
-    }
-    NX_ASSERT(!updateFeedUrl().isEmpty());
-
     /* Load from settings. */
     load();
-    NX_ASSERT(!updateFeedUrl().isEmpty());
 
     nx::utils::file_system::ensureDir(mediaFolder());
 

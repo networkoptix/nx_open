@@ -81,14 +81,19 @@ QString QnAppInfo::supportPhone()
     return QStringLiteral("${supportPhone}");
 }
 
+QString QnAppInfo::updateFeedUrl()
+{
+    return "${product.updateFeedUrl}";
+}
+
 QString QnAppInfo::updateGeneratorUrl()
 {
-    return QStringLiteral("${update.generator.url}");
+    return "${product.updateGeneratorUrl}";
 }
 
 int QnAppInfo::freeLicenseCount()
 {
-    return 4;
+    return ${product.freeLicenseCount};
 }
 
 QString QnAppInfo::freeLicenseKey()
@@ -98,5 +103,5 @@ QString QnAppInfo::freeLicenseKey()
 
 bool QnAppInfo::freeLicenseIsTrial()
 {
-    return true;
+    return ${product.freeLicenseIsTrial};
 }

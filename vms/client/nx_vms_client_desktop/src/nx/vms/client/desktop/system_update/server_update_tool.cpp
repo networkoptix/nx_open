@@ -1476,10 +1476,7 @@ QUrl generateUpdatePackageUrl(
     query.addQueryItem("components",
         compactPackagesQuery(componentsListToJson(nx::utils::OsInfo::current(), osInfoList)));
 
-    QString path = qnSettings->updateCombineUrl();
-    if (path.isEmpty())
-        path = QnAppInfo::updateGeneratorUrl();
-    QUrl url(path);
+    QUrl url(QnAppInfo::updateGeneratorUrl());
     url.setQuery(query);
 
     return url;

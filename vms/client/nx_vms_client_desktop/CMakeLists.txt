@@ -8,10 +8,6 @@ nx_find_files(ui_files src "ui")
 qt5_wrap_ui(uic_files ${ui_files})
 
 nx_configure_file(
-    maven/filter-resources/resources/globals.json
-    ${CMAKE_CURRENT_BINARY_DIR})
-
-nx_configure_file(
     maven/filter-resources/client_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 

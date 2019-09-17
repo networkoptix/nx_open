@@ -256,7 +256,7 @@ int CompatibilityVersionInstallationDialog::startUpdate()
     connect(m_private->clientUpdateTool, &ClientUpdateTool::updateStateChanged,
         this, &CompatibilityVersionInstallationDialog::atUpdateStateChanged);
 
-    QString updateUrl = qnSettings->updateFeedUrl();
+    QString updateUrl = QnAppInfo::updateFeedUrl();
     QString build = QString::number(m_versionToInstall.build());
 
     m_private->checkingUpdates = true;

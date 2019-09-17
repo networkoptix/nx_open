@@ -1,27 +1,10 @@
-set(updatefeed.auto "false")
-set(windows.skip.sign "false")
-
-set(help.language "english")
 set(liteDeviceName "microserver")
 set(shortCloudName "Cloud")
-
-# Build submodules
-set(build_nxtool OFF)
-set(build_paxton OFF)
-set(build_mobile ON)
 
 set(backgroundImage "{}")
 set(defaultWebPages "{}")
 
 set(eulaVersion 1)
-
-# Update parameters
-set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
-set(updateFeedUrl "http://updates.vmsproxy.com/updates.json")
-set(releaseNotesUrl "http://updates.vmsproxy.com/releasenotes.json")
-
-# Additional Features
-set(vmax false)
 
 set(useMetaVersion OFF)
 
@@ -57,9 +40,18 @@ set(translations
     fi_FI
     sv_SE
 )
-set(defaultTranslation en_US)
 
+set(defaultTranslation en_US)
 set(customization.defines "")
 
 # Defaults to ${customization.companyName} in the properties.cmake
 set(windowsInstallPath "")
+
+
+
+#TODO: #GDM #FIXME How to write it better?
+if(customization.translations)
+    set(product.translations ${customization.translations})
+else()
+    set(product.translations ${product.defaultTranslations})
+endif()

@@ -56,6 +56,7 @@ public:
     /** Proxy for QML usage. */
     static Q_INVOKABLE QString cloudName();
 
+    static Q_INVOKABLE QString updateFeedUrl();
     static Q_INVOKABLE QString updateGeneratorUrl();
 
     static Q_INVOKABLE int freeLicenseCount();

@@ -1,3 +1,35 @@
+# This file is loaded after the customization. It contains logic to set complex variables, combined
+# from other customizable variables. Also it contains defaults for the rarely overridden variables.
+# Finally, we can declare here some variables, that are not overridden, but semantically related to
+# the customizable product options. // TODO #GDM Ensure the latest part.
+
+# Transform the variables for the migration simplicity.
+# TODO: #GDM Replace old variables with new ones.
+set(build_nxtool OFF)
+if(customization.nxtool.enabled)
+    set(build_nxtool ON)
+endif()
+
+set(build_paxton OFF)
+if(customization.paxton.enabled)
+    set(build_paxton ON)
+endif()
+
+set(build_mobile OFF)
+if(customization.mobile.enabled)
+    set(build_mobile ON)
+endif()
+
+set(enable_hanwha false) # TODO: rename
+if(customization.desktop.supportsHanwha)
+    set(enable_hanwha true)
+endif()
+
+set(vmax false) # TODO: rename
+if(customization.desktop.supportsVmax)
+    set(vmax true)
+endif()
+
 # Overridden in metavms
 nx_set_variable_if_empty(mediaserver_service_name "${customization.companyName} Server")
 nx_set_variable_if_empty(mediaserver_application_name "${customization.companyName} Media Server")
@@ -46,7 +78,10 @@ if(eulaVersionOverride)
     set(eulaVersion ${eulaVersionOverride})
 endif()
 
-set(enable_hanwha false)
-if(customization.desktop.supportsHanwha)
-    set(enable_hanwha true)
-endif()
+
+
+#TODO: #GDM This can actually be overwritten (vista, ipera)
+set(product.updateGeneratorUrl "http://updates.hdw.mx/upcombiner/upcombine")
+set(product.updateFeedUrl "http://updates.vmsproxy.com/updates.json")
+set(product.freeLicenseCount 4)
+set(product.freeLicenseIsTrial true)
