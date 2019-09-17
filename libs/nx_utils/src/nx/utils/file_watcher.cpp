@@ -66,7 +66,7 @@ void FileWatcher::unsubscribe(SubscriptionId subscriptionId)
 	if (uniqueIdIter == m_uniqueIdToFileWatch.end())
 		return;
 
-	const auto fileWatchIter = uniqueIdIter->second;
+	auto fileWatchIter = uniqueIdIter->second;
 
 	if (fileWatchIter->second.subscriptionIds.erase(subscriptionId) > 0)
 	{
