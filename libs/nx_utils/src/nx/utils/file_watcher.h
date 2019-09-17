@@ -3,6 +3,8 @@
 #include <thread>
 #include <sys/stat.h>
 
+#include <nx/utils/system_error.h>
+
 #include "subscription.h"
 
 namespace nx::utils::file_system {
@@ -22,10 +24,11 @@ public:
 
 	enum WatchAttributes
 	{
-		metadata = 1 << 0,
+		metadata = 1 << 0, //< Check file metadata for changes, e.g, creation time, modified time
 	};
 
-	using Handler = MoveOnlyFunc<void(const std::string&, EventType)>;
+	using Handler =
+		MoveOnlyFunc<void(const std::string&, SystemError::ErrorCode, EventType)>;
 
 public:
 	/**
@@ -35,18 +38,18 @@ public:
 	~FileWatcher();
 
 	/**
-	 * @return true subscribed successfully, false otherwise. If subscription failed,
-	 * SystemError::GetLastOsErrorCode() is set.
+	 * @return SystemError::noError if subscribed successfully, some error code otherwise.
+	 * NOTE: If multiple threads subscribe to the same filepath at close to the same time, the
+	 * second thread may fail to subscribe and SystemError::again is returned. In that case,
+	 * retry until SystemError::noError or some other error code is returned.
 	 */
-	 bool subscribe(
+	 SystemError::ErrorCode subscribe(
 		 const std::string& filePath,
 		 Handler handler,
 		 nx::utils::SubscriptionId* const outSubscriptionId,
 		 WatchAttributes watchAttributes = WatchAttributes::metadata);
 
 	void unsubscribe(nx::utils::SubscriptionId subscriptionId);
-
-	std::vector<std::string> paths() const;
 
 private:
 #ifdef _WIN32
@@ -68,8 +71,11 @@ private:
 	{
 		FileData fileData;
 		int watchAttributes = 0;
-		Subscription<std::string, EventType> subscription;
+		// unique_ptr because Subscription doesn't support copy construction
+		std::unique_ptr<Subscription<std::string, SystemError::ErrorCode, EventType>> subscription;
 		std::map<UniqueId, SubscriptionId> subscriptionIds;
+
+		WatchContext();
 	};
 
 	using FileWatches = std::map<std::string, WatchContext>;
@@ -81,12 +87,10 @@ private:
 	void notify(
 		nx::utils::MutexLocker* lock,
 		FileWatchIterator* fileWatch,
-		EventType watchEvent);
+		EventType watchEvent,
+		SystemError::ErrorCode errorCode = SystemError::noError);
 
-	/**
-	 * @return std::pair.first 0 on success or errno on failure
-	 */
-	static std::pair<int, Stat> doStat(const std::string& filePath);
+	static std::pair<SystemError::ErrorCode, Stat> doStat(const std::string& filePath);
 	static bool metadataEqual(const Stat& a, const Stat& b);
 
 private:

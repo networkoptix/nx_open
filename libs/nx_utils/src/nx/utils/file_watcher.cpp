@@ -4,6 +4,12 @@
 
 namespace nx::utils::file_system {
 
+FileWatcher::WatchContext::WatchContext()
+{
+	subscription =
+		std::make_unique<Subscription<std::string, SystemError::ErrorCode, EventType>>();
+}
+
 FileWatcher::FileWatcher(std::chrono::milliseconds timeout):
 	m_timeout(timeout),
 	m_thread(std::bind(&FileWatcher::run, this))
@@ -16,7 +22,7 @@ FileWatcher::~FileWatcher()
 	m_thread.join();
 }
 
-bool FileWatcher::subscribe(
+SystemError::ErrorCode FileWatcher::subscribe(
 	const std::string& filePath,
 	Handler handler,
 	SubscriptionId* const outSubscriptionId,
@@ -24,34 +30,24 @@ bool FileWatcher::subscribe(
 {
 	*outSubscriptionId = kInvalidSubscriptionId;
 
+	const auto [systemError, stat] = doStat(filePath);
+	if (systemError && systemError != SystemError::fileNotFound)
+		return systemError;
+
+	const bool fileExists = systemError != SystemError::fileNotFound;
+
 	QnMutexLocker lock(&m_mutex);
 
-	const bool firstInsertion = m_fileWatches.find(filePath) == m_fileWatches.end();
-	WatchContext* watchContext = firstInsertion ? nullptr : &m_fileWatches[filePath];
-	bool fileExists = false;
-
+	auto [it, firstInsertion] = m_fileWatches.emplace(filePath, WatchContext());
 	if (firstInsertion)
-	{
-		lock.unlock();
-
-		const auto [err, stat] = doStat(filePath);
-		if (err && err != ENOENT)
-			return false;
-
-		lock.relock();
-
-		fileExists = err != ENOENT;
-		watchContext = &m_fileWatches[filePath];
-		watchContext->fileData.lastExists = fileExists;
-		watchContext->fileData.lastStat = std::move(stat);
-	}
+		it->second.fileData = FileData{fileExists, std::move(stat)};
 
 	*outSubscriptionId = m_uniqueId++;
-	auto& actualSubscriptionId = watchContext->subscriptionIds[*outSubscriptionId];
-	watchContext->subscription.subscribe(std::move(handler), &actualSubscriptionId);
-	watchContext->watchAttributes |= watchAttributes;
+	auto& actualSubscriptionId = it->second.subscriptionIds[*outSubscriptionId];
+	it->second.subscription->subscribe(std::move(handler), &actualSubscriptionId);
+	it->second.watchAttributes |= watchAttributes;
 
-	return true;
+	return SystemError::noError;
 }
 
 void FileWatcher::unsubscribe(SubscriptionId subscriptionId)
@@ -62,22 +58,10 @@ void FileWatcher::unsubscribe(SubscriptionId subscriptionId)
 	{
 		if (watch.second.subscriptionIds.erase(subscriptionId) > 0)
 		{
-			watch.second.subscription.removeSubscription(subscriptionId);
+			watch.second.subscription->removeSubscription(subscriptionId);
 			return;
 		}
 	}
-}
-
-std::vector<std::string> FileWatcher::paths() const
-{
-	QnMutexLocker lock(&m_mutex);
-	std::vector<std::string> paths;
-	std::transform(
-		m_fileWatches.begin(),
-		m_fileWatches.end(),
-		std::back_inserter(paths),
-		[](const auto& element) { return element.first; });
-	return paths;
 }
 
 void FileWatcher::run()
@@ -93,13 +77,16 @@ void FileWatcher::run()
 			const auto filePath = watch.first;
 
 			lock.unlock();
-
-			const auto [err, stat] = doStat(filePath);
-			if (err && err != ENOENT)
-				continue;
-			const bool fileExists = err != ENOENT;
-
+			const auto [systemErrorCode, stat] = doStat(filePath);
 			lock.relock();
+
+			if (systemErrorCode && systemErrorCode != SystemError::fileNotFound)
+			{
+				notify(&lock, &watch, EventType(), systemErrorCode);
+				continue;
+			}
+
+			const bool fileExists = systemErrorCode != SystemError::fileNotFound;
 
 			if (watch.second.fileData.lastExists && !fileExists)
 			{
@@ -132,14 +119,16 @@ void FileWatcher::run()
 void FileWatcher::notify(
 	MutexLocker* lock,
 	FileWatchIterator* fileWatch,
-	EventType eventType)
+	EventType eventType,
+	SystemError::ErrorCode errorCode)
 {
 	lock->unlock();
-	fileWatch->second.subscription.notify(fileWatch->first, eventType);
+	fileWatch->second.subscription->notify(fileWatch->first, errorCode, eventType);
 	lock->relock();
 }
 
-std::pair <int, FileWatcher::Stat> FileWatcher::doStat(const std::string& filePath)
+std::pair<SystemError::ErrorCode, FileWatcher::Stat> FileWatcher::doStat(
+	const std::string& filePath)
 {
 	Stat buf;
 	memset(&buf, 0, sizeof(buf));
@@ -151,10 +140,11 @@ std::pair <int, FileWatcher::Stat> FileWatcher::doStat(const std::string& filePa
 	result = stat64(filePath.c_str(), &buf);
 #endif // _WIN32
 
-	if (result)
-		result = errno;
+	const auto systemErrorCode = result
+		? SystemError::getLastOSErrorCode()
+		: SystemError::noError;
 
-	return std::make_pair(result, std::move(buf));
+	return std::make_pair(systemErrorCode, std::move(buf));
 }
 
 bool FileWatcher::metadataEqual(const Stat& a, const Stat& b)

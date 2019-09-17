@@ -18,7 +18,8 @@ public:
 protected:
 	virtual void SetUp() override
 	{
-		m_fileWatcher = std::make_unique<file_system::FileWatcher>(std::chrono::milliseconds(100));
+		m_timeout = std::chrono::milliseconds(10);
+		m_fileWatcher = std::make_unique<file_system::FileWatcher>(m_timeout);
 		m_filePath = testDataDir().toStdString() + "/test.txt";
 	}
 
@@ -35,18 +36,18 @@ protected:
 
 	void givenExistingFile()
 	{
-		createFile(m_filePath);
+		createFile(m_filePath, std::chrono::seconds(1));
 	}
 
 	void givenSubscription()
 	{
-		subscribe(m_filePath);
+		subscribe(m_filePath, m_timeout * 3);
 	}
 
 	void givenMultipleSubscriptions()
 	{
 		for (int i = 0; i < 2; ++i)
-			subscribe(m_filePath);
+			subscribe(m_filePath, m_timeout * 2);
 	}
 
 	void whenFileIsCreated()
@@ -95,27 +96,34 @@ protected:
 	}
 
 private:
-	void createFile(const std::string& filePath)
+	void createFile(
+		const std::string& filePath,
+		std::chrono::milliseconds sleep = std::chrono::milliseconds::zero())
 	{
 		std::ofstream file(filePath);
 		file << "data";
 		file.close();
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		std::this_thread::sleep_for(sleep);
 	}
 
-	void subscribe(const std::string& filePath)
+	void subscribe(
+		const std::string& filePath,
+		std::chrono::milliseconds sleep = std::chrono::milliseconds::zero())
 	{
 		m_subscriptionIds.emplace_back(kInvalidSubscriptionId);
 		m_fileWatcher->subscribe(
 			filePath,
-			[this](const auto& filePath, const auto eventType)
+			[this](const auto& filePath, auto systemErrorCode, const auto eventType)
 			{
+				ASSERT_EQ(SystemError::noError, systemErrorCode);
 				m_fileEvents.push(std::make_tuple(filePath, eventType));
 			},
 			&m_subscriptionIds.back());
+		std::this_thread::sleep_for(sleep);
 	}
 
 private:
+	std::chrono::milliseconds m_timeout;
 	std::unique_ptr<file_system::FileWatcher> m_fileWatcher;
 	SyncQueue<std::tuple<std::string, file_system::FileWatcher::EventType>> m_fileEvents;
 	std::string m_filePath;
