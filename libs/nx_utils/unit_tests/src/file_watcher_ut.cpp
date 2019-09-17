@@ -25,8 +25,7 @@ protected:
 
 	virtual void TearDown() override
 	{
-		for(const auto& subscriptionId: m_subscriptionIds)
-			m_fileWatcher->unsubscribe(subscriptionId);
+		m_fileWatcher.reset();
 	}
 
 	void givenNonExistentFile()
@@ -36,18 +35,18 @@ protected:
 
 	void givenExistingFile()
 	{
-		createFile(m_filePath, std::chrono::seconds(1));
+		createFile(m_filePath);
 	}
 
 	void givenSubscription()
 	{
-		subscribe(m_filePath, m_timeout * 3);
+		subscribe(m_filePath);
 	}
 
 	void givenMultipleSubscriptions()
 	{
 		for (int i = 0; i < 2; ++i)
-			subscribe(m_filePath, m_timeout * 2);
+			subscribe(m_filePath);
 	}
 
 	void whenFileIsCreated()
@@ -57,6 +56,7 @@ protected:
 
 	void whenFileIsModified()
 	{
+		std::this_thread::sleep_for(std::chrono::seconds(2));
 		std::ofstream file(m_filePath, std::ios::out | std::ios::trunc);
 		file << "data";
 		file.close();
@@ -91,24 +91,19 @@ protected:
 
 	void thenFormerSubscriberIsNotNotified()
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		ASSERT_TRUE(m_fileEvents.empty());
 	}
 
 private:
-	void createFile(
-		const std::string& filePath,
-		std::chrono::milliseconds sleep = std::chrono::milliseconds::zero())
+	void createFile(const std::string& filePath)
 	{
 		std::ofstream file(filePath);
 		file << "data";
 		file.close();
-		std::this_thread::sleep_for(sleep);
 	}
 
-	void subscribe(
-		const std::string& filePath,
-		std::chrono::milliseconds sleep = std::chrono::milliseconds::zero())
+	void subscribe(const std::string& filePath)
 	{
 		m_subscriptionIds.emplace_back(kInvalidSubscriptionId);
 		m_fileWatcher->subscribe(
@@ -119,7 +114,6 @@ private:
 				m_fileEvents.push(std::make_tuple(filePath, eventType));
 			},
 			&m_subscriptionIds.back());
-		std::this_thread::sleep_for(sleep);
 	}
 
 private:

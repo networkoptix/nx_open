@@ -1,6 +1,6 @@
 #include "file_watcher.h"
 
-#include <errno.h>
+#include <time.h>
 
 namespace nx::utils::file_system {
 
@@ -12,6 +12,7 @@ FileWatcher::WatchContext::WatchContext()
 
 FileWatcher::FileWatcher(std::chrono::milliseconds timeout):
 	m_timeout(timeout),
+	m_timerPool(std::bind(&FileWatcher::checkFile, this, std::placeholders::_1)),
 	m_thread(std::bind(&FileWatcher::run, this))
 {
 }
@@ -19,6 +20,7 @@ FileWatcher::FileWatcher(std::chrono::milliseconds timeout):
 FileWatcher::~FileWatcher()
 {
 	m_terminated = true;
+	m_cond.wakeAll();
 	m_thread.join();
 }
 
@@ -42,10 +44,16 @@ SystemError::ErrorCode FileWatcher::subscribe(
 	if (firstInsertion)
 		it->second.fileData = FileData{fileExists, std::move(stat)};
 
-	*outSubscriptionId = m_uniqueId++;
+	*outSubscriptionId = m_subscriberId++;
+	m_uniqueIdToFileWatch.emplace(*outSubscriptionId, it);
 	auto& actualSubscriptionId = it->second.subscriptionIds[*outSubscriptionId];
 	it->second.subscription->subscribe(std::move(handler), &actualSubscriptionId);
 	it->second.watchAttributes |= watchAttributes;
+
+	m_timerPool.addTimer(filePath, m_timeout);
+
+	lock.unlock();
+	m_cond.wakeAll();
 
 	return SystemError::noError;
 }
@@ -54,75 +62,86 @@ void FileWatcher::unsubscribe(SubscriptionId subscriptionId)
 {
 	QnMutexLocker lock(&m_mutex);
 
-	for (auto& watch : m_fileWatches)
+	auto uniqueIdIter = m_uniqueIdToFileWatch.find(subscriptionId);
+	if (uniqueIdIter == m_uniqueIdToFileWatch.end())
+		return;
+
+	const auto fileWatchIter = uniqueIdIter->second;
+
+	if (fileWatchIter->second.subscriptionIds.erase(subscriptionId) > 0)
 	{
-		if (watch.second.subscriptionIds.erase(subscriptionId) > 0)
-		{
-			watch.second.subscription->removeSubscription(subscriptionId);
-			return;
-		}
+		fileWatchIter->second.subscription->removeSubscription(subscriptionId);
+		m_uniqueIdToFileWatch.erase(uniqueIdIter);
+		m_timerPool.removeTimer(fileWatchIter->first);
 	}
+
+	if (fileWatchIter->second.subscriptionIds.empty())
+		m_fileWatches.erase(fileWatchIter);
 }
 
 void FileWatcher::run()
 {
 	while (!m_terminated)
 	{
+		m_timerPool.processTimers();
+
 		QnMutexLocker lock(&m_mutex);
-		for(auto& watch: m_fileWatches)
+
+		const auto delayToNextProcessing = m_timerPool.delayToNextProcessing();
+
+		// no file check jobs, so just sleep and try again later
+		if (!delayToNextProcessing)
 		{
-			if (watch.second.subscriptionIds.empty())
-				continue;
-
-			lock.unlock();
-			const auto [systemError, stat] = doStat(watch.first);
-			lock.relock();
-
-			if (systemError && systemError != SystemError::fileNotFound)
-			{
-				notify(&lock, &watch, EventType(), systemError);
-				continue;
-			}
-
-			const bool fileExists = systemError != SystemError::fileNotFound;
-
-			if (watch.second.fileData.lastExists && !fileExists)
-			{
-				watch.second.fileData.lastExists = false;
-				notify(&lock, &watch, EventType::deleted);
-				continue;
-			}
-
-			if (!watch.second.fileData.lastExists && fileExists)
-			{
-				watch.second.fileData.lastExists = true;
-				notify(&lock, &watch, EventType::created);
-				continue;
-			}
-
-			if (!metadataEqual(watch.second.fileData.lastStat, stat))
-			{
-				watch.second.fileData.lastStat = std::move(stat);
-				notify(&lock, &watch, EventType::modified);
-				continue;
-			}
+			m_cond.wait(lock.mutex(), m_timeout);
+			continue;
 		}
 
-		lock.unlock();
-		std::this_thread::sleep_for(m_timeout);
-		lock.relock();
+		if (*delayToNextProcessing > std::chrono::milliseconds(0))
+			m_cond.wait(lock.mutex(), *delayToNextProcessing);
 	}
+}
+
+void FileWatcher::checkFile(const std::string& filePath)
+{
+	const auto [systemError, stat] = doStat(filePath);
+
+	QnMutexLocker lock(&m_mutex);
+
+	auto watchIter = m_fileWatches.find(filePath);
+	if (watchIter == m_fileWatches.end())
+		return;
+
+	if (systemError && systemError != SystemError::fileNotFound)
+		return notify(&lock, watchIter, EventType(), systemError);
+
+	const bool fileExists = systemError != SystemError::fileNotFound;
+
+	if (watchIter->second.fileData.lastExists != fileExists)
+	{
+		watchIter->second.fileData.lastExists = fileExists;
+		return notify(&lock, watchIter, fileExists ? EventType::created : EventType::deleted);
+	}
+
+	if (!metadataEqual(watchIter->second.fileData.lastStat, stat))
+	{
+		watchIter->second.fileData.lastStat = std::move(stat);
+		return notify(&lock, watchIter, EventType::modified);
+	}
+
+	m_timerPool.addTimer(filePath, m_timeout);
 }
 
 void FileWatcher::notify(
 	MutexLocker* lock,
-	FileWatchIterator* fileWatch,
+	FileWatches::iterator fileWatch,
 	EventType eventType,
 	SystemError::ErrorCode errorCode)
 {
 	lock->unlock();
 	fileWatch->second.subscription->notify(fileWatch->first, errorCode, eventType);
 	lock->relock();
+
+	m_timerPool.addTimer(fileWatch->first, m_timeout);
 }
 
 std::pair<SystemError::ErrorCode, FileWatcher::Stat> FileWatcher::doStat(
@@ -131,7 +150,7 @@ std::pair<SystemError::ErrorCode, FileWatcher::Stat> FileWatcher::doStat(
 	Stat buf;
 	memset(&buf, 0, sizeof(buf));
 
-	int result;
+	int result = 0;
 #ifdef _WIN32
 	result = _stat64(filePath.c_str(), &buf);
 #else

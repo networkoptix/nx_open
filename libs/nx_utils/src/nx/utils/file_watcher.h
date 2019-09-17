@@ -3,9 +3,9 @@
 #include <thread>
 #include <sys/stat.h>
 
-#include <nx/utils/system_error.h>
-
+#include "elapsed_timer_pool.h"
 #include "subscription.h"
+#include "system_error.h"
 
 namespace nx::utils::file_system {
 
@@ -32,7 +32,7 @@ public:
 
 public:
 	/**
-	 * @param timeout the amount of time to wait between polling files for changes
+	 * @param timeout the amount of time to wait between polling files for changes.
 	 */
 	FileWatcher(std::chrono::milliseconds timeout);
 	~FileWatcher();
@@ -79,14 +79,15 @@ private:
 	};
 
 	using FileWatches = std::map<std::string, WatchContext>;
-	using FileWatchIterator = FileWatches::iterator::value_type;
 
 private:
 	void run();
 
+	void checkFile(const std::string& filePath);
+
 	void notify(
 		nx::utils::MutexLocker* lock,
-		FileWatchIterator* fileWatch,
+		FileWatches::iterator fileWatch,
 		EventType watchEvent,
 		SystemError::ErrorCode errorCode = SystemError::noError);
 
@@ -96,9 +97,12 @@ private:
 private:
 	std::chrono::milliseconds m_timeout;
 	std::atomic_bool m_terminated = false;
-	mutable nx::utils::Mutex m_mutex;
+	mutable Mutex m_mutex;
+	WaitCondition m_cond;
+	UniqueId m_subscriberId = 0;
+	ElapsedTimerPool<std::string> m_timerPool;
 	FileWatches m_fileWatches;
-	UniqueId m_uniqueId = 0;
+	std::map<UniqueId, FileWatches::iterator> m_uniqueIdToFileWatch;
 	std::thread m_thread;
 };
 

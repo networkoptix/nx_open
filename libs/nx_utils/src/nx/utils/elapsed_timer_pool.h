@@ -73,6 +73,23 @@ public:
         }
     }
 
+	/**
+	 * Calculates the delay before the next timerFunction is processing.
+	 * @return std::nullopt if there are no timers, otherwise amount of time between now and the
+	 * next timerFunction invokation.
+	 * NOTE: return value may be negative if the timers are backed up or if processTimers is not
+	 * called periodically.
+	 */
+	std::optional<std::chrono::milliseconds> delayToNextProcessing()
+	{
+		const auto currentTime = nx::utils::monotonicTime();
+		if (m_deadlineToTimerId.empty())
+			return std::nullopt;
+
+		return std::chrono::duration_cast<std::chrono::milliseconds>(
+			currentTime - m_deadlineToTimerId.begin()->first);
+	}
+
 private:
     using DeadlineToTimerId =
         std::multimap<std::chrono::steady_clock::time_point, TimerId>;
