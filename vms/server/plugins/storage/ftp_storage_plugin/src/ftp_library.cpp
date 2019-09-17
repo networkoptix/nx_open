@@ -771,7 +771,7 @@ int STORAGE_METHOD_CALL FtpStorage::getCapabilities() const
     {
         fwrite("1", 1, 2, ofs);
         fclose(ofs);
-        if (m_impl->Put(fileInfo.name.c_str(),
+        if (m_impl->Put(fileInfo.fullPath.c_str(),
                         fileInfo.name.c_str(),
                         ftplib::image) != 0)
         {
@@ -782,12 +782,8 @@ int STORAGE_METHOD_CALL FtpStorage::getCapabilities() const
         return ret;
 
     // read file
-    if (m_impl->Get(fileInfo.name.c_str(),
-                    fileInfo.name.c_str(),
-                    ftplib::image) != 0)
-    {
+    if (m_impl->Get(fileInfo.fullPath.c_str(), fileInfo.name.c_str(), ftplib::image) != 0)
         ret |= cap::ReadFile;
-    }
 
     // remove file
     if (m_impl->Delete(fileInfo.name.c_str()) != 0)
