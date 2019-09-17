@@ -288,7 +288,21 @@ int StreamReader::doRequest(nx::network::http::HttpClient* const httpClient)
 {
     httpClient->setUserName(m_login);
     httpClient->setUserPassword(m_password);
-    if (!httpClient->doGet(nx::utils::Url(m_url)) || !httpClient->response())
+
+    const nx::utils::Url url(m_url);
+    if (!url.isValid())
+    {
+        NX_DEBUG(this, "Request string %1 is not a valid URL", m_url);
+        return nxcip::NX_INVALID_PARAM_VALUE;
+    }
+
+    if (!nx::network::http::isUrlSheme(url.scheme()))
+    {
+        NX_DEBUG(this, "Request URL %1 is neither an HTTP nor an HTTPS URL", m_url);
+        return nxcip::NX_INVALID_PARAM_VALUE;
+    }
+
+    if (!httpClient->doGet(url) || !httpClient->response())
     {
         NX_DEBUG(this, "Failed to request stream");
         return nxcip::NX_NETWORK_ERROR;
