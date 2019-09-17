@@ -92,7 +92,7 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
     int result = runMainLoop();
 
 	if (m_fileWatcher)
-		m_fileWatcher->unsubscribe(m_subscriptionId);
+		m_fileWatcher.reset();
 
     model.stop();
 
@@ -149,17 +149,17 @@ void RelayService::watchSslCertificateFileIfNeeded(const conf::Settings& setting
 	m_fileWatcher = std::make_unique<nx::utils::file_system::FileWatcher>(
 		settings.https().certificateMonitorTimeout);
 
-	const bool subscribed = m_fileWatcher->subscribe(
+	const auto systemError = m_fileWatcher->subscribe(
 		settings.https().certificatePath,
 		[this, certificatePath = settings.https().certificatePath](
 		    const auto& filePath,
 		    auto systemError,
 		    auto /*watchEvent*/)
 		{
-			if (systemError != SystemError::noError && filePath == certificatePath)
+			if (systemError && filePath == certificatePath)
 			{
-				NX_WARNING(this, "SystemError %1 occured while watching certificate file.",
-					SystemError::toString(systemError));
+				NX_WARNING(this, "SystemError %1 occured while watching ssl certificate file %2.",
+					SystemError::toString(systemError), filePath);
 				return;
 			}
 
@@ -168,11 +168,8 @@ void RelayService::watchSslCertificateFileIfNeeded(const conf::Settings& setting
 		},
 		&m_subscriptionId);
 
-	if (!subscribed)
-	{
-		NX_WARNING(this, "Failed to watch ssl file for changes: %1",
-			SystemError::getLastOSErrorText());
-	}
+	if (!systemError)
+		NX_WARNING(this, "Failed to watch ssl file for changes: %1", systemError);
 }
 
 } // namespace relay
