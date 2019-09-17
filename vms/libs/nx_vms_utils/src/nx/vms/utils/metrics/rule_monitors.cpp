@@ -285,13 +285,18 @@ TextGenerator parseTemplate(QString template_, const ValueMonitors& monitors)
 
 ExtraValueMonitor::ExtraValueMonitor(ValueGeneratorResult formula):
     ValueMonitor(formula.scope),
-    m_formula(std::move(formula.generator))
+    m_generator(std::move(formula.generator))
 {
+}
+
+void ExtraValueMonitor::setGenerator(ValueGenerator generator)
+{
+    m_generator = std::move(generator);
 }
 
 api::metrics::Value ExtraValueMonitor::current() const
 {
-    return m_formula();
+    return m_generator();
 }
 
 void ExtraValueMonitor::forEach(Duration maxAge, const ValueIterator& iterator) const

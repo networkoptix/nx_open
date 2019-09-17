@@ -44,38 +44,69 @@ std::vector<api::metrics::Alarm> ValueGroupMonitor::alarms(Scope requiredScope) 
     return alarms;
 }
 
-void ValueGroupMonitor::setRules(const std::map<QString, api::metrics::ValueRule>& rules)
+void ValueGroupMonitor::setRules(
+    const std::map<QString, api::metrics::ValueRule>& rules, bool skipOnMissingArgument)
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
 
-    // TODO: Clean up m_valueMonitors.
+    for (auto it = m_valueMonitors.begin(); it != m_valueMonitors.end();)
+    {
+        if (dynamic_cast<ExtraValueMonitor*>(it->second.get()))
+            it = m_valueMonitors.erase(it);
+        else
+            ++it;
+    }
+
+    // Prepare monitors for extra values to make sure all of the formulas will find their arguments.
     for (const auto& [parameterId, rule]: rules)
     {
-        if (rule.calculate.isEmpty())
-            continue;
-        try
-        {
-            // TODO: All extra values should be emplaced before formula calculation. Currently some
-            // arguments may appear missing during calculation, because they are supposed to added
-            // later.
-            m_valueMonitors.emplace(parameterId, std::make_unique<ExtraValueMonitor>(
-                parseFormulaOrThrow(rule.calculate, m_valueMonitors)));
-        }
-        catch (const std::invalid_argument& error)
-        {
-            // TODO: This should be allowed for system resources only.
-            NX_DEBUG(this, "Skip extra value %1: %2", parameterId, error.what());
-        }
-        catch (const std::logic_error& error)
-        {
-            NX_ASSERT(false, "Unable to add extra value %1: %2", parameterId, error.what());
-        }
+        if (!rule.calculate.isEmpty())
+            m_valueMonitors.emplace(parameterId, std::make_unique<ExtraValueMonitor>());
+    }
+    for (const auto& [parameterId, rule]: rules)
+    {
+        if (!rule.calculate.isEmpty())
+            updateExtraValue(parameterId, rule, skipOnMissingArgument);
     }
 
     m_alarmMonitors.clear();
     for (const auto& [parameterId, rule]: rules)
+        updateAlarms(parameterId, rule, skipOnMissingArgument);
+}
+
+void ValueGroupMonitor::updateExtraValue(
+    const QString& parameterId, const api::metrics::ValueRule& rule, bool skipOnMissingArgument)
+{
+    auto monitor = dynamic_cast<ExtraValueMonitor*>(m_valueMonitors[parameterId].get());
+    NX_CRITICAL(monitor);
+    try
     {
-        for (const auto& alarmRule: rule.alarms)
+        try
+        {
+            auto formula = parseFormulaOrThrow(rule.calculate, m_valueMonitors);
+            monitor->setGenerator(std::move(formula.generator));
+            monitor->setScope(formula.scope);
+        }
+        catch (const std::invalid_argument& error)
+        {
+            if (!skipOnMissingArgument) throw;
+            NX_DEBUG(this, "Skip extra value %1: %2", parameterId, error.what());
+            m_valueMonitors.erase(parameterId);
+        }
+    }
+    catch (const std::logic_error& error)
+    {
+        NX_ASSERT(false, "Unable to add extra value %1: %2", parameterId, error.what());
+        m_valueMonitors.erase(parameterId);
+    }
+}
+
+void ValueGroupMonitor::updateAlarms(
+    const QString& parameterId, const api::metrics::ValueRule& rule, bool skipOnMissingArgument)
+{
+    for (const auto& alarmRule: rule.alarms)
+    {
+        try
         {
             try
             {
@@ -88,13 +119,13 @@ void ValueGroupMonitor::setRules(const std::map<QString, api::metrics::ValueRule
             }
             catch (const std::invalid_argument& error)
             {
-                // TODO: This should be allowed for system resources only.
+                if (!skipOnMissingArgument) throw;
                 NX_DEBUG(this, "Skip alarm monitor %1: %2", parameterId, error.what());
             }
-            catch (const std::logic_error& error)
-            {
-                NX_ASSERT(false, "Unable to add alarm monitor %1: %2", parameterId, error.what());
-            }
+        }
+        catch (const std::logic_error& error)
+        {
+            NX_ASSERT(false, "Unable to add alarm monitor %1: %2", parameterId, error.what());
         }
     }
 }

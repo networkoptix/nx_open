@@ -22,6 +22,8 @@ public:
     virtual ~ValueMonitor() = default;
 
     Scope scope() const { return m_scope; }
+    void setScope(Scope scope) { m_scope = scope; }
+
     virtual api::metrics::Value current() const = 0;
     virtual void forEach(Duration maxAge, const ValueIterator& iterator) const = 0;
 

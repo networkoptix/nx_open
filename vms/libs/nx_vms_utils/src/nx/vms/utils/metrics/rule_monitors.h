@@ -25,12 +25,14 @@ NX_VMS_UTILS_API TextGenerator parseTemplate(QString template_, const ValueMonit
 class NX_VMS_UTILS_API ExtraValueMonitor: public ValueMonitor
 {
 public:
-    ExtraValueMonitor(ValueGeneratorResult formula);
+    ExtraValueMonitor(ValueGeneratorResult formula = {});
+    void setGenerator(ValueGenerator generator);
+
     api::metrics::Value current() const override;
     void forEach(Duration maxAge, const ValueIterator& iterator) const override;
 
 private:
-    const ValueGenerator m_formula;
+    ValueGenerator m_generator;
 };
 
 /**

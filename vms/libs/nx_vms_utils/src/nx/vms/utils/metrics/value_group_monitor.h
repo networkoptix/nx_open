@@ -21,7 +21,15 @@ public:
     api::metrics::ValueGroup current(Scope requiredScope) const;
     std::vector<api::metrics::Alarm> alarms(Scope requiredScope) const;
 
-    void setRules(const std::map<QString, api::metrics::ValueRule>& rules);
+    void setRules(
+        const std::map<QString, api::metrics::ValueRule>& rules,
+        bool skipOnMissingArgument = false);
+
+private:
+    void updateExtraValue(
+        const QString& parameterId, const api::metrics::ValueRule& rule, bool skipOnMissingArgument);
+    void updateAlarms(
+        const QString& parameterId, const api::metrics::ValueRule& rule, bool skipOnMissingArgument);
 
 private:
     mutable nx::utils::Mutex m_mutex;

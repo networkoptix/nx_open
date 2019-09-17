@@ -55,7 +55,11 @@ void ResourceMonitor::setRules(const api::metrics::ResourceRules& rules)
     for (const auto& [id, monitor]: m_monitors)
     {
         if (const auto it = rules.find(id); it != rules.end())
-            monitor->setRules(it->second.values);
+        {
+            monitor->setRules(
+                it->second.values,
+                /*skipOnMissingArgument*/ m_resource->scope == Scope::system);
+        }
     }
 
     // TODO: Assert on unprocessed rules?
