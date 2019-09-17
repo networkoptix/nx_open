@@ -204,7 +204,7 @@ def main(config_file):
 
     if not res.success:
         raise exceptions.SshHostKeyObtainingFailed(
-            f"Can't obtain SSH host key of the box.\nDetails of the error: {res.formatted_message()}"
+            f"Can't obtain ssh host key of the box.\nDetails of the error: {res.formatted_message()}"
         )
     else:
         device.host_key = res.details[0]
@@ -215,14 +215,14 @@ def main(config_file):
 
         if not res.success:
             raise exceptions.SshHostKeyObtainingFailed(
-                'Sudo is not configured properly, check that user is root or could run `sudo true` ' +
-                'without typing password.' +
+                'Sudo is not configured properly, check that user is root or can run `sudo true` ' +
+                'without typing a password.\n' +
                 f"Details of the error: {res.formatted_message()}"
             )
 
     print(f"Device IP: {device.ip}")
     if device.is_root:
-        print(f"SSH user is root.")
+        print(f"ssh user is root.")
 
     linux_distribution = LinuxDistributionDetector.detect(device)
 
@@ -452,7 +452,8 @@ def main(config_file):
                                 raise exceptions.TestCameraStreamingError(
                                     'Streaming video from the Server FAILED: ' +
                                     f'the video lags for more than {maxAllowedLagSeconds} seconds; ' +
-                                    'can be caused by poor performance of either the host or the box.')
+                                    'can be caused by network issues or poor performance of either the host or the box.'
+                                )
 
                         ts = time.time()
 

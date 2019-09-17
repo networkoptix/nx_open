@@ -304,7 +304,7 @@ std::optional<ExtendedAnalyticsActionData>
         EngineManifest::ObjectAction::Capability::needBestShotVideoFrame);
 
     const bool needFullTrack =
-        capabilities.testFlag(EngineManifest::ObjectAction::Capability::needTrack);
+        capabilities.testFlag(EngineManifest::ObjectAction::Capability::needFullTrack);
 
     const bool needBestShotObjectPosition = capabilities.testFlag(
         EngineManifest::ObjectAction::Capability::needBestShotObjectMetadata);
