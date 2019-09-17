@@ -108,16 +108,14 @@ protected:
         for (const auto storagePlugin:
             pluginManager->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
         {
-            const auto settings = &serverModule().settings();
             serverModule().storagePluginFactory()->registerStoragePlugin(
                 storagePlugin->storageType(),
-                std::bind(
-                    &QnThirdPartyStorageResource::instance,
-                    std::placeholders::_1,
-                    std::placeholders::_2,
-                    storagePlugin,
-                    settings),
-                /*isDefaultProtocol*/ false);
+                [this, storagePlugin](QnCommonModule*, const QString& path)
+                {
+                    auto settings = &serverModule().settings();
+                    return QnThirdPartyStorageResource::instance(
+                        &serverModule(), path, storagePlugin, settings);
+                }, /*isDefaultProtocol*/ false);
         }
     }
 
