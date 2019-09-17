@@ -10,7 +10,7 @@
 #include <nx/core/resource/device_type.h>
 #include <nx/utils/std/optional.h>
 
-#include <utils/common/value_cache.h>
+#include <nx/utils/value_cache.h>
 #include <common/common_globals.h>
 #include <api/model/api_ioport_data.h>
 

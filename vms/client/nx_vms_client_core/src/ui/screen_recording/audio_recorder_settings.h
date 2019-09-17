@@ -3,7 +3,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QSettings>
 
-#include <utils/common/value_cache.h>
+#include <nx/utils/value_cache.h>
 
 #include "audio_device_info.h"
 

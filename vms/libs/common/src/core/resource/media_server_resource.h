@@ -5,7 +5,7 @@
 #include <api/server_rest_connection_fwd.h>
 #include <api/media_server_connection.h>
 #include <core/resource/resource.h>
-#include <utils/common/value_cache.h>
+#include <nx/utils/value_cache.h>
 
 #include <nx/network/socket_common.h>
 #include <nx/utils/safe_direct_connection.h>

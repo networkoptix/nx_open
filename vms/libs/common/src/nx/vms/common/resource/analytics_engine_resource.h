@@ -3,7 +3,7 @@
 #include <QtCore/QVariantMap>
 
 #include <core/resource/resource.h>
-#include <utils/common/value_cache.h>
+#include <nx/utils/value_cache.h>
 
 #include <nx/analytics/types.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
