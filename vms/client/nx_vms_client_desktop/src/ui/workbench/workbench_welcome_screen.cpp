@@ -70,7 +70,6 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QWidget* parent):
 {
     NX_ASSERT(qnRuntime->isDesktopMode());
 
-
     rootContext()->setContextProperty(lit("context"), this);
     setSource(lit("Nx/WelcomeScreen/WelcomeScreen.qml"));
     setResizeMode(QQuickWidget::SizeRootObjectToView);
@@ -127,7 +126,7 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
     if (!system)
         return;
 
-    if (qnSettings->autoLogin())
+    if (qnSettings->autoLogin() && qnSettings->saveCredentialsAllowed())
         return; // Do nothing in case of auto-login option set
 
     if (system->isCloudSystem() || !system->isConnectable())
@@ -562,4 +561,9 @@ void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId, const QString
     }
 
     qnClientCoreSettings->save();
+}
+
+bool QnWorkbenchWelcomeScreen::saveCredentialsAllowed() const
+{
+    return qnSettings->saveCredentialsAllowed();
 }

@@ -86,18 +86,6 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
         actionParams.argument<vms::event::AbstractActionPtr>(Qn::ActionDataRole);
     const auto camera = actionParams.resource().dynamicCast<QnVirtualCameraResource>();
 
-    auto bookmark = helpers::bookmarkFromAction(businessAction, camera);
-    if (!bookmark.isValid())
-        return;
-
-    const QScopedPointer<QnCameraBookmarkDialog> bookmarksDialog(
-        new QnCameraBookmarkDialog(true, mainWindowWidget()));
-
-    bookmark.description = QString(); //< Force user to fill description out.
-    bookmarksDialog->loadData(bookmark);
-    if (bookmarksDialog->exec() != QDialog::Accepted)
-        return;
-
     const auto creationCallback =
         [this, businessAction, parentThreadId = QThread::currentThreadId()](bool success)
         {
@@ -124,6 +112,30 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
                 manager->broadcastEventAction(actionData, this, fakeHandler);
             }
         };
+
+    if (!camera)
+    {
+        QnMessageBox::warning(mainWindowWidget(),
+            tr("Unable to acknowledge event on removed camera."));
+
+        creationCallback(true);
+
+        // Hiding notification instantly to keep UX smooth.
+        emit notificationRemoved(businessAction);
+        return;
+    }
+
+    auto bookmark = helpers::bookmarkFromAction(businessAction, camera);
+    if (!bookmark.isValid())
+        return;
+
+    const QScopedPointer<QnCameraBookmarkDialog> bookmarksDialog(
+        new QnCameraBookmarkDialog(true, mainWindowWidget()));
+
+    bookmark.description = QString(); //< Force user to fill description out.
+    bookmarksDialog->loadData(bookmark);
+    if (bookmarksDialog->exec() != QDialog::Accepted)
+        return;
 
     bookmarksDialog->submitData(bookmark);
 

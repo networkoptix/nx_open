@@ -242,6 +242,7 @@ namespace Qn
         TimeoutRole,                                /**< Role for timeout or lifetime in milliseconds (std::chrono::milliseconds). */
         BusyIndicatorVisibleRole,                   /**< Role for toggling busy indicator (bool). */
         ProgressValueRole,                          /**< Role for specifying progress value [0..1] (float). */
+        ProgressFormatRole,                         /**< Role for specifying progress format, when null default is used: "%p%" (QString). */
         DurationRole,                               /**< Role for duration in microseconds (std::chrono::microseconds). */
         NotificationLevelRole,                      /**< Role for notification level (QnNotificationLevel::Value). */
         ContextMenuRole,                            /**< Role for context menu (QSharedPointer<QMenu>). */

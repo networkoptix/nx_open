@@ -165,10 +165,9 @@ void initialize(Manager* manager, Action* root)
 
     factory(AcknowledgeEventAction)
         .mode(DesktopMode)
-        .flags(SingleTarget | ResourceTarget)
-        .requiredTargetPermissions(Qn::ViewContentPermission)
+        .flags(NoTarget | SingleTarget | ResourceTarget)
         .requiredGlobalPermission(GlobalPermission::manageBookmarks)
-        .condition(condition::hasFlags(Qn::live_cam, MatchMode::ExactlyOne)
+        .condition(condition::hasFlags(Qn::live_cam, MatchMode::All)
             && !condition::isSafeMode());
 
     factory(StartVideoWallControlAction)
@@ -1263,6 +1262,13 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::hasFlags(Qn::web_page, MatchMode::ExactlyOne)
             && !condition::isSafeMode()
             && !condition::tourIsRunning());
+
+    factory()
+        .flags(Scene | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Page..."))
+        .childFactory(new WebPageFactory(manager))
+        .autoRepeat(false)
+        .condition(condition::hasFlags(Qn::web_page, MatchMode::ExactlyOne));
 
     factory(RenameResourceAction)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget | IntentionallyAmbiguous)

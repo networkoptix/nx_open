@@ -63,6 +63,14 @@ public:
     virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
 };
 
+class WebPageFactory: public Factory
+{
+    Q_OBJECT
+public:
+    WebPageFactory(QObject* parent);
+    virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
+};
+
 } // namespace action
 } // namespace ui
 } // namespace nx::vms::client::desktop

@@ -62,9 +62,18 @@ void QnEnvironment::showInGraphicalShell(const QString &path)
     if (!explorer.isEmpty())
     {
         QStringList params;
-        if (!QFileInfo(path).isDir())
-            params << QLatin1String("/select,");
-        params << QDir::toNativeSeparators(path);
+        QFileInfo info(path);
+        if (!info.exists())
+        {
+            // Same as on other systems - show folder contents
+            params << QDir::toNativeSeparators(info.path());
+        }
+        else
+        {
+            if (!info.isDir())
+                params << QLatin1String("/select,");
+            params << QDir::toNativeSeparators(path);
+        }
         QProcess::startDetached(explorer, params);
     }
     else

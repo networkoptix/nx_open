@@ -50,6 +50,7 @@ public:
         LAST_SCREENSHOT_DIR,
         LAST_RECORDING_DIR,
         LAST_EXPORT_DIR,
+        LAST_DOWNLOAD_DIR,
 
         LAST_USED_CONNECTION,
         CUSTOM_CONNECTIONS,
@@ -159,6 +160,8 @@ public:
         // Upload state for ServerUpdateTool.
         SYSTEM_UPDATER_STATE,
 
+        SAVE_CREDENTIALS_ALLOWED,
+
         VARIABLE_COUNT
     };
 
@@ -208,6 +211,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                     lastScreenshotDir,      setLastScreenshotDir,       LAST_SCREENSHOT_DIR,        QString())
         QN_DECLARE_RW_PROPERTY(QString,                     lastRecordingDir,       setLastRecordingDir,        LAST_RECORDING_DIR,         QString())
         QN_DECLARE_RW_PROPERTY(QString,                     lastExportDir,          setLastExportDir,           LAST_EXPORT_DIR,            QString())
+        QN_DECLARE_RW_PROPERTY(QString,                     lastDownloadDir,        setLastDownloadDir,         LAST_DOWNLOAD_DIR,          QString())
         QN_DECLARE_RW_PROPERTY(QnWorkbenchStateList,        workbenchStates,        setWorkbenchStates,         WORKBENCH_STATES,           QnWorkbenchStateList())
         QN_DECLARE_RW_PROPERTY(QnLicenseWarningStateHash,   licenseWarningStates,   setLicenseWarningStates,    LICENSE_WARNING_STATES,     QnLicenseWarningStateHash())
         QN_DECLARE_RW_PROPERTY(QnConnectionData,            lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData())
@@ -259,6 +263,8 @@ private:
         QN_DECLARE_RW_PROPERTY(bool, allLayoutsSelectionDialogMode, setAllLayoutsSelectionDialogMode, ALL_LAYOUTS_SELECTION_DIALOG_MODE, 0)
         QN_DECLARE_RW_PROPERTY(QString, systemUpdaterState, setSystemUpdaterState, SYSTEM_UPDATER_STATE, 0)
         QN_DECLARE_R_PROPERTY(bool,                         allowMtDecoding,                                    ALLOW_MT_DECODING,          true)
+
+        QN_DECLARE_R_PROPERTY(bool, saveCredentialsAllowed, SAVE_CREDENTIALS_ALLOWED, true)
     QN_END_PROPERTY_STORAGE()
 
     void migrateKnownServerConnections();

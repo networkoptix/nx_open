@@ -191,7 +191,7 @@ public:
     void reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
     void memZero();
 
-    CLVideoDecoderOutput* rotated(int angle);
+    CLVideoDecoderOutput* rotated(int angle) const;
     /** Scale frame to new size */
     CLVideoDecoderOutput* scaled(const QSize& newSize, AVPixelFormat newFormat = AV_PIX_FMT_NONE) const;
 

@@ -125,7 +125,7 @@ struct EventTile::Private
 
     void handleHoverChanged(bool hovered)
     {
-        const auto showCloseButton = hovered && closeable;
+        const auto showCloseButton = (hovered || q->progressBarVisible()) && closeable;
         q->ui->timestampLabel->setHidden(showCloseButton || q->ui->timestampLabel->text().isEmpty());
         closeButton->setVisible(showCloseButton);
         updateBackgroundRole(hovered);
@@ -421,6 +421,14 @@ void EventTile::setCloseable(bool value)
         return;
 
     d->closeable = value;
+
+    if (progressBarVisible())
+    {
+        QMargins parentMargins = ui->progressBar->parentWidget()->contentsMargins();
+        parentMargins.setRight(d->closeable ? d->closeButton->width() : kMarginsWithHeader.right());
+        ui->progressBar->parentWidget()->setContentsMargins(parentMargins);
+    }
+
     d->handleHoverChanged(underMouse());
 }
 
@@ -755,6 +763,23 @@ void EventTile::setProgressTitle(const QString& value)
     d->progressLabel->setText(value);
 }
 
+QString EventTile::progressFormat() const
+{
+    return ui->progressBar->format();
+}
+
+void EventTile::setProgressFormat(const QString& value)
+{
+    if (value.isNull())
+    {
+        ui->progressBar->resetFormat();
+    }
+    else
+    {
+        ui->progressBar->setFormat(value);
+    }
+}
+
 bool EventTile::previewEnabled() const
 {
     return !ui->previewWidget->isHidden();
@@ -898,6 +923,7 @@ void EventTile::clear()
     setProgressBarVisible(false);
     setProgressValue(0.0);
     setProgressTitle({});
+    setProgressFormat(QString());
     setResourceList(QStringList());
     setToolTip({});
     setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
