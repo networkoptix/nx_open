@@ -4,12 +4,6 @@
 
 namespace nx::utils::file_system {
 
-FileWatcher::WatchContext::WatchContext()
-{
-	subscription =
-		std::make_unique<Subscription<std::string, SystemError::ErrorCode, EventType>>();
-}
-
 FileWatcher::FileWatcher(std::chrono::milliseconds timeout):
 	m_timeout(timeout),
 	m_timerPool(std::bind(&FileWatcher::checkFile, this, std::placeholders::_1)),
@@ -40,14 +34,20 @@ SystemError::ErrorCode FileWatcher::subscribe(
 
 	QnMutexLocker lock(&m_mutex);
 
-	auto [it, firstInsertion] = m_fileWatches.emplace(filePath, WatchContext());
+	// Using std::piecewise_construct because WatchContext.subscription doesn't support move or
+	// copy construction.
+	auto [it, firstInsertion] = m_fileWatches.emplace(
+		std::piecewise_construct,
+		std::make_tuple(filePath),
+		std::make_tuple());
+
 	if (firstInsertion)
 		it->second.fileData = FileData{fileExists, std::move(stat)};
 
 	*outSubscriptionId = m_subscriberId++;
 	m_uniqueIdToFileWatch.emplace(*outSubscriptionId, it);
 	auto& actualSubscriptionId = it->second.subscriptionIds[*outSubscriptionId];
-	it->second.subscription->subscribe(std::move(handler), &actualSubscriptionId);
+	it->second.subscription.subscribe(std::move(handler), &actualSubscriptionId);
 	it->second.watchAttributes |= watchAttributes;
 
 	m_timerPool.addTimer(filePath, m_timeout);
@@ -70,7 +70,7 @@ void FileWatcher::unsubscribe(SubscriptionId subscriptionId)
 
 	if (fileWatchIter->second.subscriptionIds.erase(subscriptionId) > 0)
 	{
-		fileWatchIter->second.subscription->removeSubscription(subscriptionId);
+		fileWatchIter->second.subscription.removeSubscription(subscriptionId);
 		m_uniqueIdToFileWatch.erase(uniqueIdIter);
 		m_timerPool.removeTimer(fileWatchIter->first);
 	}
@@ -89,7 +89,7 @@ void FileWatcher::run()
 
 		const auto delayToNextProcessing = m_timerPool.delayToNextProcessing();
 
-		// no file check jobs, so just sleep and try again later
+		// No jobs, so sleep and try again later.
 		if (!delayToNextProcessing)
 		{
 			m_cond.wait(lock.mutex(), m_timeout);
@@ -138,7 +138,7 @@ void FileWatcher::notify(
 	SystemError::ErrorCode errorCode)
 {
 	lock->unlock();
-	fileWatch->second.subscription->notify(fileWatch->first, errorCode, eventType);
+	fileWatch->second.subscription.notify(fileWatch->first, errorCode, eventType);
 	lock->relock();
 
 	m_timerPool.addTimer(fileWatch->first, m_timeout);

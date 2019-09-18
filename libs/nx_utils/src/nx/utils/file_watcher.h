@@ -12,6 +12,8 @@ namespace nx::utils::file_system {
 
 /**
  * Watches files for modifications and notifies when a file has been modified.
+ * NOTE: On Windows, the resolution for file modification detection is one second. Files created
+ * and modified within one second will not be detected as modified.
  */
 class NX_UTILS_API FileWatcher
 {
@@ -69,11 +71,8 @@ private:
 	{
 		FileData fileData;
 		int watchAttributes = 0;
-		// unique_ptr because Subscription doesn't support copy construction
-		std::unique_ptr<Subscription<std::string, SystemError::ErrorCode, EventType>> subscription;
+		Subscription<std::string, SystemError::ErrorCode, EventType> subscription;
 		std::map<UniqueId, SubscriptionId> subscriptionIds;
-
-		WatchContext();
 	};
 
 	using FileWatches = std::map<std::string, WatchContext>;
