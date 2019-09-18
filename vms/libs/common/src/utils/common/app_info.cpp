@@ -43,11 +43,6 @@ QString QnAppInfo::productNameShort()
     return nx::utils::AppInfo::productNameShort();
 }
 
-QString QnAppInfo::productNameLong()
-{
-    return nx::utils::AppInfo::productNameLong();
-}
-
 QString QnAppInfo::customizationName()
 {
     return nx::utils::AppInfo::customizationName();

@@ -31,7 +31,6 @@ public:
     static Q_INVOKABLE bool    beta();
 
     static Q_INVOKABLE QString productNameShort();
-    static Q_INVOKABLE QString productNameLong();
     static Q_INVOKABLE QString customizationName();
 
     static Q_INVOKABLE QString brand()

@@ -134,7 +134,7 @@ bool SelfUpdater::registerUriHandler()
     return nx::vms::utils::registerSystemUriProtocolHandler(
         nx::vms::utils::AppInfo::nativeUriProtocol(),
         binaryPath,
-        QnAppInfo::productNameLong(),
+        nx::utils::AppInfo::customizationVmsName(),
         nx::vms::utils::AppInfo::nativeUriProtocolDescription(),
         QnAppInfo::customizationName(),
         m_clientVersion);
@@ -643,7 +643,7 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
         return createDesktopFile(
             filePath,
             applauncherBinaryPath,
-            QnAppInfo::productNameLong(),
+            nx::utils::AppInfo::customizationVmsName(),
             QnClientAppInfo::applicationDisplayName(),
             iconName,
             SoftwareVersion(QnAppInfo::applicationVersion()));

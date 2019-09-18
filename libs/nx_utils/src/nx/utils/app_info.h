@@ -8,6 +8,8 @@ namespace utils {
 class NX_UTILS_API AppInfo
 {
 public:
+    static QString customizationVmsName();
+
     static QString applicationFullVersion();
     static bool beta();
     static QString applicationVersion();
@@ -18,9 +20,7 @@ public:
     static QString applicationArch();
     static QString armBox();
 
-    static QString productName();
     static QString productNameShort();
-    static QString productNameLong();
     static QString organizationName();
     static QString linuxOrganizationName();
     static QString organizationNameForSettings();

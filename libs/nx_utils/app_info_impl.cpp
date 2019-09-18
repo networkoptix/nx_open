@@ -7,6 +7,11 @@
 
 namespace nx::utils {
 
+QString AppInfo::customizationVmsName()
+{
+    return "${customization.vmsName}";
+}
+
 bool AppInfo::beta()
 {
     return ${beta};
@@ -80,20 +85,6 @@ QString AppInfo::organizationNameForSettings()
 QString AppInfo::productNameShort()
 {
     return "${product.name.short}";
-}
-
-QString AppInfo::productNameLong()
-{
-    return "${customization.vmsName}";
-}
-
-QString AppInfo::productName()
-{
-    #if defined(_WIN32)
-        return "${product.name}";
-    #else
-        return "${product.appName}";
-    #endif
 }
 
 QString AppInfo::armBox()

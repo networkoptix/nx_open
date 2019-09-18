@@ -6,8 +6,8 @@
 #include <QtWebSockets/QWebSocket>
 #include <QtWebChannel/QWebChannelAbstractTransport>
 
-#include <utils/common/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace mobile_client {
@@ -62,7 +62,7 @@ private:
 WebChannelServer::WebChannelServer(const quint16 port, QObject* parent):
     QWebChannel(parent),
     m_server(new QWebSocketServer(
-        QString("%1 WebChannel Server").arg(QnAppInfo::productNameLong()),
+        QString("%1 WebChannel Server").arg(nx::utils::AppInfo::customizationVmsName()),
         QWebSocketServer::NonSecureMode))
 {
     if (!m_server->listen(QHostAddress::LocalHost, port))
