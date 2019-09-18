@@ -9,6 +9,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/random.h>
 
 #include <nx/cloud/relay/statistics_provider.h>
 
@@ -38,9 +39,9 @@ protected:
         m_certificateFilePath =
 			lm("%1/%2").args(testDataDir(), "traffic_relay.cert").toStdString();
 
-        ASSERT_TRUE(nx::network::ssl::Engine::useOrCreateCertificate(
-            m_certificateFilePath.c_str(),
-            "traffic_relay/https test", "US", "Nx"));
+		ASSERT_TRUE(nx::network::ssl::Engine::useOrCreateCertificate(
+			m_certificateFilePath.c_str(),
+			"traffic_relay/https test", "US", "Nx"));
 
         addRelayInstance({
             "--https/listenOn=0.0.0.0:0",
@@ -59,9 +60,16 @@ protected:
 
     void whenEstablishSecureConnection()
     {
-        m_connection = std::make_unique<network::ssl::ClientStreamSocket>(
-            std::make_unique<network::TCPSocket>(AF_INET));
-        ASSERT_TRUE(m_connection->setNonBlockingMode(true));
+		m_connection = std::make_unique<network::ssl::ClientStreamSocket>(
+			std::make_unique<network::TCPSocket>(AF_INET));
+		ASSERT_TRUE(m_connection->setNonBlockingMode(true));
+
+		m_connection->setVerifyCertificateCallback(
+			[this](const nx::network::ssl::Certificate& certificate)
+			{
+				m_sslCertificateVerifiedEvent.push(certificate.serialNumber);
+				return certificate.serialNumber == m_sslCertificateSerialNumber;
+			});
 
         m_connection->connectAsync(
             network::url::getEndpoint(basicHttpsUrl()),
@@ -85,10 +93,10 @@ protected:
 		relay().moduleInstance()->setOnStartedEventHandler(
 			[this](bool isStarted) { m_relayRestartedEvent.push(isStarted); });
 
-		// Sleep is needed to allow SslCertificateWatcher to fully initialize.
-		// Otherwise, it may initialize with the contents of the modified file,
-		// and detection will fail.
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		// At least on Windows, file modification events have a resolution of one second.
+		// A file that is created and then modified within one second of its creation
+		// will not be detected, so sleep needs to be for at least one second.
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 
 		modifyCertificateFile();
 	}
@@ -108,6 +116,14 @@ protected:
         ASSERT_EQ(api::ResultCode::ok, m_apiResponseQueue.pop());
     }
 
+	void andNewCertificateIsInUse()
+	{
+		whenEstablishSecureConnection();
+
+		const long verifiedSslCertificateSerialNumber = m_sslCertificateVerifiedEvent.pop();
+		ASSERT_EQ(m_sslCertificateSerialNumber, verifiedSslCertificateSerialNumber);
+	}
+
 private:
     using GetStatisticsHttpClient =
         nx::network::http::FusionDataHttpClient<void, nx::cloud::relay::Statistics>;
@@ -116,8 +132,15 @@ private:
     std::unique_ptr<network::ssl::ClientStreamSocket> m_connection;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_connectResultQueue;
     nx::utils::SyncQueue<api::ResultCode> m_apiResponseQueue;
+	long m_sslCertificateSerialNumber = 0;
+	nx::utils::SyncQueue<long> m_sslCertificateVerifiedEvent;
 	std::string m_certificateFilePath;
 	nx::utils::SyncQueue<bool> m_relayRestartedEvent;
+
+	void createSslCertificateFile()
+	{
+		m_sslCertificateSerialNumber = nx::utils::random::number<long>();
+	}
 
     void saveConnectResult(SystemError::ErrorCode systemErrorCode)
     {
@@ -138,9 +161,19 @@ private:
 
 	void modifyCertificateFile()
 	{
+		m_sslCertificateSerialNumber = nx::utils::random::number<long>();
+
+		const auto certificateData = nx::network::ssl::Engine::makeCertificateAndKey(
+			"traffic_relay/https test",
+			"US",
+			"Nx",
+			m_sslCertificateSerialNumber);
+
 		NX_DEBUG(this, "Modifying certificate file");
-		std::ofstream file(m_certificateFilePath, std::ios::app);
-		file << ' ';
+
+		QFile file(m_certificateFilePath.c_str());
+		ASSERT_TRUE(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
+		ASSERT_TRUE(file.write(certificateData) == certificateData.size());
 		file.close();
 	}
 };
@@ -161,6 +194,7 @@ TEST_F(Https, relay_restarts_if_certificate_file_is_modified)
 {
 	whenCertificateFileIsModified();
 	thenRelayIsRestarted();
+	andNewCertificateIsInUse();
 }
 
 } // namespace test
