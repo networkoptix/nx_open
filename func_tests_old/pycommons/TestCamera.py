@@ -37,6 +37,7 @@ class TestCameraMixin(ClientMixin):
          "controlEnabled":True,
          "dewarpingParams":"{\"enabled\":false,\"fovRot\":0,\"hStretch\":1,\"radius\":0.5,\"viewMode\":\"1\",\"xCenter\":0.5,\"yCenter\":0.5}",
          "failoverPriority":"Medium",
+         "licenseUsed":False,
          "maxArchiveDays":-30,
          "minArchiveDays":-1,
          "motionMask":"",

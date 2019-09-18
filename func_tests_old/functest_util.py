@@ -44,6 +44,7 @@ CAMERA_ATTR_EMPTY = {
     'backupType': '',  # CameraBackup_HighQuality, CameraBackup_LowQuality or CameraBackupBoth
     'cameraName': '',
     'userDefinedGroupName': '',
+    'licenseUsed': '',
     'motionType': '',
     'motionMask': '',
     'scheduleTasks': '',

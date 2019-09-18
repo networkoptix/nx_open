@@ -84,7 +84,7 @@ void RemoteArchiveSynchronizer::at_resourceAdded(const QnResourcePtr& resource)
 
     connect(
         rawPtr,
-        &QnSecurityCamResource::scheduleEnabledChanged,
+        &QnSecurityCamResource::licenseUsedChanged,
         this,
         &RemoteArchiveSynchronizer::at_resourceStateChanged);
 
