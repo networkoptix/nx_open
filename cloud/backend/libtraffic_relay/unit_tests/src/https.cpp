@@ -122,6 +122,8 @@ protected:
 
 		const long verifiedSslCertificateSerialNumber = m_sslCertificateVerifiedEvent.pop();
 		ASSERT_EQ(m_sslCertificateSerialNumber, verifiedSslCertificateSerialNumber);
+
+		thenConnectionIsEstablished();
 	}
 
 private:
