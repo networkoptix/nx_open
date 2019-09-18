@@ -893,11 +893,8 @@ void MediaServerProcess::dumpSystemUsageStats()
     if (!m_platform->monitor())
         return;
 
-//    const bool isStatisticsDisabled = serverModule()->mutableSettings()->settings().noMonitorStatistics();
-//    const bool isStatisticsDisabled = settings->settings().noMonitorStatistics();
-    // TODO: should disable statistics in some other way here.
-
-    m_platform->monitor()->logStatistics();
+    if (!serverModule()->settings().noMonitorStatistics())
+        m_platform->monitor()->logStatistics();
 
     // TODO: #muskov
     //  - Add some more fields that might be interesting.

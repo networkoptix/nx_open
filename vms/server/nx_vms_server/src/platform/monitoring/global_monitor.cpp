@@ -15,6 +15,7 @@
 #include <iostream>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/log/log.h>
+#include <nx_vms_server_ini.h>
 #include <utils/common/delete_later.h>
 
 // TODO: move to namespace
@@ -169,7 +170,7 @@ void QnGlobalMonitor::logStatistics()
 
     NX_INFO(this, "HDD usage:");
     for (const HddLoad& hddLoad: totalHddLoad())
-        NX_INFO(this, lm("%1: %2%").arg(hddLoad.hdd.name).arg(hddLoad.load * 100, 0, 'f', 2));
+        NX_INFO(this, lm("\t%1: %2%").arg(hddLoad.hdd.name).arg(hddLoad.load * 100, 0, 'f', 2));
 
     NX_INFO(this, "File handles:");
     logOpenedHandleCount();
@@ -183,8 +184,8 @@ void QnGlobalMonitor::logStatistics()
             networkLoad.bytesPerSecOut / 1024);
     }
 
-    // TODO: check ini here
-    logMallocStatistics();
+    if (ini().enableMallocStatisticsLogging)
+        logMallocStatistics();
 
 }
 
