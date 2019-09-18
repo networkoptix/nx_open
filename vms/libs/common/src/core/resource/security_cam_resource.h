@@ -388,7 +388,7 @@ public slots:
 signals:
     void vendorChanged(const QnResourcePtr &resource);
     void modelChanged(const QnResourcePtr &resource);
-    void licenseUsedChanged(const QnResourcePtr &resource);
+    void scheduleEnabledChanged(const QnResourcePtr &resource);
     void scheduleTasksChanged(const QnResourcePtr &resource);
     void groupIdChanged(const QnResourcePtr &resource);
     void groupNameChanged(const QnResourcePtr &resource);

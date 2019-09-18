@@ -172,7 +172,7 @@ std::string Engine::manifestString() const
                 ")json" + kCarObjectType + R"json("
             ],
             "requirements": {
-                "capabilities": "needBestShotVideoFrame|needBestShotObjectMetadata|needTrack",
+                "capabilities": "needBestShotVideoFrame|needBestShotObjectMetadata|needFullTrack",
                 "bestShotVideoFramePixelFormat": "yuv420"
             },
             "parametersModel": {

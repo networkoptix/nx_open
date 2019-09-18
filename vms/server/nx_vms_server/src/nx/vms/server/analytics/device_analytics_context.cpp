@@ -368,7 +368,8 @@ void DeviceAnalyticsContext::putFrame(
         if (!gotPixelFormat)
             continue;
 
-        if (const auto dataPacket = frameConverter.getDataPacket(pixelFormat))
+        const int rotationAngle = m_device->getProperty(QnMediaResource::rotationKey()).toInt();
+        if (const auto dataPacket = frameConverter.getDataPacket(pixelFormat, rotationAngle))
         {
             if (binding->canAcceptData()
                 && NX_ASSERT(dataPacket->timestampUs() >= 0))

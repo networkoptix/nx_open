@@ -591,7 +591,7 @@ void MovableAnalyticsDb::lookup(
     if (!db)
     {
         NX_DEBUG(this, "Attempt to look up tracks in non-initialized analytics DB");
-        return completionHandler(ResultCode::error, LookupResult());
+        return completionHandler(ResultCode::ok, LookupResult());
     }
 
     return db->lookup(

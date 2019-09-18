@@ -63,6 +63,7 @@ private:
     void onStreamRecordingFinished(
         const StreamRecorderErrorStruct& status,
         const QString& filename);
+    void onProviderFinished();
 
     void onError(const QString& reason);
 

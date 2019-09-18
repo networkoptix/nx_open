@@ -94,6 +94,18 @@ namespace nx_spl
             NonCopyable(NonCopyable&&);
             NonCopyable& operator =(NonCopyable&&);
         }; // class NonCopyable
+
+        /**
+         * A file name and a full path, containing this name. When we communicate with the remote
+         * FTP server, * we operate bare file names. But locally we need to map this file to a full
+         * path. That's why it's convenient to have both.
+         */
+        struct FileNameAndPath
+        {
+            std::string name;
+            std::string fullPath;
+        };
+
     } //namespace aux
 
     typedef std::shared_ptr<ftplib> implPtrType;
@@ -153,7 +165,7 @@ namespace nx_spl
         mutable int64_t     m_pos;
         std::string         m_uri; //file URI
         implPtrType         m_impl;
-        std::string         m_localfile;
+        aux::FileNameAndPath     m_localfile;
         bool                m_altered;
         long long           m_localsize;
         mutable

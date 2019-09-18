@@ -52,6 +52,8 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(
 
             updatePermissions(resource);
         });
+    connect(resourceAccessManager(), &QnResourceAccessManager::allPermissionsRecalculated,
+        this, &QnWorkbenchAccessController::recalculateAllPermissions);
 
     connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
         this,
@@ -355,7 +357,7 @@ void QnWorkbenchAccessController::at_resourcePool_resourceAdded(const QnResource
 
     if (const auto& camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
+        connect(camera, &QnVirtualCameraResource::scheduleEnabledChanged, this,
             &QnWorkbenchAccessController::updatePermissions);
     }
 

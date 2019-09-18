@@ -31,7 +31,7 @@ struct NX_VMS_API EngineManifest
             noCapabilities = 0,
             needBestShotVideoFrame = 1 << 0,
             needBestShotObjectMetadata = 1 << 1,
-            needTrack = 1 << 2,
+            needFullTrack = 1 << 2,
         };
         Q_DECLARE_FLAGS(Capabilities, Capability);
 

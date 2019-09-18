@@ -32,6 +32,7 @@
 #include <core/dataprovider/data_provider_factory.h>
 
 #include <utils/common/delayed.h>
+#include <plugins/resource/desktop_camera/desktop_data_provider_base.h>
 
 using namespace nx::vms::client::desktop::ui;
 
@@ -232,6 +233,8 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     connect(m_recorder, &QnStreamRecorder::recordingFinished, this,
         &QnWorkbenchScreenRecordingHandler::onStreamRecordingFinished);
 
+    connect(m_dataProvider->owner(), &QnAbstractStreamDataProvider::finished, this,
+        &QnWorkbenchScreenRecordingHandler::onProviderFinished);
     m_dataProvider->start();
 
     if (!m_dataProvider->isInitialized()) {
@@ -266,6 +269,15 @@ void QnWorkbenchScreenRecordingHandler::onStreamRecordingFinished(
 
     const auto errorReason = QnStreamRecorder::errorString(status.lastError);
     onError(errorReason);
+}
+
+void QnWorkbenchScreenRecordingHandler::onProviderFinished()
+{
+    if (m_dataProvider && !m_dataProvider->lastErrorStr().isEmpty())
+    {
+        NX_ERROR(this, m_dataProvider->lastErrorStr());
+        onError(m_dataProvider->lastErrorStr());
+    }
 }
 
 void QnWorkbenchScreenRecordingHandler::stopRecording()
@@ -338,7 +350,7 @@ void QnWorkbenchScreenRecordingHandler::onRecordingFinished(const QString& fileN
 
 void QnWorkbenchScreenRecordingHandler::onError(const QString& reason)
 {
+    m_recording = false; //< Don't open save dialog.
     stopRecording();
-
     QnMessageBox::critical(mainWindowWidget(), tr("Failed to start recording"), reason);
 }

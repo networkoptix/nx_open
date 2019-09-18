@@ -645,15 +645,18 @@ void QnCommonMessageProcessor::on_accessRightsChanged(const AccessRightsData& ac
     QSet<QnUuid> accessibleResources;
     for (const QnUuid& id : accessRights.resourceIds)
         accessibleResources << id;
+
     if (auto user = resourcePool()->getResourceById<QnUserResource>(accessRights.userId))
     {
         sharedResourcesManager()->setSharedResources(user, accessibleResources);
     }
+    else if (auto role = userRolesManager()->userRole(accessRights.userId); !role.isNull())
+    {
+        sharedResourcesManager()->setSharedResources(role, accessibleResources);
+    }
     else
     {
-        auto role = userRolesManager()->userRole(accessRights.userId);
-        if (!role.isNull())
-            sharedResourcesManager()->setSharedResources(role, accessibleResources);
+        sharedResourcesManager()->setSharedResourcesById(accessRights.userId, accessibleResources);
     }
 }
 
@@ -683,7 +686,7 @@ void QnCommonMessageProcessor::on_cameraUserAttributesChanged(
         QnCameraUserAttributePool::ScopedLock userAttributesLock(
             cameraUserAttributesPool(),
             userAttributes->cameraId);
-        if ((*userAttributesLock)->licenseUsed && !attrs.scheduleEnabled)
+        if ((*userAttributesLock)->scheduleEnabled && !attrs.scheduleEnabled)
             NX_INFO(this, "Recording was turned off for camera %1", attrs.cameraId);
         (*userAttributesLock)->assign(*userAttributes, &modifiedFields);
     }

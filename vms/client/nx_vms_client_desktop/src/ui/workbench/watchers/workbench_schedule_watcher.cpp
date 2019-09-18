@@ -37,7 +37,7 @@ void QnWorkbenchScheduleWatcher::at_resourcePool_resourceAdded(const QnResourceP
     if(!camera)
         return;
 
-    connect( camera.data(), &QnSecurityCamResource::licenseUsedChanged,
+    connect( camera.data(), &QnSecurityCamResource::scheduleEnabledChanged,
              this, [this]( const QnResourcePtr& res ) { at_resource_scheduleDisabledChanged( res.staticCast<QnSecurityCamResource>() ); } );
 
     if(camera->isLicenseUsed())

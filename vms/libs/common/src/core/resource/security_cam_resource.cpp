@@ -1067,19 +1067,19 @@ void QnSecurityCamResource::setLicenseUsed(bool value)
     NX_ASSERT(!getId().isNull());
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
-        if ((*userAttributesLock)->licenseUsed == value)
+        if ((*userAttributesLock)->scheduleEnabled == value)
             return;
-        (*userAttributesLock)->licenseUsed = value;
+        (*userAttributesLock)->scheduleEnabled = value;
     }
 
-    emit licenseUsedChanged(::toSharedPointer(this));
+    emit scheduleEnabledChanged(::toSharedPointer(this));
 }
 
 bool QnSecurityCamResource::isLicenseUsed() const
 {
     NX_ASSERT(!getId().isNull());
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
-    return (*userAttributesLock)->licenseUsed;
+    return (*userAttributesLock)->scheduleEnabled;
 }
 
 Qn::FailoverPriority QnSecurityCamResource::failoverPriority() const

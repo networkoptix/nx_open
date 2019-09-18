@@ -78,6 +78,7 @@ void DiscoveryManager::getVendorName(char* buf) const
 
 int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr)
 {
+    NX_DEBUG(this, "Start camera search...");
     std::vector<device::DeviceData> devices = device::video::getDeviceList();
     device::audio::selectAudioDevices(devices);
     for (auto & device: devices)
@@ -87,6 +88,7 @@ int DiscoveryManager::findCameras(nxcip::CameraInfo* cameras, const char* localI
     }
 
     int count = std::min((int)devices.size(), nxcip::CAMERA_INFO_ARRAY_SIZE);
+    NX_DEBUG(this, "Camera search completed, found %1 cameras", count);
     if (!cameras)
         return count;
 

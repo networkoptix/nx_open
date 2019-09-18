@@ -84,12 +84,6 @@ void Manager::initExistingResources()
 
     for (const auto& device: devices)
     {
-        if (!device)
-        {
-            NX_WARNING(this, "Device is null");
-            continue;
-        }
-
         NX_DEBUG(this, "Initializing existing device on the server startup: %1 (%2)",
             device->getUserDefinedName(), device->getId());
         at_deviceAdded(device);

@@ -1,4 +1,5 @@
 #include "rtsp_perf.h"
+#include <nx/utils/log/log.h>
 
 #include <QtCore/QCommandLineParser>
 
@@ -6,17 +7,18 @@ bool validateConfig(RtspPerf::Config& config)
 {
     if (config.count < 1)
     {
-        printf("At least one session needed, use '-c <count>' option\n");
+        fprintf(stderr, "ERROR: At least one session needed, use '-c <count>' option\n");
         return false;
     }
     if (config.livePercent > 100 || config.livePercent < 0)
     {
-        printf("Live persent streams should be in interval [0..100], use '-c <count>' option\n");
+        fprintf(stderr, "ERROR: "
+            "Live persent streams should be in interval [0..100], use '-c <count>' option\n");
         return false;
     }
     if (config.server.isEmpty())
     {
-        printf("Wrong server url, use '-u <url>' option\n");
+        fprintf(stderr, "ERROR: Wrong server url, use '-u <url>' option\n");
         return false;
     }
     return true;
@@ -33,7 +35,8 @@ int main(int argc, char** argv)
     parser.addHelpOption();
     parser.addVersionOption();
     QCommandLineOption serverOption(QStringList() << "s" << "server",
-        "Server address and port. By default: '127.0.0.1:7001'.", "server", "127.0.0.1:7001");
+        "Server address and port. By default: '127.0.0.1:7001'.", "server address",
+        "127.0.0.1:7001");
     parser.addOption(serverOption);
     QCommandLineOption countOption(QStringList() << "c" << "count",
         "Rtsp session count. By default: 1", "count", "1");
@@ -50,15 +53,27 @@ int main(int argc, char** argv)
         "By default: 0ms that mean auto", "interval", "0");
     parser.addOption(intervalOption);
     QCommandLineOption userOption(QStringList() << "u" << "user",
-        "User name. By default: 'admin'", "user", "admin");
+        "Server user name. By default: 'admin'", "user", "admin");
     parser.addOption(userOption);
     QCommandLineOption passwordOption(QStringList() << "p" << "password",
-        "User password. By default: 'qweasd123'", "password", "qweasd123");
+        "Server user password", "password", "");
     parser.addOption(passwordOption);
     QCommandLineOption sslOption(QStringList() << "ssl",
         "Use SSL. By default: 'false'");
     parser.addOption(sslOption);
+    QCommandLineOption timestampsOption(QStringList() << "timestamps",
+        "Print frame timestamps. By default: 'false'");
+    parser.addOption(timestampsOption);
+    QCommandLineOption urlOption(QStringList() << "url",
+        "Force camera URL, all sessions will use this URL to connect to the Server, option "
+        "'--server' will be ignored. Repeat to set multiple URLs.", "url", "");
+    parser.addOption(urlOption);
+    QCommandLineOption logLevelOption(QStringList() << "log-level",
+        "Log level(NONE, ERROR, WARNING, INFO, DEBUG, VERBOSE)", "level", "");
+    parser.addOption(logLevelOption);
     parser.process(app);
+
+
     RtspPerf::Config config;
     config.count = parser.value(countOption).toInt();
     config.startInterval = std::chrono::milliseconds(parser.value(intervalOption).toInt());
@@ -68,11 +83,28 @@ int main(int argc, char** argv)
     config.user = parser.value(userOption);
     config.password = parser.value(passwordOption);
     config.useSsl = parser.isSet(sslOption);
+    config.printTimestamps = parser.isSet(timestampsOption);
+    config.urls = parser.values(urlOption);
+
+    if (parser.isSet(logLevelOption))
+    {
+        const QString logLevel = parser.value(logLevelOption);
+        const auto level = nx::utils::log::levelFromString(logLevel);
+        if (level == nx::utils::log::Level::undefined)
+        {
+            fprintf(stderr, "ERROR: Invalid log level: %s\n", logLevel.toUtf8().data());
+            return 1;
+        }
+        nx::utils::log::mainLogger()->setDefaultLevel(level);
+    }
+
+    if (parser.isSet(serverOption) && !config.urls.isEmpty())
+        fprintf(stderr, "WARNING: Url configured, '--server' option will ignored\n");
+
     if (!validateConfig(config))
         return 1;
 
     RtspPerf perf(config);
-    printf("Rtsp perf started with config: %s\n", config.toString().toUtf8().data());
     perf.run();
     return 0;
 }

@@ -91,6 +91,13 @@ void QnSharedResourcesManager::setSharedResources(const QnResourceAccessSubject&
     setSharedResourcesInternal(subject, resources);
 }
 
+void QnSharedResourcesManager::setSharedResourcesById(const QnUuid& subjectId,
+    const QSet<QnUuid>& resources)
+{
+    QnMutexLocker lk(&m_mutex);
+    m_sharedResources.insert(subjectId, resources);
+}
+
 void QnSharedResourcesManager::setSharedResourcesInternal(const QnResourceAccessSubject& subject,
     const QSet<QnUuid>& resources)
 {

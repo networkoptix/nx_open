@@ -18,7 +18,17 @@ device (it may be ARM or x64) with Linux called "box" here.
 
 The following prerequisites should be assured before running the tool:
 
+* Host PC hardware: A physical PC with at least Core i5 quad-core or equivalent, and 4G RAM.
+* Host PC OS: Ubuntu 18.04 or Windows 10.
+   * The tool may work with other OS versions, but it is not officially supported.
+   * On Windows, running VMS Benchmark from a Cygwin shell may or may not work, and is not
+       officially supported.
+* Host PC should not run any other software at the time of running VMS Benchmark, besides built-in
+    OS components. Such software may or may not interfere with VMS Benchmark and may or may not
+    affect its ability to run or the accuracy of its report.
 * Linux host: `ssh` and `sshpass` tools should be installed on the host.
+* Windows host: Firewall should be disabled completely to enable spawning virtual cameras in the
+    isolated network.
 * VMS Server should be installed on the box and VMS System should be set up via the Setup Wizard
     in the Server web-admin.
 * No more than one VMS should be installed on the box.
@@ -27,6 +37,9 @@ The following prerequisites should be assured before running the tool:
 * The box should be connected to an isolated network together with the host, and this network
     should have the full bandwidth that the box is planned to work with, e.g. 100 Mbps or 1 Gbps.
     There should be no cameras in this network, but it may be connected to the internet.
+
+If there is a need to contact the Support Team regarding an issue with the VMS Benchmark tool
+itself, make sure that all the above listed prerequisites are fulfilled.
 
 ---------------------------------------------------------------------------------------------------
 ## Usage
@@ -56,6 +69,7 @@ Currently, the tool has no command-line options besides `--help` which shows a t
 
 Currently, on successful run the tool produces a report similar to this:
 ```
+VMS Benchmark started.
 Device IP: 192.168.0.100
 Arch: armv7l
 Number of CPUs: 12

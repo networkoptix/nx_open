@@ -413,7 +413,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
         [this, camera, action]()
         {
             action::Parameters params;
-            if (camera && camera->commonModule())
+            if (camera && camera->commonModule() && !camera->hasFlags(Qn::removed))
                 params.setItems(QVariant::fromValue<QnResourcePtr>(camera));
             params.setArgument(Qn::ActionDataRole, action);
             menu()->trigger(action::AcknowledgeEventAction, params);

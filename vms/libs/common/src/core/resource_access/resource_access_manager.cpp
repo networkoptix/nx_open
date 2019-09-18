@@ -355,7 +355,7 @@ void QnResourceAccessManager::recalculateAllPermissions()
         QnMutexLocker lk(&m_mutex);
         m_permissionsCache = permissionsCache;
     }
-
+    emit allPermissionsRecalculated();
 }
 
 void QnResourceAccessManager::updatePermissions(const QnResourceAccessSubject& subject,
@@ -408,7 +408,7 @@ void QnResourceAccessManager::handleResourceAdded(const QnResourcePtr& resource)
         connect(camera, &QnVirtualCameraResource::licenseTypeChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
 
-        connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
+        connect(camera, &QnVirtualCameraResource::scheduleEnabledChanged, this,
             &QnResourceAccessManager::updatePermissionsToResource);
 
         connect(camera, &QnVirtualCameraResource::capabilitiesChanged, this,

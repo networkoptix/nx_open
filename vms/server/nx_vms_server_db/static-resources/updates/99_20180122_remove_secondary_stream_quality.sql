@@ -18,7 +18,6 @@ CREATE TABLE "vms_scheduletask_tmp" (
 INSERT INTO vms_scheduletask_tmp
     SELECT * FROM vms_scheduletask;
 
-
 ALTER TABLE "vms_camera_user_attributes" RENAME TO "vms_camera_user_attributes_tmp";
 
 CREATE TABLE "vms_camera_user_attributes" (
@@ -44,13 +43,15 @@ CREATE TABLE "vms_camera_user_attributes" (
 INSERT INTO "vms_camera_user_attributes"
     SELECT * FROM "vms_camera_user_attributes_tmp";
 
--- secondary_quality 4 means 'SSQualityDontUse'
+-- Set vms_camera_user_attributes::disable_dual_streaming according to secondary_quality.
+
+-- NOTE: secondary_quality 4 means 'SSQualityDontUse'.
 UPDATE vms_camera_user_attributes
-   SET disable_dual_streaming = CASE(
-    SELECT secondary_quality 
-      FROM vms_camera_user_attributes_tmp old 
-     WHERE old.id = vms_camera_user_attributes.id)
- WHEN 4 THEN 1 ELSE 0 END;
+    SET disable_dual_streaming = CASE(
+        SELECT secondary_quality 
+            FROM vms_camera_user_attributes_tmp old 
+         WHERE old.id = vms_camera_user_attributes.id)
+    WHEN 4 THEN 1 ELSE 0 END;
 
 DROP TABLE "vms_camera_user_attributes_tmp";
 

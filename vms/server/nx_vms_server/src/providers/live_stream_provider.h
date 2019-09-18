@@ -80,6 +80,8 @@ protected:
     virtual QnMetaDataV1Ptr getCameraMetadata();
     virtual void onStreamResolutionChanged(int channelNumber, const QSize& picSize);
     bool needHardwareMotion();
+
+    virtual void processMetadata(const QnCompressedVideoDataPtr& compressedFrame);
 protected:
     mutable QnMutex m_liveMutex;
 

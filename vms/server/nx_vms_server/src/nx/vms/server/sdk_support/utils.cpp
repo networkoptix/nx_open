@@ -227,7 +227,8 @@ nx::sdk::Ptr<nx::sdk::IList<ITimestampedObjectMetadata>> createObjectTrack(
 
 nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrame(
     const CLVideoDecoderOutputPtr& frame,
-    nx::vms::api::analytics::PixelFormat pixelFormat)
+    nx::vms::api::analytics::PixelFormat pixelFormat,
+    int rotationAngle)
 {
     bool compressedFrameWarningIssued = false;
     nx::vms::server::analytics::FrameConverter frameConverter(
@@ -240,7 +241,7 @@ nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrame(
     if (!NX_ASSERT(sdkPixelFormat, lm("Wrong pixel format %1").args((int) pixelFormat)))
         return nullptr;
 
-    const auto dataPacket = frameConverter.getDataPacket(sdkPixelFormat);
+    const auto dataPacket = frameConverter.getDataPacket(sdkPixelFormat, rotationAngle);
 
     if (!dataPacket)
         return nullptr;

@@ -763,6 +763,23 @@ void EventTile::setProgressTitle(const QString& value)
     d->progressLabel->setText(value);
 }
 
+QString EventTile::progressFormat() const
+{
+    return ui->progressBar->format();
+}
+
+void EventTile::setProgressFormat(const QString& value)
+{
+    if (value.isNull())
+    {
+        ui->progressBar->resetFormat();
+    }
+    else
+    {
+        ui->progressBar->setFormat(value);
+    }
+}
+
 bool EventTile::previewEnabled() const
 {
     return !ui->previewWidget->isHidden();
@@ -906,6 +923,7 @@ void EventTile::clear()
     setProgressBarVisible(false);
     setProgressValue(0.0);
     setProgressTitle({});
+    setProgressFormat(QString());
     setResourceList(QStringList());
     setToolTip({});
     setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);

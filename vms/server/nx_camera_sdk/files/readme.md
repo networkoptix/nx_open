@@ -84,7 +84,9 @@ build_samples_arm32.sh
 build_samples_rpi.sh
 ```
 
-ATTENTION: If cmake cannot find Qt, add the following arg to a build_samples* script (will be
+ATTENTION: The Qt library should be available to cmake, and its version should be the same as the
+one that comes with the Server (see Server installation files), otherwise an unpredictable behavior
+may take place. If cmake cannot find Qt, add the following arg to a build_samples* script (will be
 passed to cmake):
 ```
 build_samples* -DCMAKE_PREFIX_PATH=<full_path_to_Qt5_dir>
