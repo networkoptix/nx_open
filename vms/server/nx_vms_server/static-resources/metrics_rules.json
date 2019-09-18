@@ -144,12 +144,12 @@
         "activity": {
             "values": {
                 "readRateKBps": {
-                    "name": "Read bitrate",
+                    "name": "Read rate",
                     "display": "table|panel",
                     "unit": "KBps"
                 },
                 "writeRateKBps": {
-                    "name": "Write bitrate",
+                    "name": "Write rate",
                     "display": "table|panel",
                     "unit": "KBps"
                 }
@@ -163,7 +163,7 @@
                     "unit": "GB"
                 },
                 "mediaSpaceInPercents": {
-                    "name": "Media archive size",
+                    "name": "Space Used by VMS media",
                     "display": "table|panel",
                     "unit": "%"
                 }
