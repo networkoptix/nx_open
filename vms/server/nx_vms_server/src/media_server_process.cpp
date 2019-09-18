@@ -1497,7 +1497,7 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:integer utcTimeMs Server synchronized time.
      *     %param:boolean isTakenFromInternet Whether the server has got the time from the internet.
      */
-    reg(nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.mid(1),
+    reg(nx::vms::time::TimeSyncManager::kTimeSyncUrlPath.mid(1),
         new ::rest::handlers::SyncTimeRestHandler());
 
     /**%apidoc GET /ec2/mergeStatus
@@ -5181,7 +5181,7 @@ void MediaServerProcess::configureApiRestrictions(nx::network::http::AuthMethodR
     restrictions->allow(webPrefix + "/api/getTime", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/gettime", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(
-        webPrefix + nx::vms::time_sync::TimeSyncManager::kTimeSyncUrlPath.toStdString(),
+        webPrefix + nx::vms::time::TimeSyncManager::kTimeSyncUrlPath.toStdString(),
         nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/getTimeZones", nx::network::http::AuthMethod::noAuth);
     restrictions->allow(webPrefix + "/api/getNonce", nx::network::http::AuthMethod::noAuth);

@@ -9,7 +9,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>
 
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>
@@ -65,18 +65,18 @@ QnScreenshotParameters::QnScreenshotParameters()
 
 QString QnScreenshotParameters::timeString(bool forFilename) const
 {
-    datetime::Format timeFormat = forFilename
-        ? datetime::Format::filename_time
-        : datetime::Format::hh_mm_ss;
-    datetime::Format fullFormat = forFilename
-        ? datetime::Format::filename_date
-        : datetime::Format::yyyy_MM_dd_hh_mm_ss;
+    nx::vms::time::Format timeFormat = forFilename
+        ? nx::vms::time::Format::filename_time
+        : nx::vms::time::Format::hh_mm_ss;
+    nx::vms::time::Format fullFormat = forFilename
+        ? nx::vms::time::Format::filename_date
+        : nx::vms::time::Format::yyyy_MM_dd_hh_mm_ss;
 
     if (utcTimestampMsec == latestScreenshotTime)
-        return datetime::toString(QTime::currentTime(), timeFormat);
+        return nx::vms::time::toString(QTime::currentTime(), timeFormat);
     if (isUtc)
-        return datetime::toString(displayTimeMsec, fullFormat);
-    return datetime::toString(displayTimeMsec, timeFormat);
+        return nx::vms::time::toString(displayTimeMsec, fullFormat);
+    return nx::vms::time::toString(displayTimeMsec, timeFormat);
 }
 
 

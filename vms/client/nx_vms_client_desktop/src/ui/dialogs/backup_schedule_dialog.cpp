@@ -6,7 +6,7 @@
 
 #include <QtWidgets/QComboBox>
 
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 #include <core/resource/server_backup_schedule.h>
 
@@ -69,13 +69,13 @@ QnBackupScheduleDialog::QnBackupScheduleDialog(QWidget *parent):
     ui->comboBoxTimeTo->addItem(tr("Until finished"), kUntilFinished);
     for (int i = 0; i < 24; ++i)
     {
-        QString hour = datetime::toString(QTime(i, 0, 0), datetime::Format::hh);
+        QString hour = nx::vms::time::toString(QTime(i, 0, 0), nx::vms::time::Format::hh);
         ui->comboBoxTimeStart->addItem(hour, i * 3600);
         ui->comboBoxTimeTo->addItem(hour, i * 3600);
     }
 
     // Allowing to select the last hour in a day, according to VMS-11032.
-    QString lastHour = datetime::toString(QTime(23, 59, 0), datetime::Format::hh_mm);
+    QString lastHour = nx::vms::time::toString(QTime(23, 59, 0), nx::vms::time::Format::hh_mm);
     ui->comboBoxTimeTo->addItem(lastHour, 24 * 3600);
 
     auto updateLimitControls = [this]

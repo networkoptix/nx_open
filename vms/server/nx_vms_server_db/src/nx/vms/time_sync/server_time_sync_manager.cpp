@@ -16,9 +16,7 @@
 #include <nx/utils/time.h>
 #include <nx/vms/api/data/misc_data.h>
 
-namespace nx {
-namespace vms {
-namespace time_sync {
+namespace nx::vms::time {
 
 static const QByteArray kTimeDeltaParamName = "sync_time_delta"; //< For migration from previous version.
 
@@ -288,6 +286,4 @@ void ServerTimeSyncManager::init(const ec2::AbstractECConnectionPtr& connection)
     setSyncTimeInternal(m_systemClock->millisSinceEpoch() + std::chrono::milliseconds(m_systemTimeDeltaMs));
 }
 
-} // namespace time_sync
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::time

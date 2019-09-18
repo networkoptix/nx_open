@@ -61,7 +61,7 @@ public:
 
     TransactionMessageBusAdapter* messageBus() const;
     QnDistributedMutexManager* distributedMutex() const;
-    virtual nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager() const override;
+    virtual nx::vms::time::AbstractTimeSyncManager* timeSyncManager() const override;
 
     QnJsonTransactionSerializer* jsonTranSerializer() const;
     QnUbjsonTransactionSerializer* ubjsonTranSerializer() const;
@@ -75,7 +75,7 @@ private:
     std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
     Ec2DirectConnectionPtr m_directConnection;
     std::unique_ptr<nx::vms::network::ReverseConnectionManager> m_serverConnector;
-    std::unique_ptr<nx::vms::time_sync::ServerTimeSyncManager> m_timeSynchronizationManager;
+    std::unique_ptr<nx::vms::time::ServerTimeSyncManager> m_timeSynchronizationManager;
 
     std::unique_ptr<detail::QnDbManager> m_dbManager;
     std::unique_ptr<QnTransactionLog> m_transactionLog;

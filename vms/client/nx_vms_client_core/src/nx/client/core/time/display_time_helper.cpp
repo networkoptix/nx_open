@@ -2,8 +2,8 @@
 
 #include <QtQml/QtQml>
 
-#include <nx/client/core/time/time_constants.h>
-#include <translation/datetime_formatter.h>
+#include <nx/client/core/time/calendar_utils.h>
+#include <nx/vms/time/formatter.h>
 
 namespace nx::client::core {
 
@@ -17,13 +17,15 @@ struct DisplayTimeHelper::Private
     qint64 position = 0;
     qint64 displayOffset = 0;
     QDateTime dateTime;
+    nx::vms::time::FormatterPtr formatter;
 };
 
 DisplayTimeHelper::Private::Private(DisplayTimeHelper* owner):
     q(owner),
     position(0),
-    displayOffset(datetime::systemDisplayOffset()),
-    dateTime(getDateTime())
+    displayOffset(0),
+    dateTime(getDateTime()),
+    formatter(nx::vms::time::Formatter::system())
 {
 }
 
@@ -52,6 +54,8 @@ DisplayTimeHelper::DisplayTimeHelper(QObject* parent):
     const auto updateDateTime = [this]() { d->handleChanges(); };
     connect(this, &DisplayTimeHelper::positionChanged, this, updateDateTime);
     connect(this, &DisplayTimeHelper::displayOffsetChanged, this, updateDateTime);
+    connect(this, &DisplayTimeHelper::localeChanged, this, updateDateTime);
+    connect(this, &DisplayTimeHelper::is24HoursTimeFormatChanged, this, updateDateTime);
 }
 
 DisplayTimeHelper::~DisplayTimeHelper()
@@ -76,7 +80,7 @@ qint64 DisplayTimeHelper::position() const
 void DisplayTimeHelper::setDisplayOffset(qint64 value)
 {
     value = std::clamp<qint64>(
-        value, TimeConstants::kMinDisplayOffset, TimeConstants::kMaxDisplayOffset);
+        value, CalendarUtils::kMinDisplayOffset, CalendarUtils::kMaxDisplayOffset);
 
     if (d->displayOffset == value)
         return;
@@ -90,29 +94,57 @@ qint64 DisplayTimeHelper::displayOffset() const
     return d->displayOffset;
 }
 
+void DisplayTimeHelper::setLocale(const QLocale& locale)
+{
+    if (d->formatter->locale() == locale)
+        return;
+
+    d->formatter = nx::vms::time::Formatter::custom(locale, is24HoursTimeFormat());
+    emit localeChanged();
+}
+
+void DisplayTimeHelper::set24HoursTimeFormat(bool value)
+{
+    if (d->formatter->is24HoursTimeFormat() == value)
+        return;
+
+    d->formatter = nx::vms::time::Formatter::custom(locale(), value);
+    emit is24HoursTimeFormatChanged();
+}
+
+bool DisplayTimeHelper::is24HoursTimeFormat() const
+{
+    return d->formatter->is24HoursTimeFormat();
+}
+
+QLocale DisplayTimeHelper::locale() const
+{
+    return d->formatter->locale();
+}
+
 QString DisplayTimeHelper::fullDate() const
 {
-    return datetime::toString(d->dateTime, datetime::Format::d_MMMM_yyyy);
+    return d->formatter->toString(d->dateTime, nx::vms::time::Format::d_MMMM_yyyy);
 }
 
 QString DisplayTimeHelper::hours() const
 {
-    return datetime::toString(d->dateTime, datetime::Format::h);
+    return d->formatter->toString(d->dateTime, nx::vms::time::Format::h);
 }
 
 QString DisplayTimeHelper::minutes() const
 {
-    return datetime::toString(d->dateTime, datetime::Format::m);
+    return d->formatter->toString(d->dateTime, nx::vms::time::Format::m);
 }
 
 QString DisplayTimeHelper::seconds() const
 {
-    return datetime::toString(d->dateTime, datetime::Format::s);
+    return d->formatter->toString(d->dateTime, nx::vms::time::Format::s);
 }
 
 QString DisplayTimeHelper::noonMark() const
 {
-    return datetime::toString(d->dateTime, datetime::Format::a);
+    return d->formatter->toString(d->dateTime, nx::vms::time::Format::a);
 }
 
 } // namespace nx::client::core

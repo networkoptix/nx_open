@@ -3,13 +3,13 @@
 #include <algorithm>
 
 #include <text/time_strings.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 #include <ui/style/resource_icon_cache.h>
 
 #include <nx/client/core/utils/human_readable.h>
 #include <nx/utils/guarded_callback.h>
 
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 namespace {
 
@@ -124,13 +124,13 @@ QVariant TimeSynchronizationServersModel::data(const QModelIndex& index, int rol
                     switch (column)
                     {
                         case DateColumn:
-                            return datetime::toString(osDateTime.date());
+                            return nx::vms::time::toString(osDateTime.date());
                         case TimezoneColumn:
                             return osDateTime.timeZoneAbbreviation();
                         case OsTimeColumn:
-                            return datetime::toString(osDateTime.time());
+                            return nx::vms::time::toString(osDateTime.time());
                         case VmsTimeColumn:
-                            return datetime::toString(vmsDateTime.time());
+                            return nx::vms::time::toString(vmsDateTime.time());
                     }
                 }
 

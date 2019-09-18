@@ -5,9 +5,7 @@
 #include <api/global_settings.h>
 #include <api/common_message_processor.h>
 
-namespace nx {
-namespace vms {
-namespace time_sync {
+namespace nx::vms::time {
 
 ClientTimeSyncManager::ClientTimeSyncManager(QnCommonModule* commonModule): base_type(commonModule), m_connection(nullptr)
 {
@@ -69,6 +67,4 @@ void ClientTimeSyncManager::updateTime()
     }
 }
 
-} // namespace time_sync
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::time

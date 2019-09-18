@@ -1,4 +1,4 @@
-#include "datetime_formatter.h"
+#include "formatter.h"
 
 #include <map>
 
@@ -13,14 +13,25 @@ namespace {
 
 void removeTimezone(QString& source)
 {
-    source.remove(lit(" t"));
+    source.remove(" t");
+}
+
+QString getShortFormatWithSeconds(const QLocale& locale)
+{
+    auto result = locale.dateTimeFormat(QLocale::ShortFormat);
+    if (result.contains("ss") || !result.contains("mm"))
+        return result;
+    const int dividerPos = result.indexOf("mm") - 1;
+    const auto divider = dividerPos > 0 ? QChar(result[dividerPos]) : QChar(':');
+    result.insert(dividerPos + 3, divider + QString("ss"));
+    return result;
 }
 
 //--------------------------------------------------------------------------------------------------
 
-using FormatsHash = QHash<datetime::Format, QString>;
-using Formatter = datetime::Formatter;
-using FormatterPtr = datetime::FormatterPtr;
+using FormatsHash = QHash<nx::vms::time::Format, QString>;
+using Formatter = nx::vms::time::Formatter;
+using FormatterPtr = nx::vms::time::FormatterPtr;
 
 // This class is to define context for Qt Linguist only.
 class DateTimeFormats
@@ -36,36 +47,21 @@ private:
 
 FormatsHash DateTimeFormats::getFormats(const QLocale& locale, bool is24HoursTimeFormat)
 {
-    using namespace datetime;
+    using namespace nx::vms::time;
 
     FormatsHash result = defaultFormats();
-    result[Format::hh] = is24HoursTimeFormat ? lit("hh:00") : lit("h AP");
+    result[Format::hh] = is24HoursTimeFormat ? "hh:00" : "h AP";
     result[Format::hh_mm] = locale.timeFormat(QLocale::ShortFormat);
     result[Format::hh_mm_ss] = locale.timeFormat(QLocale::LongFormat);
 
     // This is fix - we never want timezone in time string.
     removeTimezone(result[Format::hh_mm_ss]);
 
-    result[Format::hh_mm_ss_zzz] = result[Format::hh_mm_ss] + lit(".zzz");
-
-    // Two formats belowcould has different numbers order and other distinctions
-    // in some languages. So wee mark them translatable, but hide for translaters and
-    // convert them manually.
-    result[Format::dd_MM] = tr("MM/dd"); //< Localizable.
-    result[Format::MMMM_yyyy] = tr("MMMM yyyy"); //< Localizable.
-
+    result[Format::hh_mm_ss_zzz] = result[Format::hh_mm_ss] + ".zzz";
+    result[Format::MMMM_yyyy] = "MMMM yyyy";
     result[Format::dd_MM_yyyy] = locale.dateFormat(QLocale::ShortFormat);
 
-    auto shortFormat = locale.dateTimeFormat(QLocale::ShortFormat);
-
-    // QLocale::ShortFormat probably does not include seconds - add them below.
-    if (!shortFormat.contains("ss") && shortFormat.contains("mm"))
-    {
-        const int dividerPos = shortFormat.indexOf("mm") - 1;
-        const auto divider = dividerPos >= 0 ? QChar(shortFormat[dividerPos]) : QChar(':');
-        shortFormat.insert(dividerPos + 3, divider + QString("ss"));
-    }
-
+    const auto shortFormat = getShortFormatWithSeconds(locale);
     result[Format::yyyy_MM_dd_hh_mm_ss] = shortFormat;
 
     result[Format::dddd_d_MMMM_yyyy_hh_mm_ss] = locale.dateTimeFormat(QLocale::LongFormat);
@@ -75,41 +71,40 @@ FormatsHash DateTimeFormats::getFormats(const QLocale& locale, bool is24HoursTim
     removeTimezone(result[Format::dddd_d_MMMM_yyyy_hh_mm_ss]);
 
     result[Format::filename_date] = is24HoursTimeFormat
-        ? lit("yyyy_MM_dd_hh_mm_ss")
-        : lit("yyyy_MM_dd_hAP_mm_ss");
+        ? "yyyy_MM_dd_hh_mm_ss"
+        : "yyyy_MM_dd_hAP_mm_ss";
 
     return result;
 }
 
 const FormatsHash& DateTimeFormats::defaultFormats()
 {
-    using namespace datetime;
+    using namespace nx::vms::time;
     static const FormatsHash result =
     {
-        {Format::h, lit("hh")},
-        {Format::m, lit("mm")},
-        {Format::s, lit("ss")},
-        {Format::a, lit("a")},
-        {Format::mm_ss, lit("mm:ss")},
-        {Format::hh, lit("hh:00")},
-        {Format::hh_mm, lit("hh:mm")},
-        {Format::hh_mm_ss, lit("hh:mm:ss")},
-        {Format::hh_mm_ss_zzz, lit("hh:mm:ss.zzz")},
+        {Format::h, "hh"},
+        {Format::m, "mm"},
+        {Format::s, "ss"},
+        {Format::a, "a"},
+        {Format::mm_ss, "mm:ss"},
+        {Format::hh, "hh:00"},
+        {Format::hh_mm, "hh:mm"},
+        {Format::hh_mm_ss, "hh:mm:ss"},
+        {Format::hh_mm_ss_zzz, "hh:mm:ss.zzz"},
 
-        {Format::dd, lit("dd")},
-        {Format::MMM, lit("MMM")},
-        {Format::yyyy, lit("yyyy")},
+        {Format::dd, "dd"},
+        {Format::MMM, "MMM"},
+        {Format::yyyy, "yyyy"},
 
-        {Format::dd_MM, lit("dd-MM")},
-        {Format::MMMM_yyyy, lit("MMMM yyyy")},
-        {Format::dd_MM_yyyy, lit("dd-MM-yyyy")},
-        {Format::d_MMMM_yyyy, lit("d MMMM yyyy")},
-        {Format::dd_MMMM_yyyy, lit("dd MMMM yyyy")},
-        {Format::yyyy_MM_dd_hh_mm_ss, lit("yyyy-MM-dd hh:mm:ss")},
-        {Format::dddd_d_MMMM_yyyy_hh_mm_ss, lit("dddd, d MMMM yyyy hh:mm:ss")},
+        {Format::MMMM_yyyy, "MMMM yyyy"},
+        {Format::dd_MM_yyyy, "dd-MM-yyyy"},
+        {Format::d_MMMM_yyyy, "d MMMM yyyy"},
+        {Format::dd_MMMM_yyyy, "dd MMMM yyyy"},
+        {Format::yyyy_MM_dd_hh_mm_ss, "yyyy-MM-dd hh:mm:ss"},
+        {Format::dddd_d_MMMM_yyyy_hh_mm_ss, "dddd, d MMMM yyyy hh:mm:ss"},
 
-        {Format::filename_date, lit("yyyy_MM_dd_hh_mm_ss")},
-        {Format::filename_time, lit("hh_mm_ss")},
+        {Format::filename_date, "yyyy_MM_dd_hh_mm_ss"},
+        {Format::filename_time, "hh_mm_ss"},
     };
 
     return result;
@@ -152,7 +147,7 @@ bool SystemFormatterHolder::is24HoursTimeFormat()
         []()
         {
             const auto format = QLocale::system().timeFormat();
-            return !format.contains(lit("AP"), Qt::CaseInsensitive);
+            return !format.contains("AP", Qt::CaseInsensitive);
         }();
 
     return forced24HoursFormat ? *forced24HoursFormat : isSystem24HoursFormat;
@@ -162,7 +157,7 @@ bool SystemFormatterHolder::is24HoursTimeFormat()
 
 //--------------------------------------------------------------------------------------------------
 
-namespace datetime {
+namespace nx::vms::time {
 
 struct Formatter::Private
 {
@@ -185,10 +180,11 @@ Formatter::Private::Private(const QLocale& locale, bool is24HoursFormat):
 
 QString Formatter::Private::getLocalizedHours(const QTime& value)
 {
-    if (datetime::is24HoursTimeFormat())
+    if (is24HoursFormat)
         return value.toString(QStringLiteral("hh"));
 
     const auto hours = value.hour() % 12;
+    // Am/PM notation suppose that 0 am(pm) time should be shown as 12 am(pm).
     return QString::number(hours ? hours : 12);
 }
 
@@ -291,4 +287,4 @@ bool is24HoursTimeFormat(FormatterPtr formatter)
     return formatter->is24HoursTimeFormat();
 }
 
-} // namespace datetime
+} // namespace nx::vms::time

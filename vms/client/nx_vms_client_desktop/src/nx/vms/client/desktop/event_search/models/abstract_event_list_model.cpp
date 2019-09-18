@@ -4,7 +4,7 @@
 
 #include <nx/client/core/watchers/server_time_watcher.h>
 
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/common/synctime.h>
 #include <ui/style/skin.h>
@@ -89,9 +89,9 @@ QString AbstractEventListModel::timestampText(microseconds timestamp) const
     const QDateTime dateTime = timeWatcher->displayTime(timestampMs);
 
     if (qnSyncTime->currentDateTime().date() != dateTime.date())
-        return datetime::toString(dateTime.date());
+        return nx::vms::time::toString(dateTime.date());
 
-    return datetime::toString(dateTime.time());
+    return nx::vms::time::toString(dateTime.time());
 }
 
 bool AbstractEventListModel::defaultAction(const QModelIndex& /*index*/)

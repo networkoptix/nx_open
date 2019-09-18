@@ -6,7 +6,7 @@
 
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <core/resource/camera_resource.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 #include <ui/help/business_help.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -454,11 +454,11 @@ QString SimpleMotionSearchListModel::timestampText(microseconds timestamp) const
     if (qnSyncTime->currentDateTime().date() != dateTime.date())
     {
         return QString("%1, %2").arg(
-            datetime::toString(dateTime.date()),
-            datetime::toString(dateTime.time()));
+            nx::vms::time::toString(dateTime.date()),
+            nx::vms::time::toString(dateTime.time()));
     }
 
-    return datetime::toString(dateTime.time());
+    return nx::vms::time::toString(dateTime.time());
 }
 
 } // namespace nx::vms::client::desktop

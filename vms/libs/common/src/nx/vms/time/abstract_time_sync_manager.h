@@ -4,9 +4,7 @@
 
 #include <QtCore/QObject>
 
-namespace nx {
-namespace vms {
-namespace time_sync {
+namespace nx::vms::time {
 
 class AbstractTimeSyncManager: public QObject
 {
@@ -24,6 +22,4 @@ signals:
     void timeChanged(qint64 syncTimeMs);
 };
 
-} // namespace time_sync
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::time

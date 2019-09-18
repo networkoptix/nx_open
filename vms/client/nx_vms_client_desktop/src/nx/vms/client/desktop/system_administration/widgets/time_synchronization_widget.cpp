@@ -8,7 +8,7 @@
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
@@ -145,7 +145,7 @@ TimeSynchronizationWidget::TimeSynchronizationWidget(QWidget* parent):
 
     connect(
         commonModule()->ec2Connection()->timeSyncManager(),
-        &nx::vms::time_sync::TimeSyncManager::timeChanged,
+        &nx::vms::time::TimeSyncManager::timeChanged,
         m_timeWatcher,
         &TimeSynchronizationServerTimeWatcher::forceUpdate);
 
@@ -331,8 +331,8 @@ void TimeSynchronizationWidget::loadState(const State& state)
     ui->statusLabel->setText(detailsText);
     ui->statusLabel->setWarningStyle(showWarning);
 
-    ui->timeLabel->setText(datetime::toString(vmsDateTime.time()));
-    ui->dateLabel->setText(datetime::toString(vmsDateTime.date()));
+    ui->timeLabel->setText(nx::vms::time::toString(vmsDateTime.time()));
+    ui->dateLabel->setText(nx::vms::time::toString(vmsDateTime.date()));
     ui->zoneLabel->setText(vmsDateTime.timeZoneAbbreviation());
 
     switch (state.status)

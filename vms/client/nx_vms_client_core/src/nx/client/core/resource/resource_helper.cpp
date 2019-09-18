@@ -6,7 +6,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
 #include <core/resource/media_server_resource.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 namespace nx::vms::client::core {
 
@@ -131,7 +131,7 @@ qint64 ResourceHelper::displayOffset() const
     const auto mediaResource = m_resource.dynamicCast<QnMediaResource>();
 
     return !mediaResource || timeWatcher->timeMode() == Watcher::clientTimeMode
-        ? datetime::systemDisplayOffset()
+        ? nx::vms::time::systemDisplayOffset()
         : timeWatcher->utcOffset(mediaResource);
 }
 

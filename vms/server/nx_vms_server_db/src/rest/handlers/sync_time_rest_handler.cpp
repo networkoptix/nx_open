@@ -14,7 +14,7 @@ nx::network::rest::Response SyncTimeRestHandler::executeGet(
 }
 
 SyncTimeData SyncTimeRestHandler::execute(
-    nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager)
+    nx::vms::time::AbstractTimeSyncManager* timeSyncManager)
 {
     SyncTimeData reply;
     reply.utcTimeMs = timeSyncManager->getSyncTime(&reply.isTakenFromInternet).count();

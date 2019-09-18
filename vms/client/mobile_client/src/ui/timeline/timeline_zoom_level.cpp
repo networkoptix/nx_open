@@ -1,7 +1,7 @@
 #include "timeline_zoom_level.h"
 
 #include <nx/utils/log/assert.h>
-#include <translation/datetime_formatter.h>
+#include <nx/vms/time/formatter.h>
 
 bool QnTimelineZoomLevel::testTick(qint64 tick) const
 {
@@ -149,8 +149,8 @@ QString QnTimelineZoomLevel::value(qint64 tick) const
     case Minutes:
     case Hours:
         return QString("%1:%2").arg(
-            datetime::toString(dateTime, datetime::Format::h),
-            datetime::toString(dateTime, datetime::Format::m));
+            nx::vms::time::toString(dateTime, nx::vms::time::Format::h),
+            nx::vms::time::toString(dateTime, nx::vms::time::Format::m));
     case Days:
         return dateTime.toString(QStringLiteral("d"));
     case Months:
@@ -175,7 +175,7 @@ QString QnTimelineZoomLevel::suffix(qint64 tick) const
         return QStringLiteral("s");
     case Minutes:
     case Hours:
-        return datetime::toString(dateTime, datetime::Format::a);
+        return nx::vms::time::toString(dateTime, nx::vms::time::Format::a);
     default:
         return QString();
     }
@@ -191,7 +191,7 @@ QString QnTimelineZoomLevel::longestText() const
             return QStringLiteral("00 s");
         case Minutes:
         case Hours:
-            return datetime::is24HoursTimeFormat()
+            return nx::vms::time::is24HoursTimeFormat()
                 ? QStringLiteral("00:00")
                 : QStringLiteral("00:00 MM");
         case Years:

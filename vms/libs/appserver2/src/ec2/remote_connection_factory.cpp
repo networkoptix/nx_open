@@ -36,7 +36,7 @@ RemoteConnectionFactory::RemoteConnectionFactory(
     AbstractECConnectionFactory(commonModule),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
-    m_timeSynchronizationManager(new nx::vms::time_sync::ClientTimeSyncManager(
+    m_timeSynchronizationManager(new time::ClientTimeSyncManager(
         commonModule)),
     m_terminated(false),
     m_runningRequests(0),
@@ -475,7 +475,7 @@ TransactionMessageBusAdapter* RemoteConnectionFactory::messageBus() const
     return m_bus.get();
 }
 
-nx::vms::time_sync::AbstractTimeSyncManager* RemoteConnectionFactory::timeSyncManager() const
+nx::vms::time::AbstractTimeSyncManager* RemoteConnectionFactory::timeSyncManager() const
 {
     return m_timeSynchronizationManager.get();
 }

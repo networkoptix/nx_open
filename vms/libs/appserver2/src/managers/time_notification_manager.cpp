@@ -3,10 +3,10 @@
 
 namespace ec2 {
 
-QnTimeNotificationManager::QnTimeNotificationManager(nx::vms::time_sync::AbstractTimeSyncManager* timeSyncManager)
+QnTimeNotificationManager::QnTimeNotificationManager(nx::vms::time::AbstractTimeSyncManager* timeSyncManager)
 {
     connect(
-        timeSyncManager, &nx::vms::time_sync::TimeSyncManager::timeChanged,
+        timeSyncManager, &nx::vms::time::TimeSyncManager::timeChanged,
         this, &QnTimeNotificationManager::timeChanged);
 }
 

@@ -172,11 +172,10 @@ public:
     QnTimePeriodList timePeriods[Qn::TimePeriodContentCount];
 
     int displayOffset = 0;
+    QLocale locale = QLocale::system();
 
     QElapsedTimer animationTimer;
     qint64 prevAnimationMs = 0;
-
-    QStringList suffixList;
 
     nx::client::core::ChunkProvider* chunkProvider = nullptr;
 
@@ -345,20 +344,7 @@ public:
         return time + displayOffset;
     }
 
-    void updateTextHelper()
-    {
-        auto window = parent->window();
-        if (!window)
-            return;
-
-        textHelper.reset(new QnTimelineTextHelper(textFont, textColor, suffixList));
-        textTexture = window->createTextureFromImage(textHelper->texture());
-
-        updateMaxZoomLevelTextLengths();
-    }
-
-    void updateMaxZoomLevelTextLengths();
-
+    void updateTextHelper();
     void updateStripesTextures();
 
     void tryFitInBounds();
@@ -388,16 +374,7 @@ QnTimeline::QnTimeline(QQuickItem* parent):
     setAcceptedMouseButtons(Qt::LeftButton);
 
     connect(this, &QnTimeline::widthChanged, this, [this](){ d->updateZoomLevel(); });
-
-    d->suffixList << "ms" << "s" << ":" << "AM" << "PM";
-
-    QLocale locale;
-    for (int i = 1; i <= 12; ++i)
-    {
-        d->suffixList.append(locale.standaloneMonthName(i, QLocale::ShortFormat));
-        d->suffixList.append(locale.monthName(i, QLocale::ShortFormat));
-    }
-
+    connect(this, &QnTimeline::localeChanged, this, [this]() { d->updateTextHelper(); });
     d->updateTextHelper();
 }
 
@@ -569,6 +546,21 @@ int QnTimeline::displayOffset() const
 {
     return d->displayOffset;
 }
+
+void QnTimeline::setLocale(const QLocale& locale)
+{
+    if (d->locale == locale)
+        return;
+
+    d->locale = locale;
+    emit localeChanged();
+}
+
+QLocale QnTimeline::locale() const
+{
+    return d->locale;
+}
+
 
 void QnTimeline::setDisplayOffset(int value)
 {
@@ -1411,11 +1403,26 @@ QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
     return chunksNode;
 }
 
-void QnTimelinePrivate::updateMaxZoomLevelTextLengths()
+void QnTimelinePrivate::updateTextHelper()
 {
-    const QFontMetricsF fm(parent->font());
-    const QLocale locale;
+    auto window = parent->window();
+    if (!window)
+        return;
 
+    QStringList suffixList{"ms", "s", ":", "AM", "PM"};
+
+    static constexpr int kMonthsCount = 12;
+    for (int i = 1; i <= kMonthsCount; ++i)
+    {
+        suffixList.append(locale.standaloneMonthName(i, QLocale::ShortFormat));
+        suffixList.append(locale.monthName(i, QLocale::ShortFormat));
+    }
+
+    textHelper.reset(new QnTimelineTextHelper(textFont, textColor, suffixList));
+    textTexture = window->createTextureFromImage(textHelper->texture());
+
+    // Updates text lengths.
+    const QFontMetricsF fm(parent->font());
     maxZoomLevelTextLength.resize(zoomLevels.size());
     for (int i = 0; i < zoomLevels.size(); ++i)
     {

@@ -28,6 +28,9 @@ class QnTimeline: public QQuickItem
     Q_PROPERTY(int displayOffset
         READ displayOffset WRITE setDisplayOffset NOTIFY displayOffsetChanged)
 
+    Q_PROPERTY(QLocale locale READ locale WRITE setLocale
+        NOTIFY localeChanged)
+
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     Q_PROPERTY(QColor chunkBarColor
         READ chunkBarColor WRITE setChunkBarColor NOTIFY chunkBarColorChanged)
@@ -162,6 +165,9 @@ public:
     int displayOffset() const;
     void setDisplayOffset(int value);
 
+    void setLocale(const QLocale& locale);
+    QLocale locale() const;
+
     Q_INVOKABLE void zoomIn();
     Q_INVOKABLE void zoomOut();
 
@@ -192,6 +198,7 @@ signals:
     void startBoundChanged();
     void autoReturnToBoundsEnabledChanged();
     void displayOffsetChanged();
+    void localeChanged();
 
     void textColorChanged();
     void chunkColorChanged();
