@@ -2052,7 +2052,7 @@ int ChunkHeader::serialize(BufferType* const /*dstBuffer*/) const
 
 
 static const StringType defaultUserAgentString = QString("%1%2/%3 (%4) %5").arg(
-    nx::utils::AppInfo::customizationVmsName(),
+    nx::utils::AppInfo::vmsName(),
     PRODUCT_NAME_SUFFIX,
     nx::utils::AppInfo::applicationVersion(),
     nx::utils::AppInfo::organizationName(),
@@ -2065,7 +2065,7 @@ StringType userAgentString()
 }
 
 static const StringType defaultServerString = QString("%1/%2 (%3) %4").arg(
-    nx::utils::AppInfo::customizationVmsName(),
+    nx::utils::AppInfo::vmsName(),
     nx::utils::AppInfo::applicationVersion(),
     nx::utils::AppInfo::organizationName(),
     COMPATIBILITY_SERVER_STRING

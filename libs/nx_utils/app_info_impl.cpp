@@ -7,7 +7,7 @@
 
 namespace nx::utils {
 
-QString AppInfo::customizationVmsName()
+QString AppInfo::vmsName()
 {
     return "${customization.vmsName}";
 }

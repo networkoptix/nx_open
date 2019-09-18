@@ -38,7 +38,7 @@ Settings::Settings():
 {
 	#if defined(USE_QT_KEYCHAIN)
 	    const QString serviceName = AppInfo::organizationName() + " "
-            + AppInfo::customizationVmsName();
+            + AppInfo::vmsName();
 	    KeychainBackend keychain(serviceName);
 
 	    QByteArray key = keychain.readValue(kSecureKeyPropertyName).toUtf8();

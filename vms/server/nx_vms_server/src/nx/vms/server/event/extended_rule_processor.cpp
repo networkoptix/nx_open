@@ -848,7 +848,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
     QVariantMap contextMap;
     vms::event::StringsHelper helper(serverModule()->commonModule());
 
-    contextMap[tpProductName] = nx::utils::AppInfo::customizationVmsName();
+    contextMap[tpProductName] = nx::utils::AppInfo::vmsName();
     const int deviceCount = aggregationInfo.toList().size();
     contextMap[tpEvent] = helper.eventName(eventType, qMax(1, deviceCount));
     contextMap[tpSource] = helper.getResoureNameFromParams(

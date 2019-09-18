@@ -2140,7 +2140,7 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
     if (totalProfileNumber)
         *totalProfileNumber = (int) profiles.size();
 
-    static const auto kAppName = nx::utils::AppInfo::customizationVmsName();
+    static const auto kAppName = nx::utils::AppInfo::vmsName();
     if (outPrimaryProfile)
         *outPrimaryProfile = findProfile(profiles, Qn::ConnectionRole::CR_LiveVideo, kAppName);
 
@@ -3783,7 +3783,7 @@ QString HanwhaResource::nxProfileName(
     }
 
     const auto suffix = profileSuffixByRole(role);
-    const auto appName = profileFullProductName(nx::utils::AppInfo::customizationVmsName())
+    const auto appName = profileFullProductName(nx::utils::AppInfo::vmsName())
         .left(maxLength - suffix.length());
 
     return appName + suffix;

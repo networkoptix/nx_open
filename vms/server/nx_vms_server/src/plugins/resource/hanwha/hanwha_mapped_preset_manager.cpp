@@ -151,7 +151,7 @@ QString HanwhaMappedPresetManager::makeDevicePresetName(const QString& presetNum
     if (presetNumber.isEmpty())
         return QString();
 
-    const auto normalizedAppName = nx::utils::AppInfo::customizationVmsName()
+    const auto normalizedAppName = nx::utils::AppInfo::vmsName()
         .mid(0, kHanwhaMaxPresetNameLength - presetNumber.length())
         .remove(QRegExp("[^a-zA-Z]"));
 

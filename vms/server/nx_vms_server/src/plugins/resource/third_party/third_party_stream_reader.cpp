@@ -334,7 +334,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(
 
             QnMulticodecRtpReader* rtspStreamReader =
                 new QnMulticodecRtpReader(m_resource, timeOffset);
-            rtspStreamReader->setUserAgent(nx::utils::AppInfo::customizationVmsName());
+            rtspStreamReader->setUserAgent(nx::utils::AppInfo::vmsName());
             rtspStreamReader->setRequest( mediaUrlStr );
             rtspStreamReader->setRole(role);
             updateSourceUrl(rtspStreamReader->getCurrentStreamUrl().toString());

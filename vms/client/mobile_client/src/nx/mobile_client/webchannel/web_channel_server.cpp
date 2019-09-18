@@ -62,7 +62,7 @@ private:
 WebChannelServer::WebChannelServer(const quint16 port, QObject* parent):
     QWebChannel(parent),
     m_server(new QWebSocketServer(
-        QString("%1 WebChannel Server").arg(nx::utils::AppInfo::customizationVmsName()),
+        QString("%1 WebChannel Server").arg(nx::utils::AppInfo::vmsName()),
         QWebSocketServer::NonSecureMode))
 {
     if (!m_server->listen(QHostAddress::LocalHost, port))

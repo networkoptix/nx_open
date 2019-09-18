@@ -108,7 +108,7 @@ QString getBackgroundsDirectory()
         baseDir = picturesLocations.first();
     else if (!documentsLocations.isEmpty())
         baseDir = documentsLocations.first();
-    baseDir.cd(QString("%1 Backgrounds").arg(nx::utils::AppInfo::customizationVmsName()));
+    baseDir.cd(QString("%1 Backgrounds").arg(nx::utils::AppInfo::vmsName()));
     return baseDir.absolutePath();
 }
 

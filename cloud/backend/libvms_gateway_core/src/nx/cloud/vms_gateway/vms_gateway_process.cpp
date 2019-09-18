@@ -114,7 +114,7 @@ int VmsGatewayProcess::serviceMain(
         {
             network::ssl::Engine::useOrCreateCertificate(
                 settings.http().sslCertPath,
-                nx::utils::AppInfo::customizationVmsName().toUtf8(),
+                nx::utils::AppInfo::vmsName().toUtf8(),
                 "US",
                 nx::utils::AppInfo::organizationName().toUtf8());
         }
