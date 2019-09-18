@@ -44,6 +44,11 @@ target_include_directories(nx_utils
         ${Qt5Core_PRIVATE_INCLUDE_DIRS}
 )
 
+if (IOS)
+	target_compile_definitions(nx_utils
+		PRIVATE HAVE_UNISTD_H)
+endif()
+
 if(WINDOWS)
     target_link_libraries(nx_utils PRIVATE DbgHelp ws2_32)
 endif()
@@ -60,11 +65,6 @@ endif()
 
 if(NOT WINDOWS)
     target_link_libraries(nx_utils PRIVATE z)
-endif()
-
-if (IOS)
-	target_compile_definitions(nx_utils
-		PRIVATE HAVE_UNISTD_H)
 endif()
 
 if(withTests)
