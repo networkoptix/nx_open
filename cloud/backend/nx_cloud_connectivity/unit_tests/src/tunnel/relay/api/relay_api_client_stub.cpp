@@ -117,6 +117,10 @@ SystemError::ErrorCode ClientStub::prevRequestSysErrorCode() const
     return SystemError::noError;
 }
 
+void ClientStub::setTimeout(std::optional<std::chrono::milliseconds> /*timeout*/)
+{
+}
+
 int ClientStub::scheduledRequestCount() const
 {
     return m_scheduledRequestCount;
