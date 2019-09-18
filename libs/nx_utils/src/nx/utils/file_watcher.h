@@ -1,6 +1,7 @@
 #pragma once
 
 #include <thread>
+#include <sys/types.h>
 #include <sys/stat.h>
 
 #include "elapsed_timer_pool.h"
