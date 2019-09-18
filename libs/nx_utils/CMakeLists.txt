@@ -62,6 +62,11 @@ if(NOT WINDOWS)
     target_link_libraries(nx_utils PRIVATE z)
 endif()
 
+if (IOS)
+	target_compile_definitions(nx_utils
+		PRIVATE HAVE_UNISTD_H)
+endif()
+
 if(withTests)
     add_subdirectory(unit_tests)
 endif()
