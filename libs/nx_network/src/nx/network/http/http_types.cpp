@@ -1657,7 +1657,7 @@ bool Server::Product::operator==(const Server::Product& right) const
 Server::Server()
 {
     products.push_back(Product{
-        nx::utils::AppInfo::productNameShort().toUtf8(),
+        nx::utils::AppInfo::brand().toUtf8(),
         nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion()),
         nx::utils::AppInfo::organizationName().toUtf8() });
 }

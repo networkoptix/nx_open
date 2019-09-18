@@ -12,6 +12,11 @@ QString AppInfo::vmsName()
     return "${customization.vmsName}";
 }
 
+QString AppInfo::brand()
+{
+    return "${customization.brand}";
+}
+
 bool AppInfo::beta()
 {
     return ${beta};
@@ -80,11 +85,6 @@ QString AppInfo::organizationNameForSettings()
     #else
         return linuxOrganizationName();
     #endif
-}
-
-QString AppInfo::productNameShort()
-{
-    return "${customization.brand}";
 }
 
 QString AppInfo::armBox()

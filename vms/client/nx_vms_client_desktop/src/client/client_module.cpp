@@ -143,6 +143,8 @@
 using namespace nx;
 using namespace nx::vms::client::desktop;
 
+using AppInfo = nx::utils::AppInfo;
+
 static const QString kQmlRoot = QStringLiteral("qrc:///qml");
 
 namespace {
@@ -290,13 +292,13 @@ void QnClientModule::initThread()
 void QnClientModule::initApplication()
 {
     /* Set up application parameters so that QSettings know where to look for settings. */
-    QApplication::setOrganizationName(QnAppInfo::organizationName());
+    QApplication::setOrganizationName(AppInfo::organizationName());
     QApplication::setApplicationName(QnClientAppInfo::applicationName());
     QApplication::setApplicationDisplayName(QnClientAppInfo::applicationDisplayName());
 
     const QString applicationVersion = QnClientAppInfo::metaVersion().isEmpty()
-        ? QnAppInfo::applicationVersion()
-        : QString("%1 %2").arg(QnAppInfo::applicationVersion(), QnClientAppInfo::metaVersion());
+        ? AppInfo::applicationVersion()
+        : QString("%1 %2").arg(AppInfo::applicationVersion(), QnClientAppInfo::metaVersion());
 
     QApplication::setApplicationVersion(applicationVersion);
     QApplication::setStartDragDistance(20);
@@ -305,7 +307,7 @@ void QnClientModule::initApplication()
     QApplication::setDesktopSettingsAware(false);
     QApplication::setQuitOnLastWindowClosed(true);
 
-    if (nx::utils::AppInfo::isMacOsX())
+    if (AppInfo::isMacOsX())
         QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 }
 
@@ -379,8 +381,8 @@ void QnClientModule::initSingletons()
     const auto clientPeerType = m_startupParameters.videoWallGuid.isNull()
         ? nx::vms::api::PeerType::desktopClient
         : nx::vms::api::PeerType::videowallClient;
-    const auto brand = ini().developerMode ? QString() : QnAppInfo::productNameShort();
-    const auto customization = ini().developerMode ? QString() : QnAppInfo::customizationName();
+    const auto brand = ini().developerMode ? QString() : AppInfo::brand();
+    const auto customization = ini().developerMode ? QString() : AppInfo::customizationName();
 
     // This must be done before QnCommonModule instantiation.
     nx::utils::OsInfo::currentVariantOverride = ini().currentOsVariantOverride;
@@ -664,7 +666,7 @@ void QnClientModule::initSkin()
     {
         nx::vms::client::core::FontLoader::loadFonts(
             QDir(QApplication::applicationDirPath()).absoluteFilePath(
-                nx::utils::AppInfo::isMacOsX() ? "../Resources/fonts" : "fonts"));
+                AppInfo::isMacOsX() ? "../Resources/fonts" : "fonts"));
 
         QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
@@ -764,8 +766,8 @@ void QnClientModule::initLocalInfo()
     runtimeData.peer.id = commonModule->moduleGUID();
     runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = clientPeerType;
-    runtimeData.brand = ini().developerMode ? QString() : QnAppInfo::productNameShort();
-    runtimeData.customization = ini().developerMode ? QString() : QnAppInfo::customizationName();
+    runtimeData.brand = ini().developerMode ? QString() : AppInfo::brand();
+    runtimeData.customization = ini().developerMode ? QString() : AppInfo::customizationName();
     runtimeData.videoWallInstanceGuid = m_startupParameters.videoWallItemGuid;
     commonModule->runtimeInfoManager()->updateLocalItem(runtimeData); // initializing localInfo
 }

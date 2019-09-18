@@ -1226,14 +1226,16 @@ void MediaServerProcess::updateAddressesList()
 
 void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
 {
+    using namespace nx::utils;
+
     namespace Server = ResourcePropertyKey::Server;
     const auto hwInfo = HardwareInformation::instance();
     server->setProperty(Server::kCpuArchitecture, hwInfo.cpuArchitecture);
     server->setProperty(Server::kCpuModelName, hwInfo.cpuModelName);
     server->setProperty(Server::kPhysicalMemory, QString::number(hwInfo.physicalMemory));
-    server->setProperty(Server::kProductNameShort, QnAppInfo::productNameShort());
-    server->setProperty(Server::kFullVersion, nx::utils::AppInfo::applicationFullVersion());
-    server->setProperty(Server::kBeta, QString::number(QnAppInfo::beta() ? 1 : 0));
+    server->setProperty(Server::kBrand, AppInfo::brand());
+    server->setProperty(Server::kFullVersion, AppInfo::applicationFullVersion());
+    server->setProperty(Server::kBeta, QString::number(AppInfo::beta() ? 1 : 0));
     server->setProperty(Server::kPublicIp, m_ipDiscovery->publicIP().toString());
     server->setProperty(Server::kSystemRuntime,
         nx::vms::api::SystemInformation::currentSystemRuntime());
@@ -3599,8 +3601,8 @@ void MediaServerProcess::initStaticCommonModule()
 {
     m_staticCommonModule = std::make_unique<QnStaticCommonModule>(
         nx::vms::api::PeerType::server,
-        QnAppInfo::productNameShort(),
-        QnAppInfo::customizationName());
+        nx::utils::AppInfo::brand(),
+        nx::utils::AppInfo::customizationName());
 }
 
 void MediaServerProcess::setSetupModuleCallback(std::function<void(QnMediaServerModule*)> callback)
@@ -3932,12 +3934,12 @@ void MediaServerProcess::setUpServerRuntimeData()
     runtimeData.peer.instanceId = commonModule()->runningInstanceGUID();
     runtimeData.peer.persistentId = commonModule()->dbId();
     runtimeData.peer.peerType = nx::vms::api::PeerType::server;
-    runtimeData.box = QnAppInfo::armBox();
-    runtimeData.brand = QnAppInfo::productNameShort();
-    runtimeData.customization = QnAppInfo::customizationName();
-    runtimeData.platform = QnAppInfo::applicationPlatform();
+    runtimeData.box = nx::utils::AppInfo::armBox();
+    runtimeData.brand = nx::utils::AppInfo::brand();
+    runtimeData.customization = nx::utils::AppInfo::customizationName();
+    runtimeData.platform = nx::utils::AppInfo::applicationPlatform();
 
-    if (QnAppInfo::isNx1())
+    if (nx::utils::AppInfo::isNx1())
     {
         runtimeData.nx1mac = Nx1::getMac();
         runtimeData.nx1serial = Nx1::getSerial();

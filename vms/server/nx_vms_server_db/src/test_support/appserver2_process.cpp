@@ -43,7 +43,6 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <rest/server/json_rest_result.h>
 #include <rest/server/rest_connection_processor.h>
-#include <utils/common/app_info.h>
 
 #include <test_support/resource/test_resource_factory.h>
 #include <rest/helper/ping_rest_helper.h>
@@ -59,6 +58,8 @@
 #include <nx/utils/test_support/test_options.h>
 #include <rest/handlers/sync_time_rest_handler.h>
 #include <nx/vms/network/proxy_connection.h>
+
+#include <nx/utils/app_info.h>
 
 static int registerQtResources()
 {
@@ -261,9 +262,9 @@ void Appserver2Process::updateRuntimeData()
     runtimeData.peer.id = m_commonModule->moduleGUID();
     runtimeData.peer.instanceId = m_commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = api::PeerType::server;
-    runtimeData.box = QnAppInfo::armBox();
-    runtimeData.brand = QnAppInfo::productNameShort();
-    runtimeData.platform = QnAppInfo::applicationPlatform();
+    runtimeData.box = nx::utils::AppInfo::armBox();
+    runtimeData.brand = nx::utils::AppInfo::brand();
+    runtimeData.platform = nx::utils::AppInfo::applicationPlatform();
 
     runtimeData.hardwareIds << QnUuid::createUuid().toString();
     m_commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo

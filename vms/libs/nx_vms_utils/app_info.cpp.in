@@ -21,8 +21,3 @@ QString AppInfo::iconFileName()
 {
     return QStringLiteral("vmsclient-${customization}.png");
 }
-
-QString AppInfo::productNameShort()
-{
-    return QStringLiteral("${customization.brand}");
-}

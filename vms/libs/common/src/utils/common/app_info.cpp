@@ -38,11 +38,6 @@ bool QnAppInfo::beta()
     return nx::utils::AppInfo::beta();
 }
 
-QString QnAppInfo::productNameShort()
-{
-    return nx::utils::AppInfo::productNameShort();
-}
-
 QString QnAppInfo::customizationName()
 {
     return nx::utils::AppInfo::customizationName();

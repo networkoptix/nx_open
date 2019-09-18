@@ -2,13 +2,21 @@
 
 #include <QtCore/QString>
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
 class NX_UTILS_API AppInfo
 {
 public:
+
+    /**
+     * Customization VMS name. Used for the display purposes.
+     */
     static QString vmsName();
+
+    /**
+     * Customization brand. Used for the license compatibility checks.
+     */
+    static QString brand();
 
     static QString applicationFullVersion();
     static bool beta();
@@ -20,7 +28,6 @@ public:
     static QString applicationArch();
     static QString armBox();
 
-    static QString productNameShort();
     static QString organizationName();
     static QString linuxOrganizationName();
     static QString organizationNameForSettings();
@@ -39,5 +46,4 @@ public:
     static bool isMacOsX();
 };
 
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils

@@ -30,13 +30,7 @@ public:
     static Q_INVOKABLE QString armBox();
     static Q_INVOKABLE bool    beta();
 
-    static Q_INVOKABLE QString productNameShort();
     static Q_INVOKABLE QString customizationName();
-
-    static Q_INVOKABLE QString brand()
-    {
-        return productNameShort();
-    }
 
     static Q_INVOKABLE QString defaultLanguage();
 

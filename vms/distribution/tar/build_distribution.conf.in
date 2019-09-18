@@ -1,7 +1,6 @@
 # This file is filtered by cmake; intended to be sourced into build_distribution.sh.
 
 CUSTOMIZATION="@deb.customization.company.name@"
-PRODUCT_NAME="@customization.brand@"
 VERSION="@releaseVersion@.@buildNumber@"
 MAJOR_VERSION="@PROJECT_VERSION_MAJOR@"
 MINOR_VERSION="@PROJECT_VERSION_MINOR@"
