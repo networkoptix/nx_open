@@ -135,23 +135,29 @@
                 "status": {
                     "display": "table|panel"
                 },
-                "issues": {
+                "issues24h": {
                     "name": "Issues (24h)",
-                    "display": "table|panel"
+                    "display": "table|panel",
+                    "calculate": "sum %issues 24h",
+                    "insert": "issues"
                 }
             }
         },
         "activity": {
             "values": {
-                "readRateKBps": {
+                "readRateKBps1m": {
                     "name": "Read rate",
                     "display": "table|panel",
-                    "unit": "KBps"
+                    "unit": "KBps",
+                    "calculate": "average %readRateKBps 1m",
+                    "insert": "readRateKBps"
                 },
-                "writeRateKBps": {
+               "writeRateKBps1m": {
                     "name": "Write rate",
                     "display": "table|panel",
-                    "unit": "KBps"
+                    "unit": "KBps",
+                    "calculate": "average %writeRateKBps 1m",
+                    "insert": "writeRateKBps"
                 }
             }
         },

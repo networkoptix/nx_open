@@ -52,6 +52,8 @@ double roundOff(double value, int digits = 2)
 utils::metrics::ValueGroupProviders<StorageController::Resource> StorageController::makeProviders()
 {
     static const std::chrono::seconds kIoRateUpdateInterval(5);
+    static const std::chrono::minutes kIssuesRateUpdateInterval(1);
+
     static auto ioRate =
         [](const auto& r, const auto& metric)
         {
@@ -81,7 +83,9 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
                 qtSignalWatch<Resource>(&QnStorageResource::statusChanged)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "issues", [](const auto&) { return Value(7); } // TODO: Implement.
+                "issues", [](const auto& r)
+                { return Value(r->getAndResetMetric(&StorageResource::Metrics::issues)); },
+                nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIssuesRateUpdateInterval)
             )
         ),
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
@@ -114,6 +118,3 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
 }
 
 } // namespace nx::vms::server::metrics
-
-
-

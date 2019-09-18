@@ -161,11 +161,11 @@ public:
     }
 
     template<typename Extraction> // double(double value, double durationS)
-    ValueGenerator durationExtraction(int valueI, int durationI, Extraction extraction) const
+    ValueGenerator durationExtraction(int valueI, int durationI, Extraction extraction, bool devideByTime) const
     {
         return durationOperation(
             valueI, durationI,
-            [extraction = std::move(extraction)](const auto& forEach)
+            [extraction = std::move(extraction), devideByTime](const auto& forEach)
             {
                 double maxAgeS = 0;
                 double total = 0;
@@ -182,7 +182,9 @@ public:
                     });
 
                 total += extraction(lastValue, lastAgeS);
-                return total ? api::metrics::Value(total / maxAgeS) : api::metrics::Value();
+                if (devideByTime)
+                    total /= maxAgeS;
+                return api::metrics::Value(total);
             });
     }
 
@@ -206,11 +208,14 @@ public:
         if (function() == "countValues") // value duration expected
             return durationCount(1, 2, [expected = value(3)](const auto& v) { return v == expected(); });
 
+        if (function() == "sum") // value duration
+            return durationExtraction(1, 2, [](double v, double d) { return v; }, /*devideByTime*/ false);
+
         if (function() == "average") // value duration
-            return durationExtraction(1, 2, [](double v, double d) { return v * d; });
+            return durationExtraction(1, 2, [](double v, double d) { return v * d; }, /*devideByTime*/ true);
 
         if (function() == "perSecond") // value duration
-            return durationExtraction(1, 2, [](double v, double) { return v; });
+            return durationExtraction(1, 2, [](double v, double) { return v; }, /*devideByTime*/ true);
 
         return nullptr;
     }

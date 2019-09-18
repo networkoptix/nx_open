@@ -24,9 +24,12 @@ public:
     {
         std::atomic<qint64> bytesRead{0};
         std::atomic<qint64> bytesWritten{0};
+        std::atomic<qint64> issues{0};
     };
 
-    qint64 getAndResetMetric(std::atomic<qint64> Metrics::*parameter);
+    qint64 getAndResetMetric(std::atomic<qint64> Metrics::* parameter);
+
+    void atStorageFailure() { m_metrics->issues++; }
 
 protected:
     QnMediaServerModule* serverModule() const { return m_serverModule; }
