@@ -5,6 +5,7 @@
 
 namespace nx::client::core {
 namespace test {
+namespace {
 
 using TestingType = testing::Types<DisplayTimeHelper>;
 INSTANTIATE_TYPED_TEST_CASE_P(DisplayTimeHelperTest, CommonTimePropertiesTest, TestingType);
@@ -139,5 +140,6 @@ static const std::vector<HelperTestParams> kTestData =
 INSTANTIATE_TEST_CASE_P(DisplayTimeHelperTest, HelperTestFixture,
     testing::ValuesIn(kTestData));
 
+} // namespace
 } // namespace test
 } // namespace nx::client::core

@@ -9,6 +9,7 @@
 
 namespace nx::client::core {
 namespace test {
+namespace {
 
 static const QLocale kTestLocale(QLocale::Russian, QLocale::RussianFederation);
 static constexpr int kTestYear = 2019;
@@ -313,5 +314,6 @@ TEST_P(ChunkHighlightTestFixture, ChunkStartsAfterLastDayTest)
 INSTANTIATE_TEST_CASE_P(CalendarModel, ChunkHighlightTestFixture,
     testing::ValuesIn(DisplayOffsetParams::standardDisplayOffsets));
 
+} // namespace
 } // namespace test
 } // namespace nx::client::core
