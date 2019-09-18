@@ -363,7 +363,7 @@ QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(
     auto connectToCamera =
         [this](const QnVirtualCameraResourcePtr& camera)
         {
-            connect(camera, &QnVirtualCameraResource::scheduleEnabledChanged, this,
+            connect(camera, &QnVirtualCameraResource::licenseUsedChanged, this,
                 &QnLicenseUsageWatcher::licenseUsageChanged);
             connect(camera, &QnVirtualCameraResource::groupNameChanged, this,
                 &QnLicenseUsageWatcher::licenseUsageChanged);

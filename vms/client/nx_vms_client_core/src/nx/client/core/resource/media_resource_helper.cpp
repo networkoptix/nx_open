@@ -176,7 +176,7 @@ void MediaResourceHelper::Private::handleResourceChanged()
             q, &MediaResourceHelper::videoLayoutChanged);
         connect(camera, &QnResource::mediaDewarpingParamsChanged,
             q, &MediaResourceHelper::fisheyeParamsChanged);
-        connect(camera, &QnVirtualCameraResource::scheduleEnabledChanged,
+        connect(camera, &QnVirtualCameraResource::licenseUsedChanged,
             q, &MediaResourceHelper::analogCameraWithoutLicenseChanged);
 
         updateServer();

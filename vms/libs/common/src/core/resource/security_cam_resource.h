@@ -386,7 +386,7 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
-    void scheduleEnabledChanged(const QnResourcePtr &resource);
+    void licenseUsedChanged(const QnResourcePtr &resource);
     void scheduleTasksChanged(const QnResourcePtr &resource);
     void groupIdChanged(const QnResourcePtr &resource);
     void groupNameChanged(const QnResourcePtr &resource);
