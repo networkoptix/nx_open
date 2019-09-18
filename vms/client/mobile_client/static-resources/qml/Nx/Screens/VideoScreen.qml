@@ -413,7 +413,7 @@ PageBase
 
         width: mainWindow.availableWidth
         height: mainWindow.availableHeight - header.height - toolBar.statusBarHeight
-        y: toolBar.statusBarHeight
+        y: toolBar.statusBarHeight + (header.visible ? 0 : header.height)
 
         Loader
         {
