@@ -38,7 +38,7 @@ public:
 
     Q_INVOKABLE bool isNull() const { return base_type::isNull(); }
 
-    Q_INVOKABLE bool isLessThan(const SoftwareVersion& other) const { return *this < other; }
+    Q_INVOKABLE bool isLessThan(const nx::vms::api::SoftwareVersion& other) const { return *this < other; }
 
     QN_FUSION_DECLARE_FUNCTIONS(SoftwareVersion,
         (ubjson)(json)(xml)(lexical)(datastream)(csv_field),
