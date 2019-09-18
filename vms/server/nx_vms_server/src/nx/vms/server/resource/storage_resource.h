@@ -37,6 +37,6 @@ private:
 };
 
 using StorageResourcePtr = QnSharedResourcePointer<StorageResource>;
-using  StorageResourceList = QnSharedResourcePointerList<StorageResource>;
+using StorageResourceList = QnSharedResourcePointerList<StorageResource>;
 
 } // namespace nx::vms::server

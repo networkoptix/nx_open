@@ -140,6 +140,34 @@
                     "display": "table|panel"
                 }
             }
+        },
+        "activity": {
+            "values": {
+                "readRateKBps": {
+                    "name": "Read bitrate",
+                    "display": "table|panel",
+                    "unit": "KBps"
+                },
+                "writeRateKBps": {
+                    "name": "Write bitrate",
+                    "display": "table|panel",
+                    "unit": "KBps"
+                }
+            }
+        },
+        "space": {
+            "values": {
+                "totalSpaceGb": {
+                    "name": "Total space",
+                    "display": "table|panel",
+                    "unit": "GB"
+                },
+                "mediaSpaceInPercents": {
+                    "name": "Media archive size",
+                    "display": "table|panel",
+                    "unit": "%"
+                }
+            }
         }
     },
     "networkInterfaces": {

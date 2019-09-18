@@ -238,7 +238,7 @@ void QnStorageResource::setStatusFlag(Qn::StorageStatuses status)
     m_status = status;
 }
 
-QIODevice* QnStorageResource::open(const QString &fileName, QIODevice::OpenMode openMode)
+QIODevice* QnStorageResource::open(const QString& fileName, QIODevice::OpenMode openMode)
 {
     return openInternal(fileName, openMode);
 }
