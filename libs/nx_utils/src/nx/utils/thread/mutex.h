@@ -119,8 +119,6 @@ public:
     virtual ~WaitConditionDelegate() = default;
 
     virtual bool wait(MutexDelegate* mutex, std::chrono::milliseconds timeout) = 0;
-    virtual bool wait(ReadWriteLockDelegate* mutex, std::chrono::milliseconds timeout) = 0;
-
     virtual void wakeAll() = 0;
     virtual void wakeOne() = 0;
 };
@@ -132,9 +130,6 @@ public:
 
     bool wait(Mutex* mutex, std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
     bool wait(Mutex* mutex, unsigned long timeout); //< TODO: Remove with usages.
-
-    bool wait(ReadWriteLock* mutex, std::chrono::milliseconds timeout = std::chrono::milliseconds::max());
-    bool wait(ReadWriteLock* mutex, unsigned long timeout); //< TODO: Remove with usages.
 
     void wakeAll();
     void wakeOne();
