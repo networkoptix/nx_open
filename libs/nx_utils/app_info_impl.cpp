@@ -84,7 +84,7 @@ QString AppInfo::organizationNameForSettings()
 
 QString AppInfo::productNameShort()
 {
-    return "${product.name.short}";
+    return "${customization.brand}";
 }
 
 QString AppInfo::armBox()
