@@ -1,7 +1,6 @@
 set(liteDeviceName "microserver")
 set(shortCloudName "Cloud")
 
-set(backgroundImage "{}")
 set(defaultWebPages "{}")
 
 set(eulaVersion 1)
@@ -42,7 +41,6 @@ set(translations
 )
 
 set(defaultTranslation en_US)
-set(customization.defines "")
 
 # Defaults to ${customization.companyName} in the properties.cmake
 set(windowsInstallPath "")
