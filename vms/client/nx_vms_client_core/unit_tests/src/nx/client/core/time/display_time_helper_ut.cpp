@@ -93,11 +93,13 @@ static const std::vector<HelperTestParams> kTestData =
 {
     {
         When{DisplayOffset::utc},
-        Expect{
+        Expect
+        {
             {HoursIn12Format{"12", "AM"}, HoursIn24Format{"00", kNoNoonMark}},
             Minutes{"09"},
             Seconds{"09"},
-            FullDate{"1 September 2019"}}
+            FullDate{"1 September 2019"}
+        }
     },
 
     {
@@ -107,7 +109,8 @@ static const std::vector<HelperTestParams> kTestData =
             {HoursIn12Format{"12", "AM"}, HoursIn24Format{"00", kNoNoonMark}},
             Minutes{"10"},
             Seconds{"39"},
-            FullDate{"1 September 2019"}}
+            FullDate{"1 September 2019"}
+        }
     },
 
     {
@@ -117,7 +120,8 @@ static const std::vector<HelperTestParams> kTestData =
             {HoursIn12Format{"1", "AM"}, HoursIn24Format{"01", kNoNoonMark}},
             Minutes{"09"},
             Seconds{"09"},
-            FullDate{"1 September 2019"}}
+            FullDate{"1 September 2019"}
+        }
     },
 
     {
