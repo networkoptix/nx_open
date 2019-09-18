@@ -1,4 +1,4 @@
-#include <nx/network/cloud/tunnel/relay/api/relay_api_client_over_http_get_post_tunnel.h>
+#include <nx/network/cloud/tunnel/relay/api/detail/relay_api_client_over_http_get_post_tunnel.h>
 
 #include "basic_relay_api_client_test_fixture.h"
 #include "relay_api_client_acceptance_tests.h"

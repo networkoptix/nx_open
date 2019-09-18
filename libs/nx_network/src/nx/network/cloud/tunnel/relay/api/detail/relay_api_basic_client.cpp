@@ -71,6 +71,11 @@ SystemError::ErrorCode BasicClient::prevRequestSysErrorCode() const
     return m_prevSysErrorCode;
 }
 
+void BasicClient::setTimeout(std::optional<std::chrono::milliseconds> timeout)
+{
+    m_timeout = timeout;
+}
+
 void BasicClient::stopWhileInAioThread()
 {
     m_activeRequests.clear();
@@ -100,7 +105,7 @@ ResultCode BasicClient::toResultCode(
     const nx::network::http::Response* httpResponse)
 {
     if (sysErrorCode != SystemError::noError || !httpResponse)
-        return ResultCode::networkError;
+        return toResultCode(sysErrorCode);
 
     const auto resultCodeStrIter =
         httpResponse->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
@@ -114,6 +119,22 @@ ResultCode BasicClient::toResultCode(
     return fromHttpStatusCode(
         static_cast<nx::network::http::StatusCode::Value>(
             httpResponse->statusLine.statusCode));
+}
+
+ResultCode BasicClient::toResultCode(
+    SystemError::ErrorCode sysErrorCode)
+{
+    switch (sysErrorCode)
+    {
+        case SystemError::noError:
+            return ResultCode::ok;
+
+        case SystemError::timedOut:
+            return ResultCode::timedOut;
+
+        default:
+            return ResultCode::networkError;
+    }
 }
 
 std::string BasicClient::prepareActualRelayUrl(

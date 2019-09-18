@@ -55,6 +55,9 @@ void Connector::connect(
     dispatch(
         [this, timeout]()
         {
+            if (timeout > std::chrono::milliseconds::zero())
+                m_relayClient->setTimeout(timeout);
+
             m_relayClient->startSession(
                 m_connectSessionId,
                 m_targetHostAddress.host.toStdString(),

@@ -11,10 +11,6 @@
 
 namespace nx::cloud::relay::api {
 
-// TODO: Make this timeout configurable.
-// And configure it properly when connecting!
-static constexpr auto kTimeout = std::chrono::seconds(11);
-
 ClientOverHttpTunnel::ClientOverHttpTunnel(
     const nx::utils::Url& baseUrl,
     ClientFeedbackFunction feedbackFunction)
@@ -93,7 +89,8 @@ void ClientOverHttpTunnel::openTunnel(
     if (tunnelValidatorFactoryFunc)
         client->setTunnelValidatorFactory(std::move(tunnelValidatorFactoryFunc));
     client->setCustomHeaders({{kNxProtocolHeader, kRelayProtocol}});
-    client->setTimeout(kTimeout);
+    if (timeout())
+        client->setTimeout(*timeout());
     auto clientPtr = client.get();
     m_tunnelingClients.push_back(std::move(client));
 
