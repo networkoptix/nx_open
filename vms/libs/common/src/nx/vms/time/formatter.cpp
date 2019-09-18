@@ -180,7 +180,7 @@ Formatter::Private::Private(const QLocale& locale, bool is24HoursFormat):
 
 QString Formatter::Private::getLocalizedHours(const QTime& value)
 {
-    if (nx::vms::time::is24HoursTimeFormat())
+    if (is24HoursFormat)
         return value.toString(QStringLiteral("hh"));
 
     const auto hours = value.hour() % 12;
@@ -202,11 +202,6 @@ QString Formatter::Private::getHoursTimeFormatMark(const QTime& value)
 FormatterPtr Formatter::system()
 {
     return SystemFormatterHolder::get();
-}
-
-FormatterPtr Formatter::custom(const QLocale& locale)
-{
-    return custom(locale, system()->is24HoursTimeFormat());
 }
 
 FormatterPtr Formatter::custom(const QLocale& locale, bool is24HoursTimeFormat)

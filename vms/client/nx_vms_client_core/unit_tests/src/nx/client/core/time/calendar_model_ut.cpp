@@ -59,7 +59,7 @@ INSTANTIATE_TYPED_TEST_CASE_P(CalendarModelTest, CommonTimePropertiesTest, Testi
 
 //--------------------------------------------------------------------------------------------------
 
-struct CalendarModelTimeParams
+struct When
 {
     QLocale locale = kTestLocale;
     int year = kTestYear;
@@ -77,18 +77,24 @@ struct TimeTestFixture: public Base
 template <typename Base>
 void TimeTestFixture<Base>::SetUp()
 {
-    const auto parameters = Base::GetParam();
-    model.setYear(parameters.year);
-    model.setMonth(parameters.month);
-    model.setLocale(parameters.locale);
+    const auto params = Base::GetParam();
+    model.setYear(params.when.year);
+    model.setMonth(params.when.month);
+    model.setLocale(params.when.locale);
 }
 
 //--------------------------------------------------------------------------------------------------
 
-struct StartDayOffsetTestParams: public CalendarModelTimeParams
+struct Expect
 {
-    int expectedOffsetValue;
-    QString expectedDisplayValue;
+    int offsetValue;
+    QString displayValue;
+};
+
+struct StartDayOffsetTestParams
+{
+    When when;
+    Expect expected;
 };
 
 using CalendarModelStartDayValueTestFixture =
@@ -96,9 +102,9 @@ using CalendarModelStartDayValueTestFixture =
 
 TEST_P(CalendarModelStartDayValueTestFixture, StartDayOffsetTest)
 {
-    const auto parameters = GetParam();
-    const auto dayNumber = model.index(parameters.expectedOffsetValue).data().toString();
-    ASSERT_EQ(dayNumber, parameters.expectedDisplayValue);
+    const auto params = GetParam();
+    const auto dayNumber = model.index(params.expected.offsetValue).data().toString();
+    ASSERT_EQ(dayNumber, params.expected.displayValue);
 }
 
 static const QLocale kSundayMonthStartLocale = QLocale(QLocale::English, QLocale::UnitedStates);
@@ -106,9 +112,18 @@ static const QLocale kMondayMonthStartLocale = QLocale(QLocale::Russian, QLocale
 
 // 1 September 2019 is Sunday. Testing values checks if visual model has proper offset of the first
 // month's day (accroding to the specified locale).
-static const std::vector<StartDayOffsetTestParams> kStartDayTestData = {
-    {{kSundayMonthStartLocale, kTestYear, kTestMonth}, 0, kExpectedFirstDayOfMonth},
-    {{kMondayMonthStartLocale, kTestYear, kTestMonth}, 6, kExpectedFirstDayOfMonth} };
+static const std::vector<StartDayOffsetTestParams> kStartDayTestData =
+{
+    {
+        When{kSundayMonthStartLocale, kTestYear, kTestMonth},
+        Expect{0, kExpectedFirstDayOfMonth}
+    },
+
+    {
+        When{kMondayMonthStartLocale, kTestYear, kTestMonth},
+        Expect{6, kExpectedFirstDayOfMonth}
+    }
+};
 
 INSTANTIATE_TEST_CASE_P(CalendarModel, CalendarModelStartDayValueTestFixture,
     testing::ValuesIn(kStartDayTestData));
@@ -122,12 +137,13 @@ enum DisplayOffset
     negative = -positive
 };
 
-struct DisplayOffsetParams: public CalendarModelTimeParams
+struct DisplayOffsetParams
 {
     static const std::vector<DisplayOffsetParams> standardDisplayOffsets;
 
     DisplayOffsetParams(DisplayOffset displayOffset);
 
+    When when;
     DisplayOffset displayOffset;
 };
 

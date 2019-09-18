@@ -19,6 +19,8 @@ class DisplayTimeHelper: public QObject
         NOTIFY displayOffsetChanged)
     Q_PROPERTY(QLocale locale READ locale WRITE setLocale
         NOTIFY localeChanged)
+    Q_PROPERTY(bool is24HoursTimeFormat READ is24HoursTimeFormat WRITE set24HoursTimeFormat
+        NOTIFY is24HoursTimeFormatChanged)
 
     Q_PROPERTY(QString fullDate READ fullDate NOTIFY dateTimeChanged)
     Q_PROPERTY(QString hours READ hours NOTIFY dateTimeChanged)
@@ -41,6 +43,9 @@ public:
     void setLocale(const QLocale& locale);
     QLocale locale() const;
 
+    void set24HoursTimeFormat(bool value);
+    bool is24HoursTimeFormat() const;
+
     QString fullDate() const;
     QString hours() const;
     QString minutes() const;
@@ -52,6 +57,7 @@ signals:
     void displayOffsetChanged();
     void localeChanged();
     void dateTimeChanged();
+    void is24HoursTimeFormatChanged();
 
 private:
     struct Private;

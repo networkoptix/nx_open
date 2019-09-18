@@ -55,6 +55,7 @@ DisplayTimeHelper::DisplayTimeHelper(QObject* parent):
     connect(this, &DisplayTimeHelper::positionChanged, this, updateDateTime);
     connect(this, &DisplayTimeHelper::displayOffsetChanged, this, updateDateTime);
     connect(this, &DisplayTimeHelper::localeChanged, this, updateDateTime);
+    connect(this, &DisplayTimeHelper::is24HoursTimeFormatChanged, this, updateDateTime);
 }
 
 DisplayTimeHelper::~DisplayTimeHelper()
@@ -98,8 +99,22 @@ void DisplayTimeHelper::setLocale(const QLocale& locale)
     if (d->formatter->locale() == locale)
         return;
 
-    d->formatter = nx::vms::time::Formatter::custom(locale);
+    d->formatter = nx::vms::time::Formatter::custom(locale, is24HoursTimeFormat());
     emit localeChanged();
+}
+
+void DisplayTimeHelper::set24HoursTimeFormat(bool value)
+{
+    if (d->formatter->is24HoursTimeFormat() == value)
+        return;
+
+    d->formatter = nx::vms::time::Formatter::custom(locale(), value);
+    emit is24HoursTimeFormatChanged();
+}
+
+bool DisplayTimeHelper::is24HoursTimeFormat() const
+{
+    return d->formatter->is24HoursTimeFormat();
 }
 
 QLocale DisplayTimeHelper::locale() const

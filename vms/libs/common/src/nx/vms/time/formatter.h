@@ -44,7 +44,6 @@ public:
     Formatter(const QLocale& locale, bool is24HoursFormat);
 
     static FormatterPtr system();
-    static FormatterPtr custom(const QLocale& locale);
     static FormatterPtr custom(const QLocale& locale, bool is24HoursTimeFormat);
 
     static void forceSystemTimeFormat(bool is24HoursTimeFormat);
