@@ -32,7 +32,6 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         "${customization_dir}/nx_client_desktop/resources"
         "${customization_dir}/icons/all/logo.png"
         "${customization_dir}/license.html"
-        "${CMAKE_CURRENT_BINARY_DIR}/globals.json"
         "${nov_file_launcher_executable}"
     ADDITIONAL_MOCABLES
         src/nx/vms/client/desktop/system_administration/widgets/analytics_settings_widget.cpp
