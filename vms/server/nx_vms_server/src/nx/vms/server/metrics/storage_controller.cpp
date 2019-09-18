@@ -41,23 +41,22 @@ void StorageController::start()
         });
 }
 
-double round(double value, int digits)
+double roundOff(double value, int digits = 2)
 {
     int k = 1;
     for (int i = 0; i < digits; ++i)
         k *= 10;
-    return std::round(value * k) / k;
+    return round(value * k) / k;
 }
 
 utils::metrics::ValueGroupProviders<StorageController::Resource> StorageController::makeProviders()
 {
-    static const int kDigits = 2;
     static const std::chrono::seconds kIoRateUpdateInterval(5);
     static auto ioRate =
         [](const auto& r, const auto& metric)
         {
             const auto bytes = r->getAndResetMetric(metric);
-            const auto kBps = round(bytes / 1000.0 / kIoRateUpdateInterval.count(), kDigits);
+            const auto kBps = roundOff(bytes / 1000.0 / kIoRateUpdateInterval.count());
             return StorageController::Value(kBps);
         };
 
@@ -102,12 +101,12 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
             "space",
             utils::metrics::makeLocalValueProvider<Resource>(
                 "totalSpaceGb",
-                [](const auto& r) { return round(r->getTotalSpace() / 1000000000.0, kDigits); }
+                [](const auto& r) { return roundOff(r->getTotalSpace() / 1000000000.0); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "mediaSpaceInPercents",
                 [](const auto& r)
-                { return round(r->nxOccupedSpace() / (double) r->getTotalSpace() * 100, kDigits); }
+                { return roundOff(r->nxOccupedSpace() / (double) r->getTotalSpace() * 100); }
             )
         )
     );
