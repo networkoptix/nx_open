@@ -18,7 +18,10 @@ CREATE TABLE "vms_camera_user_attributes" (
     preferred_server_id BLOB(16) ,
     group_name varchar(200) NOT NULL DEFAULT '',
     failover_priority integer NOT NULL DEFAULT 2,
-    backup_type integer NOT NULL DEFAULT 4
+    backup_type integer NOT NULL DEFAULT 4,
+    logical_id varchar(200),
+    record_before_motion_sec integer,
+    record_after_motion_sec integer
 );
 
 INSERT INTO "vms_camera_user_attributes"
@@ -38,7 +41,10 @@ INSERT INTO "vms_camera_user_attributes"
         preferred_server_id,
         group_name,
         failover_priority,
-        backup_type
+        backup_type,
+        logical_id,
+        record_before_motion_sec,
+        record_after_motion_sec
     FROM "vms_camera_user_attributes_tmp";
 
 DROP TABLE "vms_camera_user_attributes_tmp";
