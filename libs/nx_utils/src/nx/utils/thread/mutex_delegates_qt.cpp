@@ -74,13 +74,6 @@ bool WaitConditionQtDelegate::wait(MutexDelegate* mutex, std::chrono::millisecon
         timeout == std::chrono::milliseconds::max() ? ULONG_MAX : (unsigned long) timeout.count());
 }
 
-bool WaitConditionQtDelegate::wait(ReadWriteLockDelegate* mutex, std::chrono::milliseconds timeout)
-{
-    return m_delegate.wait(
-        &static_cast<ReadWriteLockQtDelegate*>(mutex)->m_delegate,
-        timeout == std::chrono::milliseconds::max() ? ULONG_MAX : (unsigned long) timeout.count());
-}
-
 void WaitConditionQtDelegate::wakeAll()
 {
     m_delegate.wakeAll();

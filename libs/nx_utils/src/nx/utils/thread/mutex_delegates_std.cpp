@@ -1,7 +1,6 @@
-// Clang on OSX does not support std::condition_variable_any.
-#if !defined(__APPLE__)
-
 #include "mutex_delegates_std.h"
+
+#include <nx/utils/scope_guard.h>
 
 namespace nx::utils {
 
@@ -99,37 +98,21 @@ void ReadWriteLockStdDelegate::unlock()
 
 //-------------------------------------------------------------------------------------------------
 
-template<typename Mutex>
-bool waitOn(std::condition_variable_any* condition, Mutex* mutex, std::chrono::milliseconds timeout)
-{
-    std::unique_lock<Mutex> lock(*mutex, std::adopt_lock);
-    bool result = true;
-
-    if (timeout != std::chrono::milliseconds::max())
-        condition->wait(lock);
-    else
-        result = (condition->wait_for(lock, timeout) == std::cv_status::no_timeout);
-
-    lock.release();
-    return result;
-}
-
 bool WaitConditionStdDelegate::wait(MutexDelegate* mutex, std::chrono::milliseconds timeout)
 {
     const auto delegate = static_cast<MutexStdDelegate*>(mutex);
-    if (delegate->m_mutex)
-        return waitOn(&m_condition, delegate->m_mutex.get(), timeout);
-    else
-        return waitOn(&m_condition, delegate->m_recursiveMutex.get(), timeout);
-}
+    if (!delegate->m_mutex)
+        return true; //< Recursive mutex causes immidiate return, just like Qt.
 
-bool WaitConditionStdDelegate::wait(ReadWriteLockDelegate* mutex, std::chrono::milliseconds timeout)
-{
-    const auto delegate = static_cast<ReadWriteLockStdDelegate*>(mutex);
-    if (delegate->m_mutex)
-        return waitOn(&m_condition, delegate->m_mutex.get(), timeout);
-    else
-        return waitOn(&m_condition, delegate->m_recursiveMutex.get(), timeout);
+    // std::condition_variable interface requires unique_lock<std::mutex> to be used.
+    std::unique_lock<std::mutex> lock(*delegate->m_mutex, std::adopt_lock);
+    const auto unlockGuard = makeScopeGuard([&] { lock.release(); });
+
+    if (timeout != std::chrono::milliseconds::max())
+        return m_condition.wait_for(lock, timeout) == std::cv_status::no_timeout;
+
+    m_condition.wait(lock);
+    return true;
 }
 
 void WaitConditionStdDelegate::wakeAll()
@@ -143,5 +126,3 @@ void WaitConditionStdDelegate::wakeOne()
 }
 
 } // namespace nx::utils
-
-#endif // !defined(__APPLE__)

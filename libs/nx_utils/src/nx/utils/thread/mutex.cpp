@@ -93,16 +93,6 @@ bool WaitCondition::wait(Mutex* mutex, unsigned long timeout)
     return m_delegate->wait(mutex->m_delegate.get(), std::chrono::milliseconds(timeout));
 }
 
-bool WaitCondition::wait(ReadWriteLock* mutex, std::chrono::milliseconds timeout)
-{
-    return m_delegate->wait(mutex->m_delegate.get(), timeout);
-}
-
-bool WaitCondition::wait(ReadWriteLock* mutex, unsigned long timeout)
-{
-    return m_delegate->wait(mutex->m_delegate.get(), std::chrono::milliseconds(timeout));
-}
-
 void WaitCondition::wakeAll()
 {
     m_delegate->wakeAll();

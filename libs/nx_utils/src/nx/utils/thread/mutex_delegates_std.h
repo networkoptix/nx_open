@@ -1,10 +1,5 @@
 #pragma once
 
-// Clang on OSX does not support std::condition_variable_any.
-#if !defined(__APPLE__)
-
-#define NX_UTILS_MUTEX_DELEGATES_STD
-
 #include <mutex>
 #include <shared_mutex>
 #include <condition_variable>
@@ -55,15 +50,11 @@ class NX_UTILS_API WaitConditionStdDelegate: public WaitConditionDelegate
 {
 public:
     virtual bool wait(MutexDelegate* mutex, std::chrono::milliseconds timeout) override;
-    virtual bool wait(ReadWriteLockDelegate* mutex, std::chrono::milliseconds timeout) override;
-
     virtual void wakeAll() override;
     virtual void wakeOne() override;
 
 private:
-    std::condition_variable_any m_condition;
+    std::condition_variable m_condition;
 };
 
 } // namespace nx::utils
-
-#endif // !defined(__APPLE__)
