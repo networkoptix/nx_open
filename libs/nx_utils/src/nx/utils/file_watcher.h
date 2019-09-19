@@ -4,6 +4,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#if defined(__APPLE__)
+#include "TargetConditionals.h"
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#define NX_UTILS_FILESYSTEM_FILEWATCHER_IOS
+#endif // TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#endif // defined(__APPLE__)
+
 #include "elapsed_timer_pool.h"
 #include "subscription.h"
 #include "system_error.h"
@@ -52,12 +59,15 @@ public:
 	void unsubscribe(nx::utils::SubscriptionId subscriptionId);
 
 private:
-#ifdef _WIN32
+#if defined(_WIN32)
 	// MSVC complains about undefined struct when "using Stat = struct _stat64;"
 	struct Stat: public _stat64 {};
-#else
+#elif defined(NX_UTILS_FILESYSTEM_FILEWATCHER_IOS)
+	using Stat = struct stat;
+#undef NX_UTILS_FILESYSTEM_FILEWATCHER_IOS
+#else // linux
 	using Stat = struct stat64;
-#endif // _WIN32
+#endif // defined(_WIN32)
 
 	using UniqueId = SubscriptionId;
 
