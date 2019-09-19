@@ -169,8 +169,7 @@ bool FileWatcher::metadataEqual(const Stat& a, const Stat& b)
 	return
 		a.st_size == b.st_size
 		&& a.st_ctime == b.st_ctime
-		&& a.st_mtime == b.st_mtime
-	    && a.st_atime == b.st_atime;
+		&& a.st_mtime == b.st_mtime;
 }
 
 } // namespace nx::utils::file_system
