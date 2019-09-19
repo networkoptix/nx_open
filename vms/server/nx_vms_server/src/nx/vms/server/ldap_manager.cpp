@@ -279,20 +279,10 @@ LdapSession::~LdapSession()
         ldap_unbind(m_ld);
 }
 
-// TODO: Should be placed in common place and used everywhre if required.
-static QString hidePassword(QString data, const QString& password)
-{
-    if (nx::utils::log::showPasswords())
-        return data;
-
-    data.replace(password, "******");
-    return data;
-}
-
 bool LdapSession::connect()
 {
     NX_DEBUG(this, "Connecting with settings %1",
-        hidePassword(m_settings.toString(), m_settings.adminPassword));
+        m_settings.toString(!nx::utils::log::showPasswords()));
     QUrl uri = m_settings.uri;
 
 #if defined Q_OS_WIN
