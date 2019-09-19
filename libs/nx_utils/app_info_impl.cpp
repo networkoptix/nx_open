@@ -87,6 +87,16 @@ QString AppInfo::organizationNameForSettings()
     #endif
 }
 
+QString AppInfo::supportAddress()
+{
+    return R"(${customization.contact.supportAddress})";
+}
+
+QString AppInfo::licensingAddress()
+{
+    return R"(${customization.contact.licensingAddress})";
+}
+
 QString AppInfo::armBox()
 {
     // TODO: #akolesnikov For now, the value of `box` has sense on ARM devices only.

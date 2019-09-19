@@ -24,7 +24,7 @@ namespace rtu
 
     QString ApplicationInfo::supportUrl()
     {
-        return QStringLiteral("${supportUrl}");
+        return R"(${customization.contact.supportAddress})";
     }
 
     QString ApplicationInfo::companyUrl()

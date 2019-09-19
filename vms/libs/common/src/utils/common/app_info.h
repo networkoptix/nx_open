@@ -39,12 +39,7 @@ public:
 
     static Q_INVOKABLE QString mediaFolderName();
 
-    static Q_INVOKABLE QString licensingEmailAddress();
     static Q_INVOKABLE QString companyUrl();
-
-    static Q_INVOKABLE QString supportEmailAddress();
-    static Q_INVOKABLE QString supportUrl();
-    static Q_INVOKABLE QString supportPhone();
 
     /** Proxy for QML usage. */
     static Q_INVOKABLE QString cloudName();
