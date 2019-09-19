@@ -129,7 +129,7 @@ private:
     void getStorage(
         std::shared_ptr<ReadStorageContext> readStorageContext);
 
-    void checkReadStorageAllowed(
+    void authorizeReadingStorage(
         std::shared_ptr<ReadStorageContext> readStorageContext);
 
     void getCredentialsForStorage(

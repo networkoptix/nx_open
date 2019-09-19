@@ -59,7 +59,7 @@ void AuthenticationForwarder::authenticateWithCloudDb(
             if (cdbResult != ResultCode::ok)
             {
                 return request.handler(
-                    prepareFailedAuthenticationResult(cdbResult, "resolveUserDigestFailed"));
+                    prepareFailedAuthenticationResult(cdbResult, "resolveUserCredentials failed"));
             }
 
             if (credentials.objectType != ObjectType::account || credentials.objectId.empty())

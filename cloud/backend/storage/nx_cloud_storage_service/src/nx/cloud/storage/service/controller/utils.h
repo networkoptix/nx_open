@@ -13,6 +13,6 @@ api::ResultCode toResultCode(nx::sql::DBResult dbResult);
 
 api::ResultCode toResultCode(aws::ResultCode resultCode);
 
-api::Result toResult(aws::Result result);
+api::Result toResult(const aws::Result& result);
 
 } // namespace nx::cloud::storage::service::controller::utils

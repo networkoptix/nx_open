@@ -321,11 +321,11 @@ void StorageManager::getStorage(
                 return readStorageContext->handler(std::move(readStorageContext->result), Storage());
             }
 
-            checkReadStorageAllowed(std::move(readStorageContext));
+            authorizeReadingStorage(std::move(readStorageContext));
         });
 }
 
-void StorageManager::checkReadStorageAllowed(
+void StorageManager::authorizeReadingStorage(
     std::shared_ptr<StorageManager::ReadStorageContext> readStorageContext)
 {
     m_accessManager->authorizeReadingStorage(
