@@ -76,6 +76,17 @@ protected:
 			m_fileEvents.pop();
 	}
 
+	void whenFileisRead()
+	{
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+
+		std::ifstream file(m_filePath);
+		std::string contents{
+			std::istreambuf_iterator<char>(file),
+			std::istreambuf_iterator<char>()};
+		file.close();
+	}
+
 	void thenSubscriberIsNotified(file_system::FileWatcher::EventType eventType)
 	{
 		m_lastEvent = m_fileEvents.pop();
@@ -87,6 +98,11 @@ protected:
 	{
 		for (int i = 0; i < (int)m_subscriptionIds.size(); ++i)
 			thenSubscriberIsNotified(eventType);
+	}
+
+	void thenSubscriberIsNotNotified()
+	{
+		thenFormerSubscriberIsNotNotified();
 	}
 
 	void thenFormerSubscriberIsNotNotified()
@@ -174,6 +190,16 @@ TEST_F(FileWatcher, multiple_subscribers)
 	whenFileIsCreated();
 
 	thenAllSubscribersAreNotified(file_system::FileWatcher::EventType::created);
+}
+
+TEST_F(FileWatcher, file_read_does_not_trigger_file_modified_event)
+{
+	givenExistingFile();
+	givenSubscription();
+
+	whenFileisRead();
+
+	thenSubscriberIsNotNotified();
 }
 
 } // namespace nx::utils::test
