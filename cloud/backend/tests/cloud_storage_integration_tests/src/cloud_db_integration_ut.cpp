@@ -130,7 +130,7 @@ TEST_F(CloudDbIntegration, non_owner_cannot_remove_storage)
 
 	whenSecondCloudDBAccountTriesToRemoveStorageOwnedByFirstAccount();
 
-	thenRemoveStorageResponseIs(ResultCode::unauthorized);
+	thenRemoveStorageResponseIs(ResultCode::forbidden);
 }
 
 TEST_F(CloudDbIntegration, user_can_read_storage_if_system_is_shared_with_them)
@@ -148,7 +148,7 @@ TEST_F(CloudDbIntegration, user_denied_read_storage_if_shared_level_is_disabled)
 
 	whenSecondUserReadsStorageFromFirst();
 
-	thenReadStorageResponseIs(ResultCode::unauthorized);
+	thenReadStorageResponseIs(ResultCode::forbidden);
 }
 
 TEST_F(CloudDbIntegration, storage_owner_can_request_credentials)
@@ -175,7 +175,7 @@ TEST_F(CloudDbIntegration, user_denied_credentials_request_if_system_shared_leve
 
 	whenSecondUserRequestsCredentialsForFirstUserStorage();
 
-	thenRequestCredentialsResponseIs(ResultCode::unauthorized);
+	thenRequestCredentialsResponseIs(ResultCode::forbidden);
 }
 
 } // namespace nx::cloud::storage::service::test
