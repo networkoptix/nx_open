@@ -35,8 +35,6 @@ set(translations
     sv_SE
 )
 
-set(defaultTranslation en_US)
-
 # Defaults to ${customization.companyName} in the properties.cmake
 set(windowsInstallPath "")
 

@@ -38,7 +38,7 @@ QString QnAppInfo::boostVersion()
 
 QString QnAppInfo::defaultLanguage()
 {
-    return QStringLiteral("${defaultTranslation}");
+    return "${customization.defaultLanguage}";
 }
 
 QString QnAppInfo::clientExecutableName()

@@ -88,4 +88,4 @@ set(product.freeLicenseIsTrial true)
 set(product.liteDeviceName "nx1")
 
 # Compatibility layer
-set(installerLanguage "${defaultTranslation}")
+set(installerLanguage "${customization.defaultLanguage}")
