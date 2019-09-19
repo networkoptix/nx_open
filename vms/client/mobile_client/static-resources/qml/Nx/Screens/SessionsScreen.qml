@@ -244,13 +244,12 @@ Page
         }
     }
 
-    function openConnectionWarningDialog(systemName)
+    function openConnectionWarningDialog(systemName, errorText)
     {
         var message = systemName ?
                     qsTr("Cannot connect to System \"%1\"", "%1 is a system name").arg(systemName) :
                     qsTr("Cannot connect to Server")
-        Workflow.openStandardDialog(
-            message, qsTr("Check your network connection or contact a system administrator"))
+        Workflow.openStandardDialog(message, errorText)
     }
 
     function resetSearch()

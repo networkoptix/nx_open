@@ -68,6 +68,12 @@ Object
             ? connectionManager.restoringConnection
             : false
 
+        function currentScreenName()
+        {
+            var currentItem = stackView ? stackView.currentItem : undefined
+            return currentItem ? currentItem.objectName : ""
+        }
+
         function managerAvailable() //< We need it to prevent "undefined variable" warning at exit.
         {
             return typeof(connectionManager) !== 'undefined'
@@ -79,10 +85,19 @@ Object
             switch (state)
             {
                 case QnConnectionManager.Disconnected: //< Connection failed.
-                    if (!failedCallback || stackView.depth <= 1)
-                        Workflow.openSessionsScreenWithWarning(connectionManager.systemName)
-                    else
-                        stackView.pop(stackView.currentItem)
+                    if (currentScreenName() != "sessionsScreen")
+                    {
+                        if (!failedCallback || stackView.depth <= 1)
+                        {
+                            Workflow.openSessionsScreenWithWarning(
+                                connectionManager.systemName,
+                                LoginUtils.connectionErrorText(result))
+                        }
+                        else
+                        {
+                            stackView.pop(stackView.currentItem)
+                        }
+                    }
 
                     if (failedCallback)
                         failedCallback(result, extraInfo)
@@ -98,8 +113,7 @@ Object
 
         function showConnectionPreloader(forcedSystemName)
         {
-            var currentItem = stackView ? stackView.currentItem : undefined
-            if (currentItem && currentItem.objectName === "resourcesScreen")
+            if (currentScreenName() === "resourcesScreen")
                 return
 
             Workflow.openResourcesScreen(forcedSystemName

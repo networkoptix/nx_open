@@ -27,13 +27,13 @@ function openSessionsScreen()
     }
 }
 
-function openSessionsScreenWithWarning(systemName)
+function openSessionsScreenWithWarning(systemName, errorText)
 {
     var item = stackView.currentItem && stackView.currentItem.objectName == "sessionsScreen"
         ? stackView.currentItem
         : stackView.safeReplace(null, Qt.resolvedUrl("Screens/SessionsScreen.qml"))
     if (item)
-        item.openConnectionWarningDialog(systemName)
+        item.openConnectionWarningDialog(systemName, errorText)
 }
 
 function openNewSessionScreen()
