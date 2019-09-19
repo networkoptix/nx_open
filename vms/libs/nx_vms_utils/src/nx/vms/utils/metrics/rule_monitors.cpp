@@ -180,10 +180,13 @@ public:
                         lastValue = value.toDouble();
                         lastAgeS = ageS;
                     });
-
                 total += extraction(lastValue, lastAgeS);
                 if (devideByTime)
+                {
+                    if (maxAgeS == 0.0)
+                        return api::metrics::Value();
                     total /= maxAgeS;
+                }
                 return api::metrics::Value(total);
             });
     }
