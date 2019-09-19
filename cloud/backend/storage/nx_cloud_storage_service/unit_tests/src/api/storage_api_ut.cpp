@@ -88,7 +88,7 @@ protected:
         base_type::SetUp();
     }
 
-    service::test::CloudDbEmulator::Account& givenCloudDbAccount()
+    service::test::CloudDbEmulator::Account& givenCloudAccount()
     {
         m_expectedCloudDbOwner = kOwner1;
         auto& account = addCloudDbAccount(kOwner1, "owner1password");
@@ -106,7 +106,7 @@ protected:
     {
         using namespace nx::network::http;
 
-        auto& account1 = givenCloudDbAccount();
+        auto& account1 = givenCloudAccount();
 
         auto &account2 = addCloudDbAccount(kOwner2, "owner2password");
         m_cloudStorageClient2 = createCloudStorageClient(account2.credentials());
@@ -120,9 +120,9 @@ protected:
             nx::cloud::db::api::SystemAccessRole::cloudAdmin);
     }
 
-    void givenCloudDbAccounts()
+    void givenCloudAccounts()
     {
-        givenCloudDbAccount();
+        givenCloudAccount();
 
         auto& account = addCloudDbAccount(kOwner2, "owner2Password");
         m_cloudStorageClient2 = createCloudStorageClient(account.credentials());
@@ -542,7 +542,7 @@ private:
 
 TEST_F(StorageApi, add_storage_by_region)
 {
-    givenCloudDbAccount();
+    givenCloudAccount();
     givenAddedBucket();
 
     whenAddStorageWithRegion();
@@ -556,7 +556,7 @@ TEST_F(StorageApi, add_storage_by_region)
 
 TEST_F(StorageApi, add_storage_by_client_location)
 {
-    givenCloudDbAccount();
+    givenCloudAccount();
     givenMultipleAddedBuckets();
 
     whenAddStorageWithoutRegion();
@@ -569,7 +569,7 @@ TEST_F(StorageApi, add_storage_by_client_location)
 
 TEST_F(StorageApi, add_multiple_storages_to_the_same_bucket)
 {
-    givenCloudDbAccount();
+    givenCloudAccount();
     givenAddedBucket();
 
     whenAddMultipleStorages(2);
@@ -583,7 +583,7 @@ TEST_F(StorageApi, add_multiple_storages_to_the_same_bucket)
 
 TEST_F(StorageApi, fails_to_add_storage_with_unknown_region)
 {
-    givenCloudDbAccount();
+    givenCloudAccount();
     //Intentionally missing added bucket
     whenAddStorageWithUnknownRegion();
 
@@ -593,7 +593,7 @@ TEST_F(StorageApi, fails_to_add_storage_with_unknown_region)
 
 TEST_F(StorageApi, rejects_add_storage_with_invalid_storage_size)
 {
-    givenCloudDbAccount();
+    givenCloudAccount();
     givenAddedBucket();
 
     whenAddStorageWithInvalidSize();
@@ -603,7 +603,7 @@ TEST_F(StorageApi, rejects_add_storage_with_invalid_storage_size)
 
 TEST_F(StorageApi, read_storage)
 {
-    givenCloudDbAccount();
+    givenCloudAccount();
     givenAddedBucket();
     givenAddedStorage();
 
@@ -617,7 +617,7 @@ TEST_F(StorageApi, read_storage)
 
 TEST_F(StorageApi, remove_storage)
 {
-    givenCloudDbAccount();
+    givenCloudAccount();
     givenAddedBucket();
     givenAddedStorage();
 
@@ -631,7 +631,7 @@ TEST_F(StorageApi, remove_storage)
 
 TEST_F(StorageApi, get_credentials)
 {
-    givenCloudDbAccount();
+    givenCloudAccount();
     givenAddedBucket();
     givenAddedStorage();
 
@@ -651,7 +651,7 @@ TEST_F(StorageApi, DISABLED_get_credentials_using_actual_aws_services)
     //    like givenAddedBucket("us-east-1", "actual-bucket-name", false);
     //    "actual-bucket-name" must be a valid bucket in the region given by first param
 
-    givenCloudDbAccount();
+    givenCloudAccount();
     givenAddedBucket("some-aws-region", "actual-bucket-name", false);
     givenAddedStorage();
 
@@ -663,7 +663,7 @@ TEST_F(StorageApi, DISABLED_get_credentials_using_actual_aws_services)
 
 TEST_F(StorageApi, add_system_storage_relation)
 {
-    givenCloudDbAccount();
+    givenCloudAccount();
     givenAddedBucket();
     givenAddedStorage();
 
@@ -678,7 +678,7 @@ TEST_F(StorageApi, add_system_storage_relation)
 
 TEST_F(StorageApi, remove_system_storage_relation)
 {
-    givenCloudDbAccount();
+    givenCloudAccount();
     givenAddedBucket();
     givenAddedStorage();
     givenAddedSystem();
@@ -693,7 +693,7 @@ TEST_F(StorageApi, remove_system_storage_relation)
 
 TEST_F(StorageApi, read_storage_lists_multiple_systems)
 {
-    givenCloudDbAccount();
+    givenCloudAccount();
     givenAddedBucket();
     givenAddedStorage();
     givenMultipleAddedSystems();
@@ -706,7 +706,7 @@ TEST_F(StorageApi, read_storage_lists_multiple_systems)
 
 TEST_F(StorageApi, read_storage_rejected_by_non_owning_user_with_no_shared_systems)
 {
-    givenCloudDbAccounts();
+    givenCloudAccounts();
     givenAddedBucket();
     givenAddedStorage();
     givenAddedSystem();
@@ -719,7 +719,7 @@ TEST_F(StorageApi, read_storage_rejected_by_non_owning_user_with_no_shared_syste
 
 TEST_F(StorageApi, user_can_read_storage_if_they_have_a_system_shared_with_them)
 {
-    givenCloudDbAccountsWithSharedSystem();
+    givenCloudAccountsWithSharedSystem();
     givenAddedBucket();
     givenAddedStorage();
     givenAddedSystem();
@@ -732,7 +732,7 @@ TEST_F(StorageApi, user_can_read_storage_if_they_have_a_system_shared_with_them)
 
 TEST_F(StorageApi, only_storage_owner_can_remove_storage)
 {
-    givenCloudDbAccounts();
+    givenCloudAccounts();
     givenAddedBucket();
     givenAddedStorage();
 
