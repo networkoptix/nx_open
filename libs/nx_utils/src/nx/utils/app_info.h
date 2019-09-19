@@ -35,6 +35,9 @@ public:
     static QString supportAddress();
     static QString licensingAddress();
 
+    static QString homePage();
+    static QString supportPage();
+
     static bool isEdgeServer();
     static bool isArm();
     static bool isWin64();

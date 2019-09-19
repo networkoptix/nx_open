@@ -1,8 +1,6 @@
 set(liteDeviceName "microserver")
 set(shortCloudName "Cloud")
 
-set(defaultWebPages "{}")
-
 set(eulaVersion 1)
 
 set(useMetaVersion OFF)

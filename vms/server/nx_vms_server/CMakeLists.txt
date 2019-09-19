@@ -7,10 +7,6 @@ nx_configure_file(
     maven/filter-resources/mediaserver_core_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
-nx_configure_file(
-    maven/filter-resources/resources/serverProperties.json
-    ${CMAKE_CURRENT_BINARY_DIR}/serverProperties.json)
-
 set(apidoctool_jar "${APIDOCTOOL_PATH}/apidoctool.jar")
 
 set(apidoctool_params

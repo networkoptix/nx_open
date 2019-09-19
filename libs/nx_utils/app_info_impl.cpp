@@ -97,6 +97,16 @@ QString AppInfo::licensingAddress()
     return R"(${customization.contact.licensingAddress})";
 }
 
+QString AppInfo::homePage()
+{
+    return R"(${customization.contact.systemWebPages.homePage})";
+}
+
+QString AppInfo::supportPage()
+{
+    return R"(${customization.contact.systemWebPages.supportPage})";
+}
+
 QString AppInfo::armBox()
 {
     // TODO: #akolesnikov For now, the value of `box` has sense on ARM devices only.
