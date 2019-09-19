@@ -1213,7 +1213,11 @@ std::future<ServerUpdateTool::RemoteStatus> ServerUpdateTool::requestRemoteUpdat
 
 QString ServerUpdateTool::getServerAuthString() const
 {
-    const auto& connectionInfo = commonModule()->ec2Connection()->connectionInfo();
+    const auto connection = commonModule()->ec2Connection();
+    if (!connection)
+        return {};
+
+    const auto& connectionInfo = connection->connectionInfo();
     nx::utils::Url serverUrl = connectionInfo.ecUrl;
     if (serverUrl.scheme().isEmpty())
         serverUrl.setScheme(nx::network::http::urlSheme(connectionInfo.allowSslConnections));
