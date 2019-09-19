@@ -79,19 +79,11 @@ void CUDTSocket::removeEPoll(const int eid)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-CUDTUnited::CUDTUnited():
-    m_TLSError()
+CUDTUnited::CUDTUnited()
 {
     // Socket ID MUST start from a random value
     srand((unsigned int)CTimer::getTime());
     m_SocketId = 1 + (int)((1 << 30) * (double(rand()) / RAND_MAX));
-
-#ifndef _WIN32
-    pthread_key_create(&m_TLSError, TLSDestroy);
-#else
-    m_TLSError = TlsAlloc();
-    m_TLSLock = CreateMutex(nullptr, false, nullptr);
-#endif
 
     m_cache = std::make_unique<CCache<CInfoBlock>>();
 }
@@ -104,13 +96,6 @@ CUDTUnited::~CUDTUnited()
     for (auto& idAndMultiplexer: m_multiplexers)
         idAndMultiplexer.second->shutdown();
     m_multiplexers.clear();
-
-#ifndef _WIN32
-    pthread_key_delete(m_TLSError);
-#else
-    TlsFree(m_TLSError);
-    CloseHandle(m_TLSLock);
-#endif
 
     m_cache.reset();
 }
@@ -1177,41 +1162,28 @@ void CUDTUnited::removeSocket(
     }
 }
 
-void CUDTUnited::setError(CUDTException* e)
+void CUDTUnited::setError(ErrorInfo e)
 {
-#ifndef _WIN32
-    delete (CUDTException*)pthread_getspecific(m_TLSError);
-    pthread_setspecific(m_TLSError, e);
-#else
-    CGuard tg(m_TLSLock);
-    delete (CUDTException*)TlsGetValue(m_TLSError);
-    TlsSetValue(m_TLSError, e);
+    std::lock_guard<std::mutex> lk(m_TLSLock);
     m_mTLSRecord[GetCurrentThreadId()] = e;
-#endif
 }
 
-CUDTException* CUDTUnited::getError()
+const ErrorInfo& CUDTUnited::getError() const
 {
-#ifndef _WIN32
-    if (nullptr == pthread_getspecific(m_TLSError))
-        pthread_setspecific(m_TLSError, new CUDTException);
-    return (CUDTException*)pthread_getspecific(m_TLSError);
-#else
-    CGuard tg(m_TLSLock);
-    if (nullptr == TlsGetValue(m_TLSError))
-    {
-        CUDTException* e = new CUDTException;
-        TlsSetValue(m_TLSError, e);
-        m_mTLSRecord[GetCurrentThreadId()] = e;
-    }
-    return (CUDTException*)TlsGetValue(m_TLSError);
-#endif
+    std::lock_guard<std::mutex> lk(m_TLSLock);
+
+    const auto it = m_mTLSRecord.find(GetCurrentThreadId());
+    if (it != m_mTLSRecord.end())
+        return it->second;
+
+    static ErrorInfo noError;
+    return noError;
 }
 
 #ifdef _WIN32
-void CUDTUnited::checkTLSValue()
+void CUDTUnited::cleanupPerThreadLastErrors()
 {
-    CGuard tg(m_TLSLock);
+    std::lock_guard<std::mutex> lk(m_TLSLock);
 
     vector<DWORD> tbr;
     for (auto i = m_mTLSRecord.begin(); i != m_mTLSRecord.end(); ++i)
@@ -1222,13 +1194,13 @@ void CUDTUnited::checkTLSValue()
             tbr.push_back(i->first);
             break;
         }
+
         if (WAIT_OBJECT_0 == WaitForSingleObject(h, 0))
-        {
-            delete i->second;
             tbr.push_back(i->first);
-        }
+
         CloseHandle(h);
     }
+
     for (auto j = tbr.begin(); j != tbr.end(); ++j)
         m_mTLSRecord.erase(*j);
 }
@@ -1334,7 +1306,7 @@ void CUDTUnited::garbageCollect()
         checkBrokenSockets();
 
 #ifdef _WIN32
-        checkTLSValue();
+        cleanupPerThreadLastErrors();
 #endif
 
         m_GCStopCond.wait_for(gcguard, kGarbageCollectTickPeriod);
@@ -1412,17 +1384,17 @@ UDTSOCKET CUDT::socket(int af, int type, int)
     }
     catch (CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return INVALID_SOCK;
     }
     catch (bad_alloc&)
     {
-        s_UDTUnited->setError(new CUDTException(3, 2, 0));
+        s_UDTUnited->setError(ErrorInfo(3, 2, 0));
         return INVALID_SOCK;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return INVALID_SOCK;
     }
 }
@@ -1435,17 +1407,17 @@ int CUDT::bind(UDTSOCKET u, const sockaddr* name, int namelen)
     }
     catch (CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (bad_alloc&)
     {
-        s_UDTUnited->setError(new CUDTException(3, 2, 0));
+        s_UDTUnited->setError(ErrorInfo(3, 2, 0));
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1458,17 +1430,17 @@ int CUDT::bind(UDTSOCKET u, UDPSOCKET udpsock)
     }
     catch (CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (bad_alloc&)
     {
-        s_UDTUnited->setError(new CUDTException(3, 2, 0));
+        s_UDTUnited->setError(ErrorInfo(3, 2, 0));
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1481,17 +1453,17 @@ int CUDT::listen(UDTSOCKET u, int backlog)
     }
     catch (CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (bad_alloc&)
     {
-        s_UDTUnited->setError(new CUDTException(3, 2, 0));
+        s_UDTUnited->setError(ErrorInfo(3, 2, 0));
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1504,12 +1476,12 @@ UDTSOCKET CUDT::accept(UDTSOCKET u, sockaddr* addr, int* addrlen)
     }
     catch (CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return INVALID_SOCK;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return INVALID_SOCK;
     }
 }
@@ -1522,17 +1494,17 @@ int CUDT::connect(UDTSOCKET u, const sockaddr* name, int namelen)
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (bad_alloc&)
     {
-        s_UDTUnited->setError(new CUDTException(3, 2, 0));
+        s_UDTUnited->setError(ErrorInfo(3, 2, 0));
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1545,12 +1517,12 @@ int CUDT::shutdown(UDTSOCKET u, int how)
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1567,12 +1539,12 @@ int CUDT::close(UDTSOCKET u)
         // will remove all the UDTSOCKET file descriptor internally there and
         // we have no way to notify UDT that this epoll filed is done as well.
         s_UDTUnited->m_EPoll.RemoveEPollEvent(u);
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1585,12 +1557,12 @@ int CUDT::getpeername(UDTSOCKET u, sockaddr* name, int* namelen)
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1603,12 +1575,12 @@ int CUDT::getsockname(UDTSOCKET u, sockaddr* name, int* namelen)
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1623,12 +1595,12 @@ int CUDT::getsockopt(UDTSOCKET u, int, UDTOpt optname, void* optval, int* optlen
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1643,12 +1615,12 @@ int CUDT::setsockopt(UDTSOCKET u, int, UDTOpt optname, const void* optval, int o
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1662,17 +1634,17 @@ int CUDT::send(UDTSOCKET u, const char* buf, int len, int)
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (bad_alloc&)
     {
-        s_UDTUnited->setError(new CUDTException(3, 2, 0));
+        s_UDTUnited->setError(ErrorInfo(3, 2, 0));
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1697,12 +1669,12 @@ int CUDT::recv(UDTSOCKET u, char* buf, int len, int)
         // a clean close right now. Currently only a ugly
         // hack in our code works.
         s_UDTUnited->m_EPoll.RemoveEPollEvent(u);
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1716,17 +1688,17 @@ int CUDT::sendmsg(UDTSOCKET u, const char* buf, int len, int ttl, bool inorder)
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (bad_alloc&)
     {
-        s_UDTUnited->setError(new CUDTException(3, 2, 0));
+        s_UDTUnited->setError(ErrorInfo(3, 2, 0));
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1740,12 +1712,12 @@ int CUDT::recvmsg(UDTSOCKET u, char* buf, int len)
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1759,17 +1731,17 @@ int64_t CUDT::sendfile(UDTSOCKET u, fstream& ifs, int64_t& offset, int64_t size,
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (bad_alloc&)
     {
-        s_UDTUnited->setError(new CUDTException(3, 2, 0));
+        s_UDTUnited->setError(ErrorInfo(3, 2, 0));
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1783,12 +1755,12 @@ int64_t CUDT::recvfile(UDTSOCKET u, fstream& ofs, int64_t& offset, int64_t size,
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1797,7 +1769,7 @@ int CUDT::select(int, ud_set* readfds, ud_set* writefds, ud_set* exceptfds, cons
 {
     if ((nullptr == readfds) && (nullptr == writefds) && (nullptr == exceptfds))
     {
-        s_UDTUnited->setError(new CUDTException(5, 3, 0));
+        s_UDTUnited->setError(ErrorInfo(5, 3, 0));
         return ERROR;
     }
 
@@ -1807,17 +1779,17 @@ int CUDT::select(int, ud_set* readfds, ud_set* writefds, ud_set* exceptfds, cons
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (bad_alloc&)
     {
-        s_UDTUnited->setError(new CUDTException(3, 2, 0));
+        s_UDTUnited->setError(ErrorInfo(3, 2, 0));
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1826,7 +1798,7 @@ int CUDT::selectEx(const vector<UDTSOCKET>& fds, vector<UDTSOCKET>* readfds, vec
 {
     if ((nullptr == readfds) && (nullptr == writefds) && (nullptr == exceptfds))
     {
-        s_UDTUnited->setError(new CUDTException(5, 3, 0));
+        s_UDTUnited->setError(ErrorInfo(5, 3, 0));
         return ERROR;
     }
 
@@ -1836,17 +1808,17 @@ int CUDT::selectEx(const vector<UDTSOCKET>& fds, vector<UDTSOCKET>* readfds, vec
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (bad_alloc&)
     {
-        s_UDTUnited->setError(new CUDTException(3, 2, 0));
+        s_UDTUnited->setError(ErrorInfo(3, 2, 0));
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1859,12 +1831,12 @@ int CUDT::epoll_create()
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1877,12 +1849,12 @@ int CUDT::epoll_add_usock(const int eid, const UDTSOCKET u, const int* events)
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1895,12 +1867,12 @@ int CUDT::epoll_add_ssock(const int eid, const SYSSOCKET s, const int* events)
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1913,12 +1885,12 @@ int CUDT::epoll_remove_usock(const int eid, const UDTSOCKET u)
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1931,12 +1903,12 @@ int CUDT::epoll_remove_ssock(const int eid, const SYSSOCKET s)
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1952,12 +1924,12 @@ int CUDT::epoll_wait(
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1970,12 +1942,12 @@ int CUDT::epoll_interrupt_wait(const int eid)
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -1988,19 +1960,19 @@ int CUDT::epoll_release(const int eid)
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
 
-CUDTException& CUDT::getlasterror()
+const ErrorInfo& CUDT::getlasterror()
 {
-    return *s_UDTUnited->getError();
+    return s_UDTUnited->getError();
 }
 
 int CUDT::perfmon(UDTSOCKET u, CPerfMon* perf, bool clear)
@@ -2013,12 +1985,12 @@ int CUDT::perfmon(UDTSOCKET u, CPerfMon* perf, bool clear)
     }
     catch (const CUDTException& e)
     {
-        s_UDTUnited->setError(new CUDTException(e));
+        s_UDTUnited->setError(e.errorInfo());
         return ERROR;
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return ERROR;
     }
 }
@@ -2043,7 +2015,7 @@ UDTSTATUS CUDT::getsockstate(UDTSOCKET u)
     }
     catch (...)
     {
-        s_UDTUnited->setError(new CUDTException(-1, 0, 0));
+        s_UDTUnited->setError(ErrorInfo(-1, 0, 0));
         return NONEXIST;
     }
 }
@@ -2272,7 +2244,7 @@ int epoll_release(int eid)
     return CUDT::epoll_release(eid);
 }
 
-ERRORINFO& getlasterror()
+const ErrorInfo& getlasterror()
 {
     return CUDT::getlasterror();
 }

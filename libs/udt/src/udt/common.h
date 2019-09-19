@@ -226,6 +226,26 @@ private:
 };
 
 
+////////////////////////////////////////////////////////////////////////////////
+
+class CUDTException
+{
+public:
+    CUDTException(int major = 0, int minor = 0, int err = -1);
+    CUDTException(const CUDTException& e);
+    virtual ~CUDTException() = default;
+
+    virtual const char* getErrorMessage() const;
+    virtual int getErrorCode() const;
+    virtual int getErrno() const;
+    virtual void clear();
+
+    const ErrorInfo& errorInfo() const;
+
+private:
+    ErrorInfo m_errorInfo;
+};
+
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -1,5 +1,7 @@
 #include "epoll_win32.h"
 
+#include "../common.h"
+
 #ifdef _WIN32
 
 namespace {

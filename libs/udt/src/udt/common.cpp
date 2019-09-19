@@ -452,34 +452,44 @@ bool CGuard::leaveCS(pthread_mutex_t& lock)
 }
 
 
-//
-CUDTException::CUDTException(int major, int minor, int err):
+////////////////////////////////////////////////////////////////////////////////
+
+ErrorInfo::ErrorInfo(int major, int minor, int err):
     m_iMajor(major),
     m_iMinor(minor)
 {
-    if (-1 == err)
+    if (err == -1)
+    {
 #ifndef _WIN32
         m_iErrno = errno;
 #else
         m_iErrno = GetLastError();
 #endif
+    }
     else
+    {
         m_iErrno = err;
+    }
+
+    prepareErrorMessage();
 }
 
-CUDTException::CUDTException(const CUDTException& e):
-    m_iMajor(e.m_iMajor),
-    m_iMinor(e.m_iMinor),
-    m_iErrno(e.m_iErrno),
-    m_strMsg()
+const char* ErrorInfo::getErrorMessage() const
 {
+    return m_strMsg.c_str();
 }
 
-CUDTException::~CUDTException()
+int ErrorInfo::getErrorCode() const
 {
+    return m_iMajor * 1000 + m_iMinor;
 }
 
-const char* CUDTException::getErrorMessage()
+int ErrorInfo::getErrno() const
+{
+    return m_iErrno;
+}
+
+void ErrorInfo::prepareErrorMessage()
 {
     // translate "Major:Minor" code into text message.
 
@@ -690,65 +700,47 @@ const char* CUDTException::getErrorMessage()
 #ifndef _WIN32
     m_strMsg += ".";
 #endif
+}
 
-    return m_strMsg.c_str();
+////////////////////////////////////////////////////////////////////////////////
+
+
+CUDTException::CUDTException(int major, int minor, int err):
+    m_errorInfo(major, minor, err)
+{
+}
+
+CUDTException::CUDTException(const CUDTException& e):
+    m_errorInfo(e.m_errorInfo)
+{
+}
+
+const char* CUDTException::getErrorMessage() const
+{
+    return m_errorInfo.getErrorMessage();
 }
 
 int CUDTException::getErrorCode() const
 {
-    return m_iMajor * 1000 + m_iMinor;
+    return m_errorInfo.getErrorCode();
 }
 
 int CUDTException::getErrno() const
 {
-    return m_iErrno;
+    return m_errorInfo.getErrno();
 }
 
 void CUDTException::clear()
 {
-    m_iMajor = 0;
-    m_iMinor = 0;
-    m_iErrno = 0;
+    m_errorInfo = {};
 }
 
-const int CUDTException::SUCCESS = 0;
-const int CUDTException::ECONNSETUP = 1000;
-const int CUDTException::ENOSERVER = 1001;
-const int CUDTException::ECONNREJ = 1002;
-const int CUDTException::ESOCKFAIL = 1003;
-const int CUDTException::ESECFAIL = 1004;
-const int CUDTException::ECONNFAIL = 2000;
-const int CUDTException::ECONNLOST = 2001;
-const int CUDTException::ENOCONN = 2002;
-const int CUDTException::ERESOURCE = 3000;
-const int CUDTException::ETHREAD = 3001;
-const int CUDTException::ENOBUF = 3002;
-const int CUDTException::EFILE = 4000;
-const int CUDTException::EINVRDOFF = 4001;
-const int CUDTException::ERDPERM = 4002;
-const int CUDTException::EINVWROFF = 4003;
-const int CUDTException::EWRPERM = 4004;
-const int CUDTException::EINVOP = 5000;
-const int CUDTException::EBOUNDSOCK = 5001;
-const int CUDTException::ECONNSOCK = 5002;
-const int CUDTException::EINVPARAM = 5003;
-const int CUDTException::EINVSOCK = 5004;
-const int CUDTException::EUNBOUNDSOCK = 5005;
-const int CUDTException::ENOLISTEN = 5006;
-const int CUDTException::ERDVNOSERV = 5007;
-const int CUDTException::ERDVUNBOUND = 5008;
-const int CUDTException::ESTREAMILL = 5009;
-const int CUDTException::EDGRAMILL = 5010;
-const int CUDTException::EDUPLISTEN = 5011;
-const int CUDTException::ELARGEMSG = 5012;
-const int CUDTException::EINVPOLLID = 5013;
-const int CUDTException::EASYNCFAIL = 6000;
-const int CUDTException::EASYNCSND = 6001;
-const int CUDTException::EASYNCRCV = 6002;
-const int CUDTException::ETIMEOUT = 6003;
-const int CUDTException::EPEERERR = 7000;
-const int CUDTException::EUNKNOWN = -1;
+const ErrorInfo& CUDTException::errorInfo() const
+{
+    return m_errorInfo;
+}
 
+////////////////////////////////////////////////////////////////////////////////
 
 bool CIPAddress::ipcmp(
     const sockaddr* addr1,

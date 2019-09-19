@@ -200,23 +200,15 @@ public:
     int epoll_interrupt_wait(int eid);
     int epoll_release(const int eid);
 
-    // Functionality:
-    //    record the UDT exception.
-    // Parameters:
-    //    0) [in] e: pointer to a UDT exception instance.
-    // Returned value:
-    //    None.
+    /**
+     * Set last error for the current thread.
+     */
+    void setError(ErrorInfo e);
 
-    void setError(CUDTException* e);
-
-    // Functionality:
-    //    look up the most recent UDT exception.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    pointer to a UDT exception instance.
-
-    CUDTException* getError();
+    /**
+     * @return The last error occured in the current thread.
+     */
+    const ErrorInfo& getError() const;
 
 private:
     //   void init();
@@ -232,14 +224,9 @@ private:
     std::map<int64_t, std::set<UDTSOCKET> > m_PeerRec;// record sockets from peers to avoid repeated connection request, int64_t = (socker_id << 30) + isn
 
 private:
-    pthread_key_t m_TLSError;                         // thread local error record (last error)
-#ifndef _WIN32
-    static void TLSDestroy(void* e) { if (NULL != e) delete (CUDTException*)e; }
-#else
-    std::map<DWORD, CUDTException*> m_mTLSRecord;
-    void checkTLSValue();
-    pthread_mutex_t m_TLSLock;
-#endif
+    std::map<DWORD, ErrorInfo> m_mTLSRecord;
+    void cleanupPerThreadLastErrors();
+    mutable std::mutex m_TLSLock;
 
 private:
     void connect_complete(const UDTSOCKET u);

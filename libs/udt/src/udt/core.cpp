@@ -1467,7 +1467,7 @@ int64_t CUDT::recvfile(fstream& ofs, int64_t& offset, int64_t size, int block)
         if (ofs.fail())
         {
             // send the sender a signal so it will not be blocked forever
-            int32_t err_code = CUDTException::EFILE;
+            int32_t err_code = udterror::EFILE;
             sendCtrl(ControlPacketType::RemotePeerFailure, &err_code);
 
             throw CUDTException(4, 4);

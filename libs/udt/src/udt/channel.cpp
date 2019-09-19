@@ -57,6 +57,7 @@ Yunhong Gu, last updated 01/27/2011
 #include <cassert>
 
 #include "channel.h"
+#include "common.h"
 #include "packet.h"
 
 #ifdef _WIN32

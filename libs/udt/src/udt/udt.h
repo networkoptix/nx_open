@@ -201,12 +201,52 @@ struct CPerfMon
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class UDT_API CUDTException
+namespace udterror {
+
+static constexpr int SUCCESS = 0;
+static constexpr int ECONNSETUP = 1000;
+static constexpr int ENOSERVER = 1001;
+static constexpr int ECONNREJ = 1002;
+static constexpr int ESOCKFAIL = 1003;
+static constexpr int ESECFAIL = 1004;
+static constexpr int ECONNFAIL = 2000;
+static constexpr int ECONNLOST = 2001;
+static constexpr int ENOCONN = 2002;
+static constexpr int ERESOURCE = 3000;
+static constexpr int ETHREAD = 3001;
+static constexpr int ENOBUF = 3002;
+static constexpr int EFILE = 4000;
+static constexpr int EINVRDOFF = 4001;
+static constexpr int ERDPERM = 4002;
+static constexpr int EINVWROFF = 4003;
+static constexpr int EWRPERM = 4004;
+static constexpr int EINVOP = 5000;
+static constexpr int EBOUNDSOCK = 5001;
+static constexpr int ECONNSOCK = 5002;
+static constexpr int EINVPARAM = 5003;
+static constexpr int EINVSOCK = 5004;
+static constexpr int EUNBOUNDSOCK = 5005;
+static constexpr int ENOLISTEN = 5006;
+static constexpr int ERDVNOSERV = 5007;
+static constexpr int ERDVUNBOUND = 5008;
+static constexpr int ESTREAMILL = 5009;
+static constexpr int EDGRAMILL = 5010;
+static constexpr int EDUPLISTEN = 5011;
+static constexpr int ELARGEMSG = 5012;
+static constexpr int EINVPOLLID = 5013;
+static constexpr int EASYNCFAIL = 6000;
+static constexpr int EASYNCSND = 6001;
+static constexpr int EASYNCRCV = 6002;
+static constexpr int ETIMEOUT = 6003;
+static constexpr int EPEERERR = 7000;
+static constexpr int EUNKNOWN = -1;
+
+} // namespace udterror
+
+class UDT_API ErrorInfo
 {
 public:
-    CUDTException(int major = 0, int minor = 0, int err = -1);
-    CUDTException(const CUDTException& e);
-    virtual ~CUDTException();
+    ErrorInfo(int major = 0, int minor = 0, int err = -1);
 
     // Functionality:
     //    Get the description of the exception.
@@ -215,7 +255,7 @@ public:
     // Returned value:
     //    Text message for the exception description.
 
-    virtual const char* getErrorMessage();
+    const char* getErrorMessage() const;
 
     // Functionality:
     //    Get the UDT error code for the exception.
@@ -224,7 +264,7 @@ public:
     // Returned value:
     //    major * 1000 + minor.
 
-    virtual int getErrorCode() const;
+    int getErrorCode() const;
 
     // Functionality:
     //    Get the system errno for the exception.
@@ -233,19 +273,10 @@ public:
     // Returned value:
     //    errno or -1 if not available.
 
-    virtual int getErrno() const;
-
-    // Functionality:
-    //    Clear the error code.
-    // Parameters:
-    //    None.
-    // Returned value:
-    //    None.
-
-    virtual void clear();
+    int getErrno() const;
 
 private:
-    int m_iMajor;        // major exception categories
+    int m_iMajor = 0;        // major exception categories
 
                          // 0: correct condition
                          // 1: network setup exception
@@ -255,51 +286,14 @@ private:
                          // 5: method not supported
                          // 6+: undefined error
 
-    int m_iMinor;        // for specific error reasons
-    int m_iErrno;        // errno returned by the system if there is any
-    std::string m_strMsg;    // text error message
+    int m_iMinor = 0;        // for specific error reasons
+    int m_iErrno = 0;        // errno returned by the system if there is any
+    mutable std::string m_strMsg;    // text error message
 
     std::string m_strAPI;    // the name of UDT function that returns the error
     std::string m_strDebug;    // debug information, set to the original place that causes the error
 
-public: // Error Code
-    static const int SUCCESS;
-    static const int ECONNSETUP;
-    static const int ENOSERVER;
-    static const int ECONNREJ;
-    static const int ESOCKFAIL;
-    static const int ESECFAIL;
-    static const int ECONNFAIL;
-    static const int ECONNLOST;
-    static const int ENOCONN;
-    static const int ERESOURCE;
-    static const int ETHREAD;
-    static const int ENOBUF;
-    static const int EFILE;
-    static const int EINVRDOFF;
-    static const int ERDPERM;
-    static const int EINVWROFF;
-    static const int EWRPERM;
-    static const int EINVOP;
-    static const int EBOUNDSOCK;
-    static const int ECONNSOCK;
-    static const int EINVPARAM;
-    static const int EINVSOCK;
-    static const int EUNBOUNDSOCK;
-    static const int ENOLISTEN;
-    static const int ERDVNOSERV;
-    static const int ERDVUNBOUND;
-    static const int ESTREAMILL;
-    static const int EDGRAMILL;
-    static const int EDUPLISTEN;
-    static const int ELARGEMSG;
-    static const int EINVPOLLID;
-    static const int EASYNCFAIL;
-    static const int EASYNCSND;
-    static const int EASYNCRCV;
-    static const int ETIMEOUT;
-    static const int EPEERERR;
-    static const int EUNKNOWN;
+    void prepareErrorMessage();
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -311,7 +305,6 @@ public: // Error Code
 
 namespace UDT {
 
-typedef CUDTException ERRORINFO;
 typedef UDTOpt SOCKOPT;
 typedef CPerfMon TRACEINFO;
 typedef ud_set UDSET;
@@ -374,7 +367,7 @@ UDT_API int epoll_wait2(int eid, UDTSOCKET* readfds, int* rnum, UDTSOCKET* write
 */
 UDT_API int epoll_interrupt_wait(int eid);
 UDT_API int epoll_release(int eid);
-UDT_API ERRORINFO& getlasterror();
+UDT_API const ErrorInfo& getlasterror();
 UDT_API int getlasterror_code();
 UDT_API const char* getlasterror_desc();
 UDT_API int perfmon(UDTSOCKET u, TRACEINFO* perf, bool clear = true);
