@@ -85,3 +85,6 @@ set(product.updateGeneratorUrl "http://updates.hdw.mx/upcombiner/upcombine")
 set(product.updateFeedUrl "http://updates.vmsproxy.com/updates.json")
 set(product.freeLicenseCount 4)
 set(product.freeLicenseIsTrial true)
+
+# This property was overridden in the vista customization only. Not actual as we dropped lite mode.
+set(product.liteDeviceName "nx1")

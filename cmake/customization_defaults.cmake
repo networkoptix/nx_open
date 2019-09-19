@@ -1,4 +1,3 @@
-set(liteDeviceName "microserver")
 set(shortCloudName "Cloud")
 
 set(eulaVersion 1)

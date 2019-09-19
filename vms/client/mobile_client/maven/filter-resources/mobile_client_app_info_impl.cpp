@@ -38,5 +38,5 @@ QString QnMobileClientAppInfo::oldAndroidAppId()
 
 QString QnMobileClientAppInfo::liteDeviceName()
 {
-    return QStringLiteral("${liteDeviceName}");
+    return QStringLiteral("${product.liteDeviceName}");
 }
