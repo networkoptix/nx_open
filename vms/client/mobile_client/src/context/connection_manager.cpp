@@ -464,8 +464,7 @@ bool QnConnectionManagerPrivate::doConnect(
                 if (restoringConnection)
                     tryResotreConnection();
                 else
-                    callCallback(callback, QnConnectionManager::State::Disconnected, status);
-
+                    callCallback(callback, QnConnectionManager::State::Disconnected, status, infoParameter);
 
                 NX_DEBUG(this, "doConnect() END: Bad status");
                 return;
