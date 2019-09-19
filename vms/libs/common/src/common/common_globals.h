@@ -19,7 +19,7 @@ Q_OBJECT
 QN_DECLARE_METAOBJECT_HEADER(Qn,
     ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
     StreamFpsSharingMethod TimePeriodContent
-    ConnectionRole ResourceStatus
+    ConnectionRole ResourceStatus RecordingState
     PanicMode RebuildState BackupState PeerType StatisticsDeviceType
     StorageInitResult IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction MediaStreamEvent
@@ -283,6 +283,14 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
 
     QString toString(ResourceStatus status);
+
+    enum class RecordingState
+    {
+        Off,
+        Scheduled,
+        On
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingState)
 
     /** Level of detail for displaying resource info. */
     enum ResourceInfoLevel
@@ -769,7 +777,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::StatisticsDeviceType)
     (Qn::StorageInitResult)
     (Qn::PanicMode)
-    (Qn::ResourceStatus)(Qn::StatusChangeReason)
+    (Qn::ResourceStatus)(Qn::RecordingState)(Qn::StatusChangeReason)
     (Qn::ConnectionRole)
     (Qn::RebuildState)(Qn::BackupState)
     (Qn::BookmarkSortField)(Qt::SortOrder)

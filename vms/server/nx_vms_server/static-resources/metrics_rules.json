@@ -91,6 +91,10 @@
                 "firmware": {
                     "display": "panel"
                 },
+                "recording": {
+                    "name": "Recording",
+                    "display": "table|panel"
+                },
                 "status": {
                     "display": "table|panel",
                     "alarms": [{

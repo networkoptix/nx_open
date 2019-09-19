@@ -156,6 +156,7 @@ public:
 
     virtual bool hasDualStreamingInternal() const override;
 
+    Qn::RecordingState recordingState() const;
 signals:
     void ptzCapabilitiesChanged(const QnVirtualCameraResourcePtr& camera);
     void userEnabledAnalyticsEnginesChanged(const QnVirtualCameraResourcePtr& camera);

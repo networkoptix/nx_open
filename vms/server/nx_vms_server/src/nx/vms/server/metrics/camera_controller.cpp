@@ -61,7 +61,7 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                 "type", [](const auto&) { return Value(); } // TODO: Get actual type.
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "ip", [](const auto& r) { return Value(r->getUrl()); } // TODO: Get host from this URL.
+                "ip", [](const auto& r) { return Value(r->getHostAddress()); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "vendor", [](const auto& r) { return Value(r->getVendor()); }
@@ -72,6 +72,10 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
             utils::metrics::makeSystemValueProvider<Resource>(
                 "firmware", [](const auto& r) { return Value(r->getFirmware()); }
             ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "recording",
+                [](const auto& r) { return Value(QnLexical::serialized(r->recordingState())); }
+                ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "status",
                 [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
