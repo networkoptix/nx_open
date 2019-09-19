@@ -108,7 +108,7 @@
                     }]
                 },
                 "offlineEvents": {
-                    "name": "Server Offline events (24h)",
+                    "name": "Camera Offline events (24h)",
                     "display": "table|panel",
                     "calculate": "countValues %status 24h Offline",
                     "alarms": [{
