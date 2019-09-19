@@ -53,6 +53,7 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
 {
     static const std::chrono::seconds kIoRateUpdateInterval(5);
     static const std::chrono::minutes kIssuesRateUpdateInterval(1);
+    static const qint64 kBytesInGb = 1000000000;
 
     static auto ioRate =
         [](const auto& r, const auto& metric)
@@ -105,12 +106,17 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
             "space",
             utils::metrics::makeLocalValueProvider<Resource>(
                 "totalSpaceGb",
-                [](const auto& r) { return roundOff(r->getTotalSpace() / 1000000000.0); }
+                [](const auto& r) { return roundOff(r->getTotalSpace() / (double) kBytesInGb); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "mediaSpaceInPercents",
+                "mediaSpacePercents",
                 [](const auto& r)
                 { return roundOff(r->nxOccupedSpace() / (double) r->getTotalSpace() * 100); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "mediaSpaceGb",
+                [](const auto& r)
+                { return roundOff(r->nxOccupedSpace() / (double) kBytesInGb); }
             )
         )
     );

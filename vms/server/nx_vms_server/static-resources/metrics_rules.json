@@ -168,10 +168,15 @@
                     "display": "table|panel",
                     "unit": "GB"
                 },
-                "mediaSpaceInPercents": {
-                    "name": "Space Used by VMS media",
+                "mediaSpacePercents": {
+                    "name": "VMS Media(%)",
                     "display": "table|panel",
                     "unit": "%"
+                },
+                "mediaSpaceGb": {
+                    "name": "VMS Media",
+                    "display": "panel",
+                    "unit": "Gb"
                 }
             }
         }
