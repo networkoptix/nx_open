@@ -96,7 +96,13 @@ protected:
         return account;
     }
 
-    void givenCloudDbAccountsWithSharedSystem()
+	void givenNoCloudAccount()
+	{
+		// creating cloud storage client with invalid cloud db credentials
+		m_cloudStorageClient = createCloudStorageClient(network::http::Credentials());
+	}
+
+    void givenCloudAccountsWithSharedSystem()
     {
         using namespace nx::network::http;
 
@@ -158,7 +164,7 @@ protected:
 
     void whenAddStorageWithRegion(std::string region = {})
     {
-        if (region.empty())
+        if (region.empty() && m_lastBucketCreated)
             region = m_lastBucketCreated->location();
 
         addStorage({1000, region});
@@ -734,6 +740,15 @@ TEST_F(StorageApi, only_storage_owner_can_remove_storage)
 
     thenRequestIsForwardedToCloudDb();
     thenRemoveStorageResponseIs(ResultCode::forbidden);
+}
+
+TEST_F(StorageApi, unauthorized_request)
+{
+	givenNoCloudAccount();
+
+	whenAddStorageWithRegion();
+
+	thenAddStorageResponseIs(ResultCode::unauthorized);
 }
 
 } // namespace nx::cloud::storage::service::test
