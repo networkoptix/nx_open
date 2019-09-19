@@ -124,6 +124,13 @@ int pthread_cond_wait_monotonic_timepoint(
 }
 #endif
 
+#ifndef _WIN32
+ThreadId GetCurrentThreadId()
+{
+    return pthread_self();
+}
+#endif
+
 bool CTimer::m_bUseMicroSecond = false;
 uint64_t CTimer::s_ullCPUFrequency = CTimer::readCPUFrequency();
 #ifndef _WIN32

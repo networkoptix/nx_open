@@ -73,6 +73,14 @@ int pthread_cond_wait_monotonic_timepoint(
     pthread_cond_t* condition, pthread_mutex_t* mutex, uint64_t timeMks);
 #endif
 
+#ifdef _WIN32
+using ThreadId = DWORD;
+#else
+using ThreadId = pthread_t;
+
+ThreadId GetCurrentThreadId();
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 
 class CTimer

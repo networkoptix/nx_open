@@ -224,7 +224,7 @@ private:
     std::map<int64_t, std::set<UDTSOCKET> > m_PeerRec;// record sockets from peers to avoid repeated connection request, int64_t = (socker_id << 30) + isn
 
 private:
-    std::map<DWORD, ErrorInfo> m_mTLSRecord;
+    std::map<int, ErrorInfo> m_mTLSRecord;
     void cleanupPerThreadLastErrors();
     mutable std::mutex m_TLSLock;
 
