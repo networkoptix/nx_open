@@ -64,7 +64,6 @@ private:
 	struct Stat: public _stat64 {};
 #elif defined(NX_UTILS_FILESYSTEM_FILEWATCHER_IOS)
 	using Stat = struct stat;
-#undef NX_UTILS_FILESYSTEM_FILEWATCHER_IOS
 #else // linux
 	using Stat = struct stat64;
 #endif // defined(_WIN32)

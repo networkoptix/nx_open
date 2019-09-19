@@ -151,11 +151,13 @@ std::pair<SystemError::ErrorCode, FileWatcher::Stat> FileWatcher::doStat(
 	memset(&buf, 0, sizeof(buf));
 
 	int result = 0;
-#ifdef _WIN32
+#if defined(_WIN32)
 	result = _stat64(filePath.c_str(), &buf);
-#else
+#elif NX_UTILS_FILESYSTEM_FILEWATCHER_IOS
+	result = stat(filePath.c_str(), &buf);
+#else // linux, mac
 	result = stat64(filePath.c_str(), &buf);
-#endif // _WIN32
+#endif // defined(_WIN32)
 
 	const auto systemError = result
 		? SystemError::getLastOSErrorCode()
