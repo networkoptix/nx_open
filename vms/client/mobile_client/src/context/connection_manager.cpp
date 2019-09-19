@@ -57,28 +57,51 @@ QnConnectionManager::ConnectionType connectionTypeForUrl(const nx::utils::Url& u
 using CallbackType = std::function<void (
     QnConnectionManager::State state,
     Qn::ConnectionResult result,
-    const QVariant& extraInfo)>;
+    const QString& systemName,
+    const QString& extraInfo)>;
 
 CallbackType makeCallback(QJSValue callback)
 {
     return
         [callback](QnConnectionManager::State state,
             Qn::ConnectionResult result,
-            const QVariant& extraInfo) mutable
+            const QString& systemName,
+            const QString& extraInfo) mutable
         {
             if (callback.isCallable())
-                callback.call(QJSValueList({state, result, extraInfo.toString()}));
+                callback.call(QJSValueList{state, result, systemName, extraInfo});
         };
 }
 
-void callCallback(
+void callSuccessCallback(
     const CallbackType& callback,
     QnConnectionManager::State state,
-    Qn::ConnectionResult result = Qn::SuccessConnectionResult,
-    const QVariant& extraInfo = QVariant())
+    const QString& systemName)
 {
     if (callback)
-        callback(state, result, extraInfo);
+        callback(state, Qn::SuccessConnectionResult, systemName, QString());
+}
+
+void callUnexpectedErrorCallback(const CallbackType& callback)
+{
+    if (!callback)
+        return;
+
+    callback(
+        QnConnectionManager::State::Disconnected,
+        Qn::NetworkErrorConnectionResult,
+        QString(), QString());
+}
+
+void callErrorConnectionCallback(
+    const CallbackType& callback,
+    QnConnectionManager::State state,
+    Qn::ConnectionResult result,
+    const QString& systemName,
+    const QString& extraInfo)
+{
+    if (callback)
+        callback(state, result, systemName, extraInfo);
 }
 } // namespace
 
@@ -384,11 +407,7 @@ bool QnConnectionManagerPrivate::doConnect(
         emit q->connectionFailed(Qn::NetworkErrorConnectionResult, QVariant());
         NX_DEBUG(this, "doConnect() END: Invalid URL");
 
-        callCallback(
-            callback,
-            QnConnectionManager::State::Disconnected,
-            Qn::NetworkErrorConnectionResult);
-
+        callUnexpectedErrorCallback(callback);
         return false;
     }
 
@@ -409,10 +428,7 @@ bool QnConnectionManagerPrivate::doConnect(
     if (connectionHandle == kInvalidHandle)
     {
         delete result;
-        callCallback(
-            callback,
-            QnConnectionManager::State::Disconnected,
-            Qn::NetworkErrorConnectionResult);
+        callUnexpectedErrorCallback(callback);
         return false;
     }
 
@@ -424,10 +440,7 @@ bool QnConnectionManagerPrivate::doConnect(
             if (connectionHandle != result->handle())
             {
                 NX_DEBUG(this, "doConnect() Invalid handle");
-                callCallback(
-                    callback,
-                    QnConnectionManager::State::Disconnected,
-                    Qn::NetworkErrorConnectionResult);
+                callUnexpectedErrorCallback(callback);
                 return;
             }
 
@@ -441,11 +454,11 @@ bool QnConnectionManagerPrivate::doConnect(
                 ? Qn::FactoryServerConnectionResult
                 : QnConnectionValidator::validateConnection(connectionInfo, errorCode);
 
-            QVariant infoParameter;
+            QString invalidServerVersion;
 
             if (status == Qn::IncompatibleVersionConnectionResult)
             {
-                infoParameter = connectionInfo.version.toString(
+                invalidServerVersion = connectionInfo.version.toString(
                     nx::utils::SoftwareVersion::BugfixFormat);
             }
             else if(status == Qn::IncompatibleCloudHostConnectionResult)
@@ -462,9 +475,18 @@ bool QnConnectionManagerPrivate::doConnect(
             {
                 updateConnectionState();
                 if (restoringConnection)
+                {
                     tryResotreConnection();
+                }
                 else
-                    callCallback(callback, QnConnectionManager::State::Disconnected, status, infoParameter);
+                {
+                    callErrorConnectionCallback(
+                        callback,
+                        QnConnectionManager::State::Disconnected,
+                        status,
+                        connectionInfo.systemName,
+                        invalidServerVersion);
+                }
 
                 NX_DEBUG(this, "doConnect() END: Bad status");
                 return;
@@ -474,16 +496,17 @@ bool QnConnectionManagerPrivate::doConnect(
             const auto callbackConnection(QSharedPointer<QMetaObject::Connection>(new QMetaObject::Connection()));
             *callbackConnection = connect(
                 connectionStatus, &QnClientConnectionStatus::stateChanged, this,
-                    [callbackConnection, callback](QnConnectionState value)
+                    [callbackConnection, callback, systemName = connectionInfo.systemName]
+                        (QnConnectionState value)
                     {
                         if (value == QnConnectionState::Connecting)
                         {
-                            callCallback(callback, QnConnectionManager::Connecting);
+                            callSuccessCallback(callback, QnConnectionManager::Connecting, systemName);
                         }
                         else if (value == QnConnectionState::Connected)
                         {
                             QObject::disconnect(*callbackConnection);
-                            callCallback(callback, QnConnectionManager::Connected);
+                            callSuccessCallback(callback, QnConnectionManager::Connected, systemName);
                         }
                     });
             reconnectHelper.reset();

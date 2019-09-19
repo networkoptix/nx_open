@@ -23,9 +23,11 @@ Object
     {
         d.showConnectionPreloader(forcedSystemName)
         connectionManager.connectToServer(url,
-            function(state, result, extraInfo)
+            function(state, result, systemName, extraInfo)
             {
-                d.connectionCallback(state, result, extraInfo, forcedSystemName)
+                if (forcedSystemName)
+                    systemName = forcedSystemName
+                d.connectionCallback(state, result, extraInfo, systemName)
             })
     }
 
@@ -33,9 +35,11 @@ Object
     {
         d.showConnectionPreloader(forcedSystemName)
         connectionManager.connectToServer(address, user, password, cloudConnection,
-            function(state, result, extraInfo)
+            function(state, result, systemName, extraInfo)
             {
-                d.connectionCallback(state, result, extraInfo, forcedSystemName)
+                if (forcedSystemName)
+                    systemName = forcedSystemName
+                d.connectionCallback(state, result, extraInfo, systemName)
             })
     }
 
@@ -45,10 +49,12 @@ Object
         connectedCallback)
     {
         connectionManager.connectByUserInput(url, user, password,
-            function(state, result, extraInfo)
+            function(state, result, systemName, extraInfo)
             {
+                if (forcedSystemName)
+                    systemName = forcedSystemName
                 d.connectionCallback(
-                    state, result, extraInfo, forcedSystemName, failedCallback, connectedCallback)
+                    state, result, extraInfo, systemName, failedCallback, connectedCallback)
             })
     }
 
@@ -80,7 +86,7 @@ Object
         }
 
         function connectionCallback(
-            state, result, extraInfo, forcedSystemName, failedCallback, connectedCallback)
+            state, result, extraInfo, systemName, failedCallback, connectedCallback)
         {
             switch (state)
             {
@@ -89,9 +95,8 @@ Object
                     {
                         if (!failedCallback || stackView.depth <= 1)
                         {
-                            Workflow.openSessionsScreenWithWarning(
-                                connectionManager.systemName,
-                                LoginUtils.connectionErrorText(result))
+                            var errorText = LoginUtils.connectionErrorText(result)
+                            Workflow.openSessionsScreenWithWarning(systemName, errorText)
                         }
                         else
                         {
@@ -104,21 +109,17 @@ Object
                     break
 
                 case QnConnectionManager.Connected: //< Connected and loading resources now.
-                    showConnectionPreloader(forcedSystemName)
+                    showConnectionPreloader(systemName)
                     if (connectedCallback)
                         connectedCallback()
                     break
             }
         }
 
-        function showConnectionPreloader(forcedSystemName)
+        function showConnectionPreloader(systemName)
         {
-            if (currentScreenName() === "resourcesScreen")
-                return
-
-            Workflow.openResourcesScreen(forcedSystemName
-                ? forcedSystemName
-                : connectionManager.systemName)
+            if (currentScreenName() != "resourcesScreen")
+                Workflow.openResourcesScreen(systemName ? systemName : connectionManager.systemName)
         }
     }
 }
