@@ -36,7 +36,7 @@ public:
 protected:
     virtual void SetUp() override
     {
-        m_certificateFilePath =
+         m_certificateFilePath =
 			lm("%1/%2").args(testDataDir(), "traffic_relay.cert").toStdString();
 
 		ASSERT_TRUE(nx::network::ssl::Engine::useOrCreateCertificate(
@@ -68,7 +68,7 @@ protected:
 			[this](const nx::network::ssl::Certificate& certificate)
 			{
 				m_sslCertificateVerifiedEvent.push(certificate.serialNumber);
-				return certificate.serialNumber == m_sslCertificateSerialNumber;
+				return true;//< Returning true intentionally so that ut can verify serialNumber.
 			});
 
         m_connection->connectAsync(
@@ -104,6 +104,7 @@ protected:
 	void thenRelayIsRestarted()
 	{
 		ASSERT_TRUE(m_relayRestartedEvent.pop());
+		NX_DEBUG(this, "Relay was restarted");
 	}
 
     void thenConnectionIsEstablished()
@@ -119,11 +120,10 @@ protected:
 	void andNewCertificateIsInUse()
 	{
 		whenEstablishSecureConnection();
+		thenConnectionIsEstablished();
 
 		const long verifiedSslCertificateSerialNumber = m_sslCertificateVerifiedEvent.pop();
 		ASSERT_EQ(m_sslCertificateSerialNumber, verifiedSslCertificateSerialNumber);
-
-		thenConnectionIsEstablished();
 	}
 
 private:
