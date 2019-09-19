@@ -10,7 +10,7 @@
 
 namespace {
 
-enum class Action { invalid, crash, exit, delayS };
+enum class Action { invalid, crash, exit, throwException, abort, delayS };
 
 static std::pair<Action, QString> actionFromParams(const QnRequestParamList& params)
 {
@@ -21,6 +21,8 @@ static std::pair<Action, QString> actionFromParams(const QnRequestParamList& par
         const Action paramAction = nx::utils::switch_(stringAction,
             "crash", [](){ return Action::crash; },
             "exit", [](){ return Action::exit; },
+            "throwException", [](){ return Action::throwException; },
+            "abort", [](){ return Action::abort; },
             "delayS", [](){ return Action::delayS; },
             nx::utils::default_, [](){ return Action::invalid; });
 
@@ -62,7 +64,7 @@ int QnDebugHandler::executeGet(
         {
             responseMessageBody = message.toUtf8();
             // NOTE: qWarning() is used to make the message appear both on stderr and in the log.
-            qWarning().noquote() << "Received /api/serverControl request:" << message;
+            qWarning().noquote() << "Received /api/debug request:" << message;
             return statusCode;
         };
 
@@ -80,10 +82,8 @@ int QnDebugHandler::executeGet(
         case Action::exit:
             return result(StatusCode::ok, "Exiting the Server via `exit(64)`");
 
-        case Action::invalid:
-            return result(
-                StatusCode::forbidden,
-                "Ignoring - unsupported params " + containerString(params));
+        case Action::throwException:
+            return result(StatusCode::ok, "Throwing an exception");
 
         case Action::delayS:
         {
@@ -94,6 +94,14 @@ int QnDebugHandler::executeGet(
             std::this_thread::sleep_for(std::chrono::seconds(delayS));
             return result(StatusCode::ok, "Delayed reply");
         }
+
+        case Action::abort:
+            return result(StatusCode::ok, "Terminating the Server via `abort()`");
+
+        case Action::invalid:
+            return result(
+                StatusCode::forbidden,
+                "Ignoring - unsupported params " + containerString(params));
     }
     const QString message = lm("Unexpected enum value: %1").arg(static_cast<int>(action));
     NX_ASSERT(false, message);
@@ -145,8 +153,13 @@ void QnDebugHandler::afterExecute(
         case Action::exit:
             exit(64);
 
-        case Action::invalid:
-        case Action::delayS:
+        case Action::throwException:
+            throw std::exception("/api/debug");
+
+        case Action::abort:
+            abort();
+
+        default: //< Other actions require no after-execution steps.
             return;
     }
     NX_ASSERT(false, lm("Unexpected enum value: %1").arg(static_cast<int>(action)));
