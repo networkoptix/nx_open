@@ -7244,7 +7244,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>Jag</translation>
+      <translation>Me</translation>
     </message>
     <message>
       <source>Hi</source>
