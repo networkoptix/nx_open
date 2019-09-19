@@ -248,7 +248,7 @@ Page
     {
         var message = systemName ?
                     qsTr("Cannot connect to System \"%1\"", "%1 is a system name").arg(systemName) :
-                    qsTr("Cannot connect to Server")
+                    qsTr("Cannot connect to server")
         Workflow.openStandardDialog(message, errorText)
     }
 
