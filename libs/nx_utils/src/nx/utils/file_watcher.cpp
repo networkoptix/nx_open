@@ -153,7 +153,7 @@ std::pair<SystemError::ErrorCode, FileWatcher::Stat> FileWatcher::doStat(
 	int result = 0;
 #if defined(_WIN32)
 	result = _stat64(filePath.c_str(), &buf);
-#elif NX_UTILS_FILESYSTEM_FILEWATCHER_IOS
+#elif defined(NX_UTILS_FILESYSTEM_FILEWATCHER_IOS)
 	result = stat(filePath.c_str(), &buf);
 #else // linux, mac
 	result = stat64(filePath.c_str(), &buf);
