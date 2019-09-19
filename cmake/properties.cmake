@@ -1,7 +1,7 @@
 # This file is loaded after the customization. It contains logic to set complex variables, combined
 # from other customizable variables. Also it contains defaults for the rarely overridden variables.
 # Finally, we can declare here some variables, that are not overridden, but semantically related to
-# the customizable product options. // TODO #GDM Ensure the latest part.
+# the customizable product options.
 
 # Transform the variables for the migration simplicity.
 # TODO: #GDM Replace old variables with new ones.
@@ -78,8 +78,6 @@ if(eulaVersionOverride)
     set(eulaVersion ${eulaVersionOverride})
 endif()
 
-
-
 #TODO: #GDM This can actually be overwritten (vista, ipera)
 set(product.updateGeneratorUrl "http://updates.hdw.mx/upcombiner/upcombine")
 set(product.updateFeedUrl "http://updates.vmsproxy.com/updates.json")
@@ -88,3 +86,6 @@ set(product.freeLicenseIsTrial true)
 
 # This property was overridden in the vista customization only. Not actual as we dropped lite mode.
 set(product.liteDeviceName "nx1")
+
+# Compatibility layer
+set(installerLanguage "${defaultTranslation}")

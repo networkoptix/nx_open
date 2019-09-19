@@ -6,7 +6,6 @@ arch = '${arch}'
 wix_directory = '${wix_directory}/bin'
 qt_directory = '${qt.dir}'
 build_configuration = '${build.configuration}'
-installer_cultures = '${installer.cultures}'
 installer_language = '${installerLanguage}'
 distribution_output_dir = '${distribution_output_dir}'
 

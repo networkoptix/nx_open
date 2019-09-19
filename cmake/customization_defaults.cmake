@@ -5,8 +5,6 @@ set(eulaVersion 1)
 set(useMetaVersion OFF)
 
 # Localization
-set(installerLanguage "en_US")
-set(installer.cultures "en-us")
 set(translations
     en_US
     en_GB
