@@ -4,6 +4,7 @@
 #include <vector>
 #include <atomic>
 #include <thread>
+#include <chrono>
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
@@ -40,8 +41,13 @@ private:
         std::atomic<bool> failed = true;
         std::thread worker;
     private:
-        void parsePacketTimestamp(const uint8_t* data, int64_t size, const QString& cameraId);
+        void parsePacketTimestamp(
+            const uint8_t* data,
+            int64_t size,
+            const QString& cameraId,
+            std::chrono::milliseconds timeout);
         bool newPacket = true;
+        std::chrono::time_point<std::chrono::system_clock> m_lastFrameTime;
     };
 
 private:
