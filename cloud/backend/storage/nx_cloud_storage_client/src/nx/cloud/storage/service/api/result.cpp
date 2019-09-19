@@ -12,6 +12,8 @@ const char* toString(ResultCode resultCode)
             return "badRequest";
         case ResultCode::unauthorized:
             return "unauthorized";
+		case ResultCode::forbidden:
+			return "forbidden";
         case ResultCode::notFound:
             return "notFound";
         case ResultCode::internalError:

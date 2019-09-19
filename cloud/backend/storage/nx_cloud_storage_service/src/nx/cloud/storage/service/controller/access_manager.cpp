@@ -38,16 +38,17 @@ static QString toString(const db::api::UserAuthorization& userAuth)
 
 static ResultCode toResultCode(db::api::ResultCode resultCode)
 {
-    // TODO if resultCode == notfound should unauthorized be returned?
     switch (resultCode)
     {
         case db::api::ResultCode::ok:
             return api::ResultCode::ok;
         case db::api::ResultCode::notAuthorized:
-        case db::api::ResultCode::forbidden:
         case db::api::ResultCode::notFound:
         case db::api::ResultCode::accountBlocked:
-            return api::ResultCode::unauthorized;
+		case db::api::ResultCode::forbidden:
+			// Any failure in cloud_db at this point is forbidden as original request to
+			// Cloud Storage Service has already been authorized.
+			return api::ResultCode::forbidden;
         default:
             return api::ResultCode::internalError;
     }
@@ -94,7 +95,7 @@ void AccessManager::authorizeReadingStorage(
     // Non-owner trying to access storage, check by user's access to a system in the storage
 
     if (storage.systems.empty())
-        return handler(ResultCode::unauthorized);
+        return handler(ResultCode::forbidden);
 
     db::api::UserAuthorization userAuth;
     authInfo.get(cloud_db::Resource::httpMethod, &userAuth.requestMethod);
@@ -127,7 +128,7 @@ void AccessManager::authorizeReadingStorage(
                 });
 
             context.handler(it == systemAccessLevels.end()
-                ? ResultCode::unauthorized
+                ? ResultCode::forbidden
                 : ResultCode::ok);
         });
 }

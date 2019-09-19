@@ -27,7 +27,6 @@ static constexpr char kStorageType[] = "awss3";
 static constexpr char kAddSystem[] = "Add System";
 static constexpr char kRemoveSystem[] = "Remove System";
 
-
 static const std::map<std::string, nx::geo_ip::Geopoint> kAwsGeopoints = {
     {"us-east-1", {39, -78}},
     {"us-east-2", {40, -83}},
@@ -614,14 +613,14 @@ void StorageManager::removeStorageFromDb(
     if (!storage->systems.empty())
     {
         removeStorageContext->result = Result(
-            ResultCode::unauthorized,
+            ResultCode::forbidden,
             "Storage has at least one system associated with it.");
         return;
     }
 
     if (!m_accessManager->isStorageOwner(removeStorageContext->authInfo, *storage))
     {
-        removeStorageContext->result = ResultCode::unauthorized;
+        removeStorageContext->result = ResultCode::forbidden;
         return;
     }
 
@@ -712,7 +711,7 @@ void StorageManager::modifySystemStorageRelation(
                     "unauthorized user %4 attempted to access storage",
                          operation, system->storageId, system->id,
                          m_accessManager->getAccountEmail(authInfo));
-                return handler(ResultCode::unauthorized, System());
+                return handler(ResultCode::forbidden, System());
             }
 
             handler(ResultCode::ok, std::move(*system));

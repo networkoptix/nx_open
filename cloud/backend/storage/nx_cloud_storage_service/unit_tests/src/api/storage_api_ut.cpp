@@ -173,7 +173,7 @@ protected:
     void whenAddStorageWithoutRegion()
     {
         using namespace nx::geo_ip;
-        m_geoIpResolver->add("127.0.0.1", Location(Continent::northAmerica));
+        m_geoIpResolver->add("127.0.0.1", Continent::northAmerica);
 
         addStorage({1000, {}});
     }
@@ -708,7 +708,7 @@ TEST_F(StorageApi, read_storage_rejected_by_non_owning_user_with_no_shared_syste
     whenSecondAccountReadsStorageOwnedByFirstAccount();
 
     thenRequestIsForwardedToCloudDb();
-    thenReadStorageResponseIs(ResultCode::unauthorized);
+    thenReadStorageResponseIs(ResultCode::forbidden);
 }
 
 TEST_F(StorageApi, user_can_read_storage_if_they_have_a_system_shared_with_them)
@@ -733,7 +733,7 @@ TEST_F(StorageApi, only_storage_owner_can_remove_storage)
     whenASecondUserRemovesStorageOwnedByFirstUser();
 
     thenRequestIsForwardedToCloudDb();
-    thenRemoveStorageResponseIs(api::ResultCode::unauthorized);
+    thenRemoveStorageResponseIs(ResultCode::forbidden);
 }
 
 } // namespace nx::cloud::storage::service::test
