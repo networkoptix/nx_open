@@ -157,7 +157,7 @@ Page
                 running: model.isRunning
                 reachable: model.isReachable
                 compatible: model.isCompatibleToMobileClient || model.isFactorySystem
-
+                wrongCustomization: model.wrongCustomization ? model.wrongCustomization : false
                 invalidVersion: model.wrongVersion ? model.wrongVersion.toString() : ""
             }
         }

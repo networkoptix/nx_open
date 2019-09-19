@@ -36,6 +36,7 @@ public:
         IsCompatibleVersionRoleId,
         IsCompatibleToDesktopClient,
 
+        WrongCustomizationRoleId,
         WrongVersionRoleId,
         CompatibleVersionRoleId,
 
