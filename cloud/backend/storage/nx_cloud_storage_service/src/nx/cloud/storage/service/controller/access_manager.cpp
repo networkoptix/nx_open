@@ -47,7 +47,7 @@ static ResultCode toResultCode(db::api::ResultCode resultCode)
         case db::api::ResultCode::accountBlocked:
 		case db::api::ResultCode::forbidden:
 			// Any failure in cloud_db at this point is forbidden as original request to
-			// Cloud Storage Service has already been authorized.
+			// Cloud Storage Service has already been authenticated.
 			return api::ResultCode::forbidden;
         default:
             return api::ResultCode::internalError;
