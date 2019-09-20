@@ -31,27 +31,21 @@ void TestFixture::SetUp()
         {
             return std::make_unique<nx::geo_ip::test::MemoryResolver>();
         });
+
+	launchS3Bucket();
+	launchCloudStorageService();
 }
 
-TestFixture::TestContext TestFixture::initializeTest(int initializationFlags)
+TestFixture::TestContext TestFixture::initializeTest()
 {
     auto cloudDbAccount = m_cloudDb.addActivatedAccount2();
-    auto& bucket = launchS3Bucket();
-    auto& cloudStorage = launchCloudStorageService();
-    auto cloudStorageUrl = cloudStorage.httpUrl();
+    auto cloudStorageUrl = m_cloudStorageCluster->server(0).httpUrl();
 
     TestContext testContext;
     testContext.cloudDbAccount = std::move(cloudDbAccount);
-    testContext.s3Bucket = &bucket;
+    testContext.s3Bucket = m_s3Buckets.begin()->second.get();
 	testContext.storageServiceClient =
 		makeStorageServiceClient(cloudStorageUrl, testContext.cloudDbAccount);
-
-	if (initializationFlags & InitializeFlags::bucket)
-		addBucket(&testContext);
-	if (initializationFlags & InitializeFlags::storage)
-		addStorage(&testContext);
-	if (initializationFlags & InitializeFlags::system)
-		addSystem(&testContext);
 
     return testContext;
 }
@@ -151,7 +145,6 @@ void TestFixture::addBucket(TestContext* outTestContext)
     ASSERT_TRUE(addBucketDone.get_future().get().ok());
 }
 
-
 void TestFixture::addStorage(TestContext* outTestContext)
 {
     api::AddStorageRequest addStorageRequest;
@@ -195,10 +188,7 @@ void TestFixture::addSystem(TestContext* outTestContext)
 
 S3Bucket& TestFixture::launchS3Bucket()
 {
-    std::string bucketName = nx::utils::random::generateName(7).toStdString();
-    while (m_s3Buckets.find(bucketName) != m_s3Buckets.end())
-        bucketName = nx::utils::random::generateName(7).toStdString();
-
+	const auto bucketName = lm("bucket-%1").arg(m_s3Buckets.size()).toStdString();
     return *m_s3Buckets.emplace(
         bucketName,
         std::make_unique<S3Bucket>(aws::s3::test::randomS3Location(), bucketName)).first->second;
@@ -220,9 +210,12 @@ CloudStorageLauncher& TestFixture::launchCloudStorageService()
     return cloudStorage;
 }
 
-TEST_F(TestFixture, launch_services)
+TEST_F(TestFixture, add_system)
 {
-    initializeTest();
+    auto testContext = initializeTest();
+	addBucket(&testContext);
+	addStorage(&testContext);
+	addSystem(&testContext);
 }
 
 } // namespace nx::cloud::storage::service::test

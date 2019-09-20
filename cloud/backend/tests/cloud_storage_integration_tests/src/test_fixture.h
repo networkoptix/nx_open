@@ -21,15 +21,7 @@ public:
     ~TestFixture();
 
 protected:
-	enum InitializeFlags
-	{
-		bucket = 1 << 0,
-		storage = 1 << 1,
-		system = 1 << 2,
-		all = bucket | storage | system,
-	};
-
-    class TestContext
+	class TestContext
     {
 	public:
         S3Bucket* s3Bucket = nullptr;
@@ -51,7 +43,7 @@ protected:
      * - Creates a Cloud Storage.
      * - Associates the CloudDb system with the Cloud Storage
      */
-    TestContext initializeTest(int initializeFlags = InitializeFlags::all);
+    TestContext initializeTest();
 
     nx::cloud::db::CdbLauncher& cloudDb();
     const nx::cloud::db::CdbLauncher& cloudDb() const;
@@ -71,13 +63,13 @@ protected:
 		const nx::utils::Url& storageServiceUrl,
 		const nx::cloud::db::AccountWithPassword& cloudDbAccount) const;
 
+	void addBucket(TestContext* outTestContext);
+	void addStorage(TestContext* outTestContext);
+	void addSystem(TestContext* outTestContext);
+
 private:
     S3Bucket& launchS3Bucket();
     CloudStorageLauncher& launchCloudStorageService();
-
-    void addBucket(TestContext* outTestContext);
-    void addStorage(TestContext* outTestContext);
-    void addSystem(TestContext* outTestContext);
 
 private:
     controller::GeoIpResolverFactory::Function m_geoIpResolverFactoryFuncBak;
