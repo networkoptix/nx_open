@@ -102,12 +102,12 @@ const CPerfMon* CCC::getPerfInfo()
     try
     {
         std::shared_ptr<CUDT> u = CUDT::getUDTHandle(m_UDT);
-        if (NULL != u)
+        if (u)
             u->sample(&m_PerfInfo, false);
     }
-    catch (...)
+    catch (const CUDTException&)
     {
-        return NULL;
+        return nullptr;
     }
 
     return &m_PerfInfo;

@@ -690,48 +690,48 @@ int CUDT::connect(const CPacket& response)
     if (!isConnecting())
         return -1;
 
-    if (/*m_bRendezvous &&*/
+    //a data packet or a keep-alive packet comes, which means the peer side is already connected
+    // in this situation, the previously recorded response will be used
+    const auto isRemotePeerAlreadyConnected =
+        /*m_bRendezvous &&*/
         ((PacketFlag::Data == response.getFlag()) || (ControlPacketType::KeepAlive == response.getType())) &&
-        (0 != m_ConnRes.m_iType))
+        (0 != m_ConnRes.m_iType);
+
+    if (!isRemotePeerAlreadyConnected)
     {
-        //a data packet or a keep-alive packet comes, which means the peer side is already connected
-        // in this situation, the previously recorded response will be used
-        goto POST_CONNECT;
-    }
-
-    if ((PacketFlag::Control != response.getFlag()) || (ControlPacketType::Handshake != response.getType()))
-        return -1;
-
-    m_ConnRes.deserialize(response.m_pcData, response.getLength());
-
-    if (m_bRendezvous)
-    {
-        // regular connect should NOT communicate with rendezvous connect
-        // rendezvous connect require 3-way handshake
-        if (1 == m_ConnRes.m_iReqType)
+        if ((PacketFlag::Control != response.getFlag()) || (ControlPacketType::Handshake != response.getType()))
             return -1;
 
-        if ((0 == m_ConnReq.m_iReqType) || (0 == m_ConnRes.m_iReqType))
+        m_ConnRes.deserialize(response.m_pcData, response.getLength());
+
+        if (m_bRendezvous)
         {
-            m_ConnReq.m_iReqType = -1;
-            // the request time must be updated so that the next handshake can be sent out immediately.
-            m_llLastReqTime = 0;
-            return 1;
+            // regular connect should NOT communicate with rendezvous connect
+            // rendezvous connect require 3-way handshake
+            if (1 == m_ConnRes.m_iReqType)
+                return -1;
+
+            if ((0 == m_ConnReq.m_iReqType) || (0 == m_ConnRes.m_iReqType))
+            {
+                m_ConnReq.m_iReqType = -1;
+                // the request time must be updated so that the next handshake can be sent out immediately.
+                m_llLastReqTime = 0;
+                return 1;
+            }
         }
-    }
-    else
-    {
-        // set cookie
-        if (1 == m_ConnRes.m_iReqType)
+        else
         {
-            m_ConnReq.m_iReqType = -1;
-            m_ConnReq.m_iCookie = m_ConnRes.m_iCookie;
-            m_llLastReqTime = 0;
-            return 1;
+            // set cookie
+            if (1 == m_ConnRes.m_iReqType)
+            {
+                m_ConnReq.m_iReqType = -1;
+                m_ConnReq.m_iCookie = m_ConnRes.m_iCookie;
+                m_llLastReqTime = 0;
+                return 1;
+            }
         }
     }
 
-POST_CONNECT:
     // Remove from rendezvous queue
     rcvQueue().removeConnector(m_SocketId);
 
@@ -748,21 +748,14 @@ POST_CONNECT:
     memcpy(m_piSelfIP, m_ConnRes.m_piPeerIP, 16);
 
     // Prepare all data structures
-    try
-    {
-        m_pSndBuffer = new CSndBuffer(32, m_iPayloadSize);
-        m_pRcvBuffer = new CRcvBuffer(rcvQueue().unitQueue(), m_iRcvBufSize);
-        // after introducing lite ACK, the sndlosslist may not be cleared in time, so it requires twice space.
-        m_pSndLossList = new CSndLossList(m_iFlowWindowSize * 2);
-        m_pRcvLossList = new CRcvLossList(m_iFlightFlagSize);
-        m_pACKWindow = new CACKWindow(1024);
-        m_pRcvTimeWindow = new CPktTimeWindow(16, 64);
-        m_pSndTimeWindow = new CPktTimeWindow();
-    }
-    catch (...)
-    {
-        return 2;
-    }
+    m_pSndBuffer = new CSndBuffer(32, m_iPayloadSize);
+    m_pRcvBuffer = new CRcvBuffer(rcvQueue().unitQueue(), m_iRcvBufSize);
+    // after introducing lite ACK, the sndlosslist may not be cleared in time, so it requires twice space.
+    m_pSndLossList = new CSndLossList(m_iFlowWindowSize * 2);
+    m_pRcvLossList = new CRcvLossList(m_iFlightFlagSize);
+    m_pACKWindow = new CACKWindow(1024);
+    m_pRcvTimeWindow = new CPktTimeWindow(16, 64);
+    m_pSndTimeWindow = new CPktTimeWindow();
 
     CInfoBlock ib;
     ib.m_iIPversion = m_iIPversion;
@@ -845,21 +838,13 @@ void CUDT::connect(const detail::SocketAddress& peer, CHandShake* hs)
     m_iPktSize = m_iMSS - 28;
     m_iPayloadSize = m_iPktSize - CPacket::m_iPktHdrSize;
 
-    // Prepare all structures
-    try
-    {
-        m_pSndBuffer = new CSndBuffer(32, m_iPayloadSize);
-        m_pRcvBuffer = new CRcvBuffer(rcvQueue().unitQueue(), m_iRcvBufSize);
-        m_pSndLossList = new CSndLossList(m_iFlowWindowSize * 2);
-        m_pRcvLossList = new CRcvLossList(m_iFlightFlagSize);
-        m_pACKWindow = new CACKWindow(1024);
-        m_pRcvTimeWindow = new CPktTimeWindow(16, 64);
-        m_pSndTimeWindow = new CPktTimeWindow();
-    }
-    catch (...)
-    {
-        throw CUDTException(3, 2, 0);
-    }
+    m_pSndBuffer = new CSndBuffer(32, m_iPayloadSize);
+    m_pRcvBuffer = new CRcvBuffer(rcvQueue().unitQueue(), m_iRcvBufSize);
+    m_pSndLossList = new CSndLossList(m_iFlowWindowSize * 2);
+    m_pRcvLossList = new CRcvLossList(m_iFlightFlagSize);
+    m_pACKWindow = new CACKWindow(1024);
+    m_pRcvTimeWindow = new CPktTimeWindow(16, 64);
+    m_pSndTimeWindow = new CPktTimeWindow();
 
     CInfoBlock ib;
     ib.m_iIPversion = peer.family();
@@ -955,7 +940,7 @@ void CUDT::close()
         for (set<int>::iterator i = m_sPollID.begin(); i != m_sPollID.end(); ++i)
             s_UDTUnited->m_EPoll.remove_usock(*i, m_SocketId);
     }
-    catch (...)
+    catch (const CUDTException&)
     {
     }
 
@@ -1368,14 +1353,7 @@ int64_t CUDT::sendfile(fstream& ifs, int64_t& offset, int64_t size, int block)
     int unitsize;
 
     // positioning...
-    try
-    {
-        ifs.seekg((streamoff)offset);
-    }
-    catch (...)
-    {
-        throw CUDTException(4, 1);
-    }
+    ifs.seekg((streamoff)offset);
 
     // sending block by block
     while (tosend > 0)
@@ -1451,15 +1429,7 @@ int64_t CUDT::recvfile(fstream& ofs, int64_t& offset, int64_t size, int block)
     int unitsize = block;
     int recvsize;
 
-    // positioning...
-    try
-    {
-        ofs.seekp((streamoff)offset);
-    }
-    catch (...)
-    {
-        throw CUDTException(4, 3);
-    }
+    ofs.seekp((streamoff)offset);
 
     // receiving... "recvfile" is always blocking
     while (torecv > 0)

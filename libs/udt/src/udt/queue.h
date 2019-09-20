@@ -432,6 +432,11 @@ public:
 private:
     void worker();
 
+    /**
+     * Take care of the timing event for all UDT sockets.
+     */
+    void timerCheck();
+
     std::thread m_WorkerThread;
 
 private:

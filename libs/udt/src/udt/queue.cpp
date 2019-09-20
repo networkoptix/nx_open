@@ -182,20 +182,9 @@ int CUnitQueue::init(int size, int mss, int version)
     CUnit* tempu = nullptr;
     char* tempb = nullptr;
 
-    try
-    {
-        tempq = new CQEntry;
-        tempu = new CUnit[size];
-        tempb = new char[size * mss];
-    }
-    catch (...)
-    {
-        delete tempq;
-        delete[] tempu;
-        delete[] tempb;
-
-        return -1;
-    }
+    tempq = new CQEntry;
+    tempu = new CUnit[size];
+    tempb = new char[size * mss];
 
     for (int i = 0; i < size; ++i)
     {
@@ -246,20 +235,9 @@ int CUnitQueue::increase()
     // all queues have the same size
     int size = m_pQEntry->m_iSize;
 
-    try
-    {
-        tempq = new CQEntry;
-        tempu = new CUnit[size];
-        tempb = new char[size * m_iMSS];
-    }
-    catch (...)
-    {
-        delete tempq;
-        delete[] tempu;
-        delete[] tempb;
-
-        return -1;
-    }
+    tempq = new CQEntry;
+    tempu = new CUnit[size];
+    tempb = new char[size * m_iMSS];
 
     for (int i = 0; i < size; ++i)
     {
@@ -878,7 +856,7 @@ void CRcvQueue::worker()
 
         // find next available slot for incoming packet
         CUnit* unit = m_UnitQueue.getNextAvailUnit();
-        if (nullptr == unit)
+        if (!unit)
         {
             // no space, skip this packet
             CPacket temp;
@@ -886,14 +864,18 @@ void CRcvQueue::worker()
             temp.setLength(m_iPayloadSize);
             m_channel->recvfrom(addr, temp);
             delete[] temp.m_pcData;
-            goto TIMER_CHECK;
+            timerCheck();
+            continue;
         }
 
         unit->m_Packet.setLength(m_iPayloadSize);
 
         // reading next incoming packet, recvfrom returns -1 is nothing has been received
         if (m_channel->recvfrom(addr, unit->m_Packet) < 0)
-            goto TIMER_CHECK;
+        {
+            timerCheck();
+            continue;
+        }
 
         id = unit->m_Packet.m_iID;
 
@@ -947,41 +929,44 @@ void CRcvQueue::worker()
                 }
             }
         }
-        catch (const CUDTException& /*e*/)
+        catch (const CUDTException&)
         {
             //socket has been removed before connect finished? ignoring error...
         }
 
-    TIMER_CHECK:
-        // take care of the timing event for all UDT sockets
+        timerCheck();
+    }
+}
 
-        uint64_t currtime;
-        CTimer::rdtsc(currtime);
+void CRcvQueue::timerCheck()
+{
 
-        CRNode* ul = m_pRcvUList->m_nodeListHead;
-        uint64_t ctime = currtime - 100000 * CTimer::getCPUFrequency();
-        while ((nullptr != ul) && (ul->timestamp < ctime))
+    uint64_t currtime;
+    CTimer::rdtsc(currtime);
+
+    CRNode* ul = m_pRcvUList->m_nodeListHead;
+    uint64_t ctime = currtime - 100000 * CTimer::getCPUFrequency();
+    while ((nullptr != ul) && (ul->timestamp < ctime))
+    {
+        std::shared_ptr<CUDT> u = ul->socket.lock();
+
+        if (u && u->connected() && !u->broken() && !u->isClosing())
         {
-            std::shared_ptr<CUDT> u = ul->socket.lock();
-
-            if (u && u->connected() && !u->broken() && !u->isClosing())
-            {
-                u->checkTimers(false);
-                m_pRcvUList->update(ul->socketId);
-            }
-            else
-            {
-                // the socket must be removed from Hash table first, then RcvUList
-                m_socketByIdDict.remove(ul->socketId);
-                m_pRcvUList->remove(ul);
-            }
-
-            ul = m_pRcvUList->m_nodeListHead;
+            u->checkTimers(false);
+            m_pRcvUList->update(ul->socketId);
+        }
+        else
+        {
+            // the socket must be removed from Hash table first, then RcvUList
+            m_socketByIdDict.remove(ul->socketId);
+            m_pRcvUList->remove(ul);
         }
 
-        // Check connection requests status for all sockets in the RendezvousQueue.
-        m_pRendezvousQueue->updateConnStatus();
+        ul = m_pRcvUList->m_nodeListHead;
     }
+
+    // Check connection requests status for all sockets in the RendezvousQueue.
+    m_pRendezvousQueue->updateConnStatus();
 }
 
 int CRcvQueue::recvfrom(int32_t id, CPacket& packet)
