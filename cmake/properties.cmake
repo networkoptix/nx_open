@@ -134,6 +134,10 @@ set(launcher.version.file "launcher.version")
 string(TIMESTAMP current_year %Y UTC)
 set(nx_copyright "Copyright (c) 2011-${current_year} Network Optix")
 
+if(customization.advanced.disableCodeSigning)
+    set(codeSigning OFF)
+endif()
+
 if(targetDevice MATCHES "bpi")
     set(liteMode "true")
 else()
