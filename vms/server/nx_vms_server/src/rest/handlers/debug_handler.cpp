@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <thread>
+#include <exception>
 
 #include <nx/utils/switch.h>
 #include <nx/utils/crash_dump/systemexcept.h>
