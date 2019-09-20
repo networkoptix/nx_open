@@ -39,15 +39,33 @@ void TestFixture::SetUp()
 TestFixture::TestContext TestFixture::initializeTest()
 {
     auto cloudDbAccount = m_cloudDb.addActivatedAccount2();
-    auto cloudStorageUrl = m_cloudStorageCluster->server(0).httpUrl();
+    auto storageServiceUrl = m_cloudStorageCluster->server(0).httpUrl();
 
     TestContext testContext;
     testContext.cloudDbAccount = std::move(cloudDbAccount);
+	testContext.system = m_cloudDb.addRandomSystemToAccount(testContext.cloudDbAccount);
     testContext.s3Bucket = m_s3Buckets.begin()->second.get();
+	testContext.storageServiceUrl = storageServiceUrl;
 	testContext.storageServiceClient =
-		makeStorageServiceClient(cloudStorageUrl, testContext.cloudDbAccount);
+		makeStorageServiceClient(
+			storageServiceUrl,
+			testContext.cloudDbAccount.email,
+			testContext.cloudDbAccount.password);
 
     return testContext;
+}
+
+TestFixture::TestContext TestFixture::initializeTestWithSystemCredentials()
+{
+	auto testContext = initializeTest();
+
+	testContext.storageServiceClient =
+		makeStorageServiceClient(
+			testContext.storageServiceUrl,
+			testContext.system.id,
+			testContext.system.authKey);
+
+	return testContext;
 }
 
 nx::cloud::db::CdbLauncher& TestFixture::cloudDb()
@@ -117,11 +135,12 @@ std::pair<api::Result, api::StorageCredentials> TestFixture::waitForGetCredentia
 
 std::unique_ptr<Client> TestFixture::makeStorageServiceClient(
 	const nx::utils::Url& storageSeviceUrl,
-	const nx::cloud::db::AccountWithPassword& cloudDbAccount) const
+	const std::string& userName,
+    const std::string& password) const
 {
 	auto url = storageSeviceUrl;
-	url.setUserName(cloudDbAccount.email.c_str());
-	url.setPassword(cloudDbAccount.password.c_str());
+	url.setUserName(userName.c_str());
+	url.setPassword(password.c_str());
 
 	auto client = std::make_unique<Client>(url);
 	client->setRequestTimeout(std::chrono::milliseconds::zero());
@@ -167,8 +186,6 @@ void TestFixture::addStorage(TestContext* outTestContext)
 
 void TestFixture::addSystem(TestContext* outTestContext)
 {
-    outTestContext->system = m_cloudDb.addRandomSystemToAccount(outTestContext->cloudDbAccount);
-
     api::AddSystemRequest addSystemRequest;
     addSystemRequest.id = outTestContext->system.id;
 
@@ -208,14 +225,6 @@ CloudStorageLauncher& TestFixture::launchCloudStorageService()
     NX_ASSERT(cloudStorage.startAndWaitUntilStarted());
 
     return cloudStorage;
-}
-
-TEST_F(TestFixture, add_system)
-{
-    auto testContext = initializeTest();
-	addBucket(&testContext);
-	addStorage(&testContext);
-	addSystem(&testContext);
 }
 
 } // namespace nx::cloud::storage::service::test

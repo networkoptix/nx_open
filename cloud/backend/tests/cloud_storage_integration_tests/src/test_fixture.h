@@ -28,22 +28,23 @@ protected:
         nx::cloud::db::AccountWithPassword cloudDbAccount;
         nx::cloud::db::api::SystemData system;
         api::Storage storage;
+		nx::utils::Url storageServiceUrl;
         std::unique_ptr<api::Client> storageServiceClient;
     };
 
     virtual void SetUp() override;
 
     /**
-     * Does the following:
-     * - Launches an S3 bucket
-     * - Adds an activated account and system to CloudDb
-     * - Launches a Cloud Storage Service instance
-     * - Prepares a Cloud Storage Service api client with CloudDb credentials
-     * - Adds the S3 bucket to the Cloud Storage Service
-     * - Creates a Cloud Storage.
-     * - Associates the CloudDb system with the Cloud Storage
+     * Initializes a TestContext with an S3Bucket, Cloud account and
+	 * System and a CloudStorageService client with Cloud account credentials.
      */
     TestContext initializeTest();
+
+	/**
+	 * Identical to initializeTest except that CloudStorageService client is initialised with
+	 * System credentials instead of Cloud account credentials.
+	 */
+	TestContext initializeTestWithSystemCredentials();
 
     nx::cloud::db::CdbLauncher& cloudDb();
     const nx::cloud::db::CdbLauncher& cloudDb() const;
@@ -61,7 +62,8 @@ protected:
 
 	std::unique_ptr<api::Client> makeStorageServiceClient(
 		const nx::utils::Url& storageServiceUrl,
-		const nx::cloud::db::AccountWithPassword& cloudDbAccount) const;
+		const std::string& userName,
+		const std::string& password) const;
 
 	void addBucket(TestContext* outTestContext);
 	void addStorage(TestContext* outTestContext);
