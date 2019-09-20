@@ -301,7 +301,8 @@ def main(config_file, sys_config_file):
 
     if not res.success:
         raise exceptions.SshHostKeyObtainingFailed(
-            f"Can't obtain ssh host key of the box.\nDetails of the error: {res.formatted_message()}"
+            f"Can't obtain ssh host key of the box." +
+            (f"\n    Details: {res.formatted_message()}" if res.formatted_message() else "")
         )
     else:
         device.host_key = res.details[0]
