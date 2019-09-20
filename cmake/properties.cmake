@@ -30,12 +30,18 @@ if(customization.desktop.supportsVmax)
     set(vmax true)
 endif()
 
-# Overridden in metavms
-nx_set_variable_if_empty(mediaserver_service_name "${customization.companyName} Server")
-nx_set_variable_if_empty(mediaserver_application_name "${customization.companyName} Media Server")
+# Overridden in hanwha, qulu
+set(shortCloudName "Cloud")
+if(customization.advanced.useFullCloudNameEverywhere)
+    set(shortCloudName "${customization.cloudName}")
+endif()
 
 # Overridden in ionetworks, ionetworks_cn
-nx_set_variable_if_empty(windowsInstallPath "${customization.companyName}")
+set(windowsInstallPath "${customization.companyName}")
+if(customization.advanced.customWindowsInstallPath)
+    set(windowsInstallPath "${customization.advanced.customWindowsInstallPath}")
+endif()
+
 
 # Internal names must not be changed in all rebrandings
 set(mobileClientInternalName "${customization.companyName} ${customization.vmsId} Mobile Client")
@@ -44,6 +50,23 @@ set(mediaFolderName "${customization.vmsId} Media")
 
 # Component display names
 set(client.display.name "${customization.vmsName} Client")
+if(customization.advanced.customClientDisplayName)
+    # Overridden in metavms
+    set(client.display.name "${customization.advanced.customClientDisplayName}")
+endif()
+
+set(mediaserver_service_name "${customization.companyName} Server")
+if(customization.advanced.customMediaserverServiceName)
+    # Overridden in metavms
+    set(mediaserver_service_name "${customization.advanced.customMediaserverServiceName}")
+endif()
+
+set(mediaserver_application_name "${customization.companyName} Media Server")
+if(customization.advanced.customMediaserverApplicationName)
+    # Overridden in metavms
+    set(mediaserver_application_name "${customization.advanced.customMediaserverApplicationName}")
+endif()
+
 set(applauncher.name "${customization.companyName} ${customization.vmsName} Launcher")
 set(traytool.name "${customization.vmsName} Tray Assistant")
 set(mediaserver.display.name "${customization.vmsName} Media Server")

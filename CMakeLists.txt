@@ -109,7 +109,7 @@ include(strip_target)
 include(vms_protocol_version)
 include(customization_package)
 
-if(useMetaVersion)
+if(customization.advanced.useMetaVersion)
     set(metaVersion R15)
 endif()
 

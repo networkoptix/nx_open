@@ -1,7 +1,3 @@
-set(shortCloudName "Cloud")
-
-set(useMetaVersion OFF)
-
 # Localization
 set(translations
     en_US
@@ -32,11 +28,6 @@ set(translations
     fi_FI
     sv_SE
 )
-
-# Defaults to ${customization.companyName} in the properties.cmake
-set(windowsInstallPath "")
-
-
 
 #TODO: #GDM #FIXME How to write it better?
 if(customization.translations)
