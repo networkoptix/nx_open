@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SERVER_DEB_FILE="@server_distribution_name@.deb"
-COMPANY_NAME="@deb.customization.company.name@"
+COMPANY_NAME="@customization.companyId@"
 WITH_ROOT_TOOL="@withRootTool@"
 
 osBasename() {

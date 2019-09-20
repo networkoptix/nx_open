@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-COMPANY_NAME=@deb.customization.company.name@
+COMPANY_NAME=@customization.companyId@
 FULLVERSION=@release.version@.@buildNumber@
 TARGET=/opt/$COMPANY_NAME/client/$FULLVERSION
 

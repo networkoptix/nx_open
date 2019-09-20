@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=@customization.vmsName@
 Comment=@client.display.name@
-Exec=/opt/@deb.customization.company.name@/client/@release.version@.@buildNumber@/bin/client %u
+Exec=/opt/@customization.companyId@/client/@release.version@.@buildNumber@/bin/client %u
 Icon=vmsclient-@customization@.png
 Terminal=false
 Type=Application

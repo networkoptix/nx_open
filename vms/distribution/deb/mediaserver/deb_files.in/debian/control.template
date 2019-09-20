@@ -1,4 +1,4 @@
-Package: @deb.customization.company.name@-mediaserver
+Package: @customization.companyId@-mediaserver
 Version: VERSION
 Installed-Size: INSTALLED_SIZE
 Architecture: @target.arch@

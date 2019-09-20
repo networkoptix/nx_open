@@ -38,9 +38,9 @@ nx_set_variable_if_empty(mediaserver_application_name "${customization.companyNa
 nx_set_variable_if_empty(windowsInstallPath "${customization.companyName}")
 
 # Internal names must not be changed in all rebrandings
-set(mobileClientInternalName "${customization.companyName} ${customization.desktop.internalName} Mobile Client")
-set(desktopClientInternalName "${customization.companyName} ${customization.desktop.internalName} Client")
-set(mediaFolderName "${customization.desktop.internalName} Media")
+set(mobileClientInternalName "${customization.companyName} ${customization.vmsId} Mobile Client")
+set(desktopClientInternalName "${customization.companyName} ${customization.vmsId} Client")
+set(mediaFolderName "${customization.vmsId} Media")
 
 # Component display names
 set(client.display.name "${customization.vmsName} Client")
@@ -51,9 +51,9 @@ set(testcamera.name "${customization.companyName} ${customization.vmsName} Test 
 
 # Binary names and pathes
 if(WINDOWS)
-    set(client.binary.name "${customization.desktop.internalName}.exe")
+    set(client.binary.name "${customization.vmsId}.exe")
     set(applauncher.binary.name "applauncher.exe")
-    set(minilauncher.binary.name "${customization.desktop.internalName} Launcher.exe")
+    set(minilauncher.binary.name "${customization.vmsId} Launcher.exe")
     set(testcamera.binary.name "testcamera.exe")
     set(installation.root "C:/Program Files/${windowsInstallPath}/${customization.vmsName}")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -67,7 +67,7 @@ else()
     set(applauncher.binary.name "applauncher-bin")
     set(minilauncher.binary.name "applauncher")
     set(testcamera.binary.name "testcamera")
-    set(installation.root "/opt/${deb.customization.company.name}")
+    set(installation.root "/opt/${customization.companyId}")
 endif()
 
 # Other variables

@@ -75,7 +75,7 @@ QString AppInfo::organizationName()
 
 QString AppInfo::linuxOrganizationName()
 {
-    return "${deb.customization.company.name}";
+    return "${customization.companyId}";
 }
 
 QString AppInfo::organizationNameForSettings()

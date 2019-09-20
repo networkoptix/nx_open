@@ -15,7 +15,7 @@ BEGIN
             VALUE "CompanyName",        "${customization.companyName}"
             VALUE "FileDescription",    "${client.display.name}"
             VALUE "FileVersion",        "${release.version}.${buildNumber}"
-            VALUE "InternalName",       "${customization.desktop.internalName}"
+            VALUE "InternalName",       "${customization.vmsId}"
             VALUE "LegalCopyright",     "${nx_copyright}"
             VALUE "LegalTrademarks1",   "All Rights Reserved"
             VALUE "LegalTrademarks2",   "All Rights Reserved"
