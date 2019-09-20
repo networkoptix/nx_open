@@ -596,6 +596,16 @@ void QnVideoCamera::stop()
 
 QnVideoCamera::~QnVideoCamera()
 {
+    beforeDestroy();
+}
+
+void QnVideoCamera::beforeDestroy()
+{
+    if (m_primaryReader)
+        m_primaryReader->beforeDestroy();
+    if (m_secondaryReader)
+        m_secondaryReader->beforeDestroy();
+
     beforeStop();
     stop();
 }

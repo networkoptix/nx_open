@@ -112,11 +112,19 @@ bool QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res, QnVideoCameraPt
 
 void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
 {
-    QnMutexLocker lock( &m_mutex );
-    if (m_isStopped)
-        return;
-
-    m_cameras.remove(res);
+    QnVideoCameraPtr removedCamera;
+    {
+        QnMutexLocker lock( &m_mutex );
+        if (m_isStopped)
+            return;
+        auto itr = m_cameras.find(res);
+        if (itr == m_cameras.end())
+            return;
+        removedCamera = itr.value();
+        m_cameras.erase(itr);
+    }
+    // Ensure readers are stopped before destroy QnVideoCamera.
+    removedCamera->beforeDestroy();
 }
 
 std::unique_ptr<VideoCameraLocker>
