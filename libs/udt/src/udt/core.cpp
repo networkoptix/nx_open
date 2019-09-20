@@ -627,7 +627,7 @@ void CUDT::connect(const detail::SocketAddress& serv_addr)
     char* resdata = new char[m_iPayloadSize];
     response.pack(ControlPacketType::Handshake, NULL, resdata, m_iPayloadSize);
 
-    CUDTException e(0, 0);
+    ErrorInfo error(0, 0);
     int internalConnectResult = -47;
 
     while (!isClosing())
@@ -657,7 +657,7 @@ void CUDT::connect(const detail::SocketAddress& serv_addr)
         if (CTimer::getTime() > ttl)
         {
             // timeout
-            e = CUDTException(1, 1, 0);
+            error = ErrorInfo(1, 1, 0);
             break;
         }
     }
@@ -665,20 +665,20 @@ void CUDT::connect(const detail::SocketAddress& serv_addr)
     delete[] reqdata;
     delete[] resdata;
 
-    if (e.getErrorCode() == 0)
+    if (error.getErrorCode() == 0)
     {
         if (isClosing())                                                 // if the socket is closed before connection...
-            e = CUDTException(1);
+            error = ErrorInfo(1);
         else if (1002 == m_ConnRes.m_iReqType)                          // connection request rejected
-            e = CUDTException(1, 2, 0);
+            error = ErrorInfo(1, 2, 0);
         else if ((!m_bRendezvous) && (m_iISN != m_ConnRes.m_iISN))      // secuity check
-            e = CUDTException(1, 4, 0);
+            error = ErrorInfo(1, 4, 0);
         else if (internalConnectResult == -1) // Otherwise, success will be reported to the caller
-            e = CUDTException(1);
+            error = ErrorInfo(1);
     }
 
-    if (e.getErrorCode() != 0)
-        throw e;
+    if (error.getErrorCode() != 0)
+        throw CUDTException(error);
 }
 
 int CUDT::connect(const CPacket& response)

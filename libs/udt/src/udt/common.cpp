@@ -633,12 +633,13 @@ void ErrorInfo::prepareErrorMessage()
 
 
 CUDTException::CUDTException(int major, int minor, int err):
-    m_errorInfo(major, minor, err)
+    CUDTException(ErrorInfo(major, minor, err))
 {
 }
 
-CUDTException::CUDTException(const CUDTException& e):
-    m_errorInfo(e.m_errorInfo)
+CUDTException::CUDTException(ErrorInfo errorInfo):
+    std::runtime_error(errorInfo.getErrorMessage()),
+    m_errorInfo(std::move(errorInfo))
 {
 }
 

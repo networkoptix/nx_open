@@ -208,17 +208,21 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class CUDTException
+class CUDTException:
+    public std::runtime_error
 {
 public:
     CUDTException(int major = 0, int minor = 0, int err = -1);
-    CUDTException(const CUDTException& e);
+    CUDTException(ErrorInfo errorInfo);
     virtual ~CUDTException() = default;
 
-    virtual const char* getErrorMessage() const;
-    virtual int getErrorCode() const;
-    virtual int getErrno() const;
-    virtual void clear();
+    CUDTException(const CUDTException&) = delete;
+    CUDTException& operator=(const CUDTException&) = delete;
+
+    const char* getErrorMessage() const;
+    int getErrorCode() const;
+    int getErrno() const;
+    void clear();
 
     const ErrorInfo& errorInfo() const;
 

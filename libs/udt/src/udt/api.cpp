@@ -1257,10 +1257,10 @@ void CUDTUnited::updateMux(
         else
             multiplexer->channel().open(addr);
     }
-    catch (CUDTException& e)
+    catch (const CUDTException&)
     {
         multiplexer->channel().shutdown();
-        throw e;
+        throw;
     }
 
     const auto sa = multiplexer->channel().getSockAddr();
