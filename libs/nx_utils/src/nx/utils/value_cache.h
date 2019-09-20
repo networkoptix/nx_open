@@ -10,23 +10,23 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/elapsed_timer.h>
 
-namespace nx {
-namespace utils {
+namespace nx::utils {
 
 /**
-    @a get() and @a update() may be called safely fom different threads
-*/
+ *  Allows caching of the value and automatical cache invalidation. get() and update() may be
+ *  called safely fom different threads.
+ */
 template<class ValueType>
 class CachedValue
 {
 public:
     /**
-        @param valGenerationFunc This functor is called from get() and update() with no
-            synchronization. So it should be synchronized by itself (if it is needed)
-        @param expirationTime CachedValue will automatically update value on @a get() or
-            @a update() every @a expirationTime milliseconds. Setting to 0 ms disables expiration.
-        @note @a valGenerationFunc is not called here!
-    */
+     *  @param valGenerationFunc This functor is called from get() and update() with no
+     *      synchronization. So it should be synchronized by itself (if it is required).
+     *  @param expirationTime CachedValue will automatically update value on get() or
+     *      update() every expirationTime milliseconds. Setting to 0 ms disables expiration.
+     *  @note valGenerationFunc is not called here!
+     */
     template<class FuncType>
     CachedValue(
         FuncType&& valGenerationFunc,
@@ -92,6 +92,5 @@ private:
     const std::chrono::milliseconds m_expirationTime;
 };
 
-}
 } // namespace nx::utils
 
