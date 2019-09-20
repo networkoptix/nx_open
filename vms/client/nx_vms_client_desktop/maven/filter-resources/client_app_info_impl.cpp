@@ -69,7 +69,7 @@ QString QnClientAppInfo::libDirSuffix()
 
 int QnClientAppInfo::eulaVersion()
 {
-    return ${eulaVersion};
+    return ${customization.eulaVersion};
 }
 QString QnClientAppInfo::metaVersion()
 {

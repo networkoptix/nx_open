@@ -3,7 +3,7 @@
 COMPANY_NAME="@deb.customization.company.name@"
 CLOUD_HOST="@cloudHost@"
 CLOUD_NAME="@customization.cloudName@"
-LICENSE_VERSION="@eulaVersion@"
+LICENSE_VERSION="@customization.eulaVersion@"
 
 . /usr/share/debconf/confmodule
 

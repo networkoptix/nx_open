@@ -105,7 +105,7 @@
         <?define paxtonDirId = "$(var.customization)_$(var.releaseVersionFull)_Paxton"?>
         <?define enable_hanwha = "${enable_hanwha}"?>
 
-        <?define eulaVersion = "${eulaVersion}"?>
+        <?define eulaVersion = "${customization.eulaVersion}"?>
         <?define developerBuild = "${developerBuild}"?>
 
         <?define installerIcon = "${installerIcon}"?>

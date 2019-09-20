@@ -75,7 +75,7 @@ endif()
 set(apple_team_id "L6FE34GJWM")
 
 if(eulaVersionOverride)
-    set(eulaVersion ${eulaVersionOverride})
+    set(customization.eulaVersion ${eulaVersionOverride})
 endif()
 
 #TODO: #GDM This can actually be overwritten (vista, ipera)

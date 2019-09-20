@@ -1,7 +1,5 @@
 set(shortCloudName "Cloud")
 
-set(eulaVersion 1)
-
 set(useMetaVersion OFF)
 
 # Localization
