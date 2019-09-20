@@ -52,21 +52,23 @@ QnConnectToCloudWatcher::QnConnectToCloudWatcher(
     connect(&m_timer, &QTimer::timeout, this, &QnConnectToCloudWatcher::at_updateConnection);
     connect(
         m_commonModule->globalSettings(), &QnGlobalSettings::cloudSettingsChanged,
-        this, [this]()
-        {
-            if (!m_cloudUrl.isEmpty())
-                m_ec2CloudConnector->stopDataSynchronization(); //< Sop connection with old parameters if exists.
-            at_updateConnection();
-        });
+        this, &QnConnectToCloudWatcher::reopenConnection, Qt::QueuedConnection);
     connect(
         m_commonModule->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded,
-        this, &QnConnectToCloudWatcher::at_updateConnection);
+        this, &QnConnectToCloudWatcher::at_updateConnection, Qt::QueuedConnection);
     connect(
         m_commonModule->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged,
-        this, &QnConnectToCloudWatcher::at_updateConnection);
+        this, &QnConnectToCloudWatcher::at_updateConnection, Qt::QueuedConnection);
     connect(
         m_commonModule->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved,
-        this, &QnConnectToCloudWatcher::at_updateConnection);
+        this, &QnConnectToCloudWatcher::at_updateConnection, Qt::QueuedConnection);
+}
+
+void QnConnectToCloudWatcher::reopenConnection()
+{
+    if (!m_cloudUrl.isEmpty())
+        m_ec2CloudConnector->stopDataSynchronization(); //< Sop connection with old parameters if exists.
+    at_updateConnection();
 }
 
 QnConnectToCloudWatcher::~QnConnectToCloudWatcher()

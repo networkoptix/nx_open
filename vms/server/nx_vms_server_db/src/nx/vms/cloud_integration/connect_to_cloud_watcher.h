@@ -52,7 +52,7 @@ private slots:
     void at_updateConnection();
     void restartTimer();
     void addCloudPeer(const nx::utils::Url& url);
-
+    void reopenConnection();
 private:
     QnCommonModule* m_commonModule;
     AbstractEc2CloudConnector* m_ec2CloudConnector;
