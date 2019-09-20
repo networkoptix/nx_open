@@ -192,7 +192,7 @@ void StorageManager::readStorage(
 
 void StorageManager::removeStorage(
     nx::utils::stree::ResourceContainer authInfo,
-    const std::string& storageId,
+    std::string storageId,
     nx::utils::MoveOnlyFunc<void(Result)> handler)
 {
     if (storageId.empty())
@@ -217,7 +217,7 @@ void StorageManager::removeStorage(
 }
 
 void StorageManager::listCameras(
-    const std::string& /*storageId*/,
+    std::string /*storageId*/,
     nx::utils::MoveOnlyFunc<void(Result, std::vector<std::string>)> handler)
 {
     handler(Result{ResultCode::ok, "listCamerasOk"}, std::vector<std::string>());
@@ -291,10 +291,10 @@ void StorageManager::getStorage(
         [this, guard = m_asyncCounter.getScopedIncrement(), readStorageContext](auto queryContext)
         {
             auto storage = m_storageDao->readStorage(queryContext, readStorageContext->storageId);
-            if (storage)
-                readStorageContext->storage = std::move(*storage);
-            else
-                readStorageContext->result = ResultCode::notFound;
+			if (storage)
+				readStorageContext->storage = std::move(*storage);
+			else
+				readStorageContext->result = Result(ResultCode::notFound, "No such storage");
 
             // TODO where to get information about storage type?
             for (auto& device : readStorageContext->storage.ioDevices)
@@ -565,7 +565,7 @@ void StorageManager::addStorageToDb(
         : findBucketByRegion(buckets, addStorageContext->request.region);
 
     addStorageContext->bucketLookupResult = std::move(result);
-    if (addStorageContext->bucketLookupResult.resultCode != ResultCode::ok)
+    if (!addStorageContext->bucketLookupResult.ok())
         return;
 
     addStorageContext->initializeStorage(bucket);
@@ -612,8 +612,8 @@ void StorageManager::removeStorageFromDb(
 	if (!m_accessManager->isStorageOwner(removeStorageContext->authInfo, *storage))
 	{
 		removeStorageContext->result = Result(ResultCode::forbidden, "Non-owner");
-        return;
-    }
+		return;
+	}
 
     // NOTE: storage can't be removed if there are already systems associated with it.
     if (!storage->systems.empty())
@@ -702,7 +702,7 @@ void StorageManager::modifySystemStorageRelation(
             {
                 NX_VERBOSE(this, "%1 request: storageId %2 not found",
                     operation, system->storageId);
-                return handler(ResultCode::notFound, System());
+                return handler(Result(ResultCode::notFound, "No such storage"), System());
             }
 
             if (!m_accessManager->isStorageOwner(authInfo, **storage))
@@ -711,7 +711,7 @@ void StorageManager::modifySystemStorageRelation(
                     "unauthorized user %4 attempted to access storage",
                          operation, system->storageId, system->id,
                          m_accessManager->getAccountEmail(authInfo));
-                return handler(ResultCode::forbidden, System());
+                return handler(Result(ResultCode::forbidden, "Non-owner"), System());
             }
 
             handler(ResultCode::ok, std::move(*system));

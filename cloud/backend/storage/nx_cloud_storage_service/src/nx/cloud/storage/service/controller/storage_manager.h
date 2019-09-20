@@ -69,11 +69,11 @@ public:
 
     void removeStorage(
         nx::utils::stree::ResourceContainer authInfo,
-        const std::string& storageId,
+        std::string storageId,
         nx::utils::MoveOnlyFunc<void(api::Result)> handler);
 
     void listCameras(
-        const std::string& storageId,
+        std::string storageId,
         nx::utils::MoveOnlyFunc<void(api::Result, std::vector<std::string>)> handler);
 
     void getCredentials(
