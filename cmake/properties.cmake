@@ -40,7 +40,7 @@ nx_set_variable_if_empty(windowsInstallPath "${customization.companyName}")
 # Internal names must not be changed in all rebrandings
 set(mobileClientInternalName "${customization.companyName} ${customization.desktop.internalName} Mobile Client")
 set(desktopClientInternalName "${customization.companyName} ${customization.desktop.internalName} Client")
-set(client.mediafolder.name "${customization.desktop.internalName} Media")
+set(mediaFolderName "${customization.desktop.internalName} Media")
 
 # Component display names
 set(client.display.name "${customization.vmsName} Client")

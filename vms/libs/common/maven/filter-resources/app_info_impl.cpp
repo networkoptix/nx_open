@@ -53,7 +53,7 @@ QString QnAppInfo::applauncherExecutableName()
 
 QString QnAppInfo::mediaFolderName()
 {
-    return QStringLiteral("${client.mediafolder.name}");
+    return QStringLiteral("${mediaFolderName}");
 }
 
 QString QnAppInfo::companyUrl()
