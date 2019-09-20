@@ -88,7 +88,26 @@ const CloudStorageLauncher& TestFixture::storageService(int index) const
     return m_cloudStorageCluster->server(index);
 }
 
-void TestFixture::readStorage(Client* storageServiceClient, const std::string& storageId)
+void TestFixture::addStorage(
+	const std::unique_ptr<api::Client>& storageServiceClient,
+	const AddStorageRequest& request)
+{
+	storageServiceClient->addStorage(
+		request,
+		[this](auto result, auto storage)
+		{
+			m_addStorageResponse.push({std::move(result), std::move(storage)});
+		});
+}
+
+std::pair<api::Result, api::Storage> TestFixture::waitForAddStorageResponse()
+{
+	return m_addStorageResponse.pop();
+}
+
+void TestFixture::readStorage(
+	const std::unique_ptr<api::Client>& storageServiceClient,
+	const std::string& storageId)
 {
 	storageServiceClient->readStorage(
 		storageId,
@@ -103,7 +122,9 @@ std::pair<Result, Storage> TestFixture::waitForReadStorageResponse()
 	return m_readStorageResponse.pop();
 }
 
-void TestFixture::removeStorage(Client* storageServiceClient, const std::string& storageId)
+void TestFixture::removeStorage(
+	const std::unique_ptr<api::Client>& storageServiceClient,
+	const std::string& storageId)
 {
 	storageServiceClient->removeStorage(
 		storageId,
@@ -118,9 +139,49 @@ Result TestFixture::waitForRemoveStorageResponse()
 	return m_removeStorageResponse.pop();
 }
 
-void TestFixture::getCredentials(api::Client* cloudStorageClient, const std::string& storageId)
+void TestFixture::addSystem(
+	const std::unique_ptr<api::Client>& storageServiceClient,
+	const std::string& storageId,
+	const api::AddSystemRequest& request)
 {
-	cloudStorageClient->getCredentials(
+	storageServiceClient->addSystem(
+		storageId,
+		request,
+		[this](auto result, auto system)
+		{
+			m_addSystemResponse.push({std::move(result), std::move(system)});
+		});
+}
+
+std::pair<api::Result, api::System> TestFixture::waitForAddSystemResponse()
+{
+	return m_addSystemResponse.pop();
+}
+
+void TestFixture::removeSystem(
+	const std::unique_ptr<api::Client>& storageServiceClient,
+	const std::string& storageId,
+	const std::string& systemId)
+{
+	storageServiceClient->removeSystem(
+		storageId,
+		systemId,
+		[this](auto result)
+		{
+			m_removeSystemResponse.push(std::move(result));
+		});
+}
+
+api::Result TestFixture::waitForRemoveSystemResponse()
+{
+	return m_removeSystemResponse.pop();
+}
+
+void TestFixture::requestMediaContentCredentials(
+	const std::unique_ptr<api::Client>& storageServiceClient,
+	const std::string& storageId)
+{
+	storageServiceClient->getCredentials(
 		storageId,
 		[this](auto result, auto storageCredentials)
 		{
@@ -170,15 +231,8 @@ void TestFixture::addStorage(TestContext* outTestContext)
     addStorageRequest.totalSpace = 10000;
     addStorageRequest.region = outTestContext->s3Bucket->location();
 
-    std::promise<std::pair<api::Result, api::Storage>> addStorageDone;
-    outTestContext->storageServiceClient->addStorage(
-        addStorageRequest,
-        [this, &addStorageDone](auto result, auto storage)
-        {
-            addStorageDone.set_value({std::move(result), std::move(storage)});
-        });
-
-    auto [result, storage] = addStorageDone.get_future().get();
+	addStorage(outTestContext->storageServiceClient, addStorageRequest);
+	auto [result, storage] = waitForAddStorageResponse();
     ASSERT_TRUE(result.ok());
 
     outTestContext->storage = std::move(storage);

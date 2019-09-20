@@ -51,13 +51,36 @@ protected:
     CloudStorageLauncher& storageService(int index = 0);
     const CloudStorageLauncher& storageService(int index = 0) const;
 
-	void readStorage(api::Client* cloudStorageClient, const std::string& storageId);
+	void addStorage(
+		const std::unique_ptr<api::Client>& storageServiceClient,
+		const api::AddStorageRequest& request);
+	std::pair<api::Result, api::Storage> waitForAddStorageResponse();
+
+	void readStorage(
+		const std::unique_ptr<api::Client>& storageServiceClient,
+		const std::string& storageId);
 	std::pair<api::Result, api::Storage> waitForReadStorageResponse();
 
-	void removeStorage(api::Client* storageServiceClient, const std::string& storageId);
+	void removeStorage(
+		const std::unique_ptr<api::Client>& storageServiceClient,
+		const std::string& storageId);
 	api::Result waitForRemoveStorageResponse();
 
-	void getCredentials(api::Client* cloudStorageClient, const std::string& storageId);
+	void addSystem(
+		const std::unique_ptr<api::Client>& storageServiceClient,
+		const std::string& storageId,
+		const api::AddSystemRequest& request);
+	std::pair<api::Result, api::System> waitForAddSystemResponse();
+
+	void removeSystem(
+		const std::unique_ptr<api::Client>& storageServiceClient,
+		const std::string& storageId,
+		const std::string& systemId);
+	api::Result waitForRemoveSystemResponse();
+
+	void requestMediaContentCredentials(
+		const std::unique_ptr<api::Client>& storageServiceClient,
+		const std::string& storageId);
 	std::pair<api::Result, api::StorageCredentials> waitForGetCredentialsResponse();
 
 	std::unique_ptr<api::Client> makeStorageServiceClient(
@@ -80,8 +103,11 @@ private:
     discovery::test::DiscoveryServer m_discoveryServer;
     std::unique_ptr<CloudStorageCluster> m_cloudStorageCluster;
     nx::cloud::db::CdbLauncher m_cloudDb;
+	nx::utils::SyncQueue<std::pair<api::Result, api::Storage>> m_addStorageResponse;
 	nx::utils::SyncQueue<std::pair<api::Result, api::Storage>> m_readStorageResponse;
 	nx::utils::SyncQueue<api::Result> m_removeStorageResponse;
+	nx::utils::SyncQueue<std::pair<api::Result, api::System>> m_addSystemResponse;
+	nx::utils::SyncQueue<api::Result> m_removeSystemResponse;
 	nx::utils::SyncQueue<std::pair<api::Result, api::StorageCredentials>> m_getCredentialsResponse;
 };
 

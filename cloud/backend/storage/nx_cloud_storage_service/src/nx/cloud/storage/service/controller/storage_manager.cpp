@@ -252,9 +252,9 @@ void StorageManager::addSystem(
 {
     modifySystemStorageRelation(
 		kAddSystem,
-        authInfo,
-        storageId,
-        request.id,
+        std::move(authInfo),
+        std::move(storageId),
+        std::move(request.id),
 		std::bind(&AbstractStorageDao::addSystem, m_storageDao, _1, _2),
         std::move(handler));
 }
@@ -267,9 +267,9 @@ void StorageManager::removeSystem(
 {
     modifySystemStorageRelation(
 		kRemoveSystem,
-        authInfo,
-        storageId,
-        systemId,
+        std::move(authInfo),
+        std::move(storageId),
+		std::move(systemId),
         std::bind(&AbstractStorageDao::removeSystem, m_storageDao, _1, _2),
         [handler = std::move(handler)](auto result, auto /*system*/)
         {
@@ -611,7 +611,7 @@ void StorageManager::removeStorageFromDb(
 
 	if (!m_authorizationManager->isStorageOwner(removeStorageContext->authInfo, *storage))
 	{
-		removeStorageContext->result = Result(ResultCode::forbidden, "Non-owner");
+		removeStorageContext->result = ResultCode::forbidden;
 		return;
 	}
 
@@ -654,9 +654,9 @@ Result StorageManager::prepareRemoveStorageResult(
 template<typename DbFunc, typename Handler>
 void StorageManager::modifySystemStorageRelation(
 	const char* operation,
-    const nx::utils::stree::ResourceContainer& authInfo,
-    const std::string& storageId,
-    const std::string& systemId,
+    nx::utils::stree::ResourceContainer authInfo,
+    std::string storageId,
+    std::string systemId,
     DbFunc dbFunc,
     Handler handler)
 {
@@ -665,26 +665,39 @@ void StorageManager::modifySystemStorageRelation(
     if (systemId.empty())
         return handler(Result(ResultCode::badRequest, "Empty systemId"), System());
 
-    auto storage = std::make_shared<std::optional<Storage>>();
-    auto system = std::make_shared<System>();
-    system->storageId = storageId;
-    system->id = systemId;
+	auto context = std::make_shared<SystemStorageContext>();
+	context->authInfo = std::move(authInfo);
+	context->system.id = std::move(systemId);
+	context->system.storageId = std::move(storageId);
 
     m_storageDao->queryExecutor().executeUpdate(
-        [this, guard = m_asyncCounter.getScopedIncrement(), storage, system,
-            operation, dbFunc = std::move(dbFunc)](
+        [this, guard = m_asyncCounter.getScopedIncrement(), operation,
+		    dbFunc = std::move(dbFunc), context](
                 auto queryContext)
         {
             NX_VERBOSE(this, "%1 request: storageId: %2, systemId: %3",
-                operation, system->storageId, system->id);
-            *storage = m_storageDao->readStorage(queryContext, system->storageId);
-            if (!*storage)
-                return;
+                operation, context->system.storageId, context->system.id);
+            auto storage = m_storageDao->readStorage(queryContext, context->system.storageId);
+            if (!storage)
+			{
+				context->result = Result(ResultCode::notFound, "No such storage");
+				return;
+			}
 
-            dbFunc(queryContext, *system);
+			if (!m_authorizationManager->isStorageOwner(context->authInfo, *storage))
+			{
+				NX_VERBOSE(this, "%1 request with storageId: %2, systemId: %3 rejected:"
+					"unauthorized user %4 attempted to access storage",
+					operation, context->system.storageId, context->system.id,
+					m_authorizationManager->getAccountEmail(context->authInfo));
+				context->result = ResultCode::forbidden;
+				return;
+			}
+
+            dbFunc(queryContext, context->system);
         },
-        [this, guard = m_asyncCounter.getScopedIncrement(), authInfo = std::move(authInfo),
-            storage, system, operation, handler = std::move(handler)](
+        [this, guard = m_asyncCounter.getScopedIncrement(), operation,
+			handler = std::move(handler), context](
                 auto dbResult)
         {
             if (dbResult != nx::sql::DBResult::ok)
@@ -692,29 +705,19 @@ void StorageManager::modifySystemStorageRelation(
                 Result error(
                     utils::toResultCode(dbResult),
                     lm("%1 request with storageId: %2, systemId: %3 failed with sql error: %4")
-                        .args(operation, system->storageId, system->id, toString(dbResult))
-                        .toStdString());
+                        .args(operation, context->system.storageId, context->system.id,
+					        toString(dbResult)).toStdString());
                 NX_ERROR(this, error.error);
                 return handler(std::move(error), System());
             }
 
-            if (!*storage)
+            if (!context->result.ok())
             {
-                NX_VERBOSE(this, "%1 request: storageId %2 not found",
-                    operation, system->storageId);
-                return handler(Result(ResultCode::notFound, "No such storage"), System());
+                NX_VERBOSE(this, "%1 request failed: %2", operation, context->result);
+                return handler(std::move(context->result), System());
             }
 
-            if (!m_authorizationManager->isStorageOwner(authInfo, **storage))
-            {
-                NX_VERBOSE(this, "%1 request with storageId: %2, systemId: %3 rejected:"
-                    "unauthorized user %4 attempted to access storage",
-                         operation, system->storageId, system->id,
-                         m_authorizationManager->getAccountEmail(authInfo));
-                return handler(Result(ResultCode::forbidden, "Non-owner"), System());
-            }
-
-            handler(ResultCode::ok, std::move(*system));
+            handler(ResultCode::ok, std::move(context->system));
         });
 }
 

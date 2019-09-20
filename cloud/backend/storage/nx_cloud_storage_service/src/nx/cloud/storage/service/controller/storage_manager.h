@@ -125,6 +125,13 @@ private:
             GetStorageHandler handler);
     };
 
+	struct SystemStorageContext
+	{
+		nx::utils::stree::ResourceContainer authInfo;
+		api::System system;
+		api::Result result;
+	};
+
 private:
     void getStorage(
         std::shared_ptr<ReadStorageContext> readStorageContext);
@@ -174,9 +181,9 @@ private:
     template<typename DbFunc, typename Handler>
     void modifySystemStorageRelation(
         const char* operation,
-        const nx::utils::stree::ResourceContainer& authInfo,
-        const std::string& storageId,
-        const std::string& systemId,
+        nx::utils::stree::ResourceContainer authInfo,
+        std::string storageId,
+        std::string systemId,
         DbFunc dbFunc,
         Handler handler);
 
