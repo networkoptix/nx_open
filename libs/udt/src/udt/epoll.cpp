@@ -62,17 +62,15 @@ using namespace std;
 CEPoll::CEPoll():
     m_iIDSeed(0)
 {
-    CGuard::createMutex(m_EPollLock);
 }
 
 CEPoll::~CEPoll()
 {
-    CGuard::releaseMutex(m_EPollLock);
 }
 
 int CEPoll::create()
 {
-    CGuard pg(m_EPollLock);
+    std::lock_guard<std::mutex> pg(m_EPollLock);
 
     std::unique_ptr<EpollImpl> desc(new EpollImpl());
 
@@ -86,7 +84,7 @@ int CEPoll::create()
 
 int CEPoll::add_usock(const int eid, const UDTSOCKET& u, const int* events)
 {
-    CGuard pg(m_EPollLock);
+    std::lock_guard<std::mutex> pg(m_EPollLock);
 
     CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
@@ -97,7 +95,7 @@ int CEPoll::add_usock(const int eid, const UDTSOCKET& u, const int* events)
 
 int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
 {
-    CGuard pg(m_EPollLock);
+    std::lock_guard<std::mutex> pg(m_EPollLock);
 
     CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
@@ -110,7 +108,7 @@ int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
 
 int CEPoll::remove_usock(const int eid, const UDTSOCKET& u)
 {
-    CGuard pg(m_EPollLock);
+    std::lock_guard<std::mutex> pg(m_EPollLock);
 
     CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
@@ -121,7 +119,7 @@ int CEPoll::remove_usock(const int eid, const UDTSOCKET& u)
 
 int CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
 {
-    CGuard pg(m_EPollLock);
+    std::lock_guard<std::mutex> pg(m_EPollLock);
 
     CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
@@ -155,7 +153,7 @@ int CEPoll::interruptWait(const int eid)
 
 int CEPoll::release(const int eid)
 {
-    CGuard pg(m_EPollLock);
+    std::lock_guard<std::mutex> pg(m_EPollLock);
 
     CEPollDescMap::iterator i = m_mPolls.find(eid);
     if (i == m_mPolls.end())
@@ -172,7 +170,7 @@ int CEPoll::update_events(
     int events,
     bool enable)
 {
-    CGuard lk(m_EPollLock);
+    std::lock_guard<std::mutex> lk(m_EPollLock);
 
     for (set<int>::iterator i = epollToTriggerIDs.begin(); i != epollToTriggerIDs.end(); ++i)
     {
@@ -182,21 +180,20 @@ int CEPoll::update_events(
 
         epollIter->second->updateEpollSets(events, socketId, enable);
     }
-    lk.unlock();
 
     return 0;
 }
 
 void CEPoll::RemoveEPollEvent(UDTSOCKET socket)
 {
-    CGuard pg(m_EPollLock);
+    std::lock_guard<std::mutex> pg(m_EPollLock);
     for (CEPollDescMap::iterator p = m_mPolls.begin(); p != m_mPolls.end(); ++p)
         p->second->removeUdtSocketEvents(socket);
 }
 
 EpollImpl* CEPoll::getEpollById(int eid) const
 {
-    CGuard lk(m_EPollLock);
+    std::lock_guard<std::mutex> lk(m_EPollLock);
 
     auto it = m_mPolls.find(eid);
     if (it == m_mPolls.end())

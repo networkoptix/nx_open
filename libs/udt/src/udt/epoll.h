@@ -44,6 +44,7 @@ Yunhong Gu, last updated 08/20/2010
 
 #include <map>
 #include <memory>
+#include <mutex>
 #include <set>
 
 #include "common.h"
@@ -133,7 +134,7 @@ public: // for CUDTUnited API
         std::map<SYSSOCKET, int>* lrfds, std::map<SYSSOCKET, int>* lwfds);
 
     // Functionality:
-    //    Interrupt one wait call: the one running simultaneously 
+    //    Interrupt one wait call: the one running simultaneously
     //    in another thread or the next one to be made.
     // Parameters:
     //    0) [in] eid: EPoll ID.
@@ -178,7 +179,7 @@ private:
     pthread_mutex_t m_SeedLock;
 
     CEPollDescMap m_mPolls;       // all epolls
-    mutable pthread_mutex_t m_EPollLock;
+    mutable std::mutex m_EPollLock;
 
     EpollImpl* getEpollById(int eid) const;
 };

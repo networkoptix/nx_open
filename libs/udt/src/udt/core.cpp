@@ -2425,7 +2425,7 @@ void CUDT::checkTimers(bool forceAck)
 void CUDT::addEPoll(const int eid, int eventsToReport)
 {
     {
-        CGuard lk(s_UDTUnited->m_EPoll.m_EPollLock);
+        std::lock_guard<std::mutex> lk(s_UDTUnited->m_EPoll.m_EPollLock);
         m_sPollID.insert(eid);
     }
 
@@ -2458,7 +2458,7 @@ void CUDT::removeEPoll(const int eid)
     s_UDTUnited->m_EPoll.update_events(m_SocketId, remove, UDT_EPOLL_IN | UDT_EPOLL_OUT, false);
 
     {
-        CGuard lk(s_UDTUnited->m_EPoll.m_EPollLock);
+        std::lock_guard<std::mutex> lk(s_UDTUnited->m_EPoll.m_EPollLock);
         m_sPollID.erase(eid);
     }
 
@@ -2573,12 +2573,12 @@ int ServerSideConnectionAcceptor::processConnectionRequest(
 
 void ServerSideConnectionAcceptor::addEPoll(const int eid)
 {
-    CGuard lk(CUDT::s_UDTUnited->m_EPoll.m_EPollLock);
+    std::lock_guard<std::mutex> lk(CUDT::s_UDTUnited->m_EPoll.m_EPollLock);
     m_pollIds.insert(eid);
 }
 
 void ServerSideConnectionAcceptor::removeEPoll(const int eid)
 {
-    CGuard lk(CUDT::s_UDTUnited->m_EPoll.m_EPollLock);
+    std::lock_guard<std::mutex> lk(CUDT::s_UDTUnited->m_EPoll.m_EPollLock);
     m_pollIds.erase(eid);
 }
