@@ -60,7 +60,6 @@ nx_store_customization_package(${customization_dir})
 nx_store_known_file(${customization_unpack_log_file})
 nx_store_known_file(${customization_cmake})
 
-include(customization_defaults)
 include(${customization_dir}/customization.cmake)
 include(${customization_cmake})
 

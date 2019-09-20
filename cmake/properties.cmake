@@ -93,6 +93,42 @@ else()
     set(installation.root "/opt/${customization.companyId}")
 endif()
 
+# Localization
+set(translations
+    en_US
+    en_GB
+    fr_FR
+    cs_CZ
+    de_DE
+    fi_FI
+    ru_RU
+    es_ES
+    it_IT
+    ja_JP
+    ko_KR
+    tr_TR
+    zh_CN
+    zh_TW
+    he_IL
+    hu_HU
+    nl_BE
+    nl_NL
+    no_NO
+    pl_PL
+    pt_BR
+    pt_PT
+    uk_UA
+    vi_VN
+    th_TH
+    fi_FI
+    sv_SE
+)
+
+# Temporary workaround cms issue
+if(customization.customLanguages AND NOT customization.customLanguages STREQUAL "[]")
+    set(translations ${customization.customLanguages})
+endif()
+
 # Other variables
 set(launcher.version.file "launcher.version")
 string(TIMESTAMP current_year %Y UTC)
