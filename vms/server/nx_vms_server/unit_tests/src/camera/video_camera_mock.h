@@ -55,6 +55,8 @@ public:
         qint64 targetDurationUSec) override;
     virtual QnResourcePtr resource() const override;
 
+    virtual void beforeDestroy() override {}
+
 private:
     std::atomic<int> m_usageCounter;
 };
