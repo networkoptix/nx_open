@@ -598,10 +598,10 @@ int CUDTUnited::connect(const UDTSOCKET u, const sockaddr* name, int namelen)
     {
         s->m_pUDT->connect(detail::SocketAddress(name, namelen));
     }
-    catch (const CUDTException& e)
+    catch (const CUDTException&)
     {
         s->m_Status = OPENED;
-        throw e;
+        throw;
     }
 
     // record peer address
