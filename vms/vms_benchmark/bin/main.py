@@ -146,6 +146,11 @@ def load_configs(config_file, sys_config_file):
             "type": 'float',
             "default": 0.5
         },
+        "minimumStorageFreeBytes": {
+            "optional": True,
+            "type": 'integer',
+            "default": 10 * 1024 * 1024
+        },
     }
 
     sys_config = ConfigParser(sys_config_file, sys_option_descriptions, is_file_optional=True)
@@ -237,7 +242,7 @@ def report_stats(stats, api, streaming_started_at, sys_config):
         raise exceptions.VmsBenchmarkIssue("Detected the following: " + issue_message + ".")
 
 
-def get_writable_storages(api):
+def get_writable_storages(api, sys_config):
     try:
         storages = api.get_storage_spaces()
     except exceptions.VmsBenchmarkError as e:
@@ -250,12 +255,12 @@ def get_writable_storages(api):
         free_space = int(storage['freeSpace'])
         reserved_space = int(storage['reservedSpace'])
 
-        return free_space > reserved_space
+        return free_space >= reserved_space + sys_config['minimumStorageFreeBytes']
 
     try:
         result = [storage for storage in storages if storage_is_writable(storage)]
     except (ValueError, KeyError) as e:
-        raise exceptions.ServerApiResponseError("Bad response body to get storages request", original_exception=e)
+        raise exceptions.ServerApiResponseError("Bad response body for storage info request", original_exception=e)
 
     return result
 
@@ -265,6 +270,7 @@ def get_writable_storages(api):
 @click.option('-C', 'config_file', default='vms_benchmark.conf', help='Input config file.')
 @click.option('--sys-config', 'sys_config_file', default='vms_benchmark.ini', help='Input internal system config file.')
 def main(config_file, sys_config_file):
+    # TODO: Rename dictionaries to `conf` and `ini` respectively, and files to `conf_file` and `ini_file`.
     config, sys_config = load_configs(config_file, sys_config_file)
 
     if sys_config.ORIGINAL_OPTIONS is not None:
@@ -411,12 +417,12 @@ def main(config_file, sys_config_file):
     print('REST API authentication test is OK.')
 
     try:
-        storages = get_writable_storages(api)
+        storages = get_writable_storages(api, sys_config)
     except Exception as e:
         raise exceptions.ServerApiError(message="Unable to get VMS storages via REST HTTP", original_exception=e)
 
     if len(storages) == 0:
-        raise exceptions.DeviceStateError("Server has no storages, check free space")
+        raise exceptions.DeviceStateError("Server has no suitable video archive storage, check the free space")
 
     for i in 1, 2, 3:
         cameras = api.get_test_cameras_all()
