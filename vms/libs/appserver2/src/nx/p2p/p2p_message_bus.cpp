@@ -1225,6 +1225,7 @@ ConnectionInfoList MessageBus::connectionsInfo() const
 
 void MessageBus::emitPeerFoundLostSignals()
 {
+    // TODO: need to refactor it. Signals should not be emitted with locked mutex.
     std::set<vms::api::PeerData> newAlivePeers;
 
     for (const auto& connection: m_connections)
