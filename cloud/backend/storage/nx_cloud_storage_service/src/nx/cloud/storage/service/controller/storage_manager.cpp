@@ -605,7 +605,13 @@ void StorageManager::removeStorageFromDb(
     auto storage = m_storageDao->readStorage(queryContext, removeStorageContext->storageId);
     if (!storage)
     {
-        removeStorageContext->result = ResultCode::notFound;
+		removeStorageContext->result = Result(ResultCode::notFound, "No such storage");
+        return;
+    }
+
+	if (!m_accessManager->isStorageOwner(removeStorageContext->authInfo, *storage))
+	{
+		removeStorageContext->result = Result(ResultCode::forbidden, "Non-owner");
         return;
     }
 
@@ -614,13 +620,7 @@ void StorageManager::removeStorageFromDb(
     {
         removeStorageContext->result = Result(
             ResultCode::forbidden,
-            "Storage has at least one system associated with it.");
-        return;
-    }
-
-    if (!m_accessManager->isStorageOwner(removeStorageContext->authInfo, *storage))
-    {
-        removeStorageContext->result = ResultCode::forbidden;
+            "Storage has at least one system associated with it");
         return;
     }
 
