@@ -337,7 +337,7 @@ void StorageManager::authorizeReadingStorage(
                 NX_VERBOSE(this,
                     "readStorage %1 for user %2 failed: %3",
                         readStorageContext->storageId,
-                        m_accessManager->getAccountEmail(readStorageContext->authInfo),
+                        m_authorizationManager->getAccountEmail(readStorageContext->authInfo),
                         result);
                 return readStorageContext->handler(std::move(result), Storage());
             }
