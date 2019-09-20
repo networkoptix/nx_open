@@ -1,13 +1,10 @@
-//
-// This file is generated. Go to pom.xml.
-//
 #include <client/client_app_info.h>
 
 #include <app_icons.h>
 
 QString QnClientAppInfo::applicationName()
 {
-    return QStringLiteral("${client.name}");
+    return "${desktopClientInternalName}";
 }
 
 QString QnClientAppInfo::applicationDisplayName()
@@ -71,6 +68,7 @@ int QnClientAppInfo::eulaVersion()
 {
     return ${customization.eulaVersion};
 }
+
 QString QnClientAppInfo::metaVersion()
 {
     return QStringLiteral("${metaVersion}");

@@ -15,12 +15,12 @@ BEGIN
             VALUE "CompanyName",        "${customization.companyName}"
             VALUE "FileDescription",    "${client.display.name}"
             VALUE "FileVersion",        "${release.version}.${buildNumber}"
-            VALUE "InternalName",       "${client.name}"
+            VALUE "InternalName",       "${customization.desktop.internalName}"
             VALUE "LegalCopyright",     "${nx_copyright}"
             VALUE "LegalTrademarks1",   "All Rights Reserved"
             VALUE "LegalTrademarks2",   "All Rights Reserved"
-            VALUE "OriginalFilename",   "desktop_client.exe"
-            VALUE "ProductName",        "desktop_client"
+            VALUE "OriginalFilename",   "${customization.desktop.internalName}.exe"
+            VALUE "ProductName",        "${customization.vmsName}"
             VALUE "ProductVersion",     "${release.version}.${buildNumber}"
         END
     END

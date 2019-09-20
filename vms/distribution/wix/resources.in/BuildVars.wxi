@@ -30,8 +30,8 @@
 
         <?define ECRegPath="Software\${customization.companyName}\${appserver.name}"?>
 
-        <?define clientInternalName = "${client.name}"?>
-        <?define clientRegPath = "Software\${customization.companyName}\${client.name}"?>
+        <?define desktopClientInternalName = "${desktopClientInternalName}"?>
+        <?define clientRegPath = "Software\${customization.companyName}\${desktopClientInternalName}"?>
         <?define nxtoolName = "${customization.nxtool.applicationName}"?>
         <?define mediaserverName = "${mediaserver_application_name}"?>
         <?define trayToolName = "${traytool.name}"?>
@@ -39,14 +39,10 @@
         <?define applauncherName = "${applauncher.name}"?>
         <?define applauncherBinaryName = "${applauncher.binary.name}"?>
         <?define minilauncherBinaryName = "${minilauncher.binary.name}"?>
-        <?define clientName = "${product.name}"?>
         <?define clientDisplayName = "${client.display.name}"?>
         <?define launcherVersionFile = "${launcher.version.file}"?>
 
-        <?define productExeName = "${product.name}"?>
-
-        <!-- TODO: #GDM Something strange here! Client exe name differs! -->
-        <?define clientExeName = "${customization.vmsName}"?>
+        <?define clientBinaryName = "${client.binary.name}"?>
 
         <?define nxtoolExeName = "${customization.nxtool.applicationName}"?>
 

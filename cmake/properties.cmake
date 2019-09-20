@@ -37,34 +37,43 @@ nx_set_variable_if_empty(mediaserver_application_name "${customization.companyNa
 # Overridden in ionetworks, ionetworks_cn
 nx_set_variable_if_empty(windowsInstallPath "${customization.companyName}")
 
-# TODO: GDM Rename to 'Client Settings Key and use explicitly'
-set(client.name "${customization.companyName} ${product.name} Client")
+# Internal names must not be changed in all rebrandings
+set(mobileClientInternalName "${customization.companyName} ${customization.desktop.internalName} Mobile Client")
+set(desktopClientInternalName "${customization.companyName} ${customization.desktop.internalName} Client")
+set(client.mediafolder.name "${customization.desktop.internalName} Media")
 
+# Component display names
 set(client.display.name "${customization.vmsName} Client")
 set(applauncher.name "${customization.companyName} ${customization.vmsName} Launcher")
 set(traytool.name "${customization.vmsName} Tray Assistant")
 set(mediaserver.display.name "${customization.vmsName} Media Server")
-set(client.mediafolder.name "${product.name} Media")
 set(testcamera.name "${customization.companyName} ${customization.vmsName} Test Camera")
-set(client.binary.name "client-bin")
-set(applauncher.binary.name "applauncher-bin")
-set(minilauncher.binary.name "applauncher")
-set(testcamera.binary.name "testcamera")
-set(installation.root "/opt/${deb.customization.company.name}")
-set(launcher.version.file "launcher.version")
-string(TIMESTAMP current_year %Y UTC)
-set(nx_copyright "Copyright (c) 2011-${current_year} Network Optix")
 
+# Binary names and pathes
 if(WINDOWS)
-    set(client.binary.name "${product.name}.exe")
+    set(client.binary.name "${customization.desktop.internalName}.exe")
     set(applauncher.binary.name "applauncher.exe")
-    set(minilauncher.binary.name "${product.name} Launcher.exe")
+    set(minilauncher.binary.name "${customization.desktop.internalName} Launcher.exe")
     set(testcamera.binary.name "testcamera.exe")
     set(installation.root "C:/Program Files/${windowsInstallPath}/${customization.vmsName}")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(client.binary.name "${customization.vmsName}")
+    set(applauncher.binary.name "applauncher-bin")
+    set(minilauncher.binary.name "applauncher")
+    set(testcamera.binary.name "testcamera")
     set(installation.root "/Applications/")
+else()
+    set(client.binary.name "client-bin")
+    set(applauncher.binary.name "applauncher-bin")
+    set(minilauncher.binary.name "applauncher")
+    set(testcamera.binary.name "testcamera")
+    set(installation.root "/opt/${deb.customization.company.name}")
 endif()
+
+# Other variables
+set(launcher.version.file "launcher.version")
+string(TIMESTAMP current_year %Y UTC)
+set(nx_copyright "Copyright (c) 2011-${current_year} Network Optix")
 
 if(targetDevice MATCHES "bpi")
     set(liteMode "true")

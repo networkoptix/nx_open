@@ -3,12 +3,11 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 
+#include <client/client_app_info.h>
 #include <client/client_settings.h>
 #include <client/client_installations_manager.h>
 
 #include <nx/vms/utils/platform/autorun.h>
-
-#include <utils/common/app_info.h>
 
 namespace {
 
@@ -54,7 +53,7 @@ void QnClientAutoRunWatcher::setAutoRun(bool enabled)
 
 QString QnClientAutoRunWatcher::autoRunKey() const
 {
-    return qApp->applicationName();
+    return QnClientAppInfo::applicationName();
 }
 
 QString QnClientAutoRunWatcher::autoRunPath() const

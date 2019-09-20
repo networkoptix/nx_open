@@ -26,7 +26,9 @@
         <?include ControlPanel.wxi ?>
         <?include installer_states.wxi ?>
 
-        <Property Id="CLIENT_NAME" Value="$(var.clientInternalName)"/>
+        <!-- This property is used in custom actions to cleanup autorun registry key. -->
+        <Property Id="CLIENT_NAME" Value="$(var.desktopClientInternalName)"/>
+
         <Property Id="REINSTALLMODE" Value="dmus"/>
         <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Secure="yes" Value="1"/>
 
@@ -68,7 +70,7 @@
             <RegistrySearch
                 Id="ClientDirectoryReg"
                 Root="HKCU"
-                Key="Software\[Manufacturer]\$(var.clientInternalName)"
+                Key="$(var.clientRegPath)"
                 Name="mediaRoot"
                 Type="raw"
                 Win64="yes"/>
@@ -78,7 +80,7 @@
             <RegistrySearch
                 Id="ClientDirectoryReg32"
                 Root="HKCU"
-                Key="Software\[Manufacturer]\$(var.clientInternalName)"
+                Key="$(var.clientRegPath)"
                 Name="mediaRoot"
                 Type="raw"
                 Win64="no"/>
@@ -175,7 +177,7 @@
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="MyPicturesFolder">
-                <Directory Id="$(var.customization)BgDir" Name="$(var.clientName) Backgrounds"/>
+                <Directory Id="$(var.customization)BgDir" Name="$(var.productName) Backgrounds"/>
             </Directory>
 
             <Directory Id="$(var.ProgramFilesFolder)">

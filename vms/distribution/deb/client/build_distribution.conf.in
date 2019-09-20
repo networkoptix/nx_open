@@ -3,8 +3,6 @@
 CUSTOMIZATION="@deb.customization.company.name@"
 CUSTOMIZATION_DIR="@customization_dir@"
 CUSTOMIZATION_NAME="@customization@" #< E.g. for "networkoptix", the value is "default".
-FULL_PRODUCT_NAME="@customization.companyName@ @product.name@ Client.conf"
-FULL_APPLAUNCHER_NAME="@customization.companyName@ Launcher.conf"
 VERSION="@releaseVersion@.@buildNumber@"
 RELEASE_VERSION="@releaseVersion@"
 

@@ -5,7 +5,7 @@
 # Required-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: @ccustomization.companyName@ @product.name@ Lite Client
+# Short-Description: @customization.companyName@ @customization.vmsName@ Lite Client
 ### END INIT INFO
 
 CUSTOMIZATION="@deb.customization.company.name@"

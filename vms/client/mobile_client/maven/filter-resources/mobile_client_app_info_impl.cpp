@@ -2,8 +2,7 @@
 
 QString QnMobileClientAppInfo::applicationName()
 {
-    //TODO: #GDM Customize as mobile client internal name to store settings?
-    return QStringLiteral("${customization.companyName} ${product.name} Mobile Client");
+    return "${mobileClientInternalName}";
 }
 
 QString QnMobileClientAppInfo::applicationDisplayName()

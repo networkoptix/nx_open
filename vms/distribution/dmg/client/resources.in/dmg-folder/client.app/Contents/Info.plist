@@ -37,7 +37,7 @@
     <array>
         <dict>
             <key>CFBundleURLName</key>
-            <string>@product.name@ Link</string>
+            <string>@customization.vmsName@ Link</string>
             <key>CFBundleURLSchemes</key>
             <array>
             <string>@customization.uriProtocol@</string>
