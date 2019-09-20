@@ -5,8 +5,6 @@
 #include "rest/server/json_rest_handler.h"
 #include <nx/vms/server/server_module_aware.h>
 
-class QnGlobalMonitor;
-
 class QnStatisticsRestHandler: public QnJsonRestHandler, public /*mixin*/ nx::vms::server::ServerModuleAware {
     Q_OBJECT
 public:

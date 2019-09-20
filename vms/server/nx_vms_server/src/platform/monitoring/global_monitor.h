@@ -5,15 +5,16 @@
 #include <nx/utils/elapsed_timer.h>
 #include <nx/utils/value_cache.h>
 
+namespace nx::vms::server {
+
 /**
  * A proxy monitor object suitable for usage as an application-wide monitor.
  *
  * Updates on regular time intervals and is thread-safe.
  */
-class QnGlobalMonitor: public QnPlatformMonitor
+class GlobalMonitor: public QnPlatformMonitor
 {
     Q_OBJECT;
-    // TODO: Can remove Q_OBJECT here?
 
 public:
     static const std::chrono::milliseconds kCacheExpirationTime;
@@ -24,8 +25,8 @@ public:
      * \param parent                    Parent of this object.
      * \param updatePeriodMs            statistics update period. It's disabled if 0.
      */
-    QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent);
-    virtual ~QnGlobalMonitor();
+    GlobalMonitor(QnPlatformMonitor *base, QObject *parent);
+    virtual ~GlobalMonitor();
 
     void logStatistics();
 
@@ -57,6 +58,6 @@ private:
     nx::utils::CachedValue<qreal> m_cachedTotalRamUsage;
     nx::utils::CachedValue<QList<QnPlatformMonitor::HddLoad>> m_cachedTotalHddLoad;
     nx::utils::CachedValue<QList<QnPlatformMonitor::NetworkLoad>> m_cachedTotalNetworkLoad;
-
-
 };
+
+} // namespace nx::vms::server

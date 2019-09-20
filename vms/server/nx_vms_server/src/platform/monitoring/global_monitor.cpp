@@ -18,10 +18,10 @@
 #include <nx_vms_server_ini.h>
 #include <utils/common/delete_later.h>
 
-// TODO: move to namespace
+namespace nx::vms::server {
 
 using namespace std::chrono_literals;
-const std::chrono::milliseconds QnGlobalMonitor::kCacheExpirationTime = 2s;
+const std::chrono::milliseconds GlobalMonitor::kCacheExpirationTime = 2s;
 
 namespace {
 
@@ -46,11 +46,11 @@ void logMallocStatistics()
 
     stream = open_memstream(&buffer, &len);
     if (stream == NULL)
-        NX_INFO(typeid(QnGlobalMonitor), "Error with open_memstream: %1", strerror(errno));
+        NX_INFO(typeid(GlobalMonitor), "Error with open_memstream: %1", strerror(errno));
 
     malloc_info(0, stream);
     fclose(stream);
-    NX_INFO(typeid(QnGlobalMonitor), "malloc statistics: \n%1", buffer);
+    NX_INFO(typeid(GlobalMonitor), "malloc statistics: \n%1", buffer);
     free(buffer);
 }
 #else
@@ -74,7 +74,7 @@ void logOpenedHandleCount()
     DIR *dir = opendir(buf);
     if (dir == nullptr)
     {
-        NX_INFO(typeid(QnGlobalMonitor), "Failed to open a directory %1: %2", buf, strerror(errno));
+        NX_INFO(typeid(GlobalMonitor), "Failed to open a directory %1: %2", buf, strerror(errno));
         return;
     }
 
@@ -82,7 +82,7 @@ void logOpenedHandleCount()
         fdCount++;
 
     closedir(dir);
-    NX_INFO(typeid(QnGlobalMonitor), lm("Opened: %1").args(fdCount));
+    NX_INFO(typeid(GlobalMonitor), lm("Opened: %1").args(fdCount));
 }
 #elif defined (Q_OS_WIN)
 void logOpenedHandleCount()
@@ -118,22 +118,21 @@ void logOpenedHandleCount()
         }
     }
 
-    NX_INFO(typeid(QnGlobalMonitor), lit("Disk files: %1").arg(typeDisk));
-    NX_INFO(typeid(QnGlobalMonitor), lit("Sockets, pipes: %1").arg(typePipe));
-    NX_INFO(typeid(QnGlobalMonitor), lit("Character devices: %1").arg(typeChar));
-    NX_INFO(typeid(QnGlobalMonitor), lit("Unknown: %1").arg(typeUnknown));
+    NX_INFO(typeid(GlobalMonitor), lit("Disk files: %1").arg(typeDisk));
+    NX_INFO(typeid(GlobalMonitor), lit("Sockets, pipes: %1").arg(typePipe));
+    NX_INFO(typeid(GlobalMonitor), lit("Character devices: %1").arg(typeChar));
+    NX_INFO(typeid(GlobalMonitor), lit("Unknown: %1").arg(typeUnknown));
 }
 #else
 void logOpenedHandleCount()
 {
-    NX_WARNING(typeid(QnGlobalMonitor), lit("Not implemented for this platform"));
+    NX_WARNING(typeid(GlobalMonitor), lit("Not implemented for this platform"));
 }
 #endif
 
 } // namespace
 
-// TODO: Check for mutex usages
-QnGlobalMonitor::QnGlobalMonitor(QnPlatformMonitor* base, QObject* parent):
+GlobalMonitor::GlobalMonitor(QnPlatformMonitor* base, QObject* parent):
     QnPlatformMonitor(parent),
     m_cachedTotalCpuUsage(
         [this]() { return m_monitorBase->totalCpuUsage(); }, &m_mutex, kCacheExpirationTime),
@@ -159,11 +158,10 @@ QnGlobalMonitor::QnGlobalMonitor(QnPlatformMonitor* base, QObject* parent):
     m_monitorBase = base;
 }
 
-QnGlobalMonitor::~QnGlobalMonitor() {
-    // TODO: who deletes base, is it those jokes of Q_OBJECT?
+GlobalMonitor::~GlobalMonitor() {
 }
 
-void QnGlobalMonitor::logStatistics()
+void GlobalMonitor::logStatistics()
 {
     NX_INFO(this, lm("Cpu usage %1%").arg(totalCpuUsage() * 100, 0, 'f', 2));
     NX_INFO(this, lm("Memory usage %1%").arg(totalRamUsage() * 100, 0, 'f', 2));
@@ -189,46 +187,46 @@ void QnGlobalMonitor::logStatistics()
 
 }
 
-qint64 QnGlobalMonitor::updatePeriodMs() const
+qint64 GlobalMonitor::updatePeriodMs() const
 {
     return kCacheExpirationTime.count();
 }
 
-qreal QnGlobalMonitor::totalCpuUsage() {
+qreal GlobalMonitor::totalCpuUsage() {
     return m_cachedTotalCpuUsage.get();
 }
 
-qreal QnGlobalMonitor::totalRamUsage() {
+qreal GlobalMonitor::totalRamUsage() {
     return m_cachedTotalRamUsage.get();
 }
 
-QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
+QList<QnPlatformMonitor::HddLoad> GlobalMonitor::totalHddLoad() {
     return m_cachedTotalHddLoad.get();
 }
 
-QList<QnPlatformMonitor::NetworkLoad> QnGlobalMonitor::totalNetworkLoad() {
+QList<QnPlatformMonitor::NetworkLoad> GlobalMonitor::totalNetworkLoad() {
     return m_cachedTotalNetworkLoad.get();
 }
 
-QList<QnPlatformMonitor::PartitionSpace> QnGlobalMonitor::totalPartitionSpaceInfo()
+QList<QnPlatformMonitor::PartitionSpace> GlobalMonitor::totalPartitionSpaceInfo()
 {
     NX_MUTEX_LOCKER locker(&m_mutex);
-    // TODO: why no cache?
     return m_monitorBase->totalPartitionSpaceInfo();
 }
 
-QString QnGlobalMonitor::partitionByPath(const QString &path) {
+QString GlobalMonitor::partitionByPath(const QString &path) {
     NX_MUTEX_LOCKER locker(&m_mutex);
-    // TODO: why no cache?
     return m_monitorBase->partitionByPath(path);
 }
 
-std::chrono::milliseconds QnGlobalMonitor::processUptime() const
+std::chrono::milliseconds GlobalMonitor::processUptime() const
 {
     return m_uptimeTimer.elapsed();
 }
 
-void QnGlobalMonitor::setServerModule(QnMediaServerModule* serverModule)
+void GlobalMonitor::setServerModule(QnMediaServerModule* serverModule)
 {
     m_monitorBase->setServerModule(serverModule);
 }
+
+} // namespace nx::vms::server

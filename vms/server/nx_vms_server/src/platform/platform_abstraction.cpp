@@ -24,7 +24,7 @@ QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
     if(!qApp)
         qnWarning("QApplication instance must be created before a QnPlatformAbstraction.");
 
-    m_monitor = new QnGlobalMonitor(new QnMonitorImpl(this), this);
+    m_monitor = new nx::vms::server::GlobalMonitor(new QnMonitorImpl(this), this);
 }
 
 QnPlatformAbstraction::~QnPlatformAbstraction()

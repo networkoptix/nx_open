@@ -15,7 +15,7 @@ public:
     QnPlatformAbstraction(QObject *parent = nullptr);
     virtual ~QnPlatformAbstraction();
 
-    QnGlobalMonitor *monitor() const
+    nx::vms::server::GlobalMonitor *monitor() const
     {
         return m_monitor;
     }
@@ -23,5 +23,5 @@ public:
     void setServerModule(QnMediaServerModule* serverModule);
 
 private:
-    QnGlobalMonitor *m_monitor;
+    nx::vms::server::GlobalMonitor *m_monitor;
 };
