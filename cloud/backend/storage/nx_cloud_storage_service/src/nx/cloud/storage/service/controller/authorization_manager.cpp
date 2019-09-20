@@ -1,4 +1,4 @@
-#include "access_manager.h"
+#include "authorization_manager.h"
 
 #include <nx/cloud/db/api/auth_provider.h>
 #include <nx/cloud/db/api/cdb_client.h>
@@ -56,17 +56,17 @@ static ResultCode toResultCode(db::api::ResultCode resultCode)
 
 } // namespace
 
-AccessManager::AccessManager(const conf::CloudDb& settings):
+AuthorizationManager::AuthorizationManager(const conf::CloudDb& settings):
     m_settings(settings)
 {
 }
 
-AccessManager::~AccessManager()
+AuthorizationManager::~AuthorizationManager()
 {
     stop();
 };
 
-void AccessManager::stop()
+void AuthorizationManager::stop()
 {
     QnMutexLocker lock(&m_mutex);
     auto cdbRequests = std::move(m_cdbRequests);
@@ -75,15 +75,17 @@ void AccessManager::stop()
     cdbRequests.clear();
 }
 
-std::pair<Result, std::string> AccessManager::authorizeAddingStorage(
+std::pair<Result, std::string> AuthorizationManager::authorizeAddingStorage(
     const nx::utils::stree::ResourceContainer& authInfo) const
 {
+	// getAccountEmail returns an empty string, it is because a non account entity is making
+	// the request, e.g. a system. Only Cloud account entities are allowed to add storage.
     auto accountEmail = this->getAccountEmail(authInfo);
-    auto result = accountEmail.empty() ? ResultCode::internalError : ResultCode::ok;
+    auto result = accountEmail.empty() ? ResultCode::forbidden : ResultCode::ok;
     return std::make_pair(std::move(result), std::move(accountEmail));
 }
 
-void AccessManager::authorizeReadingStorage(
+void AuthorizationManager::authorizeReadingStorage(
     const nx::utils::stree::ResourceContainer& authInfo,
     const Storage& storage,
     AuthorizeReadingStorageHandler handler)
@@ -133,21 +135,22 @@ void AccessManager::authorizeReadingStorage(
         });
 }
 
-std::string AccessManager::getAccountEmail(const nx::utils::stree::ResourceContainer& authInfo) const
+std::string AuthorizationManager::getAccountEmail(
+	const nx::utils::stree::ResourceContainer& authInfo) const
 {
     std::string accountOwner;
     authInfo.get(cloud_db::Resource::accountEmail, &accountOwner);
     return accountOwner;
 }
 
-bool AccessManager::isStorageOwner(
+bool AuthorizationManager::isStorageOwner(
     const nx::utils::stree::ResourceContainer& authInfo,
     const Storage& storage) const
 {
     return getAccountEmail(authInfo) == storage.owner;
 }
 
-AccessManager::ReadStorageContext& AccessManager::createReadStorageContext()
+AuthorizationManager::ReadStorageContext& AuthorizationManager::createReadStorageContext()
 {
     auto cdbClient = std::make_unique<db::api::CdbClient>();
     cdbClient->setCloudUrl(m_settings.url.toStdString());
@@ -160,7 +163,7 @@ AccessManager::ReadStorageContext& AccessManager::createReadStorageContext()
     return m_cdbRequests.emplace(cdbClientPtr, std::move(readStorageContext)).first->second;
 }
 
-AccessManager::ReadStorageContext AccessManager::takeReadStorageContext(
+AuthorizationManager::ReadStorageContext AuthorizationManager::takeReadStorageContext(
     db::api::CdbClient* cdbClient)
 {
     QnMutexLocker lock(&m_mutex);

@@ -41,7 +41,7 @@ class Model;
 
 namespace controller {
 
-class AccessManager;
+class AuthorizationManager;
 
 using GetStorageHandler = nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)>;
 
@@ -185,7 +185,7 @@ private:
     const std::string& m_clusterId;
     model::dao::AbstractStorageDao* m_storageDao = nullptr;
     BucketManager* m_bucketManager = nullptr;
-    std::unique_ptr<AccessManager> m_accessManager;
+    std::unique_ptr<AuthorizationManager> m_authorizationManager;
     std::unique_ptr<nx::geo_ip::AbstractResolver> m_geoIpResolver;
     QnMutex m_mutex;
     std::set<std::shared_ptr<s3::DataUsageCalculator>> m_dataUsageCalculators;

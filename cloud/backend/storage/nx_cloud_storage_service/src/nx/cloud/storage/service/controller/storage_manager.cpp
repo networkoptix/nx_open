@@ -12,7 +12,7 @@
 #include "nx/cloud/storage/service/model/model.h"
 #include "nx/cloud/storage/service/model/database.h"
 #include "nx/cloud/storage/service/model/dao/storage_dao.h"
-#include "access_manager.h"
+#include "authorization_manager.h"
 #include "utils.h"
 
 namespace nx::cloud::storage::service::controller {
@@ -116,7 +116,7 @@ StorageManager::StorageManager(
     m_clusterId(settings.database().synchronization.clusterId),
     m_storageDao(&model->storageDao()),
     m_bucketManager(bucketManager),
-    m_accessManager(std::make_unique<AccessManager>(settings.cloudDb())),
+    m_authorizationManager(std::make_unique<AuthorizationManager>(settings.cloudDb())),
     m_geoIpResolver(GeoIpResolverFactory::instance().create(settings)),
     m_stsClient(
         std::make_unique<aws::sts::ApiClient>(
@@ -133,7 +133,7 @@ StorageManager::~StorageManager()
 
 void StorageManager::stop()
 {
-    m_accessManager->stop();
+    m_authorizationManager->stop();
     m_stsClient->pleaseStopSync();
     m_asyncCounter.wait();
 
@@ -327,7 +327,7 @@ void StorageManager::getStorage(
 void StorageManager::authorizeReadingStorage(
     std::shared_ptr<StorageManager::ReadStorageContext> readStorageContext)
 {
-    m_accessManager->authorizeReadingStorage(
+    m_authorizationManager->authorizeReadingStorage(
         readStorageContext->authInfo,
         readStorageContext->storage,
         [this, readStorageContext](auto result)
@@ -544,7 +544,7 @@ std::pair<api::Result, std::string> StorageManager::validateAddStorageRequest(
             std::string());
     }
 
-    auto [result, accountEmail] = m_accessManager->authorizeAddingStorage(authInfo);
+    auto [result, accountEmail] = m_authorizationManager->authorizeAddingStorage(authInfo);
     if (!result.ok())
     {
         NX_VERBOSE(this, "addStorage failed for user %1: %2", accountEmail, result);
@@ -609,7 +609,7 @@ void StorageManager::removeStorageFromDb(
         return;
     }
 
-	if (!m_accessManager->isStorageOwner(removeStorageContext->authInfo, *storage))
+	if (!m_authorizationManager->isStorageOwner(removeStorageContext->authInfo, *storage))
 	{
 		removeStorageContext->result = Result(ResultCode::forbidden, "Non-owner");
 		return;
@@ -705,12 +705,12 @@ void StorageManager::modifySystemStorageRelation(
                 return handler(Result(ResultCode::notFound, "No such storage"), System());
             }
 
-            if (!m_accessManager->isStorageOwner(authInfo, **storage))
+            if (!m_authorizationManager->isStorageOwner(authInfo, **storage))
             {
                 NX_VERBOSE(this, "%1 request with storageId: %2, systemId: %3 rejected:"
                     "unauthorized user %4 attempted to access storage",
                          operation, system->storageId, system->id,
-                         m_accessManager->getAccountEmail(authInfo));
+                         m_authorizationManager->getAccountEmail(authInfo));
                 return handler(Result(ResultCode::forbidden, "Non-owner"), System());
             }
 
