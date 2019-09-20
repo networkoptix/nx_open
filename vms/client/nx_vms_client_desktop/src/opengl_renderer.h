@@ -3,6 +3,7 @@
 #include <nx/utils/singleton.h>
 
 #include <QtCore/QScopedPointer>
+#include <QtCore/QSharedPointer>
 #include <QtCore/QStack>
 #include <QtGui/QMatrix4x4>
 
@@ -71,10 +72,13 @@ public:
     QnOpenGLRendererManager(QObject* parent = nullptr);
     ~QnOpenGLRendererManager();
 
-    static QnOpenGLRenderer* instance(QOpenGLWidget* widget);
+    using RendererPtr = QSharedPointer<QnOpenGLRenderer>;
+
+    RendererPtr get(QOpenGLWidget* widget);
+    static RendererPtr instance(QOpenGLWidget* widget);
 
 private:
-    QHash<QOpenGLWidget*, QnOpenGLRenderer*> m_container;
+    QHash<QOpenGLWidget*, RendererPtr> m_container;
 };
 
 void loadImageData(

@@ -27,7 +27,7 @@ public:
 };
 
 template<class T, class Factory = QnGlContextDataForwardingFactory<T>>
-class QnGlContextData
+class QnGlContextData: public QObject
 {
 public:
     using PointerType = QSharedPointer<T>;
@@ -40,11 +40,19 @@ public:
 
     PointerType get(QOpenGLWidget* glWidget)
     {
-        const QnMutexLocker locked(&m_mutex);
+        NX_MUTEX_LOCKER locker(&m_mutex);
 
         typename HashType::iterator pos = m_map.find(glWidget);
-        if(pos == m_map.end())
+        if (pos == m_map.end())
+        {
             pos = m_map.insert(glWidget, QSharedPointer<T>(m_factory(glWidget)));
+            connect(glWidget, &QObject::destroyed, this,
+                [this, glWidget]()
+                {
+                    NX_MUTEX_LOCKER lock(&m_mutex);
+                    m_map.remove(glWidget);
+                });
+        }
 
         return *pos;
     }
