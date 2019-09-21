@@ -95,11 +95,6 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->setModuleGUID(QnUuid::createUuid());
     nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId("mc", commonModule->moduleGUID());
 
-    // Work around crash on Android.
-    nx::network::cloud::ConnectorFactory::setEnabledCloudConnectMask(
-        nx::network::cloud::ConnectorFactory::getEnabledCloudConnectMask() &
-        (~(int)nx::network::cloud::ConnectType::udpHp));
-
     // TODO: #mshevchenko Remove when client_core_module is created.
     commonModule->store(translationManager);
 
