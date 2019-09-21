@@ -631,45 +631,6 @@ void ErrorInfo::prepareErrorMessage()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-
-CUDTException::CUDTException(int major, int minor, int err):
-    CUDTException(ErrorInfo(major, minor, err))
-{
-}
-
-CUDTException::CUDTException(ErrorInfo errorInfo):
-    std::runtime_error(errorInfo.getErrorMessage()),
-    m_errorInfo(std::move(errorInfo))
-{
-}
-
-const char* CUDTException::getErrorMessage() const
-{
-    return m_errorInfo.getErrorMessage();
-}
-
-int CUDTException::getErrorCode() const
-{
-    return m_errorInfo.getErrorCode();
-}
-
-int CUDTException::getErrno() const
-{
-    return m_errorInfo.getErrno();
-}
-
-void CUDTException::clear()
-{
-    m_errorInfo = {};
-}
-
-const ErrorInfo& CUDTException::errorInfo() const
-{
-    return m_errorInfo;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
 bool CIPAddress::ipcmp(
     const sockaddr* addr1,
     const sockaddr* addr2)

@@ -50,6 +50,7 @@ Yunhong Gu, last updated 08/01/2009
 #include <windows.h>
 #endif
 #include <cstdlib>
+
 #include "udt.h"
 #include "socket_addresss.h"
 
@@ -205,31 +206,6 @@ private:
     static uint64_t readCPUFrequency();
     static bool m_bUseMicroSecond;       // No higher resolution timer available, use gettimeofday().
 };
-
-////////////////////////////////////////////////////////////////////////////////
-
-class CUDTException:
-    public std::runtime_error
-{
-public:
-    CUDTException(int major = 0, int minor = 0, int err = -1);
-    CUDTException(ErrorInfo errorInfo);
-    virtual ~CUDTException() = default;
-
-    CUDTException(const CUDTException&) = delete;
-    CUDTException& operator=(const CUDTException&) = delete;
-
-    const char* getErrorMessage() const;
-    int getErrorCode() const;
-    int getErrno() const;
-    void clear();
-
-    const ErrorInfo& errorInfo() const;
-
-private:
-    ErrorInfo m_errorInfo;
-};
-
 
 ////////////////////////////////////////////////////////////////////////////////
 

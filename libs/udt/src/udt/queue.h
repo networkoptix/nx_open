@@ -437,6 +437,8 @@ private:
      */
     void timerCheck();
 
+    Result<> processUnit(CUnit* unit, const detail::SocketAddress& addr);
+
     std::thread m_WorkerThread;
 
 private:

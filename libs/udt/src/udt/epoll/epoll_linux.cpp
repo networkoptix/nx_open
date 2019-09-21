@@ -18,16 +18,29 @@ EpollLinux::EpollLinux():
     m_epollFd(-1),
     m_interruptEventFd(-1)
 {
+}
+
+EpollLinux::~EpollLinux()
+{
+    ::close(m_epollFd);
+    m_epollFd = -1;
+
+    ::close(m_interruptEventFd);
+    m_interruptEventFd = -1;
+}
+
+Result<> EpollLinux::initialize()
+{
     // Since Linux 2.6.8, the size argument is ignored, but must be greater than zero.
     m_epollFd = epoll_create(1024);
     if (m_epollFd < 0)
-        throw CUDTException(-1, 0, errno);
-    
+        return ErrorInfo(-1, 0, errno);
+
     m_interruptEventFd = eventfd(0, EFD_NONBLOCK);
     if (m_interruptEventFd < 0)
     {
         ::close(m_epollFd);
-        throw CUDTException(-1, 0, errno);
+        return ErrorInfo(-1, 0, errno);
     }
 
     epoll_event _event;
@@ -40,20 +53,13 @@ EpollLinux::EpollLinux():
         m_epollFd = -1;
         ::close(m_interruptEventFd);
         m_interruptEventFd = -1;
-        throw CUDTException(-1, 0, errno);
+        return ErrorInfo(-1, 0, errno);
     }
+
+    return success();
 }
 
-EpollLinux::~EpollLinux()
-{
-    ::close(m_epollFd);
-    m_epollFd = -1;
-
-    ::close(m_interruptEventFd);
-    m_interruptEventFd = -1;
-}
-
-void EpollLinux::add(const SYSSOCKET& s, const int* events)
+Result<> EpollLinux::add(const SYSSOCKET& s, const int* events)
 {
     epoll_event ev;
     memset(&ev, 0, sizeof(epoll_event));
@@ -73,17 +79,19 @@ void EpollLinux::add(const SYSSOCKET& s, const int* events)
 
     ev.data.fd = s;
     if (::epoll_ctl(m_epollFd, EPOLL_CTL_ADD, s, &ev) < 0)
-        throw CUDTException();
+        return ErrorInfo(-1, 0, errno);
 
     int& eventMask = m_sLocals[s];
     eventMask |= *events;
+
+    return success();
 }
 
 void EpollLinux::remove(const SYSSOCKET& s)
 {
     epoll_event ev;  // ev is ignored, for compatibility with old Linux kernel only.
-    if (::epoll_ctl(m_epollFd, EPOLL_CTL_DEL, s, &ev) < 0)
-        throw CUDTException();
+    // Ignoring error since handle is removed anyway.
+    ::epoll_ctl(m_epollFd, EPOLL_CTL_DEL, s, &ev);
 
     m_sLocals.erase(s);
 }

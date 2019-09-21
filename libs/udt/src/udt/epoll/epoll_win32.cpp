@@ -61,7 +61,6 @@ EpollWin32::EpollWin32():
     m_exceptfdsCapacity(kInitialFdSetSize)
 {
     memset(&m_interruptionSocketLocalAddress, 0, sizeof(m_interruptionSocketLocalAddress));
-    initializeInterruptSocket();
 }
 
 EpollWin32::~EpollWin32()
@@ -76,10 +75,16 @@ EpollWin32::~EpollWin32()
     freeInterruptSocket();
 }
 
-void EpollWin32::add(const SYSSOCKET& s, const int* events)
+Result<> EpollWin32::initialize()
+{
+    return initializeInterruptSocket();
+}
+
+Result<> EpollWin32::add(const SYSSOCKET& s, const int* events)
 {
     int& eventMask = m_socketDescriptorToEventMask[s];
     eventMask |= *events;
+    return success();
 }
 
 void EpollWin32::remove(const SYSSOCKET& s)
@@ -227,18 +232,18 @@ bool EpollWin32::isPollingSocketForEvent(SYSSOCKET handle, int eventMask) const
         : false;
 }
 
-void EpollWin32::initializeInterruptSocket()
+Result<> EpollWin32::initializeInterruptSocket()
 {
     m_interruptionSocket = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (m_interruptionSocket == INVALID_SOCKET)
-        throw CUDTException(-1, 0, GetLastError());
+        return ErrorInfo(-1, 0, GetLastError());
 
     u_long val = 1;
     if (ioctlsocket(m_interruptionSocket, FIONBIO, &val) != 0)
     {
         ::closesocket(m_interruptionSocket);
         m_interruptionSocket = INVALID_SOCKET;
-        throw CUDTException(-1, 0, GetLastError());
+        return ErrorInfo(-1, 0, GetLastError());
     }
 
     sockaddr_in localEndpoint;
@@ -253,7 +258,7 @@ void EpollWin32::initializeInterruptSocket()
     {
         ::closesocket(m_interruptionSocket);
         m_interruptionSocket = INVALID_SOCKET;
-        throw CUDTException(-1, 0, GetLastError());
+        return ErrorInfo(-1, 0, GetLastError());
     }
 
     int addrLen = sizeof(m_interruptionSocketLocalAddress);
@@ -264,8 +269,10 @@ void EpollWin32::initializeInterruptSocket()
     {
         ::closesocket(m_interruptionSocket);
         m_interruptionSocket = INVALID_SOCKET;
-        throw CUDTException(-1, 0, GetLastError());
+        return ErrorInfo(-1, 0, GetLastError());
     }
+
+    return success();
 }
 
 void EpollWin32::freeInterruptSocket()

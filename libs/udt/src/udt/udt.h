@@ -246,7 +246,7 @@ static constexpr int EUNKNOWN = -1;
 class UDT_API ErrorInfo
 {
 public:
-    ErrorInfo(int major = 0, int minor = 0, int err = -1);
+    explicit ErrorInfo(int major = 0, int minor = 0, int err = -1);
 
     // Functionality:
     //    Get the description of the exception.
