@@ -660,10 +660,10 @@ void StorageManager::modifySystemStorageRelation(
     DbFunc dbFunc,
     Handler handler)
 {
-    if (storageId.empty())
-        return handler(Result(ResultCode::badRequest, "Empty storageId"), System());
-    if (systemId.empty())
-        return handler(Result(ResultCode::badRequest, "Empty systemId"), System());
+	if (storageId.empty())
+		return handler(Result(ResultCode::badRequest, "Empty storageId"), System());
+	if (systemId.empty())
+		return handler(Result(ResultCode::badRequest, "Empty systemId"), System());
 
 	auto context = std::make_shared<SystemStorageContext>();
 	context->authInfo = std::move(authInfo);
