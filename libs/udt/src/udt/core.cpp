@@ -1350,7 +1350,7 @@ Result<int64_t> CUDT::sendfile(fstream& ifs, int64_t& offset, int64_t size, int 
         return ErrorInfo(2, 2, 0);
 
     if (size <= 0)
-        return success(0LL);
+        return success(int64_t(0));
 
     std::lock_guard<std::mutex> sendguard(m_SendLock);
 
@@ -1438,7 +1438,7 @@ Result<int64_t> CUDT::recvfile(fstream& ofs, int64_t& offset, int64_t size, int 
         return ErrorInfo(2, 1, 0);
 
     if (size <= 0)
-        return success(0LL);
+        return success(int64_t(0));
 
     std::lock_guard<std::mutex> recvguard(m_RecvLock);
 
