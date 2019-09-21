@@ -653,7 +653,7 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
             auto result = connect(response);
             if (!result.ok())
             {
-                internalConnectResult = std::move(result);
+                internalConnectResult = Result<>(result.errorInfo());
                 break;
             }
 

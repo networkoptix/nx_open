@@ -5,6 +5,42 @@
 
 #include "udt.h"
 
+class BasicResult
+{
+public:
+    /**
+     * Constructs success result.
+     */
+    BasicResult() = default;
+
+    /**
+     * Constructs error result.
+     */
+    BasicResult(ErrorInfo errorInfo):
+        m_ok(false),
+        m_errorInfo(std::move(errorInfo))
+    {
+    }
+
+    BasicResult(const BasicResult&) = delete;
+    BasicResult& operator=(const BasicResult&) = delete;
+    BasicResult(BasicResult&&) = default;
+    BasicResult& operator=(BasicResult&&) = default;
+
+    bool ok() const { return m_ok; }
+
+    /**
+     * Behavior is undefined in case of success result.
+     */
+    const ErrorInfo& errorInfo() const { return *m_errorInfo; }
+
+private:
+    bool m_ok = true;
+    std::optional<ErrorInfo> m_errorInfo;
+};
+
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Is used to report any error within library except the public API
  * which follows C API style by returning int (0 - success, -1 - error).
@@ -13,9 +49,9 @@
  */
 template<typename Payload = void>
 class Result:
-    public Result<void>
+    public BasicResult
 {
-    using base_type = Result<void>;
+    using base_type = BasicResult;
 
 public:
     /**
@@ -58,38 +94,13 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 template<>
-class Result<void>
+class Result<void>:
+    public BasicResult
 {
+    using base_type = BasicResult;
+
 public:
-    /**
-     * Constructs success result.
-     */
-    Result() = default;
-
-    /**
-     * Constructs error result.
-     */
-    Result(ErrorInfo errorInfo):
-        m_ok(false),
-        m_errorInfo(std::move(errorInfo))
-    {
-    }
-
-    Result(const Result&) = delete;
-    Result& operator=(const Result&) = delete;
-    Result(Result&&) = default;
-    Result& operator=(Result&&) = default;
-
-    bool ok() const { return m_ok; }
-
-    /**
-     * Behavior is undefined in case of success result.
-     */
-    const ErrorInfo& errorInfo() const { return *m_errorInfo; }
-
-private:
-    bool m_ok = true;
-    std::optional<ErrorInfo> m_errorInfo;
+    using base_type::base_type;
 };
 
 //-------------------------------------------------------------------------------------------------
