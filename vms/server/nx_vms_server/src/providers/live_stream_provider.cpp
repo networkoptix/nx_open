@@ -587,6 +587,17 @@ void QnLiveStreamProvider::startIfNotRunning()
     }
 }
 
+void QnLiveStreamProvider::start(Priority priority)
+{
+    if (m_canStartThread)
+        QnAbstractMediaStreamDataProvider::start(priority);
+}
+
+void QnLiveStreamProvider::beforeDestroy()
+{
+    m_canStartThread = false;
+}
+
 bool QnLiveStreamProvider::isCameraControlDisabled() const
 {
     if (m_doNotConfigureCamera)

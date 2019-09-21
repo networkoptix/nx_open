@@ -14,7 +14,7 @@ struct QnLdapSettings
     QString searchFilter;
     int searchTimeoutS = 0;
 
-    QString toString() const;
+    QString toString(bool hidePassword = false) const;
     bool isValid() const;
 
     static int defaultPort(bool ssl = false);

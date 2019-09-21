@@ -97,6 +97,8 @@ public:
         MediaQuality streamQuality,
         qint64 targetDurationUSec) = 0;
     virtual QnResourcePtr resource() const = 0;
+
+    virtual void beforeDestroy() = 0;
 };
 
 class QnVideoCamera: public QObject, public QnAbstractMediaServerVideoCamera
@@ -152,6 +154,7 @@ public:
     QnConstCompressedVideoDataPtr getLastVideoFrameRtsp(StreamIndex streamIndex, int channel) const;
     QnConstCompressedAudioDataPtr getLastAudioFrameRtsp(StreamIndex streamIndex) const;
 
+    virtual void beforeDestroy() override;
 private:
     void createReader(QnServer::ChunksCatalog catalog);
     QnLiveStreamProviderPtr readerByQuality(MediaQuality streamQuality) const;

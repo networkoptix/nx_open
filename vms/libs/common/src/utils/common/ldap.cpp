@@ -2,9 +2,14 @@
 
 #include <nx/fusion/model_functions.h>
 
-QString QnLdapSettings::toString() const
+QString QnLdapSettings::toString(bool hidePassword) const
 {
-    return QJson::serialized(*this);
+    if (!hidePassword)
+        return QJson::serialized(*this);
+
+    auto copy = *this;
+    copy.adminPassword = "******";
+    return QJson::serialized(copy);
 }
 
 bool QnLdapSettings::isValid() const

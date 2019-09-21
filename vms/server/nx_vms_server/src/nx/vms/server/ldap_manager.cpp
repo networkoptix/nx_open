@@ -281,7 +281,8 @@ LdapSession::~LdapSession()
 
 bool LdapSession::connect()
 {
-    NX_DEBUG(this, lm("Connecting to %1").arg(m_settings));
+    NX_DEBUG(this, "Connecting with settings %1",
+        m_settings.toString(!nx::utils::log::showPasswords()));
     QUrl uri = m_settings.uri;
 
 #if defined Q_OS_WIN

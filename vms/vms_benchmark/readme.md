@@ -64,6 +64,22 @@ Then simply run the command `vms_benchmark` without arguments, and watch or capt
 
 Currently, the tool has no command-line options besides `--help` which shows a trivial help.
 
+If the tool encounters an error which prevents further testing (like some of the prerequisites is
+not fulfilled, or the connection to the box cannot be established, or some command at the box gives
+unexpected result), an ERROR is reported and the tool aborts execution. In this case it is
+recommended to investigate and fix the error cause, and run the tool again.
+
+If the assessment fails, an ISSUE is reported and the tool aborts execution. Due to the nature of
+the assessment process which depends on many environmental characteristics such as the performance
+of the host and the network, sometimes a false-negative assessment may take place - the tool is
+trying to be conservative and report an ISSUE when it suspects that the VMS Server performance may
+not be optimal on the box. Thus, in case an ISSUE is reported, it is recommended to run the tool
+several times using the same configuration, and estimate the percentage of failures. If the
+configured load (e.g. number of cameras and number of streams requested from each camera) is on the
+edge of the box capabilities, the assessment may have a near-50% rate of reporting an ISSUE.
+Generally, it is recommended to consider the assessment successful if the rate of reporting an
+ISSUE is up to 5%.
+
 ---------------------------------------------------------------------------------------------------
 ## Example of successful report
 

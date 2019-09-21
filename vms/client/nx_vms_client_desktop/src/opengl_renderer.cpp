@@ -199,16 +199,24 @@ void QnOpenGLRenderer::popModelViewMatrix() {
 
 Q_GLOBAL_STATIC(QnOpenGLRendererManager, qn_openGlRenderManager_instance)
 
-
-QnOpenGLRenderer* QnOpenGLRendererManager::instance(QOpenGLWidget* glWidget)
+QnOpenGLRendererManager::RendererPtr QnOpenGLRendererManager::instance(QOpenGLWidget* glWidget)
 {
-    auto manager = qn_openGlRenderManager_instance();
-    auto it = manager->m_container.find(glWidget);
-    if (it != manager->m_container.end())
+    return qn_openGlRenderManager_instance()->get(glWidget);
+}
+
+QnOpenGLRendererManager::RendererPtr QnOpenGLRendererManager::get(QOpenGLWidget* glWidget)
+{
+    auto it = m_container.find(glWidget);
+    if (it != m_container.end())
         return *it;
 
-    manager->m_container.insert(glWidget, new QnOpenGLRenderer());
-    return *(manager->m_container.find(glWidget));
+    const auto renderer = RendererPtr(new QnOpenGLRenderer());
+    m_container[glWidget] = renderer;
+
+    connect(glWidget, &QObject::destroyed, this,
+        [this, glWidget]() { m_container.remove(glWidget); });
+
+    return renderer;
 }
 
 QnOpenGLRendererManager::QnOpenGLRendererManager(QObject* parent /* = NULL*/):
@@ -216,9 +224,8 @@ QnOpenGLRendererManager::QnOpenGLRendererManager(QObject* parent /* = NULL*/):
 {
 }
 
-QnOpenGLRendererManager::~QnOpenGLRendererManager() {
-    foreach (QnOpenGLRenderer* renderer, m_container.values())
-        delete renderer;
+QnOpenGLRendererManager::~QnOpenGLRendererManager()
+{
 }
 
 void loadImageData(

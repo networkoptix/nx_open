@@ -187,6 +187,7 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
     rtspClient.play(position, AV_NOPTS_VALUE, 1.0);
     int rtpChannelNum = -1;
     std::vector<QnByteArray*> dataArrays;
+    m_lastFrameTime = std::chrono::system_clock::now();
     while (true)
     {
         int bytesRead = rtspClient.readBinaryResponse(dataArrays, rtpChannelNum);
@@ -197,7 +198,8 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
                 parsePacketTimestamp(
                     (uint8_t*)dataArrays[rtpChannelNum]->data() + kInterleavedRtpOverTcpPrefixLength,
                     dataArrays[rtpChannelNum]->size() - kInterleavedRtpOverTcpPrefixLength,
-                    cameraId);
+                    cameraId,
+                    config.timeout);
             }
             dataArrays[rtpChannelNum]->clear();
         }
@@ -214,7 +216,7 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
 }
 
 void RtspPerf::Session::parsePacketTimestamp(
-    const uint8_t* data, int64_t size, const QString& cameraId)
+    const uint8_t* data, int64_t size, const QString& cameraId, std::chrono::milliseconds timeout)
 {
     using namespace nx::streaming::rtp;
 
@@ -236,6 +238,7 @@ void RtspPerf::Session::parsePacketTimestamp(
     if (rtpHeader->padding)
         size -= qFromBigEndian(rtpHeader->padding);
 
+    auto nowTime = std::chrono::system_clock::now();
     if (newPacket)
     {
         if (size < RTSP_FFMPEG_GENERIC_HEADER_SIZE)
@@ -248,7 +251,16 @@ void RtspPerf::Session::parsePacketTimestamp(
         {
             printf("Camera %s timestamp %lld us\n", cameraId.toUtf8().data(),
                 (long long int) timestamp);
+            m_lastFrameTime = nowTime;
         }
+    }
+
+    std::chrono::duration<double> timeFromLastFrame = nowTime - m_lastFrameTime;
+    if (timeFromLastFrame > timeout)
+    {
+        printf("WARNNIG: camera %s, video frame was not received for %lfsec\n",
+            cameraId.toUtf8().data(), timeFromLastFrame.count());
+        m_lastFrameTime = nowTime;
     }
     newPacket = rtpHeader->marker;
 }

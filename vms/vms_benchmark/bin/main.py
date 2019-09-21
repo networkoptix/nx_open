@@ -5,6 +5,7 @@ import signal
 import sys
 import time
 import logging
+from dataclasses import dataclass
 
 logging.basicConfig(filename='vms_benchmark.log', filemode='w', level=logging.DEBUG)
 
@@ -56,6 +57,14 @@ from vms_benchmark import exceptions
 import urllib
 import click
 import cv2
+
+
+def to_megabytes(bytes_count):
+    return bytes_count // (1024 * 1024)
+
+
+def to_percentage(share_0_1):
+    return round(share_0_1 * 100)
 
 
 def load_configs(config_file, sys_config_file):
@@ -137,6 +146,11 @@ def load_configs(config_file, sys_config_file):
             "type": 'float',
             "default": 0.5
         },
+        "minimumStorageFreeBytes": {
+            "optional": True,
+            "type": 'integer',
+            "default": 10 * 1024 * 1024
+        },
     }
 
     sys_config = ConfigParser(sys_config_file, sys_option_descriptions, is_file_optional=True)
@@ -156,24 +170,25 @@ def log_exception(context_name, exception):
     logging.exception(f'Exception: {context_name}: {type(exception)}: {str(exception)}')
 
 
-def device_cpu_usage(device):
+def device_combined_cpu_usage(device):
     cpu_usage_file = '/proc/loadavg'
     cpu_usage_reply = device.eval(f'cat {cpu_usage_file}')
     cpu_usage_reply_list = cpu_usage_reply.split() if cpu_usage_reply else None
 
-    if not cpu_usage_reply_list or len(cpu_usage_reply_list) < 2:
+    if not cpu_usage_reply_list or len(cpu_usage_reply_list) < 1:
         # TODO: Properly log an arbitrary string in cpu_usage_reply.
         raise exceptions.DeviceFileContentError(cpu_usage_file)
 
     try:
-        result = float(cpu_usage_reply_list[1])
+        # Get CPU usage average during the last minute.
+        result = float(cpu_usage_reply_list[0])
     except ValueError:
         raise exceptions.DeviceFileContentError(cpu_usage_file)
 
     return result
 
 
-def process_server_events(api, streaming_started_at):
+def report_server_storage_failures(api, streaming_started_at):
     print(f"    Requesting potential failure events from the Server...")
     log_events = api.get_events(streaming_started_at)
     storage_failure_events_count = sum(
@@ -183,11 +198,51 @@ def process_server_events(api, streaming_started_at):
     )
     print(f"        Storage failures: {storage_failure_events_count}")
 
-    if storage_failure_events_count > 0:
-        raise exceptions.StorageFailuresIssue(storage_failure_events_count)
+    return storage_failure_events_count
 
 
-def get_writable_storages(api):
+@dataclass
+class Stats:
+    dropped_frames_count: int = 0
+    dup_frames_count: int = 0
+    cpu_usage_per_cpu: int = 0
+    ram_free_bytes: int = 0
+
+
+def report_stats(stats, api, streaming_started_at, sys_config):
+    print(f"    Frame drops: {stats.dropped_frames_count} (expected 0)")
+    print(f"    Frames with equal timestamps: {stats.dup_frames_count} (expected 0)")
+    print(f"    CPU usage (per-CPU average): {to_percentage(stats.cpu_usage_per_cpu)}%")
+    print(f"    RAM free before discovering cameras: {to_megabytes(stats.ram_free_bytes)} MB")
+
+    storage_failure_count = report_server_storage_failures(api, streaming_started_at)
+
+    # Collect messages for all detected issues and join them via '; '.
+
+    issue_message = ""
+
+    if storage_failure_count > 0:
+        issue_message += (('; ' if issue_message else '') +
+             f"{storage_failure_count} Server Storage failure events")
+
+    if stats.dropped_frames_count > 0:
+        issue_message += (('; ' if issue_message else '') +
+            f"{stats.dropped_frames_count} dropped frame(s)")
+
+    if stats.dup_frames_count > 0:
+        issue_message += (('; ' if issue_message else '') +
+            f"{stats.dup_frames_count} frame(s) with equal timestamps")
+
+    if stats.cpu_usage_per_cpu > sys_config['cpuUsageThreshold']:
+        issue_message += (('; ' if issue_message else '') +
+            f"box CPU usage of {to_percentage(stats.cpu_usage_per_cpu)}% is too high " +
+            f"(exceeds {to_percentage(sys_config['cpuUsageThreshold'])}%)")
+
+    if issue_message:
+        raise exceptions.VmsBenchmarkIssue("Detected the following: " + issue_message + ".")
+
+
+def get_writable_storages(api, sys_config):
     try:
         storages = api.get_storage_spaces()
     except exceptions.VmsBenchmarkError as e:
@@ -200,12 +255,12 @@ def get_writable_storages(api):
         free_space = int(storage['freeSpace'])
         reserved_space = int(storage['reservedSpace'])
 
-        return free_space > reserved_space
+        return free_space >= reserved_space + sys_config['minimumStorageFreeBytes']
 
     try:
         result = [storage for storage in storages if storage_is_writable(storage)]
     except (ValueError, KeyError) as e:
-        raise exceptions.ServerApiResponseError("Bad response body to get storages request", original_exception=e)
+        raise exceptions.ServerApiResponseError("Bad response body for storage info request", original_exception=e)
 
     return result
 
@@ -215,6 +270,7 @@ def get_writable_storages(api):
 @click.option('-C', 'config_file', default='vms_benchmark.conf', help='Input config file.')
 @click.option('--sys-config', 'sys_config_file', default='vms_benchmark.ini', help='Input internal system config file.')
 def main(config_file, sys_config_file):
+    # TODO: Rename dictionaries to `conf` and `ini` respectively, and files to `conf_file` and `ini_file`.
     config, sys_config = load_configs(config_file, sys_config_file)
 
     if sys_config.ORIGINAL_OPTIONS is not None:
@@ -245,7 +301,8 @@ def main(config_file, sys_config_file):
 
     if not res.success:
         raise exceptions.SshHostKeyObtainingFailed(
-            f"Can't obtain ssh host key of the box.\nDetails of the error: {res.formatted_message()}"
+            f"Can't obtain ssh host key of the box." +
+            (f"\n    Details: {res.formatted_message()}" if res.formatted_message() else "")
         )
     else:
         device.host_key = res.details[0]
@@ -274,9 +331,9 @@ def main(config_file, sys_config_file):
     dev_platform = DevicePlatform.gather(device, linux_distribution)
 
     print(f"Arch: {dev_platform.arch}")
-    print(f"Number of CPUs: {dev_platform.cpu_number}")
+    print(f"Number of CPUs: {dev_platform.cpu_count}")
     print(f"CPU features: {', '.join(dev_platform.cpu_features) if len(dev_platform.cpu_features) > 0 else '-'}")
-    print(f"RAM: {dev_platform.ram} ({dev_platform.ram_free()} free)")
+    print(f"RAM: {to_megabytes(dev_platform.ram_bytes)} MB ({to_megabytes(dev_platform.ram_free_bytes())} MB free)")
     print("Volumes:")
     [
         print(f"    {storage['fs']} on {storage['point']}: free {storage['space_free']} of {storage['space_total']}")
@@ -287,11 +344,11 @@ def main(config_file, sys_config_file):
     vmses = VmsScanner.scan(device, linux_distribution)
 
     if vmses and len(vmses) > 0:
-        print(f"Detected VMS installations:")
+        print(f"Detected VMS installation(s):")
         for vms in vmses:
             print(f"    {vms.customization} in {vms.dir} (port {vms.port}, PID {vms.pid if vms.pid else '-'})")
     else:
-        print("There is no VMSes found on the device.")
+        print("No VMS installations found on the box.")
         print("Nothing to do.")
         return 0
 
@@ -303,7 +360,7 @@ def main(config_file, sys_config_file):
     if not vms.is_up():
         raise exceptions.DeviceStateError("VMS is not running currently.")
 
-    print('Restarting server...')
+    print('Restarting Server...')
     vms.restart(exc=True)
 
     def wait_for_server_up(timeout=30):
@@ -331,7 +388,7 @@ def main(config_file, sys_config_file):
 
     vms = vmses[0]
     print('Server restarted successfully.')
-    print(f"Free space of RAM: {round(dev_platform.ram_free()/1024/1024)} MB of {round(dev_platform.ram/1024/1024)} MB")
+    print(f"RAM free: {to_megabytes(dev_platform.ram_free_bytes())} MB of {to_megabytes(dev_platform.ram_bytes)} MB")
 
     api = ServerApi(device.ip, vms.port, user=config['vmsUser'], password=config['vmsPassword'])
 
@@ -361,12 +418,12 @@ def main(config_file, sys_config_file):
     print('REST API authentication test is OK.')
 
     try:
-        storages = get_writable_storages(api)
+        storages = get_writable_storages(api, sys_config)
     except Exception as e:
         raise exceptions.ServerApiError(message="Unable to get VMS storages via REST HTTP", original_exception=e)
 
     if len(storages) == 0:
-        raise exceptions.DeviceStateError("Server has no storages, check free space")
+        raise exceptions.DeviceStateError("Server has no suitable video archive storage, check the free space")
 
     for i in 1, 2, 3:
         cameras = api.get_test_cameras_all()
@@ -385,7 +442,7 @@ def main(config_file, sys_config_file):
         raise exceptions.ServerApiError(message="Unable to get camera list.")
 
     # TODO: Move this to internal config.
-    memory_per_camera_by_arch = {
+    ram_bytes_per_camera_by_arch = {
         "armv7l": 100,
         "aarch64": 200,
         "x86_64": 200
@@ -394,11 +451,13 @@ def main(config_file, sys_config_file):
     for test_cameras_count in config.get(
             'testCamerasTestSequence', [1, 2, 3, 4, 6, 8, 10, 16, 32, 64, 128]):
 
-        ram_available = dev_platform.ram_available()
-        ram_free = ram_available if ram_available else dev_platform.ram_free()
+        stats = Stats()
 
-        if ram_available and ram_available < (
-                test_cameras_count * memory_per_camera_by_arch.get(dev_platform.arch, 200)*1024*1024
+        ram_available_bytes = dev_platform.ram_available_bytes()
+        stats.ram_free_bytes = ram_available_bytes if ram_available_bytes else dev_platform.ram_free_bytes()
+
+        if ram_available_bytes and ram_available_bytes < (
+                test_cameras_count * ram_bytes_per_camera_by_arch.get(dev_platform.arch, 200) * 1024 * 1024
         ):
             raise exceptions.InsuficientResourcesError(
                 f"Not enough free RAM on the box for {test_cameras_count} cameras.")
@@ -438,12 +497,12 @@ def main(config_file, sys_config_file):
             try:
                 discovering_timeout = 120
 
-                print(f"    Waiting for virtual cameras discovering (timeout is {discovering_timeout} seconds).")
+                print(f"    Waiting for virtual cameras discovery and going live (timeout is {discovering_timeout} seconds).")
                 res, cameras = wait_test_cameras_discovered(discovering_timeout, 3)
                 if not res:
                     raise exceptions.TestCameraError('Timeout expired.')
 
-                print("    All virtual cameras discovered successfully.")
+                print("    All virtual cameras discovered and went live.")
 
                 time.sleep(test_cameras_count * 2)
 
@@ -457,7 +516,7 @@ def main(config_file, sys_config_file):
                 camera_id = cameras[0].id
             except Exception as e:
                 log_exception('Discovering cameras', e)
-                raise exceptions.TestCameraError(f"Cameras were not discovered.", e) from e
+                raise exceptions.TestCameraError(f"Not all virtual cameras were discovered or went live.", e) from e
 
             try:
                 stream_opening_started_at = time.time()
@@ -482,9 +541,6 @@ def main(config_file, sys_config_file):
                 first_ts = None
                 frames = 0
 
-                frame_drops = 0
-                dummy_frames_count = 0
-
                 try:
                     streaming_succeeded = False
                     while stream.isOpened():
@@ -496,24 +552,24 @@ def main(config_file, sys_config_file):
                             first_ts = time.time()
                         else:
                             lag = time.time() - (first_ts + frames * (1.0/float(sys_config['testFileFps'])))
-                            maxAllowedLagSeconds = 5
-                            if lag > maxAllowedLagSeconds:
+                            max_allowed_lag_seconds = 5
+                            if lag > max_allowed_lag_seconds:
                                 raise exceptions.TestCameraStreamingIssue(
                                     'Streaming video from the Server FAILED: ' +
-                                    f'the video lags for more than {maxAllowedLagSeconds} seconds; ' +
+                                    f'the video lags for more than {max_allowed_lag_seconds} seconds; ' +
                                     'can be caused by network issues or poor performance of either the host or the box.'
                                 )
 
                         ts = time.time()
 
                         if last_ts is not None and ts - last_ts < 0.01:
-                            dummy_frames_count += 1
+                            stats.dup_frames_count += 1
 
-                            maxAllowedDummyFrames = 50
-                            if dummy_frames_count > maxAllowedDummyFrames:
+                            max_allowed_dummy_frames = 50
+                            if stats.dup_frames_count > max_allowed_dummy_frames:
                                 raise exceptions.TestCameraStreamingIssue(
                                     'Streaming video from the Server FAILED: ' +
-                                    f'the stream is broken - more than {maxAllowedDummyFrames} ' +
+                                    f'the stream is broken - more than {max_allowed_dummy_frames} ' +
                                     'frames with equal timestamps; ' +
                                     'can be caused by poor performance of either the host or the box, ' +
                                     'or Server issues.')
@@ -521,7 +577,7 @@ def main(config_file, sys_config_file):
                         pts_diff_max = (1000./float(sys_config['testFileFps']))*1.05
 
                         if last_pts is not None and pts - last_pts > pts_diff_max:
-                            frame_drops += 1
+                            stats.dropped_frames_count += 1
                         if time.time() - streaming_started_at > stream_duration:
                             streaming_succeeded = True
                             print(f"    Serving {test_cameras_count} virtual cameras succeeded.")
@@ -536,25 +592,14 @@ def main(config_file, sys_config_file):
                             'can be caused by network issues or Server issues.')
                 finally:
                     try:
-                        cpu_usage_summarized = device_cpu_usage(device)/dev_platform.cpu_number
+                        stats.cpu_usage_per_cpu = device_combined_cpu_usage(device) / dev_platform.cpu_count
                     except exceptions.VmsBenchmarkError as e:
                         raise exceptions.UnableToFetchDataFromDevice(
                             'Unable to fetch box cpu usage',
                             original_exception=e
                         )
 
-                    print(f"    Frame drops: {frame_drops} (expected 0)")
-                    print(f"    Frames with equal timestamps: {dummy_frames_count} (expected 0)")
-                    print(f"    CPU usage: {str(cpu_usage_summarized) if cpu_usage_summarized else '-'}")
-                    print(f"    Free RAM: {round(ram_free/1024/1024)} MB")
-
-                    process_server_events(api, streaming_started_at)
-
-                    if cpu_usage_summarized > sys_config['cpuUsageThreshold']:
-                        raise exceptions.CPUUsageThresholdExceededIssue(
-                            cpu_usage_summarized,
-                            sys_config['cpuUsageThreshold']
-                        )
+                    report_stats(stats, api, streaming_started_at, sys_config)
             except exceptions.VmsBenchmarkIssue as exception:
                 print(f"\nISSUE: {str(exception)}")
                 log_exception("ISSUE", exception)
