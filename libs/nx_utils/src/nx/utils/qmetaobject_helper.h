@@ -9,7 +9,7 @@ template <typename ... Args>
 void emitAsync(QObject* object, const char* signal, const Args&... args)
 {
     QMetaObject::invokeMethod(object, signal, Qt::QueuedConnection,
-        QArgument<decltype(args)>(typeid(args).name(), args)...);
+        QArgument(typeid(args).name(), args)...);
 }
 
 } // namespace nx::utils
