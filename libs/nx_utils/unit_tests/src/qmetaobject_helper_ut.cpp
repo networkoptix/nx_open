@@ -27,7 +27,7 @@ TestObjectWithSignal::TestObjectWithSignal(QObject* parent):
 
 void TestObjectWithSignal::slot1(int id)
 {
-    if (id == 1)
+    if (id == m_testInt)
         ++m_processedSlots;
     emitDoneIfNeed();
 }
