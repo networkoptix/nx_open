@@ -20,6 +20,7 @@
 #include <nx/vms/api/protocol_version.h>
 #include <nx/vms/api/data/update_sequence_data.h>
 #include <utils/common/delayed.h>
+#include <nx/utils/qmetaobject_helper.h>
 
 namespace nx {
 namespace p2p {
@@ -28,6 +29,7 @@ const QString MessageBus::kCloudPathPrefix(lit("/cdb"));
 
 using namespace ec2;
 using namespace vms::api;
+using namespace nx::utils;
 
 struct GotTransactionFuction
 {
@@ -491,7 +493,7 @@ void MessageBus::removeConnectionUnsafe(QWeakPointer<ConnectionBase> weakRef)
     }
     emitPeerFoundLostSignals();
     if (connection->state() == Connection::State::Unauthorized)
-        emit remotePeerUnauthorized(remotePeer.id);
+        emitAsync(this, "remotePeerUnauthorized", remotePeer.id);
 }
 
 void MessageBus::at_stateChanged(
@@ -1223,7 +1225,6 @@ ConnectionInfoList MessageBus::connectionsInfo() const
 
 void MessageBus::emitPeerFoundLostSignals()
 {
-    // TODO: need to refactor it. Signals should not be emitted with locked mutex.
     std::set<vms::api::PeerData> newAlivePeers;
 
     for (const auto& connection: m_connections)
@@ -1264,7 +1265,7 @@ void MessageBus::emitPeerFoundLostSignals()
             lit("Peer %1 has found peer %2")
             .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
             .arg(qnStaticCommon->moduleDisplayName(peer.id)));
-        emit peerFound(peer.id, peer.peerType);
+        emitAsync(this, "peerFound", peer.id, peer.peerType);
     }
 
     for (const auto& peer: lostPeers)
@@ -1280,7 +1281,7 @@ void MessageBus::emitPeerFoundLostSignals()
                 lit("Peer %1 has lost peer %2")
                 .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
                 .arg(qnStaticCommon->moduleDisplayName(peer.id)));
-            emit peerLost(peer.id, peer.peerType);
+            emitAsync(this, "peerLost", peer.id, peer.peerType);
             sendRuntimeInfoRemovedToClients(peer.id);
         }
     }
