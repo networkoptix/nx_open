@@ -49,6 +49,7 @@ public:
 
     void onPrimaryFpsChanged(int primaryFps);
     QnLiveStreamParams getLiveParams();
+    QnLiveStreamParams getActualParams() const;
 
     virtual bool needMetadata();
 

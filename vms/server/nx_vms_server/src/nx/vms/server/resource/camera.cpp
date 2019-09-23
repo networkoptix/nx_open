@@ -817,6 +817,34 @@ bool Camera::fixMulticastParametersIfNeeded(
     return somethingIsFixed;
 }
 
+QnLiveStreamParams Camera::getLiveParams(StreamIndex streamIndex)
+{
+    if (auto reader = findReader(streamIndex))
+        return reader->getLiveParams();
+    return QnLiveStreamParams();
+}
+
+QnLiveStreamParams Camera::getActualParams(StreamIndex streamIndex)
+{
+    if(auto reader = findReader(streamIndex))
+        return reader->getActualParams();
+    return QnLiveStreamParams();
+}
+
+QnLiveStreamProviderPtr Camera::findReader(StreamIndex streamIndex)
+{
+    auto camera = serverModule()->videoCameraPool()->getVideoCamera(toSharedPointer(this));
+    if (!camera)
+        return nullptr;
+
+    QnLiveStreamProviderPtr reader;
+    if (streamIndex == nx::vms::api::StreamIndex::primary)
+        reader = camera->getPrimaryReader();
+    else if (streamIndex == nx::vms::api::StreamIndex::secondary)
+        reader = camera->getSecondaryReader();
+    return reader;
+}
+
 } // namespace resource
 } // namespace vms::server
 } // namespace nx

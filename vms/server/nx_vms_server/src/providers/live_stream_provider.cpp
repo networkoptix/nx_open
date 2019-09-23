@@ -526,6 +526,19 @@ QnLiveStreamParams QnLiveStreamProvider::getLiveParams()
     return mergeWithAdvancedParams(m_liveParams);
 }
 
+QnLiveStreamParams QnLiveStreamProvider::getActualParams() const
+{
+    QnLiveStreamParams result;
+    result.bitrateKbps = getBitrateMbps() * 1000;
+    result.fps = getFrameRate();
+    const auto streamInfo = m_cameraRes->streamInfo(encoderIndex());
+    const auto sizeParts = streamInfo.resolution.split('x');
+    if (sizeParts.size() >= 2)
+        result.resolution = QSize(sizeParts[0].toInt(), sizeParts[1].toInt());
+    result.codec = toString(streamInfo.codec);
+    return result;
+}
+
 QnAbstractCompressedMetadataPtr QnLiveStreamProvider::getMetadata()
 {
     if (!m_metadataReceptor->metadataQueue.isEmpty())

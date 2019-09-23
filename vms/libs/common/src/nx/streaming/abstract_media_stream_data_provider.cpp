@@ -18,7 +18,7 @@ static const qint64 kMinAudioFrameDurationUsec = 1000;
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(const QnResourcePtr& res)
     :
     QnAbstractStreamDataProvider(res),
-    m_numberOfchannels(0)
+    m_numberOfchannels(1)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
     m_mediaResource = res;

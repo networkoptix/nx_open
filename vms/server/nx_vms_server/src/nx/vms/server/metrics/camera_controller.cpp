@@ -8,6 +8,8 @@
 
 namespace nx::vms::server::metrics {
 
+using namespace nx::vms::api;
+
 CameraController::CameraController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     utils::metrics::ResourceControllerImpl<resource::Camera*>("cameras", makeProviders())
@@ -82,6 +84,50 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                 qtSignalWatch<Resource>(&resource::Camera::statusChanged)
             )
             // TODO: Implement params.
+        ),
+        utils::metrics::makeValueGroupProvider<Resource>(
+            "primaryStream",
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "resolution", [](const auto& r)
+                {
+                    const auto resolution = r->getLiveParams(StreamIndex::primary).resolution;
+                    return Value(CameraMediaStreamInfo::resolutionToString(resolution));
+                }
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "fps", [](const auto& r)
+                { return Value(round(r->getLiveParams(StreamIndex::primary).fps));}
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "actualFps", [](const auto& r)
+                { return Value(round(r->getActualParams(StreamIndex::primary).fps));}
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "actualBitrate", [](const auto& r) //< KBps.
+                { return Value(r->getActualParams(StreamIndex::primary).bitrateKbps);}
+            )
+        ),
+        utils::metrics::makeValueGroupProvider<Resource>(
+            "secondaryStream",
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "resolution", [](const auto& r)
+                {
+                    const auto resolution = r->getLiveParams(StreamIndex::secondary).resolution;
+                    return Value(CameraMediaStreamInfo::resolutionToString(resolution));
+                }
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "fps", [](const auto& r)
+                { return Value(round(r->getLiveParams(StreamIndex::secondary).fps));}
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "actualFps", [](const auto& r)
+                { return Value(round(r->getActualParams(StreamIndex::secondary).fps));}
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "actualBitrate", [](const auto& r) //< KBps.
+                { return Value(r->getActualParams(StreamIndex::secondary).bitrateKbps);}
+            )
         )
         // TODO: Implement other groups.
     );

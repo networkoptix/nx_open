@@ -118,6 +118,44 @@
                     }]
                 }
             }
+        },
+        "primaryStream": {
+            "values": {
+                "resolution": {
+                    "name": "Resolution",
+                    "display": "table|panel"
+                },
+                "fps": {
+                    "display": "Target fps"
+                },
+                "actualFps": {
+                    "display": "Actual fps"
+                },
+                "actualBitrate": {
+                    "name": "Bitrate",
+                    "display": "table|panel",
+                    "unit": "KBps"
+                }
+            }
+        },
+        "secondaryStream": {
+            "values": {
+                "resolution": {
+                    "name": "Resolution",
+                    "display": "table|panel"
+                },
+                "fps": {
+                    "display": "Target fps"
+                },
+                "actualFps": {
+                    "display": "Actual fps"
+                },
+                "actualBitrate": {
+                    "name": "Bitrate",
+                    "display": "table|panel",
+                    "unit": "KBps"
+                }
+            }
         }
     },
     "storages": {

@@ -11,6 +11,7 @@
 
 typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 class QnAbstractPtzController;
+class QnLiveStreamProvider;
 
 namespace nx::vms::server::resource { struct MulticastParameters; }
 
@@ -194,6 +195,9 @@ public:
     void setRole(Role role) { m_role = role; }
     Role getRole() const { return m_role; }
 
+    QnLiveStreamParams getLiveParams(StreamIndex streamIndex);
+    QnLiveStreamParams getActualParams(StreamIndex streamIndex);
+
     bool fixMulticastParametersIfNeeded(
         nx::vms::server::resource::MulticastParameters* inOutMulticastParameters,
         nx::vms::api::StreamIndex streamIndex);
@@ -248,7 +252,7 @@ protected:
 private:
     CameraDiagnostics::Result initializeAdvancedParametersProviders();
     void fixInputPortMonitoring();
-
+    QSharedPointer<QnLiveStreamProvider> findReader(nx::vms::api::StreamIndex streamIndex);
 protected:
     QnAudioTransmitterPtr m_audioTransmitter;
 
