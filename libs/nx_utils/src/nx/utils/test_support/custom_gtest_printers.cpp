@@ -68,26 +68,11 @@ void PrintTo(const system_clock::time_point& val, ::std::ostream* os)
 
 //-------------------------------------------------------------------------------------------------
 
-namespace std {
-namespace filesystem {
+namespace nx::utils::filesystem {
 
-void PrintTo(const old_version_support::path& val, ::std::ostream* os)
+void PrintTo(const path& val, ::std::ostream* os)
 {
     *os << val.string();
 }
 
-} // namespace filesystem
-} // namespace std
-
-//-------------------------------------------------------------------------------------------------
-
-namespace nx {
-namespace utils {
-
-void PrintTo(const Url& val, ::std::ostream* os)
-{
-    *os << val.toString().toStdString();
-}
-
-} // namespace utils
-} // namespace nx
+} // namespace nx::utils::filesystem
