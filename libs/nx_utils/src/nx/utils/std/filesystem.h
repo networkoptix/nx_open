@@ -1,11 +1,14 @@
 #pragma once
 
+#if defined(_WIN32)
+#include <filesystem>
+#endif
+
 #include <string>
 
 namespace nx::utils::filesystem {
 
 #if defined(_WIN32)
-#include <filesystem>
 
 using namespace std::experimental::filesystem;
 
