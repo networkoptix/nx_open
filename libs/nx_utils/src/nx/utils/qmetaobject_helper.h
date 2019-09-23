@@ -4,14 +4,9 @@ namespace nx::utils {
 
 /**
  * Emit QT signal asynchronously via sender object event queue.
+ * Warning: object should be destroyed either via 'deleteLater' call
+ * or sender thread should be stopped before object is deleted.
  */
-template <typename ... Args>
-void emitAsync(QObject* object, const char* signal, const Args&... args)
-{
-    QMetaObject::invokeMethod(object, signal, Qt::QueuedConnection,
-        QArgument(typeid(args).name(), args)...);
-}
-
 template <typename Object, typename Func, typename ... Args>
 void emitAsync(Object* object, Func func, const Args&... args)
 {
