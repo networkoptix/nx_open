@@ -2,9 +2,7 @@
 
 #if defined(NX_STD_FILESYSTEM_IMPLEMENTATION)
 
-namespace std {
-namespace filesystem {
-namespace old_version_support {
+namespace nx::utils::filesystem {
 
 path::path(const std::string& str):
     m_pathStr(str)
@@ -64,8 +62,6 @@ const path::string_type& path::native() const
     return m_pathStr;
 }
 
-} // namespace old_version_support
-} // namespace filesystem
-} // namespace std
+} // namespace nx::utils::filesystem
 
 #endif

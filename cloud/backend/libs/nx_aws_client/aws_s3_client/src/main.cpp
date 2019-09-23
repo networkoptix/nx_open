@@ -217,8 +217,8 @@ public:
 
         std::string uploadPath;
         const nx::utils::Url url(m_settings.common.url.c_str());
-        if (!std::filesystem::path(url.path().toStdString()).has_filename())
-            uploadPath = std::filesystem::path(m_settings.inputFilePath).filename().string();
+        if (!nx::utils::filesystem::path(url.path().toStdString()).has_filename())
+            uploadPath = nx::utils::filesystem::path(m_settings.inputFilePath).filename().string();
 
         const auto [uploadResult] = invoke(
             &nx::cloud::aws::s3::ApiClient::uploadFile,
