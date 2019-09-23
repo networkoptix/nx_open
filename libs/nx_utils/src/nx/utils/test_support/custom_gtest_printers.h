@@ -34,10 +34,8 @@ NX_UTILS_API void PrintTo(const system_clock::time_point& val, ::std::ostream* o
 
 //-------------------------------------------------------------------------------------------------
 
-namespace std {
-namespace filesystem {
+namespace nx::utils::filesystem {
 
-NX_UTILS_API void PrintTo(const old_version_support::path& val, ::std::ostream* os);
+NX_UTILS_API void PrintTo(const path& val, ::std::ostream* os);
 
-} // namespace filesystem
-} // namespace std
+} // namespace nx::utils::filesystem

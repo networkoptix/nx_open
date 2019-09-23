@@ -49,7 +49,7 @@ void BasicFixture::executeUpdate(const QString& queryText)
     NX_GTEST_ASSERT_EQ(DBResult::ok, dbResult);
 }
 
-std::filesystem::old_version_support::path BasicFixture::dbFilePath() const
+nx::utils::filesystem::path BasicFixture::dbFilePath() const
 {
     return m_dbFilePath;
 }

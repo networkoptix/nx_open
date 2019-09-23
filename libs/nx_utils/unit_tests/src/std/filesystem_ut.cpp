@@ -3,9 +3,7 @@
 #include <nx/utils/std/filesystem.h>
 #include <nx/utils/test_support/utils.h>
 
-namespace std {
-namespace filesystem {
-namespace old_version_support {
+namespace nx::utils::filesystem {
 
 TEST(StdFilesystem, parent_path)
 {
@@ -31,6 +29,4 @@ TEST(StdFilesystem, filename)
     ASSERT_EQ(path("tmp"), path("tmp").filename());
 }
 
-} // namespace old_version_support
-} // namespace filesystem
-} // namespace std
+} // namespace nx::utils::filesystem
