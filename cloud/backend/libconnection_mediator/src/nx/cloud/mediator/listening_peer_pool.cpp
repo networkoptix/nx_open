@@ -430,10 +430,14 @@ std::optional<api::PeerConnectionSpeed>
 
         if (peerIter != m_peers.end())
         {
-            bestUplinkSpeed = api::PeerConnectionSpeed{
-                status.second.serverId,
-                status.second.systemId,
-                status.second.uplinkSpeed};
+			if (!bestUplinkSpeed ||
+				bestUplinkSpeed->connectionSpeed.bandwidth < status.second.uplinkSpeed.bandwidth)
+			{
+				bestUplinkSpeed = api::PeerConnectionSpeed{
+					status.second.serverId,
+					status.second.systemId,
+					status.second.uplinkSpeed};
+			}
         }
     }
 
