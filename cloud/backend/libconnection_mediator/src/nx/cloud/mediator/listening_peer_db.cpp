@@ -409,13 +409,11 @@ std::string ListeningPeerDb::nodeId() const
         : std::string();
 }
 
-nx::utils::SubscriptionId
-    nx::hpm::ListeningPeerDb::subscribeToUplinkSpeedUpdated(
-        nx::utils::MoveOnlyFunc<void(nx::hpm::api::PeerConnectionSpeed)> handler)
+void nx::hpm::ListeningPeerDb::subscribeToUplinkSpeedUpdated(
+    nx::utils::MoveOnlyFunc<void(nx::hpm::api::PeerConnectionSpeed)> handler,
+	nx::utils::SubscriptionId* const outId)
 {
-    nx::utils::SubscriptionId id;
-    m_uplinkSpeedUpdated.subscribe(std::move(handler), &id);
-    return id;
+    m_uplinkSpeedUpdated.subscribe(std::move(handler), outId);
 }
 
 void nx::hpm::ListeningPeerDb::unsubscribeFromUplinkSpeedUpdated(nx::utils::SubscriptionId id)

@@ -119,8 +119,9 @@ public:
      */
     std::string nodeId() const;
 
-    nx::utils::SubscriptionId subscribeToUplinkSpeedUpdated(
-        nx::utils::MoveOnlyFunc<void(nx::hpm::api::PeerConnectionSpeed)> handler);
+    void subscribeToUplinkSpeedUpdated(
+        nx::utils::MoveOnlyFunc<void(nx::hpm::api::PeerConnectionSpeed)> handler,
+		nx::utils::SubscriptionId* const outId);
     void unsubscribeFromUplinkSpeedUpdated(nx::utils::SubscriptionId id);
 
 private:

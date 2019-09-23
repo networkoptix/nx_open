@@ -79,13 +79,16 @@ protected:
     {
         ASSERT_TRUE(startAndWaitUntilStarted());
 
-        m_uplinkSpeedUpdatedId = moduleInstance()->impl()->listeningPeerDb().
+        moduleInstance()->impl()->listeningPeerDb().
             subscribeToUplinkSpeedUpdated(
                 [this](api::PeerConnectionSpeed peerUplinkSpeed)
                 {
                     ++m_uplinkSpeedTestsDone;
                     NX_DEBUG(this, "Received peerUplinkSpeed: %1", peerUplinkSpeed);
-                });
+                },
+				&m_uplinkSpeedUpdatedId);
+
+		ASSERT_TRUE(m_uplinkSpeedUpdatedId != nx::utils::kInvalidSubscriptionId);
 
         m_factoryFuncBak =
             UplinkSpeedTesterFactory::instance().setCustomFunc(

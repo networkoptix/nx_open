@@ -120,7 +120,6 @@ ListeningPeerData& ListeningPeerPool::DataLocker::value()
     return m_peerIter->second;
 }
 
-
 //-------------------------------------------------------------------------------------------------
 // class ListeningPeerPool
 
@@ -131,9 +130,9 @@ ListeningPeerPool::ListeningPeerPool(
     m_settings(settings),
     m_listeningPeerDb(listeningPeerDb)
 {
-    m_uplinkSpeedUpdatedId =
-        m_listeningPeerDb->subscribeToUplinkSpeedUpdated(
-        std::bind(&ListeningPeerPool::onUplinkSpeedUpdated, this, std::placeholders::_1));
+    m_listeningPeerDb->subscribeToUplinkSpeedUpdated(
+        std::bind(&ListeningPeerPool::onUplinkSpeedUpdated, this, std::placeholders::_1),
+		&m_uplinkSpeedUpdatedId);
 }
 
 ListeningPeerPool::~ListeningPeerPool()
