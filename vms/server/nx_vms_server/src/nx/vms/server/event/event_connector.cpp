@@ -142,8 +142,12 @@ void EventConnector::at_serverStarted(const QnResourcePtr& resource, qint64 time
 void EventConnector::at_cameraIPConflict(const QnResourcePtr& resource,
     const QHostAddress& hostAddress, const QStringList& macAddrList , qint64 timeStamp)
 {
-    if (auto camera = resource.dynamicCast<nx::vms::server::resource::Camera>())
-        camera->atIpConflict();
+    for (const auto& mac: macAddrList)
+    {
+        auto resource = serverModule()->resourcePool()->getResourceByMacAddress(mac);
+        if (auto camera = resource.dynamicCast<nx::vms::server::resource::Camera>())
+            camera->atIpConflict();
+    }
 
     vms::event::IpConflictEventPtr event(new vms::event::IpConflictEvent(
         resource, hostAddress, macAddrList, timeStamp));

@@ -90,12 +90,12 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                 [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
                 qtSignalWatch<Resource>(&resource::Camera::statusChanged)
             ),
-            utils::metrics::makeSystemValueProvider<Resource>(
+            utils::metrics::makeLocalValueProvider<Resource>(
                 "streamIssues", [](const auto& r)
                 { return Value(r->getAndResetMetric(&Camera::Metrics::streamIssues)); },
                 nx::vms::server::metrics::timerWatch<Camera*>(kIssuesRateUpdateInterval)
             ),
-            utils::metrics::makeSystemValueProvider<Resource>(
+            utils::metrics::makeLocalValueProvider<Resource>(
                 "ipConflicts", [](const auto& r)
                 { return Value(r->getAndResetMetric(&Camera::Metrics::ipConflicts)); },
                 nx::vms::server::metrics::timerWatch<Camera*>(kipConflictsRateUpdateInterval)

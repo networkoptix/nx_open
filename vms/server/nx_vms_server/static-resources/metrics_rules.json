@@ -146,7 +146,7 @@
             "ipConflicts3min": {
                 "name": "IP conflicts (3min)",
                 "display": "panel",
-                "calculate": "sum %ipConflicts 3min",
+                "calculate": "sum %ipConflicts 3m",
                 "insert": "ipConflicts",
                 "alarms": [
                     {
