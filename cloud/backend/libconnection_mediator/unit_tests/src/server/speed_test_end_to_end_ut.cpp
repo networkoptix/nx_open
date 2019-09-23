@@ -175,8 +175,15 @@ protected:
 
 		for (const auto& response: m_connectResponses)
 		{
+			// Ensuring that connection succeeded.
 			ASSERT_EQ(response.second.first, api::Client::ResultCode::ok);
-			ASSERT_EQ(response.first, response.second.second.destinationHostFullName);
+
+			// Ensuring that the ConnectReponse received corresponds to the requested system.
+			ASSERT_NE(
+				-1,
+				response.second.second.destinationHostFullName.indexOf(response.first.c_str()));
+
+			// Ensuring that server connected to belongs to the requested system.
 			ASSERT_EQ(
 				response.second.second.destinationHostFullName,
 				m_fastestServers[response.first]->mediaserver->fullName());

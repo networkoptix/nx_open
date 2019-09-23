@@ -24,7 +24,7 @@ struct ListeningPeerStatus
 
     // The list of Mediators that a listeningPeer is connected to.
     std::vector<MediatorEndpoint> connectedEndpoints;
-    // The listeningPeers uplink speed.
+    // The listeningPeer's uplink speed.
     nx::hpm::api::ConnectionSpeed uplinkSpeed;
 };
 
