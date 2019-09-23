@@ -32,7 +32,8 @@ const float Camera::kMaxEps = 0.01f;
 Camera::Camera(QnMediaServerModule* serverModule):
     QnVirtualCameraResource(serverModule ? serverModule->commonModule() : nullptr),
     nx::vms::server::ServerModuleAware(serverModule),
-    m_channelNumber(0)
+    m_channelNumber(0),
+    m_metrics(std::make_shared<Metrics>())
 {
     setFlags(Qn::local_live_cam);
     m_lastInitTime.invalidate();
@@ -176,6 +177,16 @@ QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>&
     }
 
     return result;
+}
+
+void Camera::atStreamIssue()
+{
+    m_metrics->streamIssues++;
+}
+
+void Camera::atIpConflict()
+{
+    m_metrics->ipConflicts++;
 }
 
 boost::optional<QString> Camera::getAdvancedParameter(const QString& id)
@@ -843,6 +854,11 @@ QnLiveStreamProviderPtr Camera::findReader(StreamIndex streamIndex)
     else if (streamIndex == nx::vms::api::StreamIndex::secondary)
         reader = camera->getSecondaryReader();
     return reader;
+}
+
+qint64 Camera::getAndResetMetric(std::atomic<qint64> Metrics::* parameter)
+{
+    return (*m_metrics.*parameter).exchange(0);
 }
 
 } // namespace resource

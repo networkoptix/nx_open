@@ -9,6 +9,7 @@
 namespace nx::vms::server::metrics {
 
 using namespace nx::vms::api;
+using namespace nx::vms::server::resource;
 
 CameraController::CameraController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
@@ -50,6 +51,9 @@ void CameraController::start()
 
 utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController::makeProviders()
 {
+    static const std::chrono::minutes kIssuesRateUpdateInterval(1);
+    static const std::chrono::seconds kipConflictsRateUpdateInterval(15);
+
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         utils::metrics::makeValueGroupProvider<Resource>(
             "info",
@@ -77,13 +81,25 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
             utils::metrics::makeSystemValueProvider<Resource>(
                 "recording",
                 [](const auto& r) { return Value(QnLexical::serialized(r->recordingState())); }
-                ),
+            )
+        ),
+        utils::metrics::makeValueGroupProvider<Resource>(
+            "availability",
             utils::metrics::makeSystemValueProvider<Resource>(
                 "status",
                 [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
                 qtSignalWatch<Resource>(&resource::Camera::statusChanged)
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "streamIssues", [](const auto& r)
+                { return Value(r->getAndResetMetric(&Camera::Metrics::streamIssues)); },
+                nx::vms::server::metrics::timerWatch<Camera*>(kIssuesRateUpdateInterval)
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "ipConflicts", [](const auto& r)
+                { return Value(r->getAndResetMetric(&Camera::Metrics::ipConflicts)); },
+                nx::vms::server::metrics::timerWatch<Camera*>(kipConflictsRateUpdateInterval)
             )
-            // TODO: Implement params.
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
             "primaryStream",
