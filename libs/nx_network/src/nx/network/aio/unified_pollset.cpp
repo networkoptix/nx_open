@@ -5,7 +5,6 @@
 #include <nx/utils/std/cpp14.h>
 #include <udt/udt.h>
 
-#include "../udt/udt_common.h"
 #include "../udt/udt_socket.h"
 #include "../udt/udt_socket_impl.h"
 
@@ -345,8 +344,7 @@ int UnifiedPollSet::poll(int millisToWait)
         &m_readSysFds, &m_writeSysFds);
     if (result < 0)
     {
-        SystemError::setLastErrorCode(
-            network::detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        SystemError::setLastErrorCode(UDT::getlasterror().osError());
         return -1;
     }
 
@@ -401,8 +399,7 @@ bool UnifiedPollSet::addSocket(
     if (addToPollSet(m_epollFd, handle, &newEventMask) != 0)
     {
         socketDictionary->erase(it);
-        SystemError::setLastErrorCode(
-            network::detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        SystemError::setLastErrorCode(UDT::getlasterror().osError());
         return false;
     }
 

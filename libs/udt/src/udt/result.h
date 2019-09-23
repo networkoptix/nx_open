@@ -5,6 +5,9 @@
 
 #include "udt.h"
 
+// TODO: #ak The following using should be removed.
+using UDT::Error;
+
 class BasicResult
 {
 public:
@@ -16,9 +19,9 @@ public:
     /**
      * Constructs error result.
      */
-    BasicResult(ErrorInfo errorInfo):
+    BasicResult(Error error):
         m_ok(false),
-        m_errorInfo(std::move(errorInfo))
+        m_error(std::move(error))
     {
     }
 
@@ -32,11 +35,11 @@ public:
     /**
      * Behavior is undefined in case of success result.
      */
-    const ErrorInfo& errorInfo() const { return *m_errorInfo; }
+    const Error& error() const { return *m_error; }
 
 private:
     bool m_ok = true;
-    std::optional<ErrorInfo> m_errorInfo;
+    std::optional<Error> m_error;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -65,7 +68,7 @@ public:
     /**
      * Constructs error result.
      */
-    Result(ErrorInfo errorInfo):
+    Result(Error errorInfo):
         base_type(std::move(errorInfo))
     {
     }

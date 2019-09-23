@@ -4,12 +4,102 @@
 
 namespace UDT {
 
+std::string toString(ProtocolError protocolError)
+{
+    switch (protocolError)
+    {
+        case ProtocolError::none:
+            return "none";
+        case ProtocolError::cannotListenInRendezvousMode:
+            return "Cannot listen in rendezvous mode";
+        case ProtocolError::handshakeFailure:
+            return "Handshake failed";
+        case ProtocolError::remotePeerInRendezvousMode:
+            return "Remote peer is in rendezvous mode";
+        case ProtocolError::retransmitReceived:
+            return "retransmitReceived";
+        case ProtocolError::outOfWindowDataReceived:
+            return "outOfWindowDataReceived";
+        default:
+            return "unknown (" + std::to_string(static_cast<int>(protocolError)) + ")";
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+
+Error::Error(ProtocolError protocolError):
+#ifdef _WIN32
+    Error(GetLastError(), protocolError)
+#else
+    Error(errno, protocolError)
+#endif
+{
+}
+
+Error::Error(Errno osError, ProtocolError protocolError):
+    m_osError(osError),
+    m_protocolError(protocolError),
+    m_errorText(prepareErrorText())
+{
+}
+
+Errno Error::osError() const
+{
+    return m_osError;
+}
+
+ProtocolError Error::protocolError() const
+{
+    return m_protocolError;
+}
+
+const char* Error::errorText() const
+{
+    return m_errorText.c_str();
+}
+
+std::string Error::prepareErrorText()
+{
+    std::string text;
+
+    // Adding "errno" information
+    if (m_osError)
+    {
+#if defined(_WIN32)
+        LPVOID lpMsgBuf;
+        FormatMessage(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            m_osError,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
+        text = (char*) lpMsgBuf;
+        LocalFree(lpMsgBuf);
+#else
+        char errmsg[1024];
+        if (strerror_r(m_iErrno, errmsg, 1024) == 0)
+            text = errmsg;
+#endif
+    }
+
+    if (m_protocolError != ProtocolError::none)
+    {
+        if (!text.empty())
+            text += ". ";
+
+        text += toString(m_protocolError);
+    }
+
+    return text;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 static int processResult(Result<> result)
 {
     if (result.ok())
         return 0;
 
-    CUDT::s_UDTUnited->setError(result.errorInfo());
+    CUDT::s_UDTUnited->setError(result.error());
     return -1;
 }
 
@@ -22,7 +112,7 @@ static Payload processResult(Result<Payload> result)
     if (result.ok())
         return result.get();
 
-    CUDT::s_UDTUnited->setError(result.errorInfo());
+    CUDT::s_UDTUnited->setError(result.error());
     return -1;
 }
 
@@ -260,19 +350,9 @@ int epoll_release(int eid)
     return processResult(CUDT::epoll_release(eid));
 }
 
-const ErrorInfo& getlasterror()
+const Error& getlasterror()
 {
     return CUDT::getlasterror();
-}
-
-int getlasterror_code()
-{
-    return CUDT::getlasterror().getErrorCode();
-}
-
-const char* getlasterror_desc()
-{
-    return CUDT::getlasterror().getErrorMessage();
 }
 
 int perfmon(UDTSOCKET u, TRACEINFO* perf, bool clear)

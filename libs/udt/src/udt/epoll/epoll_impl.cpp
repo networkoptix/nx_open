@@ -82,7 +82,7 @@ Result<int> EpollImpl::wait(
 
     int eventCount = m_systemEpoll->poll(systemReadFds, systemWriteFds, timeout);
     if (eventCount < 0)
-        return ErrorInfo(25, 1);
+        return Error();
 
     eventCount += addUdtSocketEvents(udtReadFds, udtWriteFds);
     return success(eventCount);

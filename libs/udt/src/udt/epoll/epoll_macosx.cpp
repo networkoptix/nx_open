@@ -26,16 +26,17 @@ Result<> EpollMacosx::initialize()
 {
     m_kqueueFd = kqueue();
     if (m_kqueueFd < 0)
-        return ErrorInfo(-1, 0, errno);
+        return Error();
 
     //registering filter for interrupting poll
     struct kevent _newEvent;
     EV_SET(&_newEvent, USER_EVENT_IDENT, EVFILT_USER, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, NULL);
     if (kevent(m_kqueueFd, &_newEvent, 1, NULL, 0, NULL) != 0)
     {
+        auto error = Error();
         ::close(m_kqueueFd);
         m_kqueueFd = -1;
-        return ErrorInfo(-1, 0, errno);
+        return error;
     }
 
     return success();
@@ -60,7 +61,7 @@ Result<> EpollMacosx::add(const SYSSOCKET& s, const int* events)
 
     //adding new fd to set
     if (kevent(m_kqueueFd, ev, evCount, NULL, 0, NULL) != 0)
-        return ErrorInfo(-1, 0, errno);
+        return Error();
 
     int& eventMask = m_sLocals[s];
     eventMask |= *events;
