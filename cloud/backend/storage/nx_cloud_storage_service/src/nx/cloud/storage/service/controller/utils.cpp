@@ -32,7 +32,7 @@ api::ResultCode toResultCode(aws::ResultCode resultCode)
     }
 }
 
-api::Result toResult(aws::Result result)
+api::Result toResult(const aws::Result& result)
 {
     return api::Result(toResultCode(result.code()), result.text());
 }

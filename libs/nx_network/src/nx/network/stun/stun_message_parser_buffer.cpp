@@ -6,17 +6,17 @@ namespace nx {
 namespace network {
 namespace stun {
 
-MessageParserBuffer::MessageParserBuffer(std::deque<char>* temp_buffer, const nx::Buffer& buffer):
+MessageParserBuffer::MessageParserBuffer(
+    std::deque<char>* temp_buffer,
+    const QnByteArrayConstRef& buffer)
+    :
     m_tempBuffer(temp_buffer),
-    m_buffer(buffer),
-    m_position(0)
+    m_buffer(buffer)
 {
 }
 
-MessageParserBuffer::MessageParserBuffer(const nx::Buffer& buffer):
-    m_tempBuffer(NULL),
-    m_buffer(buffer),
-    m_position(0)
+MessageParserBuffer::MessageParserBuffer(const QnByteArrayConstRef& buffer):
+    m_buffer(buffer)
 {
 }
 
@@ -95,7 +95,7 @@ bool MessageParserBuffer::ensure(std::size_t count, void* buffer)
         if (m_tempBuffer != NULL)
         {
             for (std::size_t i = m_position; i < (std::size_t)m_buffer.size(); ++i)
-                m_tempBuffer->push_back(m_buffer.at((int)i));
+                m_tempBuffer->push_back(m_buffer[i]);
             // Modify the position pointer here
             m_position = m_buffer.size();
         }

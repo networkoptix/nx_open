@@ -13,6 +13,24 @@ namespace nx::cloud::storage::service::controller::cloud_db{
 using namespace nx::cloud::db::api;
 using namespace nx::network::http;
 
+namespace {
+
+static QString toString(const UserAuthorization& userAuth)
+{
+	return lm("{ requestMethod: %1, requestAuthorization: %2 }")
+		.args(userAuth.requestMethod, userAuth.requestAuthorization);
+}
+
+static QString toString(const CredentialsDescriptor& credentials)
+{
+	return lm("{ status: %1, objectId: %2, objectType: %3 }").args(
+		credentials.status,
+		credentials.objectId,
+		toString(credentials.objectType));
+}
+
+} // namespace
+
 AuthenticationForwarder::AuthenticationForwarder(const conf::CloudDb& settings):
     m_settings(settings)
 {
@@ -59,10 +77,14 @@ void AuthenticationForwarder::authenticateWithCloudDb(
             if (cdbResult != ResultCode::ok)
             {
                 return request.handler(
-                    prepareFailedAuthenticationResult(cdbResult, "resolveUserDigestFailed"));
+                    prepareFailedAuthenticationResult(cdbResult, "resolveUserCredentials failed"));
             }
 
-            if (credentials.objectType != ObjectType::account || credentials.objectId.empty())
+			NX_VERBOSE(this, "CloudDb authentication request: %1, reporting result: %2",
+				toString(userAuth),
+				toString(credentials));
+
+            if (credentials.objectType == ObjectType::none || credentials.objectId.empty())
             {
                 return request.handler(
                     prepareFailedAuthenticationResult(
@@ -71,9 +93,14 @@ void AuthenticationForwarder::authenticateWithCloudDb(
             }
 
             server::SuccessfulAuthenticationResult success;
-            success.authInfo.put(Resource::accountEmail, credentials.objectId.c_str());
+			// There are some api requests that only account owners are allowed to make,
+			// e.g. "addStorage". if system is making the request, it will fail because authInfo
+			// is missing accountEmail.
+			if (credentials.objectType == ObjectType::account)
+				success.authInfo.put(Resource::accountEmail, credentials.objectId.c_str());
             success.authInfo.put(Resource::httpMethod, userAuth.requestMethod.c_str());
             success.authInfo.put(Resource::authorization, userAuth.requestAuthorization.c_str());
+
             request.handler(std::move(success));
         });
 }

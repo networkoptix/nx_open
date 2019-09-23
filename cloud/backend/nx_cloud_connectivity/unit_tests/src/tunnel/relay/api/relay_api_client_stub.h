@@ -37,6 +37,7 @@ public:
         nx::cloud::relay::api::OpenRelayConnectionHandler handler) override;
     virtual nx::utils::Url url() const override;
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const override;
+    virtual void setTimeout(std::optional<std::chrono::milliseconds> timeout) override;
 
     int scheduledRequestCount() const;
     void setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler);

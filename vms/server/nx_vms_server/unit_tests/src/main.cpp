@@ -42,8 +42,6 @@ std::unique_ptr<QCommandLineParser> fillConfig(QCoreApplication& app)
 
 int main(int argc, char** argv)
 {
-    nx::utils::TestOptions::setModuleName("nx_vms_server_ut");
-
     #ifndef ENABLE_CLOUD_TEST
         QCoreApplication app(argc, argv);
         auto parser = fillConfig(app);

@@ -31,7 +31,7 @@ public:
     /**
      * NOTE: Throws exception if storage.ioDevices does not contain at least one entry
      */
-    virtual nx::sql::DBResult addStorage(
+    virtual void addStorage(
         nx::sql::QueryContext* queryContext,
         const api::Storage& storage) = 0;
 
@@ -39,15 +39,15 @@ public:
         nx::sql::QueryContext* queryContext,
         const std::string& storageId) = 0;
 
-    virtual nx::sql::DBResult removeStorage(
+    virtual void removeStorage(
         nx::sql::QueryContext* queryContext,
         const std::string& storageId) = 0;
 
-    virtual nx::sql::DBResult addSystem(
+    virtual void addSystem(
         nx::sql::QueryContext* queryContext,
         const api::System& system) = 0;
 
-    virtual nx::sql::DBResult removeSystem(
+    virtual void removeSystem(
         nx::sql::QueryContext* queryContext,
         const api::System& system) = 0;
 };
@@ -64,7 +64,7 @@ public:
 
     virtual nx::sql::AbstractAsyncSqlQueryExecutor& queryExecutor() override;
 
-    virtual nx::sql::DBResult addStorage(
+    virtual void addStorage(
         nx::sql::QueryContext* queryContext,
         const api::Storage& storage) override;
 
@@ -72,15 +72,15 @@ public:
         nx::sql::QueryContext* queryContext,
         const std::string& storageId) override;
 
-    virtual nx::sql::DBResult removeStorage(
+    virtual void removeStorage(
         nx::sql::QueryContext* queryContext,
         const std::string& storageId) override;
 
-    virtual nx::sql::DBResult addSystem(
+    virtual void addSystem(
         nx::sql::QueryContext* queryContext,
         const api::System& system) override;
 
-    virtual nx::sql::DBResult removeSystem(
+    virtual void removeSystem(
         nx::sql::QueryContext* queryContext,
         const api::System& system) override;
 

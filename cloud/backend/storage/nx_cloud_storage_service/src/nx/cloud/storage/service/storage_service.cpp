@@ -83,17 +83,15 @@ void StorageService::registerThisInstanceInCluster()
         clusterdb::engine::kBaseSynchronizationPath,
         &m_view->httpServer()->messageDispatcher());
 
-    const auto& clusterId = m_settings->database().synchronization.clusterId;
-
-    nx::utils::Url syncEngineUrl = url::Builder()
+    const nx::utils::Url syncEngineUrl = url::Builder()
         .setScheme(http::kUrlSchemeName)
         .setHost(m_settings->server().name.c_str())
-        .setPath(
-            http::rest::substituteParameters(
-                clusterdb::engine::kBaseSynchronizationPath, {clusterId}));
+        .setPath(http::rest::substituteParameters(
+            clusterdb::engine::kBaseSynchronizationPath,
+            {m_settings->database().synchronization.clusterId}));
 
     m_model->database().syncEngine().discoveryManager().start(
-        clusterId,
+        m_settings->database().synchronization.clusterId,
         syncEngineUrl);
 }
 

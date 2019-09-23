@@ -14,6 +14,13 @@ nx_go_get (
     "github.com/aws/aws-sdk-go/service/dynamodb"
     "github.com/julienschmidt/httprouter")
 
+configure_file(version.go.in version.go)
+
+add_custom_command(
+    TARGET discovery_service
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/version.go nx/cloud/discovery)
+
 add_custom_command(
     TARGET discovery_service
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -22,12 +29,12 @@ add_custom_command(
 add_custom_command(
     TARGET discovery_service
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/discovery_service ${CMAKE_CURRENT_BINARY_DIR})
+    COMMAND ${CMAKE_COMMAND} -E copy discovery_service ${CMAKE_CURRENT_BINARY_DIR})
 
 add_custom_command(
     TARGET discovery_service
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    COMMAND ${CMAKE_COMMAND} -E remove -f ${CMAKE_CURRENT_SOURCE_DIR}/discovery_service)
+    COMMAND ${CMAKE_COMMAND} -E remove -f discovery_service nx/cloud/discovery/version.go)
 
 set (DISCOVERY_SERVICE_ARCHIVE_NAME "discovery_service-v${cloudVersion}.zip")
 

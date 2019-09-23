@@ -17,6 +17,7 @@ public:
 
     ContentClient(
         const std::string& storageClientId,
+        const std::string& awsRegion,
         const nx::utils::Url& url,
         const nx::cloud::aws::Credentials& credentials);
 
@@ -74,8 +75,6 @@ protected:
 
 private:
     nx::cloud::aws::s3::ApiClient m_awsClient;
-
-    static ResultCode toResultCode(aws::Result result);
 };
 
 } // namespace nx::cloud::storage::client::aws_s3

@@ -20,10 +20,13 @@ const std::chrono::seconds Engine::kCertExpiration =
     std::chrono::hours(5 * 365 * 24); // 5 years
 
 String Engine::makeCertificateAndKey(
-    const String& common, const String& country, const String& company)
+    const String& common, const String& country, const String& company,
+    std::optional<long> serialNumber)
 {
     ssl::SslStaticData::instance();
-    const int serialNumber = nx::utils::random::number();
+
+    if (!serialNumber)
+        serialNumber = nx::utils::random::number<long>();
 
     auto number = utils::wrapUnique(BN_new(), &BN_free);
     if (!number || !BN_set_word(number.get(), RSA_F4))
@@ -48,7 +51,7 @@ String Engine::makeCertificateAndKey(
 
     auto x509 = utils::wrapUnique(X509_new(), &X509_free);
     if (!x509
-        || !ASN1_INTEGER_set(X509_get_serialNumber(x509.get()), serialNumber)
+        || !ASN1_INTEGER_set(X509_get_serialNumber(x509.get()), *serialNumber)
         || !X509_gmtime_adj(X509_get_notBefore(x509.get()), 0)
         || !X509_gmtime_adj(X509_get_notAfter(x509.get()), kCertExpiration.count())
         || !X509_set_pubkey(x509.get(), pkey.get()))

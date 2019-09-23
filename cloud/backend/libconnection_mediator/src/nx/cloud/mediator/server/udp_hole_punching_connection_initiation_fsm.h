@@ -36,7 +36,7 @@ enum class State
     fini,
 };
 
-const char* toString(State);
+constexpr const char* toString(State);
 
 enum class Event
 {
@@ -51,7 +51,7 @@ enum class Event
     connectionResultWaitTimedOut,
 };
 
-const char* toString(Event);
+constexpr const char* toString(Event);
 
 //-------------------------------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ public:
      *     UDPHolePunchingConnectionInitiationFsm instance.
      */
     UDPHolePunchingConnectionInitiationFsm(
-        nx::String connectionID,
+        nx::String connectionId,
         const ListeningPeerData& serverPeerData,
         std::function<void(api::NatTraversalResultCode)> onFsmFinishedEventHandler,
         const conf::Settings& settings,
@@ -105,8 +105,16 @@ public:
     stats::ConnectSession statisticsInfo() const;
 
 private:
+    struct ConnectResponseSenderContext
+    {
+        network::TransportProtocol networkProtocol;
+        ConnectCompletionHandler sendResponseFunc;
+
+        ConnectResponseSenderContext() = delete;
+    };
+
     State m_state;
-    nx::String m_connectionID;
+    nx::String m_connectionId;
     std::function<void(api::NatTraversalResultCode)> m_onFsmFinishedEventHandler;
     const conf::Settings& m_settings;
     AbstractRelayClusterClient* const m_relayClusterClient;
@@ -117,7 +125,7 @@ private:
     api::ConnectRequest m_connectRequest;
     api::ConnectionAckRequest m_connectionAckRequest;
 
-    std::vector<ConnectCompletionHandler> m_connectResponseSenders;
+    std::vector<ConnectResponseSenderContext> m_connectResponseSenders;
     const std::vector<network::SocketAddress> m_serverPeerEndpoints;
     const nx::String m_serverPeerHostName;
     const api::CloudConnectVersion m_serverPeerCloudConnectVersion;
@@ -223,6 +231,10 @@ private:
     void fixConnectResponseForBuggyClient(
         api::ResultCode resultCode,
         api::ConnectResponse* const connectResponse);
+
+    void sendConnectResponse(
+        ConnectResponseSenderContext& senderContext,
+        const std::tuple<api::ResultCode, api::ConnectResponse>& response);
 };
 
 } // namespace hpm

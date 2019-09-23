@@ -150,26 +150,6 @@ QnResourceTreeModel::QnResourceTreeModel(
     connect(this, &QnResourceTreeModel::modelReset, this,
         [this] { m_resetInProgress = false; });
 
-    if (ini().resetResourceTreeModelOnUserChange)
-    {
-        connect(accessController, &QnWorkbenchAccessController::userChanged, this,
-            [this]
-            {
-                if (m_userChangedDepth == 0)
-                    beginResetModel();
-                m_userChangedDepth++;
-
-                // Assuming that all model rebuild operations are called directly.
-                QMetaObject::invokeMethod(this,
-                    [this]
-                    {
-                        m_userChangedDepth--;
-                        if (m_userChangedDepth == 0)
-                            endResetModel();
-                    }, Qt::QueuedConnection);
-            });
-    }
-
     /* Create top-level nodes. */
     for (NodeType nodeType: rootNodeTypes())
         m_rootNodes[nodeType] =
@@ -226,8 +206,10 @@ QnResourceTreeModel::QnResourceTreeModel(
     connect(accessController, &QnWorkbenchAccessController::userChanged, this,
         [this](QnUserResourcePtr& user)
         {
+            beginResetModel();
             rebuildTree();
             emit userChanged(user);
+            endResetModel();
         });
 
 

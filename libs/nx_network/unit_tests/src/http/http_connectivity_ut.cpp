@@ -26,12 +26,12 @@ public:
     ResumableThread(nx::utils::MoveOnlyFunc<void()> func):
         m_func(std::move(func))
     {
-        m_thread = std::make_unique<nx::utils::thread>([this]() { threadFunc(); });
+        m_thread = std::thread([this]() { threadFunc(); });
     }
 
     void join()
     {
-        m_thread->join();
+        m_thread.join();
     }
 
     void resume()
@@ -41,7 +41,7 @@ public:
 
 private:
     nx::utils::MoveOnlyFunc<void()> m_func;
-    std::unique_ptr<nx::utils::thread> m_thread;
+    std::thread m_thread;
     nx::utils::promise<void> m_resumed;
 
     void threadFunc()

@@ -40,6 +40,7 @@ struct Https
 {
     std::vector<network::SocketAddress> endpoints;
     std::string certificatePath;
+	std::chrono::milliseconds certificateMonitorTimeout;
     std::optional<std::chrono::milliseconds> sslHandshakeTimeout;
 };
 

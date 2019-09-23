@@ -18,7 +18,6 @@
 
 namespace nx {
 
-namespace clusterdb::engine { class Synchroni; }
 namespace utils::stree { class ResourceContainer; }
 
 namespace network { class SocketAddress; }
@@ -42,7 +41,7 @@ class Model;
 
 namespace controller {
 
-class AccessManager;
+class AuthorizationManager;
 
 using GetStorageHandler = nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)>;
 
@@ -70,11 +69,11 @@ public:
 
     void removeStorage(
         nx::utils::stree::ResourceContainer authInfo,
-        const std::string& storageId,
+        std::string storageId,
         nx::utils::MoveOnlyFunc<void(api::Result)> handler);
 
     void listCameras(
-        const std::string& storageId,
+        std::string storageId,
         nx::utils::MoveOnlyFunc<void(api::Result, std::vector<std::string>)> handler);
 
     void getCredentials(
@@ -126,11 +125,18 @@ private:
             GetStorageHandler handler);
     };
 
+	struct SystemStorageContext
+	{
+		nx::utils::stree::ResourceContainer authInfo;
+		api::System system;
+		api::Result result;
+	};
+
 private:
     void getStorage(
         std::shared_ptr<ReadStorageContext> readStorageContext);
 
-    void checkReadStorageAllowed(
+    void authorizeReadingStorage(
         std::shared_ptr<ReadStorageContext> readStorageContext);
 
     void getCredentialsForStorage(
@@ -156,7 +162,7 @@ private:
         const nx::utils::stree::ResourceContainer& authInfo,
         const api::AddStorageRequest& request) const;
 
-    nx::sql::DBResult addStorageToDb(
+    void addStorageToDb(
         AddStorageContext* addStorageContext,
         nx::sql::QueryContext* queryContext);
 
@@ -164,7 +170,7 @@ private:
         AddStorageContext* addStorageContext,
         nx::sql::DBResult dbResult) const;
 
-    nx::sql::DBResult removeStorageFromDb(
+    void removeStorageFromDb(
         CommonStorageContext* removeStorageContext,
         nx::sql::QueryContext* queryContext);
 
@@ -186,7 +192,7 @@ private:
     const std::string& m_clusterId;
     model::dao::AbstractStorageDao* m_storageDao = nullptr;
     BucketManager* m_bucketManager = nullptr;
-    std::unique_ptr<AccessManager> m_accessManager;
+    std::unique_ptr<AuthorizationManager> m_authorizationManager;
     std::unique_ptr<nx::geo_ip::AbstractResolver> m_geoIpResolver;
     QnMutex m_mutex;
     std::set<std::shared_ptr<s3::DataUsageCalculator>> m_dataUsageCalculators;

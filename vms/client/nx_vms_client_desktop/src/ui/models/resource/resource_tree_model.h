@@ -204,7 +204,6 @@ private:
     QnResourceTreeModelLayoutNodeManager* m_layoutNodeManager = nullptr;
 
     bool m_resetInProgress = false;
-    int m_userChangedDepth = 0;
 };
 
 Q_DECLARE_METATYPE(QnResourceTreeModel::Scope)

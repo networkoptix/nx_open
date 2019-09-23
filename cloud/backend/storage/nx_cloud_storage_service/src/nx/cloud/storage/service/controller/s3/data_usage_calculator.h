@@ -54,7 +54,7 @@ private:
 
     void getBucketSize(
         Context* context,
-        const std::string continuationToken);
+        const std::string& continuationToken);
 
     void calculateFailed(const aws::Result& result);
 

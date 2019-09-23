@@ -78,9 +78,9 @@ void DataUsageCalculator::initializeS3Clients(
     }
 }
 
-void nx::cloud::storage::service::controller::s3::DataUsageCalculator::getBucketSize(
+void DataUsageCalculator::getBucketSize(
     Context* context,
-    const std::string continuationToken)
+    const std::string& continuationToken)
 {
     aws::s3::ListBucketRequest request;
     request.continuationToken = continuationToken;

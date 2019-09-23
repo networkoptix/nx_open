@@ -9,6 +9,7 @@ enum class ResultCode
     ok,
     badRequest,
     unauthorized,
+	forbidden,
     notFound,
     internalError,
     timedOut,
@@ -38,7 +39,7 @@ struct NX_CLOUD_STORAGE_CLIENT_API Result
     std::string toString() const
     {
         return std::string(api::toString(resultCode)) +
-            (!error.empty() ? ":" + error : std::string());
+            (!error.empty() ? ": " + error : std::string());
     }
 };
 

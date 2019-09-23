@@ -49,7 +49,7 @@ public:
     std::vector<api::Bucket> fetchBuckets(nx::sql::QueryContext* queryContext);
 
 private:
-    void addBucketToDb(
+    void addBucketInternal(
         std::string region,
         api::AddBucketRequest request,
         AddBucketHandler handler);

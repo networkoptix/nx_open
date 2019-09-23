@@ -7,7 +7,7 @@ namespace nx::cloud::storage::service::api {
 struct NX_CLOUD_STORAGE_CLIENT_API AddStorageRequest
 {
     // Size in bytes of the requested storage
-    int totalSpace = 0;
+    std::int64_t totalSpace = 0;
     // Optional region. If empty, the region is auto-detected.
     // If non-empty and invalid, error is reported.
     std::string region;

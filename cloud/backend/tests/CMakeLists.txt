@@ -1,1 +1,3 @@
 add_subdirectory(cloud_connect_integration_tests)
+add_subdirectory(cloud_storage_integration_tests)
+

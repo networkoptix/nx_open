@@ -3,6 +3,7 @@
 #ifdef ENABLE_SSL
 
 #include <chrono>
+#include <optional>
 
 #include <openssl/ssl.h>
 
@@ -19,8 +20,12 @@ class NX_NETWORK_API Engine
     static const std::chrono::seconds kCertExpiration;
 
 public:
+    /**
+     * @param serialNumber if not specfiied then a random number is used.
+     */
     static String makeCertificateAndKey(
-        const String& name, const String& country, const String& company);
+        const String& name, const String& country, const String& company,
+        std::optional<long> serialNumber = std::nullopt);
 
     static bool useCertificateAndPkey(const String& certData);
 

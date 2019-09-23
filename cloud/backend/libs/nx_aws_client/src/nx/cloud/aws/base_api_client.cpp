@@ -1,7 +1,6 @@
 #include "base_api_client.h"
 
 #include "aws_signature_v4.h"
-#include <nx/utils/log/log_message.h>
 
 namespace nx::cloud::aws {
 

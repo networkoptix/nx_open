@@ -89,9 +89,8 @@ nx::sql::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
     fetchTransactionsOfAPeerQuery.addBindValue((qint64)maxSequence);
     if (!fetchTransactionsOfAPeerQuery.exec())
     {
-        NX_ERROR(this,
-            lm("systemId %1. Error executing fetch_transactions request for peer (%2; %3). %4")
-                .args(peerId, dbInstanceId, fetchTransactionsOfAPeerQuery.lastError().text()));
+        NX_ERROR(this, "systemId %1. Error executing fetch_transactions query. Peer (%2; %3). %4",
+            systemId, peerId, dbInstanceId, fetchTransactionsOfAPeerQuery.lastError().text());
         return nx::sql::DBResult::ioError;
     }
 

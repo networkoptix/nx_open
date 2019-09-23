@@ -31,6 +31,8 @@ public:
 
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const override;
 
+    virtual void setTimeout(std::optional<std::chrono::milliseconds> timeout) override;
+
 protected:
     std::list<std::unique_ptr<network::aio::BasicPollable>> m_activeRequests;
 
@@ -43,6 +45,9 @@ protected:
     static ResultCode toResultCode(
         SystemError::ErrorCode sysErrorCode,
         const nx::network::http::Response* httpResponse);
+
+    static ResultCode toResultCode(
+        SystemError::ErrorCode sysErrorCode);
 
     void giveFeedback(ResultCode resultCode);
 
@@ -60,11 +65,14 @@ protected:
             std::initializer_list<RequestPathArgument> requestPathArguments,
             CompletionHandler completionHandler);
 
+    std::optional<std::chrono::milliseconds> timeout() const { return m_timeout; }
+
 private:
     const nx::utils::Url m_baseUrl;
     ClientFeedbackFunction m_feedbackFunction;
     SystemError::ErrorCode m_prevSysErrorCode;
     nx::network::http::AuthInfo m_authInfo;
+    std::optional<std::chrono::milliseconds> m_timeout;
 
     template<
         typename Request,
@@ -183,6 +191,8 @@ BasicClient::prepareHttpRequest(
             requestUrl,
             m_authInfo,
             std::move(request));
+    if (m_timeout)
+        httpClient->setRequestTimeout(*m_timeout);
     httpClient->bindToAioThread(getAioThread());
     return httpClient;
 }

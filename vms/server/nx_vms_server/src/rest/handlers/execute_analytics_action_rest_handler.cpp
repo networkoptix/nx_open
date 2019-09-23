@@ -189,7 +189,9 @@ int QnExecuteAnalyticsActionRestHandler::executePost(
     {
         result.setError(
             QnJsonRestResult::CantProcessRequest,
-            "Unable to collect all needed action data");
+            "Unable to collect all needed Action data. Try to enable recording "
+            "and/or wait some time until all the information needed for the Action "
+            "is in the archive");
         return StatusCode::ok;
     }
 

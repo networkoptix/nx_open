@@ -3,6 +3,7 @@
 #include <nx/network/http/server/authentication_dispatcher.h>
 #include <nx/network/http/server/multi_endpoint_acceptor.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
+#include <nx/network/http/server/http_server_htdigest_authentication_provider.h>
 
 namespace nx::cloud::storage::service {
 
@@ -33,6 +34,9 @@ public:
     std::vector<network::SocketAddress> httpsEndpoints() const;
 
 private:
+    void initializeHtdigestAuthenticator();
+    void registerHtdigestAuthenticationPath(const std::string& regex);
+
     void registerAuthenticationManager(
         const std::string& regex,
         network::http::server::AbstractAuthenticationManager* authenticationManager);
@@ -47,6 +51,19 @@ private:
     void registerBucketApiHandlers();
 
 private:
+    /** Provides htdigest authentication*/
+    struct HtdigestAuthenticator
+    {
+        nx::network::http::server::HtdigestAuthenticationProvider provider;
+        nx::network::http::server::BaseAuthenticationManager manager;
+
+        HtdigestAuthenticator(const std::string& htdigestPath):
+            provider(htdigestPath),
+            manager(&provider)
+        {
+        }
+    };
+
     const conf::Settings& m_settings;
     controller::BucketManager* m_bucketManager = nullptr;
     controller::StorageManager* m_storageManager = nullptr;
@@ -56,6 +73,7 @@ private:
 
     network::http::server::rest::MessageDispatcher m_messageDispatcher;
     network::http::server::AuthenticationDispatcher m_authenticationDispatcher;
+    std::unique_ptr<HtdigestAuthenticator> m_htdigestAuthenticator;
     network::http::server::MultiEndpointAcceptor m_multiAddressServer;
 };
 

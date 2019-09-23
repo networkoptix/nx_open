@@ -29,12 +29,36 @@ struct ChunkLogEntry
     std::size_t size = 0;
 };
 
-using DeviceDescription = std::vector<std::pair<std::string, std::string>>;
+//-------------------------------------------------------------------------------------------------
+// DeviceDescription.
+
+struct Parameter
+{
+    std::string name;
+    std::string value;
+};
+
+inline bool operator==(const Parameter& one, const Parameter& two)
+{
+    return one.name == two.name && one.value == two.value;
+}
+
+using DeviceDescription = std::vector<Parameter>;
 
 NX_CLOUD_STORAGE_CLIENT_API std::string toString(const DeviceDescription&);
 
 NX_CLOUD_STORAGE_CLIENT_API void fromString(
     const std::string_view& str,
     DeviceDescription* value);
+
+template <typename T> T fromString(const std::string_view& str) = delete;
+
+template<>
+inline DeviceDescription fromString<DeviceDescription>(const std::string_view& str)
+{
+    DeviceDescription description;
+    fromString(str, &description);
+    return description;
+}
 
 } // namespace nx::cloud::storage::client

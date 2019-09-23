@@ -9,7 +9,7 @@ namespace conf {
 
 namespace {
 
-static constexpr char kModuleName[] = "nx_cloud_storage_service";
+static constexpr char kModuleName[] = "storage_service";
 
 } // namespace
 
@@ -17,6 +17,8 @@ namespace http {
 
 static constexpr char kGroupName[] = "http";
 static constexpr char kHtdigestPath[] = "htdigestPath";
+static constexpr char kDefaultEndpoint[] = "0.0.0.0:3375";
+static constexpr char kDefaultSslEndpoint[] = "0.0.0.0:3385";
 
 } // namespace http
 
@@ -103,6 +105,12 @@ void Settings::loadHttp()
     m_http.load(settings());
     m_http.htdigestPath = settings().value(
         lm("%1/%2").args(kGroupName, kHtdigestPath)).toString().toStdString();
+
+    if (m_http.endpoints.empty())
+        m_http.endpoints.emplace_back(kDefaultEndpoint);
+
+    if (m_http.sslEndpoints.empty())
+        m_http.sslEndpoints.emplace_back(kDefaultSslEndpoint);
 }
 
 void Settings::loadServer()
@@ -135,10 +143,10 @@ void Settings::loadAws()
         lm("%1/%2").args(kGroupName, kAssumeRoleArn)).toString().toStdString();
 
     m_aws.storageCredentialsDuration = duration_cast<seconds>(
-            nx::utils::parseTimerDuration(
-                settings().value(lm("%1/%2").args(kGroupName, kStorageCredentialsDuration))
-                    .toString(),
-                kDefaultStorageCredentialsDuration));
+        nx::utils::parseTimerDuration(
+            settings().value(lm("%1/%2").args(kGroupName, kStorageCredentialsDuration))
+                .toString(),
+            kDefaultStorageCredentialsDuration));
 }
 
 void Settings::loadGeoIp()

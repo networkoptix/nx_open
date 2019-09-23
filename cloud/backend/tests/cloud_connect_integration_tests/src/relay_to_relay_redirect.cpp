@@ -19,10 +19,9 @@ using namespace nx::cloud::relay;
 class RelayToRelayRedirect;
 
 class RelayToRelayRedirect:
-    public BasicTestFixture,
-    public ::testing::Test
+    public BasicTestFixture<::testing::Test>
 {
-    using base_type = BasicTestFixture;
+    using base_type = BasicTestFixture<::testing::Test>;
 
 public:
     RelayToRelayRedirect():
@@ -39,6 +38,8 @@ public:
     virtual void TearDown() override
     {
         ConnectorFactory::setEnabledCloudConnectMask(m_connectMethodMaskBak);
+
+        base_type::TearDown();
     }
 
     void assertServerIsAccessibleFromAnotherRelay()

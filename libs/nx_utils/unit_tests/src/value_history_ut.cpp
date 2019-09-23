@@ -6,64 +6,62 @@ namespace nx::utils::test {
 
 TEST(ValueHistoryTest, main)
 {
+    using namespace std::chrono;
     ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
-    ValueHistory<int> history(std::chrono::minutes(10));
-    EXPECT_EQ(0, history.current());
-    EXPECT_EQ(0, history.last().size());
+
+    ValueHistory<int> history(hours(10));
+    const auto values =
+        [&history](std::optional<milliseconds> maxAge)
+        {
+            std::vector<std::pair<int, int>> values;
+            const auto addValue =
+                [&values](int value, milliseconds age)
+                {
+                    values.emplace_back(value, duration_cast<hours>(age).count());
+                };
+
+            maxAge ? history.forEach(*maxAge, addValue) : history.forEach(addValue);
+            return containerString(values);
+        };
+
+    EXPECT_EQ(history.current(), 0);
+    EXPECT_EQ(values(std::nullopt), "none");
 
     history.update(10);
-    EXPECT_EQ(10, history.current());
-    EXPECT_EQ(1, history.last().size());
+    EXPECT_EQ(history.current(), 10);
+    EXPECT_EQ(values(std::nullopt), "{ ( 10: 0 ) }");
 
-    timeShift.applyRelativeShift(std::chrono::minutes(2));
+    timeShift.applyRelativeShift(hours(2));
+    EXPECT_EQ(values(std::nullopt), "{ ( 10: 2 ) }");
+
     history.update(20);
-    EXPECT_EQ(20, history.current());
-    EXPECT_EQ(2, history.last().size());
+    EXPECT_EQ(history.current(), 20);
+    EXPECT_EQ(values(std::nullopt), "{ ( 10: 2 ), ( 20: 0 ) }");
 
-    timeShift.applyRelativeShift(std::chrono::minutes(4));
+    timeShift.applyRelativeShift(hours(2));
+    EXPECT_EQ(values(std::nullopt), "{ ( 10: 4 ), ( 20: 2 ) }");
+
     history.update(30);
-    EXPECT_EQ(30, history.current());
-    EXPECT_EQ(3, history.last().size());
-    EXPECT_EQ(2, history.last(std::chrono::minutes(1)).size());
+    EXPECT_EQ(history.current(), 30);
+    EXPECT_EQ(values(std::nullopt), "{ ( 10: 4 ), ( 20: 2 ), ( 30: 0 ) }");
+    EXPECT_EQ(values(hours(3)), "{ ( 10: 3 ), ( 20: 2 ), ( 30: 0 ) }");
+    EXPECT_EQ(values(hours(1)), "{ ( 20: 1 ), ( 30: 0 ) }");
 
-    timeShift.applyRelativeShift(std::chrono::minutes(15));
+    timeShift.applyRelativeShift(hours(15));
+    EXPECT_EQ(values(std::nullopt), "{ ( 30: 10 ) }");
+
     history.update(40);
-    EXPECT_EQ(40, history.current());
-    EXPECT_EQ(2, history.last().size());
+    EXPECT_EQ(history.current(), 40);
+    EXPECT_EQ(values(std::nullopt), "{ ( 30: 10 ), ( 40: 0 ) }");
 
-    timeShift.applyRelativeShift(std::chrono::hours(1));
-    EXPECT_EQ(40, history.current());
-    EXPECT_EQ(1, history.last(std::chrono::minutes(1)).size());
-}
+    timeShift.applyRelativeShift(hours(15));
+    EXPECT_EQ(values(std::nullopt), "{ ( 40: 10 ) }");
 
-TEST(TreeValueHistoryTest, main)
-{
-    TreeValueHistory<QString, int> history;
-    const auto baseWriter = history.writer();
+    EXPECT_EQ(history.current(), 40);
+    EXPECT_EQ(values(std::nullopt), "{ ( 40: 10 ) }");
 
-    auto singleWriter = baseWriter[QString("single")];
-    singleWriter->update(10);
-
-    auto groupWriter = baseWriter[QString("group")];
-
-    auto aaaGroupWriter = groupWriter[QString("aaa")];
-    aaaGroupWriter->update(20);
-
-    auto bbbGroupWriter = groupWriter[QString("bbb")];
-    bbbGroupWriter->update(30);
-
-    const auto singleReader = history.reader("single");
-    ASSERT_TRUE((bool) singleReader);
-    EXPECT_EQ(10, singleReader->current());
-
-    const auto groupReader = history.reader("group");
-    ASSERT_TRUE((bool) groupReader);
-    EXPECT_EQ(20, groupReader[QString("aaa")]->current());
-    EXPECT_EQ(30, groupReader[QString("bbb")]->current());
-
-    const auto wrongReader = history.reader("wrong");
-    ASSERT_FALSE((bool) wrongReader);
-    ASSERT_EQ(wrongReader->current(), 0);
+    timeShift.applyRelativeShift(hours(15));
+    EXPECT_EQ(values(std::nullopt), "{ ( 40: 10 ) }");
 }
 
 } // namespace nx::utils::test

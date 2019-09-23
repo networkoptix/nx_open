@@ -128,20 +128,27 @@ public:
     }
 
 protected:
-    void givenStartedCloudConnectSession()
-    {
-        m_connectingPeerConnection =
-            std::make_shared<TestConnection<nx::network::UDPSocket>>();
-
-        whenIssueConnectRequest();
-    }
-
     void givenSessionConnectedThroughTcp()
     {
         whenIssueConnectRequestOverTcp();
 
         thenConnectResultIsReported();
         andConnectionResultIsSuccess();
+    }
+
+    void givenCompletedSession()
+    {
+        whenIssueConnectRequestOverUdp();
+        whenConnectionAckIsReceived();
+        thenConnectResultIsReported();
+    }
+
+    void whenIssueConnectRequestOverUdp()
+    {
+        m_connectingPeerConnection =
+            std::make_shared<TestConnection<nx::network::UDPSocket>>();
+
+        whenIssueConnectRequest();
     }
 
     void whenIssueConnectRequestOverTcp()
@@ -180,8 +187,6 @@ protected:
 
     void whenRequestConnectionToThePeerUsingDomainName()
     {
-        givenStartedCloudConnectSession();
-
         api::ConnectionAckRequest request;
         request.connectionMethods = api::ConnectionMethod::all;
         request.udpEndpointList.push_back(
@@ -238,6 +243,18 @@ protected:
         const auto& connectResponse = std::get<1>(*m_prevConnectResult);
         ASSERT_TRUE(connectResponse.trafficRelayUrl);
         ASSERT_EQ(m_trafficRelayUrl, connectResponse.trafficRelayUrl->toStdString());
+    }
+
+    void andResponseContainsServerUdpEndpoints()
+    {
+        const auto& connectResponse = std::get<1>(*m_prevConnectResult);
+        ASSERT_TRUE(!connectResponse.udpEndpointList.empty());
+    }
+
+    void andResponseDoesNotContainUdpEndpoints()
+    {
+        const auto& connectResponse = std::get<1>(*m_prevConnectResult);
+        ASSERT_TRUE(connectResponse.udpEndpointList.empty());
     }
 
     void thenFullPeerNameHasBeenReportedInResponse()
@@ -342,13 +359,15 @@ TEST_F(
     setSetting("-cloudConnect/connectionAckAwaitTimeout", std::chrono::milliseconds(10));
     setSetting("-cloudConnect/connectionResultWaitTimeout", std::chrono::milliseconds(10));
 
-    givenStartedCloudConnectSession();
+    whenIssueConnectRequestOverUdp();
     whenClientSendsResultReport();
     thenConnectSessionFsmIsTerminatedProperly();
 }
 
 TEST_F(UDPHolePunchingConnectionInitiationFsm, remote_peer_full_name_is_reported)
 {
+    whenIssueConnectRequestOverUdp();
+
     whenRequestConnectionToThePeerUsingDomainName();
 
     thenFullPeerNameHasBeenReportedInResponse();
@@ -360,7 +379,7 @@ TEST_F(UDPHolePunchingConnectionInitiationFsm, find_a_relay_instance_fails_by_ti
     setSetting("-cloudConnect/maxRelayInstanceSearchTime", std::chrono::milliseconds(1));
     installRelayClusterClientThatRespondsOnCommand();
 
-    givenStartedCloudConnectSession();
+    whenIssueConnectRequestOverUdp();
 
     whenConnectionAckIsReceived();
 
@@ -376,7 +395,7 @@ TEST_F(UDPHolePunchingConnectionInitiationFsm, find_a_relay_instance_takes_a_lon
     doInAioThread(
         [this]()
         {
-            givenStartedCloudConnectSession();
+            whenIssueConnectRequestOverUdp();
             whenConnectionAckIsReceived();
         });
 
@@ -386,6 +405,17 @@ TEST_F(UDPHolePunchingConnectionInitiationFsm, find_a_relay_instance_takes_a_lon
     thenRelayInstanceInformationIsIgnored();
 }
 
+TEST_F(UDPHolePunchingConnectionInitiationFsm, connect_over_udp)
+{
+    whenIssueConnectRequestOverUdp();
+    whenConnectionAckIsReceived();
+
+    thenConnectResultIsReported();
+    andConnectionResultIsSuccess();
+    andResponseContainsRelayInfo();
+    andResponseContainsServerUdpEndpoints();
+}
+
 TEST_F(UDPHolePunchingConnectionInitiationFsm, connect_over_tcp)
 {
     whenIssueConnectRequestOverTcp();
@@ -393,6 +423,19 @@ TEST_F(UDPHolePunchingConnectionInitiationFsm, connect_over_tcp)
     thenConnectResultIsReported();
     andConnectionResultIsSuccess();
     andResponseContainsRelayInfo();
+    andResponseDoesNotContainUdpEndpoints();
+}
+
+TEST_F(
+    UDPHolePunchingConnectionInitiationFsm,
+    response_to_connect_retransmit_over_tcp_does_not_contain_udp_endpoints)
+{
+    givenCompletedSession();
+
+    whenIssueConnectRequestOverTcp();
+
+    thenConnectResultIsReported();
+    andResponseDoesNotContainUdpEndpoints();
 }
 
 TEST_F(
@@ -413,7 +456,7 @@ TEST_F(UDPHolePunchingConnectionInitiationFsm, connect_to_server_with_broken_con
     installRelayClusterClientWithDelay(std::chrono::milliseconds(10));
 
     whenServerConnectionIsBroken();
-    givenStartedCloudConnectSession();
+    whenIssueConnectRequestOverUdp();
 
     std::this_thread::sleep_for(
         settings().connectionParameters().connectionAckAwaitTimeout * 2);
@@ -430,7 +473,7 @@ TEST_F(UDPHolePunchingConnectionInitiationFsm, connection_ack_arrives_after_no_a
 
     installRelayClusterClientWithDelay(std::chrono::milliseconds(10));
 
-    givenStartedCloudConnectSession();
+    whenIssueConnectRequestOverUdp();
 
     std::this_thread::sleep_for(
         settings().connectionParameters().connectionAckAwaitTimeout * 2);
