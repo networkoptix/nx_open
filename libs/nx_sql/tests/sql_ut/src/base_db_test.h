@@ -86,7 +86,7 @@ protected:
         return queryCompletedPromise.get_future().get();
     }
 
-    std::filesystem::path dbFilePath() const;
+    std::filesystem::old_version_support::path dbFilePath() const;
 
 private:
     std::string m_tmpDir;
