@@ -261,7 +261,7 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
 				uplinkSpeedIter->second);
             auto peerIter = m_peers.find(toMediaServerData(uplinkSpeedIter->second));
             if (peerIter != m_peers.end())
-                return ConstDataLocker(std::move(lock), std::move(peerIter));
+				return ConstDataLocker(std::move(lock), std::move(peerIter));
         }
 
 		NX_VERBOSE(this, "Best uplink speed for system %1 not found, searching for any peer",
@@ -390,13 +390,13 @@ void ListeningPeerPool::closeConnectionAsync(
         });
 }
 
-void ListeningPeerPool::onUplinkSpeedUpdated(nx::hpm::api::PeerConnectionSpeed peerUplinkSpeed)
+void ListeningPeerPool::onUplinkSpeedUpdated(api::PeerConnectionSpeed peerUplinkSpeed)
 {
     QnMutexLocker lock(&m_mutex);
 
     // Ignoring non local peers
-    if (m_peers.find(toMediaServerData(peerUplinkSpeed)) == m_peers.end())
-        return;
+	if (m_peers.find(toMediaServerData(peerUplinkSpeed)) == m_peers.end())
+		return;
 
 	auto [uplinkSpeedIter, firstInsertion] = m_bestUplinkSpeeds.emplace(
 		peerUplinkSpeed.systemId.c_str(),
@@ -426,16 +426,16 @@ std::optional<api::PeerConnectionSpeed>
                 status.second.systemId.c_str(),
                 status.second.serverId.c_str()));
 
-        if (peerIter != m_peers.end())
+		if (peerIter == m_peers.end())
+			continue;
+
+		if (!bestUplinkSpeed ||
+			bestUplinkSpeed->connectionSpeed.bandwidth < status.second.uplinkSpeed.bandwidth)
         {
-			if (!bestUplinkSpeed ||
-				bestUplinkSpeed->connectionSpeed.bandwidth < status.second.uplinkSpeed.bandwidth)
-			{
-				bestUplinkSpeed = api::PeerConnectionSpeed{
-					status.second.serverId,
-					status.second.systemId,
-					status.second.uplinkSpeed};
-			}
+			bestUplinkSpeed = api::PeerConnectionSpeed{
+				status.second.serverId,
+				status.second.systemId,
+				status.second.uplinkSpeed};
         }
     }
 
