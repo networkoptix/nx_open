@@ -5,6 +5,7 @@
 
 namespace std {
 namespace filesystem {
+namespace old_version_support {
 
 TEST(StdFilesystem, parent_path)
 {
@@ -40,5 +41,6 @@ TEST(StdFilesystem, filename)
     //ASSERT_EQ("host", path("//host").filename());
 }
 
+} // namespace old_version_support
 } // namespace filesystem
 } // namespace std
