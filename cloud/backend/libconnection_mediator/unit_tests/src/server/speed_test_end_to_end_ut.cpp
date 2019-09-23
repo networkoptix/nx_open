@@ -145,16 +145,16 @@ protected:
 
 			api::ConnectRequest request;
 			request.connectionMethods = api::ConnectionMethod::all;
-			request.destinationHostName = system.id.constData();
+			request.destinationHostName = system.id;
 			request.originatingPeerId = QnUuid::createUuid().toSimpleByteArray();
 			request.connectSessionId = QnUuid::createUuid().toSimpleByteArray();
 
 			client.initiateConnection(
 				request,
-				[this, system](auto result, auto connectResponse)
+				[this, systemId = system.id.toStdString()](auto result, auto connectResponse)
 				{
 					saveConnectResponse(
-						system.id.constData(),
+						systemId,
 						std::move(result),
 						std::move(connectResponse));
 				});
