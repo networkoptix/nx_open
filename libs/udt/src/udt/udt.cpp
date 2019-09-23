@@ -1,5 +1,7 @@
 #include "udt.h"
 
+#include <cstring>
+
 #include "core.h"
 
 namespace UDT {
@@ -76,7 +78,7 @@ std::string Error::prepareErrorText()
         LocalFree(lpMsgBuf);
 #else
         char errmsg[1024];
-        if (strerror_r(m_iErrno, errmsg, 1024) == 0)
+        if (strerror_r(m_osError, errmsg, 1024) == 0)
             text = errmsg;
 #endif
     }
