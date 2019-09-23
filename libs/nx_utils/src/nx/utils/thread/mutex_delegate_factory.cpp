@@ -71,10 +71,8 @@ std::unique_ptr<MutexDelegate> makeMutexDelegate(Mutex::RecursionMode mode)
     if (impl & MutexImplementations::qt)
         return std::make_unique<MutexQtDelegate>(mode);
 
-    #if defined(NX_UTILS_MUTEX_DELEGATES_STD)
-        if (impl & MutexImplementations::std)
-            return std::make_unique<MutexStdDelegate>(mode);
-    #endif
+    if (impl & MutexImplementations::std)
+        return std::make_unique<MutexStdDelegate>(mode);
 
     if (impl & MutexImplementations::debug)
         return std::make_unique<MutexDebugDelegate>(mode, impl == MutexImplementations::analyze);
@@ -89,10 +87,8 @@ std::unique_ptr<ReadWriteLockDelegate> makeReadWriteLockDelegate(ReadWriteLock::
     if (impl & MutexImplementations::qt)
         return std::make_unique<ReadWriteLockQtDelegate>(mode);
 
-    #if defined(NX_UTILS_MUTEX_DELEGATES_STD)
-        if (impl & MutexImplementations::std)
-            return std::make_unique<ReadWriteLockStdDelegate>(mode);
-    #endif
+    if (impl & MutexImplementations::std)
+        return std::make_unique<ReadWriteLockStdDelegate>(mode);
 
     if (impl & MutexImplementations::debug)
         return std::make_unique<ReadWriteLockDebugDelegate>(mode, impl == MutexImplementations::analyze);
@@ -107,10 +103,8 @@ std::unique_ptr<WaitConditionDelegate> makeWaitConditionDelegate()
     if (impl & MutexImplementations::qt)
         return std::make_unique<WaitConditionQtDelegate>();
 
-    #if defined(NX_UTILS_MUTEX_DELEGATES_STD)
-        if (impl & MutexImplementations::std)
-            return std::make_unique<WaitConditionStdDelegate>();
-    #endif
+    if (impl & MutexImplementations::std)
+        return std::make_unique<WaitConditionStdDelegate>();
 
     if (impl & MutexImplementations::debug)
         return std::make_unique<WaitConditionDebugDelegate>();

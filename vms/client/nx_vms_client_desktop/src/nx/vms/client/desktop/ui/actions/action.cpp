@@ -244,14 +244,14 @@ ActionVisibility Action::checkCondition(ActionScopes scope, const Parameters& pa
 
     if (m_globalPermission != GlobalPermission::none &&
         !accessController()->hasGlobalPermission(m_globalPermission))
+    {
+        return InvisibleAction;
+    }
+
+    if (qnRuntime->isVideoWallMode() && !m_mode.testFlag(VideoWallMode))
         return InvisibleAction;
 
-    if (qnRuntime->isVideoWallMode() &&
-        !m_mode.testFlag(VideoWallMode))
-        return InvisibleAction;
-
-    if (qnRuntime->isAcsMode() &&
-        !m_mode.testFlag(AcsMode))
+    if (qnRuntime->isAcsMode() && !m_mode.testFlag(AcsMode))
         return InvisibleAction;
 
     int size = parameters.size();

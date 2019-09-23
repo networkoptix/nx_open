@@ -41,8 +41,6 @@ CREATE TABLE "vms_scheduletask_tmp" (
 INSERT INTO vms_scheduletask_tmp
     SELECT * FROM vms_scheduletask;
 
-
-
 ALTER TABLE "vms_camera_user_attributes" RENAME TO "vms_camera_user_attributes_tmp";
 
 CREATE TABLE "vms_camera_user_attributes" (

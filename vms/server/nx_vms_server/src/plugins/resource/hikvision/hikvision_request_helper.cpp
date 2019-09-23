@@ -38,7 +38,7 @@ ProtocolStates IsapiRequestHelper::fetchIntegrationProtocolInfo()
 {
     ProtocolStates integrationProtocolStates;
     const auto document = get(kIntegratePath);
-    if (!document)
+    if (!document.has_value())
         return integrationProtocolStates;
 
     for (const auto& entry: kHikvisionIntegrationProtocols)
@@ -46,7 +46,7 @@ ProtocolStates IsapiRequestHelper::fetchIntegrationProtocolInfo()
         const auto& protocol = entry.first;
         const auto protocolElement = document->child(QnLexical::serialized(protocol));
         ProtocolState state;
-        if (!protocolElement)
+        if (protocolElement.has_value())
         {
             state.supported = true;
             state.enabled = protocolElement->booleanOrFalse(lit("enable"));
@@ -58,7 +58,7 @@ ProtocolStates IsapiRequestHelper::fetchIntegrationProtocolInfo()
     return integrationProtocolStates;
 }
 
-bool IsapiRequestHelper::enableIntegrationProtocols(const ProtocolStates& integrationProtocolStates)
+bool IsapiRequestHelper::enableIntegrationProtocols(ProtocolStates& integrationProtocolStates)
 {
     QString enableProtocolsXmlString;
     for (const auto& protocolState: integrationProtocolStates)
@@ -80,8 +80,18 @@ bool IsapiRequestHelper::enableIntegrationProtocols(const ProtocolStates& integr
     const auto result = put(
         kIntegratePath,
         kEnableProtocolsXmlTemplate.arg(enableProtocolsXmlString));
+    if (result)
+    {
+        for (auto& it: integrationProtocolStates)
+            it.second.enabled = true;
+        NX_VERBOSE(this, "Successfully enabled integration protocols");
+    }
+    else
+    {
+        NX_INFO(this, "Can't enable integration protocols, maybe a device doesn't support"
+            "'Integrate' API call. URL: %1", m_url);
+    }
 
-    NX_DEBUG(this, "Enable integration protocols result: %1", result);
     return result;
 }
 

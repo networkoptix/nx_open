@@ -664,9 +664,15 @@ void QnClientModule::initSkin()
     /* Initialize application UI. Skip if run in console (e.g. unit-tests). */
     if (qApp)
     {
-        nx::vms::client::core::FontLoader::loadFonts(
-            QDir(QApplication::applicationDirPath()).absoluteFilePath(
-                AppInfo::isMacOsX() ? "../Resources/fonts" : "fonts"));
+        auto fontsDir = QDir(QApplication::applicationDirPath()).absoluteFilePath("fonts");
+        if (nx::utils::AppInfo::isMacOsX())
+        {
+            const auto bundleFontsDir =
+                QDir(QApplication::applicationDirPath()).absoluteFilePath("../Resources/fonts");
+            if (QFileInfo::exists(bundleFontsDir))
+                fontsDir = bundleFontsDir;
+        }
+        nx::vms::client::core::FontLoader::loadFonts(fontsDir);
 
         QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));

@@ -83,6 +83,9 @@ public:
     QString progressTitle() const;
     void setProgressTitle(const QString& value);
 
+    QString progressFormat() const;
+    void setProgressFormat(const QString& value);
+
     bool previewEnabled() const;
     void setPreviewEnabled(bool value);
 

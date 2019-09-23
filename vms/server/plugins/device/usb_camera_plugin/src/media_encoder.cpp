@@ -31,10 +31,8 @@ MediaEncoder::MediaEncoder(nxpt::CommonRefManager* const parentRefManager,
     m_camera(camera)
 {
     NX_DEBUG(this, "Create media encoder %1", encoderIndex);
-    m_streamReader.reset(new StreamReader(
-        &m_refManager,
-        m_camera,
-        !m_isSecondaryStream));
+
+    m_streamReader.reset(new StreamReader(&m_refManager, m_camera, !m_isSecondaryStream));
 }
 
 void* MediaEncoder::queryInterface(const nxpl::NX_GUID& interfaceID)

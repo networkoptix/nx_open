@@ -38,6 +38,7 @@
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <media_server/media_server_module.h>
+#include <motion/motion_helper.h>
 
 static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
@@ -499,6 +500,7 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
     stopRecorder(recorders);
     deleteRecorder(recorders, resource);
     videoCameraPool()->removeVideoCamera(resource);
+    serverModule()->motionHelper()->remove(resource);
 }
 
 bool QnRecordingManager::isCameraRecoring(const QnResourcePtr& camera) const

@@ -426,6 +426,13 @@ void QnLiveStreamProvider::onGotVideoFrame(
     if (m_totalVideoFrames && (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
         saveBitrateIfNeeded(compressedFrame, currentLiveParams, isCameraControlRequired);
 
+    processMetadata(compressedFrame);
+}
+
+void QnLiveStreamProvider::processMetadata(
+    const QnCompressedVideoDataPtr& compressedFrame)
+{
+
     NX_VERBOSE(this) << lm("Proceeding with motion detection and/or feeding metadata plugins");
 
     bool needToAnalyzeMotion = false;
@@ -578,6 +585,17 @@ void QnLiveStreamProvider::startIfNotRunning()
         m_framesSincePrevMediaStreamCheck = CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1;
         start();
     }
+}
+
+void QnLiveStreamProvider::start(Priority priority)
+{
+    if (m_canStartThread)
+        QnAbstractMediaStreamDataProvider::start(priority);
+}
+
+void QnLiveStreamProvider::beforeDestroy()
+{
+    m_canStartThread = false;
 }
 
 bool QnLiveStreamProvider::isCameraControlDisabled() const

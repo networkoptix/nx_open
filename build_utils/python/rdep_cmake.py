@@ -56,11 +56,11 @@ class RdepSyncher:
     def generate_cmake_include(self, file_name):
         with open(file_name, "w") as f:
             f.write("# Package versions.\n")
-            for k, v in self.versions.iteritems():
+            for k, v in self.versions.items():
                 f.write("set({0}_version \"{1}\")\n".format(k, v))
 
             f.write("\n# Exported package directories.\n")
-            for k, v in self._exported_paths.iteritems():
+            for k, v in self._exported_paths.items():
                 f.write("set({0} \"{1}\")\n".format(k, v))
 
             f.write("\n# List of synchronized package directories.\n")

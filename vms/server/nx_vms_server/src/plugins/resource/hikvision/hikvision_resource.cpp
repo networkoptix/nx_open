@@ -338,20 +338,7 @@ ProtocolStates HikvisionResource::tryToEnableIntegrationProtocols(
 {
     IsapiRequestHelper requestHelper(url, authenticator);
     auto supportedProtocols = requestHelper.fetchIntegrationProtocolInfo();
-    for (auto& it: supportedProtocols)
-        it.second.enabled = true;
-
-    if (!supportedProtocols.empty())
-    {
-        if (!requestHelper.enableIntegrationProtocols(supportedProtocols))
-        {
-            NX_WARNING(
-                kHikvisionApiLogTag,
-                lm("Can't enable integration protocols, "
-                    "maybe a device doesn't support 'Integrate' API call. "
-                    "URL: %1").args(url));
-        }
-    }
+    requestHelper.enableIntegrationProtocols(supportedProtocols);
 
     if (isAdditionalSupportCheckNeeded)
     {

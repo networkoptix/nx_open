@@ -3,16 +3,16 @@ from vms_benchmark.utils import human_readable_size
 
 
 class DevicePlatform:
-    def __init__(self, device, linux_distribution, ram, arch, cpu_number, cpu_features, storages_list):
+    def __init__(self, device, linux_distribution, ram_bytes, arch, cpu_count, cpu_features, storages_list):
         self.device = device
-        self.ram = ram
+        self.ram_bytes = ram_bytes
         self.arch = arch
-        self.cpu_number = cpu_number
+        self.cpu_count = cpu_count
         self.cpu_features = cpu_features
         self.storages_list = storages_list
         self.linux_distribution = linux_distribution
 
-    def ram_free(self):
+    def ram_free_bytes(self):
         meminfo = self.device.get_file_content('/proc/meminfo')
 
         if meminfo is None:
@@ -22,11 +22,11 @@ class DevicePlatform:
             (part.strip() for part in line.split(':')) for line in meminfo.split('\n') if ':' in line
         )
 
-        ram_free = int(human_readable_size.human2bytes(meminfo_parsed['MemFree']))
+        ram_free_bytes = int(human_readable_size.human2bytes(meminfo_parsed['MemFree']))
 
-        return ram_free
+        return ram_free_bytes
 
-    def ram_available(self):
+    def ram_available_bytes(self):
         if (
             self.linux_distribution.kernel_version[0] < 3 or
             (
@@ -61,7 +61,7 @@ class DevicePlatform:
             (part.strip() for part in line.split(':')) for line in meminfo.split('\n') if ':' in line
         )
 
-        ram = human_readable_size.human2bytes(meminfo_parsed['MemTotal'])
+        ram_bytes = human_readable_size.human2bytes(meminfo_parsed['MemTotal'])
 
         # Detect architecture:
         arch = device.eval('uname -m')
@@ -158,9 +158,9 @@ class DevicePlatform:
 
         return DevicePlatform(
             device=device,
-            ram=ram,
+            ram_bytes=ram_bytes,
             arch=arch,
-            cpu_number=len(cpuinfo_parsed),
+            cpu_count=len([line for line in cpuinfo.splitlines() if line.startswith('processor')]),
             cpu_features=cpu_features,
             storages_list=storages_map,
             linux_distribution=linux_distribution

@@ -52,6 +52,14 @@ QVariantMap AnalyticsEngineResource::settingsValues() const
     interactive_settings::JsonEngine jsonEngine;
     jsonEngine.loadModelFromJsonObject(parentPluginManifest->engineSettingsModel);
     jsonEngine.applyValues(settingsFromProperty);
+
+    if (m_sdkEngine)
+    {
+        const auto pluginSideSettings = m_sdkEngine->pluginSideSettings();
+        if (pluginSideSettings)
+            jsonEngine.applyValues(pluginSideSettings->settingValues);
+    }
+
     return jsonEngine.values();
 }
 

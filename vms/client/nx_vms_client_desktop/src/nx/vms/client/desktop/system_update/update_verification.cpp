@@ -151,6 +151,16 @@ bool verifyUpdateContents(
         return false;
     }
 
+    if (clientData.clientId.isNull())
+    {
+        NX_DEBUG(logTag, "verifying updates for %1 mediaservers", activeServers.size());
+    }
+    else
+    {
+        NX_DEBUG(logTag, "verifying updates for %1 mediaservers and client",
+            activeServers.size());
+    }
+
     nx::utils::SoftwareVersion targetVersion(info.version);
 
     if (contents.info.version.isEmpty() || targetVersion.isNull())

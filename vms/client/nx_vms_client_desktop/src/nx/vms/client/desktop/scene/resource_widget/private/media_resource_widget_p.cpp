@@ -19,6 +19,7 @@
 #include <nx/vms/client/desktop/ini.h>
 
 #include <utils/license_usage_helper.h>
+#include <utils/common/delayed.h>
 
 #include <nx/analytics/metadata_log_parser.h>
 
@@ -309,11 +310,12 @@ bool MediaResourceWidgetPrivate::calculateIsAnalyticsSupported() const
     if (!camera || !analyticsMetadataProvider)
         return false;
 
-    const auto engines = camera->enabledAnalyticsEngineResources();
-    return std::any_of(engines.cbegin(), engines.cend(),
-        [](const common::AnalyticsEngineResourcePtr& engine)
+    const auto supportedObjectTypes = camera->supportedObjectTypes();
+    return std::any_of(supportedObjectTypes.cbegin(), supportedObjectTypes.cend(),
+        [](const auto& objectTypesByEngineId)
         {
-            return !engine->manifest().objectTypes.empty();
+            const auto& objectTypes = objectTypesByEngineId.second;
+            return !objectTypes.empty();
         });
 }
 
@@ -355,8 +357,10 @@ void MediaResourceWidgetPrivate::requestAnalyticsObjectsExistence()
 
             if (!success)
             {
-                NX_VERBOSE(this, "Analytics request failed, try again");
-                requestAnalyticsObjectsExistence();
+                static const auto kRetryTimeout = 5s;
+                NX_VERBOSE(this, "Analytics request failed, try again in %1", kRetryTimeout);
+                executeDelayedParented(
+                    [this]{ requestAnalyticsObjectsExistence(); }, kRetryTimeout, this);
             }
         });
     NX_VERBOSE(this, "Request analytics objects existance for camera %1", camera);

@@ -487,10 +487,12 @@ void AnalyticsSearchListModel::Private::processMetadata()
         return;
 
     // Completely stop metadata reception if paused.
-    if (q->livePaused())
+    if (q->livePaused() && !m_data.empty())
         q->setLive(false);
 
-    setLiveReceptionActive(q->isLive() && q->isOnline() && !q->isFilterDegenerate());
+    setLiveReceptionActive(q->isLive() && !q->livePaused()
+        && q->isOnline()
+        && !q->isFilterDegenerate());
 
     if (!m_liveReceptionActive)
         return;
@@ -613,6 +615,8 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     if (newTracks.empty())
         return;
+
+    NX_VERBOSE(q, "Detected %1 new object tracks", newTracks.size());
 
     if (packetsBySource.size() > 1)
     {

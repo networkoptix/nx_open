@@ -1,4 +1,5 @@
 #include <chrono>
+#include <thread>
 
 #include <gtest/gtest.h>
 
@@ -590,13 +591,76 @@ private:
     }
 };
 
-TEST_F(CloudStreamSocketShutdown, test)
+TEST_F(CloudStreamSocketShutdown, interrupting_recv)
 {
     givenSocketConnectedToATcpServer();
     startSocketReadThread();
     waitForEnterSocketRecv();
     shutdownSocket();
     assertThatSocketHasBeenShutdownCorrectly();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class CloudStreamSocketConnectShutdown:
+    public nx::network::test::StreamSocketAcceptance<nx::network::test::CloudStreamSocketTypeSet>
+{
+    using base_type =
+        nx::network::test::StreamSocketAcceptance<nx::network::test::CloudStreamSocketTypeSet>;
+
+public:
+    ~CloudStreamSocketConnectShutdown()
+    {
+        if (m_connectThread.joinable())
+            m_connectThread.join();
+    }
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        givenListeningSynchronousServer();
+    }
+
+    void issueBlockingConnectFromASeparateThread()
+    {
+        m_connectThread = std::thread(
+            [this]()
+            {
+                connection()->connect(serverEndpoint(), nx::network::kNoTimeout);
+            });
+    }
+
+    void shutdownSocket()
+    {
+        whenInvokeShutdown();
+    }
+
+    void joinConnectThread()
+    {
+        m_connectThread.join();
+    }
+
+private:
+    std::thread m_connectThread;
+};
+
+TEST_F(CloudStreamSocketConnectShutdown, interrupting_connect)
+{
+    for (int i = 0; i < 50; ++i)
+    {
+        givenClientSocket();
+        issueBlockingConnectFromASeparateThread();
+
+        std::this_thread::sleep_for(std::chrono::microseconds(
+            nx::utils::random::number<int>(0, 20)));
+
+        shutdownSocket();
+        joinConnectThread();
+
+        thenSocketCanBeSafelyRemoved();
+    }
 }
 
 } // namespace test

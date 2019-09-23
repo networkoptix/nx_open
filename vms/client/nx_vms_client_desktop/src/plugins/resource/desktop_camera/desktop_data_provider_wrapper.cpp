@@ -4,10 +4,11 @@
 
 QnDesktopDataProviderWrapper::QnDesktopDataProviderWrapper(
     QnResourcePtr res,
-    QnDesktopDataProvider* /*owner*/)
+    QnDesktopDataProviderBase* owner)
     :
     QnAbstractMediaStreamDataProvider(res),
-    QnAbstractDataConsumer(100)
+    QnAbstractDataConsumer(100),
+    m_owner(owner)
 {}
 
 QnDesktopDataProviderWrapper::~QnDesktopDataProviderWrapper()

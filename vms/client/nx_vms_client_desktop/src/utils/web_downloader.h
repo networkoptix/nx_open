@@ -31,7 +31,7 @@ public:
     WebDownloader(QObject* parent,
         std::shared_ptr<QNetworkAccessManager> networkManager,
         QNetworkReply* reply,
-        QFile* file,
+        std::unique_ptr<QFile> file,
         const QFileInfo& fileInfo);
     virtual ~WebDownloader();
 
@@ -46,7 +46,7 @@ private:
 private slots:
     void cancel();
     void onDownloadProgress(qint64 bytesRead, qint64 bytesTotal);
-    void onReadyRead();
+    void writeAvailableData();
     void onReplyFinished();
 
 private:
@@ -54,9 +54,11 @@ private:
     QElapsedTimer m_downloadTimer;
     std::shared_ptr<QNetworkAccessManager> m_networkManager;
     QNetworkReply* m_reply;
-    QFile* m_file;
+    std::unique_ptr<QFile> m_file;
     QFileInfo m_fileInfo;
     QnUuid m_activityId;
+    bool m_cancelRequested = false;
+    bool m_hasWriteError = false;
 };
 
 } // namespace utils

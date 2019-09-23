@@ -1,5 +1,7 @@
 #include "storage_plugin_factory.h"
 
+#include <nx/utils/log/log.h>
+
 QnStoragePluginFactory::QnStoragePluginFactory(QObject* parent):
     QObject(parent),
     m_defaultFactory()
@@ -35,17 +37,22 @@ QnStorageResource *QnStoragePluginFactory::createStorage(
 {
     int index = url.indexOf(lit("://"));
     if (index == -1)
-        return m_defaultFactory ? m_defaultFactory(commonModule, url) : NULL;
+        return m_defaultFactory ? m_defaultFactory(commonModule, url) : nullptr;
 
     QString protocol = url.left(index);
-    if (m_factoryByProtocol.contains(protocol)) {
+    if (m_factoryByProtocol.contains(protocol))
+    {
         QnStorageResource *ret = m_factoryByProtocol.value(protocol)(commonModule, url);
+        if (ret == nullptr)
+        {
+            NX_ERROR(this, "Failed to create storage for url %1", url);
+            return nullptr;
+        }
         ret->setStorageType(protocol);
         return ret;
     } else {
         if (useDefaultForUnknownPrefix)
-            return m_defaultFactory ? m_defaultFactory(commonModule, url) : NULL;
-        else
-            return NULL;
+            return m_defaultFactory ? m_defaultFactory(commonModule, url) : nullptr;
+        return nullptr;
     }
 }

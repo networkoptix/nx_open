@@ -79,6 +79,8 @@ ProgressListModel::ProgressListModel(QObject* parent):
         this, changed({Qn::RemovableRole, Qn::TimeoutRole}));
     connect(manager, &WorkbenchProgressManager::actionChanged,
         this, changed({Qn::CommandActionRole}));
+    connect(manager, &WorkbenchProgressManager::progressFormatChanged,
+        this, changed({Qn::ProgressFormatRole}));
 }
 
 int ProgressListModel::rowCount(const QModelIndex& parent) const
@@ -144,6 +146,9 @@ QVariant ProgressListModel::data(const QModelIndex& index, int role) const
                         == WorkbenchProgressManager::kFailedProgressValue
                 ? QVariant::fromValue(kFailedDisplayTimeout)
                 : QVariant();
+
+        case Qn::ProgressFormatRole:
+            return QVariant::fromValue(manager->progressFormat(activityId));
 
         case Qn::AlternateColorRole:
             return true;

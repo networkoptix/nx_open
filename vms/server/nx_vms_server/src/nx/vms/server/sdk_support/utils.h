@@ -87,7 +87,8 @@ nx::sdk::Ptr<nx::sdk::IList<nx::sdk::analytics::ITimestampedObjectMetadata>> cre
 
 nx::sdk::Ptr<nx::sdk::analytics::IUncompressedVideoFrame> createUncompressedVideoFrame(
     const CLVideoDecoderOutputPtr& frame,
-    nx::vms::api::analytics::PixelFormat pixelFormat);
+    nx::vms::api::analytics::PixelFormat pixelFormat,
+    int rotationAngle = 0);
 
 std::map<QString, QString> attributesMap(
     const nx::sdk::Ptr<const nx::sdk::analytics::IMetadata>& metadata);

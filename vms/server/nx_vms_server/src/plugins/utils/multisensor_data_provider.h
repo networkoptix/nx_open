@@ -32,6 +32,9 @@ protected:
 
     virtual void pleaseStop() override;
 
+    // Supress processing metada second time by	MultisensorDataProvider.
+    virtual void processMetadata(const QnCompressedVideoDataPtr&) override {}
+    virtual void setRole(Qn::ConnectionRole role) override;
 private:
     nx::vms::server::resource::CameraPtr m_cameraResource;
     QnStreamMixer m_dataSource;

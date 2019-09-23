@@ -132,12 +132,6 @@ bool WaitConditionDebugDelegate::wait(MutexDelegate* mutex, std::chrono::millise
     return result;
 }
 
-bool WaitConditionDebugDelegate::wait(
-    ReadWriteLockDelegate* mutex, std::chrono::milliseconds timeout)
-{
-    return wait(&static_cast<ReadWriteLockDebugDelegate*>(mutex)->m_delegate, timeout);
-}
-
 void WaitConditionDebugDelegate::wakeAll()
 {
     m_delegate.wakeAll();

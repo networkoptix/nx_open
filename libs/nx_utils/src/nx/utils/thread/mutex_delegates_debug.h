@@ -57,8 +57,6 @@ class NX_UTILS_API WaitConditionDebugDelegate: public WaitConditionDelegate
 {
 public:
     virtual bool wait(MutexDelegate* mutex, std::chrono::milliseconds timeout) override;
-    virtual bool wait(ReadWriteLockDelegate* mutex, std::chrono::milliseconds timeout) override;
-
     virtual void wakeAll() override;
     virtual void wakeOne() override;
 

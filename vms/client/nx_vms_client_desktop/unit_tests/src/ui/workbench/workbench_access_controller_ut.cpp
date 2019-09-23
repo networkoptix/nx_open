@@ -12,6 +12,8 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_access/resource_access_subject.h>
+#include <core/resource_access/resource_access_manager.h>
 
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -316,4 +318,43 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedInSafeMode)
     /* Make sure nothing changes if logged in as owner. */
     loginAsOwner();
     checkPermissions(layout, desired, forbidden);
+}
+
+/**
+* Check that workbench access controller and resource access manager provide consistent data
+* after recalculation of all permissions in resource access manager occurs.
+*/
+TEST_F(QnWorkbenchAccessControllerTest, workbenchAccessControllerInSyncWithResourceAccessManager)
+{
+    const auto resourceAccessManager = commonModule()->resourceAccessManager();
+
+    loginAs(GlobalPermission::liveViewerPermissions);
+    const auto layout = createLayout(Qn::local, true);
+    resourcePool()->addResource(layout);
+
+    // Triggers QnResourceAccessManager::recalculateAllPermissions()
+    commonModule()->setReadOnly(true);
+
+    ASSERT_FALSE(resourceAccessManager->permissions(m_currentUser, layout)
+        .testFlag(Qn::SavePermission));
+    ASSERT_FALSE(resourceAccessManager->permissions(m_currentUser, layout)
+        .testFlag(Qn::EditLayoutSettingsPermission));
+
+    ASSERT_FALSE(m_accessController->permissions(layout)
+        .testFlag(Qn::SavePermission));
+    ASSERT_FALSE(m_accessController->permissions(layout)
+        .testFlag(Qn::EditLayoutSettingsPermission));
+
+    // Triggers QnResourceAccessManager::recalculateAllPermissions()
+    commonModule()->setReadOnly(false);
+
+    ASSERT_TRUE(resourceAccessManager->permissions(m_currentUser, layout)
+        .testFlag(Qn::SavePermission));
+    ASSERT_TRUE(resourceAccessManager->permissions(m_currentUser, layout)
+        .testFlag(Qn::EditLayoutSettingsPermission));
+
+    ASSERT_TRUE(m_accessController->permissions(layout)
+        .testFlag(Qn::SavePermission));
+    ASSERT_TRUE(m_accessController->permissions(layout)
+        .testFlag(Qn::EditLayoutSettingsPermission));
 }

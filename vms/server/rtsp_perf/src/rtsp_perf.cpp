@@ -11,7 +11,8 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/data/camera_data_ex.h>
 #include <nx/utils/random_qt_device.h>
-//nx::utils::random::QtDevice
+#include <nx/streaming/rtp/rtp.h>
+#include <nx/streaming/video_data_packet.h>
 
 std::chrono::milliseconds kMinStartInterval{100};
 std::chrono::milliseconds kMaxStartInterval{10000};
@@ -35,21 +36,6 @@ private:
     int64_t m_prevBytesRead = 0;
 };
 
-QString RtspPerf::Config::toString()
-{
-    return
-        "\nserver: " + server +
-        "\nuser: " + user +
-        "\npassword: " + password +
-        "\nuse ssl: " + QString::number(useSsl) +
-        "\ncount: " + QString::number(count) +
-        "\nlive percent: " + QString::number(livePercent) + "%" +
-        "\ntimeout: " + QString::number(timeout.count()) + "ms" +
-        "\nstart interval: " + (startInterval == std::chrono::milliseconds::zero() ?
-            "auto" : QString::number(startInterval.count()) + "ms") +
-        "\n";
-}
-
 bool RtspPerf::getCamerasUrls(const QString& server, std::vector<QString>& urls)
 {
     std::vector<QString> result;
@@ -57,7 +43,9 @@ bool RtspPerf::getCamerasUrls(const QString& server, std::vector<QString>& urls)
     httpClient.setUserName(m_config.user);
     httpClient.setUserPassword(m_config.password);
 
-    if (!httpClient.doGet("http://" + server + "/ec2/getCamerasEx"))
+    const QString request = "http://" + server + "/ec2/getCamerasEx";
+    NX_INFO(this, "Obtain camera list using request: %1", request);
+    if (!httpClient.doGet(request))
     {
         NX_ERROR(this, "Failed to get camera list");
         return false;
@@ -111,9 +99,8 @@ void RtspPerf::startSessionsThread(const std::vector<QString>& urls)
                 ++m_totalFailed;
 
                 if (m_totalFailed > 0 && m_config.startInterval == std::chrono::milliseconds::zero())
-                {
                     m_currentStartInterval = std::min(m_currentStartInterval * 2, kMaxStartInterval);
-                }
+
                 std::this_thread::sleep_for(m_currentStartInterval);
             }
         }
@@ -127,8 +114,17 @@ void RtspPerf::run()
     nx::network::SocketGlobals::InitGuard socketInitializationGuard;
     std::vector<Session> sessions(m_config.count);
     std::vector<QString> urls;
-    if (!getCamerasUrls(m_config.server, urls))
-        return;
+
+    if (m_config.urls.isEmpty())
+    {
+        if (!getCamerasUrls(m_config.server, urls))
+            return;
+    }
+    else
+    {
+        for(const auto& url: m_config.urls)
+            urls.push_back(url);
+    }
 
     m_totalFailed = -m_config.count;
     m_currentStartInterval = m_config.startInterval != std::chrono::milliseconds::zero() ?
@@ -147,13 +143,14 @@ void RtspPerf::run()
                 ++successSessions;
         }
         float bitrate = bitrateCounter.update(totalBytesRead);
-        NX_ALWAYS(this, "Total bitrate %1 MBit/s, worked sessions %2, failed %3, bytes read %4",
+        NX_INFO(this, "Total bitrate %1 MBit/s, working sessions %2, failed %3, bytes read %4",
             QString::number(bitrate, 'f', 3), successSessions, std::max<int64_t>(m_totalFailed, 0), totalBytesRead);
     }
 }
 
 void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
 {
+    static const int kInterleavedRtpOverTcpPrefixLength = 4;
     int64_t position = DATETIME_NOW;
     if (!live)
     {
@@ -165,6 +162,12 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
     NX_INFO(this, "Start test rtps session: %1 %2",
         url,
         live ? "live" : "archive, from position: " + QString::number(position / 1000000));
+
+    const QString cameraId = url.endsWith('/') ?
+        url.mid(url.left(url.size() - 1).lastIndexOf('/') + 1) : url.mid(url.lastIndexOf('/') + 1);
+    if (cameraId.isEmpty())
+        NX_ERROR(this, "Failed to parse camera id from url: %1", url);
+
     QAuthenticator auth;
     auth.setUser(config.user);
     auth.setPassword(config.password);
@@ -181,15 +184,25 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
         failed = true;
         return;
     }
-
     rtspClient.play(position, AV_NOPTS_VALUE, 1.0);
     int rtpChannelNum = -1;
     std::vector<QnByteArray*> dataArrays;
+    m_lastFrameTime = std::chrono::system_clock::now();
     while (true)
     {
         int bytesRead = rtspClient.readBinaryResponce(dataArrays, rtpChannelNum);
         if (rtpChannelNum >= 0 && (int)dataArrays.size() > rtpChannelNum && dataArrays[rtpChannelNum])
+        {
+            if (bytesRead > 0 && config.printTimestamps)
+            {
+                parsePacketTimestamp(
+                    (uint8_t*)dataArrays[rtpChannelNum]->data() + kInterleavedRtpOverTcpPrefixLength,
+                    dataArrays[rtpChannelNum]->size() - kInterleavedRtpOverTcpPrefixLength,
+                    cameraId,
+                    config.timeout);
+            }
             dataArrays[rtpChannelNum]->clear();
+        }
         if (bytesRead <= 0)
         {
             NX_ERROR(this, "Failed to read data");
@@ -200,4 +213,54 @@ void RtspPerf::Session::run(const QString& url, const Config& config, bool live)
     }
     for (auto& data: dataArrays)
         delete data;
+}
+
+void RtspPerf::Session::parsePacketTimestamp(
+    const uint8_t* data, int64_t size, const QString& cameraId, std::chrono::milliseconds timeout)
+{
+    using namespace nx::streaming::rtp;
+
+    static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
+
+    const RtpHeader* rtpHeader = (RtpHeader*) data;
+    if (rtpHeader->CSRCCount != 0 || rtpHeader->version != 2)
+    {
+        NX_WARNING(this, "Got malformed RTP packet header. Ignored.");
+        return;
+    }
+
+    const quint8* payload = data + RtpHeader::kSize;
+    size -= RtpHeader::kSize;
+    // Odd numbers - codec context, even numbers - data. Ignore context
+    if ((qFromBigEndian(rtpHeader->ssrc) & 0x01) != 0)
+        return;
+
+    if (rtpHeader->padding)
+        size -= qFromBigEndian(rtpHeader->padding);
+
+    auto nowTime = std::chrono::system_clock::now();
+    if (newPacket)
+    {
+        if (size < RTSP_FFMPEG_GENERIC_HEADER_SIZE)
+            return;
+
+        const QnAbstractMediaData::DataType dataType = (QnAbstractMediaData::DataType)*(payload++);
+        const quint32 timestampHigh = qFromBigEndian(*(quint32*) payload);
+        const int64_t timestamp = qFromBigEndian(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
+        if (dataType == QnAbstractMediaData::VIDEO)
+        {
+            printf("Camera %s timestamp %lld us\n", cameraId.toUtf8().data(),
+                (long long int) timestamp);
+            m_lastFrameTime = nowTime;
+        }
+    }
+
+    std::chrono::duration<double> timeFromLastFrame = nowTime - m_lastFrameTime;
+    if (timeFromLastFrame > timeout)
+    {
+        printf("WARNNIG: camera %s, video frame was not received for %lfsec\n",
+            cameraId.toUtf8().data(), timeFromLastFrame.count());
+        m_lastFrameTime = nowTime;
+    }
+    newPacket = rtpHeader->marker;
 }

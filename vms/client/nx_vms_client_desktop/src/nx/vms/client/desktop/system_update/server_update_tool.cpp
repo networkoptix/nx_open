@@ -644,6 +644,17 @@ void ServerUpdateTool::markUploadCompleted(const QString& uploadId)
     }
 }
 
+bool ServerUpdateTool::hasActiveUploadsTo(const QnUuid& id) const
+{
+    QStringList idsToRemove;
+    for (const auto& record: m_uploadStateById)
+    {
+        if (record.second.uuid == id)
+            return true;
+    }
+    return false;
+}
+
 bool ServerUpdateTool::startUpload(const UpdateContents& contents, bool cleanExisting)
 {
     NX_VERBOSE(this, "startUpload() clean=%1", cleanExisting);
@@ -1085,13 +1096,14 @@ void ServerUpdateTool::requestModuleInformation()
 void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
     const std::vector<nx::update::Status>& response)
 {
-    m_checkingRemoteUpdateStatus = false;
-
-    if (m_expectedStatusHandle != handle)
+    if (m_expectedStatusHandle && m_expectedStatusHandle != handle)
     {
         NX_VERBOSE(this) << "atUpdateStatusResponse handle" << handle << "was skipped";
         return;
     }
+
+    m_checkingRemoteUpdateStatus = false;
+    m_expectedStatusHandle = 0;
 
     if (!success)
         return;
@@ -1100,7 +1112,6 @@ void ServerUpdateTool::atUpdateStatusResponse(bool success, rest::Handle handle,
     for (const auto& status : response)
         remoteStatus[status.serverId] = status;
 
-    m_expectedStatusHandle = 0;
     m_remoteUpdateStatus = std::move(remoteStatus);
 }
 
@@ -1202,7 +1213,11 @@ std::future<ServerUpdateTool::RemoteStatus> ServerUpdateTool::requestRemoteUpdat
 
 QString ServerUpdateTool::getServerAuthString() const
 {
-    const auto& connectionInfo = commonModule()->ec2Connection()->connectionInfo();
+    const auto connection = commonModule()->ec2Connection();
+    if (!connection)
+        return {};
+
+    const auto& connectionInfo = connection->connectionInfo();
     nx::utils::Url serverUrl = connectionInfo.ecUrl;
     if (serverUrl.scheme().isEmpty())
         serverUrl.setScheme(nx::network::http::urlSheme(connectionInfo.allowSslConnections));

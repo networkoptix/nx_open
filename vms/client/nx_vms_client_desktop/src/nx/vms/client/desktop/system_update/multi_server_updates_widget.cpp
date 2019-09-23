@@ -1497,26 +1497,13 @@ void MultiServerUpdatesWidget::atServerConfigurationChanged(std::shared_ptr<Upda
      *  - server was added. We should repeat verification
      */
 
-    if (!item->offline
-        || !item->verificationMessage.isEmpty()
-        || m_updateInfo.peersWithUpdate.contains(item->id))
+    if (!item->offline)
     {
-        // TODO: Make more conservative check: only check if server goes online, or if
-        // server has errors and goes offline.
+        // TODO: this triggers too often, when server goes offline, online, added or removed.
+        // We need to get this events here.
         NX_VERBOSE(this,
            "peer %1 has changed online status. We should repeat validation.", item->id);
         repeatUpdateValidation();
-
-        if (item->isServer() && m_updateInfo.peerHasUpdate(item->id))
-        {
-            auto uploaderState = m_serverUpdateTool->getUploaderState();
-            if (uploaderState == ServerUpdateTool::OfflineUpdateState::push
-                || uploaderState == ServerUpdateTool::OfflineUpdateState::ready
-                || uploaderState == ServerUpdateTool::OfflineUpdateState::done)
-            {
-                m_serverUpdateTool->startUploadsToServer(m_updateInfo, item->id);
-            }
-        }
     }
     else if (item->offline)
     {
@@ -1834,6 +1821,8 @@ void MultiServerUpdatesWidget::processDownloadingState()
         }
     }
 
+    processUploaderChanges();
+
     if (peersActive.size() + peersUnknown.size() > 0 && peersFailed.empty())
         return;
 
@@ -1886,8 +1875,6 @@ void MultiServerUpdatesWidget::processDownloadingState()
             m_serverUpdateTool->requestStopAction();
         }
     }
-
-    processUploaderChanges();
 }
 
 void MultiServerUpdatesWidget::processReadyInstallState()
@@ -2041,6 +2028,25 @@ bool MultiServerUpdatesWidget::processUploaderChanges(bool force)
         // TODO: We should deal with errors here. Should we?
         NX_INFO(this, "processUploaderChanges failed to upload all packages", force);
         setTargetState(WidgetUpdateState::ready, {});
+    }
+
+    if (state == ServerUpdateTool::OfflineUpdateState::push
+        || state == ServerUpdateTool::OfflineUpdateState::ready
+        || state == ServerUpdateTool::OfflineUpdateState::done)
+    {
+        // Should check all downloading servers and resume uploads if there are not any.
+        auto serversDownloading = m_stateTracker->peersInState(StatusCode::downloading,
+            /*withClient=*/false);
+        for (const auto id: serversDownloading)
+        {
+            bool hasUploads = m_serverUpdateTool->hasActiveUploadsTo(id);
+            bool hasUpdate = m_updateInfo.peersWithUpdate.contains(id);
+            if (!hasUploads && hasUpdate)
+            {
+                NX_DEBUG(this, "processUploaderChanges() - starting uploads to server %1", id);
+                m_serverUpdateTool->startUploadsToServer(m_updateInfo, id);
+            }
+        }
     }
     return true;
 }
@@ -2613,6 +2619,11 @@ void MultiServerUpdatesWidget::syncDebugInfoToUi()
         toDebugString(debugState, "installing", m_serverUpdateTool->getServersInstalling());
         toDebugString(debugState, "issued", m_stateTracker->peersIssued());
         toDebugString(debugState, "failed", m_stateTracker->peersFailed());
+        toDebugString(debugState, "with update", m_updateInfo.peersWithUpdate);
+        QSet<QnUuid> activeServers;
+        for (const auto& server: m_stateTracker->activeServers())
+            activeServers.insert(server.first);
+        toDebugString(debugState, "activeServers", activeServers);
 
         if (m_updateInfo.error != nx::update::InformationError::noError)
         {

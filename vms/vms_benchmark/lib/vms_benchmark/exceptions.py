@@ -4,16 +4,21 @@ class VmsBenchmarkError(Exception):
         self.original_exception = original_exception
 
 
-class TestCameraStreamingError(VmsBenchmarkError):
-    pass
-
-
 class DeviceStateError(VmsBenchmarkError):
     pass
 
 
 class DeviceCommandError(VmsBenchmarkError):
     pass
+
+
+class UnableToFetchDataFromDevice(VmsBenchmarkError):
+    pass
+
+
+class DeviceFileContentError(VmsBenchmarkError):
+    def __init__(self, path):
+        super(DeviceFileContentError, self).__init__(f"File '{path}' has unexpected content")
 
 
 class ServerError(VmsBenchmarkError):
@@ -24,7 +29,19 @@ class ServerApiError(VmsBenchmarkError):
     pass
 
 
+class ServerApiResponseError(VmsBenchmarkError):
+    pass
+
+
 class TestCameraError(VmsBenchmarkError):
+    pass
+
+
+class VmsBenchmarkIssue(VmsBenchmarkError):
+    pass
+
+
+class TestCameraStreamingIssue(VmsBenchmarkIssue):
     pass
 
 

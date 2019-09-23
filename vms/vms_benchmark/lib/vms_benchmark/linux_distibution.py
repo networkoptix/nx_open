@@ -39,24 +39,18 @@ class LinuxDistributionDetector:
 
             info = dict(unquote_value_if_needed(*line.split('=')) for line in res.split('\n') if len(line.strip()) > 0)
 
-            if info.get('ID', None) == 'debian':
-                os_name = 'debian'
-                os_family_name = 'debian'
-                os_version = info.get('VERSION_ID')
-                if int(os_version) >= 8:
-                    with_systemd = True
-            elif info.get('ID', None) == 'ubuntu':
-                os_name = 'ubuntu'
-                os_family_name = 'debian'
-                os_version = info.get('VERSION_ID')
-
-                if int(os_version.replace('.', '')) >= 1604:
-                    with_systemd = True
-
-        if not os_name:
+            os_name = info.get('ID')
+            os_family_name = info.get('ID_LIKE')
+            os_version = info.get('VERSION_ID')
+        else:
             os_name = 'custom'
             os_family_name = 'none'
             os_version = 'none'
+
+        init_link = device.eval('readlink /sbin/init')
+
+        if isinstance(init_link, str) and init_link.split('/')[-1] == 'systemd':
+            with_systemd = True
 
         return LinuxDistributionDetector.LinuxDistribution(
             name=os_name,

@@ -7,7 +7,6 @@ set(logs_dir ${CMAKE_BINARY_DIR}/build_logs)
 set(build_dir ${CMAKE_CURRENT_BINARY_DIR}/build)
 set(zip_file ${distribution_output_dir}/${vms_benchmark_distribution_name}.zip)
 set(zip_log ${logs_dir}/vms_benchmark_zip.log)
-set(vms_benchmark_binary ${build_dir}/dist/vms_benchmark)
 
 # Collect source files for statically prepared files.
 set(copied_static_origin ${package_dir})
@@ -24,7 +23,7 @@ nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/build_options.conf.in
     ${build_script_options} @ONLY)
 
 # Command to be executed at the build phase.
-if(targetDevice STREQUAL "linux-x64")
+if(targetDevice MATCHES "^linux-x64")
     add_custom_command(OUTPUT ${zip_file}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${logs_dir}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${build_dir}
@@ -32,8 +31,7 @@ if(targetDevice STREQUAL "linux-x64")
         COMMAND ${CMAKE_COMMAND} -P ${copy_files_script} #< Create and populate sdk dir.
 
         COMMAND bash ${CMAKE_CURRENT_SOURCE_DIR}/build.sh >${zip_log}
-        COMMAND ${CMAKE_COMMAND} -E copy ${build_dir}/dist/vms_benchmark ${stage_dir}/
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/distrib/.vms_benchmark.ini ${stage_dir}/
+        COMMAND ${CMAKE_COMMAND} -E copy ${build_dir}/distrib/main ${stage_dir}/vms_benchmark
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/distrib/vms_benchmark.conf ${stage_dir}/
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/readme.md ${stage_dir}/
 
@@ -56,12 +54,12 @@ elseif(targetDevice STREQUAL "windows-x64")
         COMMAND ${CMAKE_COMMAND} -P ${copy_files_script} #< Create and populate sdk dir.
 
         COMMAND cmd /c ${CMAKE_CURRENT_SOURCE_DIR}/build.bat >${zip_log}
-        COMMAND ${CMAKE_COMMAND} -E copy ${build_dir}/dist/vms_benchmark.exe ${stage_dir}/
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/distrib/.vms_benchmark.ini ${stage_dir}/
+        COMMAND ${CMAKE_COMMAND} -E copy ${build_dir}/distrib/main.exe ${stage_dir}/vms_benchmark.exe
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/distrib/vms_benchmark.conf ${stage_dir}/
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/readme.md ${stage_dir}/
 
         COMMAND ${CMAKE_COMMAND} -E echo
-        "  Zipping VMS Benchmark - see ${zip_log}"
+            "  Zipping VMS Benchmark - see ${zip_log}"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} #< Needed for zipping.
         COMMAND ${CMAKE_COMMAND} -E tar cvf ${zip_file} --format=zip vms_benchmark >${zip_log}
 

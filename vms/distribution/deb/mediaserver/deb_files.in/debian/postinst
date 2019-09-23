@@ -7,8 +7,6 @@ COMPANY_NAME=@customization.companyId@
 if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 
-UPGRADING=${2:+yes}
-
 export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 
 BASE_DIR="/opt/$COMPANY_NAME/mediaserver"
@@ -21,6 +19,13 @@ RUNTIME_CONFIG_FILE="$ETC_DIR/running_time.conf"
 DB_PATH="$BASE_DIR/var/ecs.sqlite"
 
 CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
+
+if [[ -f $CONFIG_FILE ]]
+then
+    declare -i -r UPGRADING=1
+else
+    declare -i -r UPGRADING=0
+fi    
 
 # Default MS parameters
 PORT_DEFAULT="7001"
@@ -156,7 +161,7 @@ displayCompleteSetupHintIfNeeded()
 {
     local -i port="$1"
 
-    [ -n "$UPGRADING" ] && return
+    [[ $UPGRADING == 1 ]] && return
 
     if checkNewSystem $port
     then
@@ -205,7 +210,7 @@ case "$1" in
 
         [ ! -d "$BASE_DIR/var" ] && mkdir -p "$BASE_DIR/var"
 
-        if [ -z "$UPGRADING" ]
+        if [[ $UPGRADING == 0 ]]
         then
             PORT="$($CFG_HELPER port)"
             [ -z "$PORT" ] && PORT=$(findFreePort $PORT_DEFAULT)

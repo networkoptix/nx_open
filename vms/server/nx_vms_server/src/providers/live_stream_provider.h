@@ -65,6 +65,8 @@ public:
 
     static bool hasRunningLiveProvider(QnNetworkResource* netRes);
     virtual void startIfNotRunning() override;
+    virtual void start(Priority priority = InheritPriority) override;
+    void beforeDestroy();
 
     virtual bool isCameraControlDisabled() const;
     void filterMotionByMask(const QnMetaDataV1Ptr& motion);
@@ -80,6 +82,8 @@ protected:
     virtual QnMetaDataV1Ptr getCameraMetadata();
     virtual void onStreamResolutionChanged(int channelNumber, const QSize& picSize);
     bool needHardwareMotion();
+
+    virtual void processMetadata(const QnCompressedVideoDataPtr& compressedFrame);
 protected:
     mutable QnMutex m_liveMutex;
 
@@ -135,6 +139,7 @@ private:
     bool m_doNotConfigureCamera = false;
 
     std::unique_ptr<nx::analytics::MetadataLogger> m_metadataLogger;
+    std::atomic_bool m_canStartThread{true};
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;

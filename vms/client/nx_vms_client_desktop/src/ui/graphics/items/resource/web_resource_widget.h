@@ -2,6 +2,7 @@
 
 #include <ui/graphics/items/resource/resource_widget.h>
 
+class QWebPage;
 class QnGraphicsWebView;
 
 class QnWebResourceWidget : public QnResourceWidget
@@ -14,6 +15,8 @@ public:
     virtual ~QnWebResourceWidget();
 
     virtual bool eventFilter(QObject* object, QEvent* event) override;
+
+    QWebPage* page() const;
 
 protected:
     virtual int helpTopicAt(const QPointF& pos) const override;

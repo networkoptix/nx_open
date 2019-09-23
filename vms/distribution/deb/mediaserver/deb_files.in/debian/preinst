@@ -59,13 +59,14 @@ then
     fi
 
     # Clean up potentially unwanted files from previous installations.
-    for dir in \
+    for item in \
         "$BASE_DIR/lib" \
         "$BASE_DIR/bin" \
         "$BASE_DIR/var/scripts" \
-        "/opt/$COMPANY_NAME/lib"
+        "/opt/$COMPANY_NAME/lib" \
+        "$MEDIA_SERVER_STARTUP_SCRIPT"
     do
-        rm -rf "$dir" || true
+        rm -rf "$item" || true
     done
 fi
 

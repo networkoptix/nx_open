@@ -129,6 +129,29 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
     return m_openStreamResult;
 }
 
+void CLServerPushStreamReader::postProcessData(const QnAbstractMediaDataPtr& data)
+{
+    QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
+    QnCompressedAudioDataPtr audioData = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
+
+    QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this);
+    if (videoData)
+    {
+        m_stat[videoData->channelNumber].onData(
+            static_cast<unsigned int>(data->dataSize()),
+            videoData->flags & AV_PKT_FLAG_KEY);
+
+        if (lp)
+            lp->onGotVideoFrame(videoData, m_currentLiveParams, m_openedWithStreamCtrl);
+    }
+    else
+        if (audioData)
+        {
+            if (lp)
+                lp->onGotAudioFrame(audioData);
+        }
+}
+
 void CLServerPushStreamReader::run()
 {
     initSystemThreadId();
@@ -188,8 +211,6 @@ void CLServerPushStreamReader::run()
             m_metadataLogger->pushData(data);
 
         QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
-        QnCompressedAudioDataPtr audioData = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
-
         if (videoData && needKeyData(videoData->channelNumber))
         {
             // I do not like; need to do smth with it
@@ -213,24 +234,9 @@ void CLServerPushStreamReader::run()
         if(data)
             data->dataProvider = this;
 
-        QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this);
-        if (videoData)
-        {
-            m_stat[videoData->channelNumber].onData(
-                static_cast<unsigned int>(data->dataSize()),
-                videoData->flags & AV_PKT_FLAG_KEY);
+        postProcessData(data);
 
-            if (lp)
-                lp->onGotVideoFrame(videoData, m_currentLiveParams, m_openedWithStreamCtrl);
-        }
-        else
-        if (audioData)
-        {
-            if (lp)
-                lp->onGotAudioFrame(audioData);
-        }
-
-        if (data && lp && lp->getRole() == Qn::CR_SecondaryLiveVideo)
+        if (data && getRole() == Qn::CR_SecondaryLiveVideo)
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 
         // check queue sizes

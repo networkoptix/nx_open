@@ -277,6 +277,7 @@ void EventRibbon::Private::updateTile(int index)
         widget->setProgressBarVisible(true);
         widget->setProgressValue(progress.value<qreal>());
         widget->setProgressTitle(modelIndex.data(Qt::DisplayRole).toString());
+        widget->setProgressFormat(modelIndex.data(Qn::ProgressFormatRole).toString());
         widget->setDescription(modelIndex.data(Qn::DescriptionTextRole).toString());
         widget->setToolTip(modelIndex.data(Qn::DescriptionTextRole).toString());
         widget->setCloseable(modelIndex.data(Qn::RemovableRole).toBool());

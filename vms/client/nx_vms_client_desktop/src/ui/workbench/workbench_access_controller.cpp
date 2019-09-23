@@ -52,6 +52,8 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(
 
             updatePermissions(resource);
         });
+    connect(resourceAccessManager(), &QnResourceAccessManager::allPermissionsRecalculated,
+        this, &QnWorkbenchAccessController::recalculateAllPermissions);
 
     connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
         this,

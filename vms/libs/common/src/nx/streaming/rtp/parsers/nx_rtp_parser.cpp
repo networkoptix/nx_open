@@ -73,7 +73,7 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
 
     if (rtpHeader->CSRCCount != 0 || rtpHeader->version != 2)
     {
-        NX_WARNING(this, lm("Got mailformed RTP packet header. Ignored."));
+        NX_WARNING(this, "Got malformed RTP packet header. Ignored.");
         return false;
     }
 

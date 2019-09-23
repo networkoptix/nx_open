@@ -3,6 +3,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QWidget>
+#include <QtWebKitWidgets/QWebPage>
 
 #include <nx/utils/string.h>
 #include <utils/resource_property_adaptors.h>
@@ -22,12 +23,14 @@
 
 #include <nx/vms/client/desktop/radass/radass_types.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
+#include <nx/vms/client/desktop/ini.h>
 
 #include <nx/client/ptz/ptz_helpers.h>
 #include <nx/client/ptz/ptz_hotkey_resource_property_adaptor.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
@@ -298,6 +301,57 @@ QList<QAction*> LayoutTourSettingsFactory::newActions(const Parameters& paramete
         actionGroup->addAction(action);
     }
     return actionGroup->actions();
+}
+
+
+WebPageFactory::WebPageFactory(QObject* parent):
+    Factory(parent)
+{
+}
+
+QList<QAction*> WebPageFactory::newActions(const Parameters& parameters,
+    QObject* parent)
+{
+    QList<QAction*> result;
+
+    auto widget = qobject_cast<QnWebResourceWidget*>(parameters.widget());
+    if (!NX_ASSERT(widget))
+        return result;
+
+    std::vector<QWebPage::WebAction> allowedActions = {
+        QWebPage::Back,
+        QWebPage::Forward,
+        QWebPage::Stop,
+        QWebPage::Reload
+    };
+
+    if (ini().enableWebKitDeveloperExtras)
+        allowedActions.push_back(QWebPage::InspectElement);
+
+    // TODO: calculate actual position.
+    static const QPoint kExamplePosition(1, 1);
+
+    QPointer<QWebPage> page = widget->page();
+    for (auto actionId: allowedActions)
+    {
+        auto sourceAction = page->action(actionId);
+        if (sourceAction && sourceAction->isEnabled())
+        {
+            auto action = new QAction(parent);
+            action->setText(sourceAction->text());
+            connect(action, &QAction::triggered, this,
+                [this, actionId, page]
+                {
+                    if (!page)
+                        return;
+
+                    page->updatePositionDependentActions(kExamplePosition);
+                    page->triggerAction(actionId);
+                });
+            result.push_back(action);
+        }
+    }
+    return result;
 }
 
 } // namespace action

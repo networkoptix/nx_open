@@ -12,6 +12,8 @@
 #include <ui/graphics/items/overlays/resource_title_item.h>
 #include <ui/help/help_topics.h>
 
+using namespace nx::vms::client::desktop;
+
 QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /*= NULL*/ )
     : base_type(context, item, parent)
     , m_webView(new QnGraphicsWebView(resource()->getUrl(), this))
@@ -149,8 +151,7 @@ void QnWebResourceWidget::optionsChangedNotify(Options changedFlags)
     return base_type::optionsChangedNotify(changedFlags);
 }
 
-bool QnWebResourceWidget::eventFilter(QObject *object
-    , QEvent *event)
+bool QnWebResourceWidget::eventFilter(QObject* object, QEvent* event)
 {
     if (object == m_webView )
     {
@@ -161,6 +162,11 @@ bool QnWebResourceWidget::eventFilter(QObject *object
     }
 
     return base_type::eventFilter(object, event);
+}
+
+QWebPage* QnWebResourceWidget::page() const
+{
+    return m_webView->page();
 }
 
 int QnWebResourceWidget::calculateButtonsVisibility() const

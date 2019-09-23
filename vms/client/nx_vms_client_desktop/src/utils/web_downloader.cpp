@@ -8,6 +8,7 @@
 
 #include <platform/environment.h>
 
+#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <common/common_module.h>
 
@@ -53,16 +54,88 @@ QString getSuggestedFileName(const QNetworkReply* reply)
     return match.captured(1);
 }
 
+QString getUniqueFilePath(const QString& path)
+{
+    static constexpr auto kNumTries = 100;
+    static constexpr auto kNameSuffix = " (%1)";
+
+    const auto fileInfo = QFileInfo(path);
+    if (!fileInfo.exists())
+        return path;
+
+    // Split the file into 2 parts - dot+extension, and everything else.
+    // For example, "path/file.tar.gz" becomes "path/file"+".tar.gz", while
+    // "path/file" (note lack of extension) becomes "path/file"+"".
+    QString secondPart = fileInfo.completeSuffix();
+    QString firstPart;
+    if (!secondPart.isEmpty())
+    {
+        secondPart = "." + secondPart;
+        firstPart = path.left(path.size() - secondPart.size());
+    }
+    else
+    {
+        firstPart = path;
+    }
+
+    // Try with an ever-increasing number suffix, until we've reached a file
+    // that does not yet exist.
+    for (int i = 1; i <= kNumTries; i++)
+    {
+        // Construct the new file name by adding the unique number between the
+        // first and second part.
+        const auto suffix = QString(kNameSuffix).arg(i);
+        const auto newPath = firstPart + suffix + secondPart;
+
+        // If no file exists with the new name, return it.
+        if (!QFileInfo::exists(newPath))
+            return newPath;
+    }
+
+    // All names are taken - bail out and return the original.
+    return path;
+}
+
+QString speedToText(qint64 bytesRead, qint64 elapsedMs)
+{
+    static constexpr qint64 kBitsPerByte = 8;
+
+    static constexpr auto kMsPerSec = 1000;
+    static constexpr qreal kBitsPerKb = 1000.0;
+    static constexpr qreal kKbPerMb = 1000.0;
+    static constexpr qreal kMbPerGb = 1000.0;
+
+    if (elapsedMs == 0)
+        elapsedMs = 1;
+
+    QString speedLabel = "Kbps";
+    qreal speed = (bytesRead * kBitsPerByte) / (kBitsPerKb * elapsedMs / kMsPerSec);
+
+    if (speed >= kKbPerMb)
+    {
+        speedLabel = "Mbps";
+        speed /= kKbPerMb;
+    }
+
+    if (speed >= kMbPerGb)
+    {
+        speedLabel = "Gbps";
+        speed /= kMbPerGb;
+    }
+
+    return QString("%1 %2").arg(speed, 0, 'f', 1).arg(speedLabel);
+}
+
 } // namespace
 
 WebDownloader::WebDownloader(QObject* parent,
     std::shared_ptr<QNetworkAccessManager> networkManager,
     QNetworkReply* reply,
-    QFile* file,
+    std::unique_ptr<QFile> file,
     const QFileInfo& fileInfo):
     base_type(parent),
     QnWorkbenchContextAware(parent), m_networkManager(networkManager), m_reply(reply),
-    m_file(file), m_fileInfo(fileInfo)
+    m_file(std::move(file)), m_fileInfo(fileInfo)
 {
     m_reply->setParent(this);
     startDownload();
@@ -81,6 +154,15 @@ public:
 WebDownloader::~WebDownloader()
 {
     context()->instance<WorkbenchProgressManager>()->remove(m_activityId);
+
+    // Cleanup incomplete files.
+    if (m_state != State::Completed)
+    {
+        if (m_file->isOpen())
+            m_file->close();
+
+        m_file->remove();
+    }
 }
 
 bool WebDownloader::download(
@@ -92,36 +174,61 @@ bool WebDownloader::download(
     const auto suggestedName = getSuggestedFileName(reply);
 
     auto lastDir = qnSettings->lastDownloadDir();
-    if (lastDir.isEmpty())
+    if (lastDir.isEmpty() || !QDir(lastDir).exists())
         lastDir = qnSettings->mediaFolder();
+
+    auto filePath = getUniqueFilePath(QDir(lastDir).filePath(suggestedName));
 
     ContextHelper contextHelper(parent);
 
-    QnCustomFileDialog saveDialog(contextHelper.windowWidget(),
-        tr("Save File As..."),
-        QDir(lastDir).filePath(suggestedName),
-        QnCustomFileDialog::createFilter(QnCustomFileDialog::kAllFilesFilter));
-    saveDialog.setFileMode(QFileDialog::AnyFile);
-    saveDialog.setAcceptMode(QFileDialog::AcceptSave);
+    std::unique_ptr<QFile> file;
+    QFileInfo fileInfo;
 
-    if (!saveDialog.exec())
-        return false;
+    // Loop until we have a writable file path.
+    while (true)
+    {
+        QnCustomFileDialog saveDialog(contextHelper.windowWidget(),
+            tr("Save File As..."),
+            filePath,
+            QnCustomFileDialog::createFilter(QnCustomFileDialog::kAllFilesFilter));
+        saveDialog.setFileMode(QFileDialog::AnyFile);
+        saveDialog.setAcceptMode(QFileDialog::AcceptSave);
 
-    const QString filePath = saveDialog.selectedFile();
+        if (!saveDialog.exec())
+            return false;
 
-    if (filePath.isEmpty())
-        return false;
+        filePath = saveDialog.selectedFile();
 
-    QFileInfo fileInfo(filePath);
+        if (filePath.isEmpty())
+            return false;
+
+        fileInfo = QFileInfo(filePath);
+        file = std::make_unique<QFile>();
+        file->setFileName(fileInfo.absoluteFilePath());
+        if (file->open(QIODevice::WriteOnly))
+            break; // Break from the loop if we got a writable file.
+
+        QnMessageBox messageBox(contextHelper.windowWidget());
+        messageBox.setIcon(QnMessageBoxIcon::Critical);
+        if (fileInfo.exists())
+        {
+            messageBox.setText(tr("Failed to overwrite file"));
+            messageBox.setInformativeText(QDir::toNativeSeparators(fileInfo.absoluteFilePath()));
+        }
+        else
+        {
+            messageBox.setText(tr("Failed to save file"));
+            messageBox.setInformativeText(
+                tr("%1 folder is blocked for writing.")
+                    .arg(QDir::toNativeSeparators(fileInfo.absolutePath())));
+        }
+        messageBox.setStandardButtons(QDialogButtonBox::Ok);
+        messageBox.exec();
+    }
 
     qnSettings->setLastDownloadDir(fileInfo.absolutePath());
 
-    auto file = new QFile(reply);
-    file->setFileName(fileInfo.absoluteFilePath());
-    if (!file->open(QIODevice::WriteOnly))
-        return false;
-
-    new WebDownloader(contextHelper.context()->instance<WorkbenchProgressManager>(), manager, reply, file, fileInfo);
+    new WebDownloader(contextHelper.context()->instance<WorkbenchProgressManager>(), manager, reply, std::move(file), fileInfo);
     return true;
 }
 
@@ -190,7 +297,7 @@ void WebDownloader::startDownload()
             cancel();
         });
 
-    connect(m_reply, &QNetworkReply::readyRead, this, &WebDownloader::onReadyRead);
+    connect(m_reply, &QNetworkReply::readyRead, this, &WebDownloader::writeAvailableData);
     connect(m_reply, &QNetworkReply::downloadProgress, this, &WebDownloader::onDownloadProgress);
     connect(m_reply, &QNetworkReply::finished, this, &WebDownloader::onReplyFinished);
 
@@ -198,12 +305,12 @@ void WebDownloader::startDownload()
 
     // If we missed readyRead or finished signals while save dialog event loop was running...
     if (m_reply->isRunning())
-        m_file->write(m_reply->readAll());
+        writeAvailableData();
 
     if (m_reply->isFinished())
     {
         if (m_reply->error() == QNetworkReply::NoError)
-            m_file->write(m_reply->readAll());
+            writeAvailableData();
         onReplyFinished();
     }
 }
@@ -230,6 +337,7 @@ void WebDownloader::cancel()
         if (messageBox.exec() == QDialogButtonBox::Cancel)
             return;
     }
+    m_cancelRequested = true;
     m_file->remove();
     m_reply->abort();
 
@@ -272,35 +380,47 @@ void WebDownloader::setState(State state)
     }
 }
 
-void WebDownloader::onReadyRead()
+void WebDownloader::writeAvailableData()
 {
-    m_file->write(m_reply->readAll());
+    const auto data = m_reply->readAll();
+    if (m_file->write(data) != data.size())
+    {
+        m_hasWriteError = true;
+        m_reply->abort();
+    }
 }
 
 void WebDownloader::onDownloadProgress(qint64 bytesRead, qint64 bytesTotal)
 {
     auto progressManager = context()->instance<WorkbenchProgressManager>();
-    if (m_state == State::Downloading)
-        progressManager->setProgress(m_activityId, static_cast<qreal>(bytesRead) / bytesTotal);
+    if (m_state != State::Downloading)
+        return;
+
+    const QString speed = speedToText(bytesRead, m_downloadTimer.elapsed());
+
+    progressManager->setProgress(m_activityId, static_cast<qreal>(bytesRead) / bytesTotal);
+    progressManager->setProgressFormat(m_activityId, QString("%1, %p%").arg(speed));
 }
 
 void WebDownloader::onReplyFinished()
 {
-    bool removeFile = false;
+    const bool success = m_reply->error() == QNetworkReply::NoError && !m_hasWriteError;
 
-    switch (m_reply->error())
+    if (success)
     {
-        case QNetworkReply::NoError:
-            setState(State::Completed);
-            break;
-        default:
+        setState(State::Completed);
+    }
+    else
+    {
+        // Show failed notification only if there was no cancel request from the user.
+        // If the user manually canceled the downloading process then silently remove the informer.
+        if (!m_cancelRequested)
             setState(State::Failed);
-            removeFile = true;
     }
 
     if (m_file->isOpen())
         m_file->close();
 
-    if (removeFile)
+    if (!success)
         m_file->remove();
 }
