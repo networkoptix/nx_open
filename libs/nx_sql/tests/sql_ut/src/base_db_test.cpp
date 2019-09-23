@@ -49,7 +49,7 @@ void BasicFixture::executeUpdate(const QString& queryText)
     NX_GTEST_ASSERT_EQ(DBResult::ok, dbResult);
 }
 
-void BasicFixture::init()
+std::filesystem::path BasicFixture::dbFilePath() const
 {
     m_tmpDir = testDataDir() + "/db_test/";
     QDir(m_tmpDir).removeRecursively();

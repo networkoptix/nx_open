@@ -85,6 +85,8 @@ protected:
         return queryCompletedPromise.get_future().get();
     }
 
+    std::filesystem::path dbFilePath() const;
+
 private:
     QString m_tmpDir;
     ConnectionOptions m_connectionOptions;
@@ -100,6 +102,11 @@ private:
 class BaseDbTest:
     public BasicFixture
 {
+    using base_type = BasicFixture;
+
+public:
+    using base_type::base_type;
+
 protected:
     virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) override;
     virtual void closeDatabase() override;
@@ -114,6 +121,11 @@ private:
 class FixtureWithQueryExecutorOnly:
     public BasicFixture
 {
+    using base_type = BasicFixture;
+
+public:
+    using base_type::base_type;
+
 protected:
     virtual void initializeQueryExecutor(const ConnectionOptions& connectionOptions) override;
     virtual void closeDatabase() override;
