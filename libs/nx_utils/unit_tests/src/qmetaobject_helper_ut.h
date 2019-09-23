@@ -3,6 +3,7 @@
 #include <QtCore/QThread>
 #include <QtCore/QUuid>
 #include <QtCore/QRect>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx::utils::test {
 
