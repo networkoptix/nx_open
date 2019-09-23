@@ -418,9 +418,7 @@ std::optional<api::PeerConnectionSpeed>
     ListeningPeerPool::findLocalPeerWithBestUplinkSpeedUnsafe(
         const nx::String& systemId) const
 {
-    using Status = std::pair<std::string, ListeningPeerStatus>;
-
-	std::optional<api::PeerConnectionSpeed> bestUplinkSpeed;
+    std::optional<api::PeerConnectionSpeed> bestUplinkSpeed;
     for (const auto& status: m_listeningPeerDb->getListeningPeerStatus(nx::toStdString(systemId)))
     {
         const auto peerIter = m_peers.find(
