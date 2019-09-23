@@ -24,7 +24,7 @@ bool LoggerSettings::parse(const QString& str)
     {
         if (param.first == "file")
         {
-            const auto filePath = std::filesystem::path(param.second.toStdString());
+            const auto filePath = std::filesystem::old_version_support::path(param.second.toStdString());
 
             logBaseName = QString::fromStdString(filePath.filename().string());
             if (filePath.has_parent_path())
