@@ -19,6 +19,7 @@ network::http::FusionRequestErrorClass toFusionRequestErrorClass(api::ResultCode
         case api::ResultCode::awsApiError:
             return FusionRequestErrorClass::badRequest;
         case api::ResultCode::unauthorized:
+		case api::ResultCode::forbidden:
             return FusionRequestErrorClass::unauthorized;
         case api::ResultCode::notFound:
             return FusionRequestErrorClass::logicError;

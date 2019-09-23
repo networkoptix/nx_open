@@ -57,6 +57,8 @@ Yunhong Gu, last updated 01/27/2011
 #include <cassert>
 
 #include "channel.h"
+#include "core.h"
+#include "common.h"
 #include "packet.h"
 
 #ifdef _WIN32
@@ -89,18 +91,18 @@ UdpChannel::~UdpChannel()
     closeSocket();
 }
 
-void UdpChannel::open(const std::optional<detail::SocketAddress>& addr)
+Result<> UdpChannel::open(const std::optional<detail::SocketAddress>& addr)
 {
     // construct an socket
     m_iSocket = ::socket(m_iIPversion, SOCK_DGRAM, 0);
 
     if (INVALID_SOCKET == m_iSocket)
-        throw CUDTException(1, 0, NET_ERROR);
+        return Result<>(ErrorInfo(1, 0, NET_ERROR));
 
     if (addr)
     {
         if (0 != ::bind(m_iSocket, addr->get(), addr->size()))
-            throw CUDTException(1, 3, NET_ERROR);
+            return Result<>(ErrorInfo(1, 3, NET_ERROR));
     }
     else
     {
@@ -115,24 +117,24 @@ void UdpChannel::open(const std::optional<detail::SocketAddress>& addr)
         hints.ai_socktype = SOCK_DGRAM;
 
         if (0 != ::getaddrinfo(NULL, "0", &hints, &res))
-            throw CUDTException(1, 3, NET_ERROR);
+            return Result<>(ErrorInfo(1, 3, NET_ERROR));
 
         if (0 != ::bind(m_iSocket, res->ai_addr, res->ai_addrlen))
-            throw CUDTException(1, 3, NET_ERROR);
+            return Result<>(ErrorInfo(1, 3, NET_ERROR));
 
         ::freeaddrinfo(res);
     }
 
-    setUDPSockOpt();
+    return setUDPSockOpt();
 }
 
-void UdpChannel::open(UDPSOCKET udpsock)
+Result<> UdpChannel::open(UDPSOCKET udpsock)
 {
     m_iSocket = udpsock;
-    setUDPSockOpt();
+    return setUDPSockOpt();
 }
 
-void UdpChannel::setUDPSockOpt()
+Result<> UdpChannel::setUDPSockOpt()
 {
 #if defined(BSD) || defined(__APPLE__)
     // BSD system will fail setsockopt if the requested buffer size exceeds system maximum value
@@ -145,7 +147,9 @@ void UdpChannel::setUDPSockOpt()
     // for other systems, if requested is greated than maximum, the maximum value will be automactally used
     if ((0 != ::setsockopt(m_iSocket, SOL_SOCKET, SO_RCVBUF, (char*)&m_iRcvBufSize, sizeof(int))) ||
         (0 != ::setsockopt(m_iSocket, SOL_SOCKET, SO_SNDBUF, (char*)&m_iSndBufSize, sizeof(int))))
-        throw CUDTException(1, 3, NET_ERROR);
+    {
+        return Result<>(ErrorInfo(1, 3, NET_ERROR));
+    }
 #endif
 
     timeval tv;
@@ -163,16 +167,18 @@ void UdpChannel::setUDPSockOpt()
     // UNIX does not support SO_RCVTIMEO
     int opts = ::fcntl(m_iSocket, F_GETFL);
     if (-1 == ::fcntl(m_iSocket, F_SETFL, opts | O_NONBLOCK))
-        throw CUDTException(1, 3, NET_ERROR);
+        return Result<>(ErrorInfo(1, 3, NET_ERROR));
 #elif _WIN32
     DWORD ot = 1; //milliseconds
     if (0 != ::setsockopt(m_iSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&ot, sizeof(DWORD)))
-        throw CUDTException(1, 3, NET_ERROR);
+        return Result<>(ErrorInfo(1, 3, NET_ERROR));
 #else
     // Set receiving time-out value
     if (0 != ::setsockopt(m_iSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(timeval)))
-        throw CUDTException(1, 3, NET_ERROR);
+        return Result<>(ErrorInfo(1, 3, NET_ERROR));
 #endif
+
+    return success();
 }
 
 int UdpChannel::getSndBufSize()
@@ -213,7 +219,7 @@ detail::SocketAddress UdpChannel::getPeerAddr() const
     return socketAddress;
 }
 
-int UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packet) const
+Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packet) const
 {
     assert(m_iSocket != INVALID_SOCKET);
 
@@ -273,10 +279,13 @@ int UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packet) const
             *((uint32_t *)packet.m_pcData + l) = ntohl(*((uint32_t *)packet.m_pcData + l));
     }
 
-    return res;
+    if (res < 0)
+        return ErrorInfo(1, 1);
+
+    return success(res);
 }
 
-int UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet) const
+Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet) const
 {
     assert(m_iSocket != INVALID_SOCKET);
 
@@ -319,7 +328,7 @@ int UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet) const
     if (res <= 0)
     {
         packet.setLength(-1);
-        return -1;
+        return ErrorInfo(2, 2);
     }
 
     packet.setLength(res - CPacket::m_iPktHdrSize);
@@ -340,19 +349,25 @@ int UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet) const
             *((uint32_t *)packet.m_pcData + j) = ntohl(*((uint32_t *)packet.m_pcData + j));
     }
 
-    return packet.getLength();
+    return success(packet.getLength());
 }
 
-int UdpChannel::shutdown()
+Result<void> UdpChannel::shutdown()
 {
     if (m_iSocket == INVALID_SOCKET)
-        return 0;
+        return success();
 
+    int result = 0;
 #ifdef _WIN32
-    return ::shutdown(m_iSocket, SD_BOTH);
+    result = ::shutdown(m_iSocket, SD_BOTH);
 #else
-    return ::shutdown(m_iSocket, SHUT_RDWR);
+    result = ::shutdown(m_iSocket, SHUT_RDWR);
 #endif
+
+    if (result == 0)
+        return success();
+
+    return ErrorInfo(3, 3);
 }
 
 void UdpChannel::closeSocket()

@@ -41,7 +41,7 @@ class Model;
 
 namespace controller {
 
-class AccessManager;
+class AuthorizationManager;
 
 using GetStorageHandler = nx::utils::MoveOnlyFunc<void(api::Result, api::Storage)>;
 
@@ -69,11 +69,11 @@ public:
 
     void removeStorage(
         nx::utils::stree::ResourceContainer authInfo,
-        const std::string& storageId,
+        std::string storageId,
         nx::utils::MoveOnlyFunc<void(api::Result)> handler);
 
     void listCameras(
-        const std::string& storageId,
+        std::string storageId,
         nx::utils::MoveOnlyFunc<void(api::Result, std::vector<std::string>)> handler);
 
     void getCredentials(
@@ -125,11 +125,18 @@ private:
             GetStorageHandler handler);
     };
 
+	struct SystemStorageContext
+	{
+		nx::utils::stree::ResourceContainer authInfo;
+		api::System system;
+		api::Result result;
+	};
+
 private:
     void getStorage(
         std::shared_ptr<ReadStorageContext> readStorageContext);
 
-    void checkReadStorageAllowed(
+    void authorizeReadingStorage(
         std::shared_ptr<ReadStorageContext> readStorageContext);
 
     void getCredentialsForStorage(
@@ -174,9 +181,9 @@ private:
     template<typename DbFunc, typename Handler>
     void modifySystemStorageRelation(
         const char* operation,
-        const nx::utils::stree::ResourceContainer& authInfo,
-        const std::string& storageId,
-        const std::string& systemId,
+        nx::utils::stree::ResourceContainer authInfo,
+        std::string storageId,
+        std::string systemId,
         DbFunc dbFunc,
         Handler handler);
 
@@ -185,7 +192,7 @@ private:
     const std::string& m_clusterId;
     model::dao::AbstractStorageDao* m_storageDao = nullptr;
     BucketManager* m_bucketManager = nullptr;
-    std::unique_ptr<AccessManager> m_accessManager;
+    std::unique_ptr<AuthorizationManager> m_authorizationManager;
     std::unique_ptr<nx::geo_ip::AbstractResolver> m_geoIpResolver;
     QnMutex m_mutex;
     std::set<std::shared_ptr<s3::DataUsageCalculator>> m_dataUsageCalculators;

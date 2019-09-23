@@ -825,11 +825,11 @@ int UdtStreamSocket::handleRecvResult(int recvResult)
         // UDT doesn't translate the EOF into a recv with zero return, but instead
         // it returns error with 2001 error code. We need to detect this and translate
         // back with a zero return here .
-        if (udtErrorCode == CUDTException::ECONNLOST)
+        if (udtErrorCode == udterror::ECONNLOST)
         {
             return 0;
         }
-        else if (udtErrorCode == CUDTException::EINVSOCK)
+        else if (udtErrorCode == udterror::EINVSOCK)
         {
             // This is another very ugly hack since after our patch for UDT.
             // UDT cannot distinguish a clean close or a crash. And I cannot

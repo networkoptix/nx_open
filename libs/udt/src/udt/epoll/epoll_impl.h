@@ -7,6 +7,7 @@
 #include <set>
 
 #include "abstract_epoll.h"
+#include "../result.h"
 #include "../udt.h"
 
 class EpollImpl
@@ -15,18 +16,24 @@ public:
     EpollImpl();
     virtual ~EpollImpl();
 
-    int addUdtSocket(const UDTSOCKET& u, const int* events);
-    int removeUdtSocket(const UDTSOCKET& u);
+    Result<> initialize();
+
+    void addUdtSocket(const UDTSOCKET& u, const int* events);
+    void removeUdtSocket(const UDTSOCKET& u);
     void removeUdtSocketEvents(const UDTSOCKET& socket);
 
     void add(const SYSSOCKET& s, const int* events);
     void remove(const SYSSOCKET& s);
 
-    int wait(
+    /**
+     * @return Signalled socket count.
+     */
+    Result<int> wait(
         std::map<UDTSOCKET, int>* udtReadFds, std::map<UDTSOCKET, int>* udtWriteFds,
         int64_t msTimeout,
         std::map<SYSSOCKET, int>* systemReadFds, std::map<SYSSOCKET, int>* systemWriteFds);
-    int interruptWait();
+
+    void interruptWait();
 
     void updateEpollSets(int events, const UDTSOCKET& socketId, bool enable);
 

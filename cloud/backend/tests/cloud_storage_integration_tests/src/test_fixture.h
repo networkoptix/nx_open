@@ -21,63 +21,80 @@ public:
     ~TestFixture();
 
 protected:
-	enum InitializeFlags
-	{
-		bucket = 1 << 0,
-		storage = 1 << 1,
-		system = 1 << 2,
-		all = bucket | storage | system,
-	};
-
-    class TestContext
+	class TestContext
     {
 	public:
         S3Bucket* s3Bucket = nullptr;
         nx::cloud::db::AccountWithPassword cloudDbAccount;
         nx::cloud::db::api::SystemData system;
         api::Storage storage;
+		nx::utils::Url storageServiceUrl;
         std::unique_ptr<api::Client> storageServiceClient;
     };
 
     virtual void SetUp() override;
 
     /**
-     * Does the following:
-     * - Launches an S3 bucket
-     * - Adds an activated account and system to CloudDb
-     * - Launches a Cloud Storage Service instance
-     * - Prepares a Cloud Storage Service api client with CloudDb credentials
-     * - Adds the S3 bucket to the Cloud Storage Service
-     * - Creates a Cloud Storage.
-     * - Associates the CloudDb system with the Cloud Storage
+     * Initializes a TestContext with an S3Bucket, Cloud account and
+	 * System and a CloudStorageService client with Cloud account credentials.
      */
-    TestContext initializeTest(int initializeFlags = InitializeFlags::all);
+    TestContext initializeTest();
+
+	/**
+	 * Identical to initializeTest except that CloudStorageService client is initialised with
+	 * System credentials instead of Cloud account credentials.
+	 */
+	TestContext initializeTestWithSystemCredentials();
 
     nx::cloud::db::CdbLauncher& cloudDb();
     const nx::cloud::db::CdbLauncher& cloudDb() const;
     CloudStorageLauncher& storageService(int index = 0);
     const CloudStorageLauncher& storageService(int index = 0) const;
 
-	void readStorage(api::Client* cloudStorageClient, const std::string& storageId);
+	void addStorage(
+		const std::unique_ptr<api::Client>& storageServiceClient,
+		const api::AddStorageRequest& request);
+	std::pair<api::Result, api::Storage> waitForAddStorageResponse();
+
+	void readStorage(
+		const std::unique_ptr<api::Client>& storageServiceClient,
+		const std::string& storageId);
 	std::pair<api::Result, api::Storage> waitForReadStorageResponse();
 
-	void removeStorage(api::Client* storageServiceClient, const std::string& storageId);
+	void removeStorage(
+		const std::unique_ptr<api::Client>& storageServiceClient,
+		const std::string& storageId);
 	api::Result waitForRemoveStorageResponse();
 
-	void getCredentials(api::Client* cloudStorageClient, const std::string& storageId);
+	void addSystem(
+		const std::unique_ptr<api::Client>& storageServiceClient,
+		const std::string& storageId,
+		const api::AddSystemRequest& request);
+	std::pair<api::Result, api::System> waitForAddSystemResponse();
+
+	void removeSystem(
+		const std::unique_ptr<api::Client>& storageServiceClient,
+		const std::string& storageId,
+		const std::string& systemId);
+	api::Result waitForRemoveSystemResponse();
+
+	void requestMediaContentCredentials(
+		const std::unique_ptr<api::Client>& storageServiceClient,
+		const std::string& storageId);
 	std::pair<api::Result, api::StorageCredentials> waitForGetCredentialsResponse();
 
 	std::unique_ptr<api::Client> makeStorageServiceClient(
 		const nx::utils::Url& storageServiceUrl,
-		const nx::cloud::db::AccountWithPassword& cloudDbAccount) const;
+		const std::string& userName,
+		const std::string& password) const;
+
+	void addBucket(TestContext* outTestContext);
+	void addStorage(TestContext* outTestContext);
+	void addSystem(TestContext* outTestContext);
 
 private:
     S3Bucket& launchS3Bucket();
     CloudStorageLauncher& launchCloudStorageService();
-
-    void addBucket(TestContext* outTestContext);
-    void addStorage(TestContext* outTestContext);
-    void addSystem(TestContext* outTestContext);
 
 private:
     controller::GeoIpResolverFactory::Function m_geoIpResolverFactoryFuncBak;
@@ -86,8 +103,11 @@ private:
     discovery::test::DiscoveryServer m_discoveryServer;
     std::unique_ptr<CloudStorageCluster> m_cloudStorageCluster;
     nx::cloud::db::CdbLauncher m_cloudDb;
+	nx::utils::SyncQueue<std::pair<api::Result, api::Storage>> m_addStorageResponse;
 	nx::utils::SyncQueue<std::pair<api::Result, api::Storage>> m_readStorageResponse;
 	nx::utils::SyncQueue<api::Result> m_removeStorageResponse;
+	nx::utils::SyncQueue<std::pair<api::Result, api::System>> m_addSystemResponse;
+	nx::utils::SyncQueue<api::Result> m_removeSystemResponse;
 	nx::utils::SyncQueue<std::pair<api::Result, api::StorageCredentials>> m_getCredentialsResponse;
 };
 

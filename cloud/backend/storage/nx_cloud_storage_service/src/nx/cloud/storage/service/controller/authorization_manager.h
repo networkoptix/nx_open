@@ -23,11 +23,11 @@ namespace controller {
 
 using AuthorizeReadingStorageHandler = nx::utils::MoveOnlyFunc<void(api::Result)>;
 
-class AccessManager
+class AuthorizationManager
 {
 public:
-    AccessManager(const conf::CloudDb& settings);
-    ~AccessManager();
+    AuthorizationManager(const conf::CloudDb& settings);
+    ~AuthorizationManager();
 
     void stop();
 

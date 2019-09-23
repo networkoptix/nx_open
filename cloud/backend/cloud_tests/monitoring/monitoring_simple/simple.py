@@ -22,6 +22,8 @@ from monitoring_simple.ssl_helper import cert_valid_days
 SSL_CERT_RENEW_DAYS_WARNING = 20
 RETRY_TIMEOUT = 10  # seconds
 
+DEFAULT_LOGIN = 'admin'
+ADMIN_PASS = 'qweasd123'
 
 log = logging.getLogger('simple_cloud_test')
 
@@ -104,7 +106,8 @@ def testmethod(delay=0, host=None, continue_if_fails=False, metric=None, tries=1
                         if n_try == tries:
                             raise
 
-                        log.error('Test {}: failed. Exception {} occured. Retrying...'.format(f.__name__, type(e).__name__))
+                        log.error(
+                            'Test {}: failed. Exception {} occured. Retrying...'.format(f.__name__, type(e).__name__))
 
                         io = StringIO()
                         traceback.print_exc(file=io)
@@ -402,7 +405,7 @@ class CloudSession(object):
         self.test_cctu_base(command)
 
     def test_traffic_relay_cert(self, relay_name):
-        domain = '{}.vmsproxy.com/'.format(relay_name)
+        domain = '{}.vmsproxy.com'.format(relay_name)
         days = cert_valid_days(domain)
 
         log.info('Certificate for {} is valid {} more days'.format(domain, days))
@@ -432,23 +435,23 @@ class CloudSession(object):
         self.test_traffic_relay('relay-si')
 
     @testmethod(metric='traffic_relay_cert_failure', host='relay-la', continue_if_fails=True)
-    def test_traffic_relay_la(self):
+    def test_traffic_relay_cert_la(self):
         self.test_traffic_relay_cert('relay-la')
 
     @testmethod(metric='traffic_relay_cert_failure', host='relay-ny', continue_if_fails=True)
-    def test_traffic_relay_ny(self):
+    def test_traffic_relay_cert_ny(self):
         self.test_traffic_relay_cert('relay-ny')
 
     @testmethod(metric='traffic_relay_cert_failure', host='relay-fr', continue_if_fails=True)
-    def test_traffic_relay_fr(self):
+    def test_traffic_relay_cert_fr(self):
         self.test_traffic_relay_cert('relay-fr')
 
     @testmethod(metric='traffic_relay_cert_failure', host='relay-sy', continue_if_fails=True)
-    def test_traffic_relay_sy(self):
+    def test_traffic_relay_cert_sy(self):
         self.test_traffic_relay_cert('relay-sy')
 
     @testmethod(metric='traffic_relay_cert_failure', host='relay-si', continue_if_fails=True)
-    def test_traffic_relay_si(self):
+    def test_traffic_relay_cert_si(self):
         self.test_traffic_relay_cert('relay-si')
 
     @testmethod(metric='email_failure', continue_if_fails=True, debug_skip=True)
@@ -533,7 +536,7 @@ class CloudSession(object):
         self.vms_user_id = user['vmsUserId']
 
         r = requests.get('https://{system_id}.relay.vmsproxy.com/ec2/getUsers'.format(system_id=self.system_id),
-                      auth=self.auth)
+                         auth=self.auth)
         assert r.status_code == 200, "Failed to get users from vms. Code: {}".format(r.status_code)
 
         data = r.json()
@@ -576,7 +579,7 @@ class CloudSession(object):
 
         # get users from mediaserver
         r = requests.get('https://{system_id}.relay.vmsproxy.com/ec2/getUsers'.format(system_id=self.system_id),
-                      auth=self.auth)
+                         auth=self.auth)
         assert r.status_code == 200, "Failed to get users from vms. Code: {}".format(r.status_code)
 
         data = r.json()
@@ -594,10 +597,10 @@ def mediaserver(configuration):
     client = docker.client.from_env()
 
     volumes = {'/srv/containers/mediaserver/etc': {'bind': '/opt/networkoptix/mediaserver/etc', 'mode': 'rw'},
-                '/srv/containers/mediaserver/var': {'bind': '/opt/networkoptix/mediaserver/var', 'mode': 'rw'}}
+               '/srv/containers/mediaserver/var': {'bind': '/opt/networkoptix/mediaserver/var', 'mode': 'rw'}}
 
     log.info('Running mediaserver')
-    container = client.containers.run(image, ports={7001: 7001},volumes=volumes, command=[cloud_host], detach=True)
+    container = client.containers.run(image, ports={7001: 7001}, volumes=volumes, command=[cloud_host], detach=True)
 
     try:
         mediaserver_ip = client.containers.get(container.id).attrs['NetworkSettings']['IPAddress']
@@ -606,23 +609,65 @@ def mediaserver(configuration):
             try:
                 log.info('Testing mediaserver connection...')
                 r = requests_retry_session().get('http://{}:7001/api/moduleInformation'.format(mediaserver_ip))
-                assert r.status_code == 200, 'Status code != 200: {}'.format(r.status_code)
+                if r.status_code != 200:
+                    raise ConnectionError('moduleInformation: Status code != 200: {}'.format(r.status_code))
+
                 response_data = r.json()
-                system_id = response_data['reply']['cloudSystemId']
-                if system_id:
+                system_name = response_data['reply']['systemName']
+                if system_name:
                     break
 
                 time.sleep(RETRY_TIMEOUT)
             except ConnectionError as e:
                 assert False, "Couldn't connect to local mediaserver directly: {}".format(e)
 
-        assert system_id, 'Couldn\'t get System ID'
+        # Setup if not alread set up
+        log.info('Setting up system')
+        r = requests_retry_session().post('http://{}:7001/api/setupLocalSystem'.format(mediaserver_ip),
+                                         params={'systemName': 'monitoring',
+                                                 'password': ADMIN_PASS},
+                                         auth=requests.auth.HTTPDigestAuth(DEFAULT_LOGIN, 'admin'))
+        log.info('Status: {}'.format(r.status_code))
+
+        # Detach from the cloud
+        log.info('Detaching system from the cloud')
+        r = requests_retry_session().get('http://{}:7001/api/detachFromCloud'.format(mediaserver_ip),
+                                         auth=requests.auth.HTTPDigestAuth(DEFAULT_LOGIN, ADMIN_PASS))
+        assert r.status_code == 200, 'detachFromCloud: Status code != 200: {}'.format(r.status_code)
+
+        # Attach system to the cloud
+        log.info('Binding system to the cloud')
+        r = requests.post('https://{}/cdb/system/bind'.format(configuration['host']),
+                          json={
+                              "name": system_name,
+                              "customization": 'default'
+                          },
+                          auth=requests.auth.HTTPDigestAuth(configuration['email'], configuration['password']))
+
+        json_data = r.json()
+
+        log.info('Saving cloud system credentials')
+        r = requests.post('http://{}:7001/api/saveCloudSystemCredentials'.format(mediaserver_ip),
+                          json={
+                              "cloudAuthKey": json_data["authKey"],
+                              "cloudSystemID": json_data["id"],
+                              "cloudAccountName": json_data["ownerAccountEmail"]
+                          },
+                          auth=requests.auth.HTTPDigestAuth(DEFAULT_LOGIN, ADMIN_PASS))
+
+        assert r.status_code == 200, 'saveCloudSystemCredentials: Status code != 200: {}'.format(r.status_code)
+
+        r = requests_retry_session().get('http://{}:7001/api/moduleInformation'.format(mediaserver_ip))
+        assert r.status_code == 200, 'moduleInformation (2): Status code != 200: {}'.format(r.status_code)
+
+        system_id = r.json()['reply']['cloudSystemId']
+        assert system_id, "Couldn't get System ID"
         log.info('System ID: {}'.format(system_id))
 
         try:
             log.info('Waiting for connection through proxy...')
 
-            r = requests_retry_session().get(
+            r = requests_retry_session(backoff_factor=1, retries=7).get(
                 'https://{}.relay.vmsproxy.com/web/api/moduleInformation'.format(system_id))
             assert r.status_code == 200, "Status != 200: {}".format(r.status_code)
             assert system_id == r.json()['reply']['cloudSystemId'], "Wrong system id"

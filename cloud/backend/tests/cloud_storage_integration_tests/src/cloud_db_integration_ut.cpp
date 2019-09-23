@@ -7,84 +7,114 @@ using namespace nx::cloud::storage::service::api;
 class CloudDbIntegration: public TestFixture
 {
 protected:
-	void givenCloudStorage()
+	TestContext givenCloudAccountWithStorage()
 	{
-		m_testContext = initializeTest();
+		auto testContext = initializeTest();
+		addBucket(&testContext);
+		addStorage(&testContext);
+		return testContext;
 	}
 
-	void givenCloudStorageWithoutSystem()
+	TestContext givenCloudSystemWithStorage()
 	{
-		m_testContext = initializeTest(InitializeFlags::bucket | InitializeFlags::storage);
+		auto cloudAccount = givenCloudAccountWithStorage();
+		addSystem(&cloudAccount);
+		return cloudAccount;
 	}
 
-	void givenSharedCloudDbSystem(
-		nx::cloud::db::api::SystemAccessRole systemAccessRole =
-		    nx::cloud::db::api::SystemAccessRole::liveViewer)
+	TestContext givenCloudAccount()
 	{
-		givenCloudStorage();
+		return initializeTest();
+	}
 
-		auto cloudDbAccount = cloudDb().addActivatedAccount2();
+	TestContext givenCloudStorageWithoutSystem()
+	{
+		return givenCloudAccountWithStorage();
+	}
 
+	std::unique_ptr<Client> givenMediaserver(const TestContext& testContext)
+	{
+		return makeStorageServiceClient(
+			testContext.storageServiceUrl,
+			testContext.system.id,
+			testContext.system.authKey);
+	}
+
+	TestContext givenCloudAccountWithSystemCredentials()
+	{
+		return initializeTestWithSystemCredentials();
+	}
+
+	void shareSystem(
+		const TestContext& grantor,
+		const TestContext& receiver,
+		cloud::db::api::SystemAccessRole accessLevel)
+	{
 		cloudDb().shareSystem(
-			m_testContext.cloudDbAccount,
-			m_testContext.system.id,
-			cloudDbAccount.email,
-			systemAccessRole);
-
-		m_testContext2.cloudDbAccount = std::move(cloudDbAccount);
-		m_testContext2.storageServiceClient = makeStorageServiceClient(
-			storageService().httpUrl(),
-			m_testContext2.cloudDbAccount);
+			grantor.cloudDbAccount,
+			grantor.system.id,
+			receiver.cloudDbAccount.email,
+			accessLevel);
 	}
 
-	void givenSecondCloudDbAccount()
+	void whenAddStorage(const std::unique_ptr<api::Client>& client)
 	{
-		m_testContext2.cloudDbAccount = cloudDb().addActivatedAccount2();
-		m_testContext2.storageServiceClient = makeStorageServiceClient(
-			storageService().httpUrl(),
-			m_testContext2.cloudDbAccount);
+		addStorage(client, {1000, "us-east-1"});
 	}
 
-	void whenSecondCloudDBAccountTriesToRemoveStorageOwnedByFirstAccount()
+	void whenReadStorage(TestContext* cloudAccount, const Storage& storage)
 	{
-		removeStorage(m_testContext2.storageServiceClient.get(), m_testContext.storage.id);
+		readStorage(cloudAccount->storageServiceClient, storage.id);
 	}
 
-	void whenSecondUserReadsStorageFromFirst()
+	void whenRemoveStorage(const std::unique_ptr<Client>& client, const Storage& storage)
 	{
-		readStorage(
-			m_testContext2.storageServiceClient.get(),
-			m_testContext.storage.id);
+		removeStorage(client, storage.id);
 	}
 
-	void whenSecondUserRequestsCredentialsForFirstUserStorage()
+	void whenRemoveStorage(TestContext* cloudAccount, const Storage& storage)
 	{
-		getCredentials(m_testContext2.storageServiceClient.get(), m_testContext.storage.id);
+		removeStorage(cloudAccount->storageServiceClient, storage.id);
 	}
 
-	void whenReadStorage()
+	void whenAddSystem(
+		const std::unique_ptr<api::Client>& client,
+		const Storage& storage,
+		const cloud::db::api::SystemData& system)
 	{
-		readStorage(m_testContext.storageServiceClient.get(), m_testContext.storage.id);
+		addSystem(client, storage.id, {system.id});
 	}
 
-	void whenRemoveStorage()
+	void whenRemoveSystem(
+		const std::unique_ptr<api::Client>& client,
+		const Storage& storage,
+		const cloud::db::api::SystemData& system)
 	{
-		removeStorage(m_testContext.storageServiceClient.get(), m_testContext.storage.id);
+		removeSystem(client, storage.id, system.id);
 	}
 
-	void whenRequestCredentials()
+	void whenRequestMediaContentCredentials(
+		const std::unique_ptr<Client>& client,
+		const Storage& storage)
 	{
-		getCredentials(m_testContext.storageServiceClient.get(), m_testContext.storage.id);
+		requestMediaContentCredentials(client, storage.id);
+	}
+
+	void whenRequestMediaContentCredentials(TestContext* cloudAccount, const Storage& storage)
+	{
+		requestMediaContentCredentials(cloudAccount->storageServiceClient, storage.id);
+	}
+
+	void thenAddStorageResponseIs(ResultCode resultCode)
+	{
+		auto [result, storage] = waitForAddStorageResponse();
+		ASSERT_EQ(resultCode, result.resultCode);
 	}
 
 	void thenReadStorageResponseIs(ResultCode resultCode)
 	{
 		auto [result, storage] = waitForReadStorageResponse();
 		ASSERT_EQ(resultCode, result.resultCode);
-		if (result.ok())
-		{
-			ASSERT_EQ(storage.id, m_testContext.storage.id);
-		}
 	}
 
 	void thenRemoveStorageResponseIs(ResultCode resultCode)
@@ -93,89 +123,162 @@ protected:
 		ASSERT_EQ(resultCode, result.resultCode);
 	}
 
-	void thenRequestCredentialsResponseIs(ResultCode resultCode)
+	void thenAddSystemResponseIs(ResultCode resultCode)
+	{
+		auto [result, system] = waitForAddSystemResponse();
+		ASSERT_EQ(resultCode, result.resultCode);
+		(void) system;
+	}
+
+	void thenRemoveSystemResponseIs(ResultCode resultCode)
+	{
+		auto result = waitForRemoveSystemResponse();
+		ASSERT_EQ(resultCode, result.resultCode);
+	}
+
+	void thenRequestMediaContentCredentialsResponseIs(
+		ResultCode resultCode,
+		api::StorageCredentials* outStorageCredentials = nullptr)
 	{
 		auto [result, storageCredentials] = waitForGetCredentialsResponse();
 		ASSERT_EQ(resultCode, result.resultCode);
-		(void) storageCredentials;
+		if (outStorageCredentials)
+			*outStorageCredentials = std::move(storageCredentials);
 	}
-
-private:
-	TestContext m_testContext;
-	TestContext m_testContext2;
 };
 
 TEST_F(CloudDbIntegration, storage_owner_can_read_storage)
 {
-	givenCloudStorage();
+	auto account = givenCloudAccountWithStorage();
 
-	whenReadStorage();
+	whenReadStorage(&account, account.storage);
 
 	thenReadStorageResponseIs(ResultCode::ok);
 }
 
 TEST_F(CloudDbIntegration, storage_owner_can_remove_storage_if_system_is_not_added)
 {
-	givenCloudStorageWithoutSystem();
+	auto account = givenCloudStorageWithoutSystem();
 
-	whenRemoveStorage();
+	whenRemoveStorage(&account, account.storage);
 
 	thenRemoveStorageResponseIs(ResultCode::ok);
 }
 
 TEST_F(CloudDbIntegration, non_owner_cannot_remove_storage)
 {
-	givenCloudStorage();
-	givenSecondCloudDbAccount();
+	auto accountWithStorage = givenCloudAccountWithStorage();
+	auto otherAccount = givenCloudAccount();
 
-	whenSecondCloudDBAccountTriesToRemoveStorageOwnedByFirstAccount();
+	whenRemoveStorage(&otherAccount, accountWithStorage.storage);
 
-	thenRemoveStorageResponseIs(ResultCode::unauthorized);
+	thenRemoveStorageResponseIs(ResultCode::forbidden);
 }
 
-TEST_F(CloudDbIntegration, user_can_read_storage_if_system_is_shared_with_them)
+TEST_F(CloudDbIntegration, user_can_access_storage_content_of_a_shared_system)
 {
-	givenSharedCloudDbSystem();
+	auto accountWithSystem = givenCloudSystemWithStorage();
+	auto otherAccount = givenCloudAccount();
+	shareSystem(accountWithSystem, otherAccount, cloud::db::api::SystemAccessRole::viewer);
 
-	whenSecondUserReadsStorageFromFirst();
+	whenReadStorage(&otherAccount, accountWithSystem.storage);
 
 	thenReadStorageResponseIs(ResultCode::ok);
 }
 
 TEST_F(CloudDbIntegration, user_denied_read_storage_if_shared_level_is_disabled)
 {
-	givenSharedCloudDbSystem(nx::cloud::db::api::SystemAccessRole::disabled);
+	auto accountWithSystem = givenCloudSystemWithStorage();
+	auto otherAccount = givenCloudAccount();
 
-	whenSecondUserReadsStorageFromFirst();
+	shareSystem(accountWithSystem, otherAccount, cloud::db::api::SystemAccessRole::disabled);
 
-	thenReadStorageResponseIs(ResultCode::unauthorized);
+	whenReadStorage(&otherAccount, accountWithSystem.storage);
+
+	thenReadStorageResponseIs(ResultCode::forbidden);
 }
 
-TEST_F(CloudDbIntegration, storage_owner_can_request_credentials)
+TEST_F(CloudDbIntegration, storage_owner_can_request_media_content_credentials)
 {
-	givenCloudStorage();
+	auto account = givenCloudAccountWithStorage();
 
-	whenRequestCredentials();
+	whenRequestMediaContentCredentials(&account, account.storage);
 
-	thenRequestCredentialsResponseIs(ResultCode::ok);
+	thenRequestMediaContentCredentialsResponseIs(ResultCode::ok);
 }
 
-TEST_F(CloudDbIntegration, user_can_request_credentials_if_system_is_shared_with_them)
+TEST_F(CloudDbIntegration, user_can_request_media_content_credentials_of_shared_system)
 {
-	givenSharedCloudDbSystem();
+	auto accountWithSystem = givenCloudSystemWithStorage();
+	auto otherAccount = givenCloudAccount();
 
-	whenSecondUserRequestsCredentialsForFirstUserStorage();
+	shareSystem(accountWithSystem, otherAccount, cloud::db::api::SystemAccessRole::viewer);
 
-	thenRequestCredentialsResponseIs(ResultCode::ok);
+	whenRequestMediaContentCredentials(&otherAccount, accountWithSystem.storage);
+
+	thenRequestMediaContentCredentialsResponseIs(ResultCode::ok);
 }
 
-TEST_F(CloudDbIntegration, user_denied_credentials_request_if_system_shared_level_is_disabled)
+TEST_F(CloudDbIntegration, user_denied_media_content_credentials_if_system_shared_level_is_disabled)
 {
-	givenSharedCloudDbSystem(nx::cloud::db::api::SystemAccessRole::disabled);
+	auto accountWithSystem = givenCloudSystemWithStorage();
+	auto otherAccount = givenCloudAccount();
 
-	whenSecondUserRequestsCredentialsForFirstUserStorage();
+	shareSystem(accountWithSystem, otherAccount, cloud::db::api::SystemAccessRole::disabled);
 
-	thenRequestCredentialsResponseIs(ResultCode::unauthorized);
+	whenRequestMediaContentCredentials(&otherAccount, accountWithSystem.storage);
+
+	thenRequestMediaContentCredentialsResponseIs(ResultCode::forbidden);
+}
+
+TEST_F(CloudDbIntegration, mediaserver_can_access_content_of_shared_system)
+{
+	auto accountWithSystem = givenCloudSystemWithStorage();
+	auto mediaserver = givenMediaserver(accountWithSystem);
+
+	whenRequestMediaContentCredentials(mediaserver, accountWithSystem.storage);
+
+	thenRequestMediaContentCredentialsResponseIs(ResultCode::ok);
+}
+
+TEST_F(CloudDbIntegration, mediaserver_cannot_add_storage)
+{
+	auto accountWithSystem = givenCloudSystemWithStorage();
+	auto mediaserver = givenMediaserver(accountWithSystem);
+
+	whenAddStorage(mediaserver);
+
+	thenAddStorageResponseIs(ResultCode::forbidden);
+}
+
+TEST_F(CloudDbIntegration, mediaserver_cannot_remove_storage)
+{
+	auto accountWithSystem = givenCloudSystemWithStorage();
+	auto mediaserver = givenMediaserver(accountWithSystem);
+
+	whenRemoveStorage(mediaserver, accountWithSystem.storage);
+
+	thenRemoveStorageResponseIs(ResultCode::forbidden);
+}
+
+TEST_F(CloudDbIntegration, mediaserver_cannot_add_system)
+{
+	auto accountWithSystem = givenCloudSystemWithStorage();
+	auto mediaserver = givenMediaserver(accountWithSystem);
+
+	whenAddSystem(mediaserver, accountWithSystem.storage, accountWithSystem.system);
+
+	thenAddSystemResponseIs(ResultCode::forbidden);
+}
+
+TEST_F(CloudDbIntegration, mediaserver_cannot_remove_system)
+{
+	auto accountWithSystem = givenCloudSystemWithStorage();
+	auto mediaserver = givenMediaserver(accountWithSystem);
+
+	whenRemoveSystem(mediaserver, accountWithSystem.storage, accountWithSystem.system);
+
+	thenRemoveSystemResponseIs(ResultCode::forbidden);
 }
 
 } // namespace nx::cloud::storage::service::test

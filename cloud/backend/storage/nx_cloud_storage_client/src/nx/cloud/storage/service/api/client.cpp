@@ -127,30 +127,31 @@ Client::ResultCode Client::toResultCode(SystemError::ErrorCode errorCode)
     switch (errorCode)
     {
         case SystemError::noError:
-            return ResultCode(api::ResultCode::ok);
+            return api::ResultCode::ok;
         case SystemError::timedOut:
-            return ResultCode(api::ResultCode::timedOut);
+            return api::ResultCode::timedOut;
         default:
-            return ResultCode(api::ResultCode::networkError);
+            return api::ResultCode::networkError;
     }
 }
 
 Client::ResultCode Client::toResultCode(const network::http::Response* response)
 {
     if (StatusCode::isSuccessCode(response->statusLine.statusCode))
-        return ResultCode(api::ResultCode::ok);
+        return api::ResultCode::ok;
 
     switch (response->statusLine.statusCode)
     {
         case StatusCode::unauthorized:
+			return api::ResultCode::unauthorized;
         case StatusCode::forbidden:
-            return ResultCode(api::ResultCode::unauthorized);
+            return api::ResultCode::forbidden;
         case StatusCode::badRequest:
-            return ResultCode(api::ResultCode::badRequest);
+            return api::ResultCode::badRequest;
         case StatusCode::notFound:
-            return ResultCode(api::ResultCode::notFound);
+            return api::ResultCode::notFound;
         default:
-            return ResultCode(api::ResultCode::unknownError);
+            return api::ResultCode::unknownError;
     }
 }
 
@@ -161,6 +162,7 @@ Client::ResultCode Client::toResultCode(const network::http::FusionRequestResult
         "ok", []() { return api::ResultCode::ok; },
         "badRequest", []() { return api::ResultCode::badRequest; },
         "unauthorized", []() { return api::ResultCode::unauthorized; },
+		"forbidden", []() { return api::ResultCode::forbidden; },
         "notFound", []() { return api::ResultCode::notFound; },
         "internalError", []() { return api::ResultCode::internalError; },
         "timedOut", []() { return api::ResultCode::timedOut; },

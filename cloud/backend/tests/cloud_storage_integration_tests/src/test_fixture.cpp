@@ -31,29 +31,41 @@ void TestFixture::SetUp()
         {
             return std::make_unique<nx::geo_ip::test::MemoryResolver>();
         });
+
+	launchS3Bucket();
+	launchCloudStorageService();
 }
 
-TestFixture::TestContext TestFixture::initializeTest(int initializationFlags)
+TestFixture::TestContext TestFixture::initializeTest()
 {
     auto cloudDbAccount = m_cloudDb.addActivatedAccount2();
-    auto& bucket = launchS3Bucket();
-    auto& cloudStorage = launchCloudStorageService();
-    auto cloudStorageUrl = cloudStorage.httpUrl();
+    auto storageServiceUrl = m_cloudStorageCluster->server(0).httpUrl();
 
     TestContext testContext;
     testContext.cloudDbAccount = std::move(cloudDbAccount);
-    testContext.s3Bucket = &bucket;
+	testContext.system = m_cloudDb.addRandomSystemToAccount(testContext.cloudDbAccount);
+    testContext.s3Bucket = m_s3Buckets.begin()->second.get();
+	testContext.storageServiceUrl = storageServiceUrl;
 	testContext.storageServiceClient =
-		makeStorageServiceClient(cloudStorageUrl, testContext.cloudDbAccount);
-
-	if (initializationFlags & InitializeFlags::bucket)
-		addBucket(&testContext);
-	if (initializationFlags & InitializeFlags::storage)
-		addStorage(&testContext);
-	if (initializationFlags & InitializeFlags::system)
-		addSystem(&testContext);
+		makeStorageServiceClient(
+			storageServiceUrl,
+			testContext.cloudDbAccount.email,
+			testContext.cloudDbAccount.password);
 
     return testContext;
+}
+
+TestFixture::TestContext TestFixture::initializeTestWithSystemCredentials()
+{
+	auto testContext = initializeTest();
+
+	testContext.storageServiceClient =
+		makeStorageServiceClient(
+			testContext.storageServiceUrl,
+			testContext.system.id,
+			testContext.system.authKey);
+
+	return testContext;
 }
 
 nx::cloud::db::CdbLauncher& TestFixture::cloudDb()
@@ -76,7 +88,26 @@ const CloudStorageLauncher& TestFixture::storageService(int index) const
     return m_cloudStorageCluster->server(index);
 }
 
-void TestFixture::readStorage(Client* storageServiceClient, const std::string& storageId)
+void TestFixture::addStorage(
+	const std::unique_ptr<api::Client>& storageServiceClient,
+	const AddStorageRequest& request)
+{
+	storageServiceClient->addStorage(
+		request,
+		[this](auto result, auto storage)
+		{
+			m_addStorageResponse.push({std::move(result), std::move(storage)});
+		});
+}
+
+std::pair<api::Result, api::Storage> TestFixture::waitForAddStorageResponse()
+{
+	return m_addStorageResponse.pop();
+}
+
+void TestFixture::readStorage(
+	const std::unique_ptr<api::Client>& storageServiceClient,
+	const std::string& storageId)
 {
 	storageServiceClient->readStorage(
 		storageId,
@@ -91,7 +122,9 @@ std::pair<Result, Storage> TestFixture::waitForReadStorageResponse()
 	return m_readStorageResponse.pop();
 }
 
-void TestFixture::removeStorage(Client* storageServiceClient, const std::string& storageId)
+void TestFixture::removeStorage(
+	const std::unique_ptr<api::Client>& storageServiceClient,
+	const std::string& storageId)
 {
 	storageServiceClient->removeStorage(
 		storageId,
@@ -106,9 +139,49 @@ Result TestFixture::waitForRemoveStorageResponse()
 	return m_removeStorageResponse.pop();
 }
 
-void TestFixture::getCredentials(api::Client* cloudStorageClient, const std::string& storageId)
+void TestFixture::addSystem(
+	const std::unique_ptr<api::Client>& storageServiceClient,
+	const std::string& storageId,
+	const api::AddSystemRequest& request)
 {
-	cloudStorageClient->getCredentials(
+	storageServiceClient->addSystem(
+		storageId,
+		request,
+		[this](auto result, auto system)
+		{
+			m_addSystemResponse.push({std::move(result), std::move(system)});
+		});
+}
+
+std::pair<api::Result, api::System> TestFixture::waitForAddSystemResponse()
+{
+	return m_addSystemResponse.pop();
+}
+
+void TestFixture::removeSystem(
+	const std::unique_ptr<api::Client>& storageServiceClient,
+	const std::string& storageId,
+	const std::string& systemId)
+{
+	storageServiceClient->removeSystem(
+		storageId,
+		systemId,
+		[this](auto result)
+		{
+			m_removeSystemResponse.push(std::move(result));
+		});
+}
+
+api::Result TestFixture::waitForRemoveSystemResponse()
+{
+	return m_removeSystemResponse.pop();
+}
+
+void TestFixture::requestMediaContentCredentials(
+	const std::unique_ptr<api::Client>& storageServiceClient,
+	const std::string& storageId)
+{
+	storageServiceClient->getCredentials(
 		storageId,
 		[this](auto result, auto storageCredentials)
 		{
@@ -123,11 +196,12 @@ std::pair<api::Result, api::StorageCredentials> TestFixture::waitForGetCredentia
 
 std::unique_ptr<Client> TestFixture::makeStorageServiceClient(
 	const nx::utils::Url& storageSeviceUrl,
-	const nx::cloud::db::AccountWithPassword& cloudDbAccount) const
+	const std::string& userName,
+    const std::string& password) const
 {
 	auto url = storageSeviceUrl;
-	url.setUserName(cloudDbAccount.email.c_str());
-	url.setPassword(cloudDbAccount.password.c_str());
+	url.setUserName(userName.c_str());
+	url.setPassword(password.c_str());
 
 	auto client = std::make_unique<Client>(url);
 	client->setRequestTimeout(std::chrono::milliseconds::zero());
@@ -151,22 +225,14 @@ void TestFixture::addBucket(TestContext* outTestContext)
     ASSERT_TRUE(addBucketDone.get_future().get().ok());
 }
 
-
 void TestFixture::addStorage(TestContext* outTestContext)
 {
     api::AddStorageRequest addStorageRequest;
     addStorageRequest.totalSpace = 10000;
     addStorageRequest.region = outTestContext->s3Bucket->location();
 
-    std::promise<std::pair<api::Result, api::Storage>> addStorageDone;
-    outTestContext->storageServiceClient->addStorage(
-        addStorageRequest,
-        [this, &addStorageDone](auto result, auto storage)
-        {
-            addStorageDone.set_value({std::move(result), std::move(storage)});
-        });
-
-    auto [result, storage] = addStorageDone.get_future().get();
+	addStorage(outTestContext->storageServiceClient, addStorageRequest);
+	auto [result, storage] = waitForAddStorageResponse();
     ASSERT_TRUE(result.ok());
 
     outTestContext->storage = std::move(storage);
@@ -174,8 +240,6 @@ void TestFixture::addStorage(TestContext* outTestContext)
 
 void TestFixture::addSystem(TestContext* outTestContext)
 {
-    outTestContext->system = m_cloudDb.addRandomSystemToAccount(outTestContext->cloudDbAccount);
-
     api::AddSystemRequest addSystemRequest;
     addSystemRequest.id = outTestContext->system.id;
 
@@ -195,10 +259,7 @@ void TestFixture::addSystem(TestContext* outTestContext)
 
 S3Bucket& TestFixture::launchS3Bucket()
 {
-    std::string bucketName = nx::utils::random::generateName(7).toStdString();
-    while (m_s3Buckets.find(bucketName) != m_s3Buckets.end())
-        bucketName = nx::utils::random::generateName(7).toStdString();
-
+	const auto bucketName = lm("bucket-%1").arg(m_s3Buckets.size()).toStdString();
     return *m_s3Buckets.emplace(
         bucketName,
         std::make_unique<S3Bucket>(aws::s3::test::randomS3Location(), bucketName)).first->second;
@@ -218,11 +279,6 @@ CloudStorageLauncher& TestFixture::launchCloudStorageService()
     NX_ASSERT(cloudStorage.startAndWaitUntilStarted());
 
     return cloudStorage;
-}
-
-TEST_F(TestFixture, launch_services)
-{
-    initializeTest();
 }
 
 } // namespace nx::cloud::storage::service::test
