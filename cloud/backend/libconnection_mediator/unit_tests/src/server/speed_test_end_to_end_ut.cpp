@@ -67,11 +67,11 @@ public:
     api::ConnectionSpeed getUplinkSpeed(const nx::utils::Url& url)
     {
         QnMutexLocker lock(&m_mutex);
-        return std::find_if(m_servers.begin(), m_servers.end(),
-            [&url](const TestContext& testContext)
-            {
-                return testContext.speedTestUrl == url;
-            })->uplinkSpeed.connectionSpeed;
+		return std::find_if(m_servers.begin(), m_servers.end(),
+			[&url](const auto& element)
+			{
+				return element.second.speedTestUrl == url;
+			})->second.uplinkSpeed.connectionSpeed;
     }
 
 protected:
@@ -100,7 +100,7 @@ protected:
         // Done in Setup()
     }
 
-    void givenMediaservers()
+    void givenMediaserversOnMultipleSystems()
     {
 		for (int i = 0; i < 5; ++i)
 		{
@@ -109,7 +109,7 @@ protected:
 				addServer(m_systems.back());
 		}
 
-        updateBestConnection();
+        updateBestConnections();
     }
 
     void whenSpeedTestResultsAreReportedToMediator()
@@ -123,39 +123,61 @@ protected:
 		}
     }
 
-    void whenClientRequestToConnectToSystem()
-    {
-        m_client = std::make_unique<api::Client>(httpUrl());
-
-		m_expectedSystem = &m_systems.front();
-
-        api::ConnectRequest request;
-        request.connectionMethods = api::ConnectionMethod::all;
-        request.destinationHostName = m_expectedSystem->id;
-        request.originatingPeerId = QnUuid::createUuid().toSimpleByteArray();
-        request.connectSessionId = QnUuid::createUuid().toSimpleByteArray();
-
-        m_client->initiateConnection(
-            request,
-            [this](auto&&... args)
-            {
-                m_connectDone.push({std::forward<decltype(args)>(args)...});
-            });
-    }
-
-    void thenClientConnectsToServerWithBestUplinkSpeed()
-    {
-        auto [resultCode, connectResponse] = m_connectDone.pop();
-        ASSERT_EQ(api::Client::ResultCode::ok, resultCode);
-        ASSERT_EQ(
-            m_bestConnection->mediaserver->fullName(),
-            connectResponse.destinationHostFullName);
-    }
-
-	void andServerBelongsToExpectedSystem()
+	void saveConnectResponse(
+		const std::string& systemId,
+		api::Client::ResultCode result,
+		api::ConnectResponse response)
 	{
-		const QByteArray systemId = m_bestConnection->uplinkSpeed.systemId.c_str();
-		ASSERT_EQ(systemId, m_expectedSystem->id);
+		QnMutexLocker lock(&m_mutex);
+		m_connectResponses.emplace(
+			systemId,
+			std::make_pair(std::move(result), std::move(response)));
+	}
+
+	void whenClientsConnectToSystems()
+	{
+		for (const auto& system : m_systems)
+		{
+			auto& client = m_clients.emplace(system.id.constData(), httpUrl()).first->second;
+
+			api::ConnectRequest request;
+			request.connectionMethods = api::ConnectionMethod::all;
+			request.destinationHostName = system.id.constData();
+			request.originatingPeerId = QnUuid::createUuid().toSimpleByteArray();
+			request.connectSessionId = QnUuid::createUuid().toSimpleByteArray();
+
+			client.initiateConnection(
+				request,
+				[this, system](auto result, auto connectResponse)
+				{
+					saveConnectResponse(
+						system.id.constData(),
+						std::move(result),
+						std::move(connectResponse));
+				});
+		}
+	}
+
+	void thenClientsConnectToServerWithBestUplinkSpeed()
+	{
+		const auto shouldWaitForConnectResponses =
+			[this]()
+			{
+				QnMutexLocker lock(&m_mutex);
+				return m_connectResponses.size() != m_systems.size();
+			};
+
+		while (shouldWaitForConnectResponses())
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+		for (const auto& response: m_connectResponses)
+		{
+			ASSERT_EQ(response.second.first, api::Client::ResultCode::ok);
+			ASSERT_EQ(response.first, response.second.second.destinationHostFullName);
+			ASSERT_EQ(
+				response.second.second.destinationHostFullName,
+				m_fastestServers[response.first]->mediaserver->fullName());
+		}
 	}
 
 private:
@@ -165,12 +187,13 @@ private:
             [this](int bandwidth)
         {
             return std::find_if(m_servers.begin(), m_servers.end(),
-                [&bandwidth](const TestContext& testContext)
+                [&bandwidth](const auto& element)
                 {
-                    return bandwidth == testContext.uplinkSpeed.connectionSpeed.bandwidth;
+                    return bandwidth == element.second.uplinkSpeed.connectionSpeed.bandwidth;
                 }) != m_servers.end();
         };
 
+		TestContext* testContext = nullptr;
         {
             auto mediaServer = addRandomServer(
 				system,
@@ -181,57 +204,71 @@ private:
 
             QnMutexLocker lock(&m_mutex);
 
-            m_servers.emplace_back(TestContext());
-            m_servers.back().mediaserver = std::move(mediaServer);
+			testContext = &m_servers.emplace(system.id.constData(), TestContext())->second;
+			testContext->mediaserver = std::move(mediaServer);
 
-            m_servers.back().uplinkSpeed.serverId =
-                nx::toStdString(m_servers.back().mediaserver->serverId());
-            m_servers.back().uplinkSpeed.systemId = nx::toStdString(system.id);
+            testContext->uplinkSpeed.serverId =
+                nx::toStdString(testContext->mediaserver->serverId());
+			testContext->uplinkSpeed.systemId = system.id.constData();
 
             // Ensuring every bandwidth is unique.
             int bandwidth = nx::utils::random::number(10, 10000);
             while (keepAssigningBandwidth(bandwidth))
                 bandwidth = nx::utils::random::number(10, 10000);
 
-            m_servers.back().uplinkSpeed.connectionSpeed.bandwidth = bandwidth;
-            m_servers.back().uplinkSpeed.connectionSpeed.pingTime =
+            testContext->uplinkSpeed.connectionSpeed.bandwidth = bandwidth;
+            testContext->uplinkSpeed.connectionSpeed.pingTime =
                 std::chrono::microseconds(nx::utils::random::number(10, 10000));
 
-            m_servers.back().speedTestUrl = lm("http://speedtest.%1.com").arg(m_servers.size() - 1);
+            testContext->speedTestUrl = lm("http://speedtest.%1.com").arg(m_servers.size() - 1);
         }
 
-        ASSERT_EQ(api::ResultCode::ok, m_servers.back().mediaserver->listen().first);
+        ASSERT_EQ(api::ResultCode::ok, testContext->mediaserver->listen().first);
 
-        m_servers.back().uplinkSpeedReporter = std::make_unique<UplinkSpeedReporter>(
-            &m_servers.back().mediaserver->mediatorConnector(),
-            m_servers.back().speedTestUrl);
+        testContext->uplinkSpeedReporter = std::make_unique<UplinkSpeedReporter>(
+            &testContext->mediaserver->mediatorConnector(),
+            testContext->speedTestUrl);
 
         NX_DEBUG(this, "Added a new server, index: %1, uplinkSpeed: %3",
-            m_servers.size() - 1, m_servers.back().uplinkSpeed);
+            m_servers.size() - 1, testContext->uplinkSpeed);
     }
 
-    void updateBestConnection()
+    void updateBestConnections()
     {
-        m_bestConnection = &*std::max_element(m_servers.begin(), m_servers.end(),
-            [](const TestContext& a, const TestContext& b)
-            {
-                return a.uplinkSpeed.connectionSpeed.bandwidth
-                    < b.uplinkSpeed.connectionSpeed.bandwidth;
-            });
-        NX_DEBUG(this, "Decided best uplink speed: %1", m_bestConnection->uplinkSpeed);
+		for (const auto& server: m_servers)
+		{
+			auto [it, firstInsertion] = m_fastestServers.emplace(
+				server.second.uplinkSpeed.systemId,
+				&server.second);
+			if (!firstInsertion)
+			{
+				if (server.second.uplinkSpeed.connectionSpeed.bandwidth >
+					it->second->uplinkSpeed.connectionSpeed.bandwidth)
+				{
+					it->second = &server.second;
+				}
+			}
+		}
+
+		for (const auto& server : m_fastestServers)
+		{
+			NX_DEBUG(this, "Decided best uplink speed for system %1: %2",
+				server.first, server.second);
+		}
     }
 
 private:
     UplinkSpeedTesterFactory::Function m_factoryFuncBak;
     QnMutex m_mutex;
 	std::vector<AbstractCloudDataProvider::System> m_systems;
-	AbstractCloudDataProvider::System* m_expectedSystem = nullptr;
-    std::vector<TestContext> m_servers;
+    std::multimap<std::string /*systemId*/, TestContext> m_servers;
+	std::map<std::string/*systemId*/, const TestContext*> m_fastestServers;
+	std::map<std::string/*systemId*/, api::Client> m_clients;
     std::atomic_int m_uplinkSpeedTestsDone = 0;
     nx::utils::SubscriptionId m_uplinkSpeedUpdatedId = nx::utils::kInvalidSubscriptionId;
-    const TestContext* m_bestConnection = nullptr;
-    nx::utils::SyncQueue<std::pair<api::Client::ResultCode, api::ConnectResponse>> m_connectDone;
-    std::unique_ptr<api::Client> m_client;
+	std::map<
+		std::string /*systemId*/,
+		std::pair<api::Client::ResultCode, api::ConnectResponse>> m_connectResponses;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -258,17 +295,15 @@ void UplinkSpeedTesterStub::start(const nx::utils::Url& speedTestUrl, Completion
 
 //-------------------------------------------------------------------------------------------------
 
-TEST_F(SpeedTestEndToEnd, client_connects_to_mediaserver_with_best_uplink_speed)
+TEST_F(SpeedTestEndToEnd, clients_connect_to_mediaserver_with_best_uplink_speed_in_each_system)
 {
-    givenMediator();
-    givenMediaservers();
+	givenMediator();
+	givenMediaserversOnMultipleSystems();
 
-    whenSpeedTestResultsAreReportedToMediator();
-    whenClientRequestToConnectToSystem();
+	whenSpeedTestResultsAreReportedToMediator();
+	whenClientsConnectToSystems();
 
-    thenClientConnectsToServerWithBestUplinkSpeed();
-
-	andServerBelongsToExpectedSystem();
+	thenClientsConnectToServerWithBestUplinkSpeed();
 }
 
 } // namespace nx::hpm::test
