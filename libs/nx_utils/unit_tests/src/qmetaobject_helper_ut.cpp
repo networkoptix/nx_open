@@ -15,9 +15,9 @@ TestObjectWithSignal::TestObjectWithSignal(QObject* parent):
     connect(this, &QThread::started,
         [this]()
         {
-            emitAsync(this, "signal1", m_testInt);
-            emitAsync(this, "signal2", m_testId);
-            emitAsync(this, "signal3", m_testRect, m_testId, 1);
+            emitAsync(this, &TestObjectWithSignal::signal1, m_testInt);
+            emitAsync(this, &TestObjectWithSignal::signal2, m_testId);
+            emitAsync(this, &TestObjectWithSignal::signal3, m_testRect, m_testId, 1);
         });
 
     connect(this, &TestObjectWithSignal::signal1, this, &TestObjectWithSignal::slot1);

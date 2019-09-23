@@ -493,7 +493,7 @@ void MessageBus::removeConnectionUnsafe(QWeakPointer<ConnectionBase> weakRef)
     }
     emitPeerFoundLostSignals();
     if (connection->state() == Connection::State::Unauthorized)
-        emitAsync(this, "remotePeerUnauthorized", remotePeer.id);
+        emitAsync(this, &MessageBus::remotePeerUnauthorized, remotePeer.id);
 }
 
 void MessageBus::at_stateChanged(
@@ -1265,7 +1265,7 @@ void MessageBus::emitPeerFoundLostSignals()
             lit("Peer %1 has found peer %2")
             .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
             .arg(qnStaticCommon->moduleDisplayName(peer.id)));
-        emitAsync(this, "peerFound", peer.id, peer.peerType);
+        emitAsync(this, &MessageBus::peerFound, peer.id, peer.peerType);
     }
 
     for (const auto& peer: lostPeers)
@@ -1281,7 +1281,7 @@ void MessageBus::emitPeerFoundLostSignals()
                 lit("Peer %1 has lost peer %2")
                 .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
                 .arg(qnStaticCommon->moduleDisplayName(peer.id)));
-            emitAsync(this, "peerLost", peer.id, peer.peerType);
+            emitAsync(this, &MessageBus::peerLost, peer.id, peer.peerType);
             sendRuntimeInfoRemovedToClients(peer.id);
         }
     }
