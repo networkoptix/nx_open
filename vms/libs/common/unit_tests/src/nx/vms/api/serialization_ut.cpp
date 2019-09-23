@@ -2,6 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <api/model/configure_system_data.h>
+#include <nx/core/resource/device_type.h>
 
 namespace nx::vms::api::test {
 
@@ -32,6 +33,15 @@ TEST(ConfigureSystemData, deserialization)
     auto data2 = QJson::deserialized<ConfigureSystemData>(serializedData);
 
     ASSERT_EQ(data1, data2);
-
 }
+
+TEST(DeviceType, serialization)
+{
+    using namespace nx::core::resource;
+
+    ASSERT_EQ("Camera", QnLexical::serialized(DeviceType::camera));
+    ASSERT_EQ(DeviceType::camera, QnLexical::deserialized<DeviceType>("Camera"));
+    ASSERT_EQ(DeviceType::camera, QnLexical::deserialized<DeviceType>("1"));
+}
+
 } // namespace nx::vms::api::test

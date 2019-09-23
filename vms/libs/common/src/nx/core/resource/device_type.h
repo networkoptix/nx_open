@@ -23,4 +23,4 @@ bool isProxyDeviceType(DeviceType deviceType);
 } // namespace core
 } // namespace nx
 
-QN_FUSION_DECLARE_FUNCTIONS(nx::core::resource::DeviceType, (numeric)(lexical));
+QN_FUSION_DECLARE_FUNCTIONS(nx::core::resource::DeviceType, (metatype)(lexical));
