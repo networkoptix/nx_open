@@ -361,17 +361,13 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
         });
 
 	auto uplinkSpeedIter = m_bestUplinkSpeeds.find(peerData.systemId);
-    if (uplinkSpeedIter != m_bestUplinkSpeeds.end() ||
+    if (uplinkSpeedIter != m_bestUplinkSpeeds.end() &&
         peerDataLowerCase.hostName() == toMediaServerData(uplinkSpeedIter->second).hostName())
     {
-        auto uplinkSpeed = findLocalPeerWithBestUplinkSpeedUnsafe(peerDataLowerCase.systemId);
-
-        if (uplinkSpeed)
-        {
-            NX_VERBOSE(this, "Found best peer uplink speed %1 after closing connection to peer: %2",
-                *uplinkSpeed, peerData.hostName());
-			uplinkSpeedIter->second = std::move(*uplinkSpeed);
-        }
+		NX_VERBOSE(this,
+			"Connection to peer with best uplink speed closed. Removing %1",
+			uplinkSpeedIter->second);
+		m_bestUplinkSpeeds.erase(uplinkSpeedIter);
     }
 }
 

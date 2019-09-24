@@ -139,7 +139,7 @@ protected:
 
 	void whenClientsConnectToSystems()
 	{
-		for (const auto& system : m_systems)
+		for (const auto& system: m_systems)
 		{
 			auto& client = m_clients.emplace(system.id.constData(), httpUrl()).first->second;
 
