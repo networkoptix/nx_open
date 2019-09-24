@@ -29,6 +29,9 @@
                         "condition": "greaterThen %servers %recommendedMaxCameras",
                         "text": "The maximum number of %recommendedMaxCameras camera channels per system is reached. Create another system to use more cameras"
                     }]
+                },
+                "version": {
+                    "display": "panel"
                 }
             }
         }

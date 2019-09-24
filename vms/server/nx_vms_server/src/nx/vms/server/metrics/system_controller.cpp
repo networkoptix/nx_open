@@ -5,6 +5,7 @@
 #include <core/resource/user_resource.h>
 #include <media_server/media_server_module.h>
 #include <licensing/license.h>
+#include <core/resource/media_server_resource.h>
 
 namespace nx::vms::server::metrics {
 
@@ -49,6 +50,15 @@ utils::metrics::ValueGroupProviders<SystemResourceController::Resource>
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "cameras", [pool](const auto&) { return Value(pool->getAllCameras().size()); }
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "version", [pool](const auto&)
+                {
+                    const auto guid = pool->commonModule()->moduleGUID();
+                    if (auto server = pool->getResourceById<QnMediaServerResource>(guid))
+                        return Value(toString(server->getVersion()));
+                    return Value();
+                }
             )
         )
     );
