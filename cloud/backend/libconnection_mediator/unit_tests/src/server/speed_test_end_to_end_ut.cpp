@@ -50,7 +50,7 @@ public:
         addArg("-listeningPeerDb/enabled", "true");
         addArg("-listeningPeerDb/enableCache", "true");
         addArg("-listeningPeerDb/sql/driverName", "QSQLITE");
-        addArg("-server/name", "speedtestendtoend");
+        addArg("-server/name", "speed.test.end.to.end");
     }
 
     ~SpeedTestEndToEnd()
@@ -112,8 +112,35 @@ protected:
 				addServer(m_systems.back());
 		}
 
-        updateBestConnections();
+        updateFastestServers();
     }
+
+	void givenMediatorKnowsFastestServerForEachSystem()
+	{
+		givenMediator();
+		givenMediaserversOnMultipleSystems();
+
+		whenSpeedTestResultsAreReportedToMediator();
+		whenClientsConnectToSystems();
+
+		thenClientsConnectToServerWithBestUplinkSpeedInEachSystem();
+	}
+
+	void whenFastestServersDisconnect()
+	{
+		for (auto& server: m_fastestServers)
+		{
+			auto it = std::find_if(m_servers.begin(), m_servers.end(),
+				[this, &server](const auto& systemIdAndTestContext)
+				{
+					return server.second->mediaserver->fullName()
+						== systemIdAndTestContext.second.mediaserver->fullName();
+				});
+			m_servers.erase(it); //< causes mediaserver to close connection.
+		}
+
+		updateFastestServers();
+	}
 
     void whenSpeedTestResultsAreReportedToMediator()
     {
@@ -139,9 +166,13 @@ protected:
 
 	void whenClientsConnectToSystems()
 	{
+		m_clients.clear();
+		m_connectResponses.clear();
+
 		for (const auto& system: m_systems)
 		{
 			auto& client = m_clients.emplace(system.id.constData(), httpUrl()).first->second;
+			client.setRequestTimeout(std::chrono::milliseconds(0));
 
 			api::ConnectRequest request;
 			request.connectionMethods = api::ConnectionMethod::all;
@@ -161,7 +192,14 @@ protected:
 		}
 	}
 
-	void thenClientsConnectToServerWithBestUplinkSpeed()
+	void thenMediatorUpdatesBestUplinkSpeed()
+	{
+		// Mediator will not update until client connects to a system.
+		whenClientsConnectToSystems();
+		thenClientsConnectToServerWithBestUplinkSpeedInEachSystem();
+	}
+
+	void thenClientsConnectToServerWithBestUplinkSpeedInEachSystem()
 	{
 		const auto shouldWaitForConnectResponses =
 			[this]()
@@ -243,8 +281,9 @@ private:
             m_servers.size() - 1, testContext->uplinkSpeed);
     }
 
-    void updateBestConnections()
+    void updateFastestServers()
     {
+		m_fastestServers.clear();
 		for (const auto& server: m_servers)
 		{
 			auto [it, firstInsertion] = m_fastestServers.emplace(
@@ -263,7 +302,7 @@ private:
 		for (const auto& server : m_fastestServers)
 		{
 			NX_DEBUG(this, "Decided best uplink speed for system %1: %2",
-				server.first, server.second);
+				server.first, server.second->uplinkSpeed);
 		}
     }
 
@@ -313,7 +352,16 @@ TEST_F(SpeedTestEndToEnd, clients_connect_to_mediaserver_with_best_uplink_speed_
 	whenSpeedTestResultsAreReportedToMediator();
 	whenClientsConnectToSystems();
 
-	thenClientsConnectToServerWithBestUplinkSpeed();
+	thenClientsConnectToServerWithBestUplinkSpeedInEachSystem();
+}
+
+TEST_F(SpeedTestEndToEnd, mediator_updates_best_uplink_speed_after_fastest_servers_disconnect)
+{
+	givenMediatorKnowsFastestServerForEachSystem();
+
+	whenFastestServersDisconnect();
+
+	thenMediatorUpdatesBestUplinkSpeed();
 }
 
 } // namespace nx::hpm::test
