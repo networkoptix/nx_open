@@ -191,7 +191,7 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(accessController.data()));
 
     #if defined(Q_OS_LINUX)
-        qputenv("RESOURCE_NAME", QnAppInfo::productNameShort().toUtf8());
+        qputenv("RESOURCE_NAME", nx::utils::AppInfo::brand().toUtf8());
     #endif
 
     // Dealing with EULA in videowall mode can make people frown.

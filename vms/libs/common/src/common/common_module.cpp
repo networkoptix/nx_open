@@ -55,6 +55,8 @@
 
 #include <core/resource/storage_plugin_factory.h>
 
+#include <nx/utils/app_info.h>
+
 using namespace nx;
 
 namespace {
@@ -203,12 +205,14 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_runUuid = QnUuid::createUuid();
     m_startupTime = QDateTime::currentDateTime();
 
+    using namespace nx::utils;
+
     m_moduleInformation.protoVersion = nx::vms::api::protocolVersion();
-    m_moduleInformation.osInfo = utils::OsInfo::current();
+    m_moduleInformation.osInfo = OsInfo::current();
     m_moduleInformation.hwPlatform = nx::vms::utils::installationInfo().hwPlatform;
-    m_moduleInformation.brand = QnAppInfo::productNameShort();
-    m_moduleInformation.customization = QnAppInfo::customizationName();
-    m_moduleInformation.version = nx::utils::SoftwareVersion(QnAppInfo::applicationVersion());
+    m_moduleInformation.brand = AppInfo::brand();
+    m_moduleInformation.customization = AppInfo::customizationName();
+    m_moduleInformation.version = SoftwareVersion(AppInfo::applicationVersion());
     m_moduleInformation.type = clientMode
         ? nx::vms::api::ModuleInformation::nxClientId()
         : nx::vms::api::ModuleInformation::nxMediaServerId();
@@ -216,7 +220,7 @@ QnCommonModule::QnCommonModule(bool clientMode,
     m_moduleInformation.realm = nx::network::AppInfo::realm();
 
     m_resourceDataPool = instance<QnResourceDataPool>();
-    m_engineVersion = nx::vms::api::SoftwareVersion(QnAppInfo::applicationVersion());
+    m_engineVersion = nx::vms::api::SoftwareVersion(AppInfo::applicationVersion());
 }
 
 void QnCommonModule::setModuleGUID(const QnUuid& guid)

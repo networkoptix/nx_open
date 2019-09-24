@@ -13,7 +13,8 @@
 #include <nx/utils/app_info.h>
 
 namespace {
-const QString kServerName = nx::utils::AppInfo::productNameLong() + " Desktop Client HTTP Server";
+
+const QString kServerName = nx::utils::AppInfo::vmsName() + " Desktop Client HTTP Server";
 const auto kServerBinding = QHostAddress::LocalHost;
 
 QJsonDocument convertHttpToJsonRequest(const QtHttpRequest& request)

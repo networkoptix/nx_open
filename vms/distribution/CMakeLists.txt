@@ -1,5 +1,5 @@
 nx_configure_file(${customization_dir}/license.html
-    ${distribution_output_dir}/eula-${eulaVersion}.html)
+    ${distribution_output_dir}/eula-${customization.eulaVersion}.html)
 
 set(_nx_vms_distribution_dir ${CMAKE_CURRENT_LIST_DIR})
 

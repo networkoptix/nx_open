@@ -28,7 +28,7 @@ exec 2>&1
 
 echo `date` "++++++++++++++++++++++ Starting Boot Process ++++++++++++++++++++++++"
 
-export CUSTOMIZATION="@deb.customization.company.name@"
+export CUSTOMIZATION="@customization.companyId@"
 export DISTRIB="@server_distribution_name@.tar.gz"
 
 export CHECKBOOTHDDPART=

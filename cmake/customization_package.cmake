@@ -48,6 +48,21 @@ nx_unpack_customization_package(
     ${customization_package_directory}
     ${customization_dir}
     ${customization_unpack_log_file})
-nx_store_customization_package(${customization_dir})
 
+
+set(customization_cmake ${customization_dir}/generated.cmake)
+nx_json_to_cmake(
+    ${customization_dir}/description.json
+    ${customization_cmake}
+    customization)
+
+nx_store_customization_package(${customization_dir})
 nx_store_known_file(${customization_unpack_log_file})
+nx_store_known_file(${customization_cmake})
+
+include(${customization_cmake})
+
+if(NOT ${customization} STREQUAL ${customization.id})
+    message(FATAL_ERROR "Customization package integrity check failed.\
+    Expected value: \"${customization}\". Actual value: \"${customization.id}\"")
+endif()

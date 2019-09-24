@@ -13,7 +13,6 @@
 
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
-#include <utils/common/app_info.h>
 #include <utils/media/nalUnits.h>
 
 #include <common/common_module.h>
@@ -24,6 +23,8 @@
 #include <core/resource_management/resource_properties.h>
 
 #include <nx/vms/api/types/rtp_types.h>
+
+#include <nx/utils/app_info.h>
 
 #include "onvif/soapMediaBindingProxy.h"
 #include "onvif_resource.h"
@@ -74,10 +75,12 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 
-    NETOPTIX_PRIMARY_NAME = QString(lit("%1 Primary")).arg(QnAppInfo::productNameShort()).toUtf8();
-    NETOPTIX_SECONDARY_NAME = QString(lit("%1 Secondary")).arg(QnAppInfo::productNameShort()).toUtf8();
-    NETOPTIX_PRIMARY_TOKEN = QString(lit("%1P")).arg(QnAppInfo::productNameShort()).toUtf8();
-    NETOPTIX_SECONDARY_TOKEN = QString(lit("%1S")).arg(QnAppInfo::productNameShort()).toUtf8();
+    const auto brand = nx::utils::AppInfo::brand();
+
+    NETOPTIX_PRIMARY_NAME = QString(lit("%1 Primary")).arg(brand).toUtf8();
+    NETOPTIX_SECONDARY_NAME = QString(lit("%1 Secondary")).arg(brand).toUtf8();
+    NETOPTIX_PRIMARY_TOKEN = QString(lit("%1P")).arg(brand).toUtf8();
+    NETOPTIX_SECONDARY_TOKEN = QString(lit("%1S")).arg(brand).toUtf8();
 
     int channel = m_onvifRes->getChannel();
     if (channel > 0) {

@@ -1,14 +1,14 @@
 #!/bin/bash
 ### BEGIN INIT INFO
-# Provides:          @deb.customization.company.name@-lite-client
+# Provides:          @customization.companyId@-lite-client
 # Required-Start:    networking
 # Required-Stop:
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: @company.name@ @product.name@ Lite Client
+# Short-Description: @customization.companyName@ @customization.vmsName@ Lite Client
 ### END INIT INFO
 
-CUSTOMIZATION="@deb.customization.company.name@"
+CUSTOMIZATION="@customization.companyId@"
 
 SECONDS_TO_WAIT_BEFORE_KILL_9=120
 

@@ -35,7 +35,7 @@ list(JOIN deb_dependencies_list ", " deb_dependencies)
 
 if(withRootTool)
     list(APPEND depends root_tool)
-    set(root_tool_service "${deb.customization.company.name}-root-tool.service")
+    set(root_tool_service "${customization.companyId}-root-tool.service")
 endif()
 
 nx_configure_directory(

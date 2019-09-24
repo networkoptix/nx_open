@@ -17,6 +17,8 @@
 #include <nx/system_commands.h>
 #include <nx/vms/server/root_fs.h>
 
+#include <nx/utils/app_info.h>
+
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
 #   include <platform/platform_abstraction.h>
@@ -111,7 +113,7 @@ static const QString& sysDrivePath()
 
 QString genLocalPath(const QString &url, const QString &prefix = "/tmp/")
 {
-    return prefix + NX_TEMP_FOLDER_NAME + QString::number(qHash(url), 16);
+    return prefix + QnFileStorageResource::tempFolderName() + QString::number(qHash(url), 16);
 }
 
 } // namespace <anonymous>
@@ -439,7 +441,7 @@ void QnFileStorageResource::removeOldDirs(QnMediaServerModule* serverModule)
 {
 #ifndef _WIN32
 
-    const QString prefix = lit("/tmp/") + NX_TEMP_FOLDER_NAME;
+    const QString prefix = lit("/tmp/") + tempFolderName();
     const QFileInfoList tmpEntries = QDir("/tmp").entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot);
 
     for (const QFileInfo &entry: tmpEntries)
@@ -644,6 +646,11 @@ QnFileStorageResource::~QnFileStorageResource()
         rmdir(m_localPath.toLatin1().constData());
     }
 #endif
+}
+
+QString QnFileStorageResource::tempFolderName()
+{
+    return nx::utils::AppInfo::brand() + "_temp_folder_";
 }
 
 bool QnFileStorageResource::removeFile(const QString& url)

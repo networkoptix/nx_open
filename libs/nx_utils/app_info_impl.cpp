@@ -7,6 +7,16 @@
 
 namespace nx::utils {
 
+QString AppInfo::vmsName()
+{
+    return "${customization.vmsName}";
+}
+
+QString AppInfo::brand()
+{
+    return "${customization.brand}";
+}
+
 bool AppInfo::beta()
 {
     return ${beta};
@@ -60,12 +70,12 @@ QString AppInfo::applicationArch()
 
 QString AppInfo::organizationName()
 {
-    return "${company.name}";
+    return "${customization.companyName}";
 }
 
 QString AppInfo::linuxOrganizationName()
 {
-    return "${deb.customization.company.name}";
+    return "${customization.companyId}";
 }
 
 QString AppInfo::organizationNameForSettings()
@@ -77,23 +87,24 @@ QString AppInfo::organizationNameForSettings()
     #endif
 }
 
-QString AppInfo::productNameShort()
+QString AppInfo::supportAddress()
 {
-    return "${product.name.short}";
+    return R"(${customization.contact.supportAddress})";
 }
 
-QString AppInfo::productNameLong()
+QString AppInfo::licensingAddress()
 {
-    return "${display.product.name}";
+    return R"(${customization.contact.licensingAddress})";
 }
 
-QString AppInfo::productName()
+QString AppInfo::homePage()
 {
-    #if defined(_WIN32)
-        return "${product.name}";
-    #else
-        return "${product.appName}";
-    #endif
+    return R"(${customization.contact.systemWebPages.homePage})";
+}
+
+QString AppInfo::supportPage()
+{
+    return R"(${customization.contact.systemWebPages.supportPage})";
 }
 
 QString AppInfo::armBox()

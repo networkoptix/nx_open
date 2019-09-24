@@ -22,7 +22,7 @@
     <Page Name="Install">
         <Image X="-1" Y="1" Width="480" Height="346" ImageFile="installer_bg.png"/>
         <Image X="223" Y="56" Width="102" Height="102" ImageFile="logo-102x102.png"/>
-        <Text X="12" Y="174" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">${display.product.name} ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</Text>
+        <Text X="12" Y="174" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">${customization.vmsName} ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</Text>
         <Text X="12" Y="214" Width="-12" Height="24" FontId="8" DisablePrefix="yes" Center="yes">#(loc.Components)</Text>
 
         <Checkbox Name="EulaAcceptCheckbox" X="12" Y="-16" Width="91" Height="16" TabStop="yes" FontId="7" HideWhenDisabled="yes">#(loc.InstallAcceptCheckbox)</Checkbox>
@@ -61,7 +61,7 @@
     <Page Name="Progress">
         <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
         <Image X="229" Y="56" Width="102" Height="102" ImageFile="logo-102x102.png"/>
-        <Text X="12" Y="184" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">${display.product.name} ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</Text>
+        <Text X="12" Y="184" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">${customization.vmsName} ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</Text>
         <Progressbar Name="OverallCalculatedProgressbar" X="150" Y="256" Width="250" Height="18" />
         <Text X="12" Y="282" Width="-12" Height="40" FontId="8" DisablePrefix="yes" Center="yes">#(loc.ProgressLabel)</Text>
         <Button Name="ProgressCancelButton" X="-12" Y="-12" Width="125" Height="28" TabStop="yes" FontId="0">#(loc.ProgressCancelButton)</Button>
@@ -69,7 +69,7 @@
     <Page Name="Modify">
         <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
         <Image X="223" Y="56" Width="102" Height="102" ImageFile="logo-102x102.png"/>
-        <Text X="12" Y="174" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">#(loc.ModifyUninstallButton) ${display.product.name}</Text>
+        <Text X="12" Y="174" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">#(loc.ModifyUninstallButton) ${customization.vmsName}</Text>
         <Text X="12" Y="214" Width="-12" Height="24" FontId="8" DisablePrefix="yes" Center="yes">#(loc.Components)</Text>
 
         <Button Name="UninstallButton" X="-137" Y="-12" Width="125" Height="28" TabStop="yes" FontId="0">#(loc.ModifyUninstallButton)</Button>

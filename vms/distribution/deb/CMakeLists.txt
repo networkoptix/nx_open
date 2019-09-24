@@ -35,11 +35,6 @@ file(READ ${CMAKE_CURRENT_BINARY_DIR}/license.txt license.text)
 string(REGEX REPLACE "\n\n" "\n.\n" license.text "${license.text}")
 string(REGEX REPLACE "\n" "\n " license.text "${license.text}")
 
-nx_configure_file(
-    ${CMAKE_SOURCE_DIR}/build_environment/maven/filter-resources/version.py
-    ${CMAKE_BINARY_DIR}/version.py
-)
-
 if(withMediaServer)
     add_subdirectory(mediaserver)
 endif()

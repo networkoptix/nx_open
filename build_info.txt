@@ -8,6 +8,6 @@ platformModification=@modification@
 changeSet=@changeSet@
 branch=@branch@
 beta=@beta_bool@
-brand=@product.name.short@
+brand=@customization.brand@
 protoVersion=@vmsProtocolVersion@
 metaVersion=@metaVersion@

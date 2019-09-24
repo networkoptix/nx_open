@@ -1657,7 +1657,7 @@ bool Server::Product::operator==(const Server::Product& right) const
 Server::Server()
 {
     products.push_back(Product{
-        nx::utils::AppInfo::productNameShort().toUtf8(),
+        nx::utils::AppInfo::brand().toUtf8(),
         nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion()),
         nx::utils::AppInfo::organizationName().toUtf8() });
 }
@@ -2052,7 +2052,7 @@ int ChunkHeader::serialize(BufferType* const /*dstBuffer*/) const
 
 
 static const StringType defaultUserAgentString = QString("%1%2/%3 (%4) %5").arg(
-    nx::utils::AppInfo::productNameLong(),
+    nx::utils::AppInfo::vmsName(),
     PRODUCT_NAME_SUFFIX,
     nx::utils::AppInfo::applicationVersion(),
     nx::utils::AppInfo::organizationName(),
@@ -2065,7 +2065,7 @@ StringType userAgentString()
 }
 
 static const StringType defaultServerString = QString("%1/%2 (%3) %4").arg(
-    nx::utils::AppInfo::productNameLong(),
+    nx::utils::AppInfo::vmsName(),
     nx::utils::AppInfo::applicationVersion(),
     nx::utils::AppInfo::organizationName(),
     COMPATIBILITY_SERVER_STRING
