@@ -4,10 +4,7 @@
 #include <api/server_rest_connection_fwd.h>
 #include <rest/server/json_rest_result.h>
 
-namespace nx {
-namespace vms {
-namespace client {
-namespace core {
+namespace nx::vms::client::core {
 
 class OrderedRequestsManager
 {
@@ -38,7 +35,4 @@ private:
     const QScopedPointer<Private> d;
 };
 
-} // namespace core
-} // namespace client
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::client::core

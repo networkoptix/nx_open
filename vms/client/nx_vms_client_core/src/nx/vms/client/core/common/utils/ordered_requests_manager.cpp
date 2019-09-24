@@ -1,16 +1,15 @@
 #include "ordered_requests_manager.h"
 
+#include <QtCore/QQueue>
+
 #include <api/server_rest_connection.h>
 
-namespace nx {
-namespace vms {
-namespace client {
-namespace core {
+namespace nx::vms::client::core {
 
 struct OrderedRequestsManager::Private
 {
     using Request = std::function<rest::Handle ()>;
-    using Requests = QList<Request>;
+    using Requests = QQueue<Request>;
 
     void addRequest(const Request& request);
     void tryExecuteNextRequest();
@@ -27,17 +26,14 @@ void OrderedRequestsManager::Private::addRequest(const Request& request)
     if (!request)
         return;
 
-    requests.push_back(request);
+    requests.enqueue(request);
     tryExecuteNextRequest();
 }
 
 void OrderedRequestsManager::Private::tryExecuteNextRequest()
 {
-    if (currentHandle > 0 || requests.isEmpty())
-        return;
-
-    currentHandle = requests.front()();
-    requests.pop_front();
+    if (currentHandle == -1 && !requests.isEmpty())
+        currentHandle = requests.dequeue()();
 }
 
 OrderedRequestsManager::CallbackType OrderedRequestsManager::Private::makeInternalCallback(
@@ -124,8 +120,5 @@ void OrderedRequestsManager::sendTwoWayAudioCommand(
     d->addRequest(request);
 }
 
-} // namespace core
-} // namespace client
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::client::core
 
