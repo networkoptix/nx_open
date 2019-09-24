@@ -46,6 +46,9 @@ if platform.system() == 'Linux':
                     "-o", "StrictHostKeyChecking=no",
                     "-o", "PubkeyAuthentication=no",
                     "-o", "PasswordAuthentication=yes",
+                    '-o', 'ControlMaster=auto',
+                    '-o', 'ControlPersist=1h',
+                    '-o', 'ControlPath=~/.ssh/%r@%h:%p',
                     "-T",
                     f"-p{port}",
                     f"{login}@{host}" if login else host,
@@ -60,6 +63,9 @@ if platform.system() == 'Linux':
                     "-o", "BatchMode=yes",
                     "-o", "PubkeyAuthentication=yes",
                     "-o", "PasswordAuthentication=no",
+                    '-o', 'ControlMaster=auto',
+                    '-o', 'ControlPersist=1h',
+                    '-o', 'ControlPath=~/.ssh/%r@%h:%p',
                     ]
 
             self.host_key = None
@@ -78,7 +84,7 @@ if platform.system() == 'Linux':
             self.local_ip = ssh_connection_info[0]
             self.is_root = self.eval('id -u') == '0'
 
-        def sh(self, command, timeout=3, su=False, exc=False, stdout=sys.stdout, stderr=None):
+        def sh(self, command, timeout=5, su=False, exc=False, stdout=sys.stdout, stderr=None):
             command_wrapped = command if self.is_root or not su else f'sudo -n {command}'
 
             log_remote_command(command_wrapped)
@@ -115,7 +121,7 @@ if platform.system() == 'Linux':
 
             return self.DeviceConnectionResult(run.returncode, command=command_wrapped)
 
-        def eval(self, cmd, timeout=3, su=False, stderr=None):
+        def eval(self, cmd, timeout=5, su=False, stderr=None):
             out = StringIO()
             res = self.sh(cmd, su=su, stdout=out, stderr=stderr, timeout=timeout)
 
@@ -195,7 +201,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
 
         _SH_DEFAULT = object()
 
-        def sh(self, command, timeout=3, su=False, exc=False, stdout=sys.stdout, stderr=sys.stderr):
+        def sh(self, command, timeout=5, su=False, exc=False, stdout=sys.stdout, stderr=sys.stderr):
             opts = {
                 'stdin': subprocess.PIPE
             }
@@ -234,7 +240,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
 
             return self.DeviceConnectionResult(proc.returncode, command=command_wrapped)
 
-        def eval(self, cmd, timeout=3, su=False, stderr=None):
+        def eval(self, cmd, timeout=5, su=False, stderr=None):
             out = StringIO()
             res = self.sh(cmd, su=su, stdout=out, stderr=stderr, timeout=timeout)
 

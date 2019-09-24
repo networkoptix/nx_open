@@ -49,6 +49,7 @@ from vms_benchmark.device_platform import DevicePlatform
 from vms_benchmark.vms_scanner import VmsScanner
 from vms_benchmark.server_api import ServerApi
 from vms_benchmark import test_camera_runner
+from vms_benchmark import stream_reader_runner
 from vms_benchmark.linux_distibution import LinuxDistributionDetector
 from vms_benchmark import device_tests
 from vms_benchmark import host_tests
@@ -106,10 +107,20 @@ def load_configs(config_file, sys_config_file):
             "type": 'string',
             "default": './testcamera/testcamera'
         },
+        "rtspPerfBin": {
+            "optional": True,
+            "type": 'string',
+            "default": './testcamera/rtsp_perf'
+        },
         "testFileHighResolution": {
             "optional": True,
             "type": 'string',
             "default": './high.ts'
+        },
+        "testFileHighDurationMs": {
+            "optional": True,
+            "type": 'integer',
+            "default": 10000
         },
         "testFileLowResolution": {
             "optional": True,
@@ -157,6 +168,8 @@ def load_configs(config_file, sys_config_file):
 
     if sys_config['testCameraBin']:
         test_camera_runner.binary_file = sys_config['testCameraBin']
+    if sys_config['rtspPerfBin']:
+        stream_reader_runner.binary_file = sys_config['rtspPerfBin']
     if sys_config['testFileHighResolution']:
         test_camera_runner.test_file_high_resolution = sys_config['testFileHighResolution']
     if sys_config['testFileLowResolution']:
@@ -198,8 +211,8 @@ def report_server_storage_failures(api, streaming_started_at):
     )
     print(f"        Storage failures: {storage_failure_events_count}")
 
-    return storage_failure_events_count
-
+    if storage_failure_events_count > 0:
+        raise exceptions.StorageFailuresIssue(storage_failure_events_count)
 
 @dataclass
 class Stats:
@@ -387,8 +400,11 @@ def main(config_file, sys_config_file):
         raise exceptions.ServerError("Unable to restart Server: Server was not upped.")
 
     vms = vmses[0]
+    ram_free_bytes = dev_platform.ram_available_bytes()
+    if ram_free_bytes is None:
+        ram_free_bytes = dev_platform.ram_free_bytes()
     print('Server restarted successfully.')
-    print(f"RAM free: {to_megabytes(dev_platform.ram_free_bytes())} MB of {to_megabytes(dev_platform.ram_bytes)} MB")
+    print(f"RAM free: {to_megabytes(ram_free_bytes())} MB of {to_megabytes(dev_platform.ram_bytes)} MB")
 
     api = ServerApi(device.ip, vms.port, user=config['vmsUser'], password=config['vmsPassword'])
 
@@ -451,10 +467,10 @@ def main(config_file, sys_config_file):
     for test_cameras_count in config.get(
             'testCamerasTestSequence', [1, 2, 3, 4, 6, 8, 10, 16, 32, 64, 128]):
 
-        stats = Stats()
-
         ram_available_bytes = dev_platform.ram_available_bytes()
-        stats.ram_free_bytes = ram_available_bytes if ram_available_bytes else dev_platform.ram_free_bytes()
+        ram_free_bytes = ram_available_bytes if ram_available_bytes else dev_platform.ram_free_bytes()
+
+        stats = Stats()
 
         if ram_available_bytes and ram_available_bytes < (
                 test_cameras_count * ram_bytes_per_camera_by_arch.get(dev_platform.arch, 200) * 1024 * 1024
@@ -491,6 +507,7 @@ def main(config_file, sys_config_file):
                             return True, cameras
                     else:
                         detection_started_at = None
+
                     time.sleep(1)
                 return False, None
 
@@ -512,100 +529,180 @@ def main(config_file, sys_config_file):
                     else:
                         raise exceptions.TestCameraError(
                             f"Failed enabling recording on camera {camera.id}.")
-
-                camera_id = cameras[0].id
             except Exception as e:
                 log_exception('Discovering cameras', e)
                 raise exceptions.TestCameraError(f"Not all virtual cameras were discovered or went live.", e) from e
 
-            try:
+            stream_reader_context_manager = stream_reader_runner.stream_reader_running(
+                (camera.id for camera in cameras),
+                config['vmsUser'],
+                config['vmsPassword'],
+                device.ip,
+                vms.port
+            )
+            with stream_reader_context_manager as stream_reader_context:
+                started = False
                 stream_opening_started_at = time.time()
-                stream_duration = sys_config['streamTestDurationSecs']
+
+                cameras_started_flags = dict((camera.id, False) for camera in cameras)
 
                 while time.time() - stream_opening_started_at < 25:
-                    stream_url = f"rtsp://{config['vmsUser']}:{config['vmsPassword']}@{device.ip}:{vms.port}/{camera_id}"
-                    stream = cv2.VideoCapture(stream_url)
+                    if stream_reader_context.poll() is not None:
+                        raise exceptions.RtspPerfError('FOOO')
 
-                    if stream.isOpened():
-                        print(f"    Video stream from the Server opened. Test duration: {stream_duration} seconds.")
+                    line = stream_reader_context.stdout.readline().decode('UTF-8')
+                    import re
+                    match = re.match(r'.* ([a-z0-9-]+) timestamp (\d+) us$', line.strip())
+                    if not match:
+                        continue
+
+                    camera_id = match.group(1)
+
+                    if camera_id not in cameras_started_flags:
+                        raise exceptions.RtspPerfError(f'Cannot open video streams: unexpected camera id.')
+
+                    cameras_started_flags[camera_id] = True
+
+                    if len(list(filter(lambda e: e[1] is False, cameras_started_flags.items()))) == 0:
+                        started = True
                         break
 
-                if not stream.isOpened():
+                if started is False:
+                    # TODO: check all streams are opened
                     raise exceptions.TestCameraStreamingIssue(
-                        f'Cannot open video stream {stream_url}: timeout expired.')
+                        f'Cannot open video streams: timeout expired.')
 
+                print("All streams opened.")
+
+                stream_duration = sys_config['streamTestDurationSecs']
                 streaming_started_at = time.time()
 
-                last_pts = None
-                last_ts = None
-                first_ts = None
-                frames = 0
+                last_ptses = {}
+                first_tses = {}
+                frames = {}
+                frame_drops = {}
+                lags = {}
+                streaming_succeeded = False
 
-                try:
-                    streaming_succeeded = False
-                    while stream.isOpened():
-                        _ret, _frame = stream.read()
-                        frames += 1
-                        pts = stream.get(cv2.CAP_PROP_POS_MSEC)
+                while time.time() - streaming_started_at < stream_duration:
+                    if stream_reader_context.poll() is not None:
+                        raise exceptions.RtspPerfError('asdf')
 
-                        if first_ts is None:
-                            first_ts = time.time()
-                        else:
-                            lag = time.time() - (first_ts + frames * (1.0/float(sys_config['testFileFps'])))
-                            max_allowed_lag_seconds = 5
-                            if lag > max_allowed_lag_seconds:
-                                raise exceptions.TestCameraStreamingIssue(
-                                    'Streaming video from the Server FAILED: ' +
-                                    f'the video lags for more than {max_allowed_lag_seconds} seconds; ' +
-                                    'can be caused by network issues or poor performance of either the host or the box.'
-                                )
+                    line = stream_reader_context.stdout.readline().decode('UTF-8')
 
-                        ts = time.time()
+                    match_res = re.match(r'.* ([a-z0-9-]+) timestamp (\d+) us$', line.strip())
+                    if not match_res:
+                        continue
 
-                        if last_ts is not None and ts - last_ts < 0.01:
-                            stats.dup_frames_count += 1
+                    pts = int(match_res.group(2))/1000
 
-                            max_allowed_dummy_frames = 50
-                            if stats.dup_frames_count > max_allowed_dummy_frames:
-                                raise exceptions.TestCameraStreamingIssue(
-                                    'Streaming video from the Server FAILED: ' +
-                                    f'the stream is broken - more than {max_allowed_dummy_frames} ' +
-                                    'frames with equal timestamps; ' +
-                                    'can be caused by poor performance of either the host or the box, ' +
-                                    'or Server issues.')
+                    pts_camera_id = match_res.group(1)
 
-                        pts_diff_max = (1000./float(sys_config['testFileFps']))*1.05
+                    frames[pts_camera_id] = frames.get(pts_camera_id, 0) + 1
 
-                        if last_pts is not None and pts - last_pts > pts_diff_max:
-                            stats.dropped_frames_count += 1
-                        if time.time() - streaming_started_at > stream_duration:
-                            streaming_succeeded = True
-                            print(f"    Serving {test_cameras_count} virtual cameras succeeded.")
-                            break
-                        last_pts = pts
-                        last_ts = time.time()
-
-                    if not streaming_succeeded:
-                        raise exceptions.TestCameraStreamingIssue(
-                            'Streaming video from the Server FAILED: ' +
-                            'the stream has unexpectedly finished; ' +
-                            'can be caused by network issues or Server issues.')
-                finally:
-                    try:
-                        stats.cpu_usage_per_cpu = device_combined_cpu_usage(device) / dev_platform.cpu_count
-                    except exceptions.VmsBenchmarkError as e:
-                        raise exceptions.UnableToFetchDataFromDevice(
-                            'Unable to fetch box cpu usage',
-                            original_exception=e
+                    if pts_camera_id not in first_tses:
+                        first_tses[pts_camera_id] = time.time()
+                    else:
+                        lags[pts_camera_id] = max(
+                            lags.get(pts_camera_id, 0),
+                            time.time() - (first_tses[pts_camera_id] + frames.get(pts_camera_id, 0) * (1.0/float(sys_config['testFileFps'])))
                         )
 
-                    report_stats(stats, api, streaming_started_at, sys_config)
-            except exceptions.VmsBenchmarkIssue as exception:
-                print(f"\nISSUE: {str(exception)}")
-                log_exception("ISSUE", exception)
-                return 1
-            finally:
-                stream.release()
+                    ts = time.time()
+
+                    pts_diff_deviation_factor_max = 0.01
+                    pts_diff_expected = 1000.0/float(sys_config['testFileFps'])
+                    pts_diff = pts - last_ptses[pts_camera_id] if pts_camera_id in last_ptses else None
+                    pts_diff_max = (1000./float(sys_config['testFileFps']))*1.05
+
+                    # The value is negative because the first PTS of new loop is less than last PTS of the previous
+                    # loop.
+                    pts_diff_expected_new_loop = -float(sys_config['testFileHighDurationMs'])
+
+                    if pts_diff is not None:
+                        pts_diff_deviation_factor = lambda diff_expected: abs((diff_expected - pts_diff) / diff_expected)
+
+                        if (
+                                pts_diff_deviation_factor(pts_diff_expected) > pts_diff_deviation_factor_max and
+                                pts_diff_deviation_factor(pts_diff_expected_new_loop) > pts_diff_deviation_factor_max
+                        ):
+                            frame_drops[pts_camera_id] = frame_drops.get(pts_camera_id, 0) + 1
+                            print(f'Detected framedrop from camera {pts_camera_id}: {pts - last_ptses.get(pts_camera_id, pts)} (max={pts_diff_max}) {pts} {time.time()}')
+
+                    if time.time() - streaming_started_at > stream_duration:
+                        streaming_succeeded = True
+                        print(f"    Serving {test_cameras_count} virtual cameras succeeded.")
+                        break
+
+                    last_ptses[pts_camera_id] = pts
+
+                if not streaming_succeeded:
+                    raise exceptions.TestCameraStreamingIssue(
+                        'Streaming video from the Server FAILED: ' +
+                        'the stream has unexpectedly finished; ' +
+                        'can be caused by network issues or Server issues.')
+
+                if time.time() - ts > 5:
+                    raise exceptions.TestCameraStreamingIssue(
+                        'Streaming video from the Server FAILED: ' +
+                        'the stream had been hanged; ' +
+                        'can be caused by network issues or Server issues.')
+
+                issues = []
+
+                try:
+                    ram_available = dev_platform.ram_available()
+                    ram_free = ram_available if ram_available else dev_platform.ram_free()
+                except exceptions.VmsBenchmarkError as e:
+                    issues.append(exceptions.UnableToFetchDataFromDevice(
+                        'Unable to fetch box RAM usage',
+                        original_exception=e
+                    ))
+
+                try:
+                    cpu_usage_summarized = device_combined_cpu_usage(device) / dev_platform.cpu_count
+                except exceptions.VmsBenchmarkError as e:
+                    issues.append(exceptions.UnableToFetchDataFromDevice(
+                        'Unable to fetch box cpu usage',
+                        original_exception=e
+                    ))
+                    cpu_usage_summarized = None
+
+                frame_drops_sum = sum(frame_drops.values())
+
+                print(f"    Frame drops: {sum(frame_drops.values())} (expected 0)")
+                if cpu_usage_summarized is not None:
+                    print(f"    CPU usage: {str(cpu_usage_summarized) if cpu_usage_summarized else '-'}")
+                if ram_free is not None:
+                    print(f"    Free RAM: {round(ram_free/1024/1024)} MB")
+
+                if frame_drops_sum > 0:
+                    issues.append(exceptions.VmsBenchmarkIssue(
+                        f'{frame_drops_sum} frame drops detected.'
+                    ))
+
+                try:
+                    report_server_storage_failures(api, round(streaming_started_at*1000))
+                except exceptions.VmsBenchmarkIssue as e:
+                    issues.append(e)
+
+                if cpu_usage_summarized is not None and cpu_usage_summarized > sys_config['cpuUsageThreshold']:
+                    issues.append(exceptions.CPUUsageThresholdExceededIssue(
+                        cpu_usage_summarized,
+                        sys_config['cpuUsageThreshold']
+                    ))
+
+                max_allowed_lag_seconds = 5
+                max_lag = max(lags.values())
+                if max_lag > max_allowed_lag_seconds:
+                    issues.append(exceptions.TestCameraStreamingIssue(
+                        'Streaming video from the Server FAILED: ' +
+                        f'the video lag {round(max_lag)} seconds is more than {max_allowed_lag_seconds} seconds; ' +
+                        'can be caused by network issues or poor performance of either the host or the box.'
+                    ))
+
+                if len(issues) > 0:
+                    raise exceptions.VmsBenchmarkIssue(f'There are {len(issues)} issue(s)', original_exception=issues)
 
     print('\nSUCCESS: All tests finished.')
     return 0
@@ -631,7 +728,11 @@ def nx_print_exception(exception, recursive_level=0):
         print(f"{string_indent}{str(exception)}", file=sys.stderr)
         if exception.original_exception:
             print(f'{string_indent}Caused by:', file=sys.stderr)
-            nx_print_exception(exception.original_exception, recursive_level=recursive_level+2)
+            if isinstance(exception.original_exception, list):
+                for e in exception.original_exception:
+                    nx_print_exception(e, recursive_level=recursive_level+2)
+            else:
+                nx_print_exception(exception.original_exception, recursive_level=recursive_level+2)
     else:
         print(
             f'{string_indent}{nx_format_exception(exception)}'
