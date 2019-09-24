@@ -84,7 +84,6 @@ nx_add_target(nx_vms_server LIBRARY
         ${CMAKE_CURRENT_SOURCE_DIR}/webadmin_skins/${customization.skin}
         ${favicon}
         ${static_resources}
-        ${CMAKE_CURRENT_BINARY_DIR}/serverProperties.json
     PUBLIC_LIBS
         nx_kit #< This dependency should come first to satisfy OutputRedirector.
         Qt5::WebSockets
