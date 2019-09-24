@@ -177,7 +177,7 @@ private:
     /**
      * Removes elements within existing transaction.
      * If transaction is rolled back, no data will be sent to remote peers.
-	 * @return true if the key existed and was removed.s
+	 * @return true if the key existed and was removed.
      */
     bool removeFromDb(
         nx::sql::QueryContext* queryContext,
