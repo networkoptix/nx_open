@@ -146,7 +146,7 @@ Result<int> EpollMacosx::poll(
         }
     }
 
-    return result;
+    return success(result);
 }
 
 void EpollMacosx::interrupt()

@@ -157,7 +157,7 @@ Result<int> EpollLinux::poll(
         }
     }
 
-    return total;
+    return success(total);
 }
 
 void EpollLinux::interrupt()
