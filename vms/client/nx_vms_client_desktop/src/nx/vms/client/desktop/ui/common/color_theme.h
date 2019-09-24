@@ -20,6 +20,8 @@ public:
 
     QVariantMap colors() const;
 
+    QMap<QString, QString> getColorSubstitutions() const;
+
     QColor color(const char* name) const;
     QColor color(const QString& name) const;
 

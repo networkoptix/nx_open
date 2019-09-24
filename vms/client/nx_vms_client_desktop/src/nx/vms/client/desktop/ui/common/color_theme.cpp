@@ -4,8 +4,10 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QVariant>
-#include <QtCore/QRegExp>
+#include <QtCore/QRegularExpression>
 #include <QtGui/QColor>
+
+#include <ui/style/skin.h>
 
 #include <nx/utils/log/log.h>
 
@@ -14,16 +16,22 @@ static uint qHash(const QColor& color)
     return color.rgb();
 }
 
+template<>
+nx::vms::client::desktop::ColorTheme* Singleton<nx::vms::client::desktop::ColorTheme>::s_instance =
+    nullptr;
+
 namespace nx::vms::client::desktop {
 
-static const auto kBaseSkinFileName = ":/skin/customization_common.json";
-static const auto kCustomSkinFileName = ":/skin/skin.json";
+static const auto kBaseSkinFileName = "customization_common.json";
+static const auto kCustomSkinFileName = "skin.json";
 
 struct ColorTheme::Private
 {
     QVariantMap colors;
 
     QHash<QString, QList<QColor>> groups;
+
+    QMap<QString, QString> colorSubstitutions;  // default #XXXXXX to updated #YYYYYY
 
     struct ColorInfo
     {
@@ -37,44 +45,63 @@ struct ColorTheme::Private
     QHash<QColor, ColorInfo> colorInfoByColor;
 
     void loadColors();
-    void loadColorsFromFile(const QString& filename);
+
+private:
+    QJsonObject readColorsFromFile(const QString& filename) const;
+    QSet<QString> updateColors(const QJsonObject& newColors);
 };
 
 void ColorTheme::Private::loadColors()
 {
     // Load base colors and override them with the actual skin values.
-    loadColorsFromFile(kBaseSkinFileName);
-    loadColorsFromFile(kCustomSkinFileName);
+
+    const QJsonObject baseColors = readColorsFromFile(kBaseSkinFileName);
+    updateColors(baseColors);
+
+    const QVariantMap defaultColors = colors;
+
+    const QJsonObject currentSkinColors = readColorsFromFile(kCustomSkinFileName);
+    const QSet<QString> updatedColors = updateColors(currentSkinColors);
+
+    for (auto it = updatedColors.begin(); it != updatedColors.end(); ++it)
+    {
+        if (defaultColors.contains(*it))
+            colorSubstitutions[defaultColors[*it].value<QColor>().name()] =
+                colors[*it].value<QColor>().name();
+    }
 }
 
-void ColorTheme::Private::loadColorsFromFile(const QString& filename)
+QJsonObject ColorTheme::Private::readColorsFromFile(const QString& filename) const
 {
-    QFile file(filename);
+    QJsonObject result;
+
+    QFile file(qnSkin->path(filename));
     const bool opened = file.open(QFile::ReadOnly);
-    if (!NX_ASSERT(opened, "Cannot read skin file %1", filename))
-        return;
+    if (NX_ASSERT(opened, "Cannot read skin file %1", filename))
+    {
+        const auto& jsonData = file.readAll();
 
-    const auto& jsonData = file.readAll();
+        file.close();
 
-    file.close();
+        QJsonParseError error;
+        const auto& json = QJsonDocument::fromJson(jsonData, &error);
 
-    QJsonParseError error;
-    const auto& json = QJsonDocument::fromJson(jsonData, &error);
+        const bool parsed = error.error == QJsonParseError::NoError;
+        if (NX_ASSERT(parsed, "JSON parse error: %1", error.errorString())
+                && NX_ASSERT(json.isObject(), "Invalid JSON structure"))
+            return json.object().value("globals").toObject();
+    }
 
-    const bool parsed = error.error == QJsonParseError::NoError;
-    if (!NX_ASSERT(parsed, "JSON parse error: %1", error.errorString()))
-        return;
+    return result;
+}
 
-    if (!NX_ASSERT(json.isObject(), "Invalid JSON structure"))
-        return;
+QSet<QString> ColorTheme::Private::updateColors(const QJsonObject& newColors)
+{
+    const QRegularExpression groupNameRe("([^_\\d]+)");
 
-    const auto& globals = json.object().value("globals").toObject();
-    if (globals.isEmpty())
-        return;
+    QSet<QString> updatedColors;
 
-    QRegExp groupRegExp(lit("([^_\\d]+)[_\\d].*"));
-
-    for (auto it = globals.begin(); it != globals.end(); ++it)
+    for (auto it = newColors.begin(); it != newColors.end(); ++it)
     {
         if (it->type() != QJsonValue::String)
             continue;
@@ -87,9 +114,13 @@ void ColorTheme::Private::loadColorsFromFile(const QString& filename)
         const QColor oldColor = colors[colorName].value<QColor>();
         colors[colorName] = color;
 
-        if (groupRegExp.exactMatch(colorName))
+        if (oldColor.isValid())
+            updatedColors.insert(colorName);
+
+        QRegularExpressionMatch groupNameMatch = groupNameRe.match(colorName);
+        if (groupNameMatch.hasMatch())
         {
-            const QString& groupName = groupRegExp.cap(1);
+            const QString groupName = groupNameMatch.captured(0);
             QList<QColor>& group = groups[groupName];
             if (oldColor.isValid())
                 group.removeOne(oldColor);
@@ -110,6 +141,8 @@ void ColorTheme::Private::loadColorsFromFile(const QString& filename)
         for (int i = 0; i < colors.size(); ++i)
             colorInfoByColor[colors[i]] = ColorInfo{it.key(), i};
     }
+
+    return updatedColors;
 }
 
 ColorTheme::ColorTheme(QObject* parent):
@@ -126,6 +159,11 @@ ColorTheme::~ColorTheme()
 QVariantMap ColorTheme::colors() const
 {
     return d->colors;
+}
+
+QMap<QString, QString> ColorTheme::getColorSubstitutions() const
+{
+    return d->colorSubstitutions;
 }
 
 QColor ColorTheme::color(const char* name) const
