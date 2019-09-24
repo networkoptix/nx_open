@@ -145,17 +145,21 @@ void DataManager::remove(
     if (key.empty())
         return completionHandler(ResultCode::logicError);
 
+	auto removed = std::make_shared<bool>();
+
     m_syncEngine->transactionLog().startDbTransaction(
         m_clusterId,
-        [this, key](nx::sql::QueryContext* queryContext)
+        [this, key, removed](nx::sql::QueryContext* queryContext)
         {
-            removeFromDb(queryContext, key);
+            *removed = removeFromDb(queryContext, key);
             return nx::sql::DBResult::ok;
         },
-        [completionHandler = std::move(completionHandler)](
+        [completionHandler = std::move(completionHandler), removed](
             nx::sql::DBResult dbResult)
         {
-            completionHandler(toResultCode(dbResult));
+			if (!*removed)
+				dbResult = nx::sql::DBResult::notFound;
+			completionHandler(toResultCode(dbResult));
         });
 }
 
@@ -367,16 +371,20 @@ std::optional<std::map<std::string, std::string>> DataManager::getRangeFromDb(
     return range.empty() ? std::nullopt : std::optional<decltype(range)>(range);
 }
 
-void DataManager::removeFromDb(
+bool DataManager::removeFromDb(
     nx::sql::QueryContext* queryContext,
     const std::string& key)
 {
-    m_keyValueDao.remove(queryContext, key);
+	if (!m_keyValueDao.remove(queryContext, key))
+		return false;
+
     m_eventProvider->notifyRecordRemoved(queryContext, key);
 
     m_syncEngine->transactionLog()
         .generateTransactionAndSaveToLog<command::RemoveKeyValuePair>(
             queryContext, m_clusterId, Key{key});
+
+	return true;
 }
 
 void DataManager::insertOrUpdateReceivedRecord(
