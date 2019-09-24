@@ -60,7 +60,7 @@ public:
     /**
      * Constructs success result.
      */
-    explicit Result(Payload payload):
+    Result(Payload payload):
         m_payload(std::move(payload))
     {
     }
