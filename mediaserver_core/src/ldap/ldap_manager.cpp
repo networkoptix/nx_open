@@ -349,7 +349,9 @@ QString LdapSession::getUserDn(const QString& login)
 
 bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
 {
-    NX_VERBOSE(this, lm("Fetching users with filter '%1'").arg(customFilter));
+    QString filter = QnLdapFilter(m_dType->Filter()) &
+        (customFilter.isEmpty() ? m_settings.searchFilter : customFilter);
+    NX_VERBOSE(this, lm("Fetching users with filter '%1'").arg(filter));
 
     LDAP_RESULT rc = ldap_simple_bind_s(m_ld, QSTOCW(m_settings.adminDn), QSTOCW(m_settings.adminPassword));
     if (rc != LDAP_SUCCESS)
@@ -357,9 +359,6 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
         m_lastErrorCode = rc;
         return false;
     }
-
-    QString filter = QnLdapFilter(m_dType->Filter()) &
-        (customFilter.isEmpty() ? m_settings.searchFilter : customFilter);
 
     berval *cookie = NULL;
     const auto cleanUpCookie =
@@ -440,9 +439,11 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
         if((rc = ldap_parse_result(
             m_ld, result, &lerrno, NULL, &lerrstr, NULL, &retServerControls, 0)) != LDAP_SUCCESS)
         {
+            NX_ASSERT(lerrno == rc, lm("lerrno (%1) != rc (%2)").args(lerrno, rc));
             m_lastErrorCode = rc;
             return false;
         }
+        NX_ASSERT(lerrno == LDAP_SUCCESS, lm("lerrno: %1").args(lerrno));
 
         LDAP_RESULT entcnt = 0;
         cleanUpCookie();
@@ -452,6 +453,7 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
             m_lastErrorCode = rc;
             return false;
         }
+        NX_VERBOSE(this, lm("Entities received on page: %1").args(entcnt));
 
         LDAPMessage *entry = NULL;
         for (entry = ldap_first_entry(m_ld, result);
@@ -470,9 +472,21 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
 
                 if (!user.login.isEmpty())
                     users.append(user);
+                else
+                    NX_VERBOSE(this, lm("Ignoring entry with empty login: %1").args(user.dn));
                 ldap_memfree(dn);
             }
+            else
+            {
+                // NOTE: it may be changed to ldap_get_option(ld, LDAP_OPT_RESULT_CODE, &err)
+                // TODO: Can LdapErrorStr be used here? Is LdapGetLastError another value?
+                NX_DEBUG(this, lm("Failed to extract DN of LDAP entry: %1").args(
+                    LdapErrorStr(LdapGetLastError())));
+            }
         }
+
+        NX_VERBOSE(this, lm("Fetched page with [%1] return code. Currently fetched: %2 users").args(
+            LdapErrorStr(LdapGetLastError()), users.size()));
     } while (cookie && cookie->bv_val != NULL && (strlen(cookie->bv_val) > 0));
 
     NX_VERBOSE(this, lm("Fetched %1 user(s)%2").args(
@@ -632,7 +646,10 @@ Qn::AuthResult QnLdapManager::authenticate(const QString &login, const QString &
     {
         dn = session.getUserDn(login);
         if (dn.isEmpty())
+        {
+            NX_VERBOSE(this, lm("User not found: %1").args(session.lastErrorString()));
             return Qn::Auth_WrongLogin;
+        }
 
         QnMutexLocker lock(&m_cacheMutex);
         m_dnCache[login] = dn;
@@ -640,7 +657,7 @@ Qn::AuthResult QnLdapManager::authenticate(const QString &login, const QString &
 
     auto authResult = session.authenticate(dn, password);
     if (authResult != Qn::Auth_OK)
-        NX_WARNING(this, lm("authenticate: %1").arg(session.lastErrorString()));
+        NX_WARNING(this, lm("Authentication failed: %1").arg(session.lastErrorString()));
 
     return authResult;
 }
