@@ -198,7 +198,9 @@ public:
         QnMediaServerModule* serverModule, const QnStorageResourcePtr& storage);
 
     static bool canStorageBeUsedByVms(const QnStorageResourcePtr& storage);
+
     int64_t nxOccupiedSpace(const QnStorageResourcePtr& storage) const;
+    std::chrono::milliseconds nxOccupiedDuration(const QnVirtualCameraResourcePtr& camera) const;
 signals:
     void storagesAvailable();
     void noStoragesAvailable();

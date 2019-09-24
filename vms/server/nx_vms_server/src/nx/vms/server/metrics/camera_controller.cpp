@@ -3,6 +3,7 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/text/archive_duration.h>
 
 #include "helpers.h"
 
@@ -144,8 +145,17 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                 "actualBitrate", [](const auto& r) //< KBps.
                 { return Value(r->getActualParams(StreamIndex::secondary).bitrateKbps);}
             )
+        ),
+        utils::metrics::makeValueGroupProvider<Resource>(
+            "analytics",
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "archiveLength", [](const auto& r)
+                {
+                    const auto value = std::chrono::seconds(r->nxOccupiedDuration().count()/1000);
+                    return Value(nx::vms::text::ArchiveDuration::durationToString(value));
+                }
+            )
         )
-        // TODO: Implement other groups.
     );
 }
 

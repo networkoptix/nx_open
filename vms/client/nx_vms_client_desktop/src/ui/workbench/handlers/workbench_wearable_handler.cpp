@@ -16,7 +16,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 
 #include <client/client_module.h>
-#include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/text/human_readable.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/messages/resources_messages.h>

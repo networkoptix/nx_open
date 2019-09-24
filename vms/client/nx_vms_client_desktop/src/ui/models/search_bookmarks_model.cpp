@@ -16,7 +16,7 @@
 
 #include <utils/camera/bookmark_helpers.h>
 #include <utils/camera/camera_names_watcher.h>
-#include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/text/human_readable.h>
 #include <nx/utils/collection.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/algorithm/index_of.h>
@@ -331,7 +331,7 @@ QVariant QnSearchBookmarksModelPrivate::getData(const QModelIndex& index, int ro
         case QnSearchBookmarksModel::kLength:
         {
             const auto duration = std::chrono::milliseconds(std::abs(bookmark.durationMs.count()));
-            using HumanReadable = nx::vms::client::core::HumanReadable;
+            using HumanReadable = nx::vms::text::HumanReadable;
             return HumanReadable::timeSpan(duration,
                 HumanReadable::DaysAndTime,
                 HumanReadable::SuffixFormat::Full,

@@ -8,7 +8,7 @@
 #include <utils/math/color_transformations.h>
 #include <ui/style/helper.h>
 
-#include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/text/human_readable.h>
 
 QnStorageSpaceSlider::QnStorageSpaceSlider(QWidget *parent):
     base_type(parent),
@@ -73,7 +73,7 @@ void QnStorageSpaceSlider::setTextFormat(const QString& textFormat)
 
 QString QnStorageSpaceSlider::formatSize(qint64 size)
 {
-    using HumanReadable = nx::vms::client::core::HumanReadable;
+    using HumanReadable = nx::vms::text::HumanReadable;
 
     return HumanReadable::digitalSizePrecise(size,
         HumanReadable::VolumeSize,

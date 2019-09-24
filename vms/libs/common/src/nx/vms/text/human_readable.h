@@ -5,7 +5,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QString>
 
-namespace nx::vms::client::core {
+namespace nx::vms::text {
 
 class HumanReadable
 {
@@ -103,4 +103,4 @@ public:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(HumanReadable::TimeSpanFormat);
 
-} // namespace nx::vms::client::core
+} // namespace nx::vms::text

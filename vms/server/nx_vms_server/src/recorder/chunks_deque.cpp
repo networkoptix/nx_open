@@ -558,7 +558,23 @@ ChunksDeque::ConstIterator ChunksDeque::end() const
 
 int64_t ChunksDeque::occupiedSpace(int storageIndex) const
 {
-    return m_archivePresence[storageIndex];
+    if (storageIndex >= 0)
+        return m_archivePresence[storageIndex].space;
+    int64_t result = 0;
+    for (const auto& [key, value]: m_archivePresence)
+        result += value.space;
+    return result;
+}
+
+std::chrono::milliseconds ChunksDeque::occupiedDuration(int storageIndex) const
+{
+    if (storageIndex >= 0)
+        return m_archivePresence[storageIndex].duration;
+
+    std::chrono::milliseconds result{};
+    for (const auto& [key, value]: m_archivePresence)
+        result  += value.duration;
+    return result;
 }
 
 void ChunksDeque::pop_front()
@@ -619,13 +635,17 @@ bool ChunksDeque::operator==(const ChunksDeque& other)
 
 void ChunksDeque::chunkAdded(const Chunk& chunk) const
 {
-    m_archivePresence[chunk.storageIndex] += chunk.getFileSize();
+    auto& value = m_archivePresence[chunk.storageIndex];
+    value.space += chunk.getFileSize();
+    value.duration += std::chrono::milliseconds(chunk.durationMs);
 }
 
 void ChunksDeque::chunkRemoved(const Chunk& chunk) const
 {
-    auto &oldSpaceValue = m_archivePresence[chunk.storageIndex];
-    oldSpaceValue = std::max<int64_t>(0LL, oldSpaceValue - chunk.getFileSize());
+    auto &oldValue = m_archivePresence[chunk.storageIndex];
+    oldValue.space = std::max<int64_t>(0LL, oldValue.space - chunk.getFileSize());
+    oldValue.duration = std::chrono::milliseconds(
+        std::max<int64_t>(0LL, oldValue.duration.count() - chunk.durationMs));
 }
 
 void ChunksDeque::allRemoved() const

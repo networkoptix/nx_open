@@ -21,5 +21,4 @@ public:
     static QString suffix(Suffix value);
     static QString longSuffix(Suffix value);
     static QString fullSuffix(Suffix value, int count = -1);
-
 };

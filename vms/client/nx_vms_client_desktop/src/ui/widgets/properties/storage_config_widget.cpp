@@ -45,7 +45,7 @@
 #include <utils/common/synctime.h>
 #include <utils/math/color_transformations.h>
 
-#include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/text/human_readable.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -937,7 +937,7 @@ QString QnStorageConfigWidget::intervalToString(qint64 backupTimeMs)
     if (inTheFuture || deltaMs > kMinDeltaForMessageMs)
     {
         const auto duration = std::chrono::milliseconds(std::abs(deltaMs));
-        using HumanReadable = nx::vms::client::core::HumanReadable;
+        using HumanReadable = nx::vms::text::HumanReadable;
         const auto timeSpan = HumanReadable::timeSpan(duration);
         return inTheFuture
             ? tr("in %1").arg(timeSpan)

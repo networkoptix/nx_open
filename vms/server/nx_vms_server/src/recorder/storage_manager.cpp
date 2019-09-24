@@ -842,6 +842,20 @@ int64_t QnStorageManager::occupiedSpace(int storageIndex) const
     return result;
 }
 
+std::chrono::milliseconds QnStorageManager::nxOccupiedDuration(
+    const QnVirtualCameraResourcePtr& camera) const
+{
+    std::chrono::milliseconds result{};
+    for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
+    {
+        QnMutexLocker lock(&m_mutexCatalog);
+        auto itr = m_devFileCatalog->find(camera->getPhysicalId());
+        if (itr != m_devFileCatalog->end())
+            result += itr.value()->occupiedDuration();
+    }
+    return result;
+}
+
 void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraDataList& archiveCameras)
 {
     nx::caminfo::ArchiveCameraDataList camerasToAdd;

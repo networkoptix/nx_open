@@ -154,7 +154,9 @@ public:
 
     // only for unit tests, don't use in production.
     nx::vms::server::ChunksDeque &getChunksUnsafe() { return m_chunks; }
-    int64_t occupiedSpace(int storageIndex) const;
+
+    int64_t occupiedSpace(int storageIndex = -1) const;
+    std::chrono::milliseconds occupiedDuration(int storageIndex = -1) const;
 
 private:
 

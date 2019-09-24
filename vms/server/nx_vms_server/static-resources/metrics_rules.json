@@ -197,6 +197,14 @@
                     "unit": "KBps"
                 }
             }
+        },
+        "analytics": {
+            "values": {
+                "archiveLength": {
+                    "name": "Archive length",
+                    "display": "table|panel"
+                }
+            }
         }
     },
     "storages": {

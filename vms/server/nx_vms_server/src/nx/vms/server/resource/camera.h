@@ -211,6 +211,7 @@ public:
     void atStreamIssue();
     void atIpConflict();
     qint64 getAndResetMetric(std::atomic<qint64> Metrics::* parameter);
+    std::chrono::milliseconds nxOccupiedDuration() const;
 signals:
     /** Emit on camera or IO module input change. */
     void inputPortStateChanged(
@@ -257,7 +258,6 @@ protected:
     /** Override to support input port monitoring. */
     virtual void startInputPortStatesMonitoring();
     virtual void stopInputPortStatesMonitoring();
-
 private:
     CameraDiagnostics::Result initializeAdvancedParametersProviders();
     void fixInputPortMonitoring();

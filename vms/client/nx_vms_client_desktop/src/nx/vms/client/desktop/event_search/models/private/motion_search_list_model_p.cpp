@@ -18,7 +18,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 
 #include <nx/api/mediaserver/image_request.h>
-#include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/text/human_readable.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
@@ -130,7 +130,7 @@ QVariant MotionSearchListModel::Private::data(const QModelIndex& index, int role
             return lm("Begin: %1<br>End: %2<br>Duration: %3").args( //< Not translatable debug string.
                 utils::timestampToDebugString(chunk.period.startTimeMs),
                 utils::timestampToDebugString(chunk.period.endTimeMs()),
-                core::HumanReadable::timeSpan(chunk.period.duration())).toQString();
+                text::HumanReadable::timeSpan(chunk.period.duration())).toQString();
         }
 
         case Qn::PreviewTimeRole:

@@ -6,7 +6,7 @@
 
 #include <QtGui/QStandardItemModel>
 
-#include <text/time_strings.h>
+#include <nx//vms/text/time_strings.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>

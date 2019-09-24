@@ -28,7 +28,7 @@
 
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/api/mediaserver/image_request.h>
-#include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/text/human_readable.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
@@ -725,7 +725,7 @@ QString AnalyticsSearchListModel::Private::description(
         track.firstAppearanceTimeUs,
         start.toString(Qt::RFC2822Date),
         duration.count(),
-        core::HumanReadable::timeSpan(duration_cast<milliseconds>(duration)));
+        text::HumanReadable::timeSpan(duration_cast<milliseconds>(duration)));
 }
 
 QString AnalyticsSearchListModel::Private::attributes(

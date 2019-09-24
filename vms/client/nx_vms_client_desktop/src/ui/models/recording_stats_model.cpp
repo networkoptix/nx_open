@@ -11,8 +11,8 @@
 #include <ui/style/resource_icon_cache.h>
 
 #include <nx/utils/string.h>
-
-#include <nx/client/core/utils/human_readable.h>
+#include <nx/vms/text/time_strings.h>
+#include <nx/vms/text/archive_duration.h>
 
 namespace {
 
@@ -22,11 +22,6 @@ const qreal kBytesInKB = 1024.0;
 const qreal kBytesInMB = kBytesInKB * kBytesInKB;
 const qreal kBytesInGB = kBytesInMB * kBytesInKB;
 const qreal kBytesInTB = kBytesInGB * kBytesInKB;
-
-const qreal kSecondsPerHour = 3600.0;
-const qreal kSecondsPerDay = kSecondsPerHour * 24;
-const qreal kSecondsPerYear = kSecondsPerDay * 365.25;
-const qreal kSecondsPerMonth = kSecondsPerYear / 12.0;
 
 const int kPrecision = 2;
 
@@ -137,7 +132,10 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const
                 m_data.maxNameLength);
         }
         case BytesColumn: return formatBytesString(value.recordedBytes);
-        case DurationColumn: return rowType != Normal ? QString() : formatDurationString(value);
+        case DurationColumn:
+            return rowType != Normal ? QString() :
+                nx::vms::text::ArchiveDuration::durationToString(
+                    std::chrono::seconds(value.archiveDurationSecs), m_isForecastRole);
         case BitrateColumn: return formatBitrateString(value.averageBitrate);
         default: return QString();
     }
@@ -302,23 +300,4 @@ QString QnRecordingStatsModel::formatBytesString(qint64 bytes) const
         return tr("%1 TB").arg(QString::number(bytes / kBytesInTB, 'f', kPrecision));
     else
         return tr("%1 GB").arg(QString::number(bytes / kBytesInGB, 'f', kPrecision));
-}
-
-QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsData& data) const
-{
-    if (data.archiveDurationSecs == 0)
-        return m_isForecastRole ? tr("no data for forecast") : tr("empty");
-
-    if (data.archiveDurationSecs < kSecondsPerHour)
-        return tr("less than an hour");
-
-    const auto duration = std::chrono::seconds(data.archiveDurationSecs);
-    static const QString kSeparator(L' ');
-
-    using HumanReadable = nx::vms::client::core::HumanReadable;
-    return HumanReadable::timeSpan(duration,
-        HumanReadable::Years | HumanReadable::Months | HumanReadable::Days | HumanReadable::Hours,
-        HumanReadable::SuffixFormat::Full,
-        kSeparator,
-        HumanReadable::kNoSuppressSecondUnit);
 }

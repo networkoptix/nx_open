@@ -861,6 +861,13 @@ qint64 Camera::getAndResetMetric(std::atomic<qint64> Metrics::* parameter)
     return (*m_metrics.*parameter).exchange(0);
 }
 
+std::chrono::milliseconds Camera::nxOccupiedDuration() const
+{
+    const auto ptr = toSharedPointer().dynamicCast<Camera>();
+    return serverModule()->normalStorageManager()->nxOccupiedDuration(ptr) +
+        serverModule()->backupStorageManager()->nxOccupiedDuration(ptr);
+}
+
 } // namespace resource
 } // namespace vms::server
 } // namespace nx

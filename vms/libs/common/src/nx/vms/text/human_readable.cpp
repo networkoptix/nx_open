@@ -2,11 +2,11 @@
 
 #include <QtCore/QMetaEnum>
 
-#include <text/time_strings.h>
+#include "time_strings.h"
 
 #include <nx/utils/log/assert.h>
 
-namespace nx::vms::client::core {
+namespace nx::vms::text {
 
 namespace {
 
@@ -415,4 +415,4 @@ QString HumanReadable::digitalSizePrecise(qint64 bytes,
         kAlwaysSuppressSecondUnit);
 }
 
-} // namespace nx::vms::client::core
+} // namespace nx::vms::text
