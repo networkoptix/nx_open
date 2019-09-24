@@ -71,18 +71,13 @@ void FileWatcher::unsubscribe(SubscriptionId subscriptionId)
 
 	auto fileWatchIter = uniqueIdIter->second;
 
-    auto actualSubscriptionId = nx::utils::kInvalidSubscriptionId;
     if (const auto it = fileWatchIter->second.subscriptionIds.find(subscriptionId);
         it != fileWatchIter->second.subscriptionIds.end())
     {
-        actualSubscriptionId = it->second;
+        fileWatchIter->second.subscription.removeSubscription(it->second);
+        fileWatchIter->second.subscriptionIds.erase(it);
+        m_uniqueIdToFileWatch.erase(uniqueIdIter);
     }
-
-	if (fileWatchIter->second.subscriptionIds.erase(subscriptionId) > 0)
-	{
-		fileWatchIter->second.subscription.removeSubscription(actualSubscriptionId);
-		m_uniqueIdToFileWatch.erase(uniqueIdIter);
-	}
 
 	if (fileWatchIter->second.subscriptionIds.empty())
     {
