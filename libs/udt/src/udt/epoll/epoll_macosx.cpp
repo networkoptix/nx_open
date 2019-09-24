@@ -9,6 +9,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#include "../common.h"
+
 static constexpr int USER_EVENT_IDENT = 11;
 
 EpollMacosx::EpollMacosx():
