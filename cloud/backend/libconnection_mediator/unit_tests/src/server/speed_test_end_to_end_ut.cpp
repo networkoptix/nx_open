@@ -131,7 +131,7 @@ protected:
 		for (auto& server: m_fastestServers)
 		{
 			auto it = std::find_if(m_servers.begin(), m_servers.end(),
-				[this, &server](const auto& systemIdAndTestContext)
+				[&server](const auto& systemIdAndTestContext)
 				{
 					return server.second->mediaserver->fullName()
 						== systemIdAndTestContext.second.mediaserver->fullName();
