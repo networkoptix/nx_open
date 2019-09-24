@@ -64,7 +64,7 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                 "server", [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "type", [](const auto&) { return Value(); } // TODO: Get actual type.
+                "type", [](const auto& r) { return Value(QnLexical::serialized(r->deviceType())); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "ip", [](const auto& r) { return Value(r->getHostAddress()); }

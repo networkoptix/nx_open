@@ -1050,11 +1050,11 @@ CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& in
         return CameraDiagnostics::ServerTerminatedResult();
 
     m_deviceType = info.deviceType;
-    const auto nxDeviceType = fromHanwhaToNxDeviceType(deviceType());
+    const auto nxDeviceType = fromHanwhaToNxDeviceType(hanwhaDeviceType());
 
     // Set device type only for NVRs and encoders due to optimization purposes.
     if (nx::core::resource::isProxyDeviceType(nxDeviceType))
-        setDeviceType(nxDeviceType);
+        setExplicitDeviceType(nxDeviceType);
 
     if (!info.firmware.isEmpty())
         setFirmware(info.firmware);
@@ -1637,7 +1637,7 @@ HanwhaPtzRangeMap HanwhaResource::fetchPtzRanges()
 QnPtzAuxiliaryTraitList HanwhaResource::calculatePtzTraits() const
 {
     QnPtzAuxiliaryTraitList ptzTraits;
-    if (deviceType() == HanwhaDeviceType::nwc) //< Camera device type.
+    if (hanwhaDeviceType() == HanwhaDeviceType::nwc) //< Camera device type.
         ptzTraits = calculateCameraOnlyTraits();
 
     calculateAutoFocusSupport(&ptzTraits);
@@ -1749,7 +1749,7 @@ CameraDiagnostics::Result HanwhaResource::initAdvancedParameters()
         if(!info.isValid())
             continue;
 
-        if (!info.isDeviceTypeSupported(deviceType()))
+        if (!info.isDeviceTypeSupported(hanwhaDeviceType()))
             continue;
 
         m_advancedParameterInfos.emplace(id, info);
@@ -3739,7 +3739,7 @@ bool HanwhaResource::isProxiedAnalogEncoder() const
     return bypassDeviceType() == HanwhaDeviceType::encoder;
 }
 
-HanwhaDeviceType HanwhaResource::deviceType() const
+HanwhaDeviceType HanwhaResource::hanwhaDeviceType() const
 {
     return m_deviceType;
 }

@@ -113,7 +113,7 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
                 getProperty(ResourcePropertyKey::kMediaCapabilities).toUtf8());
         },
         &m_mutex),
-    m_cachedDeviceType(
+    m_cachedExplicitDeviceType(
         [this]()
         {
             return QnLexical::deserialized<nx::core::resource::DeviceType>(
@@ -178,6 +178,23 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
         });
 
     QnMediaResource::initMediaResource();
+}
+
+nx::core::resource::DeviceType QnSecurityCamResource::deviceType() const
+{
+    // TODO: remove all setters (setIoModule, setIsDtsBased e.t.c) and keep setDeviceType only
+    using namespace nx::core::resource;
+    if (const auto result = explicitDeviceType(); result != DeviceType::unknown)
+        return result;
+    if (isDtsBased())
+        return DeviceType::nvr;
+    if (isIOModule())
+        return DeviceType::ioModule;
+    if (isAnalogEncoder() || isAnalog())
+        return DeviceType::encoder;
+    if (isMultiSensorCamera())
+        return DeviceType::multisensorCamera;
+    return DeviceType::camera;
 }
 
 QnMediaServerResourcePtr QnSecurityCamResource::getParentServer() const {
@@ -496,7 +513,7 @@ bool QnSecurityCamResource::hasDualStreamingInternal() const
 
 bool QnSecurityCamResource::isDtsBased() const
 {
-    return m_cachedIsDtsBased.get() || deviceType() == nx::core::resource::DeviceType::nvr;
+    return m_cachedIsDtsBased.get() || explicitDeviceType() == nx::core::resource::DeviceType::nvr;
 }
 
 bool QnSecurityCamResource::canConfigureRecording() const
@@ -512,7 +529,7 @@ bool QnSecurityCamResource::isAnalog() const
 
 bool QnSecurityCamResource::isAnalogEncoder() const
 {
-    if (deviceType() == nx::core::resource::DeviceType::encoder)
+    if (explicitDeviceType() == nx::core::resource::DeviceType::encoder)
         return true;
 
     return resourceData().value<bool>(lit("analogEncoder"));
@@ -557,17 +574,17 @@ bool QnSecurityCamResource::isMultiSensorCamera() const
         && !isDtsBased()
         && !isAnalogEncoder()
         && !isAnalog()
-        && !nx::core::resource::isProxyDeviceType(deviceType());
+        && !nx::core::resource::isProxyDeviceType(explicitDeviceType());
 }
 
-nx::core::resource::DeviceType QnSecurityCamResource::deviceType() const
+nx::core::resource::DeviceType QnSecurityCamResource::explicitDeviceType() const
 {
-    return m_cachedDeviceType.get();
+    return m_cachedExplicitDeviceType.get();
 }
 
-void QnSecurityCamResource::setDeviceType(nx::core::resource::DeviceType deviceType)
+void QnSecurityCamResource::setExplicitDeviceType(nx::core::resource::DeviceType deviceType)
 {
-    m_cachedDeviceType.reset();
+    m_cachedExplicitDeviceType.reset();
     m_cachedLicenseType.reset();
     setProperty(ResourcePropertyKey::kDeviceType, QnLexical::serialized(deviceType));
 }
@@ -1342,8 +1359,8 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         &QnSecurityCamResource::setVendor,
         isStringEmpty);
     mergeValue(
-        &QnSecurityCamResource::deviceType,
-        &QnSecurityCamResource::setDeviceType,
+        &QnSecurityCamResource::explicitDeviceType,
+        &QnSecurityCamResource::setExplicitDeviceType,
         isDeviceTypeEmpty);
     return result;
 }
@@ -1389,7 +1406,7 @@ void QnSecurityCamResource::resetCachedValues()
     m_cachedCanConfigureRemoteRecording.reset();
     m_cachedCameraMediaCapabilities.reset();
     m_cachedLicenseType.reset();
-    m_cachedDeviceType.reset();
+    m_cachedExplicitDeviceType.reset();
     m_cachedHasVideo.reset();
     m_cachedMotionStreamIndex.reset();
 }

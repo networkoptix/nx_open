@@ -139,9 +139,9 @@ public:
 
     bool isMultiSensorCamera() const;
 
+    nx::core::resource::DeviceType explicitDeviceType() const;
+    void setExplicitDeviceType(nx::core::resource::DeviceType);
     nx::core::resource::DeviceType deviceType() const;
-
-    void setDeviceType(nx::core::resource::DeviceType);
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);
@@ -417,6 +417,7 @@ signals:
         qint64 timestamp );
 
     void recordingActionChanged(const QnResourcePtr& resource);
+
 protected slots:
     virtual void at_initializedChanged();
     virtual void at_motionRegionChanged();
@@ -434,7 +435,6 @@ private:
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
     MotionStreamIndex calculateMotionStreamIndex() const;
-
 private:
     int m_recActionCnt;
     QString m_groupName;
@@ -452,7 +452,7 @@ private:
     nx::utils::CachedValue<bool> m_cachedIsIOModule;
     nx::utils::CachedValue<bool> m_cachedCanConfigureRemoteRecording;
     nx::utils::CachedValue<nx::media::CameraMediaCapability> m_cachedCameraMediaCapabilities;
-    nx::utils::CachedValue<nx::core::resource::DeviceType> m_cachedDeviceType;
+    nx::utils::CachedValue<nx::core::resource::DeviceType> m_cachedExplicitDeviceType;
     nx::utils::CachedValue<bool> m_cachedHasVideo;
     nx::utils::CachedValue<MotionStreamIndex> m_cachedMotionStreamIndex;
 

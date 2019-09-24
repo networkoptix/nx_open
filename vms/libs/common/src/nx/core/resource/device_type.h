@@ -13,7 +13,8 @@ enum class DeviceType
     nvr,
     encoder,
     ioModule,
-    hornSpeaker
+    hornSpeaker,
+    multisensorCamera,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(DeviceType)
 
