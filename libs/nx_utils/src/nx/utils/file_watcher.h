@@ -102,8 +102,8 @@ private:
 
 private:
 	std::chrono::milliseconds m_timeout;
-	std::atomic_bool m_terminated = false;
-	mutable Mutex m_mutex;
+    mutable Mutex m_mutex;
+	bool m_terminated = false;
 	WaitCondition m_cond;
 	UniqueId m_subscriberId = 0;
 	ElapsedTimerPool<std::string> m_timerPool;

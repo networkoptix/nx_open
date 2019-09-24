@@ -13,7 +13,10 @@ FileWatcher::FileWatcher(std::chrono::milliseconds timeout):
 
 FileWatcher::~FileWatcher()
 {
-	m_terminated = true;
+    QnMutexLocker lock(&m_mutex);
+    m_terminated = true;
+    lock.unlock();
+
 	m_cond.wakeAll();
 	m_thread.join();
 }
@@ -36,19 +39,19 @@ SystemError::ErrorCode FileWatcher::subscribe(
 
 	// Using std::piecewise_construct because WatchContext.subscription doesn't support move or
 	// copy construction.
-	auto [it, firstInsertion] = m_fileWatches.emplace(
+	auto [fileWachIter, firstInsertion] = m_fileWatches.emplace(
 		std::piecewise_construct,
 		std::make_tuple(filePath),
 		std::make_tuple());
 
 	if (firstInsertion)
-		it->second.fileData = FileData{fileExists, std::move(stat)};
+		fileWachIter->second.fileData = FileData{fileExists, std::move(stat)};
 
 	*outSubscriptionId = m_subscriberId++;
-	m_uniqueIdToFileWatch.emplace(*outSubscriptionId, it);
-	auto& actualSubscriptionId = it->second.subscriptionIds[*outSubscriptionId];
-	it->second.subscription.subscribe(std::move(handler), &actualSubscriptionId);
-	it->second.watchAttributes |= watchAttributes;
+	m_uniqueIdToFileWatch.emplace(*outSubscriptionId, fileWachIter);
+	auto& actualSubscriptionId = fileWachIter->second.subscriptionIds[*outSubscriptionId];
+	fileWachIter->second.subscription.subscribe(std::move(handler), &actualSubscriptionId);
+	fileWachIter->second.watchAttributes |= watchAttributes;
 
 	m_timerPool.addTimer(filePath, m_timeout);
 
@@ -68,24 +71,36 @@ void FileWatcher::unsubscribe(SubscriptionId subscriptionId)
 
 	auto fileWatchIter = uniqueIdIter->second;
 
+    auto actualSubscriptionId = nx::utils::kInvalidSubscriptionId;
+    if (const auto it = fileWatchIter->second.subscriptionIds.find(subscriptionId);
+        it != fileWatchIter->second.subscriptionIds.end())
+    {
+        actualSubscriptionId = it->second;
+    }
+
 	if (fileWatchIter->second.subscriptionIds.erase(subscriptionId) > 0)
 	{
-		fileWatchIter->second.subscription.removeSubscription(subscriptionId);
+		fileWatchIter->second.subscription.removeSubscription(actualSubscriptionId);
 		m_uniqueIdToFileWatch.erase(uniqueIdIter);
-		m_timerPool.removeTimer(fileWatchIter->first);
 	}
 
 	if (fileWatchIter->second.subscriptionIds.empty())
+    {
+        m_timerPool.removeTimer(fileWatchIter->first);
 		m_fileWatches.erase(fileWatchIter);
+    }
 }
 
 void FileWatcher::run()
 {
+    QnMutexLocker lock(&m_mutex);
 	while (!m_terminated)
 	{
+        lock.unlock();
+
 		m_timerPool.processTimers();
 
-		QnMutexLocker lock(&m_mutex);
+        lock.relock();
 
 		const auto delayToNextProcessing = m_timerPool.delayToNextProcessing();
 
