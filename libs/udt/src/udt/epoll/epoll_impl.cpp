@@ -80,10 +80,11 @@ Result<int> EpollImpl::wait(
         timeout = std::chrono::microseconds::zero();
     }
 
-    int eventCount = m_systemEpoll->poll(systemReadFds, systemWriteFds, timeout);
-    if (eventCount < 0)
-        return Error();
+    auto result = m_systemEpoll->poll(systemReadFds, systemWriteFds, timeout);
+    if (!result.ok())
+        return result;
 
+    int eventCount = result.get();
     eventCount += addUdtSocketEvents(udtReadFds, udtWriteFds);
     return success(eventCount);
 }

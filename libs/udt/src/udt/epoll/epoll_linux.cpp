@@ -34,7 +34,7 @@ Result<> EpollLinux::initialize()
     // Since Linux 2.6.8, the size argument is ignored, but must be greater than zero.
     m_epollFd = epoll_create(1024);
     if (m_epollFd < 0)
-        return Error();
+        return OsError();
 
     m_interruptEventFd = eventfd(0, EFD_NONBLOCK);
     if (m_interruptEventFd < 0)
@@ -81,7 +81,7 @@ Result<> EpollLinux::add(const SYSSOCKET& s, const int* events)
 
     ev.data.fd = s;
     if (::epoll_ctl(m_epollFd, EPOLL_CTL_ADD, s, &ev) < 0)
-        return Error();
+        return OsError();
 
     int& eventMask = m_sLocals[s];
     eventMask |= *events;
@@ -103,7 +103,7 @@ std::size_t EpollLinux::socketsPolledCount() const
     return m_sLocals.size();
 }
 
-int EpollLinux::poll(
+Result<int> EpollLinux::poll(
     std::map<SYSSOCKET, int>* lrfds,
     std::map<SYSSOCKET, int>* lwfds,
     std::chrono::microseconds timeout)
@@ -123,6 +123,8 @@ int EpollLinux::poll(
         ev,
         max_events,
         systemTimeout);
+    if (nfds < 0)
+        return OsError();
 
     int total = 0;
     for (int i = 0; i < nfds; ++i)

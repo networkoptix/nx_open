@@ -333,7 +333,21 @@ struct CMD5
 
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace OsError
+/**
+ * Should be used to report OS-specific error.
+ * E.g.,
+ * <pre><code>
+ * auto handle = socket(...);
+ * if (handle < 0)
+ *     return OsError();
+ * </code></pre>
+ */
+class OsError:
+    public UDT::Error
+{
+};
+
+namespace OsErrorCode
 {
     static constexpr UDT::Errno ok = 0;
 

@@ -45,7 +45,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Is used to report any error within library except the public API
+ * Intended to report any error within library except the public API
  * which follows C API style by returning int (0 - success, -1 - error).
  * Intended to protect against mixing int and bool return codes and misused if (result) {...}.
  * @param Payload Result value.

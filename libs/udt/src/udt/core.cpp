@@ -181,10 +181,10 @@ Result<> CUDT::setOpt(UDTOpt optName, const void* optval, int)
     {
         case UDT_MSS:
             if (m_bOpened)
-                return Error(OsError::invalidData);
+                return Error(OsErrorCode::invalidData);
 
             if (*(int*)optval < int(28 + CHandShake::m_iContentSize))
-                return Error(OsError::invalidData);
+                return Error(OsErrorCode::invalidData);
 
             m_iMSS = *(int*)optval;
 
@@ -206,7 +206,7 @@ Result<> CUDT::setOpt(UDTOpt optName, const void* optval, int)
 
         case UDT_CC:
             if (isConnecting() || m_bConnected)
-                return Error(OsError::isConnected);
+                return Error(OsErrorCode::isConnected);
             if (NULL != m_pCCFactory)
                 delete m_pCCFactory;
             m_pCCFactory = ((CCCVirtualFactory *)optval)->clone();
@@ -215,10 +215,10 @@ Result<> CUDT::setOpt(UDTOpt optName, const void* optval, int)
 
         case UDT_FC:
             if (isConnecting() || m_bConnected)
-                return Error(OsError::isConnected);
+                return Error(OsErrorCode::isConnected);
 
             if (*(int*)optval < 1)
-                return Error(OsError::invalidData);
+                return Error(OsErrorCode::invalidData);
 
             if (*(int*)optval > kDefaultRecvWindowSize)
                 m_iFlightFlagSize = *(int*)optval;
@@ -229,20 +229,20 @@ Result<> CUDT::setOpt(UDTOpt optName, const void* optval, int)
 
         case UDT_SNDBUF:
             if (m_bOpened)
-                return Error(OsError::isConnected);
+                return Error(OsErrorCode::isConnected);
 
             if (*(int*)optval <= 0)
-                return Error(OsError::invalidData);
+                return Error(OsErrorCode::invalidData);
 
             m_iSndBufSize = *(int*)optval / (m_iMSS - 28);
             break;
 
         case UDT_RCVBUF:
             if (m_bOpened)
-                return Error(OsError::isConnected);
+                return Error(OsErrorCode::isConnected);
 
             if (*(int*)optval <= 0)
-                return Error(OsError::invalidData);
+                return Error(OsErrorCode::invalidData);
 
             if (*(int*)optval > (m_iMSS - 28) * kMinRecvBufferSize)
                 m_iRcvBufSize = *(int*)optval / (m_iMSS - 28);
@@ -257,7 +257,7 @@ Result<> CUDT::setOpt(UDTOpt optName, const void* optval, int)
 
         case UDP_SNDBUF:
             if (m_bOpened)
-                return Error(OsError::isConnected);
+                return Error(OsErrorCode::isConnected);
 
             m_iUDPSndBufSize = *(int*)optval;
 
@@ -268,7 +268,7 @@ Result<> CUDT::setOpt(UDTOpt optName, const void* optval, int)
 
         case UDP_RCVBUF:
             if (m_bOpened)
-                return Error(OsError::isConnected);
+                return Error(OsErrorCode::isConnected);
 
             m_iUDPRcvBufSize = *(int*)optval;
 
@@ -279,7 +279,7 @@ Result<> CUDT::setOpt(UDTOpt optName, const void* optval, int)
 
         case UDT_RENDEZVOUS:
             if (isConnecting() || m_bConnected)
-                return Error(OsError::isConnected);
+                return Error(OsErrorCode::isConnected);
             m_bRendezvous = *(bool *)optval;
             break;
 
@@ -293,7 +293,7 @@ Result<> CUDT::setOpt(UDTOpt optName, const void* optval, int)
 
         case UDT_REUSEADDR:
             if (m_bOpened)
-                return Error(OsError::isConnected);
+                return Error(OsErrorCode::isConnected);
             m_bReuseAddr = *(bool*)optval;
             break;
 
@@ -302,7 +302,7 @@ Result<> CUDT::setOpt(UDTOpt optName, const void* optval, int)
             break;
 
         default:
-            return Error(OsError::noProtocolOption);
+            return Error(OsErrorCode::noProtocolOption);
     }
 
     return success();
@@ -331,7 +331,7 @@ Result<> CUDT::getOpt(UDTOpt optName, void* optval, int& optlen)
 
         case UDT_CC:
             if (!m_bOpened)
-                return Error(OsError::notConnected);
+                return Error(OsErrorCode::notConnected);
             *(CCC**)optval = m_pCC;
             optlen = sizeof(CCC*);
 
@@ -354,7 +354,7 @@ Result<> CUDT::getOpt(UDTOpt optName, void* optval, int& optlen)
 
         case UDT_LINGER:
             if (optlen < (int)(sizeof(m_Linger)))
-                return Error(OsError::invalidData);
+                return Error(OsErrorCode::invalidData);
 
             *(struct linger*)optval = m_Linger;
             optlen = sizeof(m_Linger);
@@ -434,7 +434,7 @@ Result<> CUDT::getOpt(UDTOpt optName, void* optval, int& optlen)
             break;
 
         default:
-            return Error(OsError::noProtocolOption);
+            return Error(OsErrorCode::noProtocolOption);
     }
 
     return success();
@@ -532,10 +532,10 @@ Result<> CUDT::listen()
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
 
     if (!m_bOpened)
-        return Error(OsError::badDescriptor);
+        return Error(OsErrorCode::badDescriptor);
 
     if (isConnecting() || m_bConnected)
-        return Error(OsError::isConnected);
+        return Error(OsErrorCode::isConnected);
 
     // listen can be called more than once
     if (m_bListening)
@@ -549,7 +549,7 @@ Result<> CUDT::listen()
         m_sPollID);
     // if there is already another socket listening on the same port
     if (!rcvQueue().setListener(m_synPacketHandler))
-        return Error(OsError::addressInUse);
+        return Error(OsErrorCode::addressInUse);
 
     m_bListening = true;
 
@@ -561,16 +561,16 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
     std::lock_guard<std::mutex> cg(m_ConnectionLock);
 
     if (!m_bOpened)
-        return Error(OsError::badDescriptor);
+        return Error(OsErrorCode::badDescriptor);
 
     if (m_bListening)
-        return Error(OsError::notSupported);
+        return Error(OsErrorCode::notSupported);
 
     if (isConnecting() || m_bConnected)
-        return Error(OsError::isConnected);
+        return Error(OsErrorCode::isConnected);
 
     if (serv_addr.family() != m_iIPversion)
-        return Error(OsError::invalidData);
+        return Error(OsErrorCode::invalidData);
 
     // record peer/server address
     m_pPeerAddr = serv_addr;
@@ -631,7 +631,7 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
     char* resdata = new char[m_iPayloadSize];
     response.pack(ControlPacketType::Handshake, NULL, resdata, m_iPayloadSize);
 
-    Error error(OsError::ok);
+    Error error(OsErrorCode::ok);
     Result<> internalConnectResult;
 
     while (!isClosing())
@@ -667,7 +667,7 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
         if (CTimer::getTime() > ttl)
         {
             // timeout
-            error = Error(OsError::timedOut);
+            error = Error(OsErrorCode::timedOut);
             break;
         }
     }
@@ -675,19 +675,19 @@ Result<> CUDT::connect(const detail::SocketAddress& serv_addr)
     delete[] reqdata;
     delete[] resdata;
 
-    if (error.osError() == OsError::ok)
+    if (error.osError() == OsErrorCode::ok)
     {
         if (isClosing())                                                 // if the socket is closed before connection...
-            error = Error(OsError::connectionRefused);
+            error = Error(OsErrorCode::connectionRefused);
         else if (1002 == m_ConnRes.m_iReqType)                          // connection request rejected
-            error = Error(OsError::connectionRefused);
+            error = Error(OsErrorCode::connectionRefused);
         else if ((!m_bRendezvous) && (m_iISN != m_ConnRes.m_iISN))      // secuity check
-            error = Error(OsError::connectionRefused, UDT::ProtocolError::handshakeFailure);
+            error = Error(OsErrorCode::connectionRefused, UDT::ProtocolError::handshakeFailure);
         else if (!internalConnectResult.ok()) // Otherwise, success will be reported to the caller
             error = internalConnectResult.error();
     }
 
-    if (error.osError() != OsError::ok)
+    if (error.osError() != OsErrorCode::ok)
         return error;
 
     return success();
@@ -700,7 +700,7 @@ Result<ConnectState> CUDT::connect(const CPacket& response)
     // returning 1 or 2 means the connection is in process and needs more handshake
 
     if (!isConnecting())
-        return Error(OsError::connectionRefused);
+        return Error(OsErrorCode::connectionRefused);
 
     //a data packet or a keep-alive packet comes, which means the peer side is already connected
     // in this situation, the previously recorded response will be used
@@ -712,7 +712,7 @@ Result<ConnectState> CUDT::connect(const CPacket& response)
     if (!isRemotePeerAlreadyConnected)
     {
         if ((PacketFlag::Control != response.getFlag()) || (ControlPacketType::Handshake != response.getType()))
-            return Error(OsError::connectionRefused, UDT::ProtocolError::handshakeFailure);
+            return Error(OsErrorCode::connectionRefused, UDT::ProtocolError::handshakeFailure);
 
         m_ConnRes.deserialize(response.m_pcData, response.getLength());
 
@@ -723,7 +723,7 @@ Result<ConnectState> CUDT::connect(const CPacket& response)
             if (1 == m_ConnRes.m_iReqType)
             {
                 return Error(
-                    OsError::connectionRefused,
+                    OsErrorCode::connectionRefused,
                     UDT::ProtocolError::remotePeerInRendezvousMode);
             }
 
@@ -1004,12 +1004,12 @@ void CUDT::close()
 Result<int> CUDT::send(const char* data, int len)
 {
     if (UDT_DGRAM == m_iSockType)
-        return Error(OsError::notConnected);
+        return Error(OsErrorCode::notConnected);
 
     if (!m_bConnected)
-        return Error(OsError::notConnected);
+        return Error(OsErrorCode::notConnected);
     else if (m_bBroken || isClosing())
-        return Error(OsError::connectionReset);
+        return Error(OsErrorCode::connectionReset);
 
     if (len <= 0)
         return success(0);
@@ -1028,7 +1028,7 @@ Result<int> CUDT::send(const char* data, int len)
     {
         if (!m_bSynSending)
         {
-            return Error(OsError::wouldBlock);
+            return Error(OsErrorCode::wouldBlock);
         }
         else
         {
@@ -1059,16 +1059,16 @@ Result<int> CUDT::send(const char* data, int len)
             // check the connection status
             if (!m_bConnected)
             {
-                return Error(OsError::notConnected);
+                return Error(OsErrorCode::notConnected);
             }
             else if (m_bBroken || isClosing())
             {
-                return Error(OsError::connectionReset);
+                return Error(OsErrorCode::connectionReset);
             }
             else if (!m_bPeerHealth)
             {
                 m_bPeerHealth = true;
-                return Error(OsError::notConnected);
+                return Error(OsErrorCode::notConnected);
             }
         }
     }
@@ -1076,7 +1076,7 @@ Result<int> CUDT::send(const char* data, int len)
     if (m_iSndBufSize <= m_pSndBuffer->getCurrBufSize())
     {
         if (m_iSndTimeOut >= 0)
-            return Error(OsError::timedOut);
+            return Error(OsErrorCode::timedOut);
 
         return success(0);
     }
@@ -1107,12 +1107,12 @@ Result<int> CUDT::send(const char* data, int len)
 Result<int> CUDT::recv(char* data, int len)
 {
     if (UDT_DGRAM == m_iSockType)
-        return Error(OsError::notConnected);
+        return Error(OsErrorCode::notConnected);
 
     if (!m_bConnected)
-        return Error(OsError::notConnected);
+        return Error(OsErrorCode::notConnected);
     else if ((m_bBroken || isClosing()) && (0 == m_pRcvBuffer->getRcvDataSize()))
-        return Error(OsError::connectionReset);
+        return Error(OsErrorCode::connectionReset);
 
     if (len <= 0)
         return success(0);
@@ -1123,7 +1123,7 @@ Result<int> CUDT::recv(char* data, int len)
     {
         if (!m_bSynRecving)
         {
-            return Error(OsError::wouldBlock);
+            return Error(OsErrorCode::wouldBlock);
         }
         else
         {
@@ -1148,9 +1148,9 @@ Result<int> CUDT::recv(char* data, int len)
     }
 
     if (!m_bConnected)
-        return Error(OsError::notConnected);
+        return Error(OsErrorCode::notConnected);
     else if ((m_bBroken || isClosing()) && (0 == m_pRcvBuffer->getRcvDataSize()))
-        return Error(OsError::connectionReset);
+        return Error(OsErrorCode::connectionReset);
 
     int res = m_pRcvBuffer->readBuffer(data, len);
 
@@ -1161,7 +1161,7 @@ Result<int> CUDT::recv(char* data, int len)
     }
 
     if ((res <= 0) && (m_iRcvTimeOut >= 0))
-        return Error(OsError::timedOut);
+        return Error(OsErrorCode::timedOut);
 
     return success(res);
 }
@@ -1169,18 +1169,18 @@ Result<int> CUDT::recv(char* data, int len)
 Result<int> CUDT::sendmsg(const char* data, int len, int msttl, bool inorder)
 {
     if (UDT_STREAM == m_iSockType)
-        return Error(OsError::notConnected);
+        return Error(OsErrorCode::notConnected);
 
     if (!m_bConnected)
-        return Error(OsError::notConnected);
+        return Error(OsErrorCode::notConnected);
     else if (m_bBroken || isClosing())
-        return Error(OsError::connectionReset);
+        return Error(OsErrorCode::connectionReset);
 
     if (len <= 0)
         return success(0);
 
     if (len > m_iSndBufSize * m_iPayloadSize)
-        return Error(OsError::messageTooLarge);
+        return Error(OsErrorCode::messageTooLarge);
 
     std::lock_guard<std::mutex> sendguard(m_SendLock);
 
@@ -1196,7 +1196,7 @@ Result<int> CUDT::sendmsg(const char* data, int len, int msttl, bool inorder)
     {
         if (!m_bSynSending)
         {
-            return Error(OsError::wouldBlock);
+            return Error(OsErrorCode::wouldBlock);
         }
         else
         {
@@ -1226,16 +1226,16 @@ Result<int> CUDT::sendmsg(const char* data, int len, int msttl, bool inorder)
 
             // check the connection status
             if (!m_bConnected)
-                return Error(OsError::notConnected);
+                return Error(OsErrorCode::notConnected);
             else if (m_bBroken || isClosing())
-                return Error(OsError::connectionReset);
+                return Error(OsErrorCode::connectionReset);
         }
     }
 
     if ((m_iSndBufSize - m_pSndBuffer->getCurrBufSize()) * m_iPayloadSize < len)
     {
         if (m_iSndTimeOut >= 0)
-            return Error(OsError::timedOut);
+            return Error(OsErrorCode::timedOut);
 
         return success(0);
     }
@@ -1262,10 +1262,10 @@ Result<int> CUDT::sendmsg(const char* data, int len, int msttl, bool inorder)
 Result<int> CUDT::recvmsg(char* data, int len)
 {
     if (UDT_STREAM == m_iSockType)
-        return Error(OsError::notConnected);
+        return Error(OsErrorCode::notConnected);
 
     if (!m_bConnected)
-        return Error(OsError::notConnected);
+        return Error(OsErrorCode::notConnected);
 
     if (len <= 0)
         return success(0);
@@ -1283,7 +1283,7 @@ Result<int> CUDT::recvmsg(char* data, int len)
         }
 
         if (0 == res)
-            return Error(OsError::connectionReset);
+            return Error(OsErrorCode::connectionReset);
         else
             return success(res);
     }
@@ -1292,7 +1292,7 @@ Result<int> CUDT::recvmsg(char* data, int len)
     {
         int res = m_pRcvBuffer->readMsg(data, len);
         if (0 == res)
-            return Error(OsError::wouldBlock);
+            return Error(OsErrorCode::wouldBlock);
         else
             return success(res);
     }
@@ -1324,9 +1324,9 @@ Result<int> CUDT::recvmsg(char* data, int len)
         lock.unlock();
 
         if (!m_bConnected)
-            return Error(OsError::notConnected);
+            return Error(OsErrorCode::notConnected);
         else if (m_bBroken || isClosing())
-            return Error(OsError::connectionReset);
+            return Error(OsErrorCode::connectionReset);
     } while ((0 == res) && !timeout);
 
     if (m_pRcvBuffer->getRcvMsgNum() <= 0)
@@ -1336,7 +1336,7 @@ Result<int> CUDT::recvmsg(char* data, int len)
     }
 
     if ((res <= 0) && (m_iRcvTimeOut >= 0))
-        return Error(OsError::timedOut);
+        return Error(OsErrorCode::timedOut);
 
     return success(res);
 }
@@ -1344,12 +1344,12 @@ Result<int> CUDT::recvmsg(char* data, int len)
 Result<int64_t> CUDT::sendfile(fstream& ifs, int64_t& offset, int64_t size, int block)
 {
     if (UDT_DGRAM == m_iSockType)
-        return Error(OsError::notConnected);
+        return Error(OsErrorCode::notConnected);
 
     if (!m_bConnected)
-        return Error(OsError::notConnected);
+        return Error(OsErrorCode::notConnected);
     else if (m_bBroken || isClosing())
-        return Error(OsError::connectionReset);
+        return Error(OsErrorCode::connectionReset);
 
     if (size <= 0)
         return success(int64_t(0));
@@ -1374,7 +1374,7 @@ Result<int64_t> CUDT::sendfile(fstream& ifs, int64_t& offset, int64_t size, int 
     while (tosend > 0)
     {
         if (ifs.fail())
-            return Error(OsError::io);
+            return Error(OsErrorCode::io);
 
         if (ifs.eof())
             break;
@@ -1391,17 +1391,17 @@ Result<int64_t> CUDT::sendfile(fstream& ifs, int64_t& offset, int64_t size, int 
 
         if (!m_bConnected)
         {
-            return Error(OsError::notConnected);
+            return Error(OsErrorCode::notConnected);
         }
         else if (m_bBroken || isClosing())
         {
-            return Error(OsError::connectionReset);
+            return Error(OsErrorCode::connectionReset);
         }
         else if (!m_bPeerHealth)
         {
             // reset peer health status, once this error returns, the app should handle the situation at the peer side
             m_bPeerHealth = true;
-            return Error(OsError::connectionReset);
+            return Error(OsErrorCode::connectionReset);
         }
 
         // record total time used for sending
@@ -1432,12 +1432,12 @@ Result<int64_t> CUDT::sendfile(fstream& ifs, int64_t& offset, int64_t size, int 
 Result<int64_t> CUDT::recvfile(fstream& ofs, int64_t& offset, int64_t size, int block)
 {
     if (UDT_DGRAM == m_iSockType)
-        return Error(OsError::notConnected);
+        return Error(OsErrorCode::notConnected);
 
     if (!m_bConnected)
-        return Error(OsError::notConnected);
+        return Error(OsErrorCode::notConnected);
     else if ((m_bBroken || isClosing()) && (0 == m_pRcvBuffer->getRcvDataSize()))
-        return Error(OsError::connectionReset);
+        return Error(OsErrorCode::connectionReset);
 
     if (size <= 0)
         return success(int64_t(0));
@@ -1460,7 +1460,7 @@ Result<int64_t> CUDT::recvfile(fstream& ofs, int64_t& offset, int64_t size, int 
             int32_t err_code = fileIoErrorCode;
             sendCtrl(ControlPacketType::RemotePeerFailure, &err_code);
 
-            return Error(OsError::io);
+            return Error(OsErrorCode::io);
         }
 
         {
@@ -1470,9 +1470,9 @@ Result<int64_t> CUDT::recvfile(fstream& ofs, int64_t& offset, int64_t size, int 
         }
 
         if (!m_bConnected)
-            return Error(OsError::notConnected);
+            return Error(OsErrorCode::notConnected);
         else if ((m_bBroken || isClosing()) && (0 == m_pRcvBuffer->getRcvDataSize()))
-            return Error(OsError::connectionReset);
+            return Error(OsErrorCode::connectionReset);
 
         unitsize = int((torecv >= block) ? block : torecv);
         recvsize = m_pRcvBuffer->readBufferToFile(ofs, unitsize);
@@ -1496,9 +1496,9 @@ Result<int64_t> CUDT::recvfile(fstream& ofs, int64_t& offset, int64_t size, int 
 Result<> CUDT::sample(CPerfMon* perf, bool clear)
 {
     if (!m_bConnected)
-        return Error(OsError::notConnected);
+        return Error(OsErrorCode::notConnected);
     else if (m_bBroken || isClosing())
-        return Error(OsError::connectionReset);
+        return Error(OsErrorCode::connectionReset);
 
     uint64_t currtime = CTimer::getTime();
     perf->msTimeStamp = (currtime - m_StartTime) / 1000;
@@ -2612,7 +2612,7 @@ Result<int64_t> CUDT::recvfile(UDTSOCKET u, fstream& ofs, int64_t& offset, int64
 Result<int> CUDT::select(int, ud_set* readfds, ud_set* writefds, ud_set* exceptfds, const timeval* timeout)
 {
     if ((nullptr == readfds) && (nullptr == writefds) && (nullptr == exceptfds))
-        return Error(OsError::invalidData);
+        return Error(OsErrorCode::invalidData);
 
     return s_UDTUnited->select(readfds, writefds, exceptfds, timeout);
 }
@@ -2625,7 +2625,7 @@ Result<int> CUDT::selectEx(
     int64_t msTimeOut)
 {
     if ((nullptr == readfds) && (nullptr == writefds) && (nullptr == exceptfds))
-        return Error(OsError::invalidData);
+        return Error(OsErrorCode::invalidData);
 
     return s_UDTUnited->selectEx(fds, readfds, writefds, exceptfds, msTimeOut);
 }

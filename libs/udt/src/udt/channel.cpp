@@ -96,12 +96,12 @@ Result<> UdpChannel::open(const std::optional<detail::SocketAddress>& addr)
     // construct an socket
     m_iSocket = ::socket(m_iIPversion, SOCK_DGRAM, 0);
     if (INVALID_SOCKET == m_iSocket)
-        return Error();
+        return OsError();
 
     if (addr)
     {
         if (0 != ::bind(m_iSocket, addr->get(), addr->size()))
-            return Error();
+            return OsError();
     }
     else
     {
@@ -116,10 +116,10 @@ Result<> UdpChannel::open(const std::optional<detail::SocketAddress>& addr)
         hints.ai_socktype = SOCK_DGRAM;
 
         if (0 != ::getaddrinfo(NULL, "0", &hints, &res))
-            return Error();
+            return OsError();
 
         if (0 != ::bind(m_iSocket, res->ai_addr, res->ai_addrlen))
-            return Error();
+            return OsError();
 
         ::freeaddrinfo(res);
     }
@@ -147,7 +147,7 @@ Result<> UdpChannel::setUDPSockOpt()
     if ((0 != ::setsockopt(m_iSocket, SOL_SOCKET, SO_RCVBUF, (char*)&m_iRcvBufSize, sizeof(int))) ||
         (0 != ::setsockopt(m_iSocket, SOL_SOCKET, SO_SNDBUF, (char*)&m_iSndBufSize, sizeof(int))))
     {
-        return Error();
+        return OsError();
     }
 #endif
 
@@ -166,15 +166,15 @@ Result<> UdpChannel::setUDPSockOpt()
     // UNIX does not support SO_RCVTIMEO
     int opts = ::fcntl(m_iSocket, F_GETFL);
     if (-1 == ::fcntl(m_iSocket, F_SETFL, opts | O_NONBLOCK))
-        return Error();
+        return OsError();
 #elif _WIN32
     DWORD ot = 1; //milliseconds
     if (0 != ::setsockopt(m_iSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&ot, sizeof(DWORD)))
-        return Error();
+        return OsError();
 #else
     // Set receiving time-out value
     if (0 != ::setsockopt(m_iSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(timeval)))
-        return Error();
+        return OsError();
 #endif
 
     return success();
@@ -279,7 +279,7 @@ Result<int> UdpChannel::sendto(const detail::SocketAddress& addr, CPacket& packe
     }
 
     if (res < 0)
-        return Error();
+        return OsError();
 
     return success(res);
 }
@@ -327,7 +327,7 @@ Result<int> UdpChannel::recvfrom(detail::SocketAddress& addr, CPacket& packet) c
     if (res <= 0)
     {
         packet.setLength(-1);
-        return Error();
+        return OsError();
     }
 
     packet.setLength(res - CPacket::m_iPktHdrSize);
@@ -366,7 +366,7 @@ Result<void> UdpChannel::shutdown()
     if (result == 0)
         return success();
 
-    return Error();
+    return OsError();
 }
 
 void UdpChannel::closeSocket()

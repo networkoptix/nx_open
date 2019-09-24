@@ -97,7 +97,7 @@ std::size_t EpollWin32::socketsPolledCount() const
     return m_socketDescriptorToEventMask.size();
 }
 
-int EpollWin32::poll(
+Result<int> EpollWin32::poll(
     std::map<SYSSOCKET, int>* socketsAvailableForReading,
     std::map<SYSSOCKET, int>* socketsAvailableForWriting,
     std::chrono::microseconds timeout)
@@ -129,12 +129,12 @@ int EpollWin32::poll(
             : NULL,
         isTimeoutSpecified ? &tv : NULL);
     if (eventCount < 0)
-        return -1;
+        return OsError();
 
     //select sets fd_count to number of sockets triggered and
     //moves those descriptors to the beginning of fd_array
     if (eventCount == 0)
-        return eventCount;
+        return 0;
 
     bool receivedInterruptEvent = false;
     prepareOutEvents(socketsAvailableForReading, socketsAvailableForWriting, &receivedInterruptEvent);
@@ -236,7 +236,7 @@ Result<> EpollWin32::initializeInterruptSocket()
 {
     m_interruptionSocket = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (m_interruptionSocket == INVALID_SOCKET)
-        return Error();
+        return OsError();
 
     u_long val = 1;
     if (ioctlsocket(m_interruptionSocket, FIONBIO, &val) != 0)

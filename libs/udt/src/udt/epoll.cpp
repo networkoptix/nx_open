@@ -90,7 +90,7 @@ Result<> CEPoll::add_usock(const int eid, const UDTSOCKET& u, const int* events)
 
     CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
-        return Error(OsError::badDescriptor);
+        return Error(OsErrorCode::badDescriptor);
 
     p->second->addUdtSocket(u, events);
     return success();
@@ -102,7 +102,7 @@ Result<> CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
 
     CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
-        return Error(OsError::badDescriptor);
+        return Error(OsErrorCode::badDescriptor);
 
     p->second->add(s, events);
 
@@ -115,7 +115,7 @@ Result<> CEPoll::remove_usock(const int eid, const UDTSOCKET& u)
 
     CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
-        return Error(OsError::badDescriptor);
+        return Error(OsErrorCode::badDescriptor);
 
     p->second->removeUdtSocket(u);
     return success();
@@ -127,7 +127,7 @@ Result<> CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
 
     CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
-        return Error(OsError::badDescriptor);
+        return Error(OsErrorCode::badDescriptor);
 
     p->second->remove(s);
 
@@ -142,7 +142,7 @@ Result<int> CEPoll::wait(
 {
     // if all fields is NULL and waiting time is infinite, then this would be a deadlock
     if (!readfds && !writefds && !lrfds && lwfds && (msTimeOut < 0))
-        return Error(OsError::invalidData);
+        return Error(OsErrorCode::invalidData);
 
     //NOTE calls with same eid MUST be synchronized by caller!
     //That is, while we are in this method no calls with same eid are possible
@@ -169,7 +169,7 @@ Result<> CEPoll::release(const int eid)
 
     CEPollDescMap::iterator i = m_mPolls.find(eid);
     if (i == m_mPolls.end())
-        return Error(OsError::badDescriptor);
+        return Error(OsErrorCode::badDescriptor);
 
     m_mPolls.erase(i);
     return success();
@@ -208,7 +208,7 @@ Result<EpollImpl*> CEPoll::getEpollById(int eid) const
 
     auto it = m_mPolls.find(eid);
     if (it == m_mPolls.end())
-        return Error(OsError::badDescriptor);
+        return Error(OsErrorCode::badDescriptor);
 
     return success(it->second.get());
 }
