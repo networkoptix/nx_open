@@ -34,7 +34,7 @@ QString AppInfo::defaultCloudModulesXmlUrl(const QString& cloudHost)
 
 QString AppInfo::cloudName()
 {
-    return QStringLiteral("${cloudName}");
+    return QStringLiteral("${customization.cloudName}");
 }
 
 QString AppInfo::shortCloudName()

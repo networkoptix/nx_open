@@ -30,14 +30,7 @@ public:
     static Q_INVOKABLE QString armBox();
     static Q_INVOKABLE bool    beta();
 
-    static Q_INVOKABLE QString productNameShort();
-    static Q_INVOKABLE QString productNameLong();
     static Q_INVOKABLE QString customizationName();
-
-    static Q_INVOKABLE QString brand()
-    {
-        return productNameShort();
-    }
 
     static Q_INVOKABLE QString defaultLanguage();
 
@@ -46,16 +39,12 @@ public:
 
     static Q_INVOKABLE QString mediaFolderName();
 
-    static Q_INVOKABLE QString licensingEmailAddress();
     static Q_INVOKABLE QString companyUrl();
-
-    static Q_INVOKABLE QString supportEmailAddress();
-    static Q_INVOKABLE QString supportUrl();
-    static Q_INVOKABLE QString supportPhone();
 
     /** Proxy for QML usage. */
     static Q_INVOKABLE QString cloudName();
 
+    static Q_INVOKABLE QString updateFeedUrl();
     static Q_INVOKABLE QString updateGeneratorUrl();
 
     static Q_INVOKABLE int freeLicenseCount();

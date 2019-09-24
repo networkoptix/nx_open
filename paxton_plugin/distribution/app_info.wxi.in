@@ -2,11 +2,11 @@
     <?ifndef includeGuard?>
         <?define includeGuard="app_info.wxi"?>
 
-        <?define productId = "${paxtonProductId}"?>
-        <?define productUpgradeCode = "${paxtonProductUpgradeCode}"?>
-        <?define bundleUpgradeCode = "${paxtonBundleUpgradeCode}"?>
+        <?define productId = "${customization.paxton.productId}"?>
+        <?define productUpgradeCode = "${customization.paxton.productUpgradeCode}"?>
+        <?define bundleUpgradeCode = "${customization.paxton.bundleUpgradeCode}"?>
         <?define productName = "${paxtonPluginName}"?>
-        <?define manufacturer = "${company.name}"?>
+        <?define manufacturer = "${customization.companyName}"?>
         <?define productVersion = "${releaseVersion}.${buildNumber}"?>
         <?define customizationDir = "${customization_dir}"?>
         <?define libraryName = "${paxtonDriverOutputName}"?>

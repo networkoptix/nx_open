@@ -14,7 +14,7 @@ QnMobileAppInfo::QnMobileAppInfo(QObject* parent)
 
 QString QnMobileAppInfo::productName() const
 {
-    return QnAppInfo::productNameLong();
+    return nx::utils::AppInfo::vmsName();
 }
 
 QString QnMobileAppInfo::organizationName() const

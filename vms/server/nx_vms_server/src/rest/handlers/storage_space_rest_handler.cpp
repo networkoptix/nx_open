@@ -113,7 +113,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(
     const QList<QString> storagePaths = getStoragePaths();
     for(const QnPlatformMonitor::PartitionSpace &partition: partitions)
     {
-        if (partition.path.indexOf(NX_TEMP_FOLDER_NAME) != -1)
+        if (partition.path.indexOf(QnFileStorageResource::tempFolderName()) != -1)
         {
             NX_VERBOSE(this, "Ignore temporary optional partition %1", partition);
             continue;

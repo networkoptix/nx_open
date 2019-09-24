@@ -1,57 +1,57 @@
 
-Template: @deb.customization.company.name@-mediaserver/appserverPassword
+Template: @customization.companyId@-mediaserver/appserverPassword
 Type: string
 Default:
 Description: Admin's password:
 
-Template: @deb.customization.company.name@-mediaserver/appserverPassword_invalid
+Template: @customization.companyId@-mediaserver/appserverPassword_invalid
 Type: error
 Description: Password can't be empty
 
-Template: @deb.customization.company.name@-mediaserver/port
+Template: @customization.companyId@-mediaserver/port
 Type: string
 Default:
 Description: Port:
 
-Template: @deb.customization.company.name@-mediaserver/port_invalid
+Template: @customization.companyId@-mediaserver/port_invalid
 Type: error
 Description: Port is invalid
 
-Template: @deb.customization.company.name@-mediaserver/systemName
+Template: @customization.companyId@-mediaserver/systemName
 Type: string
 Default:
 Description: System name:
 
-Template: @deb.customization.company.name@-mediaserver/removeDatabase
+Template: @customization.companyId@-mediaserver/removeDatabase
 Type: select
 Choices: ${choices}
 Description: Keep or remove the database
 
-Template: @deb.customization.company.name@-mediaserver/cameraSettingsOptimization
+Template: @customization.companyId@-mediaserver/cameraSettingsOptimization
 Type: boolean
 Description: Allow system to optimize cameras settings (Recommended)
 
-Template: @deb.customization.company.name@-mediaserver/statisticsReportAllowed
+Template: @customization.companyId@-mediaserver/statisticsReportAllowed
 Type: boolean
 Description: Send usage and crash statistics to software developers
 
-Template: @deb.customization.company.name@-mediaserver/present-mediaserver-eula
+Template: @customization.companyId@-mediaserver/present-mediaserver-eula
 Type: note
 Description: @license.text@
 
-Template: @deb.customization.company.name@-mediaserver/accepted-mediaserver-eula
+Template: @customization.companyId@-mediaserver/accepted-mediaserver-eula
 Type: boolean
 Default: false
 Description: I accept the EULA license terms.
  In order to install this package, you must accept the license terms. Not accepting will cancel the
  installation.
 
-Template: @deb.customization.company.name@-mediaserver/accepted-mediaserver-eula-version
+Template: @customization.companyId@-mediaserver/accepted-mediaserver-eula-version
 Type: string
 Default:
 Description: Accepted EULA version
 
-Template: @deb.customization.company.name@-mediaserver/error-mediaserver-eula
+Template: @customization.companyId@-mediaserver/error-mediaserver-eula
 Type: error
 Description: Declined EULA
  If you do not agree to the EULA license
@@ -59,9 +59,9 @@ Description: Declined EULA
  .
  The installation of this package will be canceled.
 
-Template: @deb.customization.company.name@-mediaserver/complete-setup-hint
+Template: @customization.companyId@-mediaserver/complete-setup-hint
 Type: note
 Description: Complete the setup process
  Installation is not yet complete.
- To proceed please run @display.product.name@ Client and click "New System" tile
+ To proceed please run @client.display.name@ and click "New System" tile
  or access server web-page with your browser.

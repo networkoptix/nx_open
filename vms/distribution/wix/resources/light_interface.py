@@ -84,7 +84,6 @@ import subprocess
 import environment
 
 wix_pdb = 'distribution_wix.wixpdb'
-light_cultures = '-cultures:{}'.format(environment.installer_cultures)
 light_locale = 'theme_{}.wxl'.format(environment.installer_language)
 light_cache_path = 'cab'
 
@@ -101,7 +100,6 @@ def common_light_options():
 
 def light_command(output_file, input_folder, extensions):
     command = [light_executable(),
-        light_cultures,
         '-cc', light_cache_path, '-reusecab',
         '-loc', light_locale,
         '-out', output_file,

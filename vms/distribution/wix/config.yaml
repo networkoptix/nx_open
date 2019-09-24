@@ -4,7 +4,6 @@ qt_directory: '${qt.dir}'
 icu_directory: '${icu_directory}/bin'
 
 build_configuration: '${build.configuration}'
-installer_cultures: '${installer.cultures}'
 installer_language: '${installerLanguage}'
 distribution_output_dir: '${distribution_output_dir}'
 
@@ -24,7 +23,7 @@ client_update_files_directory: '${client_update_files_directory}'
 server_update_files_directory: '${server_update_files_directory}'
 
 # Source binaries
-client_binary_name: '${product.name}.exe'
+client_binary_name: '${client.binary.name}'
 minilauncher_binary_name: '${minilauncher.binary.name}'
 launcher_version_file: '${launcher.version.file}'
 

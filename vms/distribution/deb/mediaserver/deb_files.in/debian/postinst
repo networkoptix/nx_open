@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-COMPANY_NAME=@deb.customization.company.name@
+COMPANY_NAME=@customization.companyId@
 
 . /usr/share/debconf/confmodule
 
@@ -165,8 +165,8 @@ displayCompleteSetupHintIfNeeded()
 
     if checkNewSystem $port
     then
-        db_fset @deb.customization.company.name@-mediaserver/complete-setup-hint seen false
-        db_input critical @deb.customization.company.name@-mediaserver/complete-setup-hint || true
+        db_fset @customization.companyId@-mediaserver/complete-setup-hint seen false
+        db_input critical @customization.companyId@-mediaserver/complete-setup-hint || true
         db_go
     fi
 }

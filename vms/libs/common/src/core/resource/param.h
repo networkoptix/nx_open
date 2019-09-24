@@ -99,7 +99,8 @@ namespace ResourcePropertyKey
         static const QString kCpuArchitecture("cpuArchitecture");
         static const QString kCpuModelName("cpuModelName");
         static const QString kPhysicalMemory("physicalMemory");
-        static const QString kProductNameShort("productNameShort");
+        // TODO: #rvasilenko can we change the property text safely?
+        static const QString kBrand("productNameShort");
         static const QString kFullVersion("fullVersion");
         static const QString kBeta("beta");
         static const QString kPublicIp("publicIp");

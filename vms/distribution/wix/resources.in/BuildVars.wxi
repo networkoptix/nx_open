@@ -4,18 +4,17 @@
         <?define buildVars_includeGuard="BuildWars.wxi"?>
 
         <?define installerLanguage="${installerLanguage}"?>
-        <?define companyName="${company.name}"?>
-        <?define ServerRegPath="Software\${company.name}\${mediaserver_application_name}"?>
-        <?define ProductTitle="${company.name} ${display.product.name} Setup v.${releaseVersion}"?>
-        <?define productTitle = "${company.name} ${display.product.name} Setup v.${releaseVersion}"?>
+        <?define companyName="${customization.companyName}"?>
+        <?define ServerRegPath="Software\${customization.companyName}\${mediaserver_application_name}"?>
+        <?define ProductTitle="${customization.companyName} ${customization.vmsName} Setup v.${releaseVersion}"?>
+        <?define productTitle = "${customization.companyName} ${customization.vmsName} Setup v.${releaseVersion}"?>
 
-        <?define serverUpgradeCode = "${customization.upgradeCode}"?>
-        <?define clientUpgradeCode = "${customization.clientUpgradeCode}"?>
-        <?define clientBundleUpgradeCode = "${customization.clientBundleUpgradeCode}"?>
-        <?define serverBundleUpgradeCode = "${customization.serverBundleUpgradeCode}"?>
-        <?define fullBundleUpgradeCode = "${customization.fullBundleUpgradeCode}"?>
-        <?define nxtoolBundleUpgradeCode = "${nxtool.bundleUpgradeCode}"?>
-        <?define axBundleUpgradeCode = "${paxton.bundleUpgradeCode}"?>
+        <?define serverUpgradeCode = "${customization.desktop.windows.serverUpgradeCode}"?>
+        <?define clientUpgradeCode = "${customization.desktop.windows.clientUpgradeCode}"?>
+        <?define clientBundleUpgradeCode = "${customization.desktop.windows.clientBundleUpgradeCode}"?>
+        <?define serverBundleUpgradeCode = "${customization.desktop.windows.serverBundleUpgradeCode}"?>
+        <?define fullBundleUpgradeCode = "${customization.desktop.windows.fullBundleUpgradeCode}"?>
+        <?define nxtoolBundleUpgradeCode = "${customization.nxtool.bundleUpgradeCode}"?>
 
         <?define cloudHost = "${cloudHost}"?>
 
@@ -23,32 +22,31 @@
         <?define vmax = "${vmax}"?>
 
         <?define customization = "${customization}"?>
-        <?define uriProtocol = "${uri.protocol}"?>
+        <?define uriProtocol = "${customization.uriProtocol}"?>
 
         <?define releaseVersionFull = "${release.version}.${buildNumber}"?>
         <?define releaseVersionMajor = "${parsedVersion.majorVersion}"?>
         <?define releaseVersionMinor = "${parsedVersion.minorVersion}"?>
 
-        <?define ECRegPath="Software\${company.name}\${appserver.name}"?>
+        <?define ECRegPath="Software\${customization.companyName}\${appserver.name}"?>
 
-        <?define clientInternalName = "${client.name}"?>
-        <?define clientRegPath = "Software\${company.name}\${client.name}"?>
-        <?define nxtoolName = "${nxtool.name}"?>
+        <?define desktopClientInternalName = "${desktopClientInternalName}"?>
+        <?define clientRegPath = "Software\${customization.companyName}\${desktopClientInternalName}"?>
+        <?define nxtoolName = "${customization.nxtool.applicationName}"?>
         <?define mediaserverName = "${mediaserver_application_name}"?>
         <?define trayToolName = "${traytool.name}"?>
-        <?define productName = "${display.product.name}"?>
+        <?define productName = "${customization.vmsName}"?>
         <?define applauncherName = "${applauncher.name}"?>
         <?define applauncherBinaryName = "${applauncher.binary.name}"?>
         <?define minilauncherBinaryName = "${minilauncher.binary.name}"?>
-        <?define clientName = "${product.name}"?>
         <?define clientDisplayName = "${client.display.name}"?>
         <?define launcherVersionFile = "${launcher.version.file}"?>
 
-        <?define productExeName = "${product.name}"?>
-        <?define clientExeName = "${display.product.name}"?>
-        <?define nxtoolExeName = "${nxtool.company.name} Server Tool"?>
+        <?define clientBinaryName = "${client.binary.name}"?>
 
-        <?define defaultTranslation = "${defaultTranslation}"?>
+        <?define nxtoolExeName = "${customization.nxtool.applicationName}"?>
+
+        <?define defaultTranslation = "${customization.defaultLanguage}"?>
         <?define companyInstallPath = "${windowsInstallPath}"?>
 
 
@@ -60,8 +58,8 @@
             <?define SystemFolderActual = "System64Folder"?>
         <?endif?>
 
-        <?define clientInstallFullPath="[$(var.ProgramFilesFolder)]${windowsInstallPath}\${display.product.name}\Client" ?>
-        <?define nxtoolInstallFullPath="[$(var.ProgramFilesFolder)]${windowsInstallPath}\${display.product.name}\Nxtool" ?>
+        <?define clientInstallFullPath="[$(var.ProgramFilesFolder)]${windowsInstallPath}\${customization.vmsName}\Client" ?>
+        <?define nxtoolInstallFullPath="[$(var.ProgramFilesFolder)]${windowsInstallPath}\${customization.vmsName}\Nxtool" ?>
 
         <!-- Wix Variables -->
 
@@ -103,7 +101,7 @@
         <?define paxtonDirId = "$(var.customization)_$(var.releaseVersionFull)_Paxton"?>
         <?define enable_hanwha = "${enable_hanwha}"?>
 
-        <?define eulaVersion = "${eulaVersion}"?>
+        <?define eulaVersion = "${customization.eulaVersion}"?>
         <?define developerBuild = "${developerBuild}"?>
 
         <?define installerIcon = "${installerIcon}"?>

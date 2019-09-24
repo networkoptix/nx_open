@@ -47,19 +47,18 @@ execute_process(
 include(${depenencies_cmake_file})
 
 include(utils)
+include(target_detection)
 include(customization_package)
-include(${repositoryRootDir}/customization/default-values.cmake)
-include(${customization_dir}/customization.cmake)
 
 include(cloud_host)
 include(output_directories)
 include(distribution_names)
 include(option)
 include(windows_signing)
+include(properties)
 
-set(minilauncher.binary.name "${product.name} Launcher.exe") #< Cannot include properties.cmake.
-set(paxtonDriverOutputName "${paxtonLibraryName}.OemDvrMiniDriver")
-set(paxtonDriverIntermediateName "${paxtonLibraryName}.OemDvrMiniDriver.mini")
+set(paxtonDriverOutputName "${customization.paxton.libraryName}.OemDvrMiniDriver")
+set(paxtonDriverIntermediateName "${customization.paxton.libraryName}.OemDvrMiniDriver.mini")
 
 if(NOT sync_result STREQUAL "0")
     message(FATAL_ERROR "error: Packages sync failed")

@@ -42,6 +42,8 @@
 #include <nx/vms/server/resource/multicast_parameters.h>
 #include <nx/vms/server/analytics/predefined_attributes.h>
 
+#include <nx/utils/app_info.h>
+
 namespace nx {
 namespace vms::server {
 namespace plugins {
@@ -2138,7 +2140,7 @@ CameraDiagnostics::Result HanwhaResource::findProfiles(
     if (totalProfileNumber)
         *totalProfileNumber = (int) profiles.size();
 
-    static const auto kAppName = QnAppInfo::productNameLong();
+    static const auto kAppName = nx::utils::AppInfo::vmsName();
     if (outPrimaryProfile)
         *outPrimaryProfile = findProfile(profiles, Qn::ConnectionRole::CR_LiveVideo, kAppName);
 
@@ -3781,7 +3783,7 @@ QString HanwhaResource::nxProfileName(
     }
 
     const auto suffix = profileSuffixByRole(role);
-    const auto appName = profileFullProductName(QnAppInfo::productNameLong())
+    const auto appName = profileFullProductName(nx::utils::AppInfo::vmsName())
         .left(maxLength - suffix.length());
 
     return appName + suffix;

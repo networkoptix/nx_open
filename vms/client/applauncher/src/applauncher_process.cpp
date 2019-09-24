@@ -7,11 +7,12 @@
 
 #include <nx/utils/log/log.h>
 #include <utils/common/process.h>
-#include <utils/common/app_info.h>
 
 #include "process_utils.h"
 
 #include <nx/vms/applauncher/api/commands.h>
+
+#include <nx/utils/app_info.h>
 
 namespace {
 
@@ -207,6 +208,8 @@ bool ApplauncherProcess::startApplication(
     const StartApplicationTask& task,
     Response& response)
 {
+    using namespace nx::utils;
+
     NX_VERBOSE(this, "Entered LaunchingApplication");
 
     auto installation = m_installationManager->installationForVersion(task.version);
@@ -241,7 +244,7 @@ bool ApplauncherProcess::startApplication(
     for (const auto& serialized: task.arguments)
         arguments.append(serialized.split(QRegularExpression("\\s+"), QString::SkipEmptyParts));
 
-    if (QnAppInfo::applicationPlatform() == "linux")
+    if (AppInfo::isLinux())
     {
         const QString kLdLibraryPathVariable = "LD_LIBRARY_PATH";
         QStringList ldLibraryPaths;
@@ -265,7 +268,7 @@ bool ApplauncherProcess::startApplication(
         if (installation->version() < kWindowClassFixedVersion)
         {
             arguments.append("-name");
-            arguments.append(QnAppInfo::productNameShort());
+            arguments.append(AppInfo::brand());
         }
 
         if (!ldLibraryPaths.isEmpty())
@@ -297,9 +300,9 @@ bool ApplauncherProcess::startApplication(
 
     const QFileInfo info(binPath);
     if (ProcessUtils::startProcessDetached(
-        QnAppInfo::applicationPlatform() == "linux"
-        ? "./" + info.fileName()
-        : info.absoluteFilePath(),
+        AppInfo::isLinux()
+            ? "./" + info.fileName()
+            : info.absoluteFilePath(),
         arguments,
         info.absolutePath(),
         environment))

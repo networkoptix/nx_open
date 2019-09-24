@@ -1,6 +1,6 @@
 #!/bin/bash
 
-COMPANY_NAME="@deb.customization.company.name@"
+COMPANY_NAME="@customization.companyId@"
 TARGET_DEVICE="@targetDevice@"
 
 VMS_DIR=$(dirname $(dirname "${BASH_SOURCE[0]}"))
@@ -63,9 +63,9 @@ echo
 echo --- Starting: $EXE $ARGS
 
 if [ "@withRootTool@" = "true" ]; then
-    su @deb.customization.company.name@ -c 'ulimit -c unlimited; ulimit -a'
+    su @customization.companyId@ -c 'ulimit -c unlimited; ulimit -a'
     exec start-stop-daemon --start \
-        --chuid @deb.customization.company.name@:@deb.customization.company.name@ \
+        --chuid @customization.companyId@:@customization.companyId@ \
         -d "$VMS_DIR/bin" --exec $EXE -- $ARGS
 else
     exec start-stop-daemon --start -d "$VMS_DIR/bin" --exec $EXE -- $ARGS

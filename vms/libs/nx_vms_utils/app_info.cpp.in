@@ -1,13 +1,10 @@
-//
-// This file is generated. Go to pom.xml.
-//
 #include <nx/vms/utils/app_info.h>
 
 using namespace nx::vms::utils;
 
 QString AppInfo::nativeUriProtocol()
 {
-    return QStringLiteral("${uri.protocol}");
+    return QStringLiteral("${customization.uriProtocol}");
 }
 
 QString AppInfo::nativeUriProtocolDescription()
@@ -17,15 +14,10 @@ QString AppInfo::nativeUriProtocolDescription()
 
 QString AppInfo::desktopFileName()
 {
-    return QStringLiteral("${installer.name}.desktop");
+    return QStringLiteral("${customization.installerName}.desktop");
 }
 
 QString AppInfo::iconFileName()
 {
     return QStringLiteral("vmsclient-${customization}.png");
-}
-
-QString AppInfo::productNameShort()
-{
-    return QStringLiteral("${product.name.short}");
 }

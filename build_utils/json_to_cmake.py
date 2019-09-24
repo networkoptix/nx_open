@@ -50,7 +50,7 @@ def convert_json_file_to_cmake_file(json_file_name, cmake_file_name, prefix=None
 
     with open(cmake_file_name, "w") as cmake_file:
         if variables:
-            for var, value in variables.items():
+            for var, value in sorted(variables.items()):
                 cmake_file.write("set({} {})\n".format(var, value))
 
 

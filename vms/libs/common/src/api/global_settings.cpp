@@ -158,12 +158,6 @@ bool QnGlobalSettings::isInitialized() const
 
 QnGlobalSettings::AdaptorList QnGlobalSettings::initEmailAdaptors()
 {
-    QString defaultSupportLink = QnAppInfo::supportUrl();
-    if (defaultSupportLink.isEmpty())
-        defaultSupportLink = QnAppInfo::supportEmailAddress();
-    if (defaultSupportLink.isEmpty())
-        defaultSupportLink = QnAppInfo::supportPhone();
-
     m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameHost, QString(), this);
     m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameFrom, QString(), this);
     m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameUser, QString(), this);
@@ -177,7 +171,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initEmailAdaptors()
         this);
     m_supportLinkAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
         kNameSupportEmail,
-        defaultSupportLink,
+        nx::utils::AppInfo::supportAddress(),
         this);
     m_connectionTypeAdaptor = new QnLexicalResourcePropertyAdaptor<QnEmail::ConnectionType>(
         kNameConnectionType,
@@ -1138,15 +1132,6 @@ QnEmailSettings QnGlobalSettings::emailSettings() const
     result.supportEmail = m_supportLinkAdaptor->value();
     result.simple = m_simpleAdaptor->value();
     result.timeout = m_timeoutAdaptor->value();
-
-    // Default email changed to link (VMS-1055).
-    // We are checking if the value is not overridden and replacing it by the updated one.
-    if (result.supportEmail == QnAppInfo::supportEmailAddress() &&
-        !QnAppInfo::supportUrl().isEmpty())
-    {
-        result.supportEmail = QnAppInfo::supportUrl();
-    }
-
     return result;
 }
 

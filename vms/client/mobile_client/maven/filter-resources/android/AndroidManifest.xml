@@ -2,7 +2,7 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="auto"
-    package="${android.packageName}"
+    package="${customization.mobile.android.packageName}"
     android:versionCode="${project.version.code}"
     android:versionName="${project.version.name}.${project.version.code}">
 
@@ -30,7 +30,7 @@
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="${uri.protocol}"/>
+                <data android:scheme="${customization.uriProtocol}"/>
             </intent-filter>
 
             <intent-filter>
@@ -85,7 +85,7 @@
     <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="26"/>
     <supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:smallScreens="true"/>
 
-    <uses-permission android:name="${android.oldPackageName}.readLogonEntries"/>
+    <uses-permission android:name="${customization.mobile.android.compatibilityPackage}.readLogonEntries"/>
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>

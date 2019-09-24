@@ -38,7 +38,7 @@ QString QnAppInfo::boostVersion()
 
 QString QnAppInfo::defaultLanguage()
 {
-    return QStringLiteral("${defaultTranslation}");
+    return "${customization.defaultLanguage}";
 }
 
 QString QnAppInfo::clientExecutableName()
@@ -53,50 +53,35 @@ QString QnAppInfo::applauncherExecutableName()
 
 QString QnAppInfo::mediaFolderName()
 {
-    return QStringLiteral("${client.mediafolder.name}");
-}
-
-QString QnAppInfo::licensingEmailAddress()
-{
-    return QStringLiteral(R"(${licenseEmail})");
+    return QStringLiteral("${mediaFolderName}");
 }
 
 QString QnAppInfo::companyUrl()
 {
-    return QStringLiteral("${companyUrl}");
+    return QStringLiteral("${customization.contact.companyUrl}");
 }
 
-QString QnAppInfo::supportEmailAddress()
+QString QnAppInfo::updateFeedUrl()
 {
-    return QStringLiteral("${supportEmail}");
-}
-
-QString QnAppInfo::supportUrl()
-{
-    return QStringLiteral("${supportUrl}");
-}
-
-QString QnAppInfo::supportPhone()
-{
-    return QStringLiteral("${supportPhone}");
+    return "${product.updateFeedUrl}";
 }
 
 QString QnAppInfo::updateGeneratorUrl()
 {
-    return QStringLiteral("${update.generator.url}");
+    return "${product.updateGeneratorUrl}";
 }
 
 int QnAppInfo::freeLicenseCount()
 {
-    return ${freeLicenseCount};
+    return ${product.freeLicenseCount};
 }
 
 QString QnAppInfo::freeLicenseKey()
 {
-    return QStringLiteral("${freeLicenseKey}");
+    return "${customization.desktop.trialLicenseKey}";
 }
 
 bool QnAppInfo::freeLicenseIsTrial()
 {
-    return ${freeLicenseIsTrial};
+    return ${product.freeLicenseIsTrial};
 }

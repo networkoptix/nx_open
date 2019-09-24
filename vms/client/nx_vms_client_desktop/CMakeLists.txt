@@ -8,10 +8,6 @@ nx_find_files(ui_files src "ui")
 qt5_wrap_ui(uic_files ${ui_files})
 
 nx_configure_file(
-    maven/filter-resources/resources/globals.json
-    ${CMAKE_CURRENT_BINARY_DIR})
-
-nx_configure_file(
     maven/filter-resources/client_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -32,11 +28,10 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         ${uic_files}
         ${mac_sources}
     ADDITIONAL_RESOURCES
-        "${CMAKE_CURRENT_LIST_DIR}/skins/${defaultSkin}"
+        "${CMAKE_CURRENT_LIST_DIR}/skins/${customization.skin}"
         "${customization_dir}/nx_client_desktop/resources"
         "${customization_dir}/icons/all/logo.png"
         "${customization_dir}/license.html"
-        "${CMAKE_CURRENT_BINARY_DIR}/globals.json"
         "${nov_file_launcher_executable}"
     ADDITIONAL_MOCABLES
         src/nx/vms/client/desktop/system_administration/widgets/analytics_settings_widget.cpp

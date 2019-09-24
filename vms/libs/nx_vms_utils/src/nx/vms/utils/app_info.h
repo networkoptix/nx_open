@@ -19,9 +19,6 @@ struct NX_VMS_UTILS_API AppInfo
 
     /** File name of the application icon (like vmsclient-default.png). */
     static QString iconFileName();
-
-    /** Short name of the product like hdwitness. */
-    static QString productNameShort();
 };
 
 } // namespace utils

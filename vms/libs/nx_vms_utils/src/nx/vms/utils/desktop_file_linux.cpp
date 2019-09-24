@@ -7,6 +7,7 @@
 #include <nx/utils/literal.h>
 
 #include "app_info.h"
+#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace vms {
@@ -32,7 +33,7 @@ bool createDesktopFile(const QString& filePath,
     result += "\nIcon=" + icon;
     result += "\nExec=\"" + applicationBinaryPath + "\" %u";
     result += "\nStartupNotify=true";
-    result += "\nStartupWMClass=" + AppInfo::productNameShort();
+    result += "\nStartupWMClass=" + nx::utils::AppInfo::brand();
     result += "\nTerminal=false";
 
     if (!version.isNull())

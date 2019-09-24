@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("${display.product.name} Net2 Minidriver")]
-[assembly: AssemblyDescription("Net2 OEM DVR ${display.product.name} driver")]
-[assembly: AssemblyCompany("${company.name}")]
-[assembly: AssemblyProduct("${company.name} ${display.product.name}")]
+[assembly: AssemblyTitle("${customization.vmsName} Net2 Minidriver")]
+[assembly: AssemblyDescription("Net2 OEM DVR ${customization.vmsName} driver")]
+[assembly: AssemblyCompany("${customization.companyName}")]
+[assembly: AssemblyProduct("${customization.companyName} ${customization.vmsName}")]
 [assembly: AssemblyCopyright("${nx_copyright}")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

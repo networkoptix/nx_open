@@ -2,7 +2,7 @@
 #include "hanwha_resource.h"
 #include "hanwha_request_helper.h"
 
-#include <utils/common/app_info.h>
+#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace vms::server {
@@ -151,7 +151,7 @@ QString HanwhaMappedPresetManager::makeDevicePresetName(const QString& presetNum
     if (presetNumber.isEmpty())
         return QString();
 
-    const auto normalizedAppName = QnAppInfo::productNameLong()
+    const auto normalizedAppName = nx::utils::AppInfo::vmsName()
         .mid(0, kHanwhaMaxPresetNameLength - presetNumber.length())
         .remove(QRegExp("[^a-zA-Z]"));
 

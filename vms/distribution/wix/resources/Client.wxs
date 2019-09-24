@@ -15,8 +15,7 @@
             </Component>
 
             <Component Id="ClientEulaVersion">
-                <RegistryKey Root="HKCU"
-                         Key="Software\[Manufacturer]\$(var.clientInternalName)">
+                <RegistryKey Root="HKCU" Key="$(var.clientRegPath)">
                     <RegistryValue Type="integer" Name="acceptedEulaVersion" Value="$(var.eulaVersion)"/>
                 </RegistryKey>
             </Component>
@@ -29,7 +28,7 @@
                     <RegistryKey Key="DefaultIcon">
                         <RegistryValue
                             Type="string"
-                            Value='"[INSTALLDIR]Client\$(var.releaseVersionFull)\$(var.clientName).exe" ,0'/>
+                            Value='"[INSTALLDIR]Client\$(var.releaseVersionFull)\$(var.clientBinaryName)" ,0'/>
                     </RegistryKey>
                     <RegistryKey Key="shell">
                         <RegistryValue Type="string" Value="open"/>
@@ -37,7 +36,7 @@
                             <RegistryKey Key="command">
                                 <RegistryValue
                                     Type="string"
-                                    Value='"[INSTALLDIR]Client\$(var.releaseVersionFull)\$(var.clientName).exe" -- "%1"' />
+                                    Value='"[INSTALLDIR]Client\$(var.releaseVersionFull)\$(var.clientBinaryName)" -- "%1"' />
                             </RegistryKey>
                         </RegistryKey>
                     </RegistryKey>
@@ -87,8 +86,8 @@
 
                     <Component Id="ClientExecutable">
                         <File Id="client.exe"
-                            Name="$(var.clientName).exe"
-                            Source="$(var.SourceDir)/$(var.clientName).exe"
+                            Name="$(var.clientBinaryName)"
+                            Source="$(var.SourceDir)/$(var.clientBinaryName)"
                             KeyPath="yes">
                             <fire:FirewallException Id="FirewallExceptionClient"
                                 Name="$(var.productName)"
