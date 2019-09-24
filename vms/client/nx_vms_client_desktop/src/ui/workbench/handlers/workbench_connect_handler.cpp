@@ -240,6 +240,8 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
         &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
     connect(action(action::DisconnectAction), &QAction::triggered, this,
         &QnWorkbenchConnectHandler::at_disconnectAction_triggered);
+    connect(action(action::SelectCurrentServerAction), &QAction::triggered, this,
+        &QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered);
 
     connect(action(action::OpenLoginDialogAction), &QAction::triggered, this,
         &QnWorkbenchConnectHandler::showLoginDialog, Qt::QueuedConnection);
@@ -447,6 +449,18 @@ void QnWorkbenchConnectHandler::handleConnectReply(
             else
             {
                 establishConnection(connection);
+
+                if (m_connecting.storeConnection)
+                {
+                    ConnectionOptions options(StoreSession | StorePreferredCloudServer);
+                    const auto localId = helpers::getLocalSystemId(connectionInfo);
+                    if (nx::vms::client::core::helpers::hasCredentials(localId))
+                        options.setFlag(StorePassword);
+                    if (qnSettings->autoLogin())
+                        options.setFlag(AutoLogin);
+
+                    storeConnectionRecord(m_connecting.url, connectionInfo, options);
+                }
             }
             break;
         case Qn::IncompatibleProtocolConnectionResult:
@@ -583,7 +597,9 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
         return;
 
     const auto localId = helpers::getLocalSystemId(info);
-    nx::vms::client::core::helpers::updateWeightData(localId);
+
+    if (options.testFlag(UpdateSystemWeight))
+        nx::vms::client::core::helpers::updateWeightData(localId);
 
     const bool cloudConnection = isConnectionToCloud(url);
 
@@ -619,6 +635,9 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
 
     qnSettings->setAutoLogin(autoLogin);
     qnSettings->save();
+
+    if (options.testFlag(StorePreferredCloudServer) && !info.cloudSystemId.isEmpty())
+        nx::vms::client::core::helpers::savePreferredCloudServer(info.cloudSystemId, info.serverId());
 
     if (cloudConnection)
     {
@@ -917,7 +936,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     }
     else if (parameters.url.isValid())
     {
-        ConnectionOptions options;
+        ConnectionOptions options(UpdateSystemWeight);
         if (parameters.storeSession)
             options |= StoreSession;
         if (parameters.storePassword && NX_ASSERT(qnSettings->saveCredentialsAllowed()))
@@ -972,23 +991,33 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
     if (!system || !system->isConnectable())
         return;
 
-    const auto servers = system->servers();
-    auto reachableServer = std::find_if(servers.cbegin(), servers.cend(),
-        [system](const nx::vms::api::ModuleInformation& server)
-        {
-            return system->isReachableServer(server.id);
-        });
+    auto reachableServer = nx::vms::client::core::helpers::preferredCloudServer(id);
+    if (reachableServer.isNull())
+    {
+        const auto servers = system->servers();
+        const auto iter = std::find_if(servers.cbegin(), servers.cend(),
+            [system](const nx::vms::api::ModuleInformation& server)
+            {
+                return system->isReachableServer(server.id);
+            });
 
-    if (reachableServer == servers.cend())
+        if (iter != servers.cend())
+            reachableServer = iter->id;
+    }
+
+    if (reachableServer.isNull())
         return;
 
-    nx::utils::Url url = system->getServerHost(reachableServer->id);
+    nx::utils::Url url = system->getServerHost(reachableServer);
     auto credentials = qnCloudStatusWatcher->credentials();
     url.setUserName(credentials.user);
     url.setPassword(credentials.password);
 
+    LogonParameters logon(url);
+    logon.autoLogin = qnCloudStatusWatcher->stayConnected();
+
     menu()->trigger(action::ConnectAction,
-        action::Parameters().withArgument(Qn::LogonParametersRole, LogonParameters(url)));
+        action::Parameters().withArgument(Qn::LogonParametersRole, logon));
 }
 
 void QnWorkbenchConnectHandler::at_reconnectAction_triggered()
@@ -1013,6 +1042,50 @@ void QnWorkbenchConnectHandler::at_disconnectAction_triggered()
         flags |= DisconnectFlag::Force;
 
     disconnectFromServer(flags);
+}
+
+void QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered()
+{
+    if (m_logicalState != LogicalState::connected)
+        return;
+
+    const auto parameters = menu()->currentParameters(sender());
+    const auto server = parameters.resource().dynamicCast<QnMediaServerResource>();
+
+    if (!NX_ASSERT(server && server->getId() != commonModule()->remoteGUID()))
+        return;
+
+    const auto discoveryManager = commonModule()->moduleDiscoveryManager();
+    const auto endpoint = discoveryManager->getEndpoint(server->getId());
+    if (!NX_ASSERT(endpoint && server->isOnline()))
+        return;
+
+    nx::utils::Url currentUrl = commonModule()->currentUrl();
+    const auto systemId = globalSettings()->cloudSystemId();
+
+    if (!disconnectFromServer(DisconnectFlag::NoFlags))
+        return;
+
+    nx::utils::Url url;
+    url.setUserName(currentUrl.userName());
+    url.setPassword(currentUrl.password());
+
+    if (systemId.isEmpty())
+    {
+        url.setHost(endpoint->address.toString());
+        url.setPort(endpoint->port);
+    }
+    else
+    {
+        const auto system = qnSystemsFinder->getSystem(systemId);
+        const auto serverUrl = system->getServerHost(server->getId());
+        url.setHost(serverUrl.host());
+        url.setPort(serverUrl.port());
+    }
+
+    setLogicalState(LogicalState::connecting_to_target);
+    m_connecting.storeConnection = true;
+    connectToServer(url);
 }
 
 void QnWorkbenchConnectHandler::connectToServer(const nx::utils::Url &url)

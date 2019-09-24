@@ -9,6 +9,7 @@
 	#include <nx/client/core/settings/keychain_property_storage_backend.h>
 #endif
 
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/property_storage/qsettings_backend.h>
@@ -55,5 +56,9 @@ Settings::Settings():
 	#endif
     load();
 }
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Settings::PreferredCloudServer,
+    (ubjson)(json)(eq),
+    (systemId)(serverId))
 
 } // namespace nx::vms::client::core

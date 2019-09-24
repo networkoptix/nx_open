@@ -4,7 +4,7 @@
 
 #include <utils/common/credentials.h>
 
-#include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 #include <nx/utils/property_storage/storage.h>
 #include <nx/utils/singleton.h>
@@ -31,6 +31,12 @@ public:
     SecureProperty<Credentials> cloudCredentials{
         this, "cloudCredentials"};
 
+    struct PreferredCloudServer;
+    using PreferredCloudServers = QList<PreferredCloudServer>;
+
+    Property<PreferredCloudServers> preferredCloudServers{
+        this, "PreferredCloudServers"};
+
 private:
     QByteArray m_securityKey;
 };
@@ -39,5 +45,13 @@ inline Settings* settings()
 {
     return Settings::instance();
 }
+
+struct Settings::PreferredCloudServer
+{
+    QString systemId;
+    QnUuid serverId;
+};
+
+QN_FUSION_DECLARE_FUNCTIONS(Settings::PreferredCloudServer, (json)(ubjson)(eq))
 
 } // namespace nx::vms::client::core

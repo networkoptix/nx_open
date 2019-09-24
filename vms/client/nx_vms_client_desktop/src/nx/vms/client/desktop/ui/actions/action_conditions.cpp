@@ -46,6 +46,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/utils/wearable_manager.h>
 #include <nx/vms/client/desktop/utils/wearable_state.h>
+#include <nx/vms/discovery/manager.h>
 
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -1694,6 +1695,24 @@ ActionVisibility CloudServerCondition::check(const QnResourceList& resources, Qn
 
     bool success = GenericCondition::check<QnResourcePtr>(resources, m_matchMode, isCloudServer);
     return success ? EnabledAction : InvisibleAction;
+}
+
+ActionVisibility ReachableServerCondition::check(
+    const Parameters& parameters, QnWorkbenchContext* context)
+{
+    const auto server = parameters.resource().dynamicCast<QnMediaServerResource>();
+    if (!server || server->hasFlags(Qn::fake))
+        return InvisibleAction;
+
+    if (server->getId() == context->commonModule()->remoteGUID())
+        return InvisibleAction;
+
+    const auto discoveryManager = context->commonModule()->moduleDiscoveryManager();
+
+    if (!server->isOnline() || !discoveryManager->getEndpoint(server->getId()))
+        return DisabledAction;
+
+    return EnabledAction;
 }
 
 namespace condition {

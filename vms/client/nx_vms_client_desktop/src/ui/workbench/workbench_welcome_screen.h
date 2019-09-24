@@ -87,7 +87,7 @@ public slots:
         bool storePassword,
         bool autoLogin);
 
-    void connectToCloudSystem(const QString& systemId, const QString& serverUrl);
+    void connectToCloudSystem(const QString& systemId);
 
     void connectToAnotherSystem();
 
