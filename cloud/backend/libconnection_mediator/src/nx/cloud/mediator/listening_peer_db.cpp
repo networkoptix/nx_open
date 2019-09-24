@@ -216,7 +216,7 @@ void ListeningPeerDb::removePeer(
     if (!m_map || m_stopped)
         return handler(false);
 
-	auto context = std::make_shared<RemovePeerContext>();
+    auto context = std::make_shared<RemovePeerContext>();
 	context->handler = std::move(handler);
 	context->keys = {mediatorEndpointKey(peerId), uplinkSpeedKey(peerId)};
 
@@ -474,7 +474,7 @@ void ListeningPeerDb::removePeer(std::shared_ptr<RemovePeerContext> context)
 					}
 				}
 
-				if (++context->keysRemoved >= context->keys.size())
+				if (++context->keysRemoved >= (int) context->keys.size())
 					context->handler(context->ok);
 			});
 	}
