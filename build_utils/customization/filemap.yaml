@@ -1,5 +1,4 @@
 description.json: 'description.json'
-customization.cmake: 'customization.cmake' # Compatibility layer.
 license.html: 'license.html'
 main_icon.ico: 'icons/all/favicon.ico'
 
