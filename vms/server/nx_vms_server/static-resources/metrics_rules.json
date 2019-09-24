@@ -37,11 +37,33 @@
         }
     },
     "servers": {
-        "state": {
+        "info": {
             "values": {
                 "name": {
+                    "name": "Name",
                     "display": "table|panel"
                 },
+                "cpu": {
+                    "name": "CPU",
+                    "display": "panel"
+                },
+                "ram": {
+                    "name": "RAM",
+                    "unit": "GB",
+                    "display": "panel"
+                },
+                "os": {
+                    "name": "OS",
+                    "display": "panel"
+                },
+                "public_ip": {
+                    "name": "Public IP",
+                    "display": "table|panel"
+                }
+            }
+        },
+        "availability": {
+            "values": {
                 "status": {
                     "display": "table|panel",
                     "alarms": [{
@@ -64,6 +86,20 @@
                 "uptimeS": {
                     "name": "Uptime",
                     "unit": "s",
+                    "display": "table|panel"
+                }
+            }
+        },
+        "serverLoad": {
+            "values": {
+                "cpuP": {
+                    "name": "CPU %",
+                    "unit": "%",
+                    "display": "table|panel"
+                },
+                "ramP": {
+                    "name": "RAM %",
+                    "unit": "%",
                     "display": "table|panel"
                 }
             }

@@ -4,7 +4,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
 #include <platform/hardware_information.h>
-#include <recorder/storage_manager.h>
+#include <platform/platform_abstraction.h>
 
 #include "helpers.h"
 
@@ -42,19 +42,37 @@ void ServerController::start()
 
 utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController::makeProviders()
 {
+    using namespace ResourcePropertyKey;
+
+    // TODO: make sure that platform is removed only after HM!
+    auto platform = serverModule()->platform()->monitor();
     const auto getUptimeS =
-        [start = std::chrono::steady_clock::now()](const auto&)
+        [platform](const auto&)
         {
-            return Value((double) std::chrono::duration_cast<std::chrono::seconds>(
-                std::chrono::steady_clock::now() - start).count());
+            return Value(static_cast<qint64>(platform->processUptime().count()) / 1000);
         };
 
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         utils::metrics::makeValueGroupProvider<Resource>(
-            "state",
+            "info",
             utils::metrics::makeSystemValueProvider<Resource>(
                 "name", [](const auto& r) { return Value(r->getName()); }
             ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "cpu", [](const auto& r) { return Value(r->getProperty(Server::kCpuModelName)); }
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "ram", [](const auto& r) { return Value(r->getProperty(Server::kPhysicalMemory)); }
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "os", [](const auto& r) { return Value(r->getProperty(Server::kSystemRuntime)); }
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "publicIp", [](const auto& r) { return Value(r->getProperty(Server::kPublicIp)); }
+            )
+        ),
+        utils::metrics::makeValueGroupProvider<Resource>(
+            "availability",
             utils::metrics::makeSystemValueProvider<Resource>(
                 "status",
                 [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
@@ -63,10 +81,18 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
             utils::metrics::makeLocalValueProvider<Resource>(
                 "uptimeS", getUptimeS
             )
+        ),
+        utils::metrics::makeValueGroupProvider<Resource>(
+            "serverLoad",
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "cpuP", [platform](const auto&) { return Value(platform->totalCpuUsage()); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "ramP", [platform](const auto&) { return Value(platform->totalRamUsage()); }
+            )
         )
         // TODO: Implement "Server load", "Info" and "Activity" groups.
     );
 }
 
 } // namespace nx::vms::server::metrics
-
