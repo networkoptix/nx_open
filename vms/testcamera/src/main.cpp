@@ -1,5 +1,4 @@
 #include <QtCore/QDir>
-#include <QtCore/QSettings>
 #include <QtCore/QCoreApplication>
 
 #include <nx/kit/output_redirector.h>
@@ -24,6 +23,8 @@
 
 #include <utils/media/ffmpeg_initializer.h>
 #include <nx/core/access/access_types.h>
+
+#include <nx/utils/app_info.h>
 
 extern "C"
 {
@@ -106,9 +107,9 @@ int main(int argc, char *argv[])
 {
     nx::kit::OutputRedirector::ensureOutputRedirection();
 
-    QCoreApplication::setOrganizationName(QnAppInfo::organizationName());
-    QCoreApplication::setApplicationName(QnAppInfo::productNameLong() + " Test Camera");
-    QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
+    QCoreApplication::setOrganizationName(nx::utils::AppInfo::organizationName());
+    QCoreApplication::setApplicationName(nx::utils::AppInfo::vmsName() + " Test Camera");
+    QCoreApplication::setApplicationVersion(nx::utils::AppInfo::applicationVersion());
 
     // Each user may have his/her own traytool running.
     QCoreApplication app(argc, argv);
