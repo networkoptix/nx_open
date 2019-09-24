@@ -6,6 +6,7 @@
 #include <common/common_module_aware.h>
 #include <client_core/connection_context_aware.h>
 #include <utils/common/connective.h>
+#include <nx/utils/impl_ptr.h>
 
 class QnSingleCamLicenseStatusHelper;
 
@@ -25,15 +26,13 @@ class TwoWayAudioController: public Connective<QObject>, public QnConnectionCont
 
 public:
     TwoWayAudioController(QObject* parent = nullptr);
-    TwoWayAudioController(
-        const QString& sourceId,
-        const QString& cameraId,
-        QObject* parent = nullptr);
 
     virtual ~TwoWayAudioController();
 
     static void registerQmlType();
 
+    using OperationCallback = std::function<void (bool callback)>;
+    bool start(OperationCallback&& callback);
     Q_INVOKABLE bool start();
     Q_INVOKABLE void stop();
 
@@ -52,15 +51,8 @@ signals:
     void availabilityChanged();
 
 private:
-    void setStarted(bool value);
-
-private:
-    const QScopedPointer<OrderedRequestsManager> m_requestsManager;
-    bool m_started = false;
-    bool m_available = false;
-    QString m_sourceId;
-    QnVirtualCameraResourcePtr m_camera;
-    QScopedPointer<TwoWayAudioAvailabilityWatcher> m_availabilityWatcher;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace nx::vms::client::core

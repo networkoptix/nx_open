@@ -242,11 +242,26 @@ QnTwoWayAudioWidget::Private::Private(
         if (m_stateTimer.hasExpired(timeout))
             setState(HintState::ok);
     });
+
+    connect(&m_controller, &nx::vms::client::core::TwoWayAudioController::availabilityChanged,
+        this, &Private::updateState);
 }
 
 QnTwoWayAudioWidget::Private::~Private()
 {
 }
+
+void QnTwoWayAudioWidget::Private::updateState()
+{
+    const bool enabled = isAllowed();
+    q->setEnabled(enabled);
+    button->setEnabled(enabled);
+    if (!enabled)
+        stopStreaming();
+
+    q->setOpacity(enabled ? kEnabledOpacityCoeff : kDisabledOpacityCoeff);
+}
+
 
 void QnTwoWayAudioWidget::Private::updateCamera(const QnVirtualCameraResourcePtr& camera)
 {
@@ -257,51 +272,21 @@ void QnTwoWayAudioWidget::Private::updateCamera(const QnVirtualCameraResourcePtr
 
     m_camera = camera;
 
-    // If the given camera is I/O Module, then the license is required.
-    if (camera && m_camera->isIOModule())
-        m_licenseHelper.reset(new QnSingleCamLicenseStatusHelper(m_camera));
-    else
-        m_licenseHelper.reset();
-
-    const auto updateState =
-        [this]()
-        {
-            const bool enabled = isAllowed();
-            q->setEnabled(enabled);
-            button->setEnabled(enabled);
-            if (!enabled)
-                stopStreaming();
-
-            q->setOpacity(enabled ? kEnabledOpacityCoeff : kDisabledOpacityCoeff);
-        };
-
     if (camera)
-        connect(camera.get(), &QnResource::statusChanged, this, updateState);
+        connect(camera.get(), &QnResource::statusChanged, this, &Private::updateState);
 
-    if (m_licenseHelper)
-    {
-        connect(m_licenseHelper, &QnSingleCamLicenseStatusHelper::licenseStatusChanged, this,
-            updateState);
-    }
-
+    m_controller.setResourceId(m_camera->getId().toString());
     updateState();
 }
 
 bool QnTwoWayAudioWidget::Private::isAllowed() const
 {
-    if (!m_camera || !m_camera->isOnline())
-        return false;
-
-    // Check if we are require licenses for two-way audio.
-    if (m_licenseHelper)
-        return m_licenseHelper->status() == QnLicenseUsageStatus::used;
-
-    return true;
+    return m_controller.available();
 }
 
 void QnTwoWayAudioWidget::Private::startStreaming()
 {
-    if (!isAllowed() || !m_camera || m_started)
+    if (!isAllowed() || !m_camera || m_controller.started())
         return;
 
     const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
@@ -312,28 +297,18 @@ void QnTwoWayAudioWidget::Private::startStreaming()
 
     setState(HintState::pressed);
 
-    m_requestHandle = server->restConnection()->twoWayAudioCommand(m_sourceId,
-        m_camera->getId(),
-        true,
-        [this](bool success, rest::Handle handle, const QnJsonRestResult& result)
+    const auto requestCallback =
+        [this](bool success)
         {
-            if (handle != m_requestHandle)
+            if (success || m_state != HintState::pressed)
                 return;
 
-            if (m_state != HintState::pressed)
-                return;
+            setHint(tr("Streaming is not ready yet"));
+            setState(HintState::error);
+            stopStreaming();
+        };
 
-            if (!success || result.error != QnRestResult::NoError)
-            {
-                setHint(tr("Streaming is not ready yet"));
-                setState(HintState::error);
-                stopStreaming();
-            }
-
-        }, QThread::currentThread());
-
-    m_started = m_requestHandle > 0;
-    if (!m_started)
+    if (!m_controller.start(requestCallback))
     {
         setHint(tr("Network error"));
         setState(HintState::error);
@@ -342,32 +317,16 @@ void QnTwoWayAudioWidget::Private::startStreaming()
 
 void QnTwoWayAudioWidget::Private::stopStreaming()
 {
-    if (!m_started)
+    if (!m_controller.started())
         return;
 
     NX_ASSERT(m_state == HintState::pressed || m_state == HintState::error, "Invalid state");
     if (m_state != HintState::error)
         setState(HintState::released);
 
-    m_started = false;
-    m_requestHandle = 0;
+    m_controller.stop();
     QnVoiceSpectrumAnalyzer::instance()->reset();
     m_visualizerData = VisualizerData();
-
-    if (!m_camera)
-        return;
-
-    const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
-        commonModule()->remoteGUID());
-
-    if (!server || server->getStatus() != Qn::Online)
-        return;
-
-    // TODO: #GDM What should we do if we cannot stop streaming?
-
-    // Sending stop anyway, because we can get here in 'Streaming is not ready' error state.
-    server->restConnection()->twoWayAudioCommand(m_sourceId, m_camera->getId(), false,
-        rest::ServerConnection::GetCallback());
 }
 
 void QnTwoWayAudioWidget::Private::setFixedHeight(qreal height)

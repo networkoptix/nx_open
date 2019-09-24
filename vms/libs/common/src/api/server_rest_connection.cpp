@@ -197,19 +197,6 @@ rest::Handle ServerConnection::cameraThumbnailAsync(const nx::api::CameraImageRe
     return executeGet(lit("/ec2/cameraThumbnail"), data.toParams(), callback, targetThread);
 }
 
-rest::Handle ServerConnection::twoWayAudioCommand(const QString& sourceId,
-    const QnUuid& cameraId,
-    bool start,
-    GetCallback callback,
-    QThread* targetThread /*= 0*/)
-{
-    QnRequestParamList params;
-    params.insert(lit("clientId"), sourceId);
-    params.insert(lit("resourceId"), cameraId.toString());
-    params.insert(lit("action"), start ? lit("start") : lit("stop"));
-    return executePost(lit("/api/transmitAudio"), params, callback, targetThread);
-}
-
 rest::Handle ServerConnection::softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
     nx::vms::api::EventState toggleState, GetCallback callback, QThread* targetThread)
 {

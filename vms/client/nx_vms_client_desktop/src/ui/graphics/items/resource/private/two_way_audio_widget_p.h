@@ -13,6 +13,7 @@
 #include <utils/common/connective.h>
 #include <utils/license_usage_helper.h>
 #include <utils/media/voice_spectrum_analyzer.h>
+#include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
 
 class QnImageButtonWidget;
 class GraphicsLabel;
@@ -55,6 +56,7 @@ private:
         error,      //< Some error occurred.
     };
 
+    void updateState();
     void setState(HintState state);
     void setHint(const QString& text);
 
@@ -65,12 +67,9 @@ private:
 
 private:
     QnTwoWayAudioWidget* const q;
-
+    nx::vms::client::core::TwoWayAudioController m_controller;
     const QString m_sourceId;
-    bool m_started = false;
     HintState m_state = HintState::ok;
-
-    rest::Handle m_requestHandle = 0;
     QTimer* const m_hintTimer;
     VariantAnimator* m_hintAnimator = nullptr;
     qreal m_hintVisibility = 0.0; //< Visibility of the hint. 0 - hidden, 1 - displayed.
@@ -80,5 +79,4 @@ private:
     qint64 m_paintTimeStamp = 0;
 
     QnVirtualCameraResourcePtr m_camera;
-    QScopedPointer<QnSingleCamLicenseStatusHelper> m_licenseHelper;
 };

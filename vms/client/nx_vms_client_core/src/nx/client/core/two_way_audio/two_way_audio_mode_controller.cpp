@@ -17,29 +17,72 @@
 
 namespace nx::vms::client::core {
 
-TwoWayAudioController::TwoWayAudioController(QObject* parent):
-    base_type(parent),
-    m_requestsManager(new OrderedRequestsManager()),
-    m_availabilityWatcher(new TwoWayAudioAvailabilityWatcher())
+struct TwoWayAudioController::Private
 {
-    connect(m_availabilityWatcher, &TwoWayAudioAvailabilityWatcher::availabilityChanged,
-        this, &TwoWayAudioController::availabilityChanged);
+    Private(TwoWayAudioController* q);
+    void setStarted(bool value);
+    bool setActive(bool active, OperationCallback&& callback = OperationCallback());
+
+    TwoWayAudioController* const q;
+    QScopedPointer<TwoWayAudioAvailabilityWatcher> availabilityWatcher;
+    QnVirtualCameraResourcePtr camera;
+    QString sourceId;
+    bool started = false;
+    bool available = false;
+};
+
+TwoWayAudioController::Private::Private(TwoWayAudioController* q):
+    q(q),
+    availabilityWatcher(new TwoWayAudioAvailabilityWatcher())
+{
+    connect(availabilityWatcher, &TwoWayAudioAvailabilityWatcher::availabilityChanged,
+        q, &TwoWayAudioController::availabilityChanged);
 }
 
-TwoWayAudioController::TwoWayAudioController(
-    const QString& sourceId,
-    const QString& cameraId,
-    QObject* parent)
-    :
-    base_type(parent),
-    m_availabilityWatcher(new TwoWayAudioAvailabilityWatcher())
+void TwoWayAudioController::Private::setStarted(bool value)
 {
-    connect(m_availabilityWatcher, &TwoWayAudioAvailabilityWatcher::availabilityChanged,
-        this, &TwoWayAudioController::availabilityChanged);
+    if (started == value)
+        return;
 
-    setSourceId(sourceId);
-    setResourceId(cameraId);
-    start();
+    started = value;
+    emit q->startedChanged();
+}
+
+bool TwoWayAudioController::Private::setActive(bool active, OperationCallback&& callback)
+{
+    const auto serverId = q->commonModule()->remoteGUID();
+    const auto server = q->resourcePool()->getResourceById<QnMediaServerResource>(serverId);
+    const bool available = server && server->getStatus() == Qn::Online && q->available();
+    setStarted(active && available);
+    if (!available)
+        return false;
+
+    const auto connection = server->restConnection();
+
+    QnRequestParamList params;
+    params.insert("clientId", sourceId);
+    params.insert("resourceId", camera->getId().toString());
+    params.insert("action", active ? "start" : "stop");
+
+    const auto requestCallback = nx::utils::guarded(q,
+        [this, active, callback](bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
+        {
+            const bool ok = success && result.error == QnRestResult::NoError;
+            setStarted(active && ok);
+            if (callback)
+                callback(ok);
+        });
+
+    connection->getJsonResult("/api/transmitAudio", params, requestCallback, q->thread());
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+
+TwoWayAudioController::TwoWayAudioController(QObject* parent):
+    base_type(parent),
+    d(new Private(this))
+{
 }
 
 TwoWayAudioController::~TwoWayAudioController()
@@ -54,94 +97,58 @@ void TwoWayAudioController::registerQmlType()
 
 bool TwoWayAudioController::started() const
 {
-    return m_started;
+    return d->started;
+}
+
+bool TwoWayAudioController::start(OperationCallback&& callback)
+{
+    return !started() && d->setActive(true, std::move(callback));
 }
 
 bool TwoWayAudioController::start()
 {
-    if (started() || !available())
-        return false;
-
-    const auto serverId = commonModule()->remoteGUID();
-    const auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
-    if (!server || server->getStatus() != Qn::Online || !available())
-        return false;
-
-    setStarted(true); // Intermediate state.
-
-    const auto callback =
-        [this](bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
-        {
-            setStarted(success && result.error == QnRestResult::NoError);
-        };
-    const auto connection = server->restConnection();
-    m_requestsManager->sendTwoWayAudioCommand(connection, m_sourceId, m_camera->getId(), true,
-        nx::utils::guarded(this, callback), QThread::currentThread());
-
-    return true;
+    return !started() && d->setActive(true);
 }
 
 void TwoWayAudioController::stop()
 {
-    if (!started())
-        return;
-
-    setStarted(false);
-
-    const auto serverId = commonModule()->remoteGUID();
-    const auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
-    if (!server || server->getStatus() != Qn::Online)
-        return;
-
-    const auto connection = server->restConnection();
-    m_requestsManager->sendTwoWayAudioCommand(connection, m_sourceId, m_camera->getId(), false,
-        rest::ServerConnection::GetCallback(), QThread::currentThread());
+    if (started())
+        d->setActive(false);
 }
 
 void TwoWayAudioController::setSourceId(const QString& value)
 {
-    if (m_sourceId == value)
+    if (d->sourceId == value)
         return;
 
-    if (m_sourceId.isEmpty())
+    if (d->sourceId.isEmpty())
         stop();
 
-    m_sourceId = value;
+    d->sourceId = value;
 }
 
 QString TwoWayAudioController::resourceId() const
 {
-    return m_camera ? m_camera->getId().toString() : QString();
+    return d->camera ? d->camera->getId().toString() : QString();
 }
 
 void TwoWayAudioController::setResourceId(const QString& value)
 {
     const auto id = QnUuid::fromStringSafe(value);
-    if (m_camera && m_camera->getId() == id)
+    if (d->camera && d->camera->getId() == id)
         return;
 
     stop();
-    if (m_camera)
-        m_camera->disconnect(this);
 
     const auto pool = commonModule()->resourcePool();
-    m_camera = pool->getResourceById<QnVirtualCameraResource>(id);
-    m_availabilityWatcher->setResourceId(id);
+    d->camera = pool->getResourceById<QnVirtualCameraResource>(id);
+    d->availabilityWatcher->setResourceId(id);
     emit resourceIdChanged();
 }
 
 bool TwoWayAudioController::available() const
 {
-    return m_availabilityWatcher->available();
-}
-
-void TwoWayAudioController::setStarted(bool value)
-{
-    if (m_started == value)
-        return;
-
-    m_started = value;
-    emit startedChanged();
+    return d->availabilityWatcher->available();
 }
 
 } // namespace nx::vms::client::core

@@ -153,13 +153,6 @@ public:
         Result<QByteArray>::type callback,
         QThread* targetThread = 0);
 
-    Handle twoWayAudioCommand(
-        const QString& sourceId,
-        const QnUuid& cameraId,
-        bool start,
-        GetCallback callback,
-        QThread* targetThread = nullptr);
-
     Handle softwareTriggerCommand(
         const QnUuid& cameraId,
         const QString& triggerId,

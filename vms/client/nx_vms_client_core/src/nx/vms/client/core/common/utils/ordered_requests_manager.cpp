@@ -108,13 +108,14 @@ void OrderedRequestsManager::sendTwoWayAudioCommand(
     const auto request =
         [this, connection, sourceId, cameraId, start, callback, targetThread]()
         {
-            const auto r = connection->twoWayAudioCommand(
-                sourceId,
-                cameraId,
-                start,
-                d->makeInternalCallback(callback),
-                targetThread);
-            return r;
+//            const auto r = connection->twoWayAudioCommand(
+//                sourceId,
+//                cameraId,
+//                start,
+//                d->makeInternalCallback(callback),
+//                targetThread);
+//            return r;
+        return 0;
         };
 
     d->addRequest(request);
