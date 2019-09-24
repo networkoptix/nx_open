@@ -265,7 +265,9 @@ LdapSession::~LdapSession()
 
 bool LdapSession::connect()
 {
-    NX_DEBUG(this, lm("Connect to %1").arg(m_settings));
+    auto tmp = m_settings;
+    tmp.adminPassword = "******";
+    NX_INFO(this, lm("Connect to %1").arg(tmp));
     QUrl uri = m_settings.uri;
 
 #if defined Q_OS_WIN
@@ -297,7 +299,7 @@ bool LdapSession::connect()
 
     if (m_settings.searchTimeoutS > 0)
     {
-        NX_VERBOSE(this, lm("Set time limit and timeout to %1 seconds").arg(m_settings.searchTimeoutS));
+        NX_INFO(this, lm("Set time limit and timeout to %1 seconds").arg(m_settings.searchTimeoutS));
         rc = ldap_set_option(m_ld, LDAP_OPT_TIMELIMIT, &m_settings.searchTimeoutS);
         if (rc != 0)
         {
@@ -333,7 +335,7 @@ bool LdapSession::connect()
     else
         m_dType.reset(new OpenLdapType());
 
-    NX_DEBUG(this, lm("Connected to vendor %1").arg(m_dType));
+    NX_INFO(this, lm("Connected to vendor %1").arg(m_dType));
     return true;
 }
 
@@ -351,7 +353,7 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
 {
     QString filter = QnLdapFilter(m_dType->Filter()) &
         (customFilter.isEmpty() ? m_settings.searchFilter : customFilter);
-    NX_VERBOSE(this, lm("Fetching users with filter '%1'").arg(filter));
+    NX_INFO(this, lm("Fetching users with filter '%1'").arg(filter));
 
     LDAP_RESULT rc = ldap_simple_bind_s(m_ld, QSTOCW(m_settings.adminDn), QSTOCW(m_settings.adminPassword));
     if (rc != LDAP_SUCCESS)
@@ -453,7 +455,7 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
             m_lastErrorCode = rc;
             return false;
         }
-        NX_VERBOSE(this, lm("Entities received on page: %1").args(entcnt));
+        NX_INFO(this, lm("Entities received on page: %1").args(entcnt));
 
         LDAPMessage *entry = NULL;
         for (entry = ldap_first_entry(m_ld, result);
@@ -473,23 +475,23 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
                 if (!user.login.isEmpty())
                     users.append(user);
                 else
-                    NX_VERBOSE(this, lm("Ignoring entry with empty login: %1").args(user.dn));
+                    NX_INFO(this, lm("Ignoring entry with empty login: %1").args(user.dn));
                 ldap_memfree(dn);
             }
             else
             {
                 // NOTE: it may be changed to ldap_get_option(ld, LDAP_OPT_RESULT_CODE, &err)
                 // TODO: Can LdapErrorStr be used here? Is LdapGetLastError another value?
-                NX_DEBUG(this, lm("Failed to extract DN of LDAP entry: %1").args(
+                NX_INFO(this, lm("Failed to extract DN of LDAP entry: %1").args(
                     LdapErrorStr(LdapGetLastError())));
             }
         }
 
-        NX_VERBOSE(this, lm("Fetched page with [%1] return code. Currently fetched: %2 users").args(
+        NX_INFO(this, lm("Fetched page with [%1] return code. Currently fetched: %2 users").args(
             LdapErrorStr(LdapGetLastError()), users.size()));
     } while (cookie && cookie->bv_val != NULL && (strlen(cookie->bv_val) > 0));
 
-    NX_VERBOSE(this, lm("Fetched %1 user(s)%2").args(
+    NX_INFO(this, lm("Fetched %1 user(s)%2").args(
         users.size(),
         users.size() < 10 ? " - " + containerString(users) : QString()));
 
@@ -647,7 +649,7 @@ Qn::AuthResult QnLdapManager::authenticate(const QString &login, const QString &
         dn = session.getUserDn(login);
         if (dn.isEmpty())
         {
-            NX_VERBOSE(this, lm("User not found: %1").args(session.lastErrorString()));
+            NX_INFO(this, lm("User not found: %1").args(session.lastErrorString()));
             return Qn::Auth_WrongLogin;
         }
 
