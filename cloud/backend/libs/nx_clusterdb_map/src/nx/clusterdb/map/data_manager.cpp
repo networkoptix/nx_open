@@ -145,7 +145,7 @@ void DataManager::remove(
     if (key.empty())
         return completionHandler(ResultCode::logicError);
 
-	auto removed = std::make_shared<bool>();
+    auto removed = std::make_shared<bool>();
 
     m_syncEngine->transactionLog().startDbTransaction(
         m_clusterId,
@@ -157,9 +157,9 @@ void DataManager::remove(
         [completionHandler = std::move(completionHandler), removed](
             nx::sql::DBResult dbResult)
         {
-			if (!*removed)
-				dbResult = nx::sql::DBResult::notFound;
-			completionHandler(toResultCode(dbResult));
+            if (!*removed)
+                dbResult = nx::sql::DBResult::notFound;
+            completionHandler(toResultCode(dbResult));
         });
 }
 
