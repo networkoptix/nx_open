@@ -26,12 +26,12 @@ static std::pair<std::string, std::string> splitPeerId(const std::string& peerId
 {
     std::vector<std::string> result;
     boost::split(result, peerId, boost::is_any_of("."));
-    if (result.size() != 2)
+    if (result.size() < 2)
     {
         NX_WARNING(NX_SCOPE_TAG, "peerId: %1 is missing required delimitter '.'", peerId);
         return {};
     }
-    return {std::move(result[0]),std::move(result[1])};
+    return {std::move(result[0]), std::move(result[1])};
 }
 
 /**
@@ -183,25 +183,25 @@ const MediatorEndpoint& ListeningPeerDb::thisMediatorEndpoint() const
 }
 
 void ListeningPeerDb::addPeer(
-    const std::string& peerDomainName,
+    const std::string& peerId,
     nx::utils::MoveOnlyFunc<void(bool)> handler)
 {
     if (!m_map || m_mediatorEndpointString.empty() || m_stopped)
         return handler(false);
 
     m_map->database().dataManager().insertOrUpdate(
-        toInternalStorageFormat(peerDomainName),
+        mediatorEndpointKey(peerId),
         m_mediatorEndpointString,
-        [this, peerDomainName, handler = std::move(handler)](
+        [this, peerId, handler = std::move(handler)](
             nx::clusterdb::map::ResultCode result)
         {
             if (result != nx::clusterdb::map::ResultCode::ok)
             {
                 NX_WARNING(
                     this,
-                    "insertOrUpdate peerDomainName(key): %1, mediatorDomainName(value): %2, "
+                    "insertOrUpdate peerId(key): %1, mediatorDomainName(value): %2, "
                         "failed with error: %3",
-                    peerDomainName, m_mediatorEndpointString, nx::clusterdb::map::toString(result));
+                    peerId, m_mediatorEndpointString, nx::clusterdb::map::toString(result));
                 return handler(false);
             }
 
@@ -210,53 +210,42 @@ void ListeningPeerDb::addPeer(
 }
 
 void ListeningPeerDb::removePeer(
-    const std::string& peerDomainName,
+    const std::string& peerId,
     nx::utils::MoveOnlyFunc<void(bool)> handler)
 {
     if (!m_map || m_stopped)
         return handler(false);
 
-    m_map->database().dataManager().remove(
-        toInternalStorageFormat(peerDomainName),
-        [this, peerDomainName, handler = std::move(handler)](
-            nx::clusterdb::map::ResultCode result)
-        {
-            if (result != nx::clusterdb::map::ResultCode::ok)
-            {
-                NX_WARNING(
-                    this,
-                    "removing peerDomainName: %1 failed with error: %3",
-                    peerDomainName, nx::clusterdb::map::toString(result));
-                return handler(false);
-            }
+	auto context = std::make_shared<RemovePeerContext>();
+	context->handler = std::move(handler);
+	context->keys = {mediatorEndpointKey(peerId), uplinkSpeedKey(peerId)};
 
-            return handler(true);
-        });
+	removePeer(std::move(context));
 }
 
 void ListeningPeerDb::findMediatorByPeerDomain(
-    const std::string& peerDomainName,
+    const std::string& peerId,
     nx::utils::MoveOnlyFunc<void(MediatorEndpoint)> handler)
 {
    if (!m_map || m_stopped)
         return handler(MediatorEndpoint());
 
     m_map->database().dataManager().getRangeWithPrefix(
-        toLowerReversed(peerDomainName),
-        [this, peerDomainName, handler = std::move(handler)](
+        toLowerReversed(peerId),
+        [this, peerId, handler = std::move(handler)](
             nx::clusterdb::map::ResultCode result, std::map<std::string, std::string> map)
         {
             if (result != nx::clusterdb::map::ResultCode::ok)
             {
                 NX_VERBOSE(this,
-                    "getRangeWithPrefix returned ResultCode: %1 for peerDomainName: %2",
-                    nx::clusterdb::map::toString(result), peerDomainName);
+                    "getRangeWithPrefix returned ResultCode: %1 for peerId: %2",
+                    nx::clusterdb::map::toString(result), peerId);
                 return handler(MediatorEndpoint());
             }
 
             NX_VERBOSE(this,
-                "getRangeWithPrefix returned ResultCode: %1 and result set: %2 for peerDomainName: %3",
-                nx::clusterdb::map::toString(result), containerString(map), peerDomainName);
+                "getRangeWithPrefix returned ResultCode: %1 and result set: %2 for peerId: %3",
+                nx::clusterdb::map::toString(result), containerString(map), peerId);
 
             if (map.empty())
                 return handler(MediatorEndpoint());
@@ -341,7 +330,7 @@ void ListeningPeerDb::startDiscovery(
 std::map<std::string, ListeningPeerStatus> ListeningPeerDb::getListeningPeerStatus(
     const std::string& peerId) const
 {
-    if (!m_map)
+    if (!m_map || m_stopped)
         return {};
 
     auto range = m_map->cache()->getRangeWithPrefix(toLowerReversed(peerId));
@@ -353,7 +342,7 @@ std::map<std::string, ListeningPeerStatus> ListeningPeerDb::getListeningPeerStat
 
     std::map<std::string, ListeningPeerStatus> result;
 
-    for (auto element : range)
+    for (auto element: range)
     {
         auto [serverId, systemId] = parsePeerId(element.first);
         if (serverId.empty() || systemId.empty())
@@ -421,14 +410,20 @@ void nx::hpm::ListeningPeerDb::unsubscribeFromUplinkSpeedUpdated(nx::utils::Subs
     m_uplinkSpeedUpdated.removeSubscription(id);
 }
 
-std::string ListeningPeerDb::toInternalStorageFormat(const std::string& peerDomainName) const
+std::string ListeningPeerDb::mediatorEndpointKey(const std::string& peerId) const
 {
+	return toLowerReversed(peerId) + "#" + m_mediatorEndpointString + kMediatorEndpointId;
     // NOTE: m_mediatorEndpointString is added to the key to guarantee uniqueness.
     std::string s;
     s.reserve(
-        peerDomainName.size() + m_mediatorEndpointString.size() + 1 + sizeof(kMediatorEndpointId));
-    s += toLowerReversed(peerDomainName);
+        peerId.size() + m_mediatorEndpointString.size() + 1 + sizeof(kMediatorEndpointId));
+    s += toLowerReversed(peerId);
     return s.append("#").append(m_mediatorEndpointString).append(kMediatorEndpointId);
+}
+
+std::string nx::hpm::ListeningPeerDb::uplinkSpeedKey(const std::string& peerId) const
+{
+	return toLowerReversed(peerId) + kUplinkSpeedId;
 }
 
 std::string ListeningPeerDb::buildInfoJson(const MediatorEndpoint& endpoint) const
@@ -446,6 +441,43 @@ std::string ListeningPeerDb::buildInfoJson(const MediatorEndpoint& endpoint) con
         .setPort(endpoint.stunUdpPort).toString().toStdString();
 
     return QJson::serialized(infoJson).constData();
+}
+
+void ListeningPeerDb::removePeer(std::shared_ptr<RemovePeerContext> context)
+{
+	using namespace nx::clusterdb::map;
+
+	for (std::size_t i = 0; i < context->keys.size(); ++i)
+	{
+		m_map->database().dataManager().remove(
+			context->keys[i],
+			[this, context, i](auto resultCode)
+			{
+				NX_VERBOSE(this, "Remove key '%1', resultCode: %2",
+					context->keys[i], toString(resultCode));
+
+				if (resultCode != ResultCode::ok)
+				{
+					if (resultCode == ResultCode::notFound &&
+						context->keys[i].find(kUplinkSpeedId) != std::string::npos)
+					{
+						NX_VERBOSE(this, "Ignoring non existent uplinkSpeed key: %1",
+							context->keys[i]);
+						// Do nothing. Many mediaservers do not report their uplink speed to the
+						// mediator. Failure to delete #uplinkSpeed key because it is not in the
+						// database should not be an error.
+					}
+					else //< resultCode != notFound || key does not contain "#uplinkSpeed"
+					{
+						// Either way, something went wrong and a non optional key was not removed.
+						context->ok = false;
+					}
+				}
+
+				if (++context->keysRemoved >= context->keys.size())
+					context->handler(context->ok);
+			});
+	}
 }
 
 } // namespace nx::hpm
