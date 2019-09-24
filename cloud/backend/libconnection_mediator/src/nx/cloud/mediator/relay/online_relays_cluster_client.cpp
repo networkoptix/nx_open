@@ -223,7 +223,7 @@ std::optional<nx::geo_ip::Location> OnlineRelaysClusterClient::resolve(
     }
     catch (const std::exception& e)
     {
-        NX_ERROR(this, "Error resolving ip address: %1 of %2 to location: %3",
+        NX_INFO(this, "Error resolving ip address: %1 of %2 to location: %3",
             ipAddress, peerType, e.what());
         return std::nullopt;
     }
@@ -235,7 +235,7 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::findRelaysByLocation(
 {
     if (!location)
     {
-        NX_ERROR(this, "Failed to resolve location for %1. Falling back to urls in"
+        NX_INFO(this, "Failed to resolve location for %1. Falling back to urls in"
             " traffic relay settings",
             entity);
         if (m_settings.trafficRelay().urls.empty())
@@ -277,6 +277,5 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::findRelaysByLocation(
 
     return m_settings.trafficRelay().urls;
 }
-
 
 } // namespace nx::hpm
