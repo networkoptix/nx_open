@@ -62,6 +62,7 @@ QString datetimeString()
 utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController::makeProviders()
 {
     static const std::chrono::seconds kTransactionsUpdateInterval(5);
+    static const std::chrono::minutes kTimeChangedInterval(1);
 
     using namespace ResourcePropertyKey;
     // TODO: make sure that platform is removed only after HM!
@@ -92,7 +93,12 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "time", [](const auto& r) { return Value(datetimeString()); }
-            )
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "timeChanged", [](const auto& r)
+                { return Value(r->getAndResetMetric(MediaServerResource::Metrics::timeChanged)); },
+                nx::vms::server::metrics::timerWatch<MediaServerResource*>(kTimeChangedInterval)
+           )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
             "availability",

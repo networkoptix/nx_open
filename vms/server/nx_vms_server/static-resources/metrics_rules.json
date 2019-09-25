@@ -63,6 +63,19 @@
                 "time": {
                     "name": "Time",
                     "display": "table|panel"
+                },
+                "timeChanged24h": {
+                    "name": "Time changedevents (24h)",
+                    "display": "table|panel",
+                    "calculate": "sum %timeChanged 24h",
+                    "insert": "timeChanged",
+                    "alarms": [
+                        {
+                            "level": "warning",
+                            "condition": "greaterThen %timeChanged24h 5",
+                            "text": "has changed time %timeChanged24h times in last 24 hours"
+                        }
+                    ]
                 }
             }
         },
