@@ -647,6 +647,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_RtpSession.setAuth(nres->getAuth(), m_prefferedAuthScheme);
 
     m_tracks.clear();
+    m_trackIndices.clear();
     m_gotKeyDataInfo.clear();
     m_gotData = false;
 
