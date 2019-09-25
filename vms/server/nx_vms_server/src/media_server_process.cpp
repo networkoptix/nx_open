@@ -810,7 +810,7 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
     {
         if (server.id == serverGuid)
         {
-            QnMediaServerResourcePtr qnServer(new QnMediaServerResource(commonModule()));
+            QnMediaServerResourcePtr qnServer(new MediaServerResource(commonModule()));
             ec2::fromApiToResource(server, qnServer);
             return qnServer;
         }
@@ -3647,7 +3647,7 @@ bool MediaServerProcess::setUpMediaServerResource(
         }
         else
         {
-            server = QnMediaServerResourcePtr(new QnMediaServerResource(commonModule()));
+            server = QnMediaServerResourcePtr(new MediaServerResource(commonModule()));
             const QnUuid serverGuid(serverModule->settings().serverGuid());
             server->setIdUnsafe(serverGuid);
             server->setMaxCameras(nx::utils::AppInfo::isEdgeServer() ? 1 : 128);

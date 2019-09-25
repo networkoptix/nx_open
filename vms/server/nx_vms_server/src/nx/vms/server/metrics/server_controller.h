@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/resource/media_server_resource.h>
+#include <nx/vms/server/resource/server_resource.h>
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/utils/metrics/resource_controller_impl.h>
 
@@ -13,7 +13,7 @@ namespace nx::vms::server::metrics {
  */
 class ServerController:
     public ServerModuleAware,
-    public utils::metrics::ResourceControllerImpl<QnMediaServerResource*>
+    public utils::metrics::ResourceControllerImpl<MediaServerResource*>
 {
 public:
     ServerController(QnMediaServerModule* serverModule);

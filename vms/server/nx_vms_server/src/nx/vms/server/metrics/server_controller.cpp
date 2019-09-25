@@ -13,7 +13,7 @@ namespace nx::vms::server::metrics {
 
 ServerController::ServerController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
-    utils::metrics::ResourceControllerImpl<QnMediaServerResource*>("servers", makeProviders())
+    utils::metrics::ResourceControllerImpl<MediaServerResource*>("servers", makeProviders())
 {
 }
 
@@ -24,7 +24,7 @@ void ServerController::start()
         resourcePool, &QnResourcePool::resourceAdded,
         [this](const QnResourcePtr& resource)
         {
-            if (const auto server = resource.dynamicCast<QnMediaServerResource>())
+            if (const auto server = resource.dynamicCast<MediaServerResource>())
             {
                 add(server.get(), server->getId(), (server->getId() == moduleGUID())
                     ? utils::metrics::Scope::local
@@ -36,15 +36,16 @@ void ServerController::start()
         resourcePool, &QnResourcePool::resourceRemoved,
         [this](const QnResourcePtr& resource)
         {
-            if (const auto server = resource.dynamicCast<QnMediaServerResource>())
+            if (const auto server = resource.dynamicCast<MediaServerResource>())
                 remove(server->getId());
         });
 }
 
 utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController::makeProviders()
 {
-    using namespace ResourcePropertyKey;
+    static const std::chrono::seconds kTransactionsUpdateInterval(5);
 
+    using namespace ResourcePropertyKey;
     // TODO: make sure that platform is removed only after HM!
     auto platform = serverModule()->platform()->monitor();
     const auto getUptimeS =
@@ -105,6 +106,14 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                         return Value(r->resourcePool()->getAllCameras(
                             r->toSharedPointer(), /*ignoreDesktopCameras*/ true).size());
                     }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "transactionsPerSecond", [](const auto& r)
+                    {
+                        return Value(
+                            r->getAndResetMetric(MediaServerResource::Metrics::transactions));
+                    },
+                    nx::vms::server::metrics::timerWatch<MediaServerResource*>(kTransactionsUpdateInterval)
             )
       )
         // TODO: Implement "Server load", "Info" and "Activity" groups.

@@ -624,28 +624,6 @@ void fromApiToResource(const MediaServerData& src, QnMediaServerResourcePtr& dst
     dst->setAuthKey(src.authKey);
 }
 
-template<class List>
-void fromApiToResourceList(const MediaServerDataList& src, List& dst, const overload_tag&, QnCommonModule* commonModule)
-{
-    dst.reserve(dst.size() + (int)src.size());
-    for (const MediaServerData& srcServer: src)
-    {
-        QnMediaServerResourcePtr dstServer(new QnMediaServerResource(commonModule));
-        fromApiToResource(srcServer, dstServer);
-        dst.push_back(std::move(dstServer));
-    }
-}
-
-void fromApiToResourceList(const MediaServerDataList& src, QnResourceList& dst, QnCommonModule* commonModule)
-{
-    fromApiToResourceList(src, dst, overload_tag(), commonModule);
-}
-
-void fromApiToResourceList(const MediaServerDataList& src, QnMediaServerResourceList& dst, QnCommonModule* commonModule)
-{
-    fromApiToResourceList(src, dst, overload_tag(), commonModule);
-}
-
 ////////////////////////////////////////////////////////////
 //// MediaServerUserAttributesData
 ////////////////////////////////////////////////////////////

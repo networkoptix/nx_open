@@ -113,6 +113,13 @@
                 "cameras": {
                     "name": "Cameras",
                     "display": "panel"
+                },
+                "transactionsPerSecond1m": {
+                    "name": "Transactions per second",
+                    "display": "|panel",
+                    "unit": "Transactions/s",
+                    "calculate": "average %transactionsPerSecond 1m",
+                    "insert": "transactionsPerSecond"
                 }
             }
         }

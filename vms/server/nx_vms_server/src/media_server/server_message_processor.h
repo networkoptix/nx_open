@@ -23,6 +23,9 @@ public:
     virtual void updateResource(
         const QnResourcePtr& resource, ec2::NotificationSource source) override;
 
+    virtual void updateResource(
+        const nx::vms::api::MediaServerData& server, ec2::NotificationSource source) override;
+
     void startReceivingLocalNotifications(const ec2::AbstractECConnectionPtr& connection);
 protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr& connection) override;
