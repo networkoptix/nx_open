@@ -25,5 +25,7 @@ void forgetSavedCloudCredentials(bool keepUser = false);
 QnUuid preferredCloudServer(const QString& systemId);
 void savePreferredCloudServer(const QString& systemId, const QnUuid& serverId);
 
+QString serverCloudHost(const QString& systemId, const QnUuid& serverId);
+
 } // namespace helpers
 } // namespace nx::vms::client::core

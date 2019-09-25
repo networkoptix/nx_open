@@ -182,5 +182,10 @@ void savePreferredCloudServer(const QString& systemId, const QnUuid& serverId)
     settings()->preferredCloudServers = preferredServers;
 }
 
+QString serverCloudHost(const QString& systemId, const QnUuid& serverId)
+{
+    return QString("%1.%2").arg(serverId.toSimpleString(), systemId);
+}
+
 } // namespace helpers
 } // namespace nx::vms::client::core

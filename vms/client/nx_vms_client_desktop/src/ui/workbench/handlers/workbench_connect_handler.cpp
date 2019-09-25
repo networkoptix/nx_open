@@ -1009,6 +1009,10 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
         return;
 
     nx::utils::Url url = system->getServerHost(reachableServer);
+
+    // Ensure the host is cloud.
+    url.setHost(nx::vms::client::core::helpers::serverCloudHost(id, reachableServer));
+
     auto credentials = qnCloudStatusWatcher->credentials();
     url.setUserName(credentials.user);
     url.setPassword(credentials.password);
@@ -1052,11 +1056,15 @@ void QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
     const auto server = parameters.resource().dynamicCast<QnMediaServerResource>();
 
-    if (!NX_ASSERT(server && server->getId() != commonModule()->remoteGUID()))
+    if (!NX_ASSERT(server))
+        return;
+
+    const auto serverId = server->getId();
+    if (!NX_ASSERT(serverId != commonModule()->remoteGUID()))
         return;
 
     const auto discoveryManager = commonModule()->moduleDiscoveryManager();
-    const auto endpoint = discoveryManager->getEndpoint(server->getId());
+    const auto endpoint = discoveryManager->getEndpoint(serverId);
     if (!NX_ASSERT(endpoint && server->isOnline()))
         return;
 
@@ -1069,19 +1077,10 @@ void QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered()
     nx::utils::Url url;
     url.setUserName(currentUrl.userName());
     url.setPassword(currentUrl.password());
-
-    if (systemId.isEmpty())
-    {
-        url.setHost(endpoint->address.toString());
-        url.setPort(endpoint->port);
-    }
-    else
-    {
-        const auto system = qnSystemsFinder->getSystem(systemId);
-        const auto serverUrl = system->getServerHost(server->getId());
-        url.setHost(serverUrl.host());
-        url.setPort(serverUrl.port());
-    }
+    url.setPort(endpoint->port);
+    url.setHost(systemId.isEmpty()
+        ? endpoint->address.toString()
+        : nx::vms::client::core::helpers::serverCloudHost(systemId, serverId));
 
     setLogicalState(LogicalState::connecting_to_target);
     m_connecting.storeConnection = true;
