@@ -7,7 +7,7 @@
 
 #include <client/client_globals.h>
 
-#include <text/time_strings.h>
+#include <nx/vms/text/time_strings.h>
 
 #include <ui/style/helper.h>
 #include <ui/models/ioports_view_model.h>

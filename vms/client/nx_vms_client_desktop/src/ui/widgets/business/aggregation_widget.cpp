@@ -1,7 +1,7 @@
 #include "aggregation_widget.h"
 #include "ui_aggregation_widget.h"
 
-#include <text/time_strings.h>
+#include <nx/vms/text/time_strings.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
 

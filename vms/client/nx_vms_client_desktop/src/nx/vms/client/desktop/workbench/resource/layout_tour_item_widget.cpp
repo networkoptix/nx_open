@@ -12,7 +12,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 
-#include <text/time_strings.h>
+#include <nx/vms/text/time_strings.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
