@@ -53,7 +53,7 @@ SystemError::ErrorCode FileWatcher::subscribe(
 	fileWachIter->second.subscription.subscribe(std::move(handler), &actualSubscriptionId);
 	fileWachIter->second.watchAttributes |= watchAttributes;
 
-	m_timerPool.addTimer(filePath, m_timeout);
+    m_addTimerTasks.push(std::make_tuple(filePath, m_timeout, nx::utils::monotonicTime()));
 
 	lock.unlock();
 	m_cond.wakeAll();
@@ -91,24 +91,40 @@ void FileWatcher::run()
     QnMutexLocker lock(&m_mutex);
 	while (!m_terminated)
 	{
+        processAddTimerTasksUnsafe();
+
         lock.unlock();
-
 		m_timerPool.processTimers();
-
         lock.relock();
 
 		const auto delayToNextProcessing = m_timerPool.delayToNextProcessing();
 
-		// No jobs, so sleep and try again later.
-		if (!delayToNextProcessing)
-		{
-			m_cond.wait(lock.mutex(), m_timeout);
-			continue;
-		}
+        const auto delay =
+            delayToNextProcessing && *delayToNextProcessing > std::chrono::milliseconds(0)
+                ? *delayToNextProcessing
+                : m_timeout;
 
-		if (*delayToNextProcessing > std::chrono::milliseconds(0))
-			m_cond.wait(lock.mutex(), *delayToNextProcessing);
+        if (!m_terminated)
+            m_cond.wait(lock.mutex(), delay);
 	}
+}
+
+void FileWatcher::processAddTimerTasksUnsafe()
+{
+    using namespace std::chrono;
+
+    while (!m_addTimerTasks.empty())
+    {
+        const auto& [filePath, timeout, timeAdded] = m_addTimerTasks.front();
+        const auto delay =
+            timeout - duration_cast<milliseconds>(nx::utils::monotonicTime() - timeAdded);
+
+        m_timerPool.addTimer(
+            filePath,
+            delay > milliseconds(0) ? delay : milliseconds(0));
+
+        m_addTimerTasks.pop();
+    }
 }
 
 void FileWatcher::checkFile(const std::string& filePath)
@@ -138,7 +154,7 @@ void FileWatcher::checkFile(const std::string& filePath)
 		return notify(&lock, watchIter, EventType::modified);
 	}
 
-	m_timerPool.addTimer(filePath, m_timeout);
+    m_addTimerTasks.push(std::make_tuple(watchIter->first, m_timeout, nx::utils::monotonicTime()));
 }
 
 void FileWatcher::notify(
@@ -151,7 +167,7 @@ void FileWatcher::notify(
 	fileWatch->second.subscription.notify(fileWatch->first, errorCode, eventType);
 	lock->relock();
 
-	m_timerPool.addTimer(fileWatch->first, m_timeout);
+    m_addTimerTasks.push(std::make_tuple(fileWatch->first, m_timeout, nx::utils::monotonicTime()));
 }
 
 std::pair<SystemError::ErrorCode, FileWatcher::Stat> FileWatcher::doStat(

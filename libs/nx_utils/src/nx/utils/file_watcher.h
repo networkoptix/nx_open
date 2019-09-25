@@ -3,6 +3,7 @@
 #include <thread>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <queue>
 
 #if defined(__APPLE__)
 #include "TargetConditionals.h"
@@ -88,6 +89,7 @@ private:
 
 private:
 	void run();
+    void processAddTimerTasksUnsafe();
 
 	void checkFile(const std::string& filePath);
 
@@ -109,6 +111,10 @@ private:
 	ElapsedTimerPool<std::string> m_timerPool;
 	FileWatches m_fileWatches;
 	std::map<UniqueId, FileWatches::iterator> m_uniqueIdToFileWatch;
+    std::queue<std::tuple<
+        std::string/*filePath*/,
+        std::chrono::milliseconds /*timeout*/,
+        std::chrono::steady_clock::time_point /*timeAdded*/>> m_addTimerTasks;
 	std::thread m_thread;
 };
 
