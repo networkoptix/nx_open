@@ -67,7 +67,7 @@ QVariant QnAvailableCameraListModel::data(const QModelIndex& index, int role) co
         case Qn::ResourceStatusRole:
             return resource->getStatus();
         case Qn::UuidRole:
-            return resource->getId().toString();
+            return QVariant::fromValue(resource->getId());
         case Qn::IpAddressRole:
             return QUrl(resource->getUrl()).host();
     }

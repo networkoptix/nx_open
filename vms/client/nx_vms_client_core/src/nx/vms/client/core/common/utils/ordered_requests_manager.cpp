@@ -80,18 +80,18 @@ void OrderedRequestsManager::sendSoftwareTriggerCommand(
     if (!connection)
         return;
 
-    const auto request =
-        [this, connection, cameraId, triggerId, toggleState, callback, targetThread]()
-        {
-            return connection->softwareTriggerCommand(
-                cameraId,
-                triggerId,
-                toggleState,
-                d->makeInternalCallback(callback),
-                targetThread);
-        };
+//    const auto request =
+//        [this, connection, cameraId, triggerId, toggleState, callback, targetThread]()
+//        {
+//            return connection->softwareTriggerCommand(
+//                cameraId,
+//                triggerId,
+//                toggleState,
+//                d->makeInternalCallback(callback),
+//                targetThread);
+//        };
 
-    d->addRequest(request);
+//    d->addRequest(request);
 }
 
 void OrderedRequestsManager::sendTwoWayAudioCommand(

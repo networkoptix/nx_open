@@ -73,7 +73,7 @@ bool TwoWayAudioController::Private::setActive(bool active, OperationCallback&& 
                 callback(ok);
         });
 
-    connection->getJsonResult("/api/transmitAudio", params, requestCallback, q->thread());
+    connection->getJsonResult("/api/transmitAudio", params, requestCallback, QThread::currentThread());
     return true;
 }
 

@@ -11,7 +11,7 @@ class ResourceHelper: public Connective<QObject>, public QnConnectionContextAwar
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(Qn::ResourceStatus resourceStatus READ resourceStatus NOTIFY resourceStatusChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
     Q_PROPERTY(bool hasDefaultCameraPassword READ hasDefaultCameraPassword
@@ -31,8 +31,8 @@ class ResourceHelper: public Connective<QObject>, public QnConnectionContextAwar
 public:
     ResourceHelper(QObject* parent = nullptr);
 
-    QString resourceId() const;
-    void setResourceId(const QString& id);
+    QnUuid resourceId() const;
+    void setResourceId(const QnUuid& id);
 
     Qn::ResourceStatus resourceStatus() const;
     QString resourceName() const;

@@ -189,7 +189,7 @@ void MediaResourceHelper::Private::handleResourceChanged()
     const auto cameraResource = currentResource.dynamicCast<QnVirtualCameraResource>();
     if (currentResource && !cameraResource)
     {
-        q->setResourceId(QString()); //< We support only camera resources.
+        q->setResourceId(QnUuid()); //< We support only camera resources.
         return;
     }
 

@@ -15,7 +15,7 @@ class ChunkProvider: public TimePeriodsStore, public QnConnectionContextAware
     Q_OBJECT
     using base_type = TimePeriodsStore;
 
-    Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(qint64 bottomBound READ bottomBound NOTIFY bottomBoundChanged)
     Q_PROPERTY(bool loading READ isLoading NOTIFY loadingChanged)
     Q_PROPERTY(bool loadingMotion READ isLoadingMotion NOTIFY loadingMotionChanged)
@@ -24,8 +24,8 @@ class ChunkProvider: public TimePeriodsStore, public QnConnectionContextAware
 public:
     ChunkProvider(QObject* parent = nullptr);
 
-    QString resourceId() const;
-    void setResourceId(const QString& id);
+    QnUuid resourceId() const;
+    void setResourceId(const QnUuid& id);
 
     qint64 bottomBound() const;
 

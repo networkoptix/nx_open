@@ -19,17 +19,17 @@ ResourceHelper::ResourceHelper(QObject* parent):
         this, &ResourceHelper::displayOffsetChanged);
 }
 
-QString ResourceHelper::resourceId() const
+QnUuid ResourceHelper::resourceId() const
 {
-    return m_resource ? m_resource->getId().toString() : QString();
+    return m_resource ? m_resource->getId() : QnUuid();
 }
 
-void ResourceHelper::setResourceId(const QString& id)
+void ResourceHelper::setResourceId(const QnUuid& id)
 {
     if (resourceId() == id)
         return;
 
-    const auto uuid = QnUuid::fromStringSafe(id);
+    const auto uuid = id;//QnUuid::fromStringSafe(id);
     const auto resource = resourcePool()->getResourceById<QnResource>(uuid);
 
     if (m_resource)

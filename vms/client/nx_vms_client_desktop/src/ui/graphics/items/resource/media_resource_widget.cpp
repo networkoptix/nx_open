@@ -156,7 +156,7 @@ static constexpr int kTriggersSpacing = 4;
 static constexpr int kTriggerButtonSize = 40;
 static constexpr int kTriggersMargin = 8; // overlaps HUD margin, i.e. does not sum up with it
 
-static const char* kTriggerRequestIdProperty = "_qn_triggerRequestId";
+static const char* kTriggerId = "_qn_triggerId";
 
 template<class Cont, class Item>
 bool contains(const Cont& cont, const Item& item)
@@ -403,6 +403,23 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         Qn::WritePermission);
     setOption(WindowRotationForbidden, !hasVideo() || !canRotate);
     updateButtonsVisibility();
+
+    const auto triggerActionHandler =
+        [](const QnUuid& triggerId, bool success)
+        {
+//            SoftwareTriggerButton* button = nullptr;
+//            button->setEnabled(true);
+
+//            button->setState(success
+//                ? SoftwareTriggerButton::State::Success
+//                : SoftwareTriggerButton::State::Failure);
+        };
+
+    m_triggerController.setResourceId(base_type::resource()->getId());
+
+    using Controller = nx::vms::client::core::SoftwareTriggersController;
+    connect(&m_triggerController, &Controller::triggerActivated, this, triggerActionHandler);
+    connect(&m_triggerController, &Controller::triggerDeactivated, this, triggerActionHandler);
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
@@ -2869,7 +2886,7 @@ QnMediaResourceWidget::SoftwareTriggerInfo QnMediaResourceWidget::makeTriggerInf
     const nx::vms::event::RulePtr& rule) const
 {
     return SoftwareTriggerInfo({
-        rule->eventParams().inputPortId,
+        QnUuid::fromStringSafe(rule->eventParams().inputPortId),
         rule->eventParams().caption,
         rule->eventParams().description,
         rule->isActionProlonged() });
@@ -2971,34 +2988,18 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
     button->setProlonged(info.prolonged);
     updateTriggerButtonTooltip(button, info, true);
 
-    const auto resultHandler =
-        [button = QPointer<SoftwareTriggerButton>(button)](bool success, qint64 requestId)
-        {
-            if (!button || button->property(
-                kTriggerRequestIdProperty).value<rest::Handle>() != requestId)
-            {
-                return;
-            }
-
-            button->setEnabled(true);
-
-            button->setState(success
-                ? SoftwareTriggerButton::State::Success
-                : SoftwareTriggerButton::State::Failure);
-        };
-
+    button->setProperty(kTriggerId, QVariant::fromValue(info.triggerId));
     if (info.prolonged)
     {
         connect(button, &SoftwareTriggerButton::pressed, this,
-            [this, button, resultHandler, clientSideHandler, id = info.triggerId]()
+            [this, button, clientSideHandler, id = info.triggerId]()
             {
                 if (!button->isLive())
                     return;
 
-                const auto requestId = invokeTrigger(id, resultHandler, vms::api::EventState::active);
-                const bool success = requestId != rest::Handle();
-                button->setProperty(kTriggerRequestIdProperty, requestId);
-                button->setState(success
+                qWarning() << "++++++++++++++" << id;
+                const bool success = m_triggerController.activateTrigger(id);
+                button->setState(m_triggerController.activateTrigger(id)
                     ? SoftwareTriggerButton::State::Waiting
                     : SoftwareTriggerButton::State::Failure);
 
@@ -3007,7 +3008,7 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
             });
 
         connect(button, &SoftwareTriggerButton::released, this,
-            [this, button, resultHandler, id = info.triggerId]()
+            [this, button]()
             {
                 if (!button->isLive())
                     return;
@@ -3016,10 +3017,7 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
                 if (button->state() == SoftwareTriggerButton::State::Failure)
                     return;
 
-                const auto requestId = invokeTrigger(id, resultHandler, vms::api::EventState::inactive);
-                const bool success = requestId != rest::Handle();
-                button->setProperty(kTriggerRequestIdProperty, requestId);
-                button->setState(success
+                button->setState(m_triggerController.deactivateTrigger()
                     ? SoftwareTriggerButton::State::Default
                     : SoftwareTriggerButton::State::Failure);
             });
@@ -3027,14 +3025,13 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
     else
     {
         connect(button, &SoftwareTriggerButton::clicked, this,
-            [this, button, resultHandler, clientSideHandler, id = info.triggerId]()
+            [this, button, clientSideHandler, id = info.triggerId]()
             {
                 if (!button->isLive())
                     return;
 
-                const auto requestId = invokeTrigger(id, resultHandler);
-                const bool success = requestId != rest::Handle();
-                button->setProperty(kTriggerRequestIdProperty, requestId);
+                qWarning() << "++++++++++++++" << id;
+                const bool success = m_triggerController.activateTrigger(id);
                 button->setEnabled(!success);
                 button->setState(success
                     ? SoftwareTriggerButton::State::Waiting
@@ -3132,37 +3129,6 @@ void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr
     // Forcing update of the trigger button.
     updateTriggerAvailability(rule);
 };
-
-rest::Handle QnMediaResourceWidget::invokeTrigger(
-    const QString& id,
-    std::function<void(bool, rest::Handle)> resultHandler,
-    vms::api::EventState toggleState)
-{
-    if (!accessController()->hasGlobalPermission(GlobalPermission::userInput))
-        return rest::Handle();
-
-    const auto responseHandler =
-        [this, resultHandler, id](bool success, rest::Handle handle, const QnJsonRestResult& result)
-        {
-            success = success && result.error == QnRestResult::NoError;
-
-            if (!success)
-            {
-                NX_ERROR(this, tr("Failed to invoke trigger %1 (%2)")
-                    .arg(id).arg(result.errorString));
-            }
-
-            if (resultHandler)
-                resultHandler(success, handle);
-        };
-
-    return commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
-        /*cameraId*/ d->resource->getId(),
-        /*triggerId*/ id,
-        toggleState,
-        nx::utils::guarded(this, responseHandler),
-        thread());
-}
 
 void QnMediaResourceWidget::updateTriggerAvailability(const vms::event::RulePtr& rule)
 {

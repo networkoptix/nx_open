@@ -197,19 +197,6 @@ rest::Handle ServerConnection::cameraThumbnailAsync(const nx::api::CameraImageRe
     return executeGet(lit("/ec2/cameraThumbnail"), data.toParams(), callback, targetThread);
 }
 
-rest::Handle ServerConnection::softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
-    nx::vms::api::EventState toggleState, GetCallback callback, QThread* targetThread)
-{
-    QnRequestParamList params;
-    params.insert(lit("timestamp"), lit("%1").arg(qnSyncTime->currentMSecsSinceEpoch()));
-    params.insert(lit("event_type"), QnLexical::serialized(nx::vms::api::EventType::softwareTriggerEvent));
-    params.insert(lit("inputPortId"), triggerId);
-    params.insert(lit("eventResourceId"), cameraId.toString());
-    if (toggleState != nx::vms::api::EventState::undefined)
-        params.insert(lit("state"), QnLexical::serialized(toggleState));
-    return executeGet(lit("/api/createEvent"), params, callback, targetThread);
-}
-
 Handle ServerConnection::createGenericEvent(
     const QString& source,
     const QString& caption,

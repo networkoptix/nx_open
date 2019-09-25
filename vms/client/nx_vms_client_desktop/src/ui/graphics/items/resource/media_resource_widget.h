@@ -23,6 +23,7 @@
 #include <client/client_globals.h>
 #include <client/client_color_types.h>
 #include <nx/vms/client/desktop/camera/camera_fwd.h>
+#include <nx/vms/client/core/software_trigger/software_triggers_controller.h>
 #include <nx/client/core/media/abstract_analytics_metadata_provider.h>
 #include <ui/common/speed_range.h>
 #include <ui/customization/customized.h>
@@ -285,11 +286,6 @@ protected:
     void updateTwoWayAudioWidget();
     bool animationAllowed() const;
 
-    rest::Handle invokeTrigger(
-        const QString& id,
-        std::function<void(bool, rest::Handle)> resultHandler,
-        nx::vms::api::EventState toggleState = nx::vms::api::EventState::undefined);
-
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr& resource, const QString& key);
     void at_screenshotButton_clicked();
@@ -362,7 +358,7 @@ private:
 private:
     struct SoftwareTriggerInfo
     {
-        QString triggerId;
+        QnUuid triggerId;
         QString name;
         QString icon;
         bool prolonged = false;
@@ -491,6 +487,7 @@ private:
     QImage m_entropixEnhancedImage;
     int m_entropixProgress = -1;
     QnUuid m_itemId;
+    nx::vms::client::core::SoftwareTriggersController m_triggerController;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

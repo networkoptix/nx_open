@@ -53,12 +53,12 @@ MediaPlayer::~MediaPlayer()
 {
 }
 
-QString MediaPlayer::resourceId() const
+QnUuid MediaPlayer::resourceId() const
 {
     return m_resourceId;
 }
 
-void MediaPlayer::setResourceId(const QString& resourceId)
+void MediaPlayer::setResourceId(const QnUuid& resourceId)
 {
     if (m_resourceId == resourceId)
         return;
@@ -66,8 +66,8 @@ void MediaPlayer::setResourceId(const QString& resourceId)
     m_resourceId = resourceId;
     emit resourceIdChanged();
 
-    setSource(!resourceId.isEmpty()
-        ? QUrl(lit("camera://media/") + resourceId)
+    setSource(!resourceId.isNull()
+        ? QUrl(lit("camera://media/") + resourceId.toString())
         : QString());
 }
 

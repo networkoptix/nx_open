@@ -37,10 +37,10 @@
 #include <nx/client/core/time/calendar_model.h>
 #include <nx/client/mobile/resource/lite_client_layout_helper.h>
 #include <nx/client/mobile/models/action_buttons_model.h>
-#include <nx/client/mobile/software_trigger/software_triggers_controller.h>
 #include <nx/client/mobile/two_way_audio/voice_spectrum_item.h>
 #include <nx/client/mobile/motion/motion_playback_mask_watcher.h>
 #include <nx/client/mobile/motion/chunk_position_watcher.h>
+#include <nx/vms/client/core/software_trigger/software_triggers_controller.h>
 
 using namespace nx::client::mobile;
 
@@ -103,11 +103,11 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterRevision<QQuickItem, 1>("com.networkoptix.qml", 1, 0);
 
     nx::client::mobile::ActionButtonsModel::registerQmlType();
-    nx::client::mobile::SoftwareTriggersController::registerQmlType();
     nx::client::mobile::VoiceSpectrumItem::registerQmlType();
     nx::client::mobile::MotionPlaybackMaskWatcher::registerQmlType();
     nx::client::mobile::ChunkPositionWatcher::registerQmlType();
     nx::client::mobile::AudioController::registerQmlType();
     nx::client::core::TimePeriodsStore::registerQmlType();
     nx::client::core::CalendarModel::registerQmlType();
+    nx::vms::client::core::SoftwareTriggersController::registerQmlType();
 }

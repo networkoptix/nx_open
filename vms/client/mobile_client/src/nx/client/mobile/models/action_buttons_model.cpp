@@ -173,9 +173,9 @@ void ActionButtonsModel::registerQmlType()
     qmlRegisterType<ActionButtonsModel>("nx.client.mobile", 1, 0, "ActionButtonsModel");
 }
 
-void ActionButtonsModel::setResourceId(const QString& resourceId)
+void ActionButtonsModel::setResourceId(const QnUuid& resourceId)
 {
-    const auto uuid = QnUuid::fromStringSafe(resourceId);
+    const auto uuid = resourceId;//QnUuid::fromStringSafe(resourceId);
     if (uuid == m_resourceId)
         return;
 
@@ -183,9 +183,9 @@ void ActionButtonsModel::setResourceId(const QString& resourceId)
     emit resourceIdChanged();
 }
 
-QString ActionButtonsModel::resourceId() const
+QnUuid ActionButtonsModel::resourceId() const
 {
-    return m_resourceId.toString();
+    return m_resourceId;//.toString();
 }
 
 int ActionButtonsModel::rowCount(const QModelIndex& parent) const

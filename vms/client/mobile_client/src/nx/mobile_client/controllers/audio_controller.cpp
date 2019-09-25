@@ -7,7 +7,7 @@
 #include <mobile_client/mobile_client_settings.h>
 
 using AudioEnabled = bool;
-using AudioDataHash = QHash<QString, AudioEnabled>;
+using AudioDataHash = QHash<QnUuid, AudioEnabled>;
 using UserDataHash = QHash<QString, AudioDataHash>;
 using SystemDataHash = QHash<QnUuid, UserDataHash>;
 
@@ -17,7 +17,7 @@ struct AudioController::Private
 {
     Private();
 
-    QString resourceId;
+    QnUuid resourceId;
     SystemDataHash data;
     QnUuid localSystemId;
     QString user;
@@ -86,7 +86,7 @@ void AudioController::setSessionParameters(const QnUuid& localSystemId, const QS
     emit audioEnabledChanged();
 }
 
-void AudioController::setResourceId(const QString& value)
+void AudioController::setResourceId(const QnUuid& value)
 {
     if (d->resourceId == value)
         return;
@@ -95,7 +95,7 @@ void AudioController::setResourceId(const QString& value)
     emit resourceIdChanged();
 }
 
-QString AudioController::resourceId() const
+QnUuid AudioController::resourceId() const
 {
     return d->resourceId;
 }

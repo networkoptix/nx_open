@@ -1,14 +1,5 @@
 #include "mobile_client_ui_controller.h"
 
-namespace {
-
-QString uuidString(const QnUuid& uuid)
-{
-    return uuid.isNull() ? QString() : uuid.toString();
-}
-
-} // anonymous namespace
-
 class QnMobileClientUiControllerPrivate
 {
 public:
@@ -68,7 +59,7 @@ void QnMobileClientUiController::openResourcesScreen(const ResourceIdList& filte
 
 void QnMobileClientUiController::openVideoScreen(const QnUuid& cameraId, qint64 timestamp)
 {
-    emit videoScreenRequested(uuidString(cameraId), timestamp);
+    emit videoScreenRequested(cameraId, timestamp);
 }
 
 void QnMobileClientUiController::openLoginToCloudScreen(

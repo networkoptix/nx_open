@@ -17,8 +17,8 @@ public:
         Qn::TimePeriodContent contentType,
         ChunkProvider* owner);
 
-    QString resourceId() const;
-    void setResourceId(const QString& id);
+    QnUuid resourceId() const;
+    void setResourceId(const QnUuid& id);
 
     const QString& filter() const;
     void setFilter(const QString& filter);
@@ -53,9 +53,9 @@ ChunkProvider::ChunkProviderInternal::ChunkProviderInternal(
 {
 }
 
-QString ChunkProvider::ChunkProviderInternal::resourceId() const
+QnUuid ChunkProvider::ChunkProviderInternal::resourceId() const
 {
-    return m_loader ? m_loader->resource()->getId().toString() : QString();
+    return m_loader ? m_loader->resource()->getId() : QnUuid();
 }
 
 void ChunkProvider::ChunkProviderInternal::cleanLoader()
@@ -68,7 +68,7 @@ void ChunkProvider::ChunkProviderInternal::cleanLoader()
     m_loader.reset();
 }
 
-void ChunkProvider::ChunkProviderInternal::setResourceId(const QString& id)
+void ChunkProvider::ChunkProviderInternal::setResourceId(const QnUuid& id)
 {
     if (id == resourceId())
         return;
@@ -76,7 +76,7 @@ void ChunkProvider::ChunkProviderInternal::setResourceId(const QString& id)
     cleanLoader();
     setTimePeriods(QnTimePeriodList());
 
-    const auto camera = getCamera(QnUuid::fromStringSafe(id));
+    const auto camera = getCamera(id);
     if (!camera)
         return;
 
@@ -192,12 +192,12 @@ bool ChunkProvider::hasMotionChunks() const
     return hasPeriods(Qn::MotionContent);
 }
 
-QString ChunkProvider::resourceId() const
+QnUuid ChunkProvider::resourceId() const
 {
     return m_providers[Qn::RecordingContent]->resourceId();
 }
 
-void ChunkProvider::setResourceId(const QString& id)
+void ChunkProvider::setResourceId(const QnUuid& id)
 {
     for (const auto& provider: m_providers)
         provider->setResourceId(id);

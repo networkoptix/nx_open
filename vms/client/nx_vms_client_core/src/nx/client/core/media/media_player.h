@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/media/media_player.h>
+#include <nx/utils/uuid.h>
 
 namespace nx::vms::client::core {
 
@@ -8,7 +9,7 @@ class MediaPlayer: public nx::media::Player
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(QnUuid resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(bool loading READ loading NOTIFY loadingChanged)
     Q_PROPERTY(bool playing READ playing NOTIFY playingChanged)
     Q_PROPERTY(bool failed READ failed NOTIFY failedChanged)
@@ -20,8 +21,8 @@ public:
     MediaPlayer(QObject* parent = nullptr);
     ~MediaPlayer();
 
-    QString resourceId() const;
-    void setResourceId(const QString& resourceId);
+    QnUuid resourceId() const;
+    void setResourceId(const QnUuid& resourceId);
 
     Q_INVOKABLE void playLive();
 
@@ -41,7 +42,7 @@ signals:
     void noVideoStreamsChanged();
 
 private:
-    QString m_resourceId;
+    QnUuid m_resourceId;
     bool m_loading = false;
     bool m_playing = false;
     bool m_failed = false;

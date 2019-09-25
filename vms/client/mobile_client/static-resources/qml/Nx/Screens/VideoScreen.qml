@@ -18,7 +18,7 @@ PageBase
     id: videoScreen
     objectName: "videoScreen"
 
-    property string initialResourceId
+    property var initialResourceId
     property alias initialScreenshot: screenshot.source
     property QnCameraListModel camerasModel: null
     property real targetTimestamp: -1

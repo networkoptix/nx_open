@@ -153,13 +153,6 @@ public:
         Result<QByteArray>::type callback,
         QThread* targetThread = 0);
 
-    Handle softwareTriggerCommand(
-        const QnUuid& cameraId,
-        const QString& triggerId,
-        nx::vms::api::EventState toggleState,
-        GetCallback callback,
-        QThread* targetThread = nullptr);
-
     Handle createGenericEvent(
         const QString& source,
         const QString& caption,
