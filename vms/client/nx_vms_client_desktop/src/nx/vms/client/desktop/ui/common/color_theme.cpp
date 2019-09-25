@@ -31,7 +31,7 @@ struct ColorTheme::Private
 
     QHash<QString, QList<QColor>> groups;
 
-    QMap<QString, QString> colorSubstitutions;  // default #XXXXXX to updated #YYYYYY
+    QMap<QString, QString> colorSubstitutions;  //< Default #XXXXXX to updated #YYYYYY.
 
     struct ColorInfo
     {
@@ -66,8 +66,10 @@ void ColorTheme::Private::loadColors()
     for (auto it = updatedColors.begin(); it != updatedColors.end(); ++it)
     {
         if (defaultColors.contains(*it))
+        {
             colorSubstitutions[defaultColors[*it].value<QColor>().name()] =
                 colors[*it].value<QColor>().name();
+        }
     }
 }
 

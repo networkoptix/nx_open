@@ -8,7 +8,7 @@
 
 namespace nx::vms::client::desktop {
 
-class ColorTheme: public QObject, public Singleton<ColorTheme>
+class NX_VMS_CLIENT_DESKTOP_API ColorTheme: public QObject, public Singleton<ColorTheme>
 {
     Q_OBJECT
 

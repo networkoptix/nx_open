@@ -15,7 +15,7 @@ class QStyle;
 class QnNoptixIconLoader;
 class QnGenericPalette;
 
-class QnSkin: public QObject, public Singleton<QnSkin>
+class NX_VMS_CLIENT_DESKTOP_API QnSkin: public QObject, public Singleton<QnSkin>
 {
     Q_OBJECT
 

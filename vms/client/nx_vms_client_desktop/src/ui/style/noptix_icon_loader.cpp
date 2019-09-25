@@ -9,6 +9,7 @@
 
 #include "skin.h"
 #include "icon_pixmap_accessor.h"
+#include "svg_icon_colorer.h"
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ini.h>
 
@@ -26,8 +27,6 @@ static const QnIcon::SuffixesList kDefaultSuffixes({
     {QnIcon::Pressed,  "pressed"},
     {QnIcon::Error,    "error"}
 });
-
-static const QString kSvgExtension(".svg");
 
 static constexpr QSize kBaseIconSize(20, 20);
 
@@ -159,135 +158,6 @@ void loadCustomIcons(
         }
     }
 }
-
-class SvgIconColorer
-{
-private:
-    static const int kColorValueStringLength = 7;
-
-public:
-    SvgIconColorer(const QByteArray& sourceIconData, const QString& iconName):
-        m_sourceIconData(sourceIconData),
-        m_iconName(iconName)
-    {
-        initializeDump();
-        dumpIconIfNeeded(sourceIconData);
-    }
-
-    QByteArray makeNormalIcon() const { return makeIcon(); }
-    QByteArray makeDisabledIcon() const { return makeIcon("dark14", "dark17", "_disabled"); }
-    QByteArray makeSelectedIcon() const { return makeIcon("light4", "light1", "_selected"); }
-    QByteArray makeActiveIcon() const { return makeIcon("brand_core", "brand_l2", "_active"); }
-    QByteArray makeErrorIcon() const { return makeIcon("red_l2", "red_l3", "_error"); }
-
-private:
-    void initializeDump()
-    {
-        const QString directoryPath(ini().dumpGeneratedIconsTo);
-        if (directoryPath.isEmpty())
-            return;
-
-        const QFileInfo basePath = QDir(directoryPath).absoluteFilePath(m_iconName);
-
-        m_dumpDirectory = basePath.absoluteDir();
-        m_iconName = basePath.baseName();
-        m_dump = m_dumpDirectory.mkpath(m_dumpDirectory.path());
-    }
-
-    void dumpIconIfNeeded(const QByteArray& data, const QString& suffix = QString()) const
-    {
-        if (!m_dump)
-            return;
-
-        QString filename = m_dumpDirectory.absoluteFilePath(m_iconName + suffix + kSvgExtension);
-        QFile f(filename);
-		if (!f.open(QIODevice::WriteOnly))
-            return;
-
-        f.write(data);
-		f.close();
-    }
-
-    QByteArray makeIcon() const
-    {
-        QByteArray result = substituteColors(colorTheme()->getColorSubstitutions());
-
-        dumpIconIfNeeded(result);
-
-        return result;
-    }
-
-    QString colorStringValue(const QString& name) const
-    {
-        return colorTheme()->color(name).name();
-    }
-
-    QByteArray makeIcon(const QString& primaryColorName,
-            const QString& secondaryColorName,
-            const QString& suffix) const
-    {
-        static const QString basePrimaryColor = "#A5B7C0"; //< Value of light10 in default customization.
-        static const QString baseSecondaryColor = "#E1E7EA"; //< Value of light4 in default customization.
-
-        QByteArray result = substituteColors(QMap<QString, QString>{
-            {basePrimaryColor, colorStringValue(primaryColorName)},
-            {baseSecondaryColor, colorStringValue(secondaryColorName)}});
-
-        dumpIconIfNeeded(result, suffix);
-
-        return result;
-    }
-    QByteArray substituteColors(const QMap<QString, QString>& colorSubstitutions) const
-    {
-        QByteArray result = m_sourceIconData;
-
-        for (int pos = 0; pos < m_sourceIconData.size(); ++pos)
-        {
-            pos = getNextColorPos(pos);
-            if (pos != m_sourceIconData.size())
-            {
-                QString currentColor = QString::fromLatin1(
-                    m_sourceIconData.begin() + pos,
-                    kColorValueStringLength);
-
-                if (colorSubstitutions.contains(currentColor))
-                {
-                    result.replace(
-                        pos,
-                        kColorValueStringLength,
-                        colorSubstitutions[currentColor].toLatin1());
-                }
-
-                pos += kColorValueStringLength;
-            }
-        }
-
-        return result;
-    }
-
-    int getNextColorPos(int startPos) const
-    {
-        for (; startPos < m_sourceIconData.size(); ++startPos)
-        {
-            if (m_sourceIconData[startPos] == '#')
-            {
-                return m_sourceIconData.size() - startPos >= kColorValueStringLength
-                    ? startPos
-                    : m_sourceIconData.size();
-            }
-        }
-
-        return startPos;
-    }
-
-private:
-    bool m_dump = false;
-    QDir m_dumpDirectory;
-    QByteArray m_sourceIconData;
-    QString m_iconName;
-};
-
-
 
 } //namespace
 
