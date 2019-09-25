@@ -3534,11 +3534,14 @@ void MediaServerProcess::connectArchiveIntegrityWatcher()
     auto serverArchiveIntegrityWatcher = static_cast<ServerArchiveIntegrityWatcher*>(
         serverModule()->archiveIntegrityWatcher());
 
-    connect(
-        serverArchiveIntegrityWatcher,
-        &ServerArchiveIntegrityWatcher::fileIntegrityCheckFailed,
-        serverModule()->eventConnector(),
-        &event::EventConnector::at_fileIntegrityCheckFailed);
+    if (serverArchiveIntegrityWatcher)
+    {
+        connect(
+            serverArchiveIntegrityWatcher,
+            &ServerArchiveIntegrityWatcher::fileIntegrityCheckFailed,
+            serverModule()->eventConnector(),
+            &event::EventConnector::at_fileIntegrityCheckFailed);
+    }
 }
 
 class TcpLogReceiverConnection: public QnTCPConnectionProcessor

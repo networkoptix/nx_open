@@ -92,6 +92,7 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/network/url/url_builder.h>
 #include <plugins/storage/dts/vmax480/vmax480_resource.h>
+#include <nx_vms_server_ini.h>
 
 using namespace nx;
 using namespace nx::vms::server;
@@ -274,7 +275,8 @@ QnMediaServerModule::QnMediaServerModule(
     m_analyticsManager = store(new nx::vms::server::analytics::Manager(this));
 
     m_sharedContextPool = store(new nx::vms::server::resource::SharedContextPool(this));
-    m_archiveIntegrityWatcher = store(new nx::vms::server::ServerArchiveIntegrityWatcher(this));
+    if (!ini().disableArchiveIntegrityWatcher)
+        m_archiveIntegrityWatcher = store(new nx::vms::server::ServerArchiveIntegrityWatcher(this));
     m_updateManager = store(new nx::vms::server::UpdateManager(this));
     auto dataDir = closeDirPath(settings().dataDir()) + QString("record_catalog");
     m_motionHelper = store(new QnMotionHelper(dataDir, this));

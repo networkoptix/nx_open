@@ -194,7 +194,7 @@ private:
     nx::vms::server::event::EventConnector* m_eventConnector = nullptr;
     nx::vms::server::analytics::EventRuleWatcher* m_analyticsEventRuleWatcher = nullptr;
     nx::vms::server::resource::SharedContextPool* m_sharedContextPool = nullptr;
-    AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher;
+    AbstractArchiveIntegrityWatcher* m_archiveIntegrityWatcher = nullptr;
     mutable boost::optional<std::chrono::milliseconds> m_lastRunningTimeBeforeRestart;
     std::unique_ptr<nx::analytics::db::AbstractEventsStorage> m_analyticsEventsStorage;
     std::unique_ptr<nx::vms::server::RootFileSystem> m_rootFileSystem;
