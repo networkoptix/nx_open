@@ -101,6 +101,14 @@
                     "name": "RAM %",
                     "unit": "%",
                     "display": "table|panel"
+                },
+                "incomingConnections": {
+                    "name": "Incoming connections",
+                    "display": "panel"
+                },
+                "encodingThreads": {
+                    "name": "Encoding threads",
+                    "display": "panel"
                 }
             }
         }

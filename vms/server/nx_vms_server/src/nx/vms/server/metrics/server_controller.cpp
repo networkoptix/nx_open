@@ -5,6 +5,7 @@
 #include <media_server/media_server_module.h>
 #include <platform/hardware_information.h>
 #include <platform/platform_abstraction.h>
+#include <nx/metrics/metrics_storage.h>
 
 #include "helpers.h"
 
@@ -89,8 +90,17 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "ramP", [platform](const auto&) { return Value(platform->totalRamUsage()); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "incomingConnections", [](const auto& r)
+                    { return Value(r->commonModule()->metrics()->tcpConnections().total()); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "encodingThreads", [](const auto& r)
+                    { return Value(r->commonModule()->metrics()->transcoders()); }
             )
-        )
+
+       )
         // TODO: Implement "Server load", "Info" and "Activity" groups.
     );
 }
