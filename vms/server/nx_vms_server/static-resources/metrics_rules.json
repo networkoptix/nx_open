@@ -109,6 +109,10 @@
                 "encodingThreads": {
                     "name": "Encoding threads",
                     "display": "panel"
+                },
+                "cameras": {
+                    "name": "Cameras",
+                    "display": "panel"
                 }
             }
         }

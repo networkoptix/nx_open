@@ -98,9 +98,15 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
             utils::metrics::makeLocalValueProvider<Resource>(
                 "encodingThreads", [](const auto& r)
                     { return Value(r->commonModule()->metrics()->transcoders()); }
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "cameras", [](const auto& r)
+                    {
+                        return Value(r->resourcePool()->getAllCameras(
+                            r->toSharedPointer(), /*ignoreDesktopCameras*/ true).size());
+                    }
             )
-
-       )
+      )
         // TODO: Implement "Server load", "Info" and "Activity" groups.
     );
 }

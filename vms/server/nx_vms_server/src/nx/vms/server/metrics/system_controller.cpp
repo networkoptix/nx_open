@@ -49,7 +49,11 @@ utils::metrics::ValueGroupProviders<SystemResourceController::Resource>
                 "users", [pool](const auto&) { return Value(pool->getResources<QnUserResource>().size()); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "cameras", [pool](const auto&) { return Value(pool->getAllCameras().size()); }
+                "cameras", [pool](const auto&)
+                    {
+                        return Value(pool->getAllCameras(
+                            QnResourcePtr(), /*ignoreDesktopCameras*/ true).size());
+                    }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "version", [pool](const auto&)
