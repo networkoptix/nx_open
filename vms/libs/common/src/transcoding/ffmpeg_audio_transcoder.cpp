@@ -111,10 +111,13 @@ bool QnFfmpegAudioTranscoder::open(const QnConstMediaContextPtr& context)
 
     m_encoderCtx->channels = context->getChannels();
     m_encoderCtx->channel_layout = context->getChannelLayout();
-    int maxEncoderChannels = getMaxAudioChannels(avCodec);
 
+    int maxEncoderChannels = getMaxAudioChannels(avCodec);
     if (m_encoderCtx->channels > maxEncoderChannels)
+    {
+        m_encoderCtx->channel_layout = av_get_default_channel_layout(maxEncoderChannels);
         m_encoderCtx->channels = maxEncoderChannels;
+    }
 
     if (m_dstSampleRate > 0)
         m_encoderCtx->sample_rate = m_dstSampleRate;
