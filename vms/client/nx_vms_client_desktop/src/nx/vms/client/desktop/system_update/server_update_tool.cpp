@@ -384,7 +384,7 @@ void ServerUpdateTool::atExtractFilesFinished(int code)
     if (contents.error == nx::update::InformationError::noError)
     {
         // TODO: Provide proper installed versions.
-        if (verifyUpdateManifest(contents, {}) && !contents.filesToUpload.empty())
+        if (verifyUpdateManifest(contents, {}))
         {
             contents.error = nx::update::InformationError::noError;
             if (!contents.eulaPath.isEmpty())
