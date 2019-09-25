@@ -577,6 +577,11 @@ std::chrono::milliseconds ChunksDeque::occupiedDuration(int storageIndex) const
     return result;
 }
 
+const std::unordered_map<int, ChunksDeque::Presence>& ChunksDeque::archivePresence() const
+{
+    return m_archivePresence;
+}
+
 void ChunksDeque::pop_front()
 {
     chunkRemoved(m_deque.front());

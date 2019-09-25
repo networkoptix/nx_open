@@ -201,6 +201,8 @@ public:
 
     int64_t nxOccupiedSpace(const QnStorageResourcePtr& storage) const;
     std::chrono::milliseconds nxOccupiedDuration(const QnVirtualCameraResourcePtr& camera) const;
+    double recordingBitrateKBps(
+        const QnVirtualCameraResourcePtr& camera, std::chrono::milliseconds bitratePeriod) const;
 signals:
     void storagesAvailable();
     void noStoragesAvailable();

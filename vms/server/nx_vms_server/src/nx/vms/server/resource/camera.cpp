@@ -868,6 +868,13 @@ std::chrono::milliseconds Camera::nxOccupiedDuration() const
         serverModule()->backupStorageManager()->nxOccupiedDuration(ptr);
 }
 
+double Camera::recordingBitrateKBps(std::chrono::milliseconds bitratePeriod) const
+{
+    const auto ptr = toSharedPointer().dynamicCast<Camera>();
+    return serverModule()->normalStorageManager()->recordingBitrateKBps(ptr, bitratePeriod) +
+        serverModule()->backupStorageManager()->recordingBitrateKBps(ptr, bitratePeriod);
+}
+
 } // namespace resource
 } // namespace vms::server
 } // namespace nx

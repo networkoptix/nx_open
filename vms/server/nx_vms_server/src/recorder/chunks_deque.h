@@ -12,6 +12,11 @@ class ChunksDeque
 public:
     class Iterator;
 
+    struct Presence {
+        int64_t space = 0;
+        std::chrono::milliseconds duration{};
+    };
+
     struct ProxyChunk
     {
         ProxyChunk(const ChunksDeque* deque, const Chunk* originalChunkPtr);
@@ -193,6 +198,7 @@ public:
     ConstIterator end() const;
     int64_t occupiedSpace(int storageIndex = -1) const;
     std::chrono::milliseconds occupiedDuration(int storageIndex = -1) const;
+    const std::unordered_map<int, Presence>& archivePresence() const;
     void pop_front();
     Iterator erase(Iterator pos);
     void clear();
@@ -204,10 +210,6 @@ public:
     bool operator==(const ChunksDeque& other);
     friend void swap(ProxyChunk c1, ProxyChunk c2) { c1.swap(c2); }
 private:
-    struct Presence {
-        int64_t space = 0;
-        std::chrono::milliseconds duration{};
-    };
     mutable std::unordered_map<int, Presence> m_archivePresence;
 
     std::deque<Chunk> m_deque;

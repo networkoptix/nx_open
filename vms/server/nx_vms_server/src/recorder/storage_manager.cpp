@@ -856,10 +856,24 @@ std::chrono::milliseconds QnStorageManager::nxOccupiedDuration(
     return result;
 }
 
+double QnStorageManager::recordingBitrateKBps(
+    const QnVirtualCameraResourcePtr& camera, std::chrono::milliseconds bitratePeriod) const
+{
+    qint64 bytesPerSecond = 0;
+    for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
+    {
+        QnMutexLocker lock(&m_mutexCatalog);
+        auto itr = m_devFileCatalog->find(camera->getPhysicalId());
+        if (itr != m_devFileCatalog->end())
+            bytesPerSecond += itr.value()->getStatistics(bitratePeriod.count()).averageBitrate;
+    }
+    return bytesPerSecond / 1000.0;
+}
+
 void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraDataList& archiveCameras)
 {
     nx::caminfo::ArchiveCameraDataList camerasToAdd;
-    for (const auto &camera : archiveCameras)
+    for (const auto &camera: archiveCameras)
     {
         auto cameraLowCatalog = getFileCatalog(camera.coreData.physicalId, QnServer::LowQualityCatalog);
         auto cameraHiCatalog = getFileCatalog(camera.coreData.physicalId, QnServer::HiQualityCatalog);

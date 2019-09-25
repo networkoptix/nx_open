@@ -239,6 +239,11 @@
                 "archiveLength": {
                     "name": "Archive length",
                     "display": "table|panel"
+                },
+                "recordingBitrateKBps": {
+                    "name": "Recording Bitrate (24h)",
+                    "display": "table|panel",
+                    "unit": "KBps"
                 }
             }
         }

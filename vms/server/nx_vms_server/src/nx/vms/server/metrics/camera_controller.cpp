@@ -54,6 +54,7 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
 {
     static const std::chrono::minutes kIssuesRateUpdateInterval(1);
     static const std::chrono::seconds kipConflictsRateUpdateInterval(15);
+    static std::chrono::hours kBitratePeriod(24);
 
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         utils::metrics::makeValueGroupProvider<Resource>(
@@ -154,6 +155,10 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                     const auto value = std::chrono::seconds(r->nxOccupiedDuration().count()/1000);
                     return Value(nx::vms::text::ArchiveDuration::durationToString(value));
                 }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "recordingBitrateKBps", [](const auto& r)
+                { return Value(r->recordingBitrateKBps(kBitratePeriod)); }
             )
         )
     );
