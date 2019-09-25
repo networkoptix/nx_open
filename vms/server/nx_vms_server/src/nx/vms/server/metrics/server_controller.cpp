@@ -8,6 +8,7 @@
 #include <nx/metrics/metrics_storage.h>
 
 #include "helpers.h"
+#include <utils/common/synctime.h>
 
 namespace nx::vms::server::metrics {
 
@@ -41,6 +42,23 @@ void ServerController::start()
         });
 }
 
+QString datetimeString()
+{
+    int timeZoneInMinutes = currentTimeZone() / 60;
+    QString timezone =  QString::number(timeZoneInMinutes / 60);
+    if (timeZoneInMinutes % 60)
+    {
+        while (timezone.length() < 2)
+            timezone.insert(0, L'0');
+        timezone += QString::number(timeZoneInMinutes % 60);
+    }
+    if (timeZoneInMinutes >= 0)
+        timezone.insert(0, L'+');
+    return lm("%1 (UTC %2)").args(
+        qnSyncTime->currentDateTime().toString("yyyy-MM-dd hh:mm:ss"),
+        timezone);
+}
+
 utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController::makeProviders()
 {
     static const std::chrono::seconds kTransactionsUpdateInterval(5);
@@ -71,6 +89,9 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "publicIp", [](const auto& r) { return Value(r->getProperty(Server::kPublicIp)); }
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "time", [](const auto& r) { return Value(datetimeString()); }
             )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(

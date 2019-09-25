@@ -59,6 +59,10 @@
                 "public_ip": {
                     "name": "Public IP",
                     "display": "table|panel"
+                },
+                "time": {
+                    "name": "Time",
+                    "display": "table|panel"
                 }
             }
         },
