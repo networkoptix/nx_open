@@ -299,6 +299,7 @@ private:
         const auto resultCode = nx::hpm::api::Client::getResultCode(
             m_mediatorClientBehindProxy.lastSysErrorCode(),
             m_mediatorClientBehindProxy.response(),
+            network::http::FusionRequestResult(),
             connectResponse);
 
         m_clientBehindProxyConnectResponse.push({resultCode, std::move(connectResponse)});
