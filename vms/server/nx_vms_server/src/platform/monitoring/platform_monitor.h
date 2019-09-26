@@ -147,7 +147,13 @@ public:
     virtual quint64 totalRamUsage() = 0;
 
     /**
-     * @returns RAM currently consumed by the current processes, a number of bytes.
+     * @returns Percent of CPU time (both user and kernel) consumed by the current process at
+     *     the moment, a number in range [0.0, 1.0].
+     */
+    virtual qreal thisProcessCpuUsage() = 0;
+
+    /**
+     * @returns RAM currently consumed by the current process, a number of bytes.
      */
     virtual quint64 thisProcessRamUsage() = 0;
 

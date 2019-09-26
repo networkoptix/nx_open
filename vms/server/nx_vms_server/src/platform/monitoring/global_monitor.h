@@ -44,6 +44,7 @@ public:
 
     virtual qreal totalCpuUsage() override;
     virtual quint64 totalRamUsage() override;
+    virtual qreal thisProcessCpuUsage() override;
     virtual quint64 thisProcessRamUsage() override;
     virtual QList<HddLoad> totalHddLoad() override;
     virtual QList<NetworkLoad> totalNetworkLoad() override;
@@ -59,6 +60,7 @@ private:
 
     nx::utils::CachedValue<qreal> m_cachedTotalCpuUsage;
     nx::utils::CachedValue<quint64> m_cachedTotalRamUsage;
+    nx::utils::CachedValue<qreal> m_cachedThisProcessCpuUsage;
     nx::utils::CachedValue<quint64> m_cachedThisProcessRamUsage;
     nx::utils::CachedValue<QList<QnPlatformMonitor::HddLoad>> m_cachedTotalHddLoad;
     nx::utils::CachedValue<QList<QnPlatformMonitor::NetworkLoad>> m_cachedTotalNetworkLoad;

@@ -138,6 +138,10 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                 "cpuUsageP", [platform](const auto&) { return Value(platform->totalCpuUsage()); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
+                "serverCpuUsageP",
+                [platform](const auto&) { return Value(platform->thisProcessCpuUsage()); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
                 "ramUsage",
                 [platform](const auto&) { return Value(qint64(platform->totalRamUsage())); }
             ),
@@ -218,7 +222,6 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                 "secondaryStreams", [](const auto& r)
                     { return Value(r->commonModule()->metrics()->secondaryStreams()); }
             )
-
         )
         // TODO: cpuP should be fixed to the near instant value from avarage...
     );

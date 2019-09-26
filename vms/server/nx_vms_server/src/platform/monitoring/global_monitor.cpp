@@ -32,6 +32,7 @@ public:
 
     virtual qreal totalCpuUsage() override { return 0.0; }
     virtual quint64 totalRamUsage() override { return 0; }
+    virtual qreal thisProcessCpuUsage() override { return 0.0; }
     virtual quint64 thisProcessRamUsage() override { return 0; }
     virtual QList<HddLoad> totalHddLoad() override { return {}; }
     virtual QList<NetworkLoad> totalNetworkLoad() override { return {}; }
@@ -140,6 +141,8 @@ GlobalMonitor::GlobalMonitor(QnPlatformMonitor* base, QObject* parent):
         [this]() { return m_monitorBase->totalCpuUsage(); }, &m_mutex, kCacheExpirationTime),
     m_cachedTotalRamUsage(
         [this]() { return m_monitorBase->totalRamUsage(); }, &m_mutex, kCacheExpirationTime),
+    m_cachedThisProcessCpuUsage(
+        [this]() { return m_monitorBase->thisProcessCpuUsage(); }, &m_mutex, kCacheExpirationTime),
     m_cachedThisProcessRamUsage(
         [this]() { return m_monitorBase->thisProcessRamUsage(); }, &m_mutex, kCacheExpirationTime),
     m_cachedTotalHddLoad(
@@ -167,9 +170,12 @@ GlobalMonitor::~GlobalMonitor() {
 
 void GlobalMonitor::logStatistics()
 {
-    NX_INFO(this, lm("Cpu usage %1%").arg(totalCpuUsage() * 100, 0, 'f', 2));
-    NX_INFO(this, lm("Memory usage %1%").arg(
+    NX_INFO(this, lm("OS CPU usage %1%").arg(totalCpuUsage() * 100, 0, 'f', 2));
+    NX_INFO(this, lm("Process CPU usage %1%").arg(thisProcessCpuUsage() * 100, 0, 'f', 2));
+    NX_INFO(this, lm("OS memory usage %1%").arg(
         ramUsageToPercentages(totalRamUsage()) * 100, 0, 'f', 2));
+    NX_INFO(this, lm("Process memory usage %1%").arg(
+        ramUsageToPercentages(thisProcessRamUsage()) * 100, 0, 'f', 2));
 
     NX_INFO(this, "HDD usage:");
     for (const HddLoad& hddLoad: totalHddLoad())
@@ -203,6 +209,11 @@ qreal GlobalMonitor::totalCpuUsage() {
 
 quint64 GlobalMonitor::totalRamUsage() {
     return m_cachedTotalRamUsage.get();
+}
+
+qreal GlobalMonitor::thisProcessCpuUsage()
+{
+    return m_cachedThisProcessCpuUsage.get();
 }
 
 quint64 GlobalMonitor::thisProcessRamUsage()

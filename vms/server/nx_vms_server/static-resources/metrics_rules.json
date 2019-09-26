@@ -118,6 +118,11 @@
                     "unit": "%",
                     "display": "table|panel"
                 },
+                "serverCpuUsageP": {
+                    "name": "CPU (VMS Server) %",
+                    "unit": "%",
+                    "display": "table|panel"
+                },
                 "ramUsage": {
                     "name": "RAM Usage",
                     "unit": "B",
