@@ -115,6 +115,7 @@ struct Storage: ParameterSet
     NX_METRICS_ADD(std::atomic<qint64>, decodedPixels, "Amount of decoded video pixels");
     NX_METRICS_ADD(std::atomic_int, offlineStatus,
         "How many times resources have switched to the offline state");
+    NX_METRICS_ADD(std::atomic<qint64>, ruleActions, "The number if executed rules actions");
 
     struct Transactions: ParameterSet
     {

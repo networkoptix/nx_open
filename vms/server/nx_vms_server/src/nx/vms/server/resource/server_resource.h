@@ -20,8 +20,9 @@ namespace nx::vms::server {
         {
             transactions,
             timeChanged,
-            decodingSpeed,
-            encodingSpeed
+            decodedPixels,
+            encodedPixels,
+            ruleActionsTriggered,
         };
 
         qint64 getAndResetMetric(Metrics parameter);

@@ -151,10 +151,16 @@
                 },
                 "encodingSpeed3s": {
                     "name": "Encoding speed",
-                    "display": "|panel",
+                    "display": "panel",
                     "unit": "Mp/s",
                     "calculate": "average %encodingSpeed 3s",
                     "insert": "encodingSpeed"
+                },
+                "actionsTriggered1s": {
+                    "name": "Event rules triggering/s",
+                    "display": "panel",
+                    "calculate": "average %actionsTriggered 1s",
+                    "insert": "actionsTriggered"
                 }
             }
         }

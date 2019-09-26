@@ -64,6 +64,7 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
     static const std::chrono::seconds kTransactionsUpdateInterval(5);
     static const std::chrono::minutes kTimeChangedInterval(1);
     static const std::chrono::milliseconds kMegapixelsUpdateInterval(500);
+    static const std::chrono::milliseconds kActionsUpdateInterval(250);
     static const double kPixelsToMegapixels = 1000000.0;
 
     using namespace ResourcePropertyKey;
@@ -152,7 +153,7 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                 "decodingSpeed", [](const auto& r)
                     {
                         return Value(r->getAndResetMetric(
-                            MediaServerResource::Metrics::decodingSpeed) / kPixelsToMegapixels);
+                            MediaServerResource::Metrics::decodedPixels) / kPixelsToMegapixels);
                     },
                     nx::vms::server::metrics::timerWatch<MediaServerResource*>(kMegapixelsUpdateInterval)
             ),
@@ -160,11 +161,18 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                 "encodingSpeed", [](const auto& r)
                     {
                         return Value(r->getAndResetMetric(
-                            MediaServerResource::Metrics::encodingSpeed) / kPixelsToMegapixels);
+                            MediaServerResource::Metrics::encodedPixels) / kPixelsToMegapixels);
                     },
                     nx::vms::server::metrics::timerWatch<MediaServerResource*>(kMegapixelsUpdateInterval)
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "actionsTriggered", [](const auto& r)
+                    {
+                        return Value(r->getAndResetMetric(
+                            MediaServerResource::Metrics::ruleActionsTriggered));
+                    },
+                    nx::vms::server::metrics::timerWatch<MediaServerResource*>(kActionsUpdateInterval)
             )
-
      )
         // TODO: Implement "Server load", "Info" and "Activity" groups.
     );

@@ -31,6 +31,7 @@
 #include <nx/vms/event/strings_helper.h>
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
+#include <nx/metrics/metrics_storage.h>
 
 namespace {
 
@@ -293,6 +294,8 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
 
 bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& action)
 {
+    serverModule()->commonModule()->metrics()->ruleActions()++;
+
     auto ruleId = action->getRuleId();
     auto res = resourcePool()->getResourceById(action->getParams().actionResourceId);
 
