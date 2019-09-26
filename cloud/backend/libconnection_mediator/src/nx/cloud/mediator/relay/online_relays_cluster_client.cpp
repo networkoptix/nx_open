@@ -197,6 +197,7 @@ std::vector<nx::utils::Url> OnlineRelaysClusterClient::findClosestRelays(
 
 std::vector<nx::utils::Url> OnlineRelaysClusterClient::getUnresolvedRelays() const
 {
+    QnMutexLocker lock(&m_mutex);
     std::vector<nx::utils::Url> urls;
     for (const auto& relay: m_unresolvedRelays)
     {
