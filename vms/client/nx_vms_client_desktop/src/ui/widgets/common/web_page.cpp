@@ -138,9 +138,17 @@ protected:
 
 } // namespace
 
-QnWebPage::QnWebPage(QObject* parent): base_type(parent)
+QnWebPage::QnWebPage(QObject* parent):
+    base_type(parent),
+    // Network access manager should not be deallocated before QWebPage destructor,
+    // so we use custom deleter which calls deleteLater.
+    // Unfortunately custom deleter can not be passed to make_shared and we loose
+    // exception safety here.
+    // One way to overcome this is by using allocate_shared with simple allocator,
+    // but it seems like an overkill.
+    m_networkAccessManager(
+        new Http1NetworkAccessManager(), [](QObject* p) { p->deleteLater(); })
 {
-    m_networkAccessManager = std::make_shared<Http1NetworkAccessManager>();
     setNetworkAccessManager(m_networkAccessManager.get());
 
     connect(networkAccessManager(), &QNetworkAccessManager::sslErrors, this,
@@ -153,13 +161,17 @@ QnWebPage::QnWebPage(QObject* parent): base_type(parent)
         });
 
     setForwardUnsupportedContent(true);
-    connect(this, &QWebPage::downloadRequested, this, [this](const QNetworkRequest& request) {
-        download(m_networkAccessManager->get(request));
-    });
+    connect(this, &QWebPage::downloadRequested, this,
+        [this](const QNetworkRequest& request)
+        {
+            download(m_networkAccessManager->get(request));
+        });
 
-    connect(this, &QWebPage::unsupportedContent, this, [this](QNetworkReply* reply) {
-        download(reply);
-    });
+    connect(this, &QWebPage::unsupportedContent, this,
+        [this](QNetworkReply* reply)
+        {
+            download(reply);
+        });
 }
 
 void QnWebPage::download(QNetworkReply* reply)
