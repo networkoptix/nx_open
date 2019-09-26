@@ -15,7 +15,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
-#include <nx/vms/client/core/common/utils/ordered_requests_manager.h>
+#include <nx/vms/client/core/common/utils/ordered_requests_helper.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <utils/common/synctime.h>
 
@@ -28,6 +28,7 @@ struct SoftwareTriggersController::Private
     bool setTriggerState(QnUuid id, vms::event::EventState state);
 
     SoftwareTriggersController* const q;
+    OrderedRequestsHelper orderedRequestsHelper;
     QnCommonModule* const commonModule;
     nx::vms::client::core::UserWatcher* const userWatcher;
     QnResourceAccessManager* const accessManager;
@@ -91,7 +92,8 @@ bool SoftwareTriggersController::Private::setTriggerState(
     if (state != nx::vms::api::EventState::undefined)
         params.insert("state", QnLexical::serialized(state));
 
-    connection->getJsonResult("/api/createEvent", params, callback, QThread::currentThread());
+    orderedRequestsHelper.getJsonResult(connection,
+        "/api/createEvent", params, callback, QThread::currentThread());
     return true;
 }
 

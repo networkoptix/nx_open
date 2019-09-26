@@ -13,7 +13,7 @@
 #include <nx/client/core/two_way_audio/two_way_audio_availability_watcher.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/assert.h>
-#include <nx/vms/client/core/common/utils/ordered_requests_manager.h>
+#include <nx/vms/client/core/common/utils/ordered_requests_helper.h>
 
 namespace nx::vms::client::core {
 
@@ -24,6 +24,7 @@ struct TwoWayAudioController::Private
     bool setActive(bool active, OperationCallback&& callback = OperationCallback());
 
     TwoWayAudioController* const q;
+    OrderedRequestsHelper orderedRequestsHelper;
     QScopedPointer<TwoWayAudioAvailabilityWatcher> availabilityWatcher;
     QnVirtualCameraResourcePtr camera;
     QString sourceId;
@@ -73,7 +74,8 @@ bool TwoWayAudioController::Private::setActive(bool active, OperationCallback&& 
                 callback(ok);
         });
 
-    connection->getJsonResult("/api/transmitAudio", params, requestCallback, QThread::currentThread());
+    orderedRequestsHelper.getJsonResult(connection,
+        "/api/transmitAudio", params, requestCallback, QThread::currentThread());
     return true;
 }
 

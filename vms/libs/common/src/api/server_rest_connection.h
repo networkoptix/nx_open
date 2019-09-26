@@ -591,7 +591,7 @@ public:
         const QString& action,
         const QnRequestParamList& params,
         const nx::Buffer& body,
-        std::function<void(bool, Handle, const QnJsonRestResult& response)>&& callback,
+        rest::JsonResultCallback&& callback,
         QThread* targetThread = nullptr, std::chrono::milliseconds timeout = {});
 
     /** Sends POST request with a response to be an Ubjson. */
@@ -619,7 +619,7 @@ public:
     Handle getJsonResult(
         const QString& action,
         const QnRequestParamList& params,
-        std::function<void(bool, Handle, QnJsonRestResult response)>&& callback,
+        rest::JsonResultCallback&& callback,
         QThread* targetThread = nullptr);
 
     Handle getRawResult(

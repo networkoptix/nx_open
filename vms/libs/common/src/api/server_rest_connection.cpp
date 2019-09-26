@@ -1175,7 +1175,7 @@ Handle ServerConnection::postJsonResult(
     const QString& action,
     const QnRequestParamList& params,
     const nx::Buffer& body,
-    std::function<void(bool, Handle, const QnJsonRestResult& response)>&& callback,
+    rest::JsonResultCallback&& callback,
     QThread* targetThread,
     std::chrono::milliseconds timeout)
 {
@@ -1215,7 +1215,7 @@ Handle ServerConnection::getUbJsonResult(
 Handle ServerConnection::getJsonResult(
     const QString& path,
     const QnRequestParamList& params,
-    std::function<void(bool, Handle, QnJsonRestResult response)>&& callback,
+    rest::JsonResultCallback&& callback,
     QThread* targetThread)
 {
     return executeGet(path, params, callback, targetThread);
