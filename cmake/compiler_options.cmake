@@ -195,7 +195,14 @@ if(LINUX)
     set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
 
     string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,--disable-new-dtags")
-    string(APPEND CMAKE_SHARED_LINKER_FLAGS " -rdynamic -Wl,--no-undefined")
+    string(APPEND CMAKE_SHARED_LINKER_FLAGS " -rdynamic")
+
+    if(NOT (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT enabledSanitizers STREQUAL ""))
+        string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--no-undefined")
+    else()
+        message(STATUS "Disabling -Wl,--no-undefined since Clang sanitizer is not compatible with it")
+    endif()
+
     string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,--as-needed")
     string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--as-needed")
 
