@@ -638,7 +638,7 @@ TEST_F(CloudMerge, all_users_are_able_to_login_after_merge)
     assertEveryCloudUserIsAbleToLogin();
 }
 
-TEST_F(CloudMerge, merging_system_produced_by_merge)
+TEST_F(CloudMerge, DISABLED_merging_system_produced_by_merge)
 {
     givenSystemProducedByAMerge();
     givenCloudSystem();
