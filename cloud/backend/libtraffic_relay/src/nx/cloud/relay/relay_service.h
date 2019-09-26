@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <nx/network/socket_common.h>
+#include <nx/utils/file_watcher.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/service.h>
@@ -42,11 +43,16 @@ protected:
     virtual int serviceMain(const utils::AbstractServiceSettings& settings) override;
 
 private:
+	nx::utils::SubscriptionId m_subscriptionId = nx::utils::kInvalidSubscriptionId;
+	std::unique_ptr<nx::utils::file_system::FileWatcher> m_fileWatcher;
+
     Model* m_model = nullptr;
     Controller* m_controller = nullptr;
     View* m_view = nullptr;
 
     bool registerThisInstanceNameInCluster(const conf::Settings& settings);
+
+	void watchSslCertificateFileIfNeeded(const conf::Settings& settings);
 };
 
 } // namespace relay

@@ -172,6 +172,8 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
     const auto peerIter = peerIterAndInsertionFlag.first;
     if (peerIterAndInsertionFlag.second)
     {
+        NX_DEBUG(this, "Peer %1 is now online", peerData.hostName());
+
         peerIter->second.isLocal = true;
         peerIter->second.isListening = false;
         peerIter->second.hostName = peerIter->first.hostName();
@@ -333,8 +335,7 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
     if (peerIter->second.peerConnection.get() != connection)
         return; //< Peer has been bound to another connection.
 
-    NX_DEBUG(this, "Peer %1 has disconnected. Connection (%2)",
-        peerIter->first.hostName(), (void*) connection);
+    NX_DEBUG(this, "Peer %1 is now offline", peerIter->first.hostName());
 
     m_peers.erase(peerIter);
 
@@ -343,7 +344,7 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
         {
             // Can't use "this" because the life time of m_listeningPeerDb is longer than "this".
             // this handler with "this" may happen after "this" has been destroyed.
-            NX_DEBUG(typeid(ListeningPeerPool), "Peer %1 removed from ListeningPeerDb: %2",
+            NX_VERBOSE(typeid(ListeningPeerPool), "Peer %1 removed from ListeningPeerDb: %2",
                 hostName, removed);
         });
 
