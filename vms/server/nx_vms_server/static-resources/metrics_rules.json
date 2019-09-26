@@ -49,7 +49,7 @@
                 },
                 "ram": {
                     "name": "RAM",
-                    "unit": "GB",
+                    "unit": "B",
                     "display": "panel"
                 },
                 "os": {
@@ -109,13 +109,28 @@
         },
         "serverLoad": {
             "values": {
-                "cpuP": {
+                "cpuUsageP": {
                     "name": "CPU %",
                     "unit": "%",
                     "display": "table|panel"
                 },
-                "ramP": {
+                "ramUsage": {
+                    "name": "RAM Usage",
+                    "unit": "B",
+                    "display": "panel"
+                },
+                "ramUsageP": {
                     "name": "RAM %",
+                    "unit": "%",
+                    "display": "table|panel"
+                },
+                "serverRamUsage": {
+                    "name": "RAM (VMS Server)",
+                    "unit": "B",
+                    "display": "panel"
+                },
+                "serverRamUsageP": {
+                    "name": "RAM (VMS Server) %",
                     "unit": "%",
                     "display": "table|panel"
                 },

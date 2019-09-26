@@ -3,7 +3,6 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
-#include <platform/hardware_information.h>
 #include <platform/platform_abstraction.h>
 #include <nx/metrics/metrics_storage.h>
 
@@ -67,12 +66,25 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
     static const double kPixelsToMegapixels = 1000000.0;
 
     using namespace ResourcePropertyKey;
+
     // TODO: make sure that platform is removed only after HM!
     auto platform = serverModule()->platform()->monitor();
     const auto getUptimeS =
         [platform](const auto&)
         {
             return Value(static_cast<qint64>(platform->processUptime().count()) / 1000);
+        };
+
+    const auto getRamUsageP =
+        [platform](const auto&)
+        {
+            return Value(ramUsageToPercentages(platform->totalRamUsage()));
+        };
+
+    const auto getServerRamUsageP =
+        [platform](const auto&)
+        {
+            return Value(ramUsageToPercentages(platform->thisProcessRamUsage()));
         };
 
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
@@ -116,10 +128,21 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
         utils::metrics::makeValueGroupProvider<Resource>(
             "serverLoad",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "cpuP", [platform](const auto&) { return Value(platform->totalCpuUsage()); }
+                "cpuUsageP", [platform](const auto&) { return Value(platform->totalCpuUsage()); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "ramP", [platform](const auto&) { return Value(platform->totalRamUsage()); }
+                "ramUsage",
+                [platform](const auto&) { return Value(qint64(platform->totalRamUsage())); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "ramUsageP", getRamUsageP
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "serverRamUsage",
+                [platform](const auto&) { return Value(qint64(platform->thisProcessRamUsage())); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "serverRamUsageP", getServerRamUsageP
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "incomingConnections", [](const auto& r)
@@ -180,8 +203,9 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                     },
                     nx::vms::server::metrics::timerWatch<MediaServerResource*>(kUpdateInterval)
             )
-     )
-        // TODO: Implement "Server load", "Info" and "Activity" groups.
+
+        )
+        // TODO: cpuP should be fixed to the near instant value from avarage...
     );
 }
 
