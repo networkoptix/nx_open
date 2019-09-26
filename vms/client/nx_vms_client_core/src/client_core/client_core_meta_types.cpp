@@ -34,7 +34,7 @@
 #include <nx/client/core/time/display_time_helper.h>
 #include <nx/client/core/utils/quick_item_mouse_tracker.h>
 #include <nx/client/core/utils/operation_manager.h>
-#include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
+#include <nx/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/vms/api/data/software_version.h>
 
 #include <nx/fusion/model_functions.h>

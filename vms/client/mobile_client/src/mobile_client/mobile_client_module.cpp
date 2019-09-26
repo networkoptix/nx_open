@@ -53,7 +53,7 @@
 #include <core/resource_management/resource_discovery_manager.h>
 #include <plugins/resource/desktop_camera/desktop_resource_searcher.h>
 #include <plugins/resource/desktop_audio_only/desktop_audio_only_resource_searcher_impl.h>
-#include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
+#include <nx/client/core/two_way_audio/two_way_audio_controller.h>
 #include <plugins/resource/desktop_camera/desktop_resource_base.h>
 #include <client/client_resource_processor.h>
 #include <utils/media/voice_spectrum_analyzer.h>

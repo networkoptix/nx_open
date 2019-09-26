@@ -26,7 +26,7 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/address_resolver.h>
-#include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
+#include <nx/client/core/two_way_audio/two_way_audio_controller.h>
 #include <nx/client/core/watchers/user_watcher.h>
 #include <nx/client/core/utils/operation_manager.h>
 #include <nx/vms/discovery/manager.h>

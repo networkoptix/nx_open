@@ -13,7 +13,7 @@
 #include <utils/common/connective.h>
 #include <utils/license_usage_helper.h>
 #include <utils/media/voice_spectrum_analyzer.h>
-#include <nx/client/core/two_way_audio/two_way_audio_mode_controller.h>
+#include <nx/client/core/two_way_audio/two_way_audio_controller.h>
 
 class QnImageButtonWidget;
 class GraphicsLabel;

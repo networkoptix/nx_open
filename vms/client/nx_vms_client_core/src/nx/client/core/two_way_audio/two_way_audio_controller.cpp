@@ -1,4 +1,4 @@
-#include "two_way_audio_mode_controller.h"
+#include "two_way_audio_controller.h"
 
 #include <QtQml/QtQml>
 
