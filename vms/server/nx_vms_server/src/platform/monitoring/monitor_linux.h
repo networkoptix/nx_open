@@ -21,6 +21,7 @@ public:
 
     virtual qreal totalCpuUsage() override;
     virtual quint64 totalRamUsage() override;
+    virtual quint64 thisProcessRamUsage() override;
     virtual QList<HddLoad> totalHddLoad() override;
     virtual QList<QnPlatformMonitor::NetworkLoad> totalNetworkLoad() override;
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;

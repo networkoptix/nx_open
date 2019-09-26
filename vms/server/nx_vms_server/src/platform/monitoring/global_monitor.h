@@ -7,7 +7,7 @@
 
 namespace nx::vms::server {
 
-qreal ramUsageToPercentages(quint64 kbytes);
+qreal ramUsageToPercentages(quint64 bytes);
 
 /**
  * A proxy monitor object suitable for usage as an application-wide monitor.
@@ -44,6 +44,7 @@ public:
 
     virtual qreal totalCpuUsage() override;
     virtual quint64 totalRamUsage() override;
+    virtual quint64 thisProcessRamUsage() override;
     virtual QList<HddLoad> totalHddLoad() override;
     virtual QList<NetworkLoad> totalNetworkLoad() override;
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
@@ -58,6 +59,7 @@ private:
 
     nx::utils::CachedValue<qreal> m_cachedTotalCpuUsage;
     nx::utils::CachedValue<quint64> m_cachedTotalRamUsage;
+    nx::utils::CachedValue<quint64> m_cachedThisProcessRamUsage;
     nx::utils::CachedValue<QList<QnPlatformMonitor::HddLoad>> m_cachedTotalHddLoad;
     nx::utils::CachedValue<QList<QnPlatformMonitor::NetworkLoad>> m_cachedTotalNetworkLoad;
 };

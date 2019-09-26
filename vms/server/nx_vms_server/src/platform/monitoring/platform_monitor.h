@@ -147,6 +147,11 @@ public:
     virtual quint64 totalRamUsage() = 0;
 
     /**
+     * @returns RAM currently consumed by the current processes, a number of bytes.
+     */
+    virtual quint64 thisProcessRamUsage() = 0;
+
+    /**
      * @returns A list of HDD load entries for all HDDs on this PC.
      */
     virtual QList<HddLoad> totalHddLoad() = 0;

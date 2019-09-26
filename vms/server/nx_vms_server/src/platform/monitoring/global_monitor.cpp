@@ -32,6 +32,7 @@ public:
 
     virtual qreal totalCpuUsage() override { return 0.0; }
     virtual quint64 totalRamUsage() override { return 0; }
+    virtual quint64 thisProcessRamUsage() override { return 0; }
     virtual QList<HddLoad> totalHddLoad() override { return {}; }
     virtual QList<NetworkLoad> totalNetworkLoad() override { return {}; }
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override { return {}; }
@@ -139,6 +140,8 @@ GlobalMonitor::GlobalMonitor(QnPlatformMonitor* base, QObject* parent):
         [this]() { return m_monitorBase->totalCpuUsage(); }, &m_mutex, kCacheExpirationTime),
     m_cachedTotalRamUsage(
         [this]() { return m_monitorBase->totalRamUsage(); }, &m_mutex, kCacheExpirationTime),
+    m_cachedThisProcessRamUsage(
+        [this]() { return m_monitorBase->thisProcessRamUsage(); }, &m_mutex, kCacheExpirationTime),
     m_cachedTotalHddLoad(
         [this]() { return m_monitorBase->totalHddLoad(); }, &m_mutex, kCacheExpirationTime),
     m_cachedTotalNetworkLoad(
@@ -202,6 +205,11 @@ quint64 GlobalMonitor::totalRamUsage() {
     return m_cachedTotalRamUsage.get();
 }
 
+quint64 GlobalMonitor::thisProcessRamUsage()
+{
+    return m_cachedThisProcessRamUsage.get();
+}
+
 QList<QnPlatformMonitor::HddLoad> GlobalMonitor::totalHddLoad() {
     return m_cachedTotalHddLoad.get();
 }
@@ -231,10 +239,9 @@ void GlobalMonitor::setServerModule(QnMediaServerModule* serverModule)
     m_monitorBase->setServerModule(serverModule);
 }
 
-qreal ramUsageToPercentages(quint64 kbytes)
+qreal ramUsageToPercentages(quint64 bytes)
 {
-    auto totalRam = HardwareInformation::instance().physicalMemory;
-    return kbytes / qreal(totalRam) * 1000.0;
+    return bytes / qreal(HardwareInformation::instance().physicalMemory);
 }
 
 } // namespace nx::vms::server

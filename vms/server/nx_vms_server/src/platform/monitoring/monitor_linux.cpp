@@ -20,6 +20,8 @@
 #include <errno.h>
 #include <net/if_arp.h>
 #include <sys/statvfs.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/concurrent.h>
@@ -478,7 +480,24 @@ quint64 QnLinuxMonitor::totalRamUsage()
     if (memTotalKB.get() == 0)
         return 0;
 
-    return memTotalKB.get() - memFreeKB.get() - memCachedKB.get();
+    return (memTotalKB.get() - memFreeKB.get() - memCachedKB.get()) * 1024;
+}
+
+quint64 QnLinuxMonitor::thisProcessRamUsage()
+{
+    const char* kStatmFilename = "/proc/self/statm";
+    std::ifstream statm(kStatmFilename);
+    if (!statm.is_open())
+    {
+        NX_DEBUG(this, "Failed to open file %1: %2", kStatmFilename, strerror(errno));
+        return 0;
+    }
+
+    statm.ignore(255, ' '); // Skip first value (size)
+    long rss_in_pages;
+    statm >> rss_in_pages;
+
+    return rss_in_pages * sysconf(_SC_PAGE_SIZE);
 }
 
 QList<QnPlatformMonitor::HddLoad> QnLinuxMonitor::totalHddLoad()

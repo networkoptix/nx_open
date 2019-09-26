@@ -272,14 +272,29 @@ qreal QnSigarMonitor::totalCpuUsage() {
 quint64 QnSigarMonitor::totalRamUsage() {
     Q_D(QnSigarMonitor);
 
-    if(!d->sigar)
+    if (!d->sigar)
         return 0;
 
     sigar_mem_t mem;
-    if(INVOKE(sigar_mem_get(d->sigar, &mem)) != SIGAR_OK)
+    if (INVOKE(sigar_mem_get(d->sigar, &mem)) != SIGAR_OK)
         return 0;
 
     return mem.used;
+}
+
+quint64 QnSigarMonitor::thisProcessRamUsage()
+{
+    Q_D(QnSigarMonitor);
+
+    if(!d->sigar)
+        return 0;
+
+    sigar_pid_t pid = sigar_pid_get(d->sigar);
+    sigar_proc_mem_t mem;
+    if (INVOKE(sigar_proc_mem_get(d->sigar, pid, &mem)) != SIGAR_OK)
+        return 0;
+
+    return mem.resident;
 }
 
 QList<QnPlatformMonitor::HddLoad> QnSigarMonitor::totalHddLoad() {
