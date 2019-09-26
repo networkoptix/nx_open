@@ -103,9 +103,12 @@ if platform.system() == 'Linux':
 
             if run.returncode == 255:
                 if exc:
-                    raise exceptions.DeviceCommandError(message=run.stderr.rstrip())
+                    raise exceptions.DeviceCommandError(message=run.stderr.decode('UTF-8').rstrip())
                 else:
-                    return self.DeviceConnectionResult(None, run.stderr.rstrip(), command=command_wrapped)
+                    return self.DeviceConnectionResult(
+                        None,
+                        run.stderr.decode('UTF-8').rstrip(), command=command_wrapped
+                    )
 
             if run.returncode != 0 and exc:
                 raise exceptions.DeviceCommandError(
