@@ -2,14 +2,9 @@
 
 #include <nx/fusion/model_functions.h>
 
-QString QnLdapSettings::toString(bool hidePassword) const
+QString QnLdapSettings::toString() const
 {
-    if (!hidePassword)
-        return QJson::serialized(*this);
-
-    auto copy = *this;
-    copy.adminPassword = "******";
-    return QJson::serialized(copy);
+    return QJson::serialized(*this);
 }
 
 bool QnLdapSettings::isValid() const
@@ -29,6 +24,17 @@ int QnLdapSettings::defaultPort(bool ssl)
 QString QnLdapUser::toString() const
 {
     return QJson::serialized(*this);
+}
+
+
+QString toString(const QnLdapSettings& settings)
+{
+    if (nx::utils::log::showPasswords())
+        return settings.toString();
+
+    auto copy = settings;
+    copy.adminPassword = "******";
+    return copy.toString();
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnLdapSettings)(QnLdapUser), (json)(eq), _Fields)

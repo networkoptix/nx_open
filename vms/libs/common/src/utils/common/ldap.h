@@ -14,11 +14,17 @@ struct QnLdapSettings
     QString searchFilter;
     int searchTimeoutS = 0;
 
-    QString toString(bool hidePassword = false) const;
+    QString toString() const;
     bool isValid() const;
 
     static int defaultPort(bool ssl = false);
 };
+
+/**
+* Used only to hide passwords from logs.
+*/
+
+QString toString(const QnLdapSettings& settings);
 
 #define QnLdapSettings_Fields (uri)(adminDn)(adminPassword)(searchBase)(searchFilter)(searchTimeoutS)
 
