@@ -44,10 +44,10 @@ struct ColorTheme::Private
 
     QHash<QColor, ColorInfo> colorInfoByColor;
 
-    void loadColors();
+    void loadColors(); //< Initialize color values, color groups and color substitutions.
 
 private:
-    QJsonObject readColorsFromFile(const QString& filename) const;
+    QJsonObject readColorDataFromFile(const QString& filename) const;
     QSet<QString> updateColors(const QJsonObject& newColors);
 };
 
@@ -55,25 +55,27 @@ void ColorTheme::Private::loadColors()
 {
     // Load base colors and override them with the actual skin values.
 
-    const QJsonObject baseColors = readColorsFromFile(kBaseSkinFileName);
+    const QJsonObject baseColors = readColorDataFromFile(kBaseSkinFileName);
     updateColors(baseColors);
 
     const QVariantMap defaultColors = colors;
 
-    const QJsonObject currentSkinColors = readColorsFromFile(kCustomSkinFileName);
+    const QJsonObject currentSkinColors = readColorDataFromFile(kCustomSkinFileName);
     const QSet<QString> updatedColors = updateColors(currentSkinColors);
 
-    for (auto it = updatedColors.begin(); it != updatedColors.end(); ++it)
+    // Calculate color substitutions.
+
+    for (auto updatedColorName: updatedColors)
     {
-        if (defaultColors.contains(*it))
+        if (defaultColors.contains(updatedColorName))
         {
-            colorSubstitutions[defaultColors[*it].value<QColor>().name()] =
-                colors[*it].value<QColor>().name();
+            colorSubstitutions[defaultColors[updatedColorName].value<QColor>().name()] =
+                colors[updatedColorName].value<QColor>().name();
         }
     }
 }
 
-QJsonObject ColorTheme::Private::readColorsFromFile(const QString& filename) const
+QJsonObject ColorTheme::Private::readColorDataFromFile(const QString& filename) const
 {
     QJsonObject result;
 
@@ -91,7 +93,7 @@ QJsonObject ColorTheme::Private::readColorsFromFile(const QString& filename) con
         const bool parsed = error.error == QJsonParseError::NoError;
         if (NX_ASSERT(parsed, "JSON parse error: %1", error.errorString())
                 && NX_ASSERT(json.isObject(), "Invalid JSON structure"))
-            return json.object().value("globals").toObject();
+            result = json.object().value("globals").toObject();
     }
 
     return result;
@@ -119,8 +121,7 @@ QSet<QString> ColorTheme::Private::updateColors(const QJsonObject& newColors)
         if (oldColor.isValid())
             updatedColors.insert(colorName);
 
-        QRegularExpressionMatch groupNameMatch = groupNameRe.match(colorName);
-        if (groupNameMatch.hasMatch())
+        if (auto groupNameMatch = groupNameRe.match(colorName); groupNameMatch.hasMatch())
         {
             const QString groupName = groupNameMatch.captured(0);
             QList<QColor>& group = groups[groupName];
