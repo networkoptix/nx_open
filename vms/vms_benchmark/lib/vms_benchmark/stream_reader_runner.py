@@ -11,7 +11,7 @@ debug = False
 
 
 @contextmanager
-def stream_reader_running(camera_ids, user, password, device_ip, vms_port):
+def stream_reader_running(camera_ids, streams_per_camera, user, password, device_ip, vms_port):
     camera_ids = list(camera_ids)
 
     args = [
@@ -22,7 +22,7 @@ def stream_reader_running(camera_ids, user, password, device_ip, vms_port):
         password,
         '--timestamps',
         '--count',
-        str(len(camera_ids))
+        streams_per_camera
     ]
 
     for stream_url in (
@@ -53,7 +53,7 @@ def stream_reader_running(camera_ids, user, password, device_ip, vms_port):
     logging.info(log_message)
 
     try:
-        proc = subprocess.Popen(args, **opts)
+        proc = subprocess.Popen([str(arg) for arg in args], **opts)
     except Exception as exception:
         raise exceptions.RtspPerfError(f"Unexpected error during starting rtsp_perf: {str(exception)}")
 

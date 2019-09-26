@@ -5,7 +5,6 @@ import signal
 import sys
 import time
 import logging
-from dataclasses import dataclass
 
 logging.basicConfig(filename='vms_benchmark.log', filemode='w', level=logging.DEBUG)
 
@@ -57,7 +56,6 @@ from vms_benchmark import exceptions
 
 import urllib
 import click
-import cv2
 
 
 def to_megabytes(bytes_count):
@@ -96,7 +94,11 @@ def load_configs(config_file, sys_config_file):
         "testCamerasTestSequence": {
             "optional": True,
             "type": "integers"
-        }
+        },
+        "streamsPerTestCamera": {
+            "optional": True,
+            "type": 'integer'
+        },
     }
 
     config = ConfigParser(config_file, option_descriptions)
@@ -213,46 +215,6 @@ def report_server_storage_failures(api, streaming_started_at):
 
     if storage_failure_events_count > 0:
         raise exceptions.StorageFailuresIssue(storage_failure_events_count)
-
-@dataclass
-class Stats:
-    dropped_frames_count: int = 0
-    dup_frames_count: int = 0
-    cpu_usage_per_cpu: int = 0
-    ram_free_bytes: int = 0
-
-
-def report_stats(stats, api, streaming_started_at, sys_config):
-    print(f"    Frame drops: {stats.dropped_frames_count} (expected 0)")
-    print(f"    Frames with equal timestamps: {stats.dup_frames_count} (expected 0)")
-    print(f"    CPU usage (per-CPU average): {to_percentage(stats.cpu_usage_per_cpu)}%")
-    print(f"    RAM free before discovering cameras: {to_megabytes(stats.ram_free_bytes)} MB")
-
-    storage_failure_count = report_server_storage_failures(api, streaming_started_at)
-
-    # Collect messages for all detected issues and join them via '; '.
-
-    issue_message = ""
-
-    if storage_failure_count > 0:
-        issue_message += (('; ' if issue_message else '') +
-             f"{storage_failure_count} Server Storage failure events")
-
-    if stats.dropped_frames_count > 0:
-        issue_message += (('; ' if issue_message else '') +
-            f"{stats.dropped_frames_count} dropped frame(s)")
-
-    if stats.dup_frames_count > 0:
-        issue_message += (('; ' if issue_message else '') +
-            f"{stats.dup_frames_count} frame(s) with equal timestamps")
-
-    if stats.cpu_usage_per_cpu > sys_config['cpuUsageThreshold']:
-        issue_message += (('; ' if issue_message else '') +
-            f"box CPU usage of {to_percentage(stats.cpu_usage_per_cpu)}% is too high " +
-            f"(exceeds {to_percentage(sys_config['cpuUsageThreshold'])}%)")
-
-    if issue_message:
-        raise exceptions.VmsBenchmarkIssue("Detected the following: " + issue_message + ".")
 
 
 def get_writable_storages(api, sys_config):
@@ -404,7 +366,7 @@ def main(config_file, sys_config_file):
     if ram_free_bytes is None:
         ram_free_bytes = dev_platform.ram_free_bytes()
     print('Server restarted successfully.')
-    print(f"RAM free: {to_megabytes(ram_free_bytes())} MB of {to_megabytes(dev_platform.ram_bytes)} MB")
+    print(f"RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(dev_platform.ram_bytes)} MB")
 
     api = ServerApi(device.ip, vms.port, user=config['vmsUser'], password=config['vmsPassword'])
 
@@ -470,8 +432,6 @@ def main(config_file, sys_config_file):
         ram_available_bytes = dev_platform.ram_available_bytes()
         ram_free_bytes = ram_available_bytes if ram_available_bytes else dev_platform.ram_free_bytes()
 
-        stats = Stats()
-
         if ram_available_bytes and ram_available_bytes < (
                 test_cameras_count * ram_bytes_per_camera_by_arch.get(dev_platform.arch, 200) * 1024 * 1024
         ):
@@ -534,11 +494,12 @@ def main(config_file, sys_config_file):
                 raise exceptions.TestCameraError(f"Not all virtual cameras were discovered or went live.", e) from e
 
             stream_reader_context_manager = stream_reader_runner.stream_reader_running(
-                (camera.id for camera in cameras),
-                config['vmsUser'],
-                config['vmsPassword'],
-                device.ip,
-                vms.port
+                camera_ids=(camera.id for camera in cameras),
+                streams_per_camera=config.get('streamsPerTestCamera', len(cameras)),
+                user=config['vmsUser'],
+                password=config['vmsPassword'],
+                device_ip=device.ip,
+                vms_port=vms.port
             )
             with stream_reader_context_manager as stream_reader_context:
                 started = False
@@ -651,8 +612,8 @@ def main(config_file, sys_config_file):
                 issues = []
 
                 try:
-                    ram_available = dev_platform.ram_available()
-                    ram_free = ram_available if ram_available else dev_platform.ram_free()
+                    ram_available_bytes = dev_platform.ram_available_bytes()
+                    ram_free_bytes = ram_available_bytes if ram_available_bytes else dev_platform.ram_free_bytes()
                 except exceptions.VmsBenchmarkError as e:
                     issues.append(exceptions.UnableToFetchDataFromDevice(
                         'Unable to fetch box RAM usage',
@@ -673,8 +634,8 @@ def main(config_file, sys_config_file):
                 print(f"    Frame drops: {sum(frame_drops.values())} (expected 0)")
                 if cpu_usage_summarized is not None:
                     print(f"    CPU usage: {str(cpu_usage_summarized) if cpu_usage_summarized else '-'}")
-                if ram_free is not None:
-                    print(f"    Free RAM: {round(ram_free/1024/1024)} MB")
+                if ram_free_bytes is not None:
+                    print(f"    Free RAM: {to_megabytes(ram_free_bytes)} MB")
 
                 if frame_drops_sum > 0:
                     issues.append(exceptions.VmsBenchmarkIssue(
