@@ -22,6 +22,7 @@
 #include "api/app_server_connection.h"
 #include "network/router.h"
 #include <nx/vms/discovery/manager.h>
+#include <core/resource/media_server_resource.h>
 
 #include <utils/common/app_info.h>
 #include "core/resource/storage_resource.h"
@@ -29,7 +30,7 @@
 #include "resource_status_watcher.h"
 #include <media_server/media_server_module.h>
 #include "nx_ec/ec_api.h"
-#include <nx/vms/server/resource/server_resource.h>
+
 
 using namespace nx;
 using namespace nx::vms::api;
@@ -91,14 +92,6 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr& resource,
         m_delayedOnlineStatus.remove(resId);
         resource->setStatus(Qn::Online);
     }
-}
-
-void QnServerMessageProcessor::updateResource(
-    const MediaServerData& server, ec2::NotificationSource source)
-{
-    QnMediaServerResourcePtr qnServer(new MediaServerResource(commonModule()));
-    ec2::fromApiToResource(server, qnServer);
-    updateResource(qnServer, source);
 }
 
 void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
