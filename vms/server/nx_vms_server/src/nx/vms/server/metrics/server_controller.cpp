@@ -135,7 +135,8 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
         utils::metrics::makeValueGroupProvider<Resource>(
             "serverLoad",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "cpuUsageP", [platform](const auto&) { return Value(platform->totalCpuUsage()); }
+                "cpuUsageP", [platform](const auto&) { return Value(platform->totalCpuUsage()); },
+                nx::vms::server::metrics::timerWatch<Resource>(kUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "serverCpuUsageP",
