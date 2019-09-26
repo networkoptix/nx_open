@@ -64,7 +64,7 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
     static const std::chrono::seconds kTransactionsUpdateInterval(5);
     static const std::chrono::minutes kTimeChangedInterval(1);
     static const std::chrono::milliseconds kMegapixelsUpdateInterval(500);
-    static const std::chrono::milliseconds kActionsUpdateInterval(250);
+    static const std::chrono::seconds kActionsUpdateInterval(5);
     static const double kPixelsToMegapixels = 1000000.0;
 
     using namespace ResourcePropertyKey;

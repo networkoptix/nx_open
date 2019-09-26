@@ -156,10 +156,10 @@
                     "calculate": "average %encodingSpeed 3s",
                     "insert": "encodingSpeed"
                 },
-                "actionsTriggered1s": {
+                "actionsTriggered1m": {
                     "name": "Event rules triggering/s",
                     "display": "panel",
-                    "calculate": "average %actionsTriggered 1s",
+                    "calculate": "average %actionsTriggered 1m",
                     "insert": "actionsTriggered"
                 }
             }
