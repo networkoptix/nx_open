@@ -623,7 +623,7 @@ PageBase
     {
         id: cameraSwitchAnimation
 
-        property string newResourceId
+        property var newResourceId
         property string thumbnail
 
         NumberAnimation

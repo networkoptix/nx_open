@@ -146,7 +146,7 @@ QnUuid QnCameraListModel::resourceIdByRow(int row) const
     if (!hasIndex(row, 0))
         return QnUuid();
 
-    return data(index(row, 0), Qn::UuidRole).toUuid();
+    return data(index(row, 0), Qn::UuidRole).value<QnUuid>();
 }
 
 QnUuid QnCameraListModel::nextResourceId(const QnUuid& resourceId) const
@@ -187,7 +187,7 @@ void QnCameraListModel::refreshThumbnail(int row)
     if (!hasIndex(row, 0))
         return;
 
-    const auto id = data(index(row, 0), Qn::UuidRole).toUuid();
+    const auto id = data(index(row, 0), Qn::UuidRole).value<QnUuid>();
     QnCameraThumbnailCache::instance()->refreshThumbnail(id);
 }
 
@@ -209,7 +209,7 @@ void QnCameraListModel::refreshThumbnails(int from, int to)
 
     QList<QnUuid> ids;
     for (int i = from; i <= to; i++)
-        ids.append(data(index(i, 0), Qn::UuidRole).toUuid());
+        ids.append(data(index(i, 0), Qn::UuidRole).value<QnUuid>());
 
     QnCameraThumbnailCache::instance()->refreshThumbnails(ids);
 }
@@ -248,7 +248,7 @@ bool QnCameraListModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourc
     if (d->filterIds.isEmpty())
         return true;
 
-    const auto id = index.data(Qn::UuidRole).toUuid();
+    const auto id = index.data(Qn::UuidRole).value<QnUuid>();
     return d->filterIds.contains(id);
 }
 
