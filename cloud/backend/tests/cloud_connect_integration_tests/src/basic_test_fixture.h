@@ -322,6 +322,7 @@ BasicTestFixture<Base>::BasicTestFixture(
     :
     base_type("cloud_connect_integration_tests"),
     m_staticMsgBody("Hello, hren!"),
+    m_discoveryServer(std::chrono::seconds(20)),
     m_relayCount(relayCount),
     m_disconnectedPeerTimeout(disconnectedPeerTimeout)
 {
