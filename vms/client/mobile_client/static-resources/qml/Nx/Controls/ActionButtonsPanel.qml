@@ -177,7 +177,7 @@ Item
 
             onTriggerActivated:
             {
-                var index = buttonModel.rowById(id)
+                var index = buttonModel.rowById(ruleId)
                 var text = d.getText(index)
                 if (!success)
                 {

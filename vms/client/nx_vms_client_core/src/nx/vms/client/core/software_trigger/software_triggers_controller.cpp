@@ -34,7 +34,7 @@ struct SoftwareTriggersController::Private
     vms::event::RuleManager* const ruleManager;
 
     QnUuid resourceId;
-    QnUuid activeTriggerId;
+    QnUuid activeTriggerRuleId;
 };
 
 SoftwareTriggersController::Private::Private(SoftwareTriggersController* q):
@@ -46,12 +46,14 @@ SoftwareTriggersController::Private::Private(SoftwareTriggersController* q):
 {
 }
 
-bool SoftwareTriggersController::Private::setTriggerState(QnUuid id, vms::event::EventState state)
+bool SoftwareTriggersController::Private::setTriggerState(
+    QnUuid ruleId,
+    vms::event::EventState state)
 {
-    if (resourceId.isNull() || id.isNull())
+    if (resourceId.isNull() || ruleId.isNull())
     {
         NX_ASSERT(!resourceId.isNull(), "Invalid resource id");
-        NX_ASSERT(!id.isNull(), "Invalid trigger id");
+        NX_ASSERT(!ruleId.isNull(), "Invalid trigger id");
         return false;
     }
 
@@ -59,30 +61,31 @@ bool SoftwareTriggersController::Private::setTriggerState(QnUuid id, vms::event:
     if (!accessManager->hasGlobalPermission(currentUser, GlobalPermission::userInput))
         return false;
 
-    const auto rule = ruleManager->rule(id);
+    const auto rule = ruleManager->rule(ruleId);
     if (!rule)
     {
         NX_ASSERT(rule, "Trigger does not exist");
         return false;
     }
 
-    activeTriggerId = state == vms::event::EventState::active ? id : QnUuid();
+    activeTriggerRuleId = state == vms::event::EventState::active ? ruleId : QnUuid();
 
     const auto callback = nx::utils::guarded(q,
-        [this, state, id](bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
+        [this, state, ruleId](bool success, rest::Handle /*handle*/, const QnJsonRestResult& result)
         {
             success = success && result.error == QnRestResult::NoError;
             if (state == nx::vms::event::EventState::inactive)
-                emit q->triggerDeactivated(id, success);
+                emit q->triggerDeactivated(ruleId, success);
             else
-                emit q->triggerActivated(id, success);
+                emit q->triggerActivated(ruleId, success);
         });
 
+    const auto triggerId = rule->eventParams().inputPortId;
     const auto connection = commonModule->currentServer()->restConnection();
     QnRequestParamList params;
     params.insert(lit("timestamp"), lit("%1").arg(qnSyncTime->currentMSecsSinceEpoch()));
     params.insert(lit("event_type"), QnLexical::serialized(nx::vms::api::EventType::softwareTriggerEvent));
-    params.insert(lit("inputPortId"), id);
+    params.insert(lit("inputPortId"), triggerId);
     params.insert(lit("eventResourceId"), resourceId.toString());
 
     if (state != nx::vms::api::EventState::undefined)
@@ -91,7 +94,6 @@ bool SoftwareTriggersController::Private::setTriggerState(QnUuid id, vms::event:
     connection->getJsonResult("/api/createEvent", params, callback, QThread::currentThread());
     return true;
 }
-
 
 //--------------------------------------------------------------------------------------------------
 
@@ -135,23 +137,23 @@ void SoftwareTriggersController::setResourceId(const QnUuid& id)
 
 QnUuid SoftwareTriggersController::activeTriggerId() const
 {
-    return d->activeTriggerId;
+    return d->activeTriggerRuleId;
 }
 
 bool SoftwareTriggersController::hasActiveTrigger() const
 {
-    return !d->activeTriggerId.isNull();
+    return !d->activeTriggerRuleId.isNull();
 }
 
-bool SoftwareTriggersController::activateTrigger(const QnUuid& id)
+bool SoftwareTriggersController::activateTrigger(const QnUuid& ruleId)
 {
-    if (!d->activeTriggerId.isNull())
+    if (!d->activeTriggerRuleId.isNull())
     {
         NX_ASSERT(false, "Can't activate trigger while another in progress");
         return false;
     }
 
-    const auto rule = d->ruleManager->rule(id);
+    const auto rule = d->ruleManager->rule(ruleId);
     if (!rule)
     {
         NX_ASSERT(false, "Not rule for specified trigger");
@@ -161,15 +163,15 @@ bool SoftwareTriggersController::activateTrigger(const QnUuid& id)
     const auto state = rule->isActionProlonged()
         ? vms::event::EventState::active
         : vms::event::EventState::undefined;
-    return d->setTriggerState(id, state);
+    return d->setTriggerState(ruleId, state);
 }
 
 bool SoftwareTriggersController::deactivateTrigger()
 {
-    if (d->activeTriggerId.isNull())
+    if (d->activeTriggerRuleId.isNull())
         return false; //< May be when activation failed.
 
-    const auto rule = d->ruleManager->rule(d->activeTriggerId);
+    const auto rule = d->ruleManager->rule(d->activeTriggerRuleId);
     if (!rule || !rule->isActionProlonged())
     {
         NX_ASSERT(rule, "No rule for specified trigger");
@@ -177,20 +179,20 @@ bool SoftwareTriggersController::deactivateTrigger()
         return false;
     }
 
-    return d->setTriggerState(d->activeTriggerId, vms::event::EventState::inactive);
+    return d->setTriggerState(d->activeTriggerRuleId, vms::event::EventState::inactive);
 }
 
 void SoftwareTriggersController::cancelTriggerAction()
 {
-    if (d->activeTriggerId.isNull())
+    if (d->activeTriggerRuleId.isNull())
         return;
 
-    const auto rule = d->ruleManager->rule(d->activeTriggerId);
+    const auto rule = d->ruleManager->rule(d->activeTriggerRuleId);
     if (rule && rule->isActionProlonged())
         deactivateTrigger();
 
-    const auto currentTriggerId = d->activeTriggerId;
-    d->activeTriggerId = QnUuid();
+    const auto currentTriggerId = d->activeTriggerRuleId;
+    d->activeTriggerRuleId = QnUuid();
     emit triggerCancelled(currentTriggerId);
 }
 

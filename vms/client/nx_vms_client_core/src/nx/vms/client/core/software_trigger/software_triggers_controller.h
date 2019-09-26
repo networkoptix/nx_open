@@ -24,7 +24,7 @@ public:
     QnUuid resourceId() const;
     void setResourceId(const QnUuid& id);
 
-    Q_INVOKABLE bool activateTrigger(const QnUuid& id);
+    Q_INVOKABLE bool activateTrigger(const QnUuid& ruleId);
     Q_INVOKABLE bool deactivateTrigger();
     Q_INVOKABLE void cancelTriggerAction();
     Q_INVOKABLE QnUuid activeTriggerId() const;
@@ -33,9 +33,9 @@ public:
 signals:
     void resourceIdChanged();
 
-    void triggerActivated(const QnUuid& id, bool success);
-    void triggerDeactivated(const QnUuid& id, bool success);
-    void triggerCancelled(const QnUuid& id);
+    void triggerActivated(const QnUuid& ruleId, bool success);
+    void triggerDeactivated(const QnUuid& ruleId, bool success);
+    void triggerCancelled(const QnUuid& ruleId);
 
 private:
     struct Private;

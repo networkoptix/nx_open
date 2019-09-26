@@ -358,14 +358,14 @@ private:
 private:
     struct SoftwareTriggerInfo
     {
-        QnUuid triggerId;
+        QnUuid ruleId;
         QString name;
         QString icon;
         bool prolonged = false;
 
         bool operator ==(const SoftwareTriggerInfo& other) const
         {
-            return triggerId == other.triggerId
+            return ruleId == other.ruleId
                 && name == other.name
                 && icon == other.icon
                 && prolonged == other.prolonged;

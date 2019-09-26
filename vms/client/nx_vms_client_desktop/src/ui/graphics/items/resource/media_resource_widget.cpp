@@ -156,8 +156,6 @@ static constexpr int kTriggersSpacing = 4;
 static constexpr int kTriggerButtonSize = 40;
 static constexpr int kTriggersMargin = 8; // overlaps HUD margin, i.e. does not sum up with it
 
-static const char* kTriggerId = "_qn_triggerId";
-
 template<class Cont, class Item>
 bool contains(const Cont& cont, const Item& item)
 {
@@ -405,14 +403,20 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     updateButtonsVisibility();
 
     const auto triggerActionHandler =
-        [](const QnUuid& triggerId, bool success)
+        [this](const QnUuid& ruleId, bool success)
         {
-//            SoftwareTriggerButton* button = nullptr;
-//            button->setEnabled(true);
+            const auto button = static_cast<SoftwareTriggerButton*>(
+                m_triggersContainer->item(ruleId));
+            if (!button)
+            {
+                NX_ASSERT(false, "Can't find button for specified trigger rule id!");
+                return;
+            }
 
-//            button->setState(success
-//                ? SoftwareTriggerButton::State::Success
-//                : SoftwareTriggerButton::State::Failure);
+            button->setEnabled(true);
+            button->setState(success
+                ? SoftwareTriggerButton::State::Success
+                : SoftwareTriggerButton::State::Failure);
         };
 
     m_triggerController.setResourceId(base_type::resource()->getId());
@@ -2886,7 +2890,7 @@ QnMediaResourceWidget::SoftwareTriggerInfo QnMediaResourceWidget::makeTriggerInf
     const nx::vms::event::RulePtr& rule) const
 {
     return SoftwareTriggerInfo({
-        QnUuid::fromStringSafe(rule->eventParams().inputPortId),
+        rule->id(),
         rule->eventParams().caption,
         rule->eventParams().description,
         rule->isActionProlonged() });
@@ -2927,7 +2931,7 @@ void QnMediaResourceWidget::createTriggerIfRelevant(
             updateTriggerAvailability(rule);
         });
 
-    const auto overlayItemId = m_triggersContainer->insertItem(index, button);
+    const auto overlayItemId = m_triggersContainer->insertItem(index, button, rule->id());
     m_triggers.insert(index, SoftwareTrigger{rule->id(), info, overlayItemId});
 }
 
@@ -2988,18 +2992,16 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
     button->setProlonged(info.prolonged);
     updateTriggerButtonTooltip(button, info, true);
 
-    button->setProperty(kTriggerId, QVariant::fromValue(info.triggerId));
     if (info.prolonged)
     {
         connect(button, &SoftwareTriggerButton::pressed, this,
-            [this, button, clientSideHandler, id = info.triggerId]()
+            [this, button, clientSideHandler, info]()
             {
                 if (!button->isLive())
                     return;
 
-                qWarning() << "++++++++++++++" << id;
-                const bool success = m_triggerController.activateTrigger(id);
-                button->setState(m_triggerController.activateTrigger(id)
+                const bool success = m_triggerController.activateTrigger(info.ruleId);
+                button->setState(success
                     ? SoftwareTriggerButton::State::Waiting
                     : SoftwareTriggerButton::State::Failure);
 
@@ -3025,13 +3027,12 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
     else
     {
         connect(button, &SoftwareTriggerButton::clicked, this,
-            [this, button, clientSideHandler, id = info.triggerId]()
+            [this, button, clientSideHandler, info]()
             {
                 if (!button->isLive())
                     return;
 
-                qWarning() << "++++++++++++++" << id;
-                const bool success = m_triggerController.activateTrigger(id);
+                const bool success = m_triggerController.activateTrigger(info.ruleId);
                 button->setEnabled(!success);
                 button->setState(success
                     ? SoftwareTriggerButton::State::Waiting
