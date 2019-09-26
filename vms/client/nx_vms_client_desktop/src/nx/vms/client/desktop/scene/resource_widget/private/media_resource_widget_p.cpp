@@ -80,9 +80,9 @@ MediaResourceWidgetPrivate::MediaResourceWidgetPrivate(
             this, &MediaResourceWidgetPrivate::stateChanged);
 
         connect(camera, &QnVirtualCameraResource::userEnabledAnalyticsEnginesChanged, this,
-	    &MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
+            &MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
         connect(camera, &QnVirtualCameraResource::compatibleAnalyticsEnginesChanged, this,
-	    &MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
+            &MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
         connect(camera, &QnVirtualCameraResource::compatibleObjectTypesMaybeChanged, this,
             &MediaResourceWidgetPrivate::updateIsAnalyticsSupported);
 
