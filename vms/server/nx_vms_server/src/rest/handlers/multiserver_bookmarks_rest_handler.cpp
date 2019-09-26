@@ -230,3 +230,4 @@ int QnMultiserverBookmarksRestHandler::executeGet(
             return performGet(serverModule(), ownerPort, params, &result, &contentType);
     }
 }
+

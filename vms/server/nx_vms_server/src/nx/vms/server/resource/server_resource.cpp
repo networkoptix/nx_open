@@ -47,6 +47,10 @@ qint64 MediaServerResource::getAndResetMetric(MediaServerResource::Metrics param
     }
     case Metrics::timeChanged:
         return getDelta(parameter, m_timeChangeEvents);
+    case Metrics::decodingSpeed:
+        return getDelta(parameter, commonModule()->metrics()->decodedPixels());
+    case Metrics::encodingSpeed:
+        return getDelta(parameter, commonModule()->metrics()->encodedPixels());
     default:
         return 0;
     }

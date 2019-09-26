@@ -221,7 +221,10 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
 
     QnFfmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
     if (!decoder)
-        decoder = m_videoDecoders[video->channelNumber] = new QnFfmpegVideoDecoder(m_config, video->compressionType, video);
+    {
+        decoder = m_videoDecoders[video->channelNumber] = 
+            new QnFfmpegVideoDecoder(m_config, m_metrics, video->compressionType, video);
+    }
 
     if (result)
         *result = QnCompressedVideoDataPtr();
@@ -296,6 +299,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     int encodeResult = avcodec_encode_video2(m_encoderCtx, m_outPacket, decodedFrame.data(), &got_packet);
     if (encodeResult < 0)
         return -3;
+    m_metrics->encodedPixels() += decodedFrame->width * decodedFrame->height;
     if (!got_packet)
         return 0;
 

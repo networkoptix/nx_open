@@ -13,6 +13,8 @@ static const int MOTION_AGGREGATION_PERIOD = 300 * 1000;
 
 static const int FRAMES_BUFFER_SIZE = 2;
 
+namespace nx::metrics { struct Storage; }
+
 class QnMotionEstimation
 {
 public:
@@ -22,7 +24,7 @@ public:
     };
 
 public:
-    QnMotionEstimation(const Config& config);
+    QnMotionEstimation(const Config& config, nx::metrics::Storage* metrics);
     ~QnMotionEstimation();
     /*
     * Set motion mask as array of quint8 values in range [0..255] . array size is Qn::kMotionGridWidth * Qn::kMotionGridHeight
@@ -98,4 +100,5 @@ private:
     int m_scaleXStep;
     int m_scaleYStep;
     int m_channelNum;
+    nx::metrics::Storage* m_metrics = nullptr;
 };

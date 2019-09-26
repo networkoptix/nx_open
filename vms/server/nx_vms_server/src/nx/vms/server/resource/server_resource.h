@@ -19,7 +19,9 @@ namespace nx::vms::server {
         enum class Metrics
         {
             transactions,
-            timeChanged
+            timeChanged,
+            decodingSpeed,
+            encodingSpeed
         };
 
         qint64 getAndResetMetric(Metrics parameter);

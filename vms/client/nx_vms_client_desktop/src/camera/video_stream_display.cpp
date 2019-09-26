@@ -484,7 +484,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         config.mtDecodePolicy = toEncoderPolicy(/*mtDecoding*/ enableFrameQueue);
 
         dec = new QnFfmpegVideoDecoder(
-            config,
+            config, /*metrics*/ nullptr,
             data->compressionType, data);
         if (dec == nullptr)
         {

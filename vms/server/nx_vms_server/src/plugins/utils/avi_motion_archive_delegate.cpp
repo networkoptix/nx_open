@@ -5,8 +5,11 @@ namespace vms::server {
 namespace plugins {
 
 
-AviMotionArchiveDelegate::AviMotionArchiveDelegate(const QnMotionEstimation::Config& config):
-    m_motionEstimation(config)
+AviMotionArchiveDelegate::AviMotionArchiveDelegate(
+    const QnMotionEstimation::Config& config,
+    nx::metrics::Storage* metrics)
+    :
+    m_motionEstimation(config, metrics)
 {
     m_motionEstimation.setChannelNum(0);
 }

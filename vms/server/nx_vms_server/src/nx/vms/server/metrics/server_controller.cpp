@@ -63,6 +63,8 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
 {
     static const std::chrono::seconds kTransactionsUpdateInterval(5);
     static const std::chrono::minutes kTimeChangedInterval(1);
+    static const std::chrono::milliseconds kMegapixelsUpdateInterval(500);
+    static const double kPixelsToMegapixels = 1000000.0;
 
     using namespace ResourcePropertyKey;
     // TODO: make sure that platform is removed only after HM!
@@ -127,6 +129,10 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                 "encodingThreads", [](const auto& r)
                     { return Value(r->commonModule()->metrics()->transcoders()); }
             ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "decodingThreads", [](const auto& r)
+                    { return Value(r->commonModule()->metrics()->decoders()); }
+            ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "cameras", [](const auto& r)
                     {
@@ -141,8 +147,25 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                             r->getAndResetMetric(MediaServerResource::Metrics::transactions));
                     },
                     nx::vms::server::metrics::timerWatch<MediaServerResource*>(kTransactionsUpdateInterval)
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "decodingSpeed", [](const auto& r)
+                    {
+                        return Value(r->getAndResetMetric(
+                            MediaServerResource::Metrics::decodingSpeed) / kPixelsToMegapixels);
+                    },
+                    nx::vms::server::metrics::timerWatch<MediaServerResource*>(kMegapixelsUpdateInterval)
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "encodingSpeed", [](const auto& r)
+                    {
+                        return Value(r->getAndResetMetric(
+                            MediaServerResource::Metrics::encodingSpeed) / kPixelsToMegapixels);
+                    },
+                    nx::vms::server::metrics::timerWatch<MediaServerResource*>(kMegapixelsUpdateInterval)
             )
-      )
+
+     )
         // TODO: Implement "Server load", "Info" and "Activity" groups.
     );
 }

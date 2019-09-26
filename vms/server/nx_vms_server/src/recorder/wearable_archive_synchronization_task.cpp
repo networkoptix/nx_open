@@ -146,7 +146,7 @@ QnAviArchiveDelegate* WearableArchiveSynchronizationTask::createArchiveDelegate(
     QnMotionEstimation::Config config;
     config.decoderConfig.mtDecodePolicy = serverModule()->settings().multiThreadDecodePolicy();
     std::unique_ptr<AviMotionArchiveDelegate> result =
-        std::make_unique<AviMotionArchiveDelegate>(config);
+        std::make_unique<AviMotionArchiveDelegate>(config, serverModule()->commonModule()->metrics());
     QnMotionRegion region;
     result->setMotionRegion(m_camera->getMotionRegion(0));
     return result.release();

@@ -127,16 +127,34 @@
                     "name": "Encoding threads",
                     "display": "panel"
                 },
+                "decodingThreads": {
+                    "name": "Decoding threads",
+                    "display": "panel"
+                },
                 "cameras": {
                     "name": "Cameras",
                     "display": "panel"
                 },
                 "transactionsPerSecond1m": {
                     "name": "Transactions per second",
-                    "display": "|panel",
+                    "display": "panel",
                     "unit": "Transactions/s",
                     "calculate": "average %transactionsPerSecond 1m",
                     "insert": "transactionsPerSecond"
+                },
+                "decodingSpeed3s": {
+                    "name": "Decoding speed",
+                    "display": "panel",
+                    "unit": "Mp/s",
+                    "calculate": "average %decodingSpeed 3s",
+                    "insert": "decodingSpeed"
+                },
+                "encodingSpeed3s": {
+                    "name": "Encoding speed",
+                    "display": "|panel",
+                    "unit": "Mp/s",
+                    "calculate": "average %encodingSpeed 3s",
+                    "insert": "encodingSpeed"
                 }
             }
         }

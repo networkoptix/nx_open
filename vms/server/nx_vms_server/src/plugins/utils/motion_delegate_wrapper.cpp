@@ -4,10 +4,13 @@ namespace nx {
 namespace vms::server {
 namespace plugins {
 
-MotionDelegateWrapper::MotionDelegateWrapper(const QnMotionEstimation::Config& config,
-    std::unique_ptr<QnAbstractArchiveDelegate> delegate):
+MotionDelegateWrapper::MotionDelegateWrapper(
+    const QnMotionEstimation::Config& config,
+    nx::metrics::Storage* metrics,
+    std::unique_ptr<QnAbstractArchiveDelegate> delegate)
+    :
     base_type(std::move(delegate)),
-    m_motionEstimation(config)
+    m_motionEstimation(config, metrics)
 {
     m_motionEstimation.setChannelNum(0);
 }

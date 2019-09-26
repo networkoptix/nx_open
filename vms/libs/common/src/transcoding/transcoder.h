@@ -260,7 +260,7 @@ protected:
     //! Make sure to correctly fill these member variables in overriden open() function.
     bool m_initializedAudio;    // Incoming audio packets will be ignored.
     bool m_initializedVideo;    // Incoming video packets will be ignored.
-
+    nx::metrics::Storage* m_metrics = nullptr;
 private:
     QString m_lastErrMessage;
     QQueue<QnConstCompressedVideoDataPtr> m_delayedVideoQueue;
@@ -269,7 +269,6 @@ private:
     bool m_packetizedMode;
     QnLegacyTranscodingSettings m_transcodingSettings;
     bool m_useRealTimeOptimization;
-    nx::metrics::Storage* m_metrics = nullptr;
 };
 
 typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;
