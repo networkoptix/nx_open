@@ -1,5 +1,7 @@
 #include "server_controller.h"
 
+#include <QtCore/QDateTime>
+
 #include <nx/fusion/serialization/lexical.h>
 #include <core/resource_management/resource_pool.h>
 #include <media_server/media_server_module.h>
@@ -41,7 +43,7 @@ void ServerController::start()
         });
 }
 
-QString datetimeString()
+QString dateTimeToString(const QDateTime& datetime)
 {
     int timeZoneInMinutes = currentTimeZone() / 60;
     QString timezone =  QString::number(timeZoneInMinutes / 60);
@@ -54,7 +56,7 @@ QString datetimeString()
     if (timeZoneInMinutes >= 0)
         timezone.insert(0, L'+');
     return lm("%1 (UTC %2)").args(
-        qnSyncTime->currentDateTime().toString("yyyy-MM-dd hh:mm:ss"),
+        datetime.toString("yyyy-MM-dd hh:mm:ss"),
         timezone);
 }
 
@@ -106,7 +108,12 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                 "publicIp", [](const auto& r) { return Value(r->getProperty(Server::kPublicIp)); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "time", [](const auto& r) { return Value(datetimeString()); }
+                "vmsTime", [](const auto& r)
+                    { return Value(dateTimeToString(qnSyncTime->currentDateTime())); }
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "osTime", [](const auto& r)
+                    { return Value(dateTimeToString(QDateTime::currentDateTime())); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "timeChanged", [](const auto& r)

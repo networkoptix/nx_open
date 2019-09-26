@@ -60,8 +60,12 @@
                     "name": "Public IP",
                     "display": "table|panel"
                 },
-                "time": {
-                    "name": "Time",
+                "vmsTime": {
+                    "name": "VMS time",
+                    "display": "table|panel"
+                },
+                "osTime": {
+                    "name": "OS time",
                     "display": "table|panel"
                 },
                 "timeChanged24h": {
