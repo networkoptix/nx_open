@@ -158,15 +158,6 @@ protected:
         int masterSystem = 0,
         int slaveSystem = 1)
     {
-        std::cout << "Merging " <<
-            m_systemMergeFixture.peer(slaveSystem).id().toSimpleByteArray().toStdString() <<
-            "." <<
-            m_systemMergeFixture.peer(slaveSystem).getCloudCredentials().systemId.toStdString() <<
-            " to " <<
-            m_systemMergeFixture.peer(masterSystem).id().toSimpleByteArray().toStdString() <<
-            "." <<
-            m_systemMergeFixture.peer(masterSystem).getCloudCredentials().systemId.toStdString();
-
         ASSERT_EQ(
             nx::cloud::db::api::ResultCode::ok,
             m_cdb.mergeSystems(
