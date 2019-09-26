@@ -153,8 +153,6 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal(
     QByteArray& contentType,
     qint64* frameTimestampUsec) const
 {
-    serverModule()->commonModule()->metrics()->thumbnails()++;
-
     QnGetImageHelper helper(serverModule());
     CLVideoDecoderOutputPtr outFrame = helper.getImage(request.request);
 
@@ -172,6 +170,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal(
 
     if (request.request.imageFormat == nx::api::CameraImageRequest::ThumbnailFormat::jpg)
     {
+        serverModule()->commonModule()->metrics()->thumbnails()++;
         QByteArray encodedData = helper.encodeImage(outFrame, imageFormat);
         result.append(encodedData);
     }
