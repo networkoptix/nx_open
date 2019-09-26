@@ -25,6 +25,8 @@
 #include <utils/media/frame_info.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/scope_guard.h>
+#include <media_server/media_server_module.h>
+#include <nx/metrics/metrics_storage.h>
 
 namespace {
 
@@ -147,10 +149,12 @@ QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer(
 
 int QnMultiserverThumbnailRestHandler::getThumbnailLocal(
     const QnThumbnailRequestData &request,
-    QByteArray& result, 
-    QByteArray& contentType, 
+    QByteArray& result,
+    QByteArray& contentType,
     qint64* frameTimestampUsec) const
 {
+    serverModule()->commonModule()->metrics()->thumbnails()++;
+
     QnGetImageHelper helper(serverModule());
     CLVideoDecoderOutputPtr outFrame = helper.getImage(request.request);
 

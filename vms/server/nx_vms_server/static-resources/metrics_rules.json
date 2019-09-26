@@ -161,6 +161,12 @@
                     "display": "panel",
                     "calculate": "average %actionsTriggered 1m",
                     "insert": "actionsTriggered"
+                },
+                "thumbnails1m": {
+                    "name": "Thumbnails per second",
+                    "display": "panel",
+                    "calculate": "average %thumbnails 1m",
+                    "insert": "thumbnails"
                 }
             }
         }

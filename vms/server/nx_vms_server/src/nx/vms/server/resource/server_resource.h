@@ -23,6 +23,7 @@ namespace nx::vms::server {
             decodedPixels,
             encodedPixels,
             ruleActionsTriggered,
+            thumbnailsRequested,
         };
 
         qint64 getAndResetMetric(Metrics parameter);

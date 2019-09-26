@@ -116,6 +116,7 @@ struct Storage: ParameterSet
     NX_METRICS_ADD(std::atomic_int, offlineStatus,
         "How many times resources have switched to the offline state");
     NX_METRICS_ADD(std::atomic<qint64>, ruleActions, "The number if executed rules actions");
+    NX_METRICS_ADD(std::atomic<qint64>, thumbnails, "Amount of requested thumbnails");
 
     struct Transactions: ParameterSet
     {

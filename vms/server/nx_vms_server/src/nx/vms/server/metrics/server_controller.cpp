@@ -61,10 +61,9 @@ QString datetimeString()
 
 utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController::makeProviders()
 {
-    static const std::chrono::seconds kTransactionsUpdateInterval(5);
+    static const std::chrono::seconds kUpdateInterval(5);
     static const std::chrono::minutes kTimeChangedInterval(1);
     static const std::chrono::milliseconds kMegapixelsUpdateInterval(500);
-    static const std::chrono::seconds kActionsUpdateInterval(5);
     static const double kPixelsToMegapixels = 1000000.0;
 
     using namespace ResourcePropertyKey;
@@ -147,7 +146,7 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                         return Value(
                             r->getAndResetMetric(MediaServerResource::Metrics::transactions));
                     },
-                    nx::vms::server::metrics::timerWatch<MediaServerResource*>(kTransactionsUpdateInterval)
+                    nx::vms::server::metrics::timerWatch<MediaServerResource*>(kUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "decodingSpeed", [](const auto& r)
@@ -171,7 +170,15 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                         return Value(r->getAndResetMetric(
                             MediaServerResource::Metrics::ruleActionsTriggered));
                     },
-                    nx::vms::server::metrics::timerWatch<MediaServerResource*>(kActionsUpdateInterval)
+                    nx::vms::server::metrics::timerWatch<MediaServerResource*>(kUpdateInterval)
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "thumbnails", [](const auto& r)
+                    {
+                        return Value(r->getAndResetMetric(
+                            MediaServerResource::Metrics::thumbnailsRequested));
+                    },
+                    nx::vms::server::metrics::timerWatch<MediaServerResource*>(kUpdateInterval)
             )
      )
         // TODO: Implement "Server load", "Info" and "Activity" groups.

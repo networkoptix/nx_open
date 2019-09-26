@@ -53,6 +53,8 @@ qint64 MediaServerResource::getAndResetMetric(MediaServerResource::Metrics param
         return getDelta(parameter, commonModule()->metrics()->encodedPixels());
     case Metrics::ruleActionsTriggered:
         return getDelta(parameter, commonModule()->metrics()->ruleActions());
+    case Metrics::thumbnailsRequested:
+        return getDelta(parameter, commonModule()->metrics()->thumbnails());
     default:
         return 0;
     }
