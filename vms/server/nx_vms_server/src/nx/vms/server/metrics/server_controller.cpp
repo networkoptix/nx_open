@@ -202,6 +202,14 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                             MediaServerResource::Metrics::thumbnailsRequested));
                     },
                     nx::vms::server::metrics::timerWatch<MediaServerResource*>(kUpdateInterval)
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "primaryStreams", [](const auto& r)
+                    { return Value(r->commonModule()->metrics()->primaryStreams()); }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "secondaryStreams", [](const auto& r)
+                    { return Value(r->commonModule()->metrics()->secondaryStreams()); }
             )
 
         )
