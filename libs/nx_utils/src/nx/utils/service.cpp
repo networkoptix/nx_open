@@ -37,7 +37,7 @@ Service::Service(int argc, char **argv, const QString& applicationDisplayName):
     m_argc(argc),
     m_argv(argv),
     m_applicationDisplayName(applicationDisplayName),
-	m_actionToTake(ActionToTake::invalid),
+	m_actionToTake(ActionToTake::stop),
     m_isTerminated(false)
 {
 }
@@ -50,7 +50,7 @@ void Service::setEnableLoggingInitialization(bool value)
 void Service::pleaseStop()
 {
 	m_isTerminated = true;
-	m_processTerminationEvents.push(ActionToTake::terminate);
+	m_processTerminationEvents.push(ActionToTake::stop);
 }
 
 void Service::setOnStartedEventHandler(
@@ -139,12 +139,9 @@ int Service::runServiceMain(const AbstractServiceSettings& settings)
 
     do
 	{
-		m_actionToTake = ActionToTake::invalid;
+		m_actionToTake = ActionToTake::stop;
 
         result = serviceMain(settings);
-
-		if (m_actionToTake == ActionToTake::invalid)
-			NX_DEBUG(this, "Service was started and stopped without calling runMainLoop");
 
         if (m_actionToTake == ActionToTake::restart)
             NX_INFO(this, "Service will restart. serviceMain returned %1", result);

@@ -248,7 +248,7 @@ void InitiateConnectionRequestHandler::processRequest(
     m_holePunchingProcessor->connect(
         RequestSourceDescriptor{
             network::TransportProtocol::tcp,
-            requestContext.connection->socket()->getForeignAddress()},
+            requestContext.connection->clientEndpoint()},
         inputData,
         [this, cachedRequestContext = std::move(cachedRequestContext),
             targetServer = inputData.destinationHostName](

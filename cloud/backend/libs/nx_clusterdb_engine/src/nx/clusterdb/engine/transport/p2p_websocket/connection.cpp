@@ -59,6 +59,10 @@ Connection::Connection(
         });
 
     auto tranState = m_transactionLogReader->getCurrentState();
+
+    NX_VERBOSE(this, "Subscribing to peer %1 data with current state %2",
+        remotePeerData.id, tranState);
+
     auto serializedData = nx::p2p::serializeSubscribeAllRequest(toVmsTranState(tranState));
     serializedData.data()[0] = (quint8)(nx::p2p::MessageType::subscribeAll);
     sendMessage(serializedData);
@@ -117,14 +121,18 @@ void Connection::onGotMessage(
                 setState(State::Error);
                 return;
             }
+
+            NX_VERBOSE(this, "Received subscribeAll request from peer %1 with state %2",
+                remotePeer().id, *m_remoteSubscription);
+
             readTransactions();
             break;
         }
 
         default:
-            NX_WARNING(this, lm("P2P message type '%1' is not allowed for cloud connect! "
-                "System id %2, source endpoint %3")
-                .args(toString(messageType), m_systemId, remotePeerEndpoint()));
+            NX_WARNING(this, "P2P message type '%1' is not allowed for cloud connect! "
+                "System id %2, source endpoint %3",
+                messageType, m_systemId, remotePeerEndpoint());
             setState(State::Error);
             break;
     }

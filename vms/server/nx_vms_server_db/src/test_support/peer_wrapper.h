@@ -101,6 +101,7 @@ public:
     QnUuid id() const;
 
     nx::hpm::api::SystemCredentials getCloudCredentials() const;
+    std::string ownerEmail() const;
 
     std::unique_ptr<MediaServerClientEx> mediaServerClient() const;
 
@@ -124,6 +125,7 @@ private:
     QString m_systemName;
     nx::network::http::Credentials m_ownerCredentials;
     nx::hpm::api::SystemCredentials m_cloudCredentials;
+    std::string m_ownerEmail;
 
     std::unique_ptr<MediaServerClientEx> prepareMediaServerClient() const;
 };

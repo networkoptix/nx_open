@@ -65,12 +65,11 @@ void DiscoveryServer::mockupClientPublicIpAddress(
     m_clientPublicIpAddresses[nodeId] = publicIpAddress;
 }
 
-nx::utils::SubscriptionId DiscoveryServer::subscribeToNodeDiscovered(
-    nx::utils::MoveOnlyFunc<void(std::string, NodeInfo)> handler)
+void DiscoveryServer::subscribeToNodeDiscovered(
+    nx::utils::MoveOnlyFunc<void(const std::string& , const NodeInfo&)> handler,
+    nx::utils::SubscriptionId* const outId)
 {
-    nx::utils::SubscriptionId id = nx::utils::kInvalidSubscriptionId;
-    m_nodeDiscoveredSubscription.subscribe(std::move(handler), &id);
-    return id;
+    m_nodeDiscoveredSubscription.subscribe(std::move(handler), outId);
 }
 
 void DiscoveryServer::unsubscribeFromNodeDiscovered(const nx::utils::SubscriptionId& subscriptionId)
