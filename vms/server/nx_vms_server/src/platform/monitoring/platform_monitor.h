@@ -24,7 +24,8 @@ public:
      */
     struct Hdd {
         Hdd(): id(-1) {}
-        Hdd(std::intptr_t id, const QString &name, const QString &partitions): id(id), name(name), partitions(partitions) {}
+        Hdd(std::intptr_t id, const QString &name, const QString &partitions):
+            id(id), name(name), partitions(partitions) {}
 
         /** Hdd ID, to be used internally. */
         std::intptr_t id;
@@ -107,7 +108,8 @@ public:
      * Network load entry
      */
     struct NetworkLoad {
-        NetworkLoad(): type(UnknownInterface), bytesPerSecIn(0), bytesPerSecOut(0), bytesPerSecMax(0) {}
+        NetworkLoad():
+            type(UnknownInterface), bytesPerSecIn(0), bytesPerSecOut(0), bytesPerSecMax(0) {}
 
         /** Network interface name */
         QString interfaceName;
@@ -135,15 +137,14 @@ public:
 
     /**
      * @returns Percent of CPU time (both user and kernel) consumed by all running processes since
-     *     the last call to this function, a number in range <tt>[0.0, 1.0]</tt>.
+     *     the last call to this function, a number in range [0.0, 1.0].
      */
     virtual qreal totalCpuUsage() = 0;
 
     /**
-     * @returns Percent of RAM currently consumed by all running processes, a number
-     *     in range <tt>[0.0, 1.0]</tt>.
+     * @returns RAM currently consumed by all running processes, a number of bytes.
      */
-    virtual qreal totalRamUsage() = 0;
+    virtual quint64 totalRamUsage() = 0;
 
     /**
      * @returns A list of HDD load entries for all HDDs on this PC.

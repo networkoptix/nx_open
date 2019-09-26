@@ -17,6 +17,7 @@
 #include <nx/utils/log/log.h>
 #include <nx_vms_server_ini.h>
 #include <utils/common/delete_later.h>
+#include <platform/hardware_information.h>
 
 namespace nx::vms::server {
 
@@ -30,7 +31,7 @@ public:
     StubMonitor(QObject *parent = NULL): QnPlatformMonitor(parent) {}
 
     virtual qreal totalCpuUsage() override { return 0.0; }
-    virtual qreal totalRamUsage() override { return 0.0; }
+    virtual quint64 totalRamUsage() override { return 0; }
     virtual QList<HddLoad> totalHddLoad() override { return {}; }
     virtual QList<NetworkLoad> totalNetworkLoad() override { return {}; }
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override { return {}; }
@@ -164,7 +165,8 @@ GlobalMonitor::~GlobalMonitor() {
 void GlobalMonitor::logStatistics()
 {
     NX_INFO(this, lm("Cpu usage %1%").arg(totalCpuUsage() * 100, 0, 'f', 2));
-    NX_INFO(this, lm("Memory usage %1%").arg(totalRamUsage() * 100, 0, 'f', 2));
+    NX_INFO(this, lm("Memory usage %1%").arg(
+        ramUsageToPercentages(totalRamUsage()) * 100, 0, 'f', 2));
 
     NX_INFO(this, "HDD usage:");
     for (const HddLoad& hddLoad: totalHddLoad())
@@ -196,7 +198,7 @@ qreal GlobalMonitor::totalCpuUsage() {
     return m_cachedTotalCpuUsage.get();
 }
 
-qreal GlobalMonitor::totalRamUsage() {
+quint64 GlobalMonitor::totalRamUsage() {
     return m_cachedTotalRamUsage.get();
 }
 
@@ -227,6 +229,12 @@ std::chrono::milliseconds GlobalMonitor::processUptime() const
 void GlobalMonitor::setServerModule(QnMediaServerModule* serverModule)
 {
     m_monitorBase->setServerModule(serverModule);
+}
+
+qreal ramUsageToPercentages(quint64 kbytes)
+{
+    auto totalRam = HardwareInformation::instance().physicalMemory;
+    return kbytes / qreal(totalRam) * 1000.0;
 }
 
 } // namespace nx::vms::server

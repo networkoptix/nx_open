@@ -41,12 +41,14 @@ int QnStatisticsRestHandler::executeGet(
     reply.uptimeMs = monitor->processUptime().count();
 
     QnStatisticsDataList cpuInfo;
-    cpuInfo.append(QnStatisticsDataItem(lit("CPU"), monitor->totalCpuUsage(), Qn::StatisticsCPU));
+    cpuInfo.append(QnStatisticsDataItem("CPU", monitor->totalCpuUsage(), Qn::StatisticsCPU));
     //cpuInfo.append(QnStatisticsDataItem(lit("CPU-CORES"), QThread::idealThreadCount(), Qn::StatisticsCPU));
     reply.statistics << cpuInfo;
 
     QnStatisticsDataList memory;
-    memory.append(QnStatisticsDataItem(lit("RAM"), monitor->totalRamUsage(), Qn::StatisticsRAM));
+    memory.append(QnStatisticsDataItem("RAM",
+        nx::vms::server::ramUsageToPercentages(monitor->totalRamUsage()),
+        Qn::StatisticsRAM));
     reply.statistics << memory;
 
     QnStatisticsDataList storages;

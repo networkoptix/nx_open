@@ -20,7 +20,7 @@ public:
     virtual ~QnLinuxMonitor();
 
     virtual qreal totalCpuUsage() override;
-    virtual qreal totalRamUsage() override;
+    virtual quint64 totalRamUsage() override;
     virtual QList<HddLoad> totalHddLoad() override;
     virtual QList<QnPlatformMonitor::NetworkLoad> totalNetworkLoad() override;
     virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;

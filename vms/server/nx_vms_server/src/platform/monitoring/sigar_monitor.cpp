@@ -269,17 +269,17 @@ qreal QnSigarMonitor::totalCpuUsage() {
     return result.combined;
 }
 
-qreal QnSigarMonitor::totalRamUsage() {
+quint64 QnSigarMonitor::totalRamUsage() {
     Q_D(QnSigarMonitor);
 
     if(!d->sigar)
-        return 0.0;
+        return 0;
 
     sigar_mem_t mem;
     if(INVOKE(sigar_mem_get(d->sigar, &mem)) != SIGAR_OK)
-        return 0.0;
+        return 0;
 
-    return mem.used_percent / 100.0;
+    return mem.used;
 }
 
 QList<QnPlatformMonitor::HddLoad> QnSigarMonitor::totalHddLoad() {

@@ -29,6 +29,7 @@
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/fs/partitions/read_partitions_linux.h>
 #include <nx/vms/server/fs/partitions/partitions_information_provider_linux.h>
+#include <platform/hardware_information.h>
 
 static const int BYTES_PER_MB = 1024*1024;
 //static const int NET_STAT_CALCULATION_PERIOD_SEC = 10;
@@ -435,7 +436,7 @@ qreal QnLinuxMonitor::totalCpuUsage()
     return 1.0 - cpuTimeIdleDiff / (qreal)cpuTimeTotalDiff;
 }
 
-qreal QnLinuxMonitor::totalRamUsage()
+quint64 QnLinuxMonitor::totalRamUsage()
 {
     std::unique_ptr<FILE, decltype(&fclose)> file( fopen("/proc/meminfo", "r"), fclose );
     if(!file)
@@ -472,7 +473,12 @@ qreal QnLinuxMonitor::totalRamUsage()
     if( !memTotalKB || !memFreeKB || !memCachedKB )
         return 0;
 
-    return 1.0 - ((memFreeKB.get()+memCachedKB.get()) / (qreal)(memTotalKB.get() == 0 ? ((memFreeKB.get() + memCachedKB.get())+1) : memTotalKB.get()));   //protecting from zero-memory-size error in /proc/meminfo. This situation is not possible in real life, so don't worry
+    // Protecting from zero-memory-size error in /proc/meminfo. This situation is not possible in
+    // real life, so nothing to worry about.
+    if (memTotalKB.get() == 0)
+        return 0;
+
+    return memTotalKB.get() - memFreeKB.get() - memCachedKB.get();
 }
 
 QList<QnPlatformMonitor::HddLoad> QnLinuxMonitor::totalHddLoad()
