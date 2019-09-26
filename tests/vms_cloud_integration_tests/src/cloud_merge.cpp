@@ -97,25 +97,37 @@ protected:
     void addRandomCloudUserToEachSystem()
     {
         for (int i = 0; i < m_systemMergeFixture.peerCount(); ++i)
-        {
-            const auto someCloudUser = m_cdb.addActivatedAccount2();
-            nx::vms::api::UserData vmsUserData;
+            addRandomCloudUserToSystem(i);
+    }
 
-            vmsUserData.id = guidFromArbitraryData(someCloudUser.email);
-            vmsUserData.typeId = kUserResourceTypeGuid;
-            vmsUserData.email = someCloudUser.email.c_str();
-            vmsUserData.name = someCloudUser.email.c_str();
-            vmsUserData.fullName = someCloudUser.fullName.c_str();
-            vmsUserData.isCloud = true;
-            vmsUserData.isEnabled = true;
-            vmsUserData.realm = nx::network::AppInfo::realm();
-            vmsUserData.hash = nx::vms::api::UserData::kCloudPasswordStub;
-            vmsUserData.digest = nx::vms::api::UserData::kCloudPasswordStub;
-            vmsUserData.permissions = GlobalPermission::adminPermissions;
+    void addRandomCloudUserToSystem(int index)
+    {
+        const auto someCloudUser = m_cdb.addActivatedAccount2();
+        m_cloudAccounts.push_back(someCloudUser);
 
-            auto mediaServerClient = m_systemMergeFixture.peer(i).mediaServerClient();
-            ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient->ec2SaveUser(vmsUserData));
-        }
+        nx::vms::api::UserData vmsUserData;
+        vmsUserData.id = guidFromArbitraryData(someCloudUser.email);
+        vmsUserData.typeId = kUserResourceTypeGuid;
+        vmsUserData.email = someCloudUser.email.c_str();
+        vmsUserData.name = someCloudUser.email.c_str();
+        vmsUserData.fullName = someCloudUser.fullName.c_str();
+        vmsUserData.isCloud = true;
+        vmsUserData.isEnabled = true;
+        vmsUserData.realm = nx::network::AppInfo::realm();
+        vmsUserData.hash = nx::vms::api::UserData::kCloudPasswordStub;
+        vmsUserData.digest = nx::vms::api::UserData::kCloudPasswordStub;
+        vmsUserData.permissions = GlobalPermission::adminPermissions;
+
+        auto mediaServerClient = m_systemMergeFixture.peer(index).mediaServerClient();
+        ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient->ec2SaveUser(vmsUserData));
+    }
+
+    void shareSystemWithRandomUser(int index)
+    {
+        const auto someCloudUser = m_cdb.addActivatedAccount2();
+        m_cloudAccounts.push_back(someCloudUser);
+
+        shareSystem(index, someCloudUser);
     }
 
     void waitForEverySystemToGoOnline()
@@ -142,14 +154,16 @@ protected:
         m_systemMergeFixture.mergeSystems();
     }
 
-    void whenMergeSystemsWithCloudDbRequest()
+    void whenMergeSystemsWithCloudDbRequest(
+        int masterSystem = 0,
+        int slaveSystem = 1)
     {
         ASSERT_EQ(
             nx::cloud::db::api::ResultCode::ok,
             m_cdb.mergeSystems(
                 m_cloudAccounts[0],
-                m_systemMergeFixture.peer(0).getCloudCredentials().systemId.toStdString(),
-                m_systemMergeFixture.peer(1).getCloudCredentials().systemId.toStdString()));
+                m_systemMergeFixture.peer(masterSystem).getCloudCredentials().systemId.toStdString(),
+                m_systemMergeFixture.peer(slaveSystem).getCloudCredentials().systemId.toStdString()));
     }
 
     void whenGoneOffline()
@@ -179,7 +193,15 @@ protected:
         ASSERT_GE(systemMergeHistory.size(), 1U);
         if (!systemMergeHistory.front().mergedSystemCloudId.isEmpty())
         {
-            ASSERT_TRUE(systemMergeHistory.front().verify(m_systemCloudCredentials.back().key));
+            const auto credentialsIter = std::find_if(
+                m_systemCloudCredentials.begin(), m_systemCloudCredentials.end(),
+                [&](const auto& credentials)
+                {
+                    return credentials.systemId == systemMergeHistory.front().mergedSystemCloudId;
+                });
+            ASSERT_NE(m_systemCloudCredentials.end(), credentialsIter);
+
+            ASSERT_TRUE(systemMergeHistory.front().verify(credentialsIter->key));
         }
     }
 
@@ -302,23 +324,26 @@ protected:
         andAllServersSynchronizedData();
         andMergeHistoryRecordIsAdded();
 
+        waitForSystemToBecomeOnline();
+
         waitUntilVmsTransactionLogMatchesCloudOne();
 
         andSlaveSystemDisappearedFromCloudDb();
+
+        assertCloudOwnerIsAbleToLogin();
     }
 
-    void waitToSystemToBeOnline()
+    void waitForSystemToBecomeOnline()
     {
-        for (;;)
-        {
-            if (systemIsOnline(m_systemMergeFixture.peer(0)
-                    .getCloudCredentials().systemId.toStdString()))
-            {
-                break;
-            }
+        auto mediaServerClient = m_systemMergeFixture.peer(0).mediaServerClient();
+        nx::vms::api::ModuleInformation moduleInformation;
+        ASSERT_EQ(
+            QnRestResult::NoError,
+            mediaServerClient->getModuleInformation(&moduleInformation).error);
+        const auto cloudSystemId = moduleInformation.cloudSystemId;
 
+        while (!systemIsOnline(cloudSystemId.toStdString()))
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
     }
 
     void waitUntilVmsTransactionLogMatchesCloudOne(int peerIndex = 0)
@@ -327,6 +352,12 @@ protected:
 
         for (;;)
         {
+            nx::vms::api::ModuleInformation moduleInformation;
+            ASSERT_EQ(
+                QnRestResult::NoError,
+                mediaServerClient->getModuleInformation(&moduleInformation).error);
+            const auto cloudSystemId = moduleInformation.cloudSystemId;
+
             ::ec2::ApiTranLogFilter filter;
             filter.cloudOnly = true;
             ::ec2::ApiTransactionDataList vmsTransactionLog;
@@ -343,7 +374,7 @@ protected:
             m_cdb.getTransactionLog(
                 m_cloudAccounts[peerIndex].email,
                 m_cloudAccounts[peerIndex].password,
-                m_systemMergeFixture.peer(peerIndex).getCloudCredentials().systemId.toStdString(),
+                cloudSystemId.toStdString(),
                 &cloudCommandLog);
 
             if (nx::test::compare(vmsTransactionLog, cloudCommandLog))
@@ -358,7 +389,7 @@ protected:
         ASSERT_EQ(
             nx::cloud::db::api::ResultCode::ok,
             m_cdb.shareSystem(
-                m_cloudAccounts[index],
+                findAccount(m_systemMergeFixture.peer(index).ownerEmail()),
                 m_systemMergeFixture.peer(index).getCloudCredentials().systemId.toStdString(),
                 cloudUser.email,
                 nx::cloud::db::api::SystemAccessRole::cloudAdmin));
@@ -382,6 +413,25 @@ protected:
     void assertUserIsNotAbleToLogin(int peerIndex, const nx::cloud::db::AccountWithPassword& cloudUser)
     {
         ASSERT_FALSE(testUserLogin(peerIndex, cloudUser));
+    }
+
+    void assertEveryCloudUserIsAbleToLogin(int peerIndex = 0)
+    {
+        auto mediaServerClient = m_systemMergeFixture.peer(peerIndex).mediaServerClient();
+        nx::vms::api::UserDataList users;
+        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient->ec2GetUsers(&users));
+        for (const auto& user: users)
+        {
+            if (!user.isCloud)
+                continue;
+
+            const auto accountIt = std::find_if(
+                m_cloudAccounts.begin(), m_cloudAccounts.end(),
+                [&user](const auto& account) { return account.email == user.email.toStdString(); });
+            ASSERT_NE(m_cloudAccounts.end(), accountIt);
+
+            assertUserIsAbleToLogin(peerIndex, *accountIt);
+        }
     }
 
     bool testUserLogin(int index, const nx::cloud::db::AccountWithPassword& cloudUser)
@@ -537,6 +587,15 @@ private:
 
         return system.stateOfHealth == nx::cloud::db::api::SystemHealth::online;
     }
+
+    nx::cloud::db::AccountWithPassword findAccount(const std::string& email) const
+    {
+        const auto it = std::find_if(
+            m_cloudAccounts.begin(), m_cloudAccounts.end(),
+            [&email](const auto& account) { return account.email == email; });
+        [this, it]() { ASSERT_NE(m_cloudAccounts.end(), it); }();
+        return *it;
+    }
 };
 
 std::unique_ptr<QnStaticCommonModule> CloudMerge::s_staticCommonModule;
@@ -560,6 +619,35 @@ TEST_F(CloudMerge, merging_cloud_systems_through_cloud_db)
     whenMergeSystemsWithCloudDbRequest();
 
     thenMergeFullyCompleted();
+}
+
+TEST_F(CloudMerge, all_users_are_able_to_login_after_merge)
+{
+    constexpr int peerWithUsersIndex = 1;
+
+    givenTwoCloudSystemsWithTheSameOwner();
+    waitForEverySystemToGoOnline();
+
+    shareSystemWithRandomUser(peerWithUsersIndex);
+    shareSystemWithRandomUser(peerWithUsersIndex);
+    waitUntilVmsTransactionLogMatchesCloudOne(peerWithUsersIndex);
+
+    whenMergeSystemsWithCloudDbRequest(0, 1);
+
+    thenMergeFullyCompleted();
+    assertEveryCloudUserIsAbleToLogin();
+}
+
+TEST_F(CloudMerge, merging_system_produced_by_merge)
+{
+    givenSystemProducedByAMerge();
+    givenCloudSystem();
+    waitForEverySystemToGoOnline();
+
+    whenMergeSystemsWithCloudDbRequest(0, 2);
+
+    thenMergeFullyCompleted();
+    assertEveryCloudUserIsAbleToLogin();
 }
 
 TEST_F(CloudMerge, cloud_systems_with_different_owners_cannot_be_merged)

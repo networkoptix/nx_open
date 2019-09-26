@@ -93,7 +93,7 @@ ServerProvider::ParameterProviders ServerProvider::makeProviders()
         ),
         singleParameterProvider(
             {"memoryUsage", "B"},
-            [](const auto& /*resource*/) { return Value(2 * 1024 * 1024 * 1024); }, //< TODO: Implement.
+            [](const auto& /*resource*/) { return Value(2LL * 1024 * 1024 * 1024); }, //< TODO: Implement.
             timerWatch<Resource>(std::chrono::seconds(5))
         ),
         makeStorageProvider("main", serverModule()->normalStorageManager()),
