@@ -75,7 +75,7 @@ void CameraResourceStub::setHasDualStreaming(bool value)
 
 void CameraResourceStub::markCameraAsNvr()
 {
-    setExplicitDeviceType(nx::core::resource::DeviceType::nvr);
+    setDeviceType(nx::core::resource::DeviceType::nvr);
 }
 
 void CameraResourceStub::setLicenseType(Qn::LicenseType licenseType)

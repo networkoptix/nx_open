@@ -10,12 +10,12 @@ namespace nx::utils {
  * on each IO operation.
  */
 
-class ProxyIoDevice: public QIODevice
+class IoDeviceWrapper: public QIODevice
 {
 public:
     using Callback = nx::utils::MoveOnlyFunc<void(qint64)>;
 
-    ProxyIoDevice(std::unique_ptr<QIODevice> source):
+    IoDeviceWrapper(std::unique_ptr<QIODevice> source):
         m_source(std::move(source))
     {
         // Add 'Unbuffered' flag to prevent internal QIODevice buffering.

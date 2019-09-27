@@ -184,7 +184,7 @@ nx::core::resource::DeviceType QnSecurityCamResource::deviceType() const
 {
     // TODO: remove all setters (setIoModule, setIsDtsBased e.t.c) and keep setDeviceType only
     using namespace nx::core::resource;
-    if (const auto result = explicitDeviceType(); result != DeviceType::unknown)
+    if (const auto result = enforcedDeviceType(); result != DeviceType::unknown)
         return result;
     if (isDtsBased())
         return DeviceType::nvr;
@@ -513,7 +513,7 @@ bool QnSecurityCamResource::hasDualStreamingInternal() const
 
 bool QnSecurityCamResource::isDtsBased() const
 {
-    return m_cachedIsDtsBased.get() || explicitDeviceType() == nx::core::resource::DeviceType::nvr;
+    return m_cachedIsDtsBased.get() || enforcedDeviceType() == nx::core::resource::DeviceType::nvr;
 }
 
 bool QnSecurityCamResource::canConfigureRecording() const
@@ -529,7 +529,7 @@ bool QnSecurityCamResource::isAnalog() const
 
 bool QnSecurityCamResource::isAnalogEncoder() const
 {
-    if (explicitDeviceType() == nx::core::resource::DeviceType::encoder)
+    if (enforcedDeviceType() == nx::core::resource::DeviceType::encoder)
         return true;
 
     return resourceData().value<bool>(lit("analogEncoder"));
@@ -574,15 +574,15 @@ bool QnSecurityCamResource::isMultiSensorCamera() const
         && !isDtsBased()
         && !isAnalogEncoder()
         && !isAnalog()
-        && !nx::core::resource::isProxyDeviceType(explicitDeviceType());
+        && !nx::core::resource::isProxyDeviceType(enforcedDeviceType());
 }
 
-nx::core::resource::DeviceType QnSecurityCamResource::explicitDeviceType() const
+nx::core::resource::DeviceType QnSecurityCamResource::enforcedDeviceType() const
 {
     return m_cachedExplicitDeviceType.get();
 }
 
-void QnSecurityCamResource::setExplicitDeviceType(nx::core::resource::DeviceType deviceType)
+void QnSecurityCamResource::setDeviceType(nx::core::resource::DeviceType deviceType)
 {
     m_cachedExplicitDeviceType.reset();
     m_cachedLicenseType.reset();
@@ -1359,8 +1359,8 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         &QnSecurityCamResource::setVendor,
         isStringEmpty);
     mergeValue(
-        &QnSecurityCamResource::explicitDeviceType,
-        &QnSecurityCamResource::setExplicitDeviceType,
+        &QnSecurityCamResource::enforcedDeviceType,
+        &QnSecurityCamResource::setDeviceType,
         isDeviceTypeEmpty);
     return result;
 }

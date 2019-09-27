@@ -132,7 +132,7 @@ QList<QnResourcePtr> HanwhaResourceSearcher::checkHostAddr(const utils::Url &url
     else if (channel > 0 || info->channelCount > 1)
         resource->updateToChannel(channel);
 
-    resource->setExplicitDeviceType(fromHanwhaToNxDeviceType(info->deviceType));
+    resource->setDeviceType(fromHanwhaToNxDeviceType(info->deviceType));
 
     return result;
 }
@@ -445,7 +445,7 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QA
 
     if (baseDeviceInfo.isValid() && baseDeviceInfo.numberOfChannels > 1)
     {
-        firstResource->setExplicitDeviceType(baseDeviceInfo.deviceType);
+        firstResource->setDeviceType(baseDeviceInfo.deviceType);
         firstResource->updateToChannel(0);
 
         for (int i = 1; i < baseDeviceInfo.numberOfChannels; ++i)
@@ -466,7 +466,7 @@ void HanwhaResourceSearcher::addMultichannelResources(QList<T>& result, const QA
 
             resource->setUrl(firstResource->getUrl());
             resource->updateToChannel(i);
-            resource->setExplicitDeviceType(baseDeviceInfo.deviceType);
+            resource->setDeviceType(baseDeviceInfo.deviceType);
 
             result.push_back(resource);
         }

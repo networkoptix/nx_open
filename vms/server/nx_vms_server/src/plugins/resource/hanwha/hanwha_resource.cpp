@@ -1056,7 +1056,7 @@ CameraDiagnostics::Result HanwhaResource::initSystem(const HanwhaInformation& in
 
     // Set device type only for NVRs and encoders due to optimization purposes.
     if (nx::core::resource::isProxyDeviceType(nxDeviceType))
-        setExplicitDeviceType(nxDeviceType);
+        setDeviceType(nxDeviceType);
 
     if (!info.firmware.isEmpty())
         setFirmware(info.firmware);

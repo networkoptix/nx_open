@@ -139,8 +139,7 @@ public:
 
     bool isMultiSensorCamera() const;
 
-    nx::core::resource::DeviceType explicitDeviceType() const;
-    void setExplicitDeviceType(nx::core::resource::DeviceType);
+    void setDeviceType(nx::core::resource::DeviceType);
     nx::core::resource::DeviceType deviceType() const;
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
@@ -431,6 +430,7 @@ protected:
 
     virtual Qn::LicenseType calculateLicenseType() const;
 
+    nx::core::resource::DeviceType enforcedDeviceType() const;
 private:
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
