@@ -573,7 +573,7 @@ std::chrono::milliseconds ChunksDeque::occupiedDuration(int storageIndex) const
 
     std::chrono::milliseconds result{};
     for (const auto& [key, value]: m_archivePresence)
-        result  += value.duration;
+        result += value.duration;
     return result;
 }
 
@@ -648,7 +648,9 @@ void ChunksDeque::chunkAdded(const Chunk& chunk) const
 void ChunksDeque::chunkRemoved(const Chunk& chunk) const
 {
     auto &oldValue = m_archivePresence[chunk.storageIndex];
+    NX_ASSERT(oldValue.space >= chunk.getFileSize());
     oldValue.space = std::max<int64_t>(0LL, oldValue.space - chunk.getFileSize());
+    NX_ASSERT(oldValue.duration.count() >= chunk.durationMs);
     oldValue.duration = std::chrono::milliseconds(
         std::max<int64_t>(0LL, oldValue.duration.count() - chunk.durationMs));
 }

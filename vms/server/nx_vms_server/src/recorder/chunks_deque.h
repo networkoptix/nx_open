@@ -12,7 +12,8 @@ class ChunksDeque
 public:
     class Iterator;
 
-    struct Presence {
+    struct Presence
+    {
         int64_t space = 0;
         std::chrono::milliseconds duration{};
     };

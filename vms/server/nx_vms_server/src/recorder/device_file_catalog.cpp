@@ -39,6 +39,8 @@ QSet<void*> DeviceFileCatalog::m_pauseList;
 
 
 using namespace nx::vms::server;
+using namespace std::chrono;
+
 namespace {
     std::array<QString, QnServer::ChunksCatalogCount> catalogPrefixes = {"low_quality", "hi_quality"};
 
@@ -251,7 +253,7 @@ int64_t DeviceFileCatalog::occupiedSpace(int storageIndex) const
     return m_chunks.occupiedSpace(storageIndex);
 }
 
-std::chrono::milliseconds DeviceFileCatalog::occupiedDuration(int storageIndex) const
+milliseconds DeviceFileCatalog::occupiedDuration(int storageIndex) const
 {
     QnMutexLocker lk( &m_mutex );
     return m_chunks.occupiedDuration(storageIndex);
@@ -974,8 +976,8 @@ QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalyzePerio
         return QnRecordingStatsData();
 
     result.recordedBytes = occupiedSpace();
-    result.recordedSecs = occupiedDuration().count() / 1000; // msec to sec
-    for (const auto&[index, data] : m_chunks.archivePresence())
+    result.recordedSecs = duration_cast<seconds>(occupiedDuration()).count();
+    for (const auto&[index, data]: m_chunks.archivePresence())
     {
         if (auto storage = getMyStorageMan()->storageRoot(index))
             result.recordedBytesPerStorage[storage->getId()] = data.space;
