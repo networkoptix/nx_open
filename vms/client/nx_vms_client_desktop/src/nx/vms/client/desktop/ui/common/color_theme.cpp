@@ -77,8 +77,6 @@ void ColorTheme::Private::loadColors()
 
 QJsonObject ColorTheme::Private::readColorDataFromFile(const QString& filename) const
 {
-    QJsonObject result;
-
     QFile file(qnSkin->path(filename));
     const bool opened = file.open(QFile::ReadOnly);
     if (NX_ASSERT(opened, "Cannot read skin file %1", filename))
@@ -93,10 +91,12 @@ QJsonObject ColorTheme::Private::readColorDataFromFile(const QString& filename) 
         const bool parsed = error.error == QJsonParseError::NoError;
         if (NX_ASSERT(parsed, "JSON parse error: %1", error.errorString())
                 && NX_ASSERT(json.isObject(), "Invalid JSON structure"))
-            result = json.object().value("globals").toObject();
+        {
+            return json.object().value("globals").toObject();
+        }
     }
 
-    return result;
+    return QJsonObject();
 }
 
 QSet<QString> ColorTheme::Private::updateColors(const QJsonObject& newColors)
