@@ -49,7 +49,7 @@ void TestObjectWithSignal::slot3(QRect rect, QUuid id, int value)
 void TestObjectWithSignal::emitDoneIfNeed()
 {
     if (m_processedSlots == 3)
-        emit done();
+        emitAsync(this, &TestObjectWithSignal::done);
 }
 
 TEST(EmitAsyncTest, basic)
@@ -57,6 +57,7 @@ TEST(EmitAsyncTest, basic)
     auto object = std::make_unique<TestObjectWithSignal>();
     std::promise<void> promise;
 
+    // This receiver hasn't event loop.
     QObject::connect(object.get(), &TestObjectWithSignal::done,
         [&promise, object = object.get()]() { promise.set_value(); });
 
