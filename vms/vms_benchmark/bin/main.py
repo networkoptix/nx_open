@@ -69,7 +69,7 @@ def to_percentage(share_0_1):
 def load_configs(config_file, sys_config_file):
     option_descriptions = {
         "deviceHost": {
-            "type": 'string'
+            "type": 'string',
         },
         "deviceLogin": {
             "optional": True,
@@ -79,11 +79,11 @@ def load_configs(config_file, sys_config_file):
             "optional": True,
             "type": 'string',
         },
-        "deviceSshPort": {
+        "boxSshPort": {
             "optional": True,
             "type": 'integer',
             "range": [0, 31768],
-            "default": 22
+            "default": 22,
         },
         "vmsUser": {
             "optional": True,
@@ -97,11 +97,11 @@ def load_configs(config_file, sys_config_file):
         },
         "testCamerasTestSequence": {
             "optional": True,
-            "type": "integers"
+            "type": "integers",
         },
         "streamsPerTestCamera": {
             "optional": True,
-            "type": 'integer'
+            "type": 'integer',
         },
     }
 
@@ -273,7 +273,7 @@ def main(config_file, sys_config_file):
         host=config['deviceHost'],
         login=config.get('deviceLogin', None),
         password=password,
-        port=config['deviceSshPort']
+        port=config['boxSshPort']
     )
 
     res = device_tests.SshHostKeyIsKnown(device).call()
