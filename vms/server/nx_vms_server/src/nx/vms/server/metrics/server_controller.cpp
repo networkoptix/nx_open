@@ -80,6 +80,8 @@ qint64 ServerController::getMetric(Metrics parameter)
         return getDelta(parameter, metrics->ruleActions());
     case Metrics::thumbnailsRequested:
         return getDelta(parameter, metrics->thumbnails());
+    case Metrics::apiCalls:
+        return getDelta(parameter, metrics->apiCalls());
     default:
         return 0;
     }
@@ -250,6 +252,11 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
             utils::metrics::makeLocalValueProvider<Resource>(
                 "thumbnails", [this](const auto&)
                     { return Value(getMetric(Metrics::thumbnailsRequested)); },
+                    nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kUpdateInterval)
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "apiCalls", [this](const auto&)
+                    { return Value(getMetric(Metrics::apiCalls)); },
                     nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(

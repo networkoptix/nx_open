@@ -18,6 +18,7 @@
 #include <common/common_module.h>
 #include <network/http_connection_listener.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <nx/metrics/metrics_storage.h>
 
 static const QByteArray NOT_AUTHORIZED_HTML("\
     <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
@@ -150,6 +151,8 @@ void QnRestConnectionProcessor::run()
         ->processorPool()->findHandler(d->request.requestLine.method, request.path);
     if (handler)
     {
+        commonModule()->metrics()->apiCalls()++;
+
         if (!m_noAuth && d->accessRights != Qn::kSystemAccess)
         {
             QnUserResourcePtr user = resourcePool()->getResourceById<QnUserResource>(d->accessRights.userId);

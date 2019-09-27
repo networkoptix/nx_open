@@ -30,6 +30,7 @@ private:
         encodedPixels,
         ruleActionsTriggered,
         thumbnailsRequested,
+        apiCalls,
         count
     };
 

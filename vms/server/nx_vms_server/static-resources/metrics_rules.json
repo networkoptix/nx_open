@@ -196,6 +196,12 @@
                     "calculate": "average %thumbnails 1m",
                     "insert": "thumbnails"
                 },
+                "apiCalls1m": {
+                    "name": "Rest API calls per second",
+                    "display": "panel",
+                    "calculate": "average %apiCalls 1m",
+                    "insert": "apiCalls"
+                },
                 "primaryStreams": {
                     "name": "Primary streams",
                     "display": "panel"
