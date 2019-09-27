@@ -438,7 +438,7 @@
                     "display": "table|panel",
                     "unit": "GB"
                 },
-                "mediaSpacePercents": {
+                "mediaSpaceP": {
                     "name": "VMS Media(%)",
                     "display": "table|panel",
                     "unit": "%"
@@ -446,7 +446,7 @@
                 "mediaSpaceGB": {
                     "name": "VMS Media",
                     "display": "panel",
-                    "unit": "Gb"
+                    "unit": "GB"
                 }
             }
         }

@@ -107,7 +107,7 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
                     [](const auto& r) { return r->getTotalSpace() / (double) kBytesInGb; }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "mediaSpacePercents",
+                "mediaSpaceP",
                     [](const auto& r)
                     { return r->nxOccupedSpace() / (double) r->getTotalSpace() * 100; }
             ),
