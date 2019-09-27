@@ -68,6 +68,10 @@
                     "name": "OS time",
                     "display": "table|panel"
                 },
+                "cores": {
+                    "name": "Cores",
+                    "display": "panel"
+                },
                 "timeChanged24h": {
                     "name": "Time changedevents (24h)",
                     "display": "table|panel",

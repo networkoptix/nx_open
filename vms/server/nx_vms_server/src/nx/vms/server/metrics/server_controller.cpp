@@ -11,6 +11,7 @@
 
 #include "helpers.h"
 #include <utils/common/synctime.h>
+#include <nx/utils/cpu_info.h>
 
 namespace nx::vms::server::metrics {
 
@@ -167,6 +168,9 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                 "timeChanged", [this](const auto&)
                     { return Value(getMetric(Metrics::timeChanged)); },
                 nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kTimeChangedInterval)
+           ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "cores", [this](const auto&) { return Value(nx::utils::cpuInfo().physicalCores); }
            )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
