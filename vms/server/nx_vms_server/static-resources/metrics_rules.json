@@ -9,6 +9,7 @@
                     "calculate": "const 100"
                 },
                 "servers": {
+                    "name": "Servers",
                     "display": "panel",
                     "alarms": [{
                         "level": "warning",
@@ -17,12 +18,18 @@
                     }]
                 },
                 "users": {
+                    "name": "Users",
+                    "display": "panel"
+                },
+                "storages": {
+                    "name": "Storage locations",
                     "display": "panel"
                 },
                 "recommendedMaxCameras": {
                     "calculate": "const 10000"
                 },
                 "cameras": {
+                    "name": "Camera channels",
                     "display": "panel",
                     "alarms": [{
                         "level": "warning",

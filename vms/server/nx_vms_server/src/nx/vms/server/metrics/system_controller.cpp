@@ -6,6 +6,7 @@
 #include <media_server/media_server_module.h>
 #include <licensing/license.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/storage_resource.h>
 
 namespace nx::vms::server::metrics {
 
@@ -43,20 +44,37 @@ utils::metrics::ValueGroupProviders<SystemResourceController::Resource>
                 "name", [settings](const auto&) { return Value(settings->systemName()); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "servers", [pool](const auto&) { return Value(pool->getAllServers(Qn::AnyStatus).size()); }
+                "servers",
+                [pool](const auto&)
+                {
+                    return Value(pool->getAllServers(Qn::AnyStatus).size());
+                }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "users", [pool](const auto&) { return Value(pool->getResources<QnUserResource>().size()); }
+                "users",
+                [pool](const auto&)
+                {
+                    return Value(pool->getResources<QnUserResource>().size());
+                }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "cameras", [pool](const auto&)
-                    {
-                        return Value(pool->getAllCameras(
-                            QnResourcePtr(), /*ignoreDesktopCameras*/ true).size());
-                    }
+                "cameras",
+                [pool](const auto&)
+                {
+                    return Value(pool->getAllCameras(
+                        QnResourcePtr(), /*ignoreDesktopCameras*/ true).size());
+                }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "version", [pool](const auto&)
+                "storages",
+                [pool](const auto&)
+                {
+                    return Value(pool->getResources<QnStorageResource>().size());
+                }
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "version",
+                [pool](const auto&)
                 {
                     const auto guid = pool->commonModule()->moduleGUID();
                     if (auto server = pool->getResourceById<QnMediaServerResource>(guid))
