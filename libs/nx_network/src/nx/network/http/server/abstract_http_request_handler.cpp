@@ -39,10 +39,6 @@ RequestResult::RequestResult(
 //-------------------------------------------------------------------------------------------------
 // AbstractHttpRequestHandler
 
-AbstractHttpRequestHandler::~AbstractHttpRequestHandler()
-{
-}
-
 bool AbstractHttpRequestHandler::processRequest(
     nx::network::http::HttpServerConnection* const connection,
     nx::network::http::Request request,
@@ -55,12 +51,12 @@ bool AbstractHttpRequestHandler::processRequest(
     responseMsg.response->statusLine.version = request.requestLine.version;
 
     m_responseMsg = std::move(responseMsg);
-    m_completionHandler = std::move(completionHandler);
 
     auto httpRequestProcessedHandler =
-        [this](RequestResult requestResult)
+        [this, completionHandler = std::move(completionHandler)](
+            RequestResult requestResult) mutable
         {
-            sendResponse(std::move(requestResult));
+            sendResponse(std::move(completionHandler), std::move(requestResult));
         };
 
     RequestContext requestContext{
@@ -82,7 +78,14 @@ void AbstractHttpRequestHandler::setRequestPathParams(
     m_requestPathParams = std::move(params);
 }
 
-void AbstractHttpRequestHandler::sendResponse(RequestResult requestResult)
+nx::network::http::Response* AbstractHttpRequestHandler::response()
+{
+    return m_responseMsg.response;
+}
+
+void AbstractHttpRequestHandler::sendResponse(
+    ResponseIsReadyHandler sendResponseFunc,
+    RequestResult requestResult)
 {
     m_responseMsg.response->statusLine.statusCode =
         requestResult.statusCode;
@@ -91,19 +94,13 @@ void AbstractHttpRequestHandler::sendResponse(RequestResult requestResult)
 
     // This object is allowed to be removed within m_completionHandler,
     //  so creating local data.
-    auto completionHandlerLocal = std::move(m_completionHandler);
     auto responseMsgLocal = std::move(m_responseMsg);
     auto dataSourceLocal = std::move(requestResult.dataSource);
 
-    completionHandlerLocal(
+    sendResponseFunc(
         std::move(responseMsgLocal),
         std::move(dataSourceLocal),
         std::move(requestResult.connectionEvents));
-}
-
-nx::network::http::Response* AbstractHttpRequestHandler::response()
-{
-    return m_responseMsg.response;
 }
 
 } // namespace nx

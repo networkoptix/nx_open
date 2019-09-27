@@ -57,7 +57,7 @@ struct RequestContext
 class NX_NETWORK_API AbstractHttpRequestHandler
 {
 public:
-    virtual ~AbstractHttpRequestHandler();
+    virtual ~AbstractHttpRequestHandler() = default;
 
     /**
      * @param connection This object is valid only in this method.
@@ -82,14 +82,15 @@ protected:
         http::RequestContext requestContext,
         http::RequestProcessedHandler completionHandler) = 0;
 
-    virtual void sendResponse(RequestResult requestResult);
-
     http::Response* response();
 
 private:
     http::Message m_responseMsg;
-    ResponseIsReadyHandler m_completionHandler;
     RequestPathParams m_requestPathParams;
+
+    void sendResponse(
+        ResponseIsReadyHandler sendResponseFunc,
+        RequestResult requestResult);
 };
 
 } // namespace nx
