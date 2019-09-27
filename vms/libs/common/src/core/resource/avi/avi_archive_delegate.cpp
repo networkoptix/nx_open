@@ -242,6 +242,8 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
                 QnWritableCompressedVideoData* videoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
                 videoData->channelNumber = m_indexToChannel[stream->index]; // [packet.stream_index]; // defalut value
+                videoData->width = stream->codecpar->width;
+                videoData->height = stream->codecpar->height;
                 data = QnAbstractMediaDataPtr(videoData);
                 packetTimestamp(videoData, packet);
                 videoData->m_data.write((const char*) packet.data, packet.size);
