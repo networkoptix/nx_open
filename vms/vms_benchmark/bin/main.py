@@ -133,10 +133,10 @@ def load_configs(config_file, sys_config_file):
             "type": 'string',
             "default": './low.ts'
         },
-        "streamTestDurationSecs": {
+        "streamingTestDurationMins": {
             "optional": True,
             "type": 'integer',
-            "default": 60
+            "default": 1
         },
         "testFileFps": {
             "optional": True,
@@ -539,7 +539,7 @@ def main(config_file, sys_config_file):
 
                 print("All streams opened.")
 
-                stream_duration = sys_config['streamTestDurationSecs']
+                streaming_duration_mins = sys_config['streamingTestDurationMins']
                 streaming_started_at = time.time()
 
                 last_ptses = {}
@@ -549,7 +549,7 @@ def main(config_file, sys_config_file):
                 lags = {}
                 streaming_succeeded = False
 
-                while time.time() - streaming_started_at < stream_duration:
+                while time.time() - streaming_started_at < streaming_duration_mins*60:
                     if stream_reader_context.poll() is not None:
                         raise exceptions.RtspPerfError('asdf')
 
@@ -594,7 +594,7 @@ def main(config_file, sys_config_file):
                             frame_drops[pts_camera_id] = frame_drops.get(pts_camera_id, 0) + 1
                             print(f'Detected framedrop from camera {pts_camera_id}: {pts - last_ptses.get(pts_camera_id, pts)} (max={pts_diff_max}) {pts} {time.time()}')
 
-                    if time.time() - streaming_started_at > stream_duration:
+                    if time.time() - streaming_started_at > streaming_duration_mins*60:
                         streaming_succeeded = True
                         print(f"    Serving {test_cameras_count} virtual cameras succeeded.")
                         break
