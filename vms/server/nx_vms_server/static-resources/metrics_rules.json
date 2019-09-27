@@ -9,7 +9,6 @@
                     "calculate": "const 100"
                 },
                 "servers": {
-                    "name": "Servers",
                     "display": "panel",
                     "alarms": [{
                         "level": "warning",
@@ -18,7 +17,6 @@
                     }]
                 },
                 "users": {
-                    "name": "Users",
                     "display": "panel"
                 },
                 "storages": {
@@ -76,7 +74,6 @@
                     "display": "table|panel"
                 },
                 "cores": {
-                    "name": "Cores",
                     "display": "panel"
                 },
                 "timeChanged24h": {

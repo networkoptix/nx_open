@@ -160,21 +160,21 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "vmsTime",
-                    [](const auto& r)
-                    {
-                        return Value(dateTimeToString(qnSyncTime->currentDateTime()));
-                    }
+                [](const auto& r)
+                {
+                    return Value(dateTimeToString(qnSyncTime->currentDateTime()));
+                }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "osTime",
-                    [](const auto& r)
-                    {
-                        return Value(dateTimeToString(QDateTime::currentDateTime()));
-                    }
+                [](const auto& r)
+                {
+                    return Value(dateTimeToString(QDateTime::currentDateTime()));
+                }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "timeChanged",
-                    [this](const auto&) { return Value(getMetric(Metrics::timeChanged)); },
+                [this](const auto&) { return Value(getMetric(Metrics::timeChanged)); },
                 nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kTimeChangedInterval)
            ),
             utils::metrics::makeSystemValueProvider<Resource>(
@@ -188,8 +188,11 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
         utils::metrics::makeValueGroupProvider<Resource>(
             "availability",
             utils::metrics::makeSystemValueProvider<Resource>(
-                "status", [this](const auto& r)
-                    { return Value(QnLexical::serialized(r->getStatus())); },
+                "status",
+                [this](const auto& r)
+                {
+                    return Value(QnLexical::serialized(r->getStatus()));
+                },
                 qtSignalWatch<Resource>(&QnResource::statusChanged)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
@@ -221,61 +224,80 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                 "serverRamUsageP", getServerRamUsageP
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "incomingConnections", [](const auto& r)
-                    { return Value(r->commonModule()->metrics()->tcpConnections().total()); }
+                "incomingConnections",
+                [](const auto& r)
+                {
+                    return Value(r->commonModule()->metrics()->tcpConnections().total());
+                }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "encodingThreads", [](const auto& r)
-                    { return Value(r->commonModule()->metrics()->transcoders()); }
+                "encodingThreads",
+                [](const auto& r) { return Value(r->commonModule()->metrics()->transcoders()); }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "decodingThreads", [](const auto& r)
-                    { return Value(r->commonModule()->metrics()->decoders()); }
+                "decodingThreads",
+                [](const auto& r) { return Value(r->commonModule()->metrics()->decoders()); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "cameras", [](const auto& r)
-                    {
-                        return Value(r->resourcePool()->getAllCameras(
-                            r->toSharedPointer(), /*ignoreDesktopCameras*/ true).size());
-                    }
+                "cameras",
+                [](const auto& r)
+                {
+                    return Value(r->resourcePool()->getAllCameras(
+                        r->toSharedPointer(), /*ignoreDesktopCameras*/ true).size());
+                }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "transactionsPerSecond", [this](const auto&)
-                    { return Value( getMetric(Metrics::transactions)); },
+                "transactionsPerSecond",
+                [this](const auto&)
+                { return Value( getMetric(Metrics::transactions)); },
+                nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kUpdateInterval)
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "decodingSpeed",
+                [this](const auto&)
+                {
+                    return Value(getMetric( Metrics::decodedPixels) / kPixelsToMegapixels);
+                },
+                nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kMegapixelsUpdateInterval)
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "encodingSpeed",
+                [this](const auto&)
+                {
+                    return Value(getMetric(Metrics::encodedPixels) / kPixelsToMegapixels);
+                },
+                nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kMegapixelsUpdateInterval)
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "actionsTriggered",
+                [this](const auto&)
+                {
+                    return Value(getMetric(Metrics::ruleActionsTriggered));
+                },
+                nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kUpdateInterval)
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "thumbnails",
+                [this](const auto&) { return Value(getMetric(Metrics::thumbnailsRequested)); },
+                nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kUpdateInterval)
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "apiCalls", [this](const auto&) { return Value(getMetric(Metrics::apiCalls)); },
                     nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "decodingSpeed", [this](const auto&)
-                    { return Value(getMetric( Metrics::decodedPixels) / kPixelsToMegapixels); },
-                    nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kMegapixelsUpdateInterval)
+                "primaryStreams",
+                [this](const auto&)
+                {
+                    return Value(serverModule()->commonModule()->metrics()->primaryStreams());
+                }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "encodingSpeed", [this](const auto&)
-                    { return Value(getMetric(Metrics::encodedPixels) / kPixelsToMegapixels); },
-                    nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kMegapixelsUpdateInterval)
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "actionsTriggered", [this](const auto&)
-                    { return Value(getMetric(Metrics::ruleActionsTriggered)); },
-                    nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kUpdateInterval)
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "thumbnails", [this](const auto&)
-                    { return Value(getMetric(Metrics::thumbnailsRequested)); },
-                    nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kUpdateInterval)
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "apiCalls", [this](const auto&)
-                    { return Value(getMetric(Metrics::apiCalls)); },
-                    nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kUpdateInterval)
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "primaryStreams", [this](const auto&)
-                    { return Value(serverModule()->commonModule()->metrics()->primaryStreams()); }
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
-                "secondaryStreams", [this](const auto&)
-                    { return Value(serverModule()->commonModule()->metrics()->secondaryStreams());}
+                "secondaryStreams",
+                [this](const auto&)
+                {
+                    return Value(serverModule()->commonModule()->metrics()->secondaryStreams());
+                }
             )
         )
         // TODO: cpuP should be fixed to the near instant value from avarage...
