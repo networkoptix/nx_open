@@ -374,6 +374,10 @@
                     "name": "Recording Bitrate (24h)",
                     "display": "table|panel",
                     "unit": "KBps"
+                },
+                "minArchiveLengths": {
+                    "name": "Minimum archive length",
+                    "display": "panel"
                 }
             }
         }

@@ -12,6 +12,7 @@ namespace nx::vms::server::metrics {
 using namespace nx::vms::api;
 using namespace nx::vms::server::resource;
 using namespace std::chrono;
+using namespace nx::vms::text;
 
 CameraController::CameraController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
@@ -220,7 +221,18 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                 [](const auto& r)
                 {
                     const auto value = duration_cast<seconds>(r->nxOccupiedDuration());
-                    return Value(nx::vms::text::ArchiveDuration::durationToString(value));
+                    if (value.count() > 0)
+                        return Value(ArchiveDuration::durationToString(value));
+                    return Value();
+                }
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "minArchiveLength",
+                [](const auto& r)
+                {
+                    if (const auto days = r->minDays(); days > 0 && r->isLicenseUsed())
+                        return Value(ArchiveDuration::durationToString(hours(days * 24)));
+                    return Value();
                 }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
