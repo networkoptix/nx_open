@@ -11,7 +11,7 @@
 
 #include "helpers.h"
 #include <utils/common/synctime.h>
-#include <nx/utils/cpu_info.h>
+#include <platform/hardware_information.h>
 
 namespace nx::vms::server::metrics {
 
@@ -159,20 +159,30 @@ utils::metrics::ValueGroupProviders<ServerController::Resource> ServerController
                 "publicIp", [](const auto& r) { return Value(r->getProperty(Server::kPublicIp)); }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "vmsTime", [](const auto& r)
-                    { return Value(dateTimeToString(qnSyncTime->currentDateTime())); }
+                "vmsTime",
+                    [](const auto& r)
+                    {
+                        return Value(dateTimeToString(qnSyncTime->currentDateTime()));
+                    }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "osTime", [](const auto& r)
-                    { return Value(dateTimeToString(QDateTime::currentDateTime())); }
+                "osTime",
+                    [](const auto& r)
+                    {
+                        return Value(dateTimeToString(QDateTime::currentDateTime()));
+                    }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "timeChanged", [this](const auto&)
-                    { return Value(getMetric(Metrics::timeChanged)); },
+                "timeChanged",
+                    [this](const auto&) { return Value(getMetric(Metrics::timeChanged)); },
                 nx::vms::server::metrics::timerWatch<QnMediaServerResource*>(kTimeChangedInterval)
            ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "cores", [this](const auto&) { return Value(nx::utils::cpuInfo().physicalCores); }
+                "cores",
+                [this](const auto&)
+                {
+                    return Value(HardwareInformation::instance().physicalCores);
+                }
            )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
