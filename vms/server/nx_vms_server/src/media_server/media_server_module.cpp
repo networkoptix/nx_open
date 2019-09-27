@@ -89,7 +89,7 @@
 #include <core/resource_management/mserver_resource_discovery_manager.h>
 #include "server_connector.h"
 #include "resource_status_watcher.h"
-#include <nx/vms/server/resource/server_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <nx/network/url/url_builder.h>
 #include <plugins/storage/dts/vmax480/vmax480_resource.h>
 
