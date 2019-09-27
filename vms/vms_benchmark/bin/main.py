@@ -73,11 +73,11 @@ def load_configs(config_file, sys_config_file):
         },
         "deviceLogin": {
             "optional": True,
-            "type": 'string'
+            "type": 'string',
         },
         "devicePassword": {
             "optional": True,
-            "type": 'string'
+            "type": 'string',
         },
         "deviceSshPort": {
             "optional": True,
@@ -86,10 +86,14 @@ def load_configs(config_file, sys_config_file):
             "default": 22
         },
         "vmsUser": {
-            "type": "string"
+            "optional": True,
+            "type": "string",
+            "default": "admin",
         },
         "vmsPassword": {
-            "type": "string"
+            "optional": True,
+            "type": "string",
+            "default": "admin",
         },
         "testCamerasTestSequence": {
             "optional": True,
