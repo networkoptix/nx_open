@@ -41,14 +41,6 @@ void StorageController::start()
         });
 }
 
-double roundOff(double value, int digits = 2)
-{
-    int k = 1;
-    for (int i = 0; i < digits; ++i)
-        k *= 10;
-    return round(value * k) / k;
-}
-
 utils::metrics::ValueGroupProviders<StorageController::Resource> StorageController::makeProviders()
 {
     static const std::chrono::seconds kIoRateUpdateInterval(5);
@@ -59,7 +51,7 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
         [](const auto& r, const auto& metric)
         {
             const auto bytes = r->getAndResetMetric(metric);
-            const auto kBps = roundOff(bytes / 1000.0 / kIoRateUpdateInterval.count());
+            const auto kBps = bytes / 1000.0 / kIoRateUpdateInterval.count();
             return StorageController::Value(kBps);
         };
 
@@ -80,43 +72,48 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
             "state",
             utils::metrics::makeSystemValueProvider<Resource>(
                 "status", // FIXME: Impl does not fallow spec so far.
-                [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
-                qtSignalWatch<Resource>(&QnStorageResource::statusChanged)
+                    [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
+                    qtSignalWatch<Resource>(&QnStorageResource::statusChanged)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "issues", [](const auto& r)
-                { return Value(r->getAndResetMetric(&StorageResource::Metrics::issues)); },
-                nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIssuesRateUpdateInterval)
+                "issues",
+                    [](const auto& r)
+                    {
+                        return Value(r->getAndResetMetric(&StorageResource::Metrics::issues));
+                    },
+                    nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIssuesRateUpdateInterval)
             )
         ),
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
             "activity",
             utils::metrics::makeLocalValueProvider<Resource>(
                 "readRateKBps",
-                [](const auto& r) { return ioRate(r, &StorageResource::Metrics::bytesRead); },
-                nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
+                    [](const auto& r) { return ioRate(r, &StorageResource::Metrics::bytesRead); },
+                    nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "writeRateKBps",
-                [](const auto& r) { return ioRate(r, &StorageResource::Metrics::bytesWritten); },
-                nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
+                    [](const auto& r)
+                    {
+                        return ioRate(r, &StorageResource::Metrics::bytesWritten);
+                    },
+                    nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
             )
         ),
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(
             "space",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "totalSpaceGb",
-                [](const auto& r) { return roundOff(r->getTotalSpace() / (double) kBytesInGb); }
+                "totalSpaceGB",
+                    [](const auto& r) { return r->getTotalSpace() / (double) kBytesInGb; }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "mediaSpacePercents",
-                [](const auto& r)
-                { return roundOff(r->nxOccupedSpace() / (double) r->getTotalSpace() * 100); }
+                    [](const auto& r)
+                    { return r->nxOccupedSpace() / (double) r->getTotalSpace() * 100; }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "mediaSpaceGb",
-                [](const auto& r)
-                { return roundOff(r->nxOccupedSpace() / (double) kBytesInGb); }
+                "mediaSpaceGB",
+                    [](const auto& r) { return r->nxOccupedSpace() / (double) kBytesInGb; }
             )
         )
     );

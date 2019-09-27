@@ -423,7 +423,7 @@
         },
         "space": {
             "values": {
-                "totalSpaceGb": {
+                "totalSpaceGB": {
                     "name": "Total space",
                     "display": "table|panel",
                     "unit": "GB"
@@ -433,7 +433,7 @@
                     "display": "table|panel",
                     "unit": "%"
                 },
-                "mediaSpaceGb": {
+                "mediaSpaceGB": {
                     "name": "VMS Media",
                     "display": "panel",
                     "unit": "Gb"

@@ -161,11 +161,11 @@ public:
     }
 
     template<typename Extraction> // double(double value, double durationS)
-    ValueGenerator durationExtraction(int valueI, int durationI, Extraction extraction, bool devideByTime) const
+    ValueGenerator durationExtraction(int valueI, int durationI, Extraction extraction, bool divideByTime) const
     {
         return durationOperation(
             valueI, durationI,
-            [extraction = std::move(extraction), devideByTime](const auto& forEach)
+            [extraction = std::move(extraction), divideByTime](const auto& forEach)
             {
                 double maxAgeS = 0;
                 double total = 0;
@@ -181,7 +181,7 @@ public:
                         lastAgeS = ageS;
                     });
                 total += extraction(lastValue, lastAgeS);
-                if (devideByTime)
+                if (divideByTime)
                 {
                     if (maxAgeS == 0.0)
                         return api::metrics::Value();
@@ -209,16 +209,28 @@ public:
             return durationCount(1, 2, [](const auto&) { return true; });
 
         if (function() == "countValues") // value duration expected
-            return durationCount(1, 2, [expected = value(3)](const auto& v) { return v == expected(); });
+        {
+            return durationCount(1, 2,
+                [expected = value(3)](const auto& v) { return v == expected(); });
+        }
 
         if (function() == "sum") // value duration
-            return durationExtraction(1, 2, [](double v, double d) { return v; }, /*devideByTime*/ false);
+        {
+            return durationExtraction(1, 2,
+                [](double v, double /*d*/) { return v; }, /*divideByTime*/ false);
+        }
 
         if (function() == "average") // value duration
-            return durationExtraction(1, 2, [](double v, double d) { return v * d; }, /*devideByTime*/ true);
+        {
+            return durationExtraction(1, 2,
+                [](double v, double d) { return v * d; }, /*divideByTime*/ true);
+        }
 
         if (function() == "perSecond") // value duration
-            return durationExtraction(1, 2, [](double v, double) { return v; }, /*devideByTime*/ true);
+        {
+            return durationExtraction(1, 2,
+                [](double v, double) { return v; }, /*divideByTime*/ true);
+        }
 
         return nullptr;
     }

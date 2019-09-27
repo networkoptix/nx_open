@@ -21,6 +21,8 @@ qint64 StorageResource::getAndResetMetric(std::atomic<qint64> Metrics::* paramet
 QIODevice* StorageResource::open(const QString &fileName, QIODevice::OpenMode openMode)
 {
     auto sourceIoDevice = openInternal(fileName, openMode);
+    if (!sourceIoDevice)
+        return sourceIoDevice;
     return wrapIoDevice(std::unique_ptr<QIODevice>(sourceIoDevice));
 }
 
