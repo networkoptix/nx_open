@@ -19,8 +19,8 @@ def log_remote_command_status(status_code):
 
 
 if platform.system() == 'Linux':
-    class DeviceConnection:
-        class DeviceConnectionResult:
+    class BoxConnection:
+        class BoxConnectionResult:
             def __init__(self, return_code, message=None, command=None):
                 self.message = message
                 self.return_code = return_code
@@ -46,6 +46,9 @@ if platform.system() == 'Linux':
                     "-o", "StrictHostKeyChecking=no",
                     "-o", "PubkeyAuthentication=no",
                     "-o", "PasswordAuthentication=yes",
+                    '-o', 'ControlMaster=auto',
+                    '-o', 'ControlPersist=1h',
+                    '-o', 'ControlPath=~/.ssh/%r@%h:%p',
                     "-T",
                     f"-p{port}",
                     f"{login}@{host}" if login else host,
@@ -60,6 +63,9 @@ if platform.system() == 'Linux':
                     "-o", "BatchMode=yes",
                     "-o", "PubkeyAuthentication=yes",
                     "-o", "PasswordAuthentication=no",
+                    '-o', 'ControlMaster=auto',
+                    '-o', 'ControlPersist=1h',
+                    '-o', 'ControlPath=~/.ssh/%r@%h:%p',
                     ]
 
             self.host_key = None
@@ -72,13 +78,13 @@ if platform.system() == 'Linux':
             eval_reply = self.eval('echo $SSH_CONNECTION')
             ssh_connection_info = eval_reply.strip().split() if eval_reply else None
             if not eval_reply or len(ssh_connection_info) < 3:
-                raise exceptions.DeviceCommandError(
-                    'Unable to connect to the box via ssh; check deviceLogin and devicePassword in vms_benchmark.conf.')
+                raise exceptions.BoxCommandError(
+                    'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
             self.ip = ssh_connection_info[2]
             self.local_ip = ssh_connection_info[0]
             self.is_root = self.eval('id -u') == '0'
 
-        def sh(self, command, timeout=3, su=False, exc=False, stdout=sys.stdout, stderr=None):
+        def sh(self, command, timeout=5, su=False, exc=False, stdout=sys.stdout, stderr=None):
             command_wrapped = command if self.is_root or not su else f'sudo -n {command}'
 
             log_remote_command(command_wrapped)
@@ -87,22 +93,25 @@ if platform.system() == 'Linux':
                 run = subprocess.run([*self.ssh_args, command_wrapped], timeout=timeout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             except subprocess.TimeoutExpired:
                 message = (f'Unable to execute remote command via ssh: timeout of {timeout} seconds expired; ' +
-                          'check deviceHost in vms_benchmark.conf.')
+                          'check boxHostnameOrIp in vms_benchmark.conf.')
                 if exc:
-                    raise exceptions.DeviceCommandError(message=message)
+                    raise exceptions.BoxCommandError(message=message)
                 else:
-                    return self.DeviceConnectionResult(None, message, command=command_wrapped)
+                    return self.BoxConnectionResult(None, message, command=command_wrapped)
 
             log_remote_command_status(run.returncode)
 
             if run.returncode == 255:
                 if exc:
-                    raise exceptions.DeviceCommandError(message=run.stderr.rstrip())
+                    raise exceptions.BoxCommandError(message=run.stderr.decode('UTF-8').rstrip())
                 else:
-                    return self.DeviceConnectionResult(None, run.stderr.rstrip(), command=command_wrapped)
+                    return self.BoxConnectionResult(
+                        None,
+                        run.stderr.decode('UTF-8').rstrip(), command=command_wrapped
+                    )
 
             if run.returncode != 0 and exc:
-                raise exceptions.DeviceCommandError(
+                raise exceptions.BoxCommandError(
                     message=f'Command `{command_wrapped}` failed with code {run.returncode}, stderr:\n    {run.stderr}'
                 )
 
@@ -113,14 +122,14 @@ if platform.system() == 'Linux':
                 stderr.write(run.stderr.decode())
                 stderr.flush()
 
-            return self.DeviceConnectionResult(run.returncode, command=command_wrapped)
+            return self.BoxConnectionResult(run.returncode, command=command_wrapped)
 
-        def eval(self, cmd, timeout=3, su=False, stderr=None):
+        def eval(self, cmd, timeout=5, su=False, stderr=None):
             out = StringIO()
             res = self.sh(cmd, su=su, stdout=out, stderr=stderr, timeout=timeout)
 
             if res.return_code is None:
-                raise exceptions.DeviceCommandError(res.message)
+                raise exceptions.BoxCommandError(res.message)
 
             if not res:
                 return None
@@ -131,8 +140,8 @@ if platform.system() == 'Linux':
             return self.eval(f'cat "{path}"', su=su, stderr=stderr, timeout=timeout)
 
 elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
-    class DeviceConnection:
-        class DeviceConnectionResult:
+    class BoxConnection:
+        class BoxConnectionResult:
             def __init__(self, return_code, message=None, command=None):
                 self.message = message
                 self.return_code = return_code
@@ -180,8 +189,8 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             eval_reply = self.eval('echo $SSH_CONNECTION')
             ssh_connection_info = eval_reply.strip().split() if eval_reply else None
             if not eval_reply or len(ssh_connection_info) < 3:
-                raise exceptions.DeviceCommandError(
-                    'Unable to connect to the box via ssh; check deviceLogin and devicePassword in vms_benchmark.conf.')
+                raise exceptions.BoxCommandError(
+                    'Unable to connect to the box via ssh; check boxLogin and boxPassword in vms_benchmark.conf.')
             self.ip = ssh_connection_info[2]
             self.local_ip = ssh_connection_info[0]
             self.is_root = self.eval('id -u') == '0'
@@ -195,7 +204,7 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
 
         _SH_DEFAULT = object()
 
-        def sh(self, command, timeout=3, su=False, exc=False, stdout=sys.stdout, stderr=sys.stderr):
+        def sh(self, command, timeout=5, su=False, exc=False, stdout=sys.stdout, stderr=sys.stderr):
             opts = {
                 'stdin': subprocess.PIPE
             }
@@ -212,9 +221,9 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             except subprocess.TimeoutExpired:
                 message = f'Timeout {timeout} seconds expired'
                 if exc:
-                    raise exceptions.DeviceCommandError(message=message)
+                    raise exceptions.BoxCommandError(message=message)
                 else:
-                    return self.DeviceConnectionResult(None, message, command=command_wrapped)
+                    return self.BoxConnectionResult(None, message, command=command_wrapped)
 
             if stdout != self._SH_DEFAULT:
                 write_method = getattr(stdout, 'write', None)
@@ -228,13 +237,13 @@ elif platform.system() == 'Windows' or platform.system().startswith('CYGWIN'):
             log_remote_command_status(proc.returncode)
             
             if exc and proc.returncode != 0:
-                raise exceptions.DeviceCommandError(
+                raise exceptions.BoxCommandError(
                     message=f'Command `{command_wrapped}` failed with code {proc.returncode}'
                 )
 
-            return self.DeviceConnectionResult(proc.returncode, command=command_wrapped)
+            return self.BoxConnectionResult(proc.returncode, command=command_wrapped)
 
-        def eval(self, cmd, timeout=3, su=False, stderr=None):
+        def eval(self, cmd, timeout=5, su=False, stderr=None):
             out = StringIO()
             res = self.sh(cmd, su=su, stdout=out, stderr=stderr, timeout=timeout)
 

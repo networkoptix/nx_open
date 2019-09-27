@@ -24,7 +24,6 @@
 
 #include <client_core/client_core_module.h>
 
-#include <utils/common/app_info.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <context/context.h>
@@ -55,6 +54,8 @@
 #include <nx/mobile_client/controllers/web_admin_controller.h>
 #include <nx/mobile_client/helpers/inter_client_message.h>
 #include <nx/network/system_socket.h>
+
+#include <nx/utils/app_info.h>
 
 extern "C"
 {
@@ -139,7 +140,7 @@ int runUi(QtSingleGuiApplication* application)
     QScopedPointer<QnTextureSizeHelper> textureSizeHelper(
             new QnTextureSizeHelper(mainWindow.data()));
 
-    if (!QnAppInfo::isMobile())
+    if (!nx::utils::AppInfo::isMobile())
     {
         if (mainWindow)
         {
@@ -186,9 +187,9 @@ int runUi(QtSingleGuiApplication* application)
     {
         // Use platform-dependent defaults.
 
-        if (QnAppInfo::isArm())
+        if (nx::utils::AppInfo::isArm())
         {
-            if (QnAppInfo::isNx1())
+            if (nx::utils::AppInfo::isNx1())
             {
                 maxFfmpegResolution = QSize(1280, 720);
                 maxFfmpegHevcResolution = QSize(640, 480);
@@ -311,7 +312,7 @@ void initLog(const QString& logLevel)
     logSettings.loggers.front().maxBackupCount = 5;
     logSettings.loggers.front().logBaseName = *ini().logFile
         ? QString::fromUtf8(ini().logFile)
-        : QnAppInfo::isAndroid()
+        : nx::utils::AppInfo::isAndroid()
             ? "-"
             : (QString::fromUtf8(nx::kit::IniConfig::iniFilesDir()) + "mobile_client");
 
@@ -407,8 +408,9 @@ int main(int argc, char *argv[])
     ini().reload();
     initLog(startupParams.logLevel);
 
-    QnStaticCommonModule staticModule(nx::vms::api::PeerType::mobileClient, QnAppInfo::brand(),
-        QnAppInfo::customizationName());
+    QnStaticCommonModule staticModule(nx::vms::api::PeerType::mobileClient,
+        nx::utils::AppInfo::brand(),
+        nx::utils::AppInfo::customizationName());
 
     QnMobileClientModule mobile_client(startupParams);
     mobile_client.initDesktopCamera();

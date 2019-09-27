@@ -14,8 +14,9 @@
 
 #include "axis_resource.h"
 #include "axis_resource.h"
-#include <utils/common/app_info.h>
 #include <utils/media/av_codec_helper.h>
+
+#include <nx/utils/app_info.h>
 
 static const char AXIS_SEI_UUID[] = "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa";
 static const int AXIS_SEI_PRODUCT_INFO = 0x0a00;
@@ -88,17 +89,17 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
         static const QByteArray OLD_SECONDARY_STREAM_PROFILE_NAME = "netOptixSecondary";
 
         QByteArray oldProfileName;
-
+        const auto brand = nx::utils::AppInfo::brand();
         if (role == Qn::CR_LiveVideo)
         {
-            profileName = lit("%1Primary%2").arg(QnAppInfo::productNameShort()).arg(profileSufix).toUtf8();
-            profileDescription = QString(lit("%1 Primary Stream")).arg(QnAppInfo::productNameShort()).toUtf8();
+            profileName = lit("%1Primary%2").arg(brand).arg(profileSufix).toUtf8();
+            profileDescription = QString(lit("%1 Primary Stream")).arg(brand).toUtf8();
             oldProfileName = OLD_PRIMARY_STREAM_PROFILE_NAME;
         }
         else
         {
-            profileName = lit("%1Secondary%2").arg(QnAppInfo::productNameShort()).arg(profileSufix).toUtf8();
-            profileDescription = QString(lit("%1 Secondary Stream")).arg(QnAppInfo::productNameShort()).toUtf8();
+            profileName = lit("%1Secondary%2").arg(brand).arg(profileSufix).toUtf8();
+            profileDescription = QString(lit("%1 Secondary Stream")).arg(brand).toUtf8();
             oldProfileName = OLD_SECONDARY_STREAM_PROFILE_NAME;
         }
 

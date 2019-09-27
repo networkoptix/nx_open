@@ -114,8 +114,9 @@ int VmsGatewayProcess::serviceMain(
         {
             network::ssl::Engine::useOrCreateCertificate(
                 settings.http().sslCertPath,
-                nx::utils::AppInfo::productName().toUtf8(),
-                "US", nx::utils::AppInfo::organizationName().toUtf8());
+                nx::utils::AppInfo::vmsName().toUtf8(),
+                "US",
+                nx::utils::AppInfo::organizationName().toUtf8());
         }
 
         network::server::MultiAddressServer<nx::network::http::HttpStreamSocketServer>

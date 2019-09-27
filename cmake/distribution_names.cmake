@@ -1,5 +1,5 @@
 function(set_distribution_names)
-    set(prefix ${installer.name})
+    set(prefix ${customization.installerName})
 
     set(distribution_platform "${targetDevice}")
     if(targetDevice STREQUAL "linux_arm32")

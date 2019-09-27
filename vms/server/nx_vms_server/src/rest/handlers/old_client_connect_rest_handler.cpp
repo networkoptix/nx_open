@@ -1,6 +1,7 @@
 #include "old_client_connect_rest_handler.h"
 #include <nx/network/http/http_types.h>
-#include <utils/common/app_info.h>
+#include <nx/utils/app_info.h>
+
 #include <QFile>
 
 namespace {
@@ -22,14 +23,14 @@ int QnOldClientConnectRestHandler::executeGet(const QString& /*path*/,
     char oldLength, newLength;
 
     /* replace product name */
-    QByteArray product = QnAppInfo::productNameShort().toLatin1();
+    QByteArray product = nx::utils::AppInfo::brand().toLatin1();
     newLength = product.length();
     oldLength = responseMessageBody[productOffset];
     responseMessageBody[productOffset] = newLength;
     responseMessageBody.replace(productOffset + 1, oldLength, product);
 
     /* replace version */
-    QByteArray version = QnAppInfo::applicationVersion().toLatin1();
+    QByteArray version = nx::utils::AppInfo::applicationVersion().toLatin1();
     newLength = version.length();
     oldLength = responseMessageBody[versionOffset];
     responseMessageBody[versionOffset] = newLength;

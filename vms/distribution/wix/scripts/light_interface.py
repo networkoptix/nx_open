@@ -99,14 +99,12 @@ def common_light_options():
 def light_command(
     wix_directory,
     input_folder,
-    installer_cultures,
     installer_language,
     extensions,
     output_file
 ):
     command = [
         light_executable(wix_directory),
-        '-cultures:{}'.format(installer_cultures),
         '-cc', light_cache_path, '-reusecab',
         '-loc', installer_language,
         '-out', output_file,
@@ -124,7 +122,6 @@ def light(
     working_directory,
     wix_directory,
     input_folder,
-    installer_cultures,
     installer_language,
     extensions,
     output_file
@@ -133,7 +130,6 @@ def light(
         command=light_command(
             wix_directory=wix_directory,
             input_folder=input_folder,
-            installer_cultures=installer_cultures,
             installer_language=installer_language,
             extensions=extensions,
             output_file=output_file),

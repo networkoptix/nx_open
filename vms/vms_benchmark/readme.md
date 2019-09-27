@@ -55,8 +55,8 @@ a detailed comment in this file.
 
 Do at least the following in the `vms_benchmark.conf` before running the tool:
 - Specify VMS username and password in `vmsUser`/`vmsPassword` fields.
-- If `ssh <deviceHost>` on the host machine requires to enter credentials, specify them in 
-    `deviceLogin` and `devicePassword` fields.
+- If `ssh <boxHostnameOrIp>` on the host machine requires to enter credentials, specify them in 
+    `boxLogin` and `boxPassword` fields.
 - In order to test the ability of the box to process the load of the desired number of cameras,
     set `testCamerasTestSequence` accordingly.
 
@@ -86,7 +86,7 @@ ISSUE is up to 5%.
 Currently, on successful run the tool produces a report similar to this:
 ```
 VMS Benchmark started.
-Device IP: 192.168.0.100
+Box IP: 192.168.0.100
 Arch: armv7l
 Number of CPUs: 12
 CPU features: NEON

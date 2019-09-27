@@ -10,6 +10,8 @@
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
 
+#include <nx/utils/app_info.h>
+
 using namespace nx::vms::client::desktop;
 
 QnEmailSettings QnSimpleSmtpSettings::toSettings(const QnEmailSettings &base) const
@@ -73,7 +75,7 @@ QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullp
     ui->signatureInputField->setTitle(tr("System Signature"));
     ui->signatureInputField->setPlaceholderText(tr("Enter a short System description here."));
     ui->supportInputField->setTitle(tr("Support Signature"));
-    ui->supportInputField->setPlaceholderText(QnAppInfo::supportUrl());
+    ui->supportInputField->setPlaceholderText(nx::utils::AppInfo::supportAddress());
 
     Aligner* aligner = new Aligner(this);
     aligner->registerTypeAccessor<InputField>(InputField::createLabelWidthAccessor());

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CUSTOMIZATION="@deb.customization.company.name@"
+CUSTOMIZATION="@customization.companyId@"
 DISTRIB="@server_distribution_name@"
 
 INSTALL_DIR="/usr/local/apps/$CUSTOMIZATION"

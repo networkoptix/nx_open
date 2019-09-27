@@ -5,7 +5,7 @@ set -u #< Prohibit undefined variables.
 configure()
 {
     BOX="@box@"
-    CUSTOMIZATION="@deb.customization.company.name@"
+    CUSTOMIZATION="@customization.companyId@"
     INSTALL_PATH="opt/$CUSTOMIZATION"
     MEDIASERVER_PATH="$INSTALL_PATH/mediaserver"
     LITE_CLIENT_PATH="$INSTALL_PATH/lite_client"

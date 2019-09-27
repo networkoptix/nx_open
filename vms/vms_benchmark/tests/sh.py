@@ -11,13 +11,13 @@ project_root = osp.dirname(osp.dirname(osp.realpath(__file__)))
 if osp.isfile(osp.join(project_root, ".not_installed")):
     sys.path.insert(0, osp.join(project_root, "lib"))
 
-from vms_benchmark.device_connection import DeviceConnection
+from vms_benchmark.box_connection import BoxConnection
 
 logging.basicConfig(filename='test.log', filemode='w', level=logging.DEBUG)
 
 class TestStringMethods(unittest.TestCase):
     def test_connection(self):
-        device = DeviceConnection(
+        device = BoxConnection(
             host='vega',
             port=22
         )
@@ -65,7 +65,7 @@ class TestStringMethods(unittest.TestCase):
         )
 
     def test_stderr_none_acceptance(self):
-        device = DeviceConnection(
+        device = BoxConnection(
             host='vega',
             port=22
         )

@@ -94,23 +94,31 @@ bool HanwhaPtzController::continuousMove(
         params.emplace(kHanwhaPanProperty, "0");
         params.emplace(kHanwhaTiltProperty, "0");
         params.emplace(kHanwhaZoomProperty, "0");
-        m_lastParamValue.clear();
+
+        {
+            QnMutexLocker lock(&m_mutex);
+            m_lastParamValue.clear();
+        }
     }
     else
     {
-        auto addIfNeeded = [&](const QString& paramName, float value)
-        {
-            if (!qFuzzyEquals(value, m_lastParamValue[paramName]))
-                params.emplace(paramName, QString::number((int)value));
-            m_lastParamValue[paramName] = value;
-        };
+        auto addIfNeeded =
+            [&](const QString& paramName, float value)
+            {
+                if (!qFuzzyEquals(value, m_lastParamValue[paramName]))
+                    params.emplace(paramName, QString::number((int)value));
+                m_lastParamValue[paramName] = value;
+            };
 
         if (useNormalizedSpeed())
             params.emplace(kHanwhaNormalizedSpeedProperty, kHanwhaTrue);
 
-        addIfNeeded(kHanwhaPanProperty, hanwhaSpeed.pan);
-        addIfNeeded(kHanwhaTiltProperty, hanwhaSpeed.tilt);
-        addIfNeeded(kHanwhaZoomProperty, hanwhaSpeed.zoom);
+        {
+            QnMutexLocker lock(&m_mutex);
+            addIfNeeded(kHanwhaPanProperty, hanwhaSpeed.pan);
+            addIfNeeded(kHanwhaTiltProperty, hanwhaSpeed.tilt);
+            addIfNeeded(kHanwhaZoomProperty, hanwhaSpeed.zoom);
+        }
     }
 
     HanwhaRequestHelper helper(m_hanwhaResource->sharedContext());

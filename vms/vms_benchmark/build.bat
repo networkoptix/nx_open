@@ -9,6 +9,5 @@ python3.exe -m PyInstaller ^
     --distpath %BUILD_DIR%\distrib ^
     --workpath %BUILD_DIR%\build ^
     --specpath %BUILD_DIR% ^
-    --add-binary "%DEV_PATH%\python\Lib\site-packages\cv2\opencv_ffmpeg400_64.dll;." ^
     -p %SRC_DIR%\lib ^
     %SRC_DIR%\bin\main.py

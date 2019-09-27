@@ -16,7 +16,7 @@ def main():
     for path, subdirs, files in os.walk(root, topdown=True):
         subdirs[:] = [d for d in subdirs if d not in exclude]
         for name in files:
-            if fnmatch(name, pattern) and name != 'globals.json' and name != 'serverProperties.json':
+            if fnmatch(name, pattern):
                 p = subprocess.Popen('jsonlint -v --nonstrict %s' % os.path.join(path, name), shell=True, stdout=PIPE)
                 out, err = p.communicate()
                 print out

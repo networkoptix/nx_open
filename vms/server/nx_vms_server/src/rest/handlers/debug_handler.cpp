@@ -155,7 +155,7 @@ void QnDebugHandler::afterExecute(
             exit(64);
 
         case Action::throwException:
-            throw std::exception("/api/debug");
+            throw std::exception();
 
         case Action::abort:
             abort();

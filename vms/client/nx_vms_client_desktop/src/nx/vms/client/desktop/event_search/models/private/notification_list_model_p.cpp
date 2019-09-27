@@ -324,7 +324,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
         eventData.lifetime = kDisplayTimeout;
 
     if (action->actionType() == ActionType::showPopupAction && camera)
-        setupAcknowledgeAction(eventData, camera, action);
+        setupAcknowledgeAction(eventData, camera->getId(), action);
 
     eventData.titleColor = QnNotificationLevel::notificationTextColor(eventData.level);
     eventData.icon = pixmapForAction(action, eventData.titleColor);
@@ -378,8 +378,7 @@ void NotificationListModel::Private::removeNotification(const vms::event::Abstra
 }
 
 void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData,
-    const QnVirtualCameraResourcePtr& camera,
-    const nx::vms::event::AbstractActionPtr& action)
+    const QnUuid& cameraId, const nx::vms::event::AbstractActionPtr& action)
 {
     if (action->actionType() != vms::api::ActionType::showPopupAction)
     {
@@ -394,7 +393,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     if (!actionParams.requireConfirmation(action->getRuntimeParams().eventType))
         return;
 
-    if (!NX_ASSERT(menu()->canTrigger(action::AcknowledgeEventAction, camera)))
+    if (!NX_ASSERT(!cameraId.isNull()))
         return;
 
     eventData.removable = false;
@@ -410,9 +409,10 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
     actionParams.recordBeforeMs = 0;
 
     const auto actionHandler =
-        [this, camera, action]()
+        [this, cameraId, action]()
         {
             action::Parameters params;
+            const auto camera = resourcePool()->getResourceById(cameraId);
             if (camera && camera->commonModule() && !camera->hasFlags(Qn::removed))
                 params.setItems(QVariant::fromValue<QnResourcePtr>(camera));
             params.setArgument(Qn::ActionDataRole, action);

@@ -2,7 +2,6 @@
 
 #include <atomic>
 #include "core/resource/storage_resource.h"
-#include <utils/common/app_info.h>
 #include <platform/platform_abstraction.h>
 
 #if defined(Q_OS_WIN)
@@ -18,8 +17,6 @@ class QnMediaServerModule;
 
 namespace nx { namespace vms::server { class RootFileSystem; } }
 
-const QString NX_TEMP_FOLDER_NAME = QnAppInfo::productNameShort() + "_temp_folder_";
-
 class QnFileStorageResource: public QnStorageResource
 {
     using base_type = QnStorageResource;
@@ -30,6 +27,8 @@ private:
 public:
     QnFileStorageResource(QnMediaServerModule* serverModule);
     ~QnFileStorageResource();
+
+    static QString tempFolderName();
 
     static QnStorageResource* instance(QnMediaServerModule* serverModule, const QString&);
 

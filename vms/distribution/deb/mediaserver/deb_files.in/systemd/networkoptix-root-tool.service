@@ -1,11 +1,11 @@
-# @company.name@ Root Tool
+# @customization.companyName@ Root Tool
 
 [Unit]
-Description=@company.name@ Root Tool
+Description=@customization.companyName@ Root Tool
 After=network.target local-fs.target remote-fs.target
 
 [Service]
-ExecStart=/opt/@deb.customization.company.name@/mediaserver/bin/root-tool-bin
+ExecStart=/opt/@customization.companyId@/mediaserver/bin/root-tool-bin
 Restart=on-failure
 TimeoutStopSec=120
 KillMode=process

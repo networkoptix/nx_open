@@ -7,10 +7,6 @@ nx_configure_file(
     maven/filter-resources/mediaserver_core_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
-nx_configure_file(
-    maven/filter-resources/resources/serverProperties.json
-    ${CMAKE_CURRENT_BINARY_DIR}/serverProperties.json)
-
 set(apidoctool_jar "${APIDOCTOOL_PATH}/apidoctool.jar")
 
 set(apidoctool_params
@@ -75,7 +71,7 @@ set_source_files_properties(${static_resources} PROPERTIES RESOURCE_ALIAS_PREFIX
 set(favicon ${customization_dir}/icons/all/favicon.ico)
 set_property(SOURCE ${favicon} PROPERTY RESOURCE_ALIAS_PREFIX static/customization/)
 
-set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/webadmin_skins/${defaultSkin}
+set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/webadmin_skins/${customization.skin}
     PROPERTY RESOURCE_ALIAS_PREFIX static/skin/)
 
 nx_add_target(nx_vms_server LIBRARY
@@ -85,10 +81,9 @@ nx_add_target(nx_vms_server LIBRARY
         ${vendor_source_exclusions}
     ADDITIONAL_RESOURCES
         ${customization_dir}/mediaserver_core/resources
-        ${CMAKE_CURRENT_SOURCE_DIR}/webadmin_skins/${defaultSkin}
+        ${CMAKE_CURRENT_SOURCE_DIR}/webadmin_skins/${customization.skin}
         ${favicon}
         ${static_resources}
-        ${CMAKE_CURRENT_BINARY_DIR}/serverProperties.json
     PUBLIC_LIBS
         nx_kit #< This dependency should come first to satisfy OutputRedirector.
         Qt5::WebSockets

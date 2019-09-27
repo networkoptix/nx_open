@@ -22,6 +22,8 @@
 
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 
+#include <nx/utils/app_info.h>
+
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -71,7 +73,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget* parent):
     setPaletteColor(ui->manualActivationTextWidget, QPalette::WindowText,
         ui->manualActivationTextWidget->palette().color(QPalette::Light));
 
-    const QString licensingAddress(QnAppInfo::licensingEmailAddress());
+    const QString licensingAddress(nx::utils::AppInfo::licensingAddress());
     const QnEmailAddress licensingEmail(licensingAddress);
     QString activationText;
     if (licensingEmail.isValid())

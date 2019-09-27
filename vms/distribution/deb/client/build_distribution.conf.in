@@ -1,10 +1,8 @@
 # This file is filtered by cmake; intended to be sourced into build_distribution.sh.
 
-CUSTOMIZATION="@deb.customization.company.name@"
+CUSTOMIZATION="@customization.companyId@"
 CUSTOMIZATION_DIR="@customization_dir@"
 CUSTOMIZATION_NAME="@customization@" #< E.g. for "networkoptix", the value is "default".
-FULL_PRODUCT_NAME="@company.name@ @product.name@ Client.conf"
-FULL_APPLAUNCHER_NAME="@company.name@ Launcher.conf"
 VERSION="@releaseVersion@.@buildNumber@"
 RELEASE_VERSION="@releaseVersion@"
 
@@ -22,8 +20,8 @@ ARCH="@arch@"
 CPP_RUNTIME_LIBS=( @cpp_runtime_libs_string@ )
 ICU_RUNTIME_LIBS=( @icu_runtime_libs_string@ )
 
-URI_PROTOCOL="@uri.protocol@"
-INSTALLER_NAME="@installer.name@"
+URI_PROTOCOL="@customization.uriProtocol@"
+INSTALLER_NAME="@customization.installerName@"
 LAUNCHER_VERSION_FILE="@launcher.version.file@"
 APPLAUNCHER_BINARY_NAME="@applauncher.binary.name@"
 CLIENT_BINARY_NAME="@client.binary.name@"

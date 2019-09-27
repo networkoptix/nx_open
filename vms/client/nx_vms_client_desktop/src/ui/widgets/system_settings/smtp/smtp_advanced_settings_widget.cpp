@@ -12,6 +12,8 @@
 #include <utils/common/app_info.h>
 #include <utils/email/email.h>
 
+#include <nx/utils/app_info.h>
+
 using namespace nx::vms::client::desktop;
 
 namespace {
@@ -81,7 +83,7 @@ QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent /*= n
     ui->signatureInputField->setPlaceholderText(tr("Enter a short System description here."));
 
     ui->supportInputField->setTitle(tr("Support Signature"));
-    ui->supportInputField->setPlaceholderText(QnAppInfo::supportUrl());
+    ui->supportInputField->setPlaceholderText(nx::utils::AppInfo::supportAddress());
 
     const QString autoPort = tr("Auto");
     ui->portComboBox->addItem(autoPort, 0);

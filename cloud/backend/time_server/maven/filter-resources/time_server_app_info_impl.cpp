@@ -2,5 +2,5 @@
 
 QString TimeServerAppInfo::applicationName()
 {
-    return QStringLiteral("${company.name} Time Server");
+    return QStringLiteral("${customization.companyName} Time Server");
 }

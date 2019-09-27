@@ -1,7 +1,7 @@
 import re
 from io import StringIO
 import platform
-from vms_benchmark.device_tests import DeviceTestResult
+from vms_benchmark.box_tests import BoxTestResult
 
 
 class SshHostKeyIsKnown:
@@ -12,7 +12,6 @@ class SshHostKeyIsKnown:
         if platform.system() == 'Windows':
             stderr = StringIO()
             res = self.dev.sh('true', stderr=stderr)
-
             error_messages = re.split(r'[\r\n]+', stderr.getvalue().strip())
 
             host_key = 'unneeded'
@@ -21,8 +20,8 @@ class SshHostKeyIsKnown:
                 host_key = error_messages[-2].split()[-1]
 
             if not res or res.return_code != 0:
-                return DeviceTestResult(success=False, message=str(error_messages))
+                return BoxTestResult(success=False, message=str(stderr.getvalue() if stderr.getvalue() else None))
 
-            return DeviceTestResult(success=True, details=[host_key])
+            return BoxTestResult(success=True, details=[host_key])
         else:
-            return DeviceTestResult(success=True, details=['unneeded'])
+            return BoxTestResult(success=True, details=['unneeded'])

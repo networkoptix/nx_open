@@ -11,6 +11,7 @@
         Version="$(var.releaseVersionFull)"
         Manufacturer="$(var.companyName)"
         UpgradeCode="$(var.nxtoolBundleUpgradeCode)">
+        <!--TODO: #GDM Why do we use bundle upgrade code here??? -->
             <Package
                 Id="*"
                 InstallerVersion="405"

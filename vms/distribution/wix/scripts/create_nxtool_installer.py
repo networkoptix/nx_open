@@ -44,7 +44,6 @@ class Config():
     def __init__(self, args):
         with open(args.config, 'r') as f:
             config = yaml.load(f, Loader=yaml.SafeLoader)
-        self.installer_cultures = config['installer_cultures']
         self.language_file = installer_language_pattern.format(config['installer_language'])
         self.wix_directory = config['wix_directory']
         self.output_file = os.path.join(
@@ -76,7 +75,6 @@ def candle_and_light(
         working_directory=config.sources_directory,
         wix_directory=config.wix_directory,
         input_folder=candle_output_folder,
-        installer_cultures=config.installer_cultures,
         installer_language=os.path.join(config.sources_directory, config.language_file),
         extensions=wix_extensions,
         output_file=output_file)
