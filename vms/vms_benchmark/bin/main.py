@@ -103,6 +103,16 @@ def load_configs(config_file, sys_config_file):
             "optional": True,
             "type": 'integer',
         },
+        "streamingTestDurationMinutes": {
+            "optional": True,
+            "type": 'integer',
+            "default": 1
+        },
+        "cameraDiscoveryTimeoutMinutes": {
+            "optional": True,
+            "type": 'integer',
+            "default": 3
+        },
     }
 
     config = ConfigParser(config_file, option_descriptions)
@@ -132,11 +142,6 @@ def load_configs(config_file, sys_config_file):
             "optional": True,
             "type": 'string',
             "default": './low.ts'
-        },
-        "streamingTestDurationMins": {
-            "optional": True,
-            "type": 'integer',
-            "default": 1
         },
         "testFileFps": {
             "optional": True,
@@ -454,7 +459,7 @@ def main(config_file, sys_config_file):
         with test_camera_context_manager as test_camera_context:
             print(f"    Started {test_cameras_count} virtual cameras.")
 
-            def wait_test_cameras_discovered(timeout, duration):
+            def wait_test_cameras_discovered(timeout, online_duration):
                 started_at = time.time()
                 detection_started_at = None
                 while time.time() - started_at < timeout:
@@ -467,7 +472,7 @@ def main(config_file, sys_config_file):
                     if len(cameras) >= test_cameras_count:
                         if detection_started_at is None:
                             detection_started_at = time.time()
-                        elif time.time() - detection_started_at >= duration:
+                        elif time.time() - detection_started_at >= online_duration:
                             return True, cameras
                     else:
                         detection_started_at = None
@@ -476,10 +481,13 @@ def main(config_file, sys_config_file):
                 return False, None
 
             try:
-                discovering_timeout = 120
+                discovering_timeout_mins = config['cameraDiscoveryTimeoutMinutes']
 
-                print(f"    Waiting for virtual cameras discovery and going live (timeout is {discovering_timeout} seconds).")
-                res, cameras = wait_test_cameras_discovered(discovering_timeout, 3)
+                print(
+                    ("    Waiting for virtual cameras discovery and going live " +
+                        f"(timeout is {discovering_timeout_mins} minutes).")
+                )
+                res, cameras = wait_test_cameras_discovered(timeout=discovering_timeout_mins*60, online_duration=3)
                 if not res:
                     raise exceptions.TestCameraError('Timeout expired.')
 
@@ -503,7 +511,7 @@ def main(config_file, sys_config_file):
                 user=config['vmsUser'],
                 password=config['vmsPassword'],
                 box_ip=box.ip,
-                vms_port=vms.port
+                vms_port=vms.port,
             )
             with stream_reader_context_manager as stream_reader_context:
                 started = False
@@ -539,7 +547,7 @@ def main(config_file, sys_config_file):
 
                 print("All streams opened.")
 
-                streaming_duration_mins = sys_config['streamingTestDurationMins']
+                streaming_duration_mins = config['streamingTestDurationMinutes']
                 streaming_started_at = time.time()
 
                 last_ptses = {}
