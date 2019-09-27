@@ -195,8 +195,8 @@ public:
     void setRole(Role role) { m_role = role; }
     Role getRole() const { return m_role; }
 
-    QnLiveStreamParams getLiveParams(StreamIndex streamIndex);
-    QnLiveStreamParams getActualParams(StreamIndex streamIndex);
+    std::optional<QnLiveStreamParams> targetParams(StreamIndex streamIndex);
+    std::optional<QnLiveStreamParams> actualParams(StreamIndex streamIndex);
 
     bool fixMulticastParametersIfNeeded(
         nx::vms::server::resource::MulticastParameters* inOutMulticastParameters,

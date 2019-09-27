@@ -117,31 +117,38 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                 "resolution",
                 [](const auto& r)
                 {
-                    const auto resolution = r->getLiveParams(StreamIndex::primary).resolution;
-                    return Value(CameraMediaStreamInfo::resolutionToString(resolution));
+                    if (auto p = r->targetParams(StreamIndex::primary))
+                        return Value(CameraMediaStreamInfo::resolutionToString(p->resolution));
+                    return Value();
                 }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "targetFps",
                 [](const auto& r)
                 {
-                    return Value(r->getLiveParams(StreamIndex::primary).fps);
+                    if (auto params = r->targetParams(StreamIndex::primary))
+                        return Value(params->fps);
+                    return Value();
                 }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "actualFps",
                 [](const auto& r)
                 {
-                    return Value(r->getActualParams(StreamIndex::primary).fps);
+                    if (auto params = r->actualParams(StreamIndex::primary))
+                        return Value(params->fps);
+                    return Value();
                 }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "fpsDelta",
                 [](const auto& r)
                 {
-                    const auto fpsDelta = r->getLiveParams(StreamIndex::primary).fps -
-                        r->getActualParams(StreamIndex::primary).fps;
-                    return Value(fpsDelta);
+                    const auto targetParams = r->targetParams(StreamIndex::primary);
+                    const auto actualParams = r->actualParams(StreamIndex::primary);
+                    if (targetParams && actualParams)
+                        return Value(targetParams->fps - actualParams->fps);
+                    return Value();
                 },
                 nx::vms::server::metrics::timerWatch<Camera*>(kFpsDeltaCheckInterval)
             ),
@@ -149,7 +156,9 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                 "actualBitrateKBps",
                 [](const auto& r)
                 {
-                    return Value(r->getActualParams(StreamIndex::primary).bitrateKbps);
+                    if (auto params = r->actualParams(StreamIndex::primary))
+                        return Value(params->bitrateKbps);
+                    return Value();
                 }
             )
         ),
@@ -159,34 +168,47 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                 "resolution",
                 [](const auto& r)
                 {
-                    const auto resolution = r->getLiveParams(StreamIndex::secondary).resolution;
-                    return Value(CameraMediaStreamInfo::resolutionToString(resolution));
+                    if (auto p = r->targetParams(StreamIndex::secondary))
+                        return Value(CameraMediaStreamInfo::resolutionToString(p->resolution));
+                    return Value();
                 }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
                 "targetFps",
                 [](const auto& r)
-                { return Value(r->getLiveParams(StreamIndex::secondary).fps);}
+                {
+                    if (auto params = r->targetParams(StreamIndex::secondary))
+                        return Value(params->fps);
+                    return Value();
+                }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "actualFps",
                 [](const auto& r)
                 {
-                    return Value(r->getActualParams(StreamIndex::secondary).fps);
+                    if (auto params = r->actualParams(StreamIndex::secondary))
+                        return Value(params->fps);
+                    return Value();
                 }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "actualBitrateKBps",
                 [](const auto& r)
-                { return Value(r->getActualParams(StreamIndex::secondary).bitrateKbps);}
+                {
+                    if (auto params = r->actualParams(StreamIndex::secondary))
+                        return Value(params->bitrateKbps);
+                    return Value();
+                }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
                 "fpsDelta",
                 [](const auto& r)
                 {
-                    const auto fpsDelta = r->getLiveParams(StreamIndex::secondary).fps -
-                        r->getActualParams(StreamIndex::secondary).fps;
-                    return Value(fpsDelta);
+                    const auto targetParams = r->targetParams(StreamIndex::secondary);
+                    const auto actualParams = r->actualParams(StreamIndex::secondary);
+                    if (targetParams && actualParams)
+                        return Value(targetParams->fps - actualParams->fps);
+                    return Value();
                 },
                 nx::vms::server::metrics::timerWatch<Camera*>(kFpsDeltaCheckInterval)
             )

@@ -828,18 +828,18 @@ bool Camera::fixMulticastParametersIfNeeded(
     return somethingIsFixed;
 }
 
-QnLiveStreamParams Camera::getLiveParams(StreamIndex streamIndex)
+std::optional<QnLiveStreamParams> Camera::targetParams(StreamIndex streamIndex)
 {
     if (auto reader = findReader(streamIndex))
         return reader->getLiveParams();
-    return QnLiveStreamParams();
+    return std::optional<QnLiveStreamParams>();
 }
 
-QnLiveStreamParams Camera::getActualParams(StreamIndex streamIndex)
+std::optional<QnLiveStreamParams> Camera::actualParams(StreamIndex streamIndex)
 {
     if(auto reader = findReader(streamIndex))
         return reader->getActualParams();
-    return QnLiveStreamParams();
+    return std::optional<QnLiveStreamParams>();
 }
 
 QnLiveStreamProviderPtr Camera::findReader(StreamIndex streamIndex)
