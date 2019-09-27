@@ -1,5 +1,7 @@
 #include "epoll_win32.h"
 
+#include "../common.h"
+
 #ifdef _WIN32
 
 namespace {
@@ -59,7 +61,6 @@ EpollWin32::EpollWin32():
     m_exceptfdsCapacity(kInitialFdSetSize)
 {
     memset(&m_interruptionSocketLocalAddress, 0, sizeof(m_interruptionSocketLocalAddress));
-    initializeInterruptSocket();
 }
 
 EpollWin32::~EpollWin32()
@@ -74,10 +75,16 @@ EpollWin32::~EpollWin32()
     freeInterruptSocket();
 }
 
-void EpollWin32::add(const SYSSOCKET& s, const int* events)
+Result<> EpollWin32::initialize()
+{
+    return initializeInterruptSocket();
+}
+
+Result<> EpollWin32::add(const SYSSOCKET& s, const int* events)
 {
     int& eventMask = m_socketDescriptorToEventMask[s];
     eventMask |= *events;
+    return success();
 }
 
 void EpollWin32::remove(const SYSSOCKET& s)
@@ -90,7 +97,7 @@ std::size_t EpollWin32::socketsPolledCount() const
     return m_socketDescriptorToEventMask.size();
 }
 
-int EpollWin32::poll(
+Result<int> EpollWin32::poll(
     std::map<SYSSOCKET, int>* socketsAvailableForReading,
     std::map<SYSSOCKET, int>* socketsAvailableForWriting,
     std::chrono::microseconds timeout)
@@ -122,12 +129,12 @@ int EpollWin32::poll(
             : NULL,
         isTimeoutSpecified ? &tv : NULL);
     if (eventCount < 0)
-        return -1;
+        return OsError();
 
     //select sets fd_count to number of sockets triggered and
     //moves those descriptors to the beginning of fd_array
     if (eventCount == 0)
-        return eventCount;
+        return 0;
 
     bool receivedInterruptEvent = false;
     prepareOutEvents(socketsAvailableForReading, socketsAvailableForWriting, &receivedInterruptEvent);
@@ -225,18 +232,19 @@ bool EpollWin32::isPollingSocketForEvent(SYSSOCKET handle, int eventMask) const
         : false;
 }
 
-void EpollWin32::initializeInterruptSocket()
+Result<> EpollWin32::initializeInterruptSocket()
 {
     m_interruptionSocket = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (m_interruptionSocket == INVALID_SOCKET)
-        throw CUDTException(-1, 0, GetLastError());
+        return OsError();
 
     u_long val = 1;
     if (ioctlsocket(m_interruptionSocket, FIONBIO, &val) != 0)
     {
+        auto error = Error();
         ::closesocket(m_interruptionSocket);
         m_interruptionSocket = INVALID_SOCKET;
-        throw CUDTException(-1, 0, GetLastError());
+        return error;
     }
 
     sockaddr_in localEndpoint;
@@ -249,9 +257,10 @@ void EpollWin32::initializeInterruptSocket()
             (SOCKADDR*)&localEndpoint,
             sizeof(localEndpoint)) == SOCKET_ERROR)
     {
+        auto error = Error();
         ::closesocket(m_interruptionSocket);
         m_interruptionSocket = INVALID_SOCKET;
-        throw CUDTException(-1, 0, GetLastError());
+        return error;
     }
 
     int addrLen = sizeof(m_interruptionSocketLocalAddress);
@@ -260,10 +269,13 @@ void EpollWin32::initializeInterruptSocket()
             (sockaddr*)&m_interruptionSocketLocalAddress,
             &addrLen) < 0)
     {
+        auto error = Error();
         ::closesocket(m_interruptionSocket);
         m_interruptionSocket = INVALID_SOCKET;
-        throw CUDTException(-1, 0, GetLastError());
+        return error;
     }
+
+    return success();
 }
 
 void EpollWin32::freeInterruptSocket()

@@ -1,18 +1,21 @@
 #include "epoll_impl.h"
 
-#include "../common.h"
 #include "epoll_factory.h"
+#include "../common.h"
 
 EpollImpl::EpollImpl()
 {
     m_systemEpoll = EpollFactory::instance()->create();
 }
 
-EpollImpl::~EpollImpl()
+EpollImpl::~EpollImpl() = default;
+
+Result<> EpollImpl::initialize()
 {
+    return m_systemEpoll->initialize();
 }
 
-int EpollImpl::addUdtSocket(const UDTSOCKET& u, const int* events)
+void EpollImpl::addUdtSocket(const UDTSOCKET& u, const int* events)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -20,11 +23,9 @@ int EpollImpl::addUdtSocket(const UDTSOCKET& u, const int* events)
         m_sUDTSocksIn.insert(u);
     if (!events || (*events & UDT_EPOLL_OUT))
         m_sUDTSocksOut.insert(u);
-
-    return 0;
 }
 
-int EpollImpl::removeUdtSocket(const UDTSOCKET& u)
+void EpollImpl::removeUdtSocket(const UDTSOCKET& u)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -33,8 +34,6 @@ int EpollImpl::removeUdtSocket(const UDTSOCKET& u)
     m_sUDTSocksEx.erase(u);
 
     removeUdtSocketEvents(lock, u);
-
-    return 0;
 }
 
 void EpollImpl::removeUdtSocketEvents(const UDTSOCKET& socket)
@@ -55,7 +54,7 @@ void EpollImpl::remove(const SYSSOCKET& s)
     m_systemEpoll->remove(s);
 }
 
-int EpollImpl::wait(
+Result<int> EpollImpl::wait(
     std::map<UDTSOCKET, int>* udtReadFds, std::map<UDTSOCKET, int>* udtWriteFds,
     int64_t msTimeout,
     std::map<SYSSOCKET, int>* systemReadFds, std::map<SYSSOCKET, int>* systemWriteFds)
@@ -70,7 +69,7 @@ int EpollImpl::wait(
     if (systemWriteFds)
         systemWriteFds->clear();
 
-    std::chrono::microseconds timeout = 
+    std::chrono::microseconds timeout =
         msTimeout < 0
         ? std::chrono::microseconds::max()
         : std::chrono::milliseconds(msTimeout);
@@ -81,18 +80,18 @@ int EpollImpl::wait(
         timeout = std::chrono::microseconds::zero();
     }
 
-    int eventCount = m_systemEpoll->poll(systemReadFds, systemWriteFds, timeout);
-    if (eventCount < 0)
-        return -1;
+    auto result = m_systemEpoll->poll(systemReadFds, systemWriteFds, timeout);
+    if (!result.ok())
+        return result;
 
+    int eventCount = result.get();
     eventCount += addUdtSocketEvents(udtReadFds, udtWriteFds);
-    return eventCount;
+    return success(eventCount);
 }
 
-int EpollImpl::interruptWait()
+void EpollImpl::interruptWait()
 {
     m_systemEpoll->interrupt();
-    return 0;
 }
 
 void EpollImpl::updateEpollSets(int events, const UDTSOCKET& socketId, bool enable)
@@ -111,7 +110,7 @@ void EpollImpl::updateEpollSets(int events, const UDTSOCKET& socketId, bool enab
         if ((events & UDT_EPOLL_ERR) != 0)
             modified |= recordSocketEvent(socketId, m_sUDTSocksEx, m_sUDTExcepts, enable);
     }
-    
+
     if (modified)
         m_systemEpoll->interrupt();
 }

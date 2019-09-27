@@ -62,77 +62,79 @@ using namespace std;
 CEPoll::CEPoll():
     m_iIDSeed(0)
 {
-    CGuard::createMutex(m_EPollLock);
 }
 
 CEPoll::~CEPoll()
 {
-    CGuard::releaseMutex(m_EPollLock);
 }
 
-int CEPoll::create()
+Result<int> CEPoll::create()
 {
-    CGuard pg(m_EPollLock);
+    auto desc = std::make_unique<EpollImpl>();
+    if (auto result = desc->initialize(); !result.ok())
+        return result.error();
 
-    std::unique_ptr<EpollImpl> desc(new EpollImpl());
+    std::lock_guard<std::mutex> pg(m_EPollLock);
 
     if (++m_iIDSeed >= 0x7FFFFFFF)
         m_iIDSeed = 0;
 
     m_mPolls[m_iIDSeed] = std::move(desc);
 
-    return m_iIDSeed;
+    return success(m_iIDSeed);
 }
 
-int CEPoll::add_usock(const int eid, const UDTSOCKET& u, const int* events)
+Result<> CEPoll::add_usock(const int eid, const UDTSOCKET& u, const int* events)
 {
-    CGuard pg(m_EPollLock);
+    std::lock_guard<std::mutex> pg(m_EPollLock);
 
     CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
-        throw CUDTException(5, 13);
+        return Error(OsErrorCode::badDescriptor);
 
-    return p->second->addUdtSocket(u, events);
+    p->second->addUdtSocket(u, events);
+    return success();
 }
 
-int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
+Result<> CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
 {
-    CGuard pg(m_EPollLock);
+    std::lock_guard<std::mutex> pg(m_EPollLock);
 
     CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
-        throw CUDTException(5, 13);
+        return Error(OsErrorCode::badDescriptor);
 
     p->second->add(s, events);
 
-    return 0;
+    return success();
 }
 
-int CEPoll::remove_usock(const int eid, const UDTSOCKET& u)
+Result<> CEPoll::remove_usock(const int eid, const UDTSOCKET& u)
 {
-    CGuard pg(m_EPollLock);
+    std::lock_guard<std::mutex> pg(m_EPollLock);
 
     CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
-        throw CUDTException(5, 13);
+        return Error(OsErrorCode::badDescriptor);
 
-    return p->second->removeUdtSocket(u);
+    p->second->removeUdtSocket(u);
+    return success();
 }
 
-int CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
+Result<> CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
 {
-    CGuard pg(m_EPollLock);
+    std::lock_guard<std::mutex> pg(m_EPollLock);
 
     CEPollDescMap::iterator p = m_mPolls.find(eid);
     if (p == m_mPolls.end())
-        throw CUDTException(5, 13);
+        return Error(OsErrorCode::badDescriptor);
 
     p->second->remove(s);
 
-    return 0;
+    return success();
 }
 
-int CEPoll::wait(
+Result<int> CEPoll::wait(
     const int eid,
     std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds,
     int64_t msTimeOut,
@@ -140,30 +142,37 @@ int CEPoll::wait(
 {
     // if all fields is NULL and waiting time is infinite, then this would be a deadlock
     if (!readfds && !writefds && !lrfds && lwfds && (msTimeOut < 0))
-        throw CUDTException(5, 3, 0);
+        return Error(OsErrorCode::invalidData);
 
     //NOTE calls with same eid MUST be synchronized by caller!
     //That is, while we are in this method no calls with same eid are possible
-    EpollImpl* epollContext = getEpollById(eid);
-    return epollContext->wait(readfds, writefds, msTimeOut, lrfds, lwfds);
+    auto epollContext = getEpollById(eid);
+    if (!epollContext.ok())
+        return epollContext.error();
+
+    return epollContext.get()->wait(readfds, writefds, msTimeOut, lrfds, lwfds);
 }
 
-int CEPoll::interruptWait(const int eid)
+Result<> CEPoll::interruptWait(const int eid)
 {
-    return getEpollById(eid)->interruptWait();
+    auto epollContext = getEpollById(eid);
+    if (!epollContext.ok())
+        return epollContext.error();
+
+    epollContext.get()->interruptWait();
+    return success();
 }
 
-int CEPoll::release(const int eid)
+Result<> CEPoll::release(const int eid)
 {
-    CGuard pg(m_EPollLock);
+    std::lock_guard<std::mutex> pg(m_EPollLock);
 
     CEPollDescMap::iterator i = m_mPolls.find(eid);
     if (i == m_mPolls.end())
-        throw CUDTException(5, 13);
+        return Error(OsErrorCode::badDescriptor);
 
     m_mPolls.erase(i);
-
-    return 0;
+    return success();
 }
 
 int CEPoll::update_events(
@@ -172,9 +181,9 @@ int CEPoll::update_events(
     int events,
     bool enable)
 {
-    CGuard lk(m_EPollLock);
+    std::lock_guard<std::mutex> lk(m_EPollLock);
 
-    for (set<int>::iterator i = epollToTriggerIDs.begin(); i != epollToTriggerIDs.end(); ++i)
+    for (auto i = epollToTriggerIDs.begin(); i != epollToTriggerIDs.end(); ++i)
     {
         auto epollIter = m_mPolls.find(*i);
         if (epollIter == m_mPolls.end())
@@ -182,24 +191,24 @@ int CEPoll::update_events(
 
         epollIter->second->updateEpollSets(events, socketId, enable);
     }
-    lk.unlock();
 
     return 0;
 }
 
 void CEPoll::RemoveEPollEvent(UDTSOCKET socket)
 {
-    CGuard pg(m_EPollLock);
+    std::lock_guard<std::mutex> pg(m_EPollLock);
     for (CEPollDescMap::iterator p = m_mPolls.begin(); p != m_mPolls.end(); ++p)
         p->second->removeUdtSocketEvents(socket);
 }
 
-EpollImpl* CEPoll::getEpollById(int eid) const
+Result<EpollImpl*> CEPoll::getEpollById(int eid) const
 {
-    CGuard lk(m_EPollLock);
+    std::lock_guard<std::mutex> lk(m_EPollLock);
 
     auto it = m_mPolls.find(eid);
     if (it == m_mPolls.end())
-        throw CUDTException(5, 13);
-    return it->second.get();
+        return Error(OsErrorCode::badDescriptor);
+
+    return success(it->second.get());
 }

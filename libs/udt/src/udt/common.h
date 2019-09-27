@@ -50,9 +50,9 @@ Yunhong Gu, last updated 08/01/2009
 #include <windows.h>
 #endif
 #include <cstdlib>
+
 #include "udt.h"
 #include "socket_addresss.h"
-
 
 #ifdef _WIN32
 // Windows compability
@@ -71,6 +71,14 @@ int pthread_cond_wait_monotonic_timeout(
 
 int pthread_cond_wait_monotonic_timepoint(
     pthread_cond_t* condition, pthread_mutex_t* mutex, uint64_t timeMks);
+#endif
+
+#ifdef _WIN32
+using ThreadId = DWORD;
+#else
+using ThreadId = pthread_t;
+
+ThreadId GetCurrentThreadId();
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -200,35 +208,6 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class CGuard
-{
-public:
-    CGuard(pthread_mutex_t& lock);
-    ~CGuard();
-
-    void unlock();
-
-public:
-    static void createMutex(pthread_mutex_t& lock);
-    static void releaseMutex(pthread_mutex_t& lock);
-
-    static void createCond(pthread_cond_t& cond);
-    static void releaseCond(pthread_cond_t& cond);
-
-private:
-    pthread_mutex_t& m_Mutex;            // Alias name of the mutex to be protected
-    bool m_iLocked;                       // Locking status
-
-    CGuard& operator=(const CGuard&);
-
-    static bool enterCS(pthread_mutex_t& lock);
-    static bool leaveCS(pthread_mutex_t& lock);
-};
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-
 // UDT Sequence Number 0 - (2^31 - 1)
 
 // seqcmp: compare two seq#, considering the wraping
@@ -352,5 +331,61 @@ struct CMD5
     static void compute(const char* input, unsigned char result[16]);
 };
 
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Should be used to report OS-specific error.
+ * E.g.,
+ * <pre><code>
+ * auto handle = socket(...);
+ * if (handle < 0)
+ *     return OsError();
+ * </code></pre>
+ */
+class OsError:
+    public UDT::Error
+{
+};
+
+namespace OsErrorCode
+{
+    static constexpr UDT::Errno ok = 0;
+
+#if defined(_WIN32)
+    static constexpr UDT::Errno addressFamilyNotSupported = WSAEAFNOSUPPORT;
+    static constexpr UDT::Errno protocolNotSupported = WSAEPROTONOSUPPORT;
+    static constexpr UDT::Errno badDescriptor = WSAEBADF;
+    static constexpr UDT::Errno connectionRefused = WSAECONNREFUSED;
+    static constexpr UDT::Errno invalidData = WSAEINVAL;
+    static constexpr UDT::Errno wouldBlock = WSAEWOULDBLOCK;
+    static constexpr UDT::Errno already = WSAEALREADY;
+    static constexpr UDT::Errno notConnected = WSAENOTCONN;
+    static constexpr UDT::Errno isConnected = WSAEISCONN;
+    static constexpr UDT::Errno noProtocolOption = WSAENOPROTOOPT;
+    static constexpr UDT::Errno addressInUse = WSAEADDRINUSE;
+    static constexpr UDT::Errno notSupported = WSAEOPNOTSUPP;
+    static constexpr UDT::Errno timedOut = WSAETIMEDOUT;
+    static constexpr UDT::Errno messageTooLarge = WSAEMSGSIZE;
+    static constexpr UDT::Errno connectionReset = WSAECONNRESET;
+    static constexpr UDT::Errno io = ERROR_GEN_FAILURE;
+#else
+    static constexpr UDT::Errno addressFamilyNotSupported = EAFNOSUPPORT;
+    static constexpr UDT::Errno protocolNotSupported = EPROTONOSUPPORT;
+    static constexpr UDT::Errno badDescriptor = EBADF;
+    static constexpr UDT::Errno connectionRefused = ECONNREFUSED;
+    static constexpr UDT::Errno invalidData = EINVAL;
+    static constexpr UDT::Errno wouldBlock = EWOULDBLOCK;
+    static constexpr UDT::Errno already = EALREADY;
+    static constexpr UDT::Errno notConnected = ENOTCONN;
+    static constexpr UDT::Errno isConnected = EISCONN;
+    static constexpr UDT::Errno noProtocolOption = ENOPROTOOPT;
+    static constexpr UDT::Errno addressInUse = EADDRINUSE;
+    static constexpr UDT::Errno notSupported = EOPNOTSUPP;
+    static constexpr UDT::Errno timedOut = ETIMEDOUT;
+    static constexpr UDT::Errno messageTooLarge = EMSGSIZE;
+    static constexpr UDT::Errno connectionReset = ECONNRESET;
+    static constexpr UDT::Errno io = EIO;
+#endif
+}
 
 #endif

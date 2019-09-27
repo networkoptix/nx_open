@@ -21,13 +21,17 @@ public:
     EpollWin32();
     virtual ~EpollWin32() override;
 
-    virtual void add(const SYSSOCKET& s, const int* events) override;
+    virtual Result<> initialize() override;
+
+    virtual Result<> add(const SYSSOCKET& s, const int* events) override;
     virtual void remove(const SYSSOCKET& s) override;
     virtual std::size_t socketsPolledCount() const override;
-    virtual int poll(
+
+    virtual Result<int> poll(
         std::map<SYSSOCKET, int>* socketsAvailableForReading,
         std::map<SYSSOCKET, int>* socketsAvailableForWriting,
         std::chrono::microseconds timeout) override;
+
     virtual void interrupt() override;
 
 private:
@@ -53,7 +57,7 @@ private:
         bool* receivedInterruptEvent);
     bool isPollingSocketForEvent(SYSSOCKET handle, int eventMask) const;
 
-    void initializeInterruptSocket();
+    Result<> initializeInterruptSocket();
     void freeInterruptSocket();
 
     EpollWin32(const EpollWin32&) = delete;
