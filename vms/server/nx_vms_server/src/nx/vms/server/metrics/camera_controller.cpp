@@ -55,6 +55,7 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
     static const std::chrono::minutes kIssuesRateUpdateInterval(1);
     static const std::chrono::seconds kipConflictsRateUpdateInterval(15);
     static std::chrono::hours kBitratePeriod(24);
+    static const std::chrono::seconds kFpsDeltaCheckInterval(5);
 
     return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
         utils::metrics::makeValueGroupProvider<Resource>(
@@ -121,6 +122,15 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                 { return Value(round(r->getActualParams(StreamIndex::primary).fps));}
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
+                "fpsDelta", [](const auto& r)
+                {
+                    const auto fpsDelta = r->getLiveParams(StreamIndex::primary).fps -
+                        r->getActualParams(StreamIndex::primary).fps;
+                    return Value(round(fpsDelta));
+                },
+                nx::vms::server::metrics::timerWatch<Camera*>(kFpsDeltaCheckInterval)
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
                 "actualBitrate", [](const auto& r) //< KBps.
                 { return Value(r->getActualParams(StreamIndex::primary).bitrateKbps);}
             )
@@ -145,6 +155,15 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
             utils::metrics::makeLocalValueProvider<Resource>(
                 "actualBitrate", [](const auto& r) //< KBps.
                 { return Value(r->getActualParams(StreamIndex::secondary).bitrateKbps);}
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "fpsDelta", [](const auto& r)
+                {
+                    const auto fpsDelta = r->getLiveParams(StreamIndex::secondary).fps -
+                        r->getActualParams(StreamIndex::secondary).fps;
+                    return Value(round(fpsDelta));
+                },
+                nx::vms::server::metrics::timerWatch<Camera*>(kFpsDeltaCheckInterval)
             )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(

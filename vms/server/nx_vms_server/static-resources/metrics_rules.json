@@ -306,6 +306,16 @@
                 "actualFps": {
                     "display": "Actual fps"
                 },
+                "fpsDeltaAvarage": {
+                    "name": "Primary stream fps drops avarage (10m)",
+                    "display": "panel",
+                    "calculate": "average %fpsDelta 10m",
+                    "alarms": [{
+                        "level": "warning",
+                        "condition": "greaterThen %fpsDelta 5",
+                        "text": "has actual fps less for %fpsDelta frames/s"
+                    }]
+                },
                 "actualBitrate": {
                     "name": "Bitrate",
                     "display": "panel",
@@ -329,6 +339,16 @@
                     "name": "Bitrate",
                     "display": "panel",
                     "unit": "KBps"
+                },
+                "fpsDeltaAvarage": {
+                    "name": "Secondary stream fps drops avarage (10m)",
+                    "display": "panel",
+                    "calculate": "average %fpsDelta 10m",
+                    "alarms": [{
+                        "level": "warning",
+                        "condition": "greaterThen %fpsDelta 3",
+                        "text": "has actual fps less for %fpsDelta frames/s"
+                    }]
                 }
             }
         },
