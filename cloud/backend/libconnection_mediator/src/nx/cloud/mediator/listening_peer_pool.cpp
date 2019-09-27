@@ -120,7 +120,6 @@ ListeningPeerData& ListeningPeerPool::DataLocker::value()
     return m_peerIter->second;
 }
 
-
 //-------------------------------------------------------------------------------------------------
 // class ListeningPeerPool
 
@@ -131,9 +130,9 @@ ListeningPeerPool::ListeningPeerPool(
     m_settings(settings),
     m_listeningPeerDb(listeningPeerDb)
 {
-    m_uplinkSpeedUpdatedId =
-        m_listeningPeerDb->subscribeToUplinkSpeedUpdated(
-        std::bind(&ListeningPeerPool::onUplinkSpeedUpdated, this, std::placeholders::_1));
+    m_listeningPeerDb->subscribeToUplinkSpeedUpdated(
+        std::bind(&ListeningPeerPool::onUplinkSpeedUpdated, this, std::placeholders::_1),
+		&m_uplinkSpeedUpdatedId);
 }
 
 ListeningPeerPool::~ListeningPeerPool()
@@ -244,17 +243,31 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
 
         QnMutexLocker lock(&m_mutex);
 
-        if (!m_bestUplinkSpeed)
-            m_bestUplinkSpeed = findLocalPeerWithBestUplinkSpeedUnsafe(systemId);
+		auto uplinkSpeedIter = m_bestUplinkSpeeds.find(systemId);
+		if (uplinkSpeedIter == m_bestUplinkSpeeds.end())
+		{
+			auto uplinkSpeed = findLocalPeerWithBestUplinkSpeedUnsafe(systemId);
+			if (uplinkSpeed)
+			{
+				uplinkSpeedIter = m_bestUplinkSpeeds.emplace(
+					systemId,
+					std::move(*uplinkSpeed)).first;
+				NX_VERBOSE(this, "Found best uplink speed while searching for Peer: %1",
+					uplinkSpeedIter->second);
+			}
+		}
 
-        if (m_bestUplinkSpeed)
+        if (uplinkSpeedIter != m_bestUplinkSpeeds.end())
         {
-            NX_VERBOSE(this, "Found best uplink speed while searching for Peer: %1",
-                *m_bestUplinkSpeed);
-            auto peerIter = m_peers.find(toMediaServerData(*m_bestUplinkSpeed));
+			NX_VERBOSE(this, "Locking peer data by best uplink speed: %1",
+				uplinkSpeedIter->second);
+            auto peerIter = m_peers.find(toMediaServerData(uplinkSpeedIter->second));
             if (peerIter != m_peers.end())
-                return ConstDataLocker(std::move(lock), std::move(peerIter));
+				return ConstDataLocker(std::move(lock), std::move(peerIter));
         }
+
+		NX_VERBOSE(this, "Best uplink speed for system %1 not found, searching for any peer",
+			systemId);
 
         //resolving to any server of a system
         auto peerIter = m_peers.lower_bound(MediaserverData(systemId, nx::String()));
@@ -348,17 +361,14 @@ void ListeningPeerPool::onListeningPeerConnectionClosed(
                 hostName, removed);
         });
 
-    if (!m_bestUplinkSpeed ||
-        peerDataLowerCase.hostName() == toMediaServerData(*m_bestUplinkSpeed).hostName())
+	auto uplinkSpeedIter = m_bestUplinkSpeeds.find(peerData.systemId);
+    if (uplinkSpeedIter != m_bestUplinkSpeeds.end() &&
+        peerDataLowerCase.hostName() == toMediaServerData(uplinkSpeedIter->second).hostName())
     {
-        m_bestUplinkSpeed =
-            findLocalPeerWithBestUplinkSpeedUnsafe(peerDataLowerCase.systemId);
-
-        if (m_bestUplinkSpeed)
-        {
-            NX_VERBOSE(this, "Found best uplink speed after closing connection to Peer: %1",
-                *m_bestUplinkSpeed);
-        }
+		NX_VERBOSE(this,
+			"Connection to peer with best uplink speed closed. Removing %1",
+			uplinkSpeedIter->second);
+		m_bestUplinkSpeeds.erase(uplinkSpeedIter);
     }
 }
 
@@ -377,71 +387,56 @@ void ListeningPeerPool::closeConnectionAsync(
         });
 }
 
-void ListeningPeerPool::onUplinkSpeedUpdated(nx::hpm::api::PeerConnectionSpeed peerUplinkSpeed)
+void ListeningPeerPool::onUplinkSpeedUpdated(api::PeerConnectionSpeed peerUplinkSpeed)
 {
     QnMutexLocker lock(&m_mutex);
 
     // Ignoring non local peers
-    if (m_peers.find(toMediaServerData(peerUplinkSpeed)) == m_peers.end())
+	if (m_peers.find(toMediaServerData(peerUplinkSpeed)) == m_peers.end())
+		return;
+
+	auto [uplinkSpeedIter, firstInsertion] = m_bestUplinkSpeeds.emplace(
+		peerUplinkSpeed.systemId.c_str(),
+		peerUplinkSpeed);
+	// No existing entry to compare against.
+    if (firstInsertion)
         return;
 
-    // Default value
-    if (!m_bestUplinkSpeed)
-    {
-        m_bestUplinkSpeed = peerUplinkSpeed;
-        return;
-    }
-
-    // Ignoring new speed if current is still better.
-    if (peerUplinkSpeed.connectionSpeed.bandwidth < m_bestUplinkSpeed->connectionSpeed.bandwidth)
-        return;
-
-    m_bestUplinkSpeed = peerUplinkSpeed;
-
-    NX_VERBOSE(this, "Updating best uplink speed: %1", m_bestUplinkSpeed->toString());
+    // Updating if new speed is better than current.
+	if (peerUplinkSpeed.connectionSpeed.bandwidth >
+		uplinkSpeedIter->second.connectionSpeed.bandwidth)
+	{
+		NX_VERBOSE(this, "Updating best peer uplink speed: %1", peerUplinkSpeed);
+		uplinkSpeedIter->second = std::move(peerUplinkSpeed);
+	}
 }
 
-std::optional<nx::hpm::api::PeerConnectionSpeed>
+std::optional<api::PeerConnectionSpeed>
     ListeningPeerPool::findLocalPeerWithBestUplinkSpeedUnsafe(
         const nx::String& systemId) const
 {
-    using Status = std::pair<std::string, ListeningPeerStatus>;
-
-    auto statuses = m_listeningPeerDb->getListeningPeerStatus(nx::toStdString(systemId));
-    if (statuses.empty())
-        return std::nullopt;
-
-    std::vector<Status> statusesSorted;
-    std::transform(statuses.begin(), statuses.end(), std::back_inserter(statusesSorted),
-        [](Status&& status) { return std::move(status); });
-
-    std::sort(statusesSorted.begin(), statusesSorted.end(),
-        [](const Status& a, const Status& b)
-        {
-            // Sorting in descending order
-            return a.second.uplinkSpeed.bandwidth > b.second.uplinkSpeed.bandwidth;
-        });
-
-    for (const auto& status : statusesSorted)
+    std::optional<api::PeerConnectionSpeed> bestUplinkSpeed;
+    for (const auto& status: m_listeningPeerDb->getListeningPeerStatus(nx::toStdString(systemId)))
     {
-        auto peerIter = m_peers.find(
-            MediaserverData (
+        const auto peerIter = m_peers.find(
+            MediaserverData(
                 status.second.systemId.c_str(),
                 status.second.serverId.c_str()));
 
-        // 0 bandwidth probably means that uplinkSpeed is default constructed and shouldn't be used
-        if (peerIter != m_peers.end() && status.second.uplinkSpeed.bandwidth != 0)
-        {
-            nx::hpm::api::PeerConnectionSpeed uplinkSpeed{
-                status.second.serverId,
-                status.second.systemId,
-                status.second.uplinkSpeed};
+		if (peerIter == m_peers.end())
+			continue;
 
-            return uplinkSpeed;
+		if (!bestUplinkSpeed ||
+			bestUplinkSpeed->connectionSpeed.bandwidth < status.second.uplinkSpeed.bandwidth)
+        {
+			bestUplinkSpeed = api::PeerConnectionSpeed{
+				status.second.serverId,
+				status.second.systemId,
+				status.second.uplinkSpeed};
         }
     }
 
-    return std::nullopt;
+	return bestUplinkSpeed;
 }
 
 } // namespace hpm

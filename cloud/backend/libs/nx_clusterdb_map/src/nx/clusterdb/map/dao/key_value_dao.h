@@ -19,7 +19,10 @@ public:
         const std::string& key,
         const std::string& value);
 
-    void remove(
+	/**
+	 * @return true if the record existed and was removed.
+	 */
+    bool remove(
         nx::sql::QueryContext* queryContext,
         const std::string& key);
 

@@ -177,8 +177,9 @@ private:
     /**
      * Removes elements within existing transaction.
      * If transaction is rolled back, no data will be sent to remote peers.
+	 * @return true if the key existed and was removed.
      */
-    void removeFromDb(
+    bool removeFromDb(
         nx::sql::QueryContext* queryContext,
         const std::string& key);
 

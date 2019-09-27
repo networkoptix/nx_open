@@ -27,7 +27,7 @@ public:
     virtual void remove(const SYSSOCKET& s) override;
     virtual std::size_t socketsPolledCount() const override;
 
-    virtual int poll(
+    virtual Result<int> poll(
         std::map<SYSSOCKET, int>* socketsAvailableForReading,
         std::map<SYSSOCKET, int>* socketsAvailableForWriting,
         std::chrono::microseconds timeout) override;

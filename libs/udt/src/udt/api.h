@@ -205,12 +205,12 @@ public:
     /**
      * Set last error for the current thread.
      */
-    void setError(ErrorInfo e);
+    void setError(Error e);
 
     /**
      * @return The last error occured in the current thread.
      */
-    const ErrorInfo& getError() const;
+    const Error& getError() const;
 
 private:
     //   void init();
@@ -226,7 +226,7 @@ private:
     std::map<int64_t, std::set<UDTSOCKET> > m_PeerRec;// record sockets from peers to avoid repeated connection request, int64_t = (socker_id << 30) + isn
 
 private:
-    std::map<ThreadId, ErrorInfo> m_mTLSRecord;
+    std::map<ThreadId, Error> m_mTLSRecord;
     void cleanupPerThreadLastErrors();
     mutable std::mutex m_TLSLock;
 

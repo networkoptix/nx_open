@@ -153,7 +153,7 @@ public: //API
 
     static Result<void> epoll_interrupt_wait(const int eid);
     static Result<void> epoll_release(const int eid);
-    static const ErrorInfo& getlasterror();
+    static const Error& getlasterror();
     static Result<> perfmon(UDTSOCKET u, CPerfMon* perf, bool clear = true);
     static UDTSTATUS getsockstate(UDTSOCKET u);
 

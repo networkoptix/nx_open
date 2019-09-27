@@ -779,7 +779,7 @@ TEST_F(Database, handles_removing_non_existent_key)
 
     whenRemoveNonExistentKey();
 
-    thenOperationSucceeded();
+    thenOperationFailed(map::ResultCode::notFound);
 }
 
 TEST_F(Database, fails_to_fetch_non_existent_value)
