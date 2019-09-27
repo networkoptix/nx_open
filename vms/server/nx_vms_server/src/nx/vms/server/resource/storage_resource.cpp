@@ -1,7 +1,7 @@
 #include "storage_resource.h"
 #include <media_server/media_server_module.h>
 #include <recorder/storage_manager.h>
-#include <nx/utils/proxy_io_device.h>
+#include <nx/utils/iodevice_wrapper.h>
 #include <recorder/file_deletor.h>
 
 namespace nx::vms::server {
@@ -26,7 +26,7 @@ QIODevice* StorageResource::open(const QString &fileName, QIODevice::OpenMode op
 
 QIODevice* StorageResource::wrapIoDevice(std::unique_ptr<QIODevice> ioDevice)
 {
-    auto result = new nx::utils::ProxyIoDevice(std::move(ioDevice));
+    auto result = new nx::utils::IoDeviceWrapper(std::move(ioDevice));
 
     std::weak_ptr<Metrics> statistics = m_metrics;
     result->setOnWriteCallback(
