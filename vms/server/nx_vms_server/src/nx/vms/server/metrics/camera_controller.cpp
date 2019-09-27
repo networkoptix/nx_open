@@ -11,6 +11,7 @@ namespace nx::vms::server::metrics {
 
 using namespace nx::vms::api;
 using namespace nx::vms::server::resource;
+using namespace std::chrono;
 
 CameraController::CameraController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
@@ -94,74 +95,98 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                 qtSignalWatch<Resource>(&resource::Camera::statusChanged)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "streamIssues", [](const auto& r)
-                { return Value(r->getAndResetMetric(&Camera::Metrics::streamIssues)); },
+                "streamIssues",
+                [](const auto& r)
+                {
+                    return Value(r->getAndResetMetric(&Camera::Metrics::streamIssues));
+                },
                 nx::vms::server::metrics::timerWatch<Camera*>(kIssuesRateUpdateInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "ipConflicts", [](const auto& r)
-                { return Value(r->getAndResetMetric(&Camera::Metrics::ipConflicts)); },
+                "ipConflicts",
+                [](const auto& r)
+                {
+                    return Value(r->getAndResetMetric(&Camera::Metrics::ipConflicts));
+                },
                 nx::vms::server::metrics::timerWatch<Camera*>(kipConflictsRateUpdateInterval)
             )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
             "primaryStream",
             utils::metrics::makeSystemValueProvider<Resource>(
-                "resolution", [](const auto& r)
+                "resolution",
+                [](const auto& r)
                 {
                     const auto resolution = r->getLiveParams(StreamIndex::primary).resolution;
                     return Value(CameraMediaStreamInfo::resolutionToString(resolution));
                 }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "fps", [](const auto& r)
-                { return Value(round(r->getLiveParams(StreamIndex::primary).fps));}
+                "targetFps",
+                [](const auto& r)
+                {
+                    return Value(r->getLiveParams(StreamIndex::primary).fps);
+                }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "actualFps", [](const auto& r)
-                { return Value(round(r->getActualParams(StreamIndex::primary).fps));}
+                "actualFps",
+                [](const auto& r)
+                {
+                    return Value(r->getActualParams(StreamIndex::primary).fps);
+                }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "fpsDelta", [](const auto& r)
+                "fpsDelta",
+                [](const auto& r)
                 {
                     const auto fpsDelta = r->getLiveParams(StreamIndex::primary).fps -
                         r->getActualParams(StreamIndex::primary).fps;
-                    return Value(round(fpsDelta));
+                    return Value(fpsDelta);
                 },
                 nx::vms::server::metrics::timerWatch<Camera*>(kFpsDeltaCheckInterval)
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "actualBitrate", [](const auto& r) //< KBps.
-                { return Value(r->getActualParams(StreamIndex::primary).bitrateKbps);}
+                "actualBitrateKBps",
+                [](const auto& r)
+                {
+                    return Value(r->getActualParams(StreamIndex::primary).bitrateKbps);
+                }
             )
         ),
         utils::metrics::makeValueGroupProvider<Resource>(
             "secondaryStream",
             utils::metrics::makeSystemValueProvider<Resource>(
-                "resolution", [](const auto& r)
+                "resolution",
+                [](const auto& r)
                 {
                     const auto resolution = r->getLiveParams(StreamIndex::secondary).resolution;
                     return Value(CameraMediaStreamInfo::resolutionToString(resolution));
                 }
             ),
             utils::metrics::makeSystemValueProvider<Resource>(
-                "fps", [](const auto& r)
-                { return Value(round(r->getLiveParams(StreamIndex::secondary).fps));}
+                "targetFps",
+                [](const auto& r)
+                { return Value(r->getLiveParams(StreamIndex::secondary).fps);}
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "actualFps", [](const auto& r)
-                { return Value(round(r->getActualParams(StreamIndex::secondary).fps));}
+                "actualFps",
+                [](const auto& r)
+                {
+                    return Value(r->getActualParams(StreamIndex::secondary).fps);
+                }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "actualBitrate", [](const auto& r) //< KBps.
+                "actualBitrateKBps",
+                [](const auto& r)
                 { return Value(r->getActualParams(StreamIndex::secondary).bitrateKbps);}
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "fpsDelta", [](const auto& r)
+                "fpsDelta",
+                [](const auto& r)
                 {
                     const auto fpsDelta = r->getLiveParams(StreamIndex::secondary).fps -
                         r->getActualParams(StreamIndex::secondary).fps;
-                    return Value(round(fpsDelta));
+                    return Value(fpsDelta);
                 },
                 nx::vms::server::metrics::timerWatch<Camera*>(kFpsDeltaCheckInterval)
             )
@@ -169,15 +194,16 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
         utils::metrics::makeValueGroupProvider<Resource>(
             "analytics",
             utils::metrics::makeLocalValueProvider<Resource>(
-                "archiveLength", [](const auto& r)
+                "archiveLength",
+                [](const auto& r)
                 {
-                    const auto value = std::chrono::seconds(r->nxOccupiedDuration().count()/1000);
+                    const auto value = duration_cast<seconds>(r->nxOccupiedDuration());
                     return Value(nx::vms::text::ArchiveDuration::durationToString(value));
                 }
             ),
             utils::metrics::makeLocalValueProvider<Resource>(
-                "recordingBitrateKBps", [](const auto& r)
-                { return Value(r->recordingBitrateKBps(kBitratePeriod)); }
+                "recordingBitrateKBps",
+                [](const auto& r) { return Value(r->recordingBitrateKBps(kBitratePeriod)); }
             )
         )
     );

@@ -310,7 +310,7 @@
                     "name": "Resolution",
                     "display": "table|panel"
                 },
-                "fps": {
+                "targetFps": {
                     "display": "Target fps"
                 },
                 "actualFps": {
@@ -326,7 +326,7 @@
                         "text": "has actual fps less for %fpsDelta frames/s"
                     }]
                 },
-                "actualBitrate": {
+                "actualBitrateKBps": {
                     "name": "Bitrate",
                     "display": "panel",
                     "unit": "KBps"
@@ -339,13 +339,13 @@
                     "name": "Resolution",
                     "display": "table|panel"
                 },
-                "fps": {
+                "targetFps": {
                     "display": "Target fps"
                 },
                 "actualFps": {
                     "display": "Actual fps"
                 },
-                "actualBitrate": {
+                "actualBitrateKBps": {
                     "name": "Bitrate",
                     "display": "panel",
                     "unit": "KBps"
