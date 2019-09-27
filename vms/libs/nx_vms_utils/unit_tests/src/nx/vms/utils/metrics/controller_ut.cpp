@@ -31,11 +31,11 @@ static const QByteArray kRules(R"json({
                     "insert": "i",
                     "alarms": [{
                         "level": "warning",
-                        "condition": "greaterThen %i 100",
+                        "condition": "greaterThan %i 100",
                         "text": "i = %i (>100), ip = %ip"
                     },{
                         "level": "danger",
-                        "condition": "lessThen %i 0",
+                        "condition": "lessThan %i 0",
                         "text": "i = %i (<0), ip = %ip"
                     }]
                 }
@@ -49,7 +49,7 @@ static const QByteArray kRules(R"json({
                     "display": "table",
                     "alarms": [{
                         "level": "warning",
-                        "condition": "greaterThen %i 30",
+                        "condition": "greaterThan %i 30",
                         "text": "i is %i (>30)"
                     }]
                 },

@@ -12,7 +12,7 @@
                     "display": "panel",
                     "alarms": [{
                         "level": "warning",
-                        "condition": "greaterThen %servers %recommendedMaxServers",
+                        "condition": "greaterThan %servers %recommendedMaxServers",
                         "text": "The maximum number of %recommendedMaxServers servers per system is reached. Create another system to use more servers"
                     }]
                 },
@@ -31,7 +31,7 @@
                     "display": "panel",
                     "alarms": [{
                         "level": "warning",
-                        "condition": "greaterThen %servers %recommendedMaxCameras",
+                        "condition": "greaterThan %servers %recommendedMaxCameras",
                         "text": "The maximum number of %recommendedMaxCameras camera channels per system is reached. Create another system to use more cameras"
                     }]
                 },
@@ -84,7 +84,7 @@
                     "alarms": [
                         {
                             "level": "warning",
-                            "condition": "greaterThen %timeChanged24h 5",
+                            "condition": "greaterThan %timeChanged24h 5",
                             "text": "has changed time %timeChanged24h times in last 24 hours"
                         }
                     ]
@@ -108,7 +108,7 @@
                     "insert": "uptimeS",
                     "alarms": [{
                         "level": "warning",
-                        "condition": "greaterThen %offlineEvents 1",
+                        "condition": "greaterThan %offlineEvents 1",
                         "text": "went Offline %offlineEvents times in last 24 hours"
                     }]
                 },
@@ -272,7 +272,7 @@
                     "alarms": [
                         {
                             "level": "warning",
-                            "condition": "greaterThen %offlineEvents 1",
+                            "condition": "greaterThan %offlineEvents 1",
                             "text": "went Offline %offlineEvents times in last 24 hours"
                         }
                     ]
@@ -285,12 +285,12 @@
                     "alarms": [
                         {
                             "level": "warning",
-                            "condition": "greaterThen %streamIssues1h 0",
+                            "condition": "greaterThan %streamIssues1h 0",
                             "text": "has stream issues %streamIssues1h times in last hour"
                         },
                         {
                             "level": "error",
-                            "condition": "greaterThen %streamIssues1h 5",
+                            "condition": "greaterThan %streamIssues1h 5",
                             "text": "has stream issues %streamIssues1h times in last hour"
                         }
                     ]
@@ -303,7 +303,7 @@
                     "alarms": [
                         {
                             "level": "error",
-                            "condition": "greaterThen %ipConflicts3min 0",
+                            "condition": "greaterThan %ipConflicts3min 0",
                             "text": "has IP conflicts %ipConflicts3min times in last 3 minute"
                         }
                     ]

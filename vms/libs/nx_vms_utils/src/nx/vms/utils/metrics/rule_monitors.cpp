@@ -80,6 +80,10 @@ public:
         return
             [operation, getter1 = value(firstI), getter2 = value(secondI)]
             {
+                // Currently all of the values are optional. If one of them is missing, the formula
+                // result should be missing too.
+                // TODO: Add optionality marker to all formulas and report error if any of
+                // non-optional values is missing.
                 auto v1 = getter1();
                 auto v2 = getter2();
                 return (v1.isNull() || v2.isNull())
@@ -95,6 +99,11 @@ public:
             firstI, secondI,
             [operation](api::metrics::Value v1, api::metrics::Value v2)
             {
+                // Currenlty we do not have any way of reporting errors to the user. Returning the
+                // error string is the only option for error detection during manual testing. End
+                // users will newer see them, because rules newer change and we test our product
+                // properly :).
+                // TODO: Implement some kind of error handling, visible to the user.
                 return (!v1.isDouble() || !v2.isDouble())
                     ? api::metrics::Value("ERROR: One of the arguments is not an integer")
                     : api::metrics::Value(operation(v1.toDouble(), v2.toDouble()));
@@ -139,7 +148,10 @@ public:
                 const auto durationStr = getDuration().toVariant().toString();
                 const auto duration = nx::utils::parseTimerDuration(durationStr);
                 if (duration.count() <= 0)
+                {
+                    // TODO: Error handling.
                     return api::metrics::Value("ERROR: Wrong duration: " + durationStr);
+                }
 
                 return api::metrics::Value(operation(
                     [&monitor, &duration](const auto& action) { monitor->forEach(duration, action); }
