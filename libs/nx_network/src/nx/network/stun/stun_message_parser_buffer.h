@@ -29,7 +29,7 @@ public:
 
 private:
     std::deque<char>* m_tempBuffer = nullptr;
-    const QnByteArrayConstRef& m_buffer;
+    const QnByteArrayConstRef m_buffer;
     std::size_t m_position = 0;
 
     bool ensure(std::size_t byteSize, void* buffer);
