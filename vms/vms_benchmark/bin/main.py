@@ -43,14 +43,14 @@ if osp.isfile(osp.join(project_root, ".not_installed")):
     sys.path.insert(0, osp.join(project_root, "lib"))
 
 from vms_benchmark.config import ConfigParser
-from vms_benchmark.device_connection import DeviceConnection
-from vms_benchmark.device_platform import DevicePlatform
+from vms_benchmark.box_connection import BoxConnection
+from vms_benchmark.box_platform import BoxPlatform
 from vms_benchmark.vms_scanner import VmsScanner
 from vms_benchmark.server_api import ServerApi
 from vms_benchmark import test_camera_runner
 from vms_benchmark import stream_reader_runner
 from vms_benchmark.linux_distibution import LinuxDistributionDetector
-from vms_benchmark import device_tests
+from vms_benchmark import box_tests
 from vms_benchmark import host_tests
 from vms_benchmark import exceptions
 
@@ -68,14 +68,14 @@ def to_percentage(share_0_1):
 
 def load_configs(config_file, sys_config_file):
     option_descriptions = {
-        "deviceHost": {
+        "boxHostnameOrIp": {
             "type": 'string',
         },
-        "deviceLogin": {
+        "boxLogin": {
             "optional": True,
             "type": 'string',
         },
-        "devicePassword": {
+        "boxPassword": {
             "optional": True,
             "type": 'string',
         },
@@ -189,20 +189,20 @@ def log_exception(context_name, exception):
     logging.exception(f'Exception: {context_name}: {type(exception)}: {str(exception)}')
 
 
-def device_combined_cpu_usage(device):
+def box_combined_cpu_usage(box):
     cpu_usage_file = '/proc/loadavg'
-    cpu_usage_reply = device.eval(f'cat {cpu_usage_file}')
+    cpu_usage_reply = box.eval(f'cat {cpu_usage_file}')
     cpu_usage_reply_list = cpu_usage_reply.split() if cpu_usage_reply else None
 
     if not cpu_usage_reply_list or len(cpu_usage_reply_list) < 1:
         # TODO: Properly log an arbitrary string in cpu_usage_reply.
-        raise exceptions.DeviceFileContentError(cpu_usage_file)
+        raise exceptions.BoxFileContentError(cpu_usage_file)
 
     try:
         # Get CPU usage average during the last minute.
         result = float(cpu_usage_reply_list[0])
     except ValueError:
-        raise exceptions.DeviceFileContentError(cpu_usage_file)
+        raise exceptions.BoxFileContentError(cpu_usage_file)
 
     return result
 
@@ -257,7 +257,7 @@ def main(config_file, sys_config_file):
         for k, v in sys_config.ORIGINAL_OPTIONS.items():
             print(f"    {k}={v}")
 
-    password = config.get('devicePassword', None)
+    password = config.get('boxPassword', None)
 
     if password and platform.system() == 'Linux':
         res = host_tests.SshPassInstalled().call()
@@ -269,14 +269,14 @@ def main(config_file, sys_config_file):
                 f"Details for the error: {res.formatted_message()}"
             )
 
-    device = DeviceConnection(
-        host=config['deviceHost'],
-        login=config.get('deviceLogin', None),
+    box = BoxConnection(
+        host=config['boxHostnameOrIp'],
+        login=config.get('boxLogin', None),
         password=password,
         port=config['boxSshPort']
     )
 
-    res = device_tests.SshHostKeyIsKnown(device).call()
+    res = box_tests.SshHostKeyIsKnown(box).call()
 
     if not res.success:
         raise exceptions.SshHostKeyObtainingFailed(
@@ -284,11 +284,11 @@ def main(config_file, sys_config_file):
             (f"\n    Details: {res.formatted_message()}" if res.formatted_message() else "")
         )
     else:
-        device.host_key = res.details[0]
-        device.obtain_connection_info()
+        box.host_key = res.details[0]
+        box.obtain_connection_info()
 
-    if not device.is_root:
-        res = device_tests.SudoConfigured(device).call()
+    if not box.is_root:
+        res = box_tests.SudoConfigured(box).call()
 
         if not res.success:
             raise exceptions.SshHostKeyObtainingFailed(
@@ -297,30 +297,30 @@ def main(config_file, sys_config_file):
                 f"Details of the error: {res.formatted_message()}"
             )
 
-    print(f"Device IP: {device.ip}")
-    if device.is_root:
+    print(f"Box IP: {box.ip}")
+    if box.is_root:
         print(f"ssh user is root.")
 
-    linux_distribution = LinuxDistributionDetector.detect(device)
+    linux_distribution = LinuxDistributionDetector.detect(box)
 
     print(f"Linux distribution name: {linux_distribution.name}")
     print(f"Linux distribution version: {linux_distribution.version}")
     print(f"Linux kernel version: {'.'.join(str(c) for c in linux_distribution.kernel_version)}")
 
-    dev_platform = DevicePlatform.gather(device, linux_distribution)
+    box_platform = BoxPlatform.gather(box, linux_distribution)
 
-    print(f"Arch: {dev_platform.arch}")
-    print(f"Number of CPUs: {dev_platform.cpu_count}")
-    print(f"CPU features: {', '.join(dev_platform.cpu_features) if len(dev_platform.cpu_features) > 0 else '-'}")
-    print(f"RAM: {to_megabytes(dev_platform.ram_bytes)} MB ({to_megabytes(dev_platform.ram_free_bytes())} MB free)")
+    print(f"Arch: {box_platform.arch}")
+    print(f"Number of CPUs: {box_platform.cpu_count}")
+    print(f"CPU features: {', '.join(box_platform.cpu_features) if len(box_platform.cpu_features) > 0 else '-'}")
+    print(f"RAM: {to_megabytes(box_platform.ram_bytes)} MB ({to_megabytes(box_platform.ram_free_bytes())} MB free)")
     print("Volumes:")
     [
         print(f"    {storage['fs']} on {storage['point']}: free {storage['space_free']} of {storage['space_total']}")
         for (point, storage) in
-        dev_platform.storages_list.items()
+        box_platform.storages_list.items()
     ]
 
-    vmses = VmsScanner.scan(device, linux_distribution)
+    vmses = VmsScanner.scan(box, linux_distribution)
 
     if vmses and len(vmses) > 0:
         print(f"Detected VMS installation(s):")
@@ -332,12 +332,12 @@ def main(config_file, sys_config_file):
         return 0
 
     if len(vmses) > 1:
-        raise exceptions.DeviceStateError("More than one customizations found.")
+        raise exceptions.BoxStateError("More than one customizations found.")
 
     vms = vmses[0]
 
     if not vms.is_up():
-        raise exceptions.DeviceStateError("VMS is not running currently.")
+        raise exceptions.BoxStateError("VMS is not running currently.")
 
     print('Restarting Server...')
     vms.restart(exc=True)
@@ -348,7 +348,7 @@ def main(config_file, sys_config_file):
         while True:
             global vmses
 
-            vmses = VmsScanner.scan(device, linux_distribution)
+            vmses = VmsScanner.scan(box, linux_distribution)
 
             if vmses and len(vmses) > 0 and vmses[0].is_up():
                 break
@@ -366,13 +366,13 @@ def main(config_file, sys_config_file):
         raise exceptions.ServerError("Unable to restart Server: Server was not upped.")
 
     vms = vmses[0]
-    ram_free_bytes = dev_platform.ram_available_bytes()
+    ram_free_bytes = box_platform.ram_available_bytes()
     if ram_free_bytes is None:
-        ram_free_bytes = dev_platform.ram_free_bytes()
+        ram_free_bytes = box_platform.ram_free_bytes()
     print('Server restarted successfully.')
-    print(f"RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(dev_platform.ram_bytes)} MB")
+    print(f"RAM free: {to_megabytes(ram_free_bytes)} MB of {to_megabytes(box_platform.ram_bytes)} MB")
 
-    api = ServerApi(device.ip, vms.port, user=config['vmsUser'], password=config['vmsPassword'])
+    api = ServerApi(box.ip, vms.port, user=config['vmsUser'], password=config['vmsPassword'])
 
     def wait_for_api(timeout=60):
         started_at = time.time()
@@ -405,7 +405,7 @@ def main(config_file, sys_config_file):
         raise exceptions.ServerApiError(message="Unable to get VMS storages via REST HTTP", original_exception=e)
 
     if len(storages) == 0:
-        raise exceptions.DeviceStateError("Server has no suitable video archive storage, check the free space")
+        raise exceptions.BoxStateError("Server has no suitable video archive storage, check the free space")
 
     for i in 1, 2, 3:
         cameras = api.get_test_cameras_all()
@@ -433,11 +433,11 @@ def main(config_file, sys_config_file):
     for test_cameras_count in config.get(
             'testCamerasTestSequence', [1, 2, 3, 4, 6, 8, 10, 16, 32, 64, 128]):
 
-        ram_available_bytes = dev_platform.ram_available_bytes()
-        ram_free_bytes = ram_available_bytes if ram_available_bytes else dev_platform.ram_free_bytes()
+        ram_available_bytes = box_platform.ram_available_bytes()
+        ram_free_bytes = ram_available_bytes if ram_available_bytes else box_platform.ram_free_bytes()
 
         if ram_available_bytes and ram_available_bytes < (
-                test_cameras_count * ram_bytes_per_camera_by_arch.get(dev_platform.arch, 200) * 1024 * 1024
+                test_cameras_count * ram_bytes_per_camera_by_arch.get(box_platform.arch, 200) * 1024 * 1024
         ):
             raise exceptions.InsuficientResourcesError(
                 f"Not enough free RAM on the box for {test_cameras_count} cameras.")
@@ -446,7 +446,7 @@ def main(config_file, sys_config_file):
         print("")
 
         test_camera_context_manager = test_camera_runner.test_camera_running(
-            local_ip=device.local_ip,
+            local_ip=box.local_ip,
             count=test_cameras_count,
             primary_fps=sys_config['testStreamFpsHigh'],
             secondary_fps=sys_config['testStreamFpsLow'],
@@ -502,7 +502,7 @@ def main(config_file, sys_config_file):
                 streams_per_camera=config.get('streamsPerTestCamera', len(cameras)),
                 user=config['vmsUser'],
                 password=config['vmsPassword'],
-                device_ip=device.ip,
+                box_ip=box.ip,
                 vms_port=vms.port
             )
             with stream_reader_context_manager as stream_reader_context:
@@ -616,18 +616,18 @@ def main(config_file, sys_config_file):
                 issues = []
 
                 try:
-                    ram_available_bytes = dev_platform.ram_available_bytes()
-                    ram_free_bytes = ram_available_bytes if ram_available_bytes else dev_platform.ram_free_bytes()
+                    ram_available_bytes = box_platform.ram_available_bytes()
+                    ram_free_bytes = ram_available_bytes if ram_available_bytes else box_platform.ram_free_bytes()
                 except exceptions.VmsBenchmarkError as e:
-                    issues.append(exceptions.UnableToFetchDataFromDevice(
+                    issues.append(exceptions.UnableToFetchDataFromBox(
                         'Unable to fetch box RAM usage',
                         original_exception=e
                     ))
 
                 try:
-                    cpu_usage_summarized = device_combined_cpu_usage(device) / dev_platform.cpu_count
+                    cpu_usage_summarized = box_combined_cpu_usage(box) / box_platform.cpu_count
                 except exceptions.VmsBenchmarkError as e:
-                    issues.append(exceptions.UnableToFetchDataFromDevice(
+                    issues.append(exceptions.UnableToFetchDataFromBox(
                         'Unable to fetch box cpu usage',
                         original_exception=e
                     ))

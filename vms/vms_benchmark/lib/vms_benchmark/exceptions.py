@@ -4,21 +4,21 @@ class VmsBenchmarkError(Exception):
         self.original_exception = original_exception
 
 
-class DeviceStateError(VmsBenchmarkError):
+class BoxStateError(VmsBenchmarkError):
     pass
 
 
-class DeviceCommandError(VmsBenchmarkError):
+class BoxCommandError(VmsBenchmarkError):
     pass
 
 
-class UnableToFetchDataFromDevice(VmsBenchmarkError):
+class UnableToFetchDataFromBox(VmsBenchmarkError):
     pass
 
 
-class DeviceFileContentError(VmsBenchmarkError):
+class BoxFileContentError(VmsBenchmarkError):
     def __init__(self, path):
-        super(DeviceFileContentError, self).__init__(f"File '{path}' has unexpected content")
+        super(BoxFileContentError, self).__init__(f"File '{path}' has unexpected content")
 
 
 class ServerError(VmsBenchmarkError):
@@ -65,7 +65,7 @@ class HostPrerequisiteFailed(VmsBenchmarkError):
     pass
 
 
-class DevicePrerequisiteFailed(VmsBenchmarkError):
+class BoxPrerequisiteFailed(VmsBenchmarkError):
     pass
 
 

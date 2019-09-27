@@ -11,7 +11,7 @@ debug = False
 
 
 @contextmanager
-def stream_reader_running(camera_ids, streams_per_camera, user, password, device_ip, vms_port):
+def stream_reader_running(camera_ids, streams_per_camera, user, password, box_ip, vms_port):
     camera_ids = list(camera_ids)
 
     args = [
@@ -26,7 +26,7 @@ def stream_reader_running(camera_ids, streams_per_camera, user, password, device
     ]
 
     for stream_url in (
-        f"rtsp://{device_ip}:{vms_port}/{camera_id}"
+        f"rtsp://{box_ip}:{vms_port}/{camera_id}"
         for camera_id in camera_ids
     ):
         args.append('--url')

@@ -2,7 +2,7 @@ from functools import reduce
 from vms_benchmark.utils import human_readable_size
 
 
-class DevicePlatform:
+class BoxPlatform:
     def __init__(self, device, linux_distribution, ram_bytes, arch, cpu_count, cpu_features, storages_list):
         self.device = device
         self.ram_bytes = ram_bytes
@@ -156,7 +156,7 @@ class DevicePlatform:
             df_data.split('\n')[1:]
         ]
 
-        return DevicePlatform(
+        return BoxPlatform(
             device=device,
             ram_bytes=ram_bytes,
             arch=arch,

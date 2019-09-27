@@ -1,5 +1,5 @@
 from io import StringIO
-from vms_benchmark.device_tests import DeviceTestResult
+from vms_benchmark.box_tests import BoxTestResult
 
 
 class SudoConfigured:
@@ -20,9 +20,9 @@ class SudoConfigured:
             print(f'`{res.command}`: "{obtained_test_message}"', file=sys.stderr)
 
         if not res or res.return_code != 0 or obtained_test_message != test_message:
-            return DeviceTestResult(
+            return BoxTestResult(
                 success=False,
                 message=f"Command `{res.command}` failed: {str(error_message.getvalue().strip())}"
             )
 
-        return DeviceTestResult(success=True)
+        return BoxTestResult(success=True)
