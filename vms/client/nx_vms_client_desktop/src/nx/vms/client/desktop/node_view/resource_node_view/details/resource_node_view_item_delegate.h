@@ -5,15 +5,18 @@
 
 #include <QtCore/QScopedPointer>
 
-struct QnResourceItemColors;
+#include <ui/customization/customized.h>
+#include <client/client_color_types.h>
 
 namespace nx::vms::client::desktop {
 namespace node_view {
 
-class ResourceNodeViewItemDelegate: public NodeViewItemDelegate
+class ResourceNodeViewItemDelegate: public Customized<NodeViewItemDelegate>
 {
     Q_OBJECT
-    using base_type = NodeViewItemDelegate;
+    using base_type = Customized<NodeViewItemDelegate>;
+
+    Q_PROPERTY(QnResourceItemColors colors READ colors WRITE setColors)
 
 public:
     ResourceNodeViewItemDelegate(

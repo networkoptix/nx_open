@@ -319,6 +319,17 @@
         }
     },
 
+    "nx::vms::client::desktop::node_view::ResourceNodeViewItemDelegate": {
+        "colors": {
+            "mainText":          "light10",
+            "mainTextSelected":  "light4",
+            "mainTextAccented":  "brand_core",
+            "extraText":         "dark17",
+            "extraTextSelected": "light10",
+            "extraTextAccented": "brand_d3"
+        }
+    },
+
     "QnRecordingStatsItemDelegate": {
         "colors": {
             "chartBackground": "brand_core.setAlpha(40)",
