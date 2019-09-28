@@ -40,7 +40,7 @@ private:
     qint64 getDelta(Metrics key, qint64 value);
     void at_syncTimeChanged(qint64 syncTime);
 private:
-    std::atomic<qint64> m_counters[(int)Metrics::count];
+    std::vector<std::atomic<qint64>> m_counters;
     int m_timeChangeEvents = 0;
 };
 

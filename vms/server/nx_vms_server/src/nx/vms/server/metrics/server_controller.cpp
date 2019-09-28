@@ -34,7 +34,8 @@ QString dateTimeToString(const QDateTime& datetime)
 
 ServerController::ServerController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
-    utils::metrics::ResourceControllerImpl<QnMediaServerResource*>("servers", makeProviders())
+    utils::metrics::ResourceControllerImpl<QnMediaServerResource*>("servers", makeProviders()),
+    m_counters((int) Metrics::count)
 {
     Qn::directConnect(
         serverModule->commonModule()->messageProcessor(),
