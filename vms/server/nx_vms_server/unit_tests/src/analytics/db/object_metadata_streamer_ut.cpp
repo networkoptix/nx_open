@@ -168,6 +168,10 @@ public:
     }
 
     virtual bool initialized() const override { return true; }
+    virtual std::optional<nx::sql::QueryStatistics> statistics() const override
+    {
+        return std::optional<nx::sql::QueryStatistics>();
+    }
 
 private:
     nx::utils::SyncQueue<Cursor*>* m_createdCursors;

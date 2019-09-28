@@ -97,6 +97,9 @@ public:
      */
     virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) = 0;
 
+    /**
+     * @return statistics data (transactions/s e.t.c).
+     */
     virtual std::optional<nx::sql::QueryStatistics> statistics() const = 0;
 };
 
