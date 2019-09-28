@@ -249,63 +249,65 @@
             }
         },
         "availability": {
-            "status": {
-                "display": "table|panel",
-                "alarms": [
-                    {
-                        "level": "warning",
-                        "condition": "equal %status Unauthorized",
-                        "text": "Status is %status"
-                    },
-                    {
-                        "level": "error",
-                        "condition": "equal %status Offline",
-                        "text": "Status is %status"
-                    }
-                ]
-            },
-            "offlineEvents": {
-                "name": "Camera Offline events (24h)",
-                "display": "table|panel",
-                "calculate": "countValues %status 24h Offline",
-                "alarms": [
-                    {
-                        "level": "warning",
-                        "condition": "greaterThen %offlineEvents 1",
-                        "text": "went Offline %offlineEvents times in last 24 hours"
-                    }
-                ]
-            },
-            "streamIssues1h": {
-                "name": "Stream issues (1h)",
-                "display": "table|panel",
-                "calculate": "sum %streamIssues 1h",
-                "insert": "streamIssues",
-                "alarms": [
-                    {
-                        "level": "warning",
-                        "condition": "greaterThen %streamIssues1h 0",
-                        "text": "has stream issues %streamIssues1h times in last hour"
-                    },
-                    {
-                        "level": "error",
-                        "condition": "greaterThen %streamIssues1h 5",
-                        "text": "has stream issues %streamIssues1h times in last hour"
-                    }
-                ]
-            },
-            "ipConflicts3min": {
-                "name": "IP conflicts (3min)",
-                "display": "panel",
-                "calculate": "sum %ipConflicts 3m",
-                "insert": "ipConflicts",
-                "alarms": [
-                    {
-                        "level": "error",
-                        "condition": "greaterThen %ipConflicts3min 0",
-                        "text": "has IP conflicts %ipConflicts3min times in last 3 minute"
-                    }
-                ]
+            "values": {
+                "status": {
+                    "display": "table|panel",
+                    "alarms": [
+                        {
+                            "level": "warning",
+                            "condition": "equal %status Unauthorized",
+                            "text": "Status is %status"
+                        },
+                        {
+                            "level": "error",
+                            "condition": "equal %status Offline",
+                            "text": "Status is %status"
+                        }
+                    ]
+                },
+                "offlineEvents": {
+                    "name": "Camera Offline events (24h)",
+                    "display": "table|panel",
+                    "calculate": "countValues %status 24h Offline",
+                    "alarms": [
+                        {
+                            "level": "warning",
+                            "condition": "greaterThen %offlineEvents 1",
+                            "text": "went Offline %offlineEvents times in last 24 hours"
+                        }
+                    ]
+                },
+                "streamIssues1h": {
+                    "name": "Stream issues (1h)",
+                    "display": "table|panel",
+                    "calculate": "sum %streamIssues 1h",
+                    "insert": "streamIssues",
+                    "alarms": [
+                        {
+                            "level": "warning",
+                            "condition": "greaterThen %streamIssues1h 0",
+                            "text": "has stream issues %streamIssues1h times in last hour"
+                        },
+                        {
+                            "level": "error",
+                            "condition": "greaterThen %streamIssues1h 5",
+                            "text": "has stream issues %streamIssues1h times in last hour"
+                        }
+                    ]
+                },
+                "ipConflicts3min": {
+                    "name": "IP conflicts (3min)",
+                    "display": "panel",
+                    "calculate": "sum %ipConflicts 3m",
+                    "insert": "ipConflicts",
+                    "alarms": [
+                        {
+                            "level": "error",
+                            "condition": "greaterThen %ipConflicts3min 0",
+                            "text": "has IP conflicts %ipConflicts3min times in last 3 minute"
+                        }
+                    ]
+                }
             }
         },
         "primaryStream": {
