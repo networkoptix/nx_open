@@ -9,6 +9,7 @@
 #include "abstract_cursor.h"
 #include "analytics_db_settings.h"
 #include "analytics_db_types.h"
+#include <nx/sql/db_statistics_collector.h>
 
 namespace nx::analytics::db {
 
@@ -95,6 +96,8 @@ public:
      * Select minumal timestamp of the data in the database.
      */
     virtual bool readMinimumEventTimestamp(std::chrono::milliseconds* outResult) = 0;
+
+    virtual std::optional<nx::sql::QueryStatistics> statistics() const = 0;
 };
 
 } // namespace nx::analytics::db

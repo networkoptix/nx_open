@@ -30,9 +30,8 @@ public:
     qint64 getAndResetMetric(std::atomic<qint64> Metrics::* parameter);
 
     void atStorageFailure() { m_metrics->issues++; }
-
-protected:
     QnMediaServerModule* serverModule() const { return m_serverModule; }
+protected:
     QIODevice* wrapIoDevice(std::unique_ptr<QIODevice> ioDevice);
 private:
     QnMediaServerModule* m_serverModule = nullptr;

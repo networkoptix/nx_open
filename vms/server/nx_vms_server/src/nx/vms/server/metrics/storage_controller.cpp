@@ -5,8 +5,12 @@
 #include <media_server/media_server_module.h>
 
 #include "helpers.h"
+#include <core/resource/media_server_resource.h>
+#include <nx/vms/server/analytics/db/analytics_db.h>
 
 namespace nx::vms::server::metrics {
+
+using namespace std::chrono;
 
 StorageController::StorageController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
@@ -98,6 +102,21 @@ utils::metrics::ValueGroupProviders<StorageController::Resource> StorageControll
                         return ioRate(r, &StorageResource::Metrics::bytesWritten);
                     },
                     nx::vms::server::metrics::timerWatch<QnStorageResource*>(kIoRateUpdateInterval)
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "transactionsPerSecond",
+                [](const auto& r)
+                {
+                    QnMediaServerResourcePtr ownMediaServer = r->commonModule()->resourcePool()
+                        ->getResourceById<QnMediaServerResource>(r->commonModule()->moduleGUID());
+                    if (!ownMediaServer || ownMediaServer->metadataStorageId() != r->getId())
+                        return Value();
+                    auto statistics = r->serverModule()->analyticsEventsStorage()->statistics();
+                    if (!statistics)
+                        return Value();
+                    return Value(statistics->requestsSucceeded
+                        / (double) duration_cast<seconds>(statistics->statisticalPeriod).count());
+                }
             )
         ),
         std::make_unique<utils::metrics::ValueGroupProvider<Resource>>(

@@ -428,6 +428,11 @@
                     "unit": "KBps",
                     "calculate": "average %writeRateKBps 1m",
                     "insert": "writeRateKBps"
+                },
+               "transactionsPerSecond": {
+                    "name": "Transactions/s",
+                    "display": "panel",
+                    "unit": "Transactions/s"
                 }
             }
         },
