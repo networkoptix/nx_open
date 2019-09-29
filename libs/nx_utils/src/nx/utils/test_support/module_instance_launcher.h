@@ -163,6 +163,7 @@ public:
 
     void removeArgAt(std::size_t pos)
     {
+        free(m_args[pos]);
         m_args.erase(m_args.begin() + pos);
         m_argTypes.erase(m_argTypes.begin() + pos);
     }
