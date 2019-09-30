@@ -25,8 +25,6 @@ public:
 
     const details::NodeViewState& state() const;
 
-    void setHeightToContent(bool value);
-
     virtual void setupHeader();
 
 protected:

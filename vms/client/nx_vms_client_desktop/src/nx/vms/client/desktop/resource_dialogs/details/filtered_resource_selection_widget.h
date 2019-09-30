@@ -30,6 +30,8 @@ public:
     bool detailsVisible() const;
     void setDetailsVisible(bool visible);
 
+    virtual bool eventFilter(QObject* watched, QEvent* event) override;
+
 signals:
     void detailsVisibleChanged();
     void invalidMessageChanged();

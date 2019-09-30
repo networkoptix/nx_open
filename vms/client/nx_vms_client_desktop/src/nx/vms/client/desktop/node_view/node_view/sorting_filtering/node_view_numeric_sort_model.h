@@ -1,6 +1,7 @@
 #pragma once
 
 #include "node_view_base_sort_model.h"
+#include <QtCore/QCollator>
 
 namespace nx::vms::client::desktop {
 namespace node_view {
@@ -15,14 +16,8 @@ public:
     virtual ~NodeViewNumericSortModel() override;
 
 public:
-    enum NumericMode
-    {
-        Lexicographic,
-        Alphanumeric
-    };
-
-    void setNumericMode(NumericMode mode);
-    NumericMode getNumericMode() const;
+    bool numericMode() const;
+    void setNumericMode(bool isNumericMode);
 
 protected:
     virtual bool lessThan(
@@ -30,7 +25,7 @@ protected:
         const QModelIndex& sourceRight) const override;
 
 private:
-    NumericMode m_numericMode = Lexicographic;
+    mutable QCollator m_collator;
 };
 
 } // namespace node_view

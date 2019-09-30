@@ -1,15 +1,12 @@
 #include "node_view_numeric_sort_model.h"
 
-#include <QtCore/QCollator>
-
-#include <nx/utils/log/assert.h>
-
 namespace nx::vms::client::desktop {
 namespace node_view {
 
 NodeViewNumericSortModel::NodeViewNumericSortModel(QObject* parent):
     base_type(parent)
 {
+    m_collator.setNumericMode(true);
 }
 
 NodeViewNumericSortModel::~NodeViewNumericSortModel()
@@ -24,37 +21,24 @@ bool NodeViewNumericSortModel::lessThan(
     auto rightData = sourceRight.data(sortRole());
     if (leftData.type() == QVariant::String && rightData.type() == QVariant::String)
     {
-        QCollator collator;
-        collator.setCaseSensitivity(sortCaseSensitivity());
-        switch (m_numericMode)
-        {
-            case Lexicographic:
-                collator.setNumericMode(false);
-                break;
-            case Alphanumeric:
-                collator.setNumericMode(true);
-                break;
-            default:
-                NX_ASSERT(false);
-                break;
-        }
-        return collator.compare(leftData.value<QString>(), rightData.value<QString>()) < 0;
+        m_collator.setCaseSensitivity(sortCaseSensitivity());
+        return m_collator.compare(leftData.value<QString>(), rightData.value<QString>()) < 0;
     }
     return base_type::lessThan(sourceLeft, sourceRight);
 }
 
-void NodeViewNumericSortModel::setNumericMode(NumericMode mode)
+bool NodeViewNumericSortModel::numericMode() const
 {
-    if (m_numericMode == mode)
-        return;
-
-    m_numericMode = mode;
-    sort(sortColumn(), sortOrder());
+    return m_collator.numericMode();
 }
 
-NodeViewNumericSortModel::NumericMode NodeViewNumericSortModel::getNumericMode() const
+void NodeViewNumericSortModel::setNumericMode(bool isNumericMode)
 {
-    return m_numericMode;
+    if (numericMode() == isNumericMode)
+        return;
+
+    m_collator.setNumericMode(isNumericMode);
+    sort(sortColumn(), sortOrder());
 }
 
 } // namespace node_view

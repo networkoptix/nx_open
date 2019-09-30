@@ -78,9 +78,7 @@ ResourceSelectionNodeView::ResourceSelectionNodeView(QWidget* parent):
 {
     setItemDelegate(&d->itemDelegate);
 
-    auto numericSortProxyModel = new NodeViewNumericSortModel(this);
-    numericSortProxyModel->setNumericMode(NodeViewNumericSortModel::Alphanumeric);
-    setProxyModel(numericSortProxyModel);
+    setProxyModel(new NodeViewNumericSortModel(this));
 
     // We have to emit data changed signals for each checked state change to
     // correct repaint items in resource view.

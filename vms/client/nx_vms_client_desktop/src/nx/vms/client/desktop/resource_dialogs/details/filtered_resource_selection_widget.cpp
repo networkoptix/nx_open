@@ -10,6 +10,8 @@
 #include <nx/vms/client/desktop/resources/search_helper.h>
 #include <core/resource/resource.h>
 
+#include <QtGui/QResizeEvent>
+
 namespace nx::vms::client::desktop {
 
 FilteredResourceSelectionWidget::FilteredResourceSelectionWidget(QWidget* parent):
@@ -17,6 +19,9 @@ FilteredResourceSelectionWidget::FilteredResourceSelectionWidget(QWidget* parent
     ui(new Ui::FilteredResourceSelectionWidget())
 {
     ui->setupUi(this);
+    ui->resourcesTree->setUniformRowHeights(true);
+    ui->resourcesTree->setSizeAdjustPolicy(node_view::NodeView::AdjustToContents);
+    ui->scrollArea->installEventFilter(this); //< Adjust to viewport width horizontally.
 
     ui->detailsArea->setVisible(false);
     clearInvalidMessage();
@@ -52,6 +57,7 @@ FilteredResourceSelectionWidget::FilteredResourceSelectionWidget(QWidget* parent
     const auto scrollBar = new SnappedScrollBar(ui->holder);
     scrollBar->setUseItemViewPaddingWhenVisible(true);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
+    ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
 FilteredResourceSelectionWidget::~FilteredResourceSelectionWidget()
@@ -87,6 +93,14 @@ void FilteredResourceSelectionWidget::setDetailsVisible(bool visible)
 {
     if (visible != detailsVisible())
         ui->detailsArea->setVisible(visible);
+}
+
+bool FilteredResourceSelectionWidget::eventFilter(QObject* watched, QEvent* event)
+{
+    // View with AdjustToContents policy may grow horizontally but won't shrink back.
+    if (event->type() == QEvent::Resize && watched == ui->scrollArea)
+        ui->resourcesTree->setMaximumWidth(static_cast<QResizeEvent*>(event)->size().width());
+    return false;
 }
 
 } // namespace nx::vms::client::desktop
