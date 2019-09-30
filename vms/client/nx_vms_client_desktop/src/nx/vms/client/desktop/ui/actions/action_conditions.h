@@ -577,6 +577,12 @@ private:
     MatchMode m_matchMode;
 };
 
+class ReachableServerCondition: public Condition
+{
+public:
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
+};
+
 namespace condition {
 
 /** Visible always. */

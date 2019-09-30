@@ -11,6 +11,12 @@
 namespace nx::vms::client::core {
 namespace helpers {
 
+namespace {
+
+static constexpr int kMaxStoredPreferredCloudServers = 100;
+
+} // namespace
+
 struct Credentials {};
 const utils::log::Tag kCredentialsLogTag(typeid(Credentials));
 
@@ -148,6 +154,37 @@ void forgetSavedCloudCredentials(bool keepUser)
 {
     settings()->cloudCredentials = {keepUser ? settings()->cloudCredentials().user : QString(),
         QString()};
+}
+
+QnUuid preferredCloudServer(const QString& systemId)
+{
+    const auto preferredServers = settings()->preferredCloudServers();
+    const auto iter = std::find_if(preferredServers.cbegin(), preferredServers.cend(),
+        [&systemId](const auto& item) { return item.systemId == systemId; });
+
+    return (iter != preferredServers.cend()) ? iter->serverId : QnUuid();
+}
+
+void savePreferredCloudServer(const QString& systemId, const QnUuid& serverId)
+{
+    auto preferredServers = settings()->preferredCloudServers();
+    const auto iter = std::find_if(preferredServers.begin(), preferredServers.end(),
+        [&systemId](const auto& item) { return item.systemId == systemId; });
+
+    if (iter != preferredServers.end())
+        preferredServers.erase(iter);
+
+    preferredServers.push_back({systemId, serverId});
+
+    while (preferredServers.size() > kMaxStoredPreferredCloudServers)
+        preferredServers.pop_front();
+
+    settings()->preferredCloudServers = preferredServers;
+}
+
+QString serverCloudHost(const QString& systemId, const QnUuid& serverId)
+{
+    return QString("%1.%2").arg(serverId.toSimpleString(), systemId);
 }
 
 } // namespace helpers

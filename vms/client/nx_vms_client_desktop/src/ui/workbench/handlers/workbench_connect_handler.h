@@ -73,6 +73,8 @@ private:
         StoreSession = 0x1,
         StorePassword = 0x2,
         AutoLogin = 0x4,
+        UpdateSystemWeight = 0x8,
+        StorePreferredCloudServer = 0x10
     };
     Q_DECLARE_FLAGS(ConnectionOptions, ConnectionOption)
 
@@ -141,6 +143,7 @@ private:
     void at_connectToCloudSystemAction_triggered();
     void at_reconnectAction_triggered();
     void at_disconnectAction_triggered();
+    void at_selectCurrentServerAction_triggered();
 
     void showPreloader();
 
@@ -152,8 +155,9 @@ private:
     {
         int handle = 0;
         nx::utils::Url url;
+        bool storeConnection = false;
 
-        void reset() { handle = 0; url = nx::utils::Url(); }
+        void reset() { handle = 0; url = nx::utils::Url(); storeConnection = false; }
     } m_connecting;
 
     LogicalState m_logicalState = LogicalState::disconnected;

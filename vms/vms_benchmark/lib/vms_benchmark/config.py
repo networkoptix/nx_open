@@ -69,15 +69,15 @@ class ConfigParser:
                     if 'default' in option_descriptions[name]:
                         self.options[name] = self.options.get(name, option_descriptions[name]['default'])
 
-                    if option_descriptions[name]['type'] == 'integer':
+                    if option_descriptions[name]['type'] == 'integer' and name in self.options:
                         self.options[name] = int(self.options[name])
-                    if option_descriptions[name]['type'] == 'float':
+                    if option_descriptions[name]['type'] == 'float' and name in self.options:
                         self.options[name] = float(self.options[name])
-                    if option_descriptions[name]['type'] == 'boolean':
+                    if option_descriptions[name]['type'] == 'boolean' and name in self.options:
                         self.options[name] = self.options[name] in ('true', 'True', 't', 'yes', 'Yes', '1')
-                    elif option_descriptions[name]['type'] == 'integers' and self.options.get(name, None) is not None:
+                    elif option_descriptions[name]['type'] == 'integers' and name in self.options:
                         self.options[name] = [int(item.strip()) for item in self.options[name].split(',')]
-                    elif option_descriptions[name]['type'] == 'strings' and self.options.get(name, None) is not None:
+                    elif option_descriptions[name]['type'] == 'strings' and name in self.options:
                         self.options[name] = [item.strip() for item in self.options[name].split(',')]
                 except Exception as e:
                     raise ConfigOptionValueError(filepath, name, self.options[name], e)

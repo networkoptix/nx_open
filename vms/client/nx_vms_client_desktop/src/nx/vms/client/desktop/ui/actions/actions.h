@@ -1210,6 +1210,11 @@ enum IDType
      */
     AnalyticsObjectsVisualizationModeAction,
 
+    /**
+     * Connect to chosen server and select it as preferred.
+     */
+    SelectCurrentServerAction,
+
     ActionCount,
 
     NoAction = -1

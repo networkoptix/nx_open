@@ -431,16 +431,13 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
     executeDelayedParented(connectFunction, kMinimalDelay, this);
 }
 
-void QnWorkbenchWelcomeScreen::connectToCloudSystem(
-    const QString& systemId,
-    const QString& serverUrl)
+void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemId)
 {
     if (!isLoggedInToCloud())
         return;
 
-    const bool autoLogin = qnCloudStatusWatcher->stayConnected();
-    connectToSystemInternal(systemId, serverUrl,
-        qnCloudStatusWatcher->credentials(), false, autoLogin);
+    menu()->trigger(action::ConnectToCloudSystemAction,
+        action::Parameters().withArgument(Qn::CloudSystemIdRole, systemId));
 }
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()

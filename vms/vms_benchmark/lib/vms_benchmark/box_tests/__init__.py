@@ -1,4 +1,4 @@
-class DeviceTestResult:
+class BoxTestResult:
     def __init__(self, success, message='', details=()):
         self.success = bool(success)
         self.message = str(message)

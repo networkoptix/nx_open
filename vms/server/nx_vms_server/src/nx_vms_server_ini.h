@@ -15,7 +15,7 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(1, enableMetadataProcessing, "Enables processing data from metadata plugins.");
     NX_INI_FLAG(0, analyzeKeyFramesOnly, "Whether to use only key frames for metadata plugins.");
-    NX_INI_FLAG(0, analyzeSecondaryStream, 
+    NX_INI_FLAG(0, analyzeSecondaryStream,
         "Whether to use secondary stream for Analytics instead of primary.\n"
         "\n"
         "Enabling may reduce the CPU usage on the Server, but may cause the degradation of\n"
@@ -57,6 +57,8 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_INT(60000, autoUpdateInstallationDelayMs,
         "After this delay server will start update installation automatically if detects that\n"
         "it was supposed to install the update.");
+
+    NX_INI_FLAG(0, disableArchiveIntegrityWatcher, "Disables media files integrity check.");
 };
 
 inline Ini& ini()

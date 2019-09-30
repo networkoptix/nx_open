@@ -41,7 +41,7 @@ class VmsScanner:
                         stderr=None,
                         stdout=None
                     )
-            except exceptions.DeviceCommandError as e:
+            except exceptions.BoxCommandError as e:
                 if exc:
                     raise exceptions.ServerError("Unable to restart Server.", original_exception=e)
                 else:

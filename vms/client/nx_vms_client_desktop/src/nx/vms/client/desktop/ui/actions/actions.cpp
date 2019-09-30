@@ -978,6 +978,11 @@ void initialize(Manager* manager, Action* root)
         .autoRepeat(false)
         .condition(new DetachFromVideoWallCondition());
 
+    factory(SelectCurrentServerAction)
+        .flags(Tree | SingleTarget | ResourceTarget)
+        .text(ContextMenu::tr("Connect to this Server"))
+        .condition(new ReachableServerCondition());
+
     factory()
         .flags(Tree | VideoWallReviewScene | SingleTarget | VideoWallItemTarget)
         .separator();

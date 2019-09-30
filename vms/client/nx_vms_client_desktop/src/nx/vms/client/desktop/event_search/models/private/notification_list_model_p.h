@@ -33,8 +33,7 @@ private:
     void addNotification(const vms::event::AbstractActionPtr& action);
     void removeNotification(const vms::event::AbstractActionPtr& action);
 
-    void setupAcknowledgeAction(EventData& eventData,
-        const QnVirtualCameraResourcePtr& camera,
+    void setupAcknowledgeAction(EventData& eventData, const QnUuid& cameraId,
         const nx::vms::event::AbstractActionPtr& action);
 
     QString caption(const nx::vms::event::EventParameters& parameters,

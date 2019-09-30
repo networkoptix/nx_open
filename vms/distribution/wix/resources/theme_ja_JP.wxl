@@ -17,13 +17,13 @@
   <String Id="ClientOnly">クライアントのみ</String>
   <String Id="ClientOnlyDesc">クライアント版はビデオの表示およびシステム管理に使用します。</String>
   <String Id="ServerOnly">サーバーのみ</String>
-  <String Id="ServerOnlyDesc">サーバー版はシステム情報およびアーカイブ記録に使用します。</String>
+  <String Id="ServerOnlyDesc">サーバーアプリケーションは、システム情報とアーカイブを保存するために使用されます。</String>
   <String Id="HelpHeader">セットアップのヘルプ</String>
   <String Id="HelpCloseButton">閉じる</String>
   <String Id="InstallOptionsButton">オプション</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallInstallButton">インストール</String>
   <String Id="InstallCloseButton">閉じる</String>
-  <String Id="InstallAcceptCheckbox">I agree to the</String>
+  <String Id="InstallAcceptCheckbox">同意します</String>
   <String Id="InstallLicenseLinkText">エンドユーザーライセンス契約</String>
   <String Id="OptionsHeader">セットアップオプション</String>
   <String Id="OptionsLocationLabel">インストール場所:</String>
@@ -60,13 +60,13 @@
   <String Id="FilesInUseCancelButton">キャンセル</String>
   <String Id="Options">オプション</String>
   <String Id="SelectApps">インストールするアプリケーションを選択:</String>
-  <String Id="msierrFirewallCannotConnect">Windowsファイアウォールに接続できません ([2]   [3]   [4]   [5])</String>
+  <String Id="msierrFirewallCannotConnect">Windowsファイアウォールに接続できません。 ([2]   [3]   [4]   [5])</String>
   <String Id="WixSchedFirewallExceptionsInstall">Windowsファイアウォールの設定</String>
   <String Id="WixSchedFirewallExceptionsUninstall">Windowsファイアウォールの設定</String>
-  <String Id="WixRollbackFirewallExceptionsInstall">Windows ファイアウォールの構成のロールバック</String>
-  <String Id="WixExecFirewallExceptionsInstall">Windowsファイアウォール構成のインストール</String>
-  <String Id="WixRollbackFirewallExceptionsUninstall">Windows ファイアウォールの構成のロールバック</String>
-  <String Id="WixExecFirewallExceptionsUninstall">Windowsファイアウォール構成のアンインストール</String>
-  <String Id="Product_ArchMismatch_x86">このパッケージは32ビットOS向けに設計されています　セットアップを終了します</String>
-  <String Id="Product_ArchMismatch_x64">このパッケージは64ビットOS向けに設計されています　セットアップを終了します</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">Windowsファイアウォールの設定のロールバック</String>
+  <String Id="WixExecFirewallExceptionsInstall">Windowsファイアウォール設定のインストール</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">Windowsファイアウォールの設定のロールバック</String>
+  <String Id="WixExecFirewallExceptionsUninstall">Windowsファイアウォール設定のアンインストール</String>
+  <String Id="Product_ArchMismatch_x86">このパッケージは32ビットOS向けに設計されています。セットアップを終了します。</String>
+  <String Id="Product_ArchMismatch_x64">このパッケージは64ビットOS向けに設計されています。セットアップを終了します。</String>
 </WixLocalization>
