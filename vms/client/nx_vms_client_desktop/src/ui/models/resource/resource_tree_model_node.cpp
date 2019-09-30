@@ -698,7 +698,8 @@ QModelIndex QnResourceTreeModelNode::createIndex(int row, int col)
          return QModelIndex();
 
     NX_ASSERT(isValid()); /* Only valid nodes have indices. */
-    NX_ASSERT(m_parent != NULL && row == m_parent->m_children.indexOf(toSharedPointer()));
+    NX_ASSERT_HEAVY_CONDITION(
+        m_parent != NULL && row == m_parent->m_children.indexOf(toSharedPointer()));
 
     return m_model->createIndex(row, col, this);
 }
