@@ -112,6 +112,15 @@ public:
 
     ValueGenerator getBinaryOperation() const
     {
+        static auto square =
+            [](QJsonValue value)
+            {
+                const auto params = value.toString().split(L'x');
+                if (params.size() == 2)
+                    return params[0].toInt() * params[1].toInt();
+                return 0;
+            };
+
         if (function() == "+" || function() == "add")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 + v2; });
 
@@ -126,6 +135,9 @@ public:
 
         if (function() == ">" || function() == "greaterThan")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 > v2; });
+
+        if (function() == "resolutionGreaterThan")
+            return binaryOperation(1, 2, [](auto v1, auto v2) { return square(v1) > square(v2); });
 
         if (function() == "<" || function() == "lessThan")
             return numericOperation(1, 2, [](auto v1, auto v2) { return v1 < v2; });

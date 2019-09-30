@@ -157,7 +157,14 @@
                 },
                 "encodingThreads": {
                     "name": "Encoding threads",
-                    "display": "panel"
+                    "display": "panel",
+                    "alarms": [
+                        {
+                            "level": "warning",
+                            "condition": "greaterThan %encodingThreads 2",
+                            "text": "Encoding threads %encodingThreads could cause high server load"
+                        }
+                    ]
                 },
                 "decodingThreads": {
                     "name": "Decoding threads",
@@ -342,7 +349,14 @@
                 "actualBitrateKBps": {
                     "name": "Bitrate",
                     "display": "panel",
-                    "unit": "KBps"
+                    "unit": "KBps",
+                    "alarms": [
+                        {
+                            "level": "error",
+                            "condition": "equal %actualBitrateKBps 0",
+                            "text": "Actual bitrate is 0KBps"
+                        }
+                    ]
                 }
             }
         },
@@ -350,7 +364,14 @@
             "values": {
                 "resolution": {
                     "name": "Resolution",
-                    "display": "table|panel"
+                    "display": "table|panel",
+                    "alarms": [
+                        {
+                            "level": "error",
+                            "condition": "resolutionGreaterThan %resolution 1280x720",
+                            "text": "Resolution '%resolution' is too high"
+                        }
+                    ]
                 },
                 "targetFps": {
                     "display": "Target fps"
@@ -361,7 +382,14 @@
                 "actualBitrateKBps": {
                     "name": "Bitrate",
                     "display": "panel",
-                    "unit": "KBps"
+                    "unit": "KBps",
+                    "alarms": [
+                        {
+                            "level": "error",
+                            "condition": "equal %actualBitrateKBps 0",
+                            "text": "Actual bitrate is 0KBps"
+                        }
+                    ]
                 },
                 "fpsDeltaAvarage": {
                     "name": "Secondary stream fps drops avarage (10m)",
@@ -381,7 +409,20 @@
                     "display": "table|panel",
                     "unit": "KBps"
                 },
-                "minArchiveLengths": {
+                "minArchiveLength": {
+                    "name": "Minimum archive length",
+                    "display": "panel",
+                    "alarms": [{
+                        "level": "error",
+                        "condition": "greaterThan %minArchiveLengthSec %archiveLengthSec",
+                        "text": "Actual archive length '%archiveLength' is less than user defined minumal archive length '%minArchiveLength'"
+                    }]
+                },
+                "archiveLengthSec": {
+                    "name": "Archive length",
+                    "display": "table|panel"
+                },
+                "minArchiveLengthSec": {
                     "name": "Minimum archive length",
                     "display": "panel"
                 }

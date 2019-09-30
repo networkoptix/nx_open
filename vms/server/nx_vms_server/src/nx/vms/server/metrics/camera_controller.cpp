@@ -38,6 +38,8 @@ void CameraController::start()
         {
             if (auto camera = resource.dynamicCast<resource::Camera>().get())
             {
+                if (camera->hasFlags(Qn::desktop_camera))
+                    return; //< Ignore desktop cameras.
                 const auto addOrUpdate =
                     [this, camera]()
                     {
@@ -255,6 +257,25 @@ auto makeAnalyticsGroupProvider()
                 {
                     if (const auto days = r->minDays(); days > 0 && r->isLicenseUsed())
                         return Value(ArchiveDuration::durationToString(hours(days * 24)));
+                    return Value();
+                }
+            ),
+            utils::metrics::makeLocalValueProvider<Resource>(
+                "archiveLengthSec",
+                [](const auto& r)
+                {
+                    const auto value = duration_cast<seconds>(r->nxOccupiedDuration());
+                    if (value.count() > 0)
+                        return Value(value.count());
+                    return Value();
+                }
+            ),
+            utils::metrics::makeSystemValueProvider<Resource>(
+                "minArchiveLengthSec",
+                [](const auto& r)
+                {
+                    if (const auto days = r->minDays(); days > 0 && r->isLicenseUsed())
+                        return Value(duration_cast<seconds>((hours(days * 24))).count());
                     return Value();
                 }
             ),
