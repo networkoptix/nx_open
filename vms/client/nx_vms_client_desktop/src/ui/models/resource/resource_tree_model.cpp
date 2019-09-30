@@ -212,6 +212,13 @@ QnResourceTreeModel::QnResourceTreeModel(
     connect(qnClientModule->wearableManager(), &WearableManager::stateChanged, this,
         &QnResourceTreeModel::at_wearableManager_stateChanged);
 
+    connect(resourceAccessProvider(), &QnResourceAccessProvider::accessChanged, this,
+        [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
+        {
+            if (resource->hasFlags(Qn::server) && !accessController()->hasGlobalPermission(GlobalPermission::admin))
+                updateSystemHasManyServers();
+        });
+
     rebuildTree();
 
     /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
@@ -405,7 +412,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
     case NodeType::servers:
         if (m_scope == CamerasScope && isAdmin)
             return QnResourceTreeModelNodePtr();    /*< Be the root node in this scope. */
-        if (m_scope == FullScope && isAdmin && m_systemHasManyServers)
+        if (m_scope == FullScope && m_systemHasManyServers)
             return rootNode;
         return bastardNode;
 
@@ -435,8 +442,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
     case NodeType::userResources:
         if (m_scope == CamerasScope && !isAdmin)
             return QnResourceTreeModelNodePtr(); /*< Be the root node in this scope. */
-        if (m_scope == FullScope && isLoggedIn && !isAdmin)
-            return rootNode;
         return bastardNode;
 
     case NodeType::edge:
@@ -483,9 +488,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
 
     if (node->resourceFlags().testFlag(Qn::server))
     {
-        if (!isAdmin)
-            return bastardNode;
-
         return m_systemHasManyServers || m_scope == CamerasScope
             ? m_rootNodes[NodeType::servers]
             : rootNode;
@@ -547,9 +549,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParentForResourceNode(co
 
     if (QnVirtualCameraResourcePtr camera = node->resource().dynamicCast<QnVirtualCameraResource>())
     {
-        auto parentNode = isAdmin
-            ? ensureResourceNode(parentResource)
-            : bastardNode;
+        auto parentNode = ensureResourceNode(parentResource);
 
         QString groupId = camera->getGroupId();
         if (!groupId.isEmpty())
@@ -1173,6 +1173,8 @@ void QnResourceTreeModel::rebuildTree()
         updateNodeParent(node);
         node->update();
     }
+
+    updateSystemHasManyServers();
 }
 
 void QnResourceTreeModel::handleDrop(
@@ -1253,7 +1255,18 @@ void QnResourceTreeModel::handlePermissionsChanged(const QnResourcePtr& resource
 
 void QnResourceTreeModel::updateSystemHasManyServers()
 {
-    const auto servers = resourcePool()->getAllServers(Qn::AnyStatus);
+    auto servers = resourcePool()->getAllServers(Qn::AnyStatus);
+    const bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
+
+    if (!isAdmin)
+    {
+        servers = servers.filtered(
+            [this](const QnMediaServerResourcePtr& server)
+            {
+                return resourceAccessProvider()->hasAccess(accessController()->user(), server);
+            });
+    }
+
     const bool hasManyServers = servers.size() > 1;
     if (m_systemHasManyServers == hasManyServers)
         return;

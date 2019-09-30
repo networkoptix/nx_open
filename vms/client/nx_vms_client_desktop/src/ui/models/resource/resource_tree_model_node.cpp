@@ -31,6 +31,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <core/resource_access/providers/resource_access_provider.h>
 
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
@@ -518,6 +519,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
 
         case NodeType::currentSystem:
         case NodeType::currentUser:
+        case NodeType::servers:
             return !isLoggedIn;
 
     /* Hide non-readable resources. */
@@ -531,7 +533,6 @@ bool QnResourceTreeModelNode::calculateBastard() const
     }
 
     case NodeType::users:
-    case NodeType::servers:
         return !isAdmin;
 
     case NodeType::userResources:
@@ -586,6 +587,9 @@ bool QnResourceTreeModelNode::calculateBastard() const
         /* Hide local server resource. */
         if (m_flags.testFlag(Qn::local_server))
             return true;
+
+        if (m_flags.testFlag(Qn::server) && isLoggedIn && !isAdmin)
+            return !resourceAccessProvider()->hasAccess(accessController()->user(), m_resource);
 
         // Hide exported camera resources inside of exported layouts. Layout items are displayed instead.
         if (m_flags.testFlag(Qn::exported_media)
