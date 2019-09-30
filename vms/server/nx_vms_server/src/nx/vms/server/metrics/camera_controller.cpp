@@ -14,6 +14,14 @@ using namespace nx::vms::server::resource;
 using namespace std::chrono;
 using namespace nx::vms::text;
 
+using Resource = CameraController::Resource;
+using Value = CameraController::Value;
+
+static const std::chrono::minutes kIssuesRateUpdateInterval(1);
+static const std::chrono::seconds kipConflictsRateUpdateInterval(15);
+static std::chrono::hours kBitratePeriod(24);
+static const std::chrono::seconds kFpsDeltaCheckInterval(5);
+
 CameraController::CameraController(QnMediaServerModule* serverModule):
     ServerModuleAware(serverModule),
     utils::metrics::ResourceControllerImpl<resource::Camera*>("cameras", makeProviders())
@@ -52,50 +60,50 @@ void CameraController::start()
         });
 }
 
-utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController::makeProviders()
+auto makeInfoGroupProvider()
 {
-    static const std::chrono::minutes kIssuesRateUpdateInterval(1);
-    static const std::chrono::seconds kipConflictsRateUpdateInterval(15);
-    static std::chrono::hours kBitratePeriod(24);
-    static const std::chrono::seconds kFpsDeltaCheckInterval(5);
-
-    return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
+    return
         utils::metrics::makeValueGroupProvider<Resource>(
-            "info",
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "name", [](const auto& r) { return Value(r->getName()); }
+        "info",
+        utils::metrics::makeSystemValueProvider<Resource>(
+            "name", [](const auto& r) { return Value(r->getName()); }
             ),
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "server", [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
+        utils::metrics::makeSystemValueProvider<Resource>(
+            "server", [](const auto& r) { return Value(r->getParentId().toSimpleString()); }
             ),
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "type", [](const auto& r) { return Value(QnLexical::serialized(r->deviceType())); }
+        utils::metrics::makeSystemValueProvider<Resource>(
+            "type", [](const auto& r) { return Value(QnLexical::serialized(r->deviceType())); }
             ),
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "ip", [](const auto& r) { return Value(r->getHostAddress()); }
+        utils::metrics::makeSystemValueProvider<Resource>(
+            "ip", [](const auto& r) { return Value(r->getHostAddress()); }
             ),
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "vendor", [](const auto& r) { return Value(r->getVendor()); }
+        utils::metrics::makeSystemValueProvider<Resource>(
+            "vendor", [](const auto& r) { return Value(r->getVendor()); }
             ),
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "model", [](const auto& r) { return Value(r->getModel()); }
+        utils::metrics::makeSystemValueProvider<Resource>(
+            "model", [](const auto& r) { return Value(r->getModel()); }
             ),
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "firmware", [](const auto& r) { return Value(r->getFirmware()); }
+        utils::metrics::makeSystemValueProvider<Resource>(
+            "firmware", [](const auto& r) { return Value(r->getFirmware()); }
             ),
-            utils::metrics::makeSystemValueProvider<Resource>(
-                "recording",
-                [](const auto& r) { return Value(QnLexical::serialized(r->recordingState())); }
+        utils::metrics::makeSystemValueProvider<Resource>(
+            "recording",
+            [](const auto& r) { return Value(QnLexical::serialized(r->recordingState())); }
             )
-        ),
+        );
+}
+
+auto makeAvailabilityGroupProvider()
+{
+    return
         utils::metrics::makeValueGroupProvider<Resource>(
             "availability",
-            utils::metrics::makeSystemValueProvider<Resource>(
+                utils::metrics::makeSystemValueProvider<Resource>(
                 "status",
                 [](const auto& r) { return Value(QnLexical::serialized(r->getStatus())); },
                 qtSignalWatch<Resource>(&resource::Camera::statusChanged)
-            ),
-            utils::metrics::makeLocalValueProvider<Resource>(
+                ),
+                utils::metrics::makeLocalValueProvider<Resource>(
                 "streamIssues",
                 [](const auto& r)
                 {
@@ -111,7 +119,12 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                 },
                 nx::vms::server::metrics::timerWatch<Camera*>(kipConflictsRateUpdateInterval)
             )
-        ),
+        );
+}
+
+auto makePrimaryStreamGroupProvider()
+{
+    return
         utils::metrics::makeValueGroupProvider<Resource>(
             "primaryStream",
             utils::metrics::makeSystemValueProvider<Resource>(
@@ -162,7 +175,12 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                     return Value();
                 }
             )
-        ),
+        );
+}
+
+auto makeSecondaryStreamGroupProvider()
+{
+    return
         utils::metrics::makeValueGroupProvider<Resource>(
             "secondaryStream",
             utils::metrics::makeSystemValueProvider<Resource>(
@@ -213,7 +231,12 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                 },
                 nx::vms::server::metrics::timerWatch<Camera*>(kFpsDeltaCheckInterval)
             )
-        ),
+        );
+}
+
+auto makeAnalyticsGroupProvider()
+{
+    return
         utils::metrics::makeValueGroupProvider<Resource>(
             "analytics",
             utils::metrics::makeLocalValueProvider<Resource>(
@@ -239,7 +262,17 @@ utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController
                 "recordingBitrateKBps",
                 [](const auto& r) { return Value(r->recordingBitrateKBps(kBitratePeriod)); }
             )
-        )
+        );
+}
+
+utils::metrics::ValueGroupProviders<CameraController::Resource> CameraController::makeProviders()
+{
+    return nx::utils::make_container<utils::metrics::ValueGroupProviders<Resource>>(
+        makeInfoGroupProvider(),
+        makeAvailabilityGroupProvider(),
+        makePrimaryStreamGroupProvider(),
+        makeSecondaryStreamGroupProvider(),
+        makeAnalyticsGroupProvider()
     );
 }
 
