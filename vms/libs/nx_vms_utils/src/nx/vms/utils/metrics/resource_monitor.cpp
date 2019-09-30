@@ -52,17 +52,19 @@ std::vector<api::metrics::Alarm> ResourceMonitor::alarms(Scope requestScope) con
 
 void ResourceMonitor::setRules(const api::metrics::ResourceRules& rules)
 {
-    for (const auto& [id, monitor]: m_monitors)
+    const auto skipOnMissing = m_resource->scope == Scope::system;
+    for (const auto& [id, groupRules]: rules)
     {
-        if (const auto it = rules.find(id); it != rules.end())
+        if (const auto& it = m_monitors.find(id); it != m_monitors.end())
         {
-            monitor->setRules(
-                it->second.values,
-                /*skipOnMissingArgument*/ m_resource->scope == Scope::system);
+            it->second->setRules(groupRules.values, skipOnMissing);
+        }
+        else
+        {
+            NX_DEBUG(this, "Skip group %1 in rules", id);
+            NX_ASSERT(skipOnMissing, "%1 unexpected group %2", this, id);
         }
     }
-
-    // TODO: Assert on unprocessed rules?
 }
 
 QString ResourceMonitor::idForToStringFromPtr() const
