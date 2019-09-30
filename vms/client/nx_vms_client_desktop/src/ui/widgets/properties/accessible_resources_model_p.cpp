@@ -84,6 +84,9 @@ QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) co
                     if (accessLevels.contains(nx::core::access::Source::videowall))
                         return qnResIconCache->icon(QnResourceIconCache::VideoWall);
 
+                    if (accessLevels.contains(nx::core::access::Source::childDevice))
+                        return qnResIconCache->icon(QnResourceIconCache::Camera);
+
                     return QVariant();
                 }
 
